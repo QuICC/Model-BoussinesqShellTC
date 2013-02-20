@@ -79,4 +79,4 @@ if(GEOMHDISCC_STORAGEPROFILE)
    set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Storage)
 endif(GEOMHDISCC_STORAGEPROFILE)
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Debug MHDDebugSrcDirs)
+geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDDebugSrcDirs)

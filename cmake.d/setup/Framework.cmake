@@ -103,11 +103,13 @@ endif(groupTest)
 ###################################################
 
 #
-# List of source subdirectories for the Base subframework
+# List of source subdirectories for the Framework part
 #
-set(MHDBaseSrcDirs
+set(MHDFrameworkSrcDirs
    Base
+   Exception
+   Framework
    Timer
 )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDBaseSrcDirs)
+geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDFrameworkSrcDirs)

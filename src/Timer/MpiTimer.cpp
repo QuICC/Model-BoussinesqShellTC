@@ -4,10 +4,10 @@
 
 // Configuration includes
 //
-#include "Base/PrepMacros/FrameworkMacro.h"
 
 // System includes
 //
+#include <mpi.h>
 
 // External includes
 //

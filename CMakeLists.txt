@@ -64,4 +64,6 @@ if(platformTest)
    # TestSuite setup
    #include(cmake.d/setup/testsuite.cmake)
 
+   message(STATUS ${All_Srcs})
+
 endif(platformTest)
