@@ -47,21 +47,21 @@ if(platformTest)
    include(cmake.d/structure/external.cmake)
 
    # Base setup
-   include(cmake.d/setup/Base.cmake)
+   include(cmake.d/setup/Framework.cmake)
 
    # Simulation setup
-   include(cmake.d/setup/Simulation.cmake)
+   #include(cmake.d/setup/Simulation.cmake)
 
    # Debug setup
-   include(cmake.d/setup/Debug.cmake)
+   #include(cmake.d/setup/Debug.cmake)
 
    # Automatic setup
    include(cmake.d/setup/automatic.cmake)
 
    # Executable setup
-   include(cmake.d/setup/executable.cmake)
+   #include(cmake.d/setup/executable.cmake)
 
    # TestSuite setup
-   include(cmake.d/setup/testsuite.cmake)
+   #include(cmake.d/setup/testsuite.cmake)
 
 endif(platformTest)

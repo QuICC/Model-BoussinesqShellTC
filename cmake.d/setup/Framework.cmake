@@ -10,7 +10,7 @@ include(cmake.d/functions.cmake)
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
 message(STATUS "***********************************************")
-message(STATUS "***************** Base setup ******************")
+message(STATUS "*************** Framework setup ***************")
 message(STATUS "***********************************************")
 
 ###################################################
@@ -106,19 +106,8 @@ endif(groupTest)
 # List of source subdirectories for the Base subframework
 #
 set(MHDBaseSrcDirs
-   Enums
-   Framework
-   General
-   Communicators
-   ScalarFields
-   Resolutions
-   IO
-   Quadratures
-   Polynomials
-   Transforms
-   SpatialSchemes
-   SpectralOperators
-   LoadSplitter
+   Base
+   Timer
 )
 
-geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR}/Base MHDBaseSrcDirs)
+geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDBaseSrcDirs)
