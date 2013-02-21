@@ -64,7 +64,7 @@ namespace Debug {
          /**
           * @brief Destructor
           */
-         virtual ~MpiProfiler() {};
+         ~MpiProfiler() {};
 
       private:
          /**

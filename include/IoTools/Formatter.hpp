@@ -61,7 +61,7 @@ namespace IoTools {
          /**
          * @brief Destructor
          */
-         virtual ~Formatter() {};
+         ~Formatter() {};
    };
 
 }

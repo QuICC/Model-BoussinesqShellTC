@@ -64,7 +64,7 @@ namespace Debug {
          /**
           * @brief Destructor
           */
-         virtual ~SerialProfiler() {};
+         ~SerialProfiler() {};
 
       private:
          /**
