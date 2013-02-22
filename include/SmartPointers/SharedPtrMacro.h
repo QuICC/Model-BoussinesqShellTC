@@ -1,9 +1,9 @@
-/** \file SmartPointerMacro.h
- *  \brief Preprocessor macros used to setup the smart pointer implementation depending on CMake setup.
+/** \file SharedPtrMacro.h
+ *  \brief Preprocessor macros used to setup the shared pointer implementation depending on CMake setup.
  */
 
-#ifndef SMARTPOINTERMACRO_H
-#define SMARTPOINTERMACRO_H
+#ifndef SHAREDPTRMACRO_H
+#define SHAREDPTRMACRO_H
 
 // Boost Version
 #ifdef GEOMHDISCC_SMARTPTR_BOOST
@@ -44,4 +44,4 @@
    #define SharedPtrMacro std::shared_ptr
 #endif //GEOMHDISCC_SMARTPTR_CXX0X
 
-#endif // SMARTPOINTERMACRO_H
+#endif // SHAREDPTRMACRO_H

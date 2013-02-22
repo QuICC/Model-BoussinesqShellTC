@@ -7,7 +7,7 @@
 
 // Configuration includes
 //
-#include "PrepMacros/SmartPointerMacro.h"
+#include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
 //
