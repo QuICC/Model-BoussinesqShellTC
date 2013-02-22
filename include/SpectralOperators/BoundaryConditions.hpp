@@ -30,7 +30,15 @@ namespace Spectral {
          /**
           * @brief List of avaible boundary conditions
           */
-         enum Id {VALUE, FIRST_DERIVATIVE, SECOND_DERIVATIVE, BETA_SLOPE}
+         enum Id {
+            /// Boundary value
+            VALUE, 
+            /// First derivative boundary value
+            FIRST_DERIVATIVE,
+            /// First derivative boundary value
+            SECOND_DERIVATIVE,
+            /// Beta complex slope boundary value
+            BETA_SLOPE};
 
          /**
           * @brief Convert boundary condition ids into Tau lines
@@ -38,15 +46,13 @@ namespace Spectral {
           * @param bcOp Spectral boundary operator
           * @param bcId Map of boundary condition IDs
           */
-         static DecoupledZMatrix BoundaryConditions::tauLines(const IBoundary& bcOp, const std::map<BoundaryConditions::Id,IBoundary::Position>& bcId)
+         static DecoupledZMatrix tauLines(const IBoundary& bcOp, const std::map<BoundaryConditions::Id,IBoundary::Position>& bcId);
          
       protected:
 
       private:
          /**
           * @brief Constructor
-          *
-          * @param basisN   Size of the spectral basis
           */
          BoundaryConditions();
 

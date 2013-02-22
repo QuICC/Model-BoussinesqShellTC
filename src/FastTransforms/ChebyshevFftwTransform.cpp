@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Transform {
+
    ChebyshevFftwTransform::ChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
@@ -117,4 +119,5 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }

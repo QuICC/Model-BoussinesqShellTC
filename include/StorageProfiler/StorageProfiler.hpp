@@ -1,5 +1,7 @@
 /** \file StorageProfiler.hpp
  *  \brief Implementation of a storage profiler
+ *
+ *  \mhdTodo Cleanup the StorageProfiler class similarly to the Profiler class
  */
 
 #ifndef STORAGEPROFILER_HPP

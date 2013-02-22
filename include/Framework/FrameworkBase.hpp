@@ -28,6 +28,11 @@ namespace GeoMHDiSCC {
          static const int IO_RANK;
 
          /**
+          * @brief Check if local core is allowed to do IO
+          */
+         static bool allowsIO();
+
+         /**
           * @brief Get the number of CPUs
           */
          static int nCpu();

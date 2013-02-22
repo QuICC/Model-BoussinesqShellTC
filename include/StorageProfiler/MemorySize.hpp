@@ -28,33 +28,61 @@ namespace Debug {
    {
    };
 
+   /**
+    * @brief Template specialization for char
+    */
    template <> struct MemorySize<char>
    {
+      /// Size of datatype in bytes
       static const int BYTES = 1;
    };
 
+
+   /**
+    * @brief Template specialization for int
+    */
    template <> struct MemorySize<int>
    {
+      /// Size of datatype in bytes
       static const int BYTES = 4;
    };
 
+
+   /**
+    * @brief Template specialization for float
+    */
    template <> struct MemorySize<float>
    {
+      /// Size of datatype in bytes
       static const int BYTES = 4;
    };
+
+   /**
+    * @brief Template specialization for double
+    */
 
    template <> struct MemorySize<double>
    {
+      /// Size of datatype in bytes
       static const int BYTES = 8;
    };
+
+   /**
+    * @brief Template specialization for complex<float>
+    */
 
    template <> struct MemorySize<std::complex<float> >
    {
+      /// Size of datatype in bytes
       static const int BYTES = 8;
    };
 
+   /**
+    * @brief Template specialization for complex<double>
+    */
    template <> struct MemorySize<std::complex<double> >
    {
+      /// Size of datatype in bytes
       static const int BYTES = 16;
    };
 

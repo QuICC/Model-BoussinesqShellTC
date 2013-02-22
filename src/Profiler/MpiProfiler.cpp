@@ -50,7 +50,7 @@ namespace Debug {
       ProfilerBase::update(point, t_stops.at(point)-t_starts.at(point));
    }
 
-   void ProfilerBase::analyze(Array& ts, Array& min, Array& max)
+   void MpiProfiler::analyze(Array& ts, Array& min, Array& max)
    {
       ts.resize(ProfilerBase::NBREAKPOINT);
       for(int i = 0; i < ts.size(); ++i)

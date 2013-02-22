@@ -117,5 +117,6 @@ namespace Spectral {
    };
 
 }
+}
 
 #endif // PERIODICOPERATOR_HPP

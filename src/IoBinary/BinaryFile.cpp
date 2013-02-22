@@ -29,7 +29,7 @@ namespace IoBinary {
       return this->mName + this->mExt;
    }
 
-   void BinaryFile::reset(std::string name)
+   void BinaryFile::resetName(std::string name)
    {
       this->mName = name;
    }

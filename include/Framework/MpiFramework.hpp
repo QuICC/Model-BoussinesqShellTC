@@ -34,11 +34,6 @@ namespace GeoMHDiSCC {
          static void setup(const int nCpu);
 
          /**
-          * @brief Check if local core is allowed to do IO
-          */
-         static bool allowsIO();
-
-         /**
           * @brief Synchronize
           */
          static void synchronize();

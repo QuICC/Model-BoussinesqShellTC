@@ -26,8 +26,7 @@ namespace GeoMHDiSCC {
          /**
          * @brief Constructs the exception based on the given strings.
          *
-         * \param location Location where the exception has been thrown 
-         * \param message Error message
+         * \param msg Error message
          */
          Exception(const std::string& msg);
 

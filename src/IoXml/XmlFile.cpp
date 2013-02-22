@@ -29,7 +29,7 @@ namespace IoXml {
       return this->mName + this->mExt;
    }
 
-   void XmlFile::reset(std::string name)
+   void XmlFile::resetName(std::string name)
    {
       this->mName = name;
    }

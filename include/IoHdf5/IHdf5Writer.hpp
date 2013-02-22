@@ -1,5 +1,7 @@
 /** \file IHdf5Writer.hpp
  *  \brief Interface to a general HDF5 writer
+ *
+ *  \mhdTodo Cleanup the dependency on Base/Enums/DimensionSpace.hpp
  */
 
 #ifndef IHDF5WRITER_HPP

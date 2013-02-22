@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Transform {
+
    FftwTransform::FftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
@@ -132,4 +134,5 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }

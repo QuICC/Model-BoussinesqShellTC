@@ -27,7 +27,7 @@ namespace IoHdf5 {
    {
    }
 
-   void Hdf5File::setFilePList()
+   hid_t Hdf5File::filePList()
    {
       // 
       // Default options are fine for serial case
@@ -79,7 +79,7 @@ namespace IoHdf5 {
       return this->mName + this->mExt;
    }
 
-   void Hdf5File::reset(std::string name)
+   void Hdf5File::resetName(std::string name)
    {
       this->mName = name;
    }
@@ -92,11 +92,6 @@ namespace IoHdf5 {
    std::string Hdf5File::extension()
    {
       return this->mExt;
-   }
-
-   std::string Hdf5File::fileTag()
-   {
-      return Hdf5File::FILE_TAG;
    }
 
    std::string Hdf5File::headerTag()

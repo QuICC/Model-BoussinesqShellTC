@@ -131,17 +131,17 @@ namespace IoHdf5 {
          /**
           * @brief Header of file before header information
           */
-         static const std::string FILE_HEADER;
+         static const std::string HEADER_TAG;
 
          /**
           * @brief Header of file before optional information
           */
-         static const std::string FILE_TYPE;
+         static const std::string TYPE_TAG;
 
          /**
           * @brief Header of file before version information
           */
-         static const std::string FILE_VERSION;
+         static const std::string VERSION_TAG;
 
          /**
           * @brief Name of the file without extension

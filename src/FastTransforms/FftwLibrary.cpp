@@ -18,6 +18,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Transform {
+
   // Fastest FFTW plan creation
   #ifdef GEOMHDISCC_FFTPLAN_FAST
      unsigned int FftwLibrary::sPlanFlag = FFTW_ESTIMATE;
@@ -63,4 +65,5 @@ namespace GeoMHDiSCC {
       }
    }
 
+}
 }

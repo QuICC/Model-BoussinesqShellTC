@@ -323,5 +323,6 @@ namespace Transform {
    }
 
 }
+}
 
 #endif // FFTWTRANSFORM_HPP

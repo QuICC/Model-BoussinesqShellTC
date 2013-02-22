@@ -18,6 +18,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Transform {
+
    FftSetup::FftSetup(const int size, const int howmany, const int specSize, const bool isMixed)
       : mFwdSize(size), mBwdSize(0), mHowmany(howmany), mSpecSize(specSize), mIsMixed(isMixed), mScale(-1)
    {
@@ -74,4 +76,5 @@ namespace GeoMHDiSCC {
       return this->mScale;
    }
 
+}
 }

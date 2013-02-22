@@ -45,6 +45,11 @@ namespace Transform {
          ~FftSetup() {};
 
          /**
+          * @brief Does setup define a mixed real/complex transform?
+          */
+         bool isMixed() const;
+
+         /**
           * @brief Set the transform scaling factor
           */
          void setScale(const MHDFloat scale);
@@ -77,7 +82,7 @@ namespace Transform {
          /**
           * @brief Get scaling factor
           */
-         MHDFloat scalingFactor() const;
+         MHDFloat scale() const;
          
       protected:
 

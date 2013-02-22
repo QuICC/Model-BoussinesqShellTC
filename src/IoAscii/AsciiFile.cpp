@@ -29,7 +29,7 @@ namespace IoAscii {
       return this->mName + this->mExt;
    }
 
-   void AsciiFile::reset(std::string name)
+   void AsciiFile::resetName(std::string name)
    {
       this->mName = name;
    }

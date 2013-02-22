@@ -42,9 +42,9 @@ namespace Spectral {
       assert(bcOp.basisN() >= nBCs);
 
       // Initialise tau lines matrix
-      DecoupledZMatrix tauLines(std::make_pair(Matrix(bcOp.basisN(), nBCs),Matrix(bcOp.basisN(), nBCs)));
-      tauLines.first.setZero();
-      tauLines.second.setZero();
+      DecoupledZMatrix lines(std::make_pair(Matrix(bcOp.basisN(), nBCs),Matrix(bcOp.basisN(), nBCs)));
+      lines.first.setZero();
+      lines.second.setZero();
 
       // Map iterator
       std::map<BoundaryConditions::Id,BoundaryConditions::Position>::const_iterator mapIt;
@@ -56,27 +56,27 @@ namespace Spectral {
          switch(mapIt->first)
          {
             case BoundaryConditions::VALUE:
-               tauLines.first.col(idx) = bcOp.value(mapIt->second);
+               lines.first.col(idx) = bcOp.value(mapIt->second);
                idx++;
                hasReal = true;
                break;
             case BoundaryConditions::FIRST_DERIVATIVE:
-               tauLines.first.col(idx) = bcOp.firstDerivative(mapIt->second);
+               lines.first.col(idx) = bcOp.firstDerivative(mapIt->second);
                idx++;
                hasReal = true;
                break;
             case BoundaryConditions::SECOND_DERIVATIVE:
-               tauLines.first.col(idx) = bcOp.secondDerivative(mapIt->second);
+               lines.first.col(idx) = bcOp.secondDerivative(mapIt->second);
                idx++;
                hasReal = true;
                break;
             case BoundaryConditions::BETA_SLOPE:
-               tauLines.second.col(idx) = static_cast<MHDFloat>(-k)*bcOp.value(mapIt->second);
+               lines.second.col(idx) = static_cast<MHDFloat>(-k)*bcOp.value(mapIt->second);
                idx++;
                hasImag = true;
                break;
             default:
-               throw Exception("Unknown boundary condition for Chebyshev tau method");
+               throw Exception("Unknown boundary condition ID for tau method");
                break;
          }
       }
@@ -84,16 +84,16 @@ namespace Spectral {
       // Clear real matrix if not conditions have been set
       if(!hasReal)
       {
-         tauLines.first.resize(0,0);
+         lines.first.resize(0,0);
       }
 
       // Clear imaginary matrix if not conditions have been set
       if(!hasImag)
       {
-         tauLines.second.resize(0,0);
+         lines.second.resize(0,0);
       }
 
-      return tauLines;
+      return lines;
    }
 
 }
