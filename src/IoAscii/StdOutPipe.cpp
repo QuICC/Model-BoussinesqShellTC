@@ -35,6 +35,10 @@ namespace IoAscii {
    {
    }
 
+   StdOutPipe::~StdOutPipe()
+   {
+   }
+
    void StdOutPipe::init()
    {
       // Initialise parent

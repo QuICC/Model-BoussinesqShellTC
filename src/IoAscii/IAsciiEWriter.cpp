@@ -28,6 +28,10 @@ namespace IoAscii {
    {
    }
 
+   IAsciiEWriter::~IAsciiEWriter()
+   {
+   }
+
    void IAsciiEWriter::init()
    {
       // Check if the workflow allows IO to be performed

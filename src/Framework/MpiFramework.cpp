@@ -66,8 +66,4 @@ namespace GeoMHDiSCC {
       MPI_Finalize();
    }
 
-   MpiFramework::MpiFramework()
-   {
-   }
-
 }

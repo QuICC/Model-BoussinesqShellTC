@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~FrameworkBase() {};
+         virtual ~FrameworkBase();
 
       private:
    };

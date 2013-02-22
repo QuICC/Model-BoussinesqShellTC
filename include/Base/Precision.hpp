@@ -119,12 +119,12 @@ namespace GeoMHDiSCC {
          /**
          * @brief Empty constructor
          */
-         Precision() {};
+         Precision();
 
          /**
          * @brief Simple empty destructor
          */
-         ~Precision() {};
+         ~Precision();
    };
 
    inline void Precision::init()

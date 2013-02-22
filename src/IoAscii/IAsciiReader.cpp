@@ -29,6 +29,10 @@ namespace IoAscii {
    {
    }
 
+   IAsciiReader::~IAsciiReader()
+   {
+   }
+
    void IAsciiReader::init()
    {
       // Check if the workflow allows IO to be performed

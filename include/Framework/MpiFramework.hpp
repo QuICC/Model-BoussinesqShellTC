@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         ~MpiFramework() {};
+         ~MpiFramework();
    };
 
 }

@@ -24,6 +24,10 @@ namespace IoXml {
    {
    }
 
+   XmlFile::~XmlFile()
+   {
+   }
+
    std::string XmlFile::filename() const
    {
       return this->mName + this->mExt;

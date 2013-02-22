@@ -54,4 +54,8 @@ namespace GeoMHDiSCC {
    FrameworkBase::FrameworkBase()
    {
    }
+
+   FrameworkBase::~FrameworkBase()
+   {
+   }
 }

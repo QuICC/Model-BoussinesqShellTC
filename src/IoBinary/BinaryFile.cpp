@@ -24,6 +24,10 @@ namespace IoBinary {
    {
    }
 
+   BinaryFile::~BinaryFile()
+   {
+   }
+
    std::string BinaryFile::filename() const
    {
       return this->mName + this->mExt;

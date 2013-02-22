@@ -24,6 +24,10 @@ namespace IoAscii {
    {
    }
 
+   AsciiFile::~AsciiFile()
+   {
+   }
+
    std::string AsciiFile::filename() const
    {
       return this->mName + this->mExt;

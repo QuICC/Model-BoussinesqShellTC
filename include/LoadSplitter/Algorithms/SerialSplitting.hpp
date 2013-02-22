@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~SerialSplitting() {};
+         virtual ~SerialSplitting();
 
          /**
           * @brief Check if factorisation is applicable to scheme

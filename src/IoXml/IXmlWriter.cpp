@@ -30,6 +30,10 @@ namespace IoXml {
    {
    }
 
+   IXmlWriter::~IXmlWriter()
+   {
+   }
+
    void IXmlWriter::init()
    {
       // Node variables

@@ -21,4 +21,8 @@ namespace GeoMHDiSCC {
    {
    }
 
+   ITimer::~ITimer()
+   {
+   }
+
 }

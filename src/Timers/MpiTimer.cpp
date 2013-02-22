@@ -31,6 +31,10 @@ namespace GeoMHDiSCC {
       }
    }
 
+   MpiTimer::~MpiTimer()
+   {
+   }
+
    void MpiTimer::start()
    {
       // Get starting MPI time

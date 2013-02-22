@@ -26,6 +26,10 @@ namespace GeoMHDiSCC {
       }
    }
 
+   SerialTimer::~SerialTimer()
+   {
+   }
+
    void SerialTimer::start()
    {
       // Get the starting timespec

@@ -29,6 +29,10 @@ namespace IoAscii {
    {
    }
 
+   IAsciiWriter::~IAsciiWriter()
+   {
+   }
+
    void IAsciiWriter::open()
    {
       // Check if the workflow allows IO to be performed

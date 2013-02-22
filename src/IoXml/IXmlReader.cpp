@@ -29,6 +29,10 @@ namespace IoXml {
    {
    }
 
+   IXmlReader::~IXmlReader()
+   {
+   }
+
    void IXmlReader::init()
    {
       // Check if the framework allows IO to be performed
