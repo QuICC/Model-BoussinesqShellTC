@@ -16,7 +16,6 @@
 //
 #include "Base/General/Typedefs.hpp"
 #include "SpectralOperators/IOperatorBase.hpp"
-#include "Simulation/Enums/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,11 +30,9 @@ namespace Spectral {
          /**
           * @brief Constructor
           *
-          * @param idx     Index of assigned parameter
-          * @param polyN   Size of the polynomial basis
-          * @param specIdx Spectral indexes
+          * @param basisN   Size of the spectral basis
           */
-         ChebyshevOperator(const int idx, const int polyN, const ArrayI& specIdx);
+         ChebyshevOperator(const int basisN);
 
          /**
           * @brief Empty Destructor
@@ -57,14 +54,6 @@ namespace Spectral {
           * @param q    Order of the derivative
           */
          SparseMatrix qDiff(const int p, const int q);
-
-         /**
-          * @brief Convert tau lines to complete sparse matrix
-          *
-          * @param bcId    List of BC to implement
-          * @param atTop   Set tau lines at top? (default: true)
-          */
-         DecoupledZSparse tau(const std::map<BoundaryConditions::Id,BoundaryConditions::Position>& bcId, const bool atTop = true);
          
       protected:
 
@@ -74,7 +63,7 @@ namespace Spectral {
           *
           * @param n Order of polynial
           */
-         EPMFloat c(const int n) const;
+         MHDFloat c(const int n) const;
 
          /**
           * @brief Build the derivative matrix

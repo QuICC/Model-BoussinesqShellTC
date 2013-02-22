@@ -15,14 +15,13 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   ChebyshevOperator::ChebyshevOperator(const int polyN)
-      : IOperator(polyN)
+   ChebyshevOperator::ChebyshevOperator(const int basisN)
+      : IOperator(basisN)
    {
    }
 
@@ -36,7 +35,7 @@ namespace Spectral {
       assert(p > 0);
 
       // Create temporary object
-      SparseMatrix diffMat(this->polyN(), this->polyN());
+      SparseMatrix diffMat(this->basisN(), this->basisN());
 
       // Build the derivative
       this->buildDerivative(diffMat);
@@ -68,7 +67,7 @@ namespace Spectral {
       int pq = p - q;
 
       // Create temporary object
-      SparseMatrix tmp(this->polyN() + pq, this->polyN() + pq);
+      SparseMatrix tmp(this->basisN() + pq, this->basisN() + pq);
 
       // Build the inverse
       this->buildInverse(tmp);
@@ -81,10 +80,10 @@ namespace Spectral {
       }
 
       // Create storage for the inverse
-      SparseMatrix invMat(this->polyN(), this->polyN());
+      SparseMatrix invMat(this->basisN(), this->basisN());
 
       // Create left preudo identity to extract rows
-      SparseMatrix idL(this->polyN(), this->polyN() + pq);
+      SparseMatrix idL(this->basisN(), this->basisN() + pq);
       idL.reserve(idL.rows()-pq);
       for(int j = 0; j < idL.rows(); ++j)
       {
@@ -100,7 +99,7 @@ namespace Spectral {
       idL.finalize(); 
 
       // Create right preudo identity to extract rows
-      SparseMatrix idR(this->polyN() + pq, this->polyN());
+      SparseMatrix idR(this->basisN() + pq, this->basisN());
       idR.reserve(idR.cols()-pq);
       for(int j = 0; j < idR.cols()-pq; ++j)
       {
@@ -126,7 +125,7 @@ namespace Spectral {
       }
    }
 
-   EPMFloat ChebyshevOperator::c(const int n) const
+   MHDFloat ChebyshevOperator::c(const int n) const
    {
       if(n == 0)
       {
@@ -156,7 +155,7 @@ namespace Spectral {
          // Fill column j
          for(int i = (j-1)%2; i < j; i+=2)
          {
-            mat.insertBack(i,j) = static_cast<EPMFloat>(2*j);
+            mat.insertBack(i,j) = static_cast<MHDFloat>(2*j);
          }
       }
       mat.finalize(); 
@@ -176,156 +175,16 @@ namespace Spectral {
          // Create super diagonal entry for j-1
          if(j > 1)
          {
-            mat.insertBack(j-1,j) = (-1.0/static_cast<EPMFloat>(2*(j-1)));
+            mat.insertBack(j-1,j) = (-1.0/static_cast<MHDFloat>(2*(j-1)));
          }
 
          // Create sub diagonal entry for j+1
          if(j < mat.rows()-1)
          {
-            mat.insertBack(j+1,j) = (1.0/static_cast<EPMFloat>(2*(j+1)));
+            mat.insertBack(j+1,j) = (1.0/static_cast<MHDFloat>(2*(j+1)));
          }
       }
       mat.finalize(); 
-   }
-
-   DecoupledZSparse ChebyshevOperator::tau(const std::map<BoundaryConditions::Id,BoundaryConditions::Position>& bcId, const bool atTop)
-   {
-      // Map iterator
-      std::map<BoundaryConditions::Id,BoundaryConditions::Position>::const_iterator mapIt;
-
-      // Count boundary conditions
-      int nBCs = 0;
-      for(mapIt = bcId.begin(); mapIt != bcId.end(); ++mapIt)
-      {
-         if(mapIt->second == BoundaryConditions::BOTH)
-         {
-            nBCs += 2;
-         } else
-         {
-            nBCs += 1;
-         }
-      }
-
-      // Flags to now if real and imaginary parts are used
-      bool hasReal = false;
-      bool hasImag = false;
-
-      // Check for compatible sizes
-      assert(this->polyN() >= nBCs);
-
-      // Initialise tau lines matrix
-      DecoupledZMatrix tauLines(std::make_pair(Matrix(this->polyN(), nBCs),Matrix(this->polyN(), nBCs)));
-      tauLines.first.setZero();
-      tauLines.second.setZero();
-
-      Array direct(this->polyN());
-      for(int i = 0; i < direct.size(); i++)
-      {
-         direct(i) = (1.0/this->c(i));
-      }
-
-      Array alternate(this->polyN());
-      for(int i = 0; i < alternate.size(); i++)
-      {
-         alternate(i) = (1.0/this->c(i))*std::pow(-1.0,i);
-      }
-
-      // Storage for boundary values
-      Array val(this->polyN());
-
-      // Create boundary values
-      int idx = 0;
-      for(mapIt = bcId.begin(); mapIt != bcId.end(); ++mapIt)
-      {
-         switch(mapIt->first)
-         {
-            case BoundaryConditions::VALUE:
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::TOP)
-               {
-                  tauLines.first.col(idx) = direct;
-                  idx++;
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::BOTTOM)
-               {
-                  tauLines.first.col(idx) = alternate;
-                  idx++;
-               }
-               hasReal = true;
-               break;
-            case BoundaryConditions::FIRST_DERIVATIVE:
-               val.setConstant(0.0);
-               for(int i = 1; i < val.size(); i++)
-               {
-                  val(i) = static_cast<EPMFloat>(i*i);
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::TOP)
-               {
-                  tauLines.first.col(idx) = val;
-                  idx++;
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::BOTTOM)
-               {
-                  tauLines.first.col(idx) = val.array()*(-1.0*alternate.array());
-                  idx++;
-               }
-               hasReal = true;
-               break;
-            case BoundaryConditions::SECOND_DERIVATIVE:
-               val.setConstant(0.0);
-               for(int i = 2; i < val.size(); i++)
-               {
-                  val(i) = (1.0/3.0)*static_cast<EPMFloat>(std::pow(i,4) - std::pow(i,2));
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::TOP)
-               {
-                  tauLines.first.col(idx) = val;
-                  idx++;
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::BOTTOM)
-               {
-                  tauLines.first.col(idx) = val.array()*alternate.array();
-                  idx++;
-               }
-               hasReal = true;
-               break;
-            case BoundaryConditions::BETA_SLOPE:
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::TOP)
-               {
-                  tauLines.second.col(idx) = static_cast<EPMFloat>(-this->mSpecIdx(this->mIdx))*direct;
-                  idx++;
-               }
-               if(mapIt->second == BoundaryConditions::BOTH || mapIt->second == BoundaryConditions::BOTTOM)
-               {
-                  tauLines.second.col(idx) = static_cast<EPMFloat>(this->mSpecIdx(this->mIdx))*alternate;
-                  idx++;
-               }
-               hasImag = true;
-               break;
-            case BoundaryConditions::FIRST_MODE:
-               tauLines.first.col(idx).setConstant(0.0);
-               tauLines.first.col(idx)(0) = 1.0;
-               idx++;
-               hasReal = true;
-               break;
-            default:
-               throw Exception("Unknown boundary condition for Chebyshev tau method");
-               break;
-         }
-      }
-
-      // Clear real matrix if not conditions have been set
-      if(!hasReal)
-      {
-         tauLines.first.resize(0,0);
-      }
-
-      // Clear imaginary matrix if not conditions have been set
-      if(!hasImag)
-      {
-         tauLines.second.resize(0,0);
-      }
-
-      return this->createSparseTau(tauLines, atTop);
    }
 
 }

@@ -14,7 +14,6 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Simulation/Enums/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,24 +28,21 @@ namespace Spectral {
          /**
           * @brief Constructor
           *
-          * @param idx        Index of assigned parameter
-          * @param specSize   Size of the spectral space
-          * @param specIdx    Spectral indexes
+          * @param basisN   Size of the spectral basis
           */
-         SpectralOperatorBase(const int idx, const int specSize, const ArrayI& specIdx);
+         IOperator(const int basisN);
 
          /**
           * @brief Empty Destructor
           */
-         virtual ~SpectralOperatorBase();
+         virtual ~IOperator();
 
          /**
-          * @brief Reset spectral operators and set new dimension and spectral indexes
+          * @brief Reset spectral operators and set new dimension
           *
-          * @param specSize   New size of the spectral space
-          * @param specIdx    New set of spectral indexes
+          * @param basisN   New size of the spectral basis
           */
-         void reset(const int specSize, const ArrayI& specIdx);
+         void reset(const int basisN);
 
          /**
           * @brief Get the (qasi) identity matrix of order p
@@ -56,7 +52,7 @@ namespace Spectral {
           *
           * @param p Order of the quasi identity
           */
-         virtual SparseMatrix id(const int p = 0);
+         virtual SparseMatrix id(const int p);
 
          /**
           * @brief Get the derivative of order p
@@ -73,26 +69,29 @@ namespace Spectral {
           * @param q    Order of the derivative
           */
          virtual SparseMatrix qDiff(const int p, const int q) = 0;
+
+         /**
+          * @brief Convert tau lines into sparse matrix pair
+          *
+          * Any unused component (real, imaginary) will have a zero
+          * size if it is not required.
+          *
+          * @param lines   Tau lines. Matrices have zero size or the same
+          * @param atTop   Put tau lines at top of matrix?
+          */
+         DecoupledZSparse  tau(const DecoupledZMatrix& lines, const bool atTop) const;
          
       protected:
          /**
           * @brief Get size of spectral space
           */
-         int polyN() const;
-
-         /**
-          * @brief Convert tau lines into sparse matrix
-          *
-          * @param lines   Tau lines
-          * @param atTop   Put tau lines at top? (default: true)
-          */
-         DecoupledZSparse  createSparseTau(const DecoupledZMatrix& lines, const bool atTop = true) const;
+         int basisN() const;
 
       private:
          /**
           * @brief Size of the polynomial basis
           */
-         int mPolyN;
+         int mBasisN;
    };
 
 }

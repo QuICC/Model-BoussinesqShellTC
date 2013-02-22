@@ -15,7 +15,6 @@
 //
 #include "Base/Typedefs.hpp"
 #include "SpectralOperators/IOperator.hpp"
-#include "Simulation/Enums/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,11 +29,9 @@ namespace Spectral {
          /**
           * @brief Constructor
           *
-          * @param idx     Index of assigned parameter
-          * @param polyN   Size of the polynomial basis
-          * @param specIdx Spectral indexes
+          * @param basisN   Size of the spectral basis
           */
-         UnitOperator(const int idx, const int polyN, const ArrayI& specIdx);
+         UnitOperator(const int basisN);
 
          /**
           * @brief Empty Destructor
@@ -42,21 +39,11 @@ namespace Spectral {
          ~UnitOperator();
 
          /**
-          * @brief (Possibly) change dimension and spectral indexes. Returns true if new operators a created
-          *
-          * This routine is to be used when looping over all indexes to extract the minimal set of required matrices.
-          *
-          * @param polyN   New dimension
-          * @param specIdx New set of spectral indexes
-          */
-         bool loopNext(const int polyN, const ArrayI& specIdx);
-
-         /**
           * @brief Get the identity matrix
           *
           * @param p Order of the quasi identity
           */
-         SparseMatrix id(const int p = 0);
+         SparseMatrix id(const int p);
 
          /**
           * @brief Get the derivative of order p
@@ -73,13 +60,6 @@ namespace Spectral {
           * @param q    Order of the derivative
           */
          SparseMatrix qDiff(const int p, const int q);
-
-         /**
-          * @brief Convert tau lines to complete sparse matrix
-          *
-          * @param bcId List of BC to implement
-          */
-         DecoupledZSparse tau(const std::map<BoundaryConditions::Id,BoundaryConditions::Position>& bcId);
          
       protected:
 

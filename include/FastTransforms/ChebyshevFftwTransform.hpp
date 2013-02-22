@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
-#include "Base/SpectralOperators/ChebyshevSpectralOperator.hpp"
+#include "SpectralOperators/ChebyshevOperator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -229,8 +229,7 @@ namespace Transform {
       // Compute first derivative
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         ArrayI   params = ArrayI::Zero(3);
-         ChebyshevSpectralOperator  spec(0, this->mspSetup->specSize(), params);
+         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize());
@@ -297,8 +296,7 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         ArrayI   params = ArrayI::Zero(3);
-         ChebyshevSpectralOperator  spec(0, this->mspSetup->specSize(), params);
+         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Compute derivative
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).real();
@@ -320,8 +318,7 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         ArrayI   params = ArrayI::Zero(3);
-         ChebyshevSpectralOperator  spec(0, this->mspSetup->specSize(), params);
+         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).imag();

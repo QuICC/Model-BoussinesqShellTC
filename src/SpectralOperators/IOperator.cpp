@@ -20,8 +20,8 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   IOperator::IOperator(const int polyN)
-      : mPolyN(polyN)
+   IOperator::IOperator(const int basisN)
+      : mBasisN(basisN)
    {
    }
 
@@ -29,16 +29,16 @@ namespace Spectral {
    {
    }
 
-   void IOperator::reset(const int polyN)
+   void IOperator::reset(const int basisN)
    {
       // Set dimension
-      this->mPolyN = polyN;
+      this->mBasisN = basisN;
    }
 
    SparseMatrix IOperator::id(const int p)
    {
       // Create storage for the identity
-      SparseMatrix idMat(this->polyN(), this->polyN());
+      SparseMatrix idMat(this->basisN(), this->basisN());
 
       int colStart;
       int colMax;
@@ -66,17 +66,18 @@ namespace Spectral {
       return idMat;
    }
 
-   int IOperator::polyN() const
+   int IOperator::basisN() const
    {
-      return this->mPolyN;
+      return this->mBasisN;
    }
 
-   DecoupledZSparse IOperator::createSparseTau(const DecoupledZMatrix& lines, const bool atTop) const
+   DecoupledZSparse IOperator::tau(const DecoupledZMatrix& tauLines, const bool atTop) const
    {
-      // Create sparse Tau lines
-      DecoupledZSparse tau(std::make_pair(SparseMatrix(this->polyN(), this->polyN()),SparseMatrix(this->polyN(), this->polyN())));
+      // Create sparse matrix pair for Tau matrix
+      DecoupledZSparse tauMat(std::make_pair(SparseMatrix(this->basisN(), this->basisN()),SparseMatrix(this->basisN(), this->basisN())));
 
       int nBC;
+      // Get the number of boundary conditions (inpute should either have zero size, or both matrices with the same size)
       if(lines.first.size() != 0)
       {
          nBC = lines.first.cols();
@@ -87,59 +88,60 @@ namespace Spectral {
 
       int rowStart;
       int rowMax;
+      // Get starting row and max number of rows (depends on atTop)
       if(atTop)
       {
          rowStart = 0;
          rowMax = nBC;
       } else
       {
-         rowStart = tau.first.rows()-nBC;
-         rowMax = tau.first.rows();
+         rowStart = tauMat.first.rows()-nBC;
+         rowMax = tauMat.first.rows();
       }
 
       // Create real tau lines
       if(lines.first.size() != 0)
       {
-         tau.first.reserve(lines.first.size());
-         for(int j = 0; j < tau.first.cols(); ++j)
+         tauMat.first.reserve(lines.first.size());
+         for(int j = 0; j < tauMat.first.cols(); ++j)
          {
             // Create column j
-            tau.first.startVec(j);
+            tauMat.first.startVec(j);
 
             // Loop over tau lines
             for(int i = rowStart; i < rowMax; i++)
             {
                if(lines.first(j,i-rowStart) != 0.0)
                {
-                  tau.first.insertBack(i,j) = lines.first(j,i-rowStart);
+                  tauMat.first.insertBack(i,j) = lines.first(j,i-rowStart);
                }
             }
          }
       }
-      tau.first.finalize(); 
+      tauMat.first.finalize(); 
 
       // Create imaginary tau lines
       if(lines.second.size() != 0)
       {
-         tau.second.reserve(lines.second.size());
-         for(int j = 0; j < tau.second.cols(); ++j)
+         tauMat.second.reserve(lines.second.size());
+         for(int j = 0; j < tauMat.second.cols(); ++j)
          {
             // Create column j
-            tau.second.startVec(j);
+            tauMat.second.startVec(j);
 
             // Loop over tau lines
             for(int i = rowStart; i < rowMax; i++)
             {
                if(lines.second(j,i-rowStart) != 0.0)
                {
-                  tau.second.insertBack(i,j) = lines.second(j,i-rowStart);
+                  tauMat.second.insertBack(i,j) = lines.second(j,i-rowStart);
                }
             }
          }
       }
-      tau.second.finalize(); 
+      tauMat.second.finalize(); 
 
-      return tau;
+      return tauMat;
    }
 
 }

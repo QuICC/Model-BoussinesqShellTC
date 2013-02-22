@@ -20,8 +20,8 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   UnitOperator::UnitOperator(const int polyN)
-      : IOperator(polyN)
+   UnitOperator::UnitOperator(const int basisN)
+      : IOperator(basisN)
    {
    }
 
@@ -66,14 +66,6 @@ namespace Spectral {
 
       // 1x1 identity
       return this->id();
-   }
-
-   DecoupledZSparse UnitOperator::tau(const std::map<BoundaryConditions::Id,BoundaryConditions::Position>& bcId)
-   {
-      // Can't be implemented in general => should never get called
-      assert(false);
-
-      return DecoupledZSparse();
    }
 
 }
