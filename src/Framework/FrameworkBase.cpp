@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 

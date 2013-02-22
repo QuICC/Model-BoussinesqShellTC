@@ -7,7 +7,7 @@
 
 #ifdef GEOMHDISCC_MPI
    // include MPI timer
-   #include "Timer/MpiTimer.hpp"
+   #include "Timers/MpiTimer.hpp"
 
    namespace GeoMHDiSCC {
       /// Typedef for a generic Timer based on the MpiTimer
@@ -15,7 +15,7 @@
    }
 #else
    // include serial timer
-   #include "Timer/SerialTimer.hpp"
+   #include "Timers/SerialTimer.hpp"
 
    namespace GeoMHDiSCC {
       /// Typedef for a generic Timer based on the SerialTimer

@@ -35,7 +35,7 @@ namespace Spectral {
       this->mBasisN = basisN;
    }
 
-   SparseMatrix IOperator::id(const int p)
+   SparseMatrix IOperator::id(const int p) const
    {
       // Create storage for the identity
       SparseMatrix idMat(this->basisN(), this->basisN());
@@ -78,12 +78,12 @@ namespace Spectral {
 
       int nBC;
       // Get the number of boundary conditions (inpute should either have zero size, or both matrices with the same size)
-      if(lines.first.size() != 0)
+      if(tauLines.first.size() != 0)
       {
-         nBC = lines.first.cols();
+         nBC = tauLines.first.cols();
       } else
       {
-         nBC = lines.second.cols();
+         nBC = tauLines.second.cols();
       }
 
       int rowStart;
@@ -100,9 +100,9 @@ namespace Spectral {
       }
 
       // Create real tau lines
-      if(lines.first.size() != 0)
+      if(tauLines.first.size() != 0)
       {
-         tauMat.first.reserve(lines.first.size());
+         tauMat.first.reserve(tauLines.first.size());
          for(int j = 0; j < tauMat.first.cols(); ++j)
          {
             // Create column j
@@ -111,9 +111,9 @@ namespace Spectral {
             // Loop over tau lines
             for(int i = rowStart; i < rowMax; i++)
             {
-               if(lines.first(j,i-rowStart) != 0.0)
+               if(tauLines.first(j,i-rowStart) != 0.0)
                {
-                  tauMat.first.insertBack(i,j) = lines.first(j,i-rowStart);
+                  tauMat.first.insertBack(i,j) = tauLines.first(j,i-rowStart);
                }
             }
          }
@@ -121,20 +121,20 @@ namespace Spectral {
       tauMat.first.finalize(); 
 
       // Create imaginary tau lines
-      if(lines.second.size() != 0)
+      if(tauLines.second.size() != 0)
       {
-         tauMat.second.reserve(lines.second.size());
+         tauMat.second.reserve(tauLines.second.size());
          for(int j = 0; j < tauMat.second.cols(); ++j)
          {
             // Create column j
             tauMat.second.startVec(j);
 
-            // Loop over tau lines
+            // Loop over tau tauLines
             for(int i = rowStart; i < rowMax; i++)
             {
-               if(lines.second(j,i-rowStart) != 0.0)
+               if(tauLines.second(j,i-rowStart) != 0.0)
                {
-                  tauMat.second.insertBack(i,j) = lines.second(j,i-rowStart);
+                  tauMat.second.insertBack(i,j) = tauLines.second(j,i-rowStart);
                }
             }
          }

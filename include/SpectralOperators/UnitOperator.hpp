@@ -43,7 +43,7 @@ namespace Spectral {
           *
           * @param p Order of the quasi identity
           */
-         SparseMatrix id(const int p);
+         SparseMatrix id(const int p) const;
 
          /**
           * @brief Get the derivative of order p
@@ -51,7 +51,7 @@ namespace Spectral {
           * @param nBC  Number of boundary
           * @param p Order of the derivative
           */
-         SparseMatrix diff(const int nBC, const int p);
+         SparseMatrix diff(const int nBC, const int p) const;
 
          /**
           * @brief Get the quasi inverse derivative of order p
@@ -59,7 +59,7 @@ namespace Spectral {
           * @param p    Order of the quasi inverse
           * @param q    Order of the derivative
           */
-         SparseMatrix qDiff(const int p, const int q);
+         SparseMatrix qDiff(const int p, const int q) const;
          
       protected:
 

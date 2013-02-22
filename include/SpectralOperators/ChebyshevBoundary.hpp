@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Base/General/Typedefs.hpp"
+#include "Base/Typedefs.hpp"
 #include "SpectralOperators/IBoundary.hpp"
 
 namespace GeoMHDiSCC {

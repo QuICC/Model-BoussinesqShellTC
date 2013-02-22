@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 #include "IoHdf5/Hdf5Types.hpp"
 #include "IoHdf5/Hdf5File.hpp"
 
@@ -48,7 +48,7 @@ namespace IoHdf5 {
          /**
          * @brief Destructor
          */
-         virtual ~IHdf5Reader() {};
+         virtual ~IHdf5Reader();
 
          /**
           * @brief Initialise the file

@@ -62,12 +62,12 @@ namespace Debug {
          /**
           * @brief Constructor
           */
-         ProfilerBase() {};
+         ProfilerBase();
 
          /**
           * @brief Destructor
           */
-         virtual ~ProfilerBase() {};
+         virtual ~ProfilerBase();
 
          /**
           * @brief Update measured time

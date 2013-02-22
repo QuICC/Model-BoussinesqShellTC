@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Timer/ITimer.hpp"
+#include "Timers/ITimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -40,7 +40,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         ~TimerTools() {};
+         ~TimerTools();
 
    };
 

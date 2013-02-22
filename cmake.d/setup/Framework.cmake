@@ -107,9 +107,13 @@ endif(groupTest)
 #
 set(MHDFrameworkSrcDirs
    Base
-   Exception
+   Exceptions
    Framework
-   Timer
+   Timers
 )
+
+##### DEVELOPMENT: NEEDS TO BE REMOVED ONCE CODE IS READY
+message(STATUS "!!!WARNING!!! OVERRIDING ACTUAL Framework.cmake DIRECTORY LIST WITH NOTHING")
+set(MHDFrameworkSrcDirs )
 
 geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDFrameworkSrcDirs)

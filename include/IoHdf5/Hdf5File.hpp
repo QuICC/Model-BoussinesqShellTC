@@ -7,6 +7,7 @@
 
 // System includes
 //
+#include <string>
 #include <vector>
 #include <hdf5.h>
 
@@ -40,7 +41,7 @@ namespace IoHdf5 {
          /**
           * @brief Destructor
           */
-         virtual ~Hdf5File() {};
+         virtual ~Hdf5File();
 
          /**
           * @brief Get filename

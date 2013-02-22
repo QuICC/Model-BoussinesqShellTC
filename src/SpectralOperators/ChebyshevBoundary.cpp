@@ -76,8 +76,8 @@ namespace Spectral {
 
    Array ChebyshevBoundary::firstDerivative(IBoundary::Position pt) const
    {
-      Array tau = Array::zero(this->basisN());
-      for(int i = 1; i < val.size(); i++)
+      Array tau = Array::Zero(this->basisN());
+      for(int i = 1; i < tau.size(); i++)
       {
          tau(i) = static_cast<MHDFloat>(i*i);
       }
@@ -93,9 +93,9 @@ namespace Spectral {
 
    Array ChebyshevBoundary::secondDerivative(IBoundary::Position pt) const
    {
-      Array tau = Array::zero(this->basisN());
+      Array tau = Array::Zero(this->basisN());
 
-      for(int i = 2; i < val.size(); i++)
+      for(int i = 2; i < tau.size(); i++)
       {
          tau(i) = (1.0/3.0)*static_cast<MHDFloat>(std::pow(i,4) - std::pow(i,2));
       }

@@ -29,7 +29,7 @@ namespace Spectral {
    {
    }
 
-   SparseMatrix ChebyshevOperator::diff(const int nBC, const int p)
+   SparseMatrix ChebyshevOperator::diff(const int nBC, const int p) const
    {
       // Check that requested order is possible
       assert(p > 0);
@@ -56,7 +56,7 @@ namespace Spectral {
       }
    }
 
-   SparseMatrix ChebyshevOperator::qDiff(const int p, const int q)
+   SparseMatrix ChebyshevOperator::qDiff(const int p, const int q) const
    {
       // Check that requested order is possible
       assert(p > 0);

@@ -39,7 +39,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         virtual ~StdOutPipe() {};
+         virtual ~StdOutPipe();
 
          /**
           * @brief Init the file

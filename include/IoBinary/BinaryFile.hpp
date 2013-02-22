@@ -39,7 +39,7 @@ namespace IoBinary {
          /**
          * @brief Destructor
          */
-         virtual ~BinaryFile() {};
+         virtual ~BinaryFile();
 
          /**
           * @brief Get filename

@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -37,9 +37,6 @@ namespace IoHdf5 {
 
    void IHdf5Reader::open()
    {
-      // Set Access Property list
-      this->setFilePList(); 
-
       // Open file
       this->mFile = H5Fopen(this->filename().c_str(), H5F_ACC_RDONLY, this->filePList());
 
@@ -163,4 +160,5 @@ namespace IoHdf5 {
 
       H5Gclose(loc);
    }
+}
 }

@@ -14,6 +14,7 @@
 
 // External includes
 //
+#include <fftw3.h>
 
 // Project includes
 //
@@ -206,7 +207,7 @@ namespace Transform {
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
       // Rescale to remove FFT scaling
-      rChebVal *= this->mScale;
+      rChebVal *= this->mspSetup->scale();
    }
 
    template <Arithmetics::Operation TOperation> void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)

@@ -29,23 +29,23 @@
    #endif // GEOMHDISCC_MPI
 
    /// Define profiler initialisation macro function
-   #define ProfilerMacro_init()  ProfilerMacro::init()
+   #define ProfilerMacro_init()  Debug::ProfilerMacro::init()
 
    /// Define profiler start macro function
-   #define ProfilerMacro_start(P)  ProfilerMacro::start(P)
+   #define ProfilerMacro_start(P)  Debug::ProfilerMacro::start(P)
 
    /// Define profiler stop macro function
-   #define ProfilerMacro_stop(P)  ProfilerMacro::stop(P)
+   #define ProfilerMacro_stop(P)  Debug::ProfilerMacro::stop(P)
 
    /// Define profiler printInfo macro function
-   #define ProfilerMacro_printInfo()  ProfilerTools::printInfo()
+   #define ProfilerMacro_printInfo()  Debug::ProfilerTools::printInfo()
 
    #ifdef GEOMHDISCC_PROFILER_DETAILED
       /// Define detailed profiler start macro function
-      #define DetailedProfilerMacro_start(P)  ProfilerMacro::start(P)
+      #define DetailedProfilerMacro_start(P)  Debug::ProfilerMacro::start(P)
 
       /// Define detailed profiler stop macro function
-      #define DetailedProfilerMacro_stop(P)  ProfilerMacro::stop(P)
+      #define DetailedProfilerMacro_stop(P)  Debug::ProfilerMacro::stop(P)
    #else
       /// Define empty detailed profiler start macro function
       #define DetailedProfilerMacro_start(P)  

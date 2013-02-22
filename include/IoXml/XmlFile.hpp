@@ -11,6 +11,7 @@
 
 // External includes
 //
+#include <rapidxml.hpp>
 
 // Project includes
 //
@@ -39,7 +40,7 @@ namespace IoXml {
          /**
          * @brief Destructor
          */
-         virtual ~XmlFile() {};
+         virtual ~XmlFile();
 
          /**
           * @brief Get filename
@@ -47,6 +48,11 @@ namespace IoXml {
          std::string  filename() const;
          
       protected:
+         /**
+          * @brief XML interface
+          */
+         rapidxml::xml_document<>   mXML;
+
          /**
           * @brief Get the name
           */
@@ -144,11 +150,6 @@ namespace IoXml {
           * @brief Version of the file to check compatibility
           */
          std::string mVersion;
-
-         /**
-          * @brief XML interface
-          */
-         rapidxml::xml_document<>   mXML;
    };
 
 }

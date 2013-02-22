@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Timer/TimerTools.hpp"
+#include "Timers/TimerTools.hpp"
 
 // Project includes
 //

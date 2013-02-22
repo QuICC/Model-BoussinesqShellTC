@@ -5,8 +5,13 @@
 #ifndef IXMLWRITER_HPP
 #define IXMLWRITER_HPP
 
+// Configuration includes
+//
+#include "SmartPointers/SharedPtrMacro.h"
+
 // System includes
 //
+#include <fstream>
 #include <sstream>
 
 // External includes
@@ -15,8 +20,8 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
-#include "IoXml/IXmlFile.hpp"
+#include "Exceptions/Exception.hpp"
+#include "IoXml/XmlFile.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -42,7 +47,7 @@ namespace IoXml {
          /**
          * @brief Destructor
          */
-         virtual ~IXmlWriter() {};
+         virtual ~IXmlWriter();
 
          /**
           * @brief Initialise the file

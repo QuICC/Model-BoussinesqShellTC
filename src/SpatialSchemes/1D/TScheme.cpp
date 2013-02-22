@@ -10,11 +10,11 @@
 
 // Class include
 //
-#include "Base/SpatialSchemes/1D/TScheme.hpp"
+#include "SpatialSchemes/1D/TScheme.hpp"
 
 // Project includes
 //
-#include "Base/General/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace EPMPhoenix {
 

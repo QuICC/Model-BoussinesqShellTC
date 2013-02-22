@@ -59,12 +59,12 @@ namespace Debug {
          /**
           * @brief Constructor
           */
-         MpiProfiler() {};
+         MpiProfiler();
 
          /**
           * @brief Destructor
           */
-         ~MpiProfiler() {};
+         ~MpiProfiler();
 
       private:
          /**

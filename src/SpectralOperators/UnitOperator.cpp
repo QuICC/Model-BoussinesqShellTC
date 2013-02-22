@@ -29,7 +29,7 @@ namespace Spectral {
    {
    }
 
-   SparseMatrix UnitOperator::id(const int p)
+   SparseMatrix UnitOperator::id(const int p) const
    {
       // Create the 1x1 identity
       SparseMatrix idMat(1, 1);
@@ -48,16 +48,16 @@ namespace Spectral {
       return idMat;
    }
 
-   SparseMatrix UnitOperator::diff(const int nBC, const int p)
+   SparseMatrix UnitOperator::diff(const int nBC, const int p) const
    {
       // Check that requested order is possible
       assert(p > 0);
 
       // 1x1 identity
-      return this->id();
+      return this->id(0);
    }
 
-   SparseMatrix UnitOperator::qDiff(const int p, const int q)
+   SparseMatrix UnitOperator::qDiff(const int p, const int q) const
    {
       // Check that requested order is possible
       assert(p > 0);
@@ -65,7 +65,7 @@ namespace Spectral {
       assert(p > q);
 
       // 1x1 identity
-      return this->id();
+      return this->id(0);
    }
 
 }

@@ -53,12 +53,12 @@ namespace Debug {
          /**
           * @brief Constructor
           */
-         StorageProfiler() {};
+         StorageProfiler();
 
          /**
           * @brief Destructor
           */
-         virtual ~StorageProfiler() {};
+         virtual ~StorageProfiler();
 
          /**
           * @brief Analyze the measured storage requirements

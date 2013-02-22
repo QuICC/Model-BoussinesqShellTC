@@ -24,7 +24,7 @@ namespace IoAscii {
    {
    }
 
-   std::string AsciiFile::filename()
+   std::string AsciiFile::filename() const
    {
       return this->mName + this->mExt;
    }
@@ -34,27 +34,27 @@ namespace IoAscii {
       this->mName = name;
    }
 
-   std::string AsciiFile::name()
+   std::string AsciiFile::name() const
    {
       return this->mName;
    }
 
-   std::string AsciiFile::extension()
+   std::string AsciiFile::extension() const
    {
       return this->mExt;
    }
 
-   std::string AsciiFile::header()
+   std::string AsciiFile::header() const
    {
       return AsciiFile::FILE_HEADER + this->mHeader;
    }
 
-   std::string AsciiFile::type()
+   std::string AsciiFile::type() const
    {
       return AsciiFile::FILE_TYPE + this->mType;
    }
 
-   std::string AsciiFile::version()
+   std::string AsciiFile::version() const
    {
       return AsciiFile::FILE_VERSION + this->mVersion;
    }

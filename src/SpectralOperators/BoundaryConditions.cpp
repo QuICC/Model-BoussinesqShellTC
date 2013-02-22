@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -47,7 +47,7 @@ namespace Spectral {
       lines.second.setZero();
 
       // Map iterator
-      std::map<BoundaryConditions::Id,BoundaryConditions::Position>::const_iterator mapIt;
+      std::map<BoundaryConditions::Id,IBoundary::Position>::const_iterator mapIt;
 
       // Create boundary values
       int idx = 0;
@@ -71,7 +71,8 @@ namespace Spectral {
                hasReal = true;
                break;
             case BoundaryConditions::BETA_SLOPE:
-               lines.second.col(idx) = static_cast<MHDFloat>(-k)*bcOp.value(mapIt->second);
+               /// \mhdBug Beta slope boundary conditions should have a wave number included
+               lines.second.col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(mapIt->second);
                idx++;
                hasImag = true;
                break;

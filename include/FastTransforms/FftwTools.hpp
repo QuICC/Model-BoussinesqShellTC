@@ -30,14 +30,14 @@ namespace Transform {
           *
           * @param size Size to dealias
           */
-         static int dealiasFft()
+         static int dealiasFft(const int size);
 
          /***
           * @brief Compute the dealiased size for FFT (R<->Z, or Z<->R)
           *
           * @param size Size to dealias
           */
-         static int dealiasMixedFft(const int size)
+         static int dealiasMixedFft(const int size);
 
          /**
           * @brief Optimise the FFT sizes
@@ -67,12 +67,12 @@ namespace Transform {
          /**
          * @brief Empty constructor
          */
-         FftwTools() {};
+         FftwTools();
 
          /**
          * @brief Empty Destructor
          */
-         ~FftwTools() {};
+         ~FftwTools();
 
    };
 

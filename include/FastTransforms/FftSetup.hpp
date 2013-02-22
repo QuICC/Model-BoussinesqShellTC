@@ -42,7 +42,7 @@ namespace Transform {
          /**
           * @brief Empty destructor
           */
-         ~FftSetup() {};
+         ~FftSetup();
 
          /**
           * @brief Does setup define a mixed real/complex transform?

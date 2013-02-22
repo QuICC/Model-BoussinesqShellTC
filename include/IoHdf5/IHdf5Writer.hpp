@@ -50,7 +50,7 @@ namespace IoHdf5 {
          /**
           * @brief Destructor
           */
-         virtual ~IHdf5Writer() {};
+         virtual ~IHdf5Writer();
 
          /**
           * @brief Initialise the file

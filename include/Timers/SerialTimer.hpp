@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Timer/ITimer.hpp"
+#include "Timers/ITimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,7 +34,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~SerialTimer() {};
+         virtual ~SerialTimer();
 
          /**
           * @brief Start clock
@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Reset timer (stop and restart)
           */
-         virtual MHDFloat resetTimer();
+         virtual MHDFloat resetTimer() = 0;
          
       protected:
 

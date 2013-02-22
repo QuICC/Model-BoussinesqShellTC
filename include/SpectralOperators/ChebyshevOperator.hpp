@@ -14,8 +14,8 @@
 
 // Project includes
 //
-#include "Base/General/Typedefs.hpp"
-#include "SpectralOperators/IOperatorBase.hpp"
+#include "Base/Typedefs.hpp"
+#include "SpectralOperators/IOperator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,7 +45,7 @@ namespace Spectral {
           * @param nBC  Number of boundary
           * @param p    Order of the derivative
           */
-         SparseMatrix diff(const int nBC, const int p);
+         SparseMatrix diff(const int nBC, const int p) const;
 
          /**
           * @brief Get the quasi inverse derivative for D^-p D^q
@@ -53,7 +53,7 @@ namespace Spectral {
           * @param p    Order of the quasi inverse
           * @param q    Order of the derivative
           */
-         SparseMatrix qDiff(const int p, const int q);
+         SparseMatrix qDiff(const int p, const int q) const;
          
       protected:
 

@@ -16,11 +16,11 @@
 
 // Project includes
 //
-#include "Base/General/Typedefs.hpp"
+#include "Base/Typedefs.hpp"
 #include "Base/Enums/Splittings.hpp"
-#include "Base/Resolutions/Resolution.hpp"
-#include "Base/SpatialSchemes/2D/Regular2DScheme.hpp"
-#include "Base/Transforms/FFT/FFTSetup.hpp"
+#include "Resolutions/Resolution.hpp"
+#include "SpatialSchemes/2D/Regular2DScheme.hpp"
+#include "FastTransforms/FftSetup.hpp"
 
 namespace EPMPhoenix {
 

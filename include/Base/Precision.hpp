@@ -19,7 +19,7 @@
 #include "Base/Typedefs.hpp"
 
 #ifdef GEOMHDISCC_MULTPRECISION
-   #include "Base/General/MpTypedefs.hpp"
+   #include "Base/MpTypedefs.hpp"
    
    /// Define a small macro to replace float constants to strings in the case of MP computations
    #define MHD_MP(c) #c

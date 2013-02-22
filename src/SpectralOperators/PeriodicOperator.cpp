@@ -34,7 +34,7 @@ namespace Spectral {
    SparseMatrix PeriodicOperator::bilaplacian2D(const IOperator& op, const int k, const int nBC)
    {
       // Compute sparse laplacian
-      SparseMatrix lapl = PeriodicOperator::laplacian(op, k, nBC);
+      SparseMatrix lapl = PeriodicOperator::laplacian2D(op, k, nBC);
 
       // Compute bilaplacian
       lapl = lapl*lapl;
@@ -59,7 +59,7 @@ namespace Spectral {
    SparseMatrix PeriodicOperator::bilaplacian3D(const IOperator& op, const int k, const int m, const int nBC)
    {
       // Compute sparse laplacian
-      SparseMatrix lapl = PeriodicOperator::laplacian(op, k, m, nBC);
+      SparseMatrix lapl = PeriodicOperator::laplacian3D(op, k, m, nBC);
 
       // Compute bilaplacian
       lapl = lapl*lapl;

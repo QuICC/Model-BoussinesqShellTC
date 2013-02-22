@@ -28,6 +28,58 @@ namespace GeoMHDiSCC {
       this->filterFactors();
    }
 
+   int SplittingAlgorithm::id() const
+   {
+      return this->mId;
+   }
+
+   int SplittingAlgorithm::nCpu() const
+   {
+      return this->mNCpu;
+   }
+
+   int SplittingAlgorithm::dims() const
+   {
+      return this->mDims;
+   }
+
+   int SplittingAlgorithm::factor(const int i) const
+   {
+      // Assert on index of requested factor
+      assert(i < this->mFactors.size());
+
+      return this->mFactors(i);
+   }
+
+   const ArrayI& SplittingAlgorithm::factors() const
+   {
+      return this->mFactors;
+   }
+
+   int SplittingAlgorithm::maxFactor() const
+   {
+      return this->mFactors.maxCoeff();
+   }
+
+   int SplittingAlgorithm::groupId(const int i, const int id) const
+   {
+      // Assert on index of requested factor
+      assert(i < this->mFactors.size());
+
+      switch(i)
+      {
+         case(0):
+            return id % this->factor(0);
+            break;
+         case(1):
+            return id / this->factor(0);
+            break;
+         case(2):
+            return id / (this->factor(0)*this->factor(1));
+            break;
+      }
+   }
+
    bool SerialSplitting::applicable() const
    {
       bool status = true;

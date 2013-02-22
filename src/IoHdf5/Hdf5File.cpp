@@ -74,7 +74,7 @@ namespace IoHdf5 {
       H5Pclose(dsPList);
    }
 
-   std::string Hdf5File::filename()
+   std::string Hdf5File::filename() const
    {
       return this->mName + this->mExt;
    }
@@ -84,42 +84,42 @@ namespace IoHdf5 {
       this->mName = name;
    }
 
-   std::string Hdf5File::name()
+   std::string Hdf5File::name() const
    {
       return this->mName;
    }
 
-   std::string Hdf5File::extension()
+   std::string Hdf5File::extension() const
    {
       return this->mExt;
    }
 
-   std::string Hdf5File::headerTag()
+   std::string Hdf5File::headerTag() const
    {
       return Hdf5File::HEADER_TAG;
    }
 
-   std::string Hdf5File::header()
+   std::string Hdf5File::header() const
    {
       return this->mHeader;
    }
 
-   std::string Hdf5File::typeTag()
+   std::string Hdf5File::typeTag() const
    {
       return Hdf5File::TYPE_TAG;
    }
 
-   std::string Hdf5File::type()
+   std::string Hdf5File::type() const
    {
       return this->mType;
    }
 
-   std::string Hdf5File::versionTag()
+   std::string Hdf5File::versionTag() const
    {
       return Hdf5File::VERSION_TAG;
    }
 
-   std::string Hdf5File::version()
+   std::string Hdf5File::version() const 
    {
       return this->mVersion;
    }

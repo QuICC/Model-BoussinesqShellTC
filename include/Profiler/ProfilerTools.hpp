@@ -38,12 +38,12 @@ namespace Debug {
          /**
           * @brief Constructor
           */
-         ProfilerTools() {};
+         ProfilerTools();
 
          /**
           * @brief Destructor
           */
-         ~ProfilerTools() {};
+         ~ProfilerTools();
    };
 
 }

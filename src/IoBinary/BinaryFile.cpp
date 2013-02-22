@@ -24,7 +24,7 @@ namespace IoBinary {
    {
    }
 
-   std::string BinaryFile::filename()
+   std::string BinaryFile::filename() const
    {
       return this->mName + this->mExt;
    }
@@ -34,27 +34,27 @@ namespace IoBinary {
       this->mName = name;
    }
 
-   std::string BinaryFile::name()
+   std::string BinaryFile::name() const
    {
       return this->mName;
    }
 
-   std::string BinaryFile::extension()
+   std::string BinaryFile::extension() const
    {
       return this->mExt;
    }
 
-   std::string BinaryFile::header()
+   std::string BinaryFile::header() const
    {
       return BinaryFile::FILE_HEADER + this->mHeader;
    }
 
-   std::string BinaryFile::type()
+   std::string BinaryFile::type() const
    {
       return BinaryFile::FILE_TYPE + this->mType;
    }
 
-   std::string BinaryFile::version()
+   std::string BinaryFile::version() const
    {
       return BinaryFile::FILE_VERSION + this->mVersion;
    }

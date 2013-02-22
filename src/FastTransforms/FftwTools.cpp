@@ -21,18 +21,18 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   const MHDFloat FftwTools::STD_DEALIASING  = 3.0/2.0;
+   const MHDFloat FftwTools::STD_DEALIASING = 3.0/2.0;
 
-   const MHDFloat FftwTools::MIXED_DEALIASING  = 3.0;
+   const MHDFloat FftwTools::MIXED_DEALIASING = 3.0;
 
-   const MHDFloat FftwTools::OPTIMIZATION_WIDTH  = 0.05;
+   const MHDFloat FftwTools::OPTIMIZATION_WIDTH = 0.05;
 
-   int dealiasFft(const int size)
+   int FftwTools::dealiasFft(const int size)
    {
       return std::ceil(FftwTools::STD_DEALIASING*static_cast<MHDFloat>(size));
    }
 
-   int dealiasMixedFft(const int size)
+   int FftwTools::dealiasMixedFft(const int size)
    {
       return std::ceil(FftwTools::MIXED_DEALIASING*static_cast<MHDFloat>(size));
    }
@@ -114,11 +114,11 @@ namespace Transform {
       if(!good)
       {
          // Create nice looking warnig message
-         IoTools::Formatter::printLine('%');
-         IoTools::Formatter::printCentered("WARNING: FFT size optimization failed", '%');
-         IoTools::Formatter::printCentered("Selected FFT size might be slow!", '%');
-         IoTools::Formatter::printLine('%');
-         IoTools::Formatter::printNewline();
+         IoTools::Formatter::printLine(std::cout, '%');
+         IoTools::Formatter::printCentered(std::cout, "WARNING: FFT size optimization failed", '%');
+         IoTools::Formatter::printCentered(std::cout, "Selected FFT size might be slow!", '%');
+         IoTools::Formatter::printLine(std::cout, '%');
+         IoTools::Formatter::printNewline(std::cout);
 
          return size;
 
@@ -126,16 +126,16 @@ namespace Transform {
       } else if(good && opt != 0)
       {
          // Create nice looking warning message
-         IoTools::Formatter::printLine('%');
+         IoTools::Formatter::printLine(std::cout, '%');
          std::stringstream oss;
          if(opt > 2)
          {
             oss << "WARNING: ";
          }
          oss << "Extended FFT size (+" << opt << ")!";
-         IoTools::Formatter::printCentered(oss.str(), '%');
-         IoTools::Formatter::printLine('%');
-         IoTools::Formatter::printNewline();
+         IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
+         IoTools::Formatter::printLine(std::cout, '%');
+         IoTools::Formatter::printNewline(std::cout);
 
          return size + opt;
       }

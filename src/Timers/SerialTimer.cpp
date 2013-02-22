@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Timer/SerialTimer.hpp"
+#include "Timers/SerialTimer.hpp"
 
 // Project includes
 //
@@ -42,6 +42,21 @@ namespace GeoMHDiSCC {
    {
       // return elapsed seconds
       return this->elapsedSeconds();
+   }
+
+   MHDFloat SerialTimer::resetTimer()
+   {
+      // Stop the timer
+      this->stop();
+
+      // Get elapsed time
+      MHDFloat tmp = this->time();
+
+      // Set start time to stopping time
+      this->mStart = this->mStop;
+
+      // return elapsed time
+      return tmp;
    }
 
    MHDFloat SerialTimer::elapsedSeconds() const

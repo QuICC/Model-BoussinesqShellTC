@@ -123,21 +123,6 @@ namespace GeoMHDiSCC {
          void describeSplitting(const SplittingDescription& descr) const;
    };
 
-   inline int LoadSplitter::nCpu() const
-   {
-      return this->mNCpu;
-   }
-
-   inline int LoadSplitter::id() const
-   {
-      return this->mId;
-   }
-
-   inline bool LoadSplitter::moreSplittings() const
-   {
-      return ((this->mScores.size() - this->mSkip) > 0);
-   }
-
    template <typename TSchemeType> void LoadSplitter::init(const ArrayI& dim)
    {
       // Assert that scheme and dimensions are compatible

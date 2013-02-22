@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 
 // Project includes
 //
@@ -19,6 +19,10 @@ namespace GeoMHDiSCC {
 
    Exception::Exception(const std::string& msg)
       : std::runtime_error(msg)   
+   {
+   }
+
+   Exception::~Exception() throw()
    {
    }
 

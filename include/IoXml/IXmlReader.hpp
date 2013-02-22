@@ -7,7 +7,9 @@
 
 // System includes
 //
+#include <fstream>
 #include <sstream>
+#include <vector>
 
 // External includes
 //
@@ -15,8 +17,8 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
-#include "IoXml/IXmlFile.hpp"
+#include "Exceptions/Exception.hpp"
+#include "IoXml/XmlFile.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -42,7 +44,7 @@ namespace IoXml {
          /**
          * @brief Destructor
          */
-         virtual ~IXmlReader() {};
+         virtual ~IXmlReader();
 
          /**
           * @brief Initialise the file

@@ -49,21 +49,16 @@ if(platformTest)
    # Base setup
    include(cmake.d/setup/Framework.cmake)
 
-   # Simulation setup
-   #include(cmake.d/setup/Simulation.cmake)
-
    # Debug setup
-   #include(cmake.d/setup/Debug.cmake)
+   include(cmake.d/setup/Debug.cmake)
+
+   # DEBUG STATEMENT TO COMPILE EVERYTHING
+   include(cmake.d/setup/AllSrc.cmake)
 
    # Automatic setup
    include(cmake.d/setup/automatic.cmake)
 
-   # Executable setup
-   #include(cmake.d/setup/executable.cmake)
-
-   # TestSuite setup
-   #include(cmake.d/setup/testsuite.cmake)
-
-   message(STATUS ${All_Srcs})
+   # Executables setup
+   include(cmake.d/setup/executable.cmake)
 
 endif(platformTest)

@@ -59,12 +59,12 @@ namespace Debug {
          /**
           * @brief Constructor
           */
-         SerialProfiler() {};
+         SerialProfiler();
 
          /**
           * @brief Destructor
           */
-         ~SerialProfiler() {};
+         ~SerialProfiler();
 
       private:
          /**

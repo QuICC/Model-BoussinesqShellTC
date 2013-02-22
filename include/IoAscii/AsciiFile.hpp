@@ -39,7 +39,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         virtual ~AsciiFile() {};
+         virtual ~AsciiFile();
 
          /**
           * @brief Get filename

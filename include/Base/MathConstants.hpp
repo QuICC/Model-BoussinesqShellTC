@@ -39,12 +39,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Empty constructor
           */
-         MathConstants() {};
+         MathConstants();
 
          /**
           * @brief Empty Destructor
           */
-         ~MathConstants() {};
+         ~MathConstants();
    };
 
 }

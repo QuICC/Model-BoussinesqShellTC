@@ -34,14 +34,14 @@ namespace GeoMHDiSCC {
          static void setup(const int nodes);
 
          /**
-          * @brief Synchronize
+          * @brief Synchronise
           */
-         static void synchronize();
+         static void synchronise();
   
          /**
-          * @brief Finalize the Serial system
+          * @brief Finalise the Serial system
           */
-         static void finalize();
+         static void finalise();
          
       protected:
 

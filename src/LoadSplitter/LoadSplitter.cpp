@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Base/Enums/Splittings.hpp"
 #include "Base/IO/Ascii/FormatToolbox.hpp"
 // Splitting algorithms
@@ -33,6 +33,21 @@ namespace GeoMHDiSCC {
    LoadSplitter::LoadSplitter(const int id, const int nCpu)
       : mSkip(0), mId(id), mNCpu(nCpu)
    {
+   }
+
+   int LoadSplitter::nCpu() const
+   {
+      return this->mNCpu;
+   }
+
+   int LoadSplitter::id() const
+   {
+      return this->mId;
+   }
+
+   bool LoadSplitter::moreSplittings() const
+   {
+      return ((this->mScores.size() - this->mSkip) > 0);
    }
 
    void LoadSplitter::initAlgorithms(const ArrayI& dim)

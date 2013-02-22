@@ -224,58 +224,6 @@ namespace GeoMHDiSCC {
          ArrayI mSimDim;
    };
 
-   inline int SplittingAlgorithm::id() const
-   {
-      return this->mId;
-   }
-
-   inline int SplittingAlgorithm::nCpu() const
-   {
-      return this->mNCpu;
-   }
-
-   inline int SplittingAlgorithm::dims() const
-   {
-      return this->mDims;
-   }
-
-   inline int SplittingAlgorithm::factor(const int i) const
-   {
-      // Assert on index of requested factor
-      assert(i < this->mFactors.size());
-
-      return this->mFactors(i);
-   }
-
-   inline const ArrayI& SplittingAlgorithm::factors() const
-   {
-      return this->mFactors;
-   }
-
-   inline int SplittingAlgorithm::maxFactor() const
-   {
-      return this->mFactors.maxCoeff();
-   }
-
-   inline int SplittingAlgorithm::groupId(const int i, const int id) const
-   {
-      // Assert on index of requested factor
-      assert(i < this->mFactors.size());
-
-      switch(i)
-      {
-         case(0):
-            return id % this->factor(0);
-            break;
-         case(1):
-            return id / this->factor(0);
-            break;
-         case(2):
-            return id / (this->factor(0)*this->factor(1));
-            break;
-      }
-   }
-
    template <typename TSchemeType> void SplittingAlgorithm::initScheme(const ArrayI& dim)
    {
       // Create shared pointer

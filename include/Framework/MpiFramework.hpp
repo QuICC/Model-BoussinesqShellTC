@@ -34,14 +34,14 @@ namespace GeoMHDiSCC {
          static void setup(const int nCpu);
 
          /**
-          * @brief Synchronize
+          * @brief Synchronise
           */
-         static void synchronize();
+         static void synchronise();
 
          /**
-          * @brief Finalize the MPI system
+          * @brief Finalise the MPI system
           */
-         static void finalize();
+         static void finalise();
          
       protected:
 

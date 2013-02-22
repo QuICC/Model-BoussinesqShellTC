@@ -39,7 +39,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         virtual ~IAsciiNWriter() {};
+         virtual ~IAsciiNWriter();
 
          /**
           * @brief Initialise the file

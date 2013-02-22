@@ -76,7 +76,11 @@ if(GEOMHDISCC_PROFILE)
 endif(GEOMHDISCC_PROFILE)
 
 if(GEOMHDISCC_STORAGEPROFILE)
-   set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Storage)
+   set(MHDDebugSrcDirs ${MHDDebugSrcDirs} StorageProfiler)
 endif(GEOMHDISCC_STORAGEPROFILE)
+
+##### DEVELOPMENT: NEEDS TO BE REMOVED ONCE CODE IS READY
+message(STATUS "!!!WARNING!!! OVERRIDING ACTUAL Debug.cmake DIRECTORY LIST WITH NOTHING")
+set(MHDDebugSrcDirs )
 
 geomhdiscc_append_sources(All_Srcs ${GEOMHDISCC_SRC_DIR} MHDDebugSrcDirs)

@@ -20,6 +20,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 #include "IoTools/Formatter.hpp"
 
 namespace GeoMHDiSCC {
@@ -40,7 +41,7 @@ namespace Debug {
          IoTools::Formatter::printNewline(std::cout);
          IoTools::Formatter::printLine(std::cout, '%');
          IoTools::Formatter::printCentered(std::cout, "Profiling information", '%');
-         IoTools::Formater::printLine(std::cout, '%');
+         IoTools::Formatter::printLine(std::cout, '%');
 
          // Output the timinigs
          std::stringstream oss;

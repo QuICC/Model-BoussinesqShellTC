@@ -19,7 +19,7 @@
 // Project includes
 //
 
-namespace GeoMDHiSCC {
+namespace GeoMHDiSCC {
 
 namespace IoAscii {
 

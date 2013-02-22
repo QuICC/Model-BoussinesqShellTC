@@ -14,6 +14,7 @@
 
 // External includes
 //
+#include <fftw3.h>
 
 // Project includes
 //

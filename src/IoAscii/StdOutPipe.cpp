@@ -38,7 +38,7 @@ namespace IoAscii {
    void StdOutPipe::init()
    {
       // Initialise parent
-      AsciiEWriter::init();
+      IAsciiEWriter::init();
 
       // Backup std::cout buffer
       this->mpCoutBuffer = std::cout.rdbuf();
@@ -59,7 +59,7 @@ namespace IoAscii {
       std::cout.rdbuf(this->mpCoutBuffer);
 
       // Finalise the parent
-      AsciiEWriter::finalise();
+      IAsciiEWriter::finalise();
    }
 }
 }

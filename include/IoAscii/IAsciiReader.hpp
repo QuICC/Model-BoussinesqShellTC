@@ -40,7 +40,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         virtual ~IAsciiReader() {};
+         virtual ~IAsciiReader();
 
          /**
           * @brief Initialise the file

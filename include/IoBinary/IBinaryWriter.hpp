@@ -44,7 +44,7 @@ namespace IoBinary {
          /**
          * @brief Destructor
          */
-         virtual ~IBinaryWriter() {};
+         virtual ~IBinaryWriter();
 
          /**
           * @brief Initialise the file

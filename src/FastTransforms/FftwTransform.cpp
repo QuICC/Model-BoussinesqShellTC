@@ -97,8 +97,8 @@ namespace Transform {
       }
 
       // Initialise temporary storage
-      this->mTmpRIn.setZero(this->mZRow, howmany);
-      this->mTmpZIn.setZero(this->mSize, howmany);
+      this->mTmpRIn.setZero(bwdSize, howmany);
+      this->mTmpZIn.setZero(fwdSize, howmany);
    }
 
    void FftwTransform::cleanupFft()

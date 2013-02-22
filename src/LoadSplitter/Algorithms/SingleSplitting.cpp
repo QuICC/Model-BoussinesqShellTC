@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Exception/Exception.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Base/IO/Ascii/FormatToolbox.hpp"
 
 namespace GeoMHDiSCC {

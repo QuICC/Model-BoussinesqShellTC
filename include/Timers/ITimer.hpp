@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~ITimer() {};
+         virtual ~ITimer();
 
          /**
           * @brief Start clock

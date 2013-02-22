@@ -51,18 +51,18 @@ namespace GeoMHDiSCC {
       MpiFramework::checkFramework(size);
    }
 
-   void MpiFramework::synchronize()
+   void MpiFramework::synchronise()
    {
-      // Create MPI barrier to force synchronization
+      // Create MPI barrier to force synchronisation
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
-   void MpiFramework::finalize()
+   void MpiFramework::finalise()
    {
-      // Make sure all finished and are synchronized
+      // Make sure all finished and are synchronised
       MPI_Barrier(MPI_COMM_WORLD);
 
-      // Finalize MPI system
+      // Finalise MPI system
       MPI_Finalize();
    }
 

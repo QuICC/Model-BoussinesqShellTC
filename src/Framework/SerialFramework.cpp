@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Base/Framework/SerialFramework.hpp"
+#include "Framework/SerialFramework.hpp"
 
 // Project includes
 //
@@ -43,12 +43,12 @@ namespace GeoMHDiSCC {
       SerialFramework::checkFramework(1);
    }
 
-   void SerialFramework::synchronize()
+   void SerialFramework::synchronise()
    {
       // Nothing to be done in serial framework
    }
 
-   void SerialFramework::finalize()
+   void SerialFramework::finalise()
    {
       // Nothing to be done in serial framework
    }

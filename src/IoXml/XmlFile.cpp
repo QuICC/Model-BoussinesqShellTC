@@ -24,7 +24,7 @@ namespace IoXml {
    {
    }
 
-   std::string XmlFile::filename()
+   std::string XmlFile::filename() const
    {
       return this->mName + this->mExt;
    }
@@ -34,47 +34,47 @@ namespace IoXml {
       this->mName = name;
    }
 
-   std::string XmlFile::name()
+   std::string XmlFile::name() const
    {
       return this->mName;
    }
 
-   std::string XmlFile::extension()
+   std::string XmlFile::extension() const
    {
       return this->mExt;
    }
 
-   std::string XmlFile::fileTag()
+   std::string XmlFile::fileTag() const
    {
       return XmlFile::FILE_TAG;
    }
 
-   std::string XmlFile::headerTag()
+   std::string XmlFile::headerTag() const
    {
       return XmlFile::HEADER_TAG;
    }
 
-   std::string XmlFile::header()
+   std::string XmlFile::header() const
    {
       return this->mHeader;
    }
 
-   std::string XmlFile::typeTag()
+   std::string XmlFile::typeTag() const
    {
       return XmlFile::TYPE_TAG;
    }
 
-   std::string XmlFile::type()
+   std::string XmlFile::type() const
    {
       return this->mType;
    }
 
-   std::string XmlFile::versionTag()
+   std::string XmlFile::versionTag() const
    {
       return XmlFile::VERSION_TAG;
    }
 
-   std::string XmlFile::version()
+   std::string XmlFile::version() const
    {
       return this->mVersion;
    }

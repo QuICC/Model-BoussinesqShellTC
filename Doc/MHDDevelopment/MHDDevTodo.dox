@@ -2,5 +2,14 @@
  *
  * \section mhdTodoGlobal  Global
  *
+ * \mhdTodo Choose between american and UK english and stick with it (finalise/finalize, synchronise/synchronize)
+ * \mhdTodo Restructure LoadSplitters
+ * \mhdTodo Restructure SpatialSchemes
+ * \mhdTodo Restructure Resolution
+ * \mhdTodo Restructure StorageProfiler
+ * \mhdTodo Restructure TransformCoordinators
+ * \mhdTodo Restructure Communicators
+ * \mhdTodo Restructure StorageProviders
+ *
  * \section mhdTodoLocal  Local
  */

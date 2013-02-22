@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
          /**
          * @brief Simple empty destructor
          */
-         virtual ~Exception() {};
+         virtual ~Exception() throw();
          
       protected:
 

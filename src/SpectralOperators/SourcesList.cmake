@@ -1,6 +1,10 @@
 # Create list of sources
 set(MHDSources
-   SpectralOperatorBase.cpp
-   ChebyshevSpectralOperator.cpp
-   UnitSpectralOperator.cpp
+   BoundaryConditions.cpp
+   ChebyshevOperator.cpp
+   ChebyshevBoundary.cpp
+   IBoundary.cpp
+   IOperator.cpp
+   PeriodicOperator.cpp
+   UnitOperator.cpp
 )

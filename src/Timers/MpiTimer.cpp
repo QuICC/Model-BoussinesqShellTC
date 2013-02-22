@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Timer/MpiTimer.hpp"
+#include "Timers/MpiTimer.hpp"
 
 // Project includes
 //
@@ -47,6 +47,21 @@ namespace GeoMHDiSCC {
    {
       // Compute elapsed time
       return this->mStop - this->mStart;
+   }
+
+   MHDFloat MpiTimer::resetTimer()
+   {
+      // Stop the timer
+      this->stop();
+
+      // Get elapsed time
+      MHDFloat tmp = this->time();
+
+      // Set start time to stopping time
+      this->mStart = this->mStop;
+
+      // return elapsed time
+      return tmp;
    }
 
 }

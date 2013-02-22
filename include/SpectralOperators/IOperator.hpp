@@ -52,7 +52,7 @@ namespace Spectral {
           *
           * @param p Order of the quasi identity
           */
-         virtual SparseMatrix id(const int p);
+         virtual SparseMatrix id(const int p) const;
 
          /**
           * @brief Get the derivative of order p
@@ -60,7 +60,7 @@ namespace Spectral {
           * @param nBC  Number of boundary
           * @param p    Order of the derivative
           */
-         virtual SparseMatrix diff(const int nBC, const int p) = 0;
+         virtual SparseMatrix diff(const int nBC, const int p) const = 0;
 
          /**
           * @brief Get the quasi inverse derivative for D^-p D^q
@@ -68,7 +68,7 @@ namespace Spectral {
           * @param p    Order of the quasi inverse
           * @param q    Order of the derivative
           */
-         virtual SparseMatrix qDiff(const int p, const int q) = 0;
+         virtual SparseMatrix qDiff(const int p, const int q) const = 0;
 
          /**
           * @brief Convert tau lines into sparse matrix pair
