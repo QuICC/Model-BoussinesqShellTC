@@ -128,7 +128,7 @@ namespace IoAscii {
       }
    }
 
-   void IAsciiReader::finalise()
+   void IAsciiReader::finalize()
    {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

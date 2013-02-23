@@ -260,7 +260,7 @@ namespace EPMPhoenix {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateForwardCommunication()
    {
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
 
       // Store the number of packs in active send
       this->mActiveBSendPacks = this->mPacks;
@@ -278,7 +278,7 @@ namespace EPMPhoenix {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateBackwardCommunication()
    {
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
 
       // Store the number of packs in active send
       this->mActiveFSendPacks = this->mPacks;

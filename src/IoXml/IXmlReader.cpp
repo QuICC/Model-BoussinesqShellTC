@@ -164,7 +164,7 @@ namespace IoXml {
       }
    }
 
-   void IXmlReader::finalise()
+   void IXmlReader::finalize()
    {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

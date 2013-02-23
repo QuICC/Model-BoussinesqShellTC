@@ -123,7 +123,7 @@ namespace Transform {
          return size;
 
       // Size was not good but optimisation worked
-      } else if(good && opt != 0)
+      } else
       {
          // Create nice looking warning message
          IoTools::Formatter::printLine(std::cout, '%');
@@ -132,7 +132,10 @@ namespace Transform {
          {
             oss << "WARNING: ";
          }
-         oss << "Extended FFT size (+" << opt << ")!";
+         if(opt > 0)
+         {
+            oss << "Extended FFT size (+" << opt << ")!";
+         }
          IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
          IoTools::Formatter::printLine(std::cout, '%');
          IoTools::Formatter::printNewline(std::cout);

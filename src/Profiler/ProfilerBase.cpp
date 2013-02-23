@@ -82,6 +82,8 @@ namespace Debug {
             return "send 3D";
          case FWDCONVRECV:
             return "receive 3D";
+         default:
+            return "Unknown break point";
       }
    }
 

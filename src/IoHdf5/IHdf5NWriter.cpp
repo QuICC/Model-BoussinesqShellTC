@@ -28,6 +28,10 @@ namespace IoHdf5 {
    {
    }
 
+   IHdf5NWriter::~IHdf5NWriter()
+   {
+   }
+
    void IHdf5NWriter::changeBasename(std::string base)
    {
       this->mBaseName = base;
@@ -67,7 +71,7 @@ namespace IoHdf5 {
       ++this->mCounter;
    }
 
-   void IHdf5NWriter::finalise()
+   void IHdf5NWriter::finalize()
    {
    }
 

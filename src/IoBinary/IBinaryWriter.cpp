@@ -29,6 +29,10 @@ namespace IoBinary {
    {
    }
 
+   IBinaryWriter::~IBinaryWriter()
+   {
+   }
+
    void IBinaryWriter::open()
    {
       // Check if the workflow allows IO to be performed

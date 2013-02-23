@@ -28,6 +28,10 @@ namespace IoBinary {
    {
    }
 
+   DirectBinaryWriter::~DirectBinaryWriter()
+   {
+   }
+
    void DirectBinaryWriter::init()
    {
       // Check if the workflow allows IO to be performed
@@ -38,7 +42,7 @@ namespace IoBinary {
       }
    }
 
-   void DirectBinaryWriter::finalise()
+   void DirectBinaryWriter::finalize()
    {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

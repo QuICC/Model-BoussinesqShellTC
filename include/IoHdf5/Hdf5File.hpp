@@ -90,16 +90,21 @@ namespace IoHdf5 {
          std::string  version() const;
 
          /**
+          * @brief Get the file handle
+          */
+         hid_t  file() const;
+
+         /**
+          * @brief Store the file handle
+          */
+         void setFile(hid_t fId);
+
+         /**
           * @brief Reset name
           *
           * @param name New name
           */
          void resetName(std::string name);
-
-         /**
-          * @brief HDF5 file handle
-          */
-         hid_t  mFile;
 
          /**
           * @brief Size of the dimensions (HDF5 cols)
@@ -168,6 +173,11 @@ namespace IoHdf5 {
           * @brief Version of the file to check compatibility
           */
          std::string mVersion;
+
+         /**
+          * @brief HDF5 file handle
+          */
+         hid_t  mFile;
    };
 
 }

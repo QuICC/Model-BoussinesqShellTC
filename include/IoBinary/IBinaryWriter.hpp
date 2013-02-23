@@ -59,7 +59,7 @@ namespace IoBinary {
          /**
           * @brief Finalise the file
           */
-         virtual void finalise() = 0;
+         virtual void finalize() = 0;
          
       protected:
 

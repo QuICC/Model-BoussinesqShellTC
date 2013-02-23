@@ -20,7 +20,7 @@ namespace GeoMHDiSCC {
 namespace IoXml {
 
    XmlFile::XmlFile(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version), mXML()
+      : mXML(), mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version)
    {
    }
 

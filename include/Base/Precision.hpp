@@ -30,7 +30,6 @@
 
 namespace GeoMHDiSCC {
 
-   /// definition of internal namespace to allow for internal multiple precision computations
    namespace internal {
 
       #ifdef GEOMHDISCC_MULTPRECISION

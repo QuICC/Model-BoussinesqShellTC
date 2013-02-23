@@ -219,7 +219,7 @@ namespace GeoMHDiSCC {
          std::list<int> mNCpuFactors;
 
          /**
-          * @bref Storage for the simulation resolution
+          * @brief Storage for the simulation resolution
           */
          ArrayI mSimDim;
    };

@@ -1,0 +1,36 @@
+/** 
+ * @namespace  GeoMHDiSCC
+ * @brief This is the main namespace for the whole code.
+ *
+ * Everything should be at least in this namespace
+ *
+ * @namespace GeoMHDiSCC::internal
+ * @brief This namespace provides all the multiple precision computations related code.
+ *
+ * @namespace GeoMHDiSCC::Debug
+ * @brief This namespace provides all the debugging related code.
+ *
+ * @namespace GeoMHDiSCC::Dimensions
+ * @brief This namespace provided all the dimensionality related code.
+ *
+ * @namespace GeoMHDiSCC::IoAscii
+ * @brief This namespace provides all the ASCII IO related code
+ *
+ * @namespace GeoMHDiSCC::IoBinary
+ * @brief This namespace provides all the Binary ASCII IO related code
+ *
+ * @namespace GeoMHDiSCC::IoHdf5
+ * @brief This namespace provides all the HDF5 IO related code
+ *
+ * @namespace GeoMHDiSCC::IoTools
+ * @brief This namespace provides all the IO tools related code
+ *
+ * @namespace GeoMHDiSCC::IoXml
+ * @brief This namespace provides all the XML IO related code
+ *
+ * @namespace GeoMHDiSCC::Spectral
+ * @brief This namespace provides all the spectral space related code
+ *
+ * @namespace GeoMHDiSCC::Transform
+ * @brief This namespace provides all the transform related code
+ */

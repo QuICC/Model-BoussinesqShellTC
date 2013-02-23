@@ -25,14 +25,14 @@ namespace Transform {
    class FftwTools
    {
       public:
-         /***
+         /**
           * @brief Compute the dealiased size for FFT (R<->R, or Z<->Z)
           *
           * @param size Size to dealias
           */
          static int dealiasFft(const int size);
 
-         /***
+         /**
           * @brief Compute the dealiased size for FFT (R<->Z, or Z<->R)
           *
           * @param size Size to dealias
@@ -42,7 +42,7 @@ namespace Transform {
          /**
           * @brief Optimise the FFT sizes
           *
-          * @param size On input current size/on output optimised size
+          * @param size Current size of the FFT
           */
          static int optimiseFft(const int size);
          
@@ -65,13 +65,13 @@ namespace Transform {
          static const MHDFloat OPTIMIZATION_WIDTH;
 
          /**
-         * @brief Empty constructor
-         */
+          * @brief Empty constructor
+          */
          FftwTools();
 
          /**
-         * @brief Empty Destructor
-         */
+          * @brief Empty Destructor
+          */
          ~FftwTools();
 
    };

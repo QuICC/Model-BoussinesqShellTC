@@ -45,7 +45,7 @@ int run()
    catch(int i)
    {
       // Cleanup and close file handles
-      spSim->finalise();
+      spSim->finalize();
 
       return i;
    }
@@ -54,7 +54,7 @@ int run()
    spSim->run();
 
    // Cleanup and close file handles
-   spSim->finalise();
+   spSim->finalize();
 
    return 0;
 }
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
    code = run();
 
    // Finalise everything that can't be done inside a class
-   mhd::FrameworkMacro::finalise();
+   mhd::FrameworkMacro::finalize();
 
    return code;
 }

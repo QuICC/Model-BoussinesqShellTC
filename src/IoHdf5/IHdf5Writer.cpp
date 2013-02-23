@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,28 +28,40 @@ namespace IoHdf5 {
    {
    }
 
+   IHdf5Writer::~IHdf5Writer()
+   {
+   }
+
    void IHdf5Writer::open()
    {
-      // Set Create Property list
-      this->setFilePList(); 
-
       // Create file
-      this->mFile = H5Fcreate(this->filename().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, this->filePList());
+      hid_t fId = H5Fcreate(this->filename().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, this->filePList());
+
+      // Check for successfully opened file
+      if(fId < 0)
+      {
+         throw Exception("Failed to open HDF5 file " + this->filename() + " in write mode!");
+      }
+
+      // Store the file handle
+      this->setFile(fId);
    }
 
    void IHdf5Writer::close()
    {
-      // Free the file property list
-      this->freeFilePList();
+      hid_t fPList = H5Fget_access_plist(this->file());
 
       // Close file
-      H5Fclose(this->mFile);
+      H5Fclose(this->file());
+
+      // Free the file property list
+      this->freePList(fPList);
    }
 
    void IHdf5Writer::createFileInfo()
    {
       // Select root of the file
-      hid_t loc = H5Gopen(this->mFile, "/", H5P_DEFAULT);
+      hid_t loc = H5Gopen(this->file(), "/", H5P_DEFAULT);
 
       // Define some used variables
       hid_t attr;

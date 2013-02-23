@@ -51,7 +51,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Finalise simulation run
           */
-         void finalise();
+         void finalize();
 
       protected:
 

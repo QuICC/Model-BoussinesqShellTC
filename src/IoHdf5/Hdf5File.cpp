@@ -23,7 +23,11 @@ namespace GeoMHDiSCC {
 namespace IoHdf5 {
 
    Hdf5File::Hdf5File(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version), mFile()
+      : mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version), mFile(-1)
+   {
+   }
+
+   Hdf5File::~Hdf5File()
    {
    }
 
@@ -122,6 +126,16 @@ namespace IoHdf5 {
    std::string Hdf5File::version() const 
    {
       return this->mVersion;
+   }
+
+   hid_t Hdf5File::file() const
+   {
+      return this->mFile;
+   }
+
+   void Hdf5File::setFile(hid_t fId)
+   {
+      this->mFile = fId;
    }
 
    const std::string Hdf5File::HEADER_TAG = "header";

@@ -71,7 +71,7 @@ namespace IoAscii {
    {
    }
 
-   void IAsciiNWriter::finalise()
+   void IAsciiNWriter::finalize()
    {
    }
 

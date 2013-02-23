@@ -141,13 +141,13 @@ namespace EPMPhoenix {
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
       {
-         (*scalEqIt)->finaliseMatrices();
+         (*scalEqIt)->finalizeMatrices();
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
       {
-         (*vectEqIt)->finaliseMatrices();
+         (*vectEqIt)->finalizeMatrices();
       }
 
       // Init timestepper
@@ -180,7 +180,7 @@ namespace EPMPhoenix {
 //      inState.read();
 //
 //      // Finalise file
-//      inState.finalise();
+//      inState.finalize();
 
       std::map<PhysicalNames::Id,Code::SharedScalarVariable>::const_iterator  sit;
       for(sit = this->mScalarVariables.begin(); sit != this->mScalarVariables.end(); sit++)
@@ -217,16 +217,16 @@ namespace EPMPhoenix {
       this->mIOSystem.cleanup();
    }
 
-   void SimulationBase::finaliseOutput()
+   void SimulationBase::finalizeOutput()
    {
       // finalise the output writers
-      this->mIOSystem.finaliseWriters();
+      this->mIOSystem.finalizeWriters();
    }
 
-   void SimulationBase::finaliseSimulation()
+   void SimulationBase::finalizeSimulation()
    {
       // Finalise IOSystem
-      this->mIOSystem.finalise();
+      this->mIOSystem.finalize();
    }
 
    void SimulationBase::timestepEquations()
@@ -279,7 +279,7 @@ namespace EPMPhoenix {
       this->ioSys().writeHdf5();
 
       // Synchronise all nodes of simulation
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
 
       // Execute last initialisations
       this->simCtrl().preRun();
@@ -294,7 +294,7 @@ namespace EPMPhoenix {
       this->ioSys().writeHdf5();
 
       // Synchronise all nodes of simulation
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
 
       // Execute run finalisations
       this->simCtrl().postRun();

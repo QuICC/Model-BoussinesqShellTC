@@ -26,6 +26,10 @@ namespace IoHdf5 {
    {
    }
 
+   IHdf5Reader::~IHdf5Reader()
+   {
+   }
+
    void IHdf5Reader::init()
    {
       // Open the file
@@ -38,26 +42,29 @@ namespace IoHdf5 {
    void IHdf5Reader::open()
    {
       // Open file
-      this->mFile = H5Fopen(this->filename().c_str(), H5F_ACC_RDONLY, this->filePList());
+      hid_t fId = H5Fopen(this->filename().c_str(), H5F_ACC_RDONLY, this->filePList());
 
       // Check for successfully opened file
-      if(this->mFile < 0)
+      if(fId < 0)
       {
-         throw Exception("Failed to open HDF5 file " + this->filename() + "!");
+         throw Exception("Failed to open HDF5 file " + this->filename() + " in read mode!");
       }
+
+      // Store the file handle
+      this->setFile(fId);
    }
 
-   void IHdf5Reader::finalise()
+   void IHdf5Reader::finalize()
    {
       this->close();
    }
 
    void IHdf5Reader::close()
    {
-      hid_t fPList = H5Fget_access_plist(this->mFile);
+      hid_t fPList = H5Fget_access_plist(this->file());
 
       // Close file
-      H5Fclose(this->mFile);
+      H5Fclose(this->file());
 
       // Free the property list
       this->freePList(fPList);
@@ -66,7 +73,7 @@ namespace IoHdf5 {
    void IHdf5Reader::checkCompatibility()
    {
       // Open the root of the file
-      hid_t loc = H5Gopen(this->mFile, "/", H5P_DEFAULT);
+      hid_t loc = H5Gopen(this->file(), "/", H5P_DEFAULT);
 
       // Some useful variables
       hid_t type, ftype;

@@ -140,10 +140,10 @@ namespace EPMPhoenix {
                // Separate scalar and vector fields
                if(infoIt->second.first)
                {
-                  this->mScalarVariables.at(infoIt->first)->initialisePhysical();
+                  this->mScalarVariables.at(infoIt->first)->initializePhysical();
                } else
                {
-                  this->mVectorVariables.at(infoIt->first)->initialisePhysical();
+                  this->mVectorVariables.at(infoIt->first)->initializePhysical();
                }
             }
 
@@ -153,10 +153,10 @@ namespace EPMPhoenix {
                // Separate scalar and vector fields
                if(infoIt->second.first)
                {
-                  this->mScalarVariables.at(infoIt->first)->initialisePhysicalDiff();
+                  this->mScalarVariables.at(infoIt->first)->initializePhysicalDiff();
                } else
                {
-                  this->mVectorVariables.at(infoIt->first)->initialisePhysicalDiff();
+                  this->mVectorVariables.at(infoIt->first)->initializePhysicalDiff();
                }
             }
 
@@ -164,7 +164,7 @@ namespace EPMPhoenix {
             if(infoIt->second.first)
             {
                // Initialise to zero
-               this->mScalarVariables.at(infoIt->first)->initialiseZeros();
+               this->mScalarVariables.at(infoIt->first)->initializeZeros();
 
                #ifdef EPMPHOENIX_STORAGEPROFILE
                   StorageProfilerMacro_update(StorageProfiler::VARIABLES, this->mScalarVariables.at(infoIt->first)->requiredStorage());
@@ -172,7 +172,7 @@ namespace EPMPhoenix {
             } else
             {
                // Initialise to zero
-               this->mVectorVariables.at(infoIt->first)->initialiseZeros();
+               this->mVectorVariables.at(infoIt->first)->initializeZeros();
 
                #ifdef EPMPHOENIX_STORAGEPROFILE
                   StorageProfilerMacro_update(StorageProfiler::VARIABLES, this->mVectorVariables.at(infoIt->first)->requiredStorage());

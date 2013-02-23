@@ -47,7 +47,7 @@ namespace IoAscii {
       }
    }
 
-   void DirectAsciiWriter::finalise()
+   void DirectAsciiWriter::finalize()
    {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

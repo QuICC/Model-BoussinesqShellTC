@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "IoHdf5/HIdf5Writer.hpp"
+#include "IoHdf5/IHdf5Writer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -56,7 +56,7 @@ namespace IoHdf5 {
          /**
           * @brief Finalise the file
           */
-         virtual void finalise();
+         virtual void finalize();
 
          /**
           * @brief Change the basename

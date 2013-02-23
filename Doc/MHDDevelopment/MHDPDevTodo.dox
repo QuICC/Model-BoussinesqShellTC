@@ -2,7 +2,7 @@
  *
  * \section mhdTodoGlobal  Global
  *
- * \mhdTodo Choose between american and UK english and stick with it (finalise/finalize, synchronise/synchronize)
+ * \mhdTodo Restructure IoHdf5
  * \mhdTodo Restructure LoadSplitters
  * \mhdTodo Restructure SpatialSchemes
  * \mhdTodo Restructure Resolution

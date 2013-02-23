@@ -43,18 +43,14 @@ namespace GeoMHDiSCC {
       SerialFramework::checkFramework(1);
    }
 
-   void SerialFramework::synchronise()
+   void SerialFramework::synchronize()
    {
       // Nothing to be done in serial framework
    }
 
-   void SerialFramework::finalise()
+   void SerialFramework::finalize()
    {
       // Nothing to be done in serial framework
-   }
-
-   SerialFramework::SerialFramework()
-   {
    }
 
 }

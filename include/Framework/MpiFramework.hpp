@@ -36,12 +36,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Synchronise
           */
-         static void synchronise();
+         static void synchronize();
 
          /**
           * @brief Finalise the MPI system
           */
-         static void finalise();
+         static void finalize();
          
       protected:
 

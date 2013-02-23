@@ -1,7 +1,5 @@
 /** \file IHdf5Writer.hpp
  *  \brief Interface to a general HDF5 writer
- *
- *  \mhdTodo Cleanup the dependency on Base/Enums/DimensionSpace.hpp
  */
 
 #ifndef IHDF5WRITER_HPP
@@ -21,7 +19,6 @@
 
 // Project includes
 //
-#include "Base/Enums/DimensionSpace.hpp"
 #include "Base/Typedefs.hpp"
 #include "IoHdf5/Hdf5Types.hpp"
 #include "IoHdf5/Hdf5File.hpp"
@@ -65,36 +62,13 @@ namespace IoHdf5 {
          /**
           * @brief Finalise the file
           */
-         virtual void finalise() = 0;
+         virtual void finalize() = 0;
          
       protected:
          /**
           * @brief Max collective IO Write operations over all CPUs
           */
          int mCollIOWrite;
-
-         /**
-          * @brief Set the maximum number of collective IO operations
-          *
-          * @param id ID of the dimension space (spectral or physical)
-          */
-         virtual void setCollIO(const DimensionSpace::Id id) = 0;
-
-         /**
-          * @brief Set total dataset size
-          *
-          * @param id ID of the dimension space (spectral or physical)
-          * @param isRegular  Is data regular?
-          */
-         virtual void setDatasetSize(const DimensionSpace::Id id, const bool isRegular) = 0;
-
-         /**
-          * @brief Set dataset offsets
-          *
-          * @param id ID of the dimension space (spectral or physical)
-          * @param isRegular  Is data regular?
-          */
-         virtual void setDatasetOffsets(const DimensionSpace::Id id, const bool isRegular) = 0;
 
          /**
           * @brief Open the file

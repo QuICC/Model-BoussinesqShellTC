@@ -39,7 +39,7 @@ set(MHDAllSrcDirs
    Framework         # SourcesList.txt IS IN DEBUG MODE
    IoAscii
    IoBinary
-   #IoHdf5
+   IoHdf5
    IoTools
    IoXml
    #   LoadSplitter

@@ -13,8 +13,13 @@ CODEDOCDIR	= ./CodeDoc/
 #--------------------------------------------------------------------
 .PHONY: all
 all:
-	echo "This Makefile only generates the code documentations.\n"
-	echo "Use CMake to generate the Makefiles for the executables.\n"
+	@echo "#############################################################"
+	@echo "#############################################################"
+	@echo "#   This Makefile only generates the code documentations.   #"
+	@echo "#    - Use 'make doc' to generate the documentation.        #"
+	@echo "#    - Use CMake to generate the real Makefiles.            #"
+	@echo "#############################################################"
+	@echo "#############################################################"
 
 .PHONY: doc
 doc:	

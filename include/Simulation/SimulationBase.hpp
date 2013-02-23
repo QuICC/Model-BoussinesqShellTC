@@ -106,12 +106,12 @@ namespace EPMPhoenix {
          /**
           * @brief Finalise the output files
           */
-         void finaliseOutput();
+         void finalizeOutput();
 
          /**
           * @brief Finalise the simulation base
           */
-         void finaliseSimulation();
+         void finalizeSimulation();
 
          /**
           * @brief Get the equation parameters

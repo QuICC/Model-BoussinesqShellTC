@@ -59,6 +59,35 @@ function (geomhdiscc_add_definition base)
 endfunction (geomhdiscc_add_definition base)
 
 #
+# Link to external libraries
+#
+function (geomhdiscc_link_external varName)
+   set(libName ${${varName}})
+   # Check if variable is defined
+   if(DEFINED GEOMHDISCC_LIBRARIES_${libName})
+      list(LENGTH GEOMHDISCC_LIBRARIES_${libName} len)
+      # Check the number of elements in list and rule out if not equal to 1
+      if(${len} EQUAL 1)
+         # Check if library requires lookup through find_package
+         if(${GEOMHDISCC_LIBRARIES_${libName}} STREQUAL "auto")
+            find_package(${libName})
+            if(${${libName}_FOUND})
+               set(GEOMHDISCC_LIBRARIES_${libName} ${${libName}_LIBRARIES})
+            endif(${${libName}_FOUND})
+         endif(${GEOMHDISCC_LIBRARIES_${libName}} STREQUAL "auto") 
+      endif(${len} EQUAL 1)
+   endif(DEFINED GEOMHDISCC_LIBRARIES_${libName})
+   # Loop over all libraries to link to
+   foreach(lib ${GEOMHDISCC_LIBRARIES_${libName}})
+      link_libraries(${lib})
+   endforeach(lib)
+   # Loop over all include directories to add 
+   foreach(inc ${GEOMHDISCC_INCLUDES_${libName}})
+      include_directories(${inc})
+   endforeach(inc)
+endfunction (geomhdiscc_link_external libName)
+
+#
 # Recursive crawler through sources
 #
 function (geomhdiscc_append_sources MHDAll MHDPath MHDDirs)

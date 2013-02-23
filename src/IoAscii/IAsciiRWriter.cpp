@@ -28,11 +28,15 @@ namespace IoAscii {
    {
    }
 
+   IAsciiRWriter::~IAsciiRWriter()
+   {
+   }
+
    void IAsciiRWriter::init()
    {
    }
 
-   void IAsciiRWriter::finalise()
+   void IAsciiRWriter::finalize()
    {
    }
 

@@ -87,7 +87,7 @@ namespace GeoMHDiSCC {
       }
 
       // Make sure nodes are synchronised after initialisation
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
    }
 
    void Simulation::run()
@@ -118,7 +118,7 @@ namespace GeoMHDiSCC {
          this->writeOutput();
 
          // Synchronise computation nodes
-         FrameworkMacro::synchronise();
+         FrameworkMacro::synchronize();
       }
 
       // Stop main loop timing
@@ -132,17 +132,17 @@ namespace GeoMHDiSCC {
       this->postRun();
 
       // Synchronise computation nodes
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
 
       // Stop post-run timing
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::POSTRUN);
 
       // Synchronise computation nodes
-      FrameworkMacro::synchronise();
+      FrameworkMacro::synchronize();
    }
 
-   void Simulation::finalise()
+   void Simulation::finalize()
    {
       // Print simulation control information
       this->simCtrl().printInfo(std::cout);
@@ -157,10 +157,10 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo(std::cout);
 
       // Finalise the output files
-      this->finaliseOutput();
+      this->finalizeOutput();
 
       // Finalise the simulation base
-      this->finaliseSimulation();
+      this->finalizeSimulation();
    }
 
 }

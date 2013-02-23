@@ -54,7 +54,7 @@ namespace IoAscii {
          /**
           * @brief Finalise the file
           */
-         virtual void finalise();
+         virtual void finalize();
          
       protected:
 

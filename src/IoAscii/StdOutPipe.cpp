@@ -57,13 +57,13 @@ namespace IoAscii {
       // Once this file is initialise any std::cout will be written to this file
    }
 
-   void StdOutPipe::finalise()
+   void StdOutPipe::finalize()
    {
       // Put std::cout buffer back in place
       std::cout.rdbuf(this->mpCoutBuffer);
 
       // Finalise the parent
-      IAsciiEWriter::finalise();
+      IAsciiEWriter::finalize();
    }
 }
 }

@@ -52,6 +52,8 @@ namespace Spectral {
       {
          unit(i) = (1.0/this->c(i))*std::pow(-1.0,i);
       }
+
+      return unit;
    }
 
    Array ChebyshevBoundary::rightUnit() const
@@ -61,6 +63,8 @@ namespace Spectral {
       {
          unit(i) = (1.0/this->c(i));
       }
+
+      return unit;
    }
 
    Array ChebyshevBoundary::value(IBoundary::Position pt) const

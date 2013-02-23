@@ -82,7 +82,7 @@ namespace IoXml {
       }
    }
 
-   void IXmlWriter::finalise()
+   void IXmlWriter::finalize()
    {
    }
 
