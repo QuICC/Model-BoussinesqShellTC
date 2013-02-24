@@ -37,28 +37,12 @@ namespace Debug {
          enum StoragePoint {VARIABLES, TRANSFORMS, TEMPORARIES, TIMESTEP, MPI, IO, SCALAR1, SCALAR2, SCALAR3, VECTOR1, VECTOR2, VECTOR3, TRANSFORM1D, TRANSFORM2D, TRANSFORM3D, TRANSFORM1DTEMP, TRANSFORM2DTEMP, TRANSFORM3DTEMP, MPIBUFFERS, MPITYPES, MPICOMM, NMAXSTORAGEPOINT};
 
          /**
-          * @brief Print execution time information
-          */
-         static void printInfo();
-
-         /**
           * @brief Update required storage
           *
           * @param point   Storage location
           * @param memory  Required storage
           */
          static void update(StoragePoint point, MHDFloat memory);
-         
-      protected:
-         /**
-          * @brief Constructor
-          */
-         StorageProfiler();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~StorageProfiler();
 
          /**
           * @brief Analyze the measured storage requirements
@@ -75,16 +59,23 @@ namespace Debug {
           */
          static void createNameMap(std::map<StoragePoint, std::string>& map);
 
-      private:
-         /**
-          * @brief Define the unit of the memory requirements
-          */
-         static void setUnit(MHDFloat value, std::string &ext, MHDFloat &factor);
-
          /**
           * @brief Storage requirements
           */
          static std::map<StoragePoint, MHDFloat> requirements;
+         
+      protected:
+
+      private:
+         /**
+          * @brief Constructor
+          */
+         StorageProfiler();
+
+         /**
+          * @brief Destructor
+          */
+         ~StorageProfiler();
    };
 
 }

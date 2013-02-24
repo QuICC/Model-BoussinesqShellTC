@@ -22,7 +22,7 @@
 #include "SpatialSchemes/2D/Regular2DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of Chebyshev(FFT) + Chebyshev(FFT) scheme
@@ -55,7 +55,7 @@ namespace EPMPhoenix {
          /**
           * @brief Destructor
           */
-         virtual ~TTScheme() {};
+         virtual ~TTScheme();
 
          /**
           * @brief Scheme specific splitting restrictions

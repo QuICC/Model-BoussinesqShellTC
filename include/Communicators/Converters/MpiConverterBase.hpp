@@ -27,7 +27,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/Converters/ConverterBase.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * \brief Templated implementation of the base of a MPI data converter.

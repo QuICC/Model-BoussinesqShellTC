@@ -4,9 +4,9 @@
 
 // Configuration includes
 //
-#include "Framework/FrameworkMacro.h"
 #include "Profiler/ProfilerMacro.h"
 #include "StorageProfiler/StorageProfilerMacro.h"
+#include "Framework/FrameworkMacro.h"
 
 // System includes
 //
@@ -20,15 +20,17 @@
 
 // Project includes
 //
-#include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
-#include "Base/Enums/RuntimeStatus.hpp"
-#include "Timers/ExecutionTimer.hpp"
 #include "IoTools/Formatter.hpp"
 
 namespace GeoMHDiSCC {
 
    Simulation::Simulation()
+      : mExecutionTimer(), mSimRunCtrl()
+   {
+   }
+
+   Simulation::~Simulation()
    {
    }
 
@@ -39,32 +41,6 @@ namespace GeoMHDiSCC {
 
       // Make sure to catch raised exception in initialisation steps
       try{
-         // Initialise the simulation
-         this->initSimulation();
-
-         // Initialise the equations
-         this->initEquations();
-
-         // Initialise the variables
-         this->initVariables();
-
-         // Setup the equations
-         this->setupEquations();
-
-         // Load information from input files (initial states, etc)
-         this->initInput();
-
-         // Initialise the timestepper
-         this->initTimestepper();
-
-         // Initialise output files (ASCII diagnostics, state files, etc)
-         this->initOutput();
-
-         // Setup output files (ASCII diagnostics, state files, etc)
-         this->setupOutput();
-
-         // Cleanup unused memory
-         this->cleanupSimulation();
       }
       catch(Exception &e)
       {
@@ -106,7 +82,7 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.start();
 
       // Start main loop of simulation
-      while(this->simCtrl().status() == RuntimeStatus::GOON)
+      while(this->mSimRunCtrl.status() == Runtime::Status::GOON)
       {
          // Compute the nonlinear terms
          this->computeNonlinear();
@@ -144,9 +120,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::finalize()
    {
-      // Print simulation control information
-      this->simCtrl().printInfo(std::cout);
-
       // Print execution timer infos
       this->mExecutionTimer.printInfo(std::cout);
 
@@ -154,13 +127,107 @@ namespace GeoMHDiSCC {
       ProfilerMacro_printInfo();
 
       // Print storage profiling infos (if required)
-      StorageProfilerMacro_printInfo(std::cout);
+      StorageProfilerMacro_printInfo();
+   }
 
-      // Finalise the output files
-      this->finalizeOutput();
+   void Simulation::addEquation(int spEq)//SharedScalarEquation spEq)
+   {
+   }
 
-      // Finalise the simulation base
-      this->finalizeSimulation();
+   void Simulation::addEquation(double spEq)//SharedVectorEquation spEq)
+   {
+   }
+
+   void Simulation::setConfigurationFile(int spCfgFile)//SharedConfigurationFile spCfgFile)
+   {
+   }
+
+   void Simulation::setInitialStateFile(int spInitFile)//SharedStateFile spInitFile)
+   {
+   }
+
+   void Simulation::addOutputFile(int spOutFile)//SharedAscii spOutFile)
+   {
+   }
+
+   void Simulation::addOutputFile(double spOutFile)//SharedHdf5 spOutFile)
+   {
+   }
+
+   void Simulation::preRun()
+   {
+      // Print message to signal successful completion of initialisation step
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "... Starting simulation ...", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
+      // Write initial ASCII output
+      this->mSimIoCtrl.writeASCII();
+
+      // Write initial state file
+      this->mSimIoCtrl.writeHdf5();
+
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
+   }
+
+   void Simulation::computeNonlinear()
+   {
+      // Compute backward transform
+      ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
+      //this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->transformCoordinator());
+      ProfilerMacro_stop(ProfilerMacro::BWDTRANSFORM);
+
+      // compute nonlinear interaction and forward transform
+      //this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->transformCoordinator());
+   }
+
+   void Simulation::timestepEquations()
+   {
+      ProfilerMacro_start(ProfilerMacro::TIMESTEP);
+      //this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
+      ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+
+      ProfilerMacro_start(ProfilerMacro::CONTROL);
+      if(this->mTimestepper.finishedStep())
+      {
+         // Update timestepper
+         this->mTimestepper.update();
+      
+         // Update simulation control
+         this->simCtrl().update();
+      }
+      ProfilerMacro_stop(ProfilerMacro::CONTROL);
+   }
+
+   void Simulation::writeOutput()
+   {
+      ProfilerMacro_start(ProfilerMacro::IO);
+      if(this->mTimestepper.finishedStep() && this->simCtrl().doIO())
+      {
+         // Write initial ASCII output
+         this->mSimIoCtrl.writeASCII();
+      
+         // Write initial state file
+         this->mSimIoCtrl.writeHdf5();
+      }
+      ProfilerMacro_stop(ProfilerMacro::IO);
+   }
+
+   void Simulation::postRun()
+   {
+      // Write final ASCII output
+      this->mSimIoCtrl.writeASCII();
+
+      // Write final state file
+      this->mSimIoCtrl.writeHdf5();
+
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
    }
 
 }

@@ -21,7 +21,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/SpatialScheme.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of a generic regular 3D scheme
@@ -44,7 +44,7 @@ namespace EPMPhoenix {
          /**
           * @brief Destructor
           */
-         virtual ~Regular3DScheme() {};
+         virtual ~Regular3DScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set

@@ -18,7 +18,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * 

@@ -39,7 +39,7 @@ namespace IoAscii {
          /**
          * @brief Destructor
          */
-         virtual ~StdOutPipe();
+         ~StdOutPipe();
 
          /**
           * @brief Init the file
@@ -57,6 +57,8 @@ namespace IoAscii {
          void finalize();
          
       protected:
+
+      private:
          /**
           * @brief HEADER part for StdOutPipe file
           */
@@ -82,7 +84,6 @@ namespace IoAscii {
           */
          static const std::string  EXTENSION;
 
-      private:
          /**
           * Backup std::cout buffer
           */

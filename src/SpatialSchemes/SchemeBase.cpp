@@ -15,7 +15,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    SchemeBase::SchemeBase(const int dims)
       : mCosts(dims), mScalings(dims), mMemory(dims)

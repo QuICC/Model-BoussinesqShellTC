@@ -9,8 +9,6 @@
 #define MAKE_STR( _P ) MAKE_STR_X( _P )
 /// Create header include string for the required implementation
 #define MODELHEADER MAKE_STR( MODELPATH )
-/// Create implementation name macro
-#define MODEL mhd::GEOMHDISCC_RUNSIM_MODEL
 
 // Configuration includes
 //
@@ -23,9 +21,8 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
+#include "PhysicalModels/ModelFactory.hpp"
 #include MODELHEADER
-
-namespace mhd = GeoMHDiSCC;
 
 /**
  * @brief Setup and run the simulation
@@ -33,7 +30,7 @@ namespace mhd = GeoMHDiSCC;
 int run()
 {
    // Create simulation
-   mhd::SharedSimulation   spSim = MODEL::createSimulation();
+   GeoMHDiSCC::SharedSimulation   spSim = GeoMHDiSCC::ModelFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createSimulation();
 
    // Exception handling during the initialisation part
    try
@@ -68,7 +65,7 @@ int run()
 int main(int argc, char* argv[])
 {
    // Initilise everything that can't be done inside a class
-   mhd::FrameworkMacro::init();
+   GeoMHDiSCC::FrameworkMacro::init();
 
    // Storage for the return code of run
    int code;
@@ -77,7 +74,7 @@ int main(int argc, char* argv[])
    code = run();
 
    // Finalise everything that can't be done inside a class
-   mhd::FrameworkMacro::finalize();
+   GeoMHDiSCC::FrameworkMacro::finalize();
 
    return code;
 }

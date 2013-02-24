@@ -15,7 +15,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    SpatialScheme::SpatialScheme(const int dims)
       : SchemeBase(dims), mDims(dims)

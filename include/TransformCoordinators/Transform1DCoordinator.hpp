@@ -24,7 +24,7 @@
 #include "Simulation/Enums/PhysicalNames.hpp"
 
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * 
@@ -172,14 +172,14 @@ namespace EPMPhoenix {
       // initialise the first transform
       this->mTransform1D.init(setup1D);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
-         EPMFloat mem1D = this->mTransform1D.requiredStorage();
+      #ifdef GEOMHDISCC_STORAGEPROFILE
+         MHDFloat mem1D = this->mTransform1D.requiredStorage();
          StorageProfilerMacro_update(StorageProfiler::TRANSFORMS, mem1D);
 
-         #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
+         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
             DetailedStorageProfilerMacro_update(StorageProfiler::TRANSFORM1D, mem1D);
-         #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
-      #endif // EPMPHOENIX_STORAGEPROFILE
+         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initCommunicator(SharedResolution spRes)

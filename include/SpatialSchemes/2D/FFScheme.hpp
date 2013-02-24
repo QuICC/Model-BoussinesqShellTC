@@ -22,7 +22,7 @@
 #include "SpatialSchemes/2D/Regular2DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of Fourier + Fourier scheme
@@ -55,7 +55,7 @@ namespace EPMPhoenix {
          /**
           * @brief Destructor
           */
-         virtual ~FFScheme() {};
+         virtual ~FFScheme();
 
          /**
           * @brief Scheme specific splitting restrictions

@@ -40,7 +40,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~LoadSplitter() {};
+         virtual ~LoadSplitter();
 
          /**
           * @brief Initialise the algorithms

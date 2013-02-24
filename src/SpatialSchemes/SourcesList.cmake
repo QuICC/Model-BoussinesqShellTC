@@ -1,10 +1,10 @@
 # Create list of sources
-set(EPMSources
+set(MHDSources
    SchemeBase.cpp
    SpatialScheme.cpp
 )
 
-set(EPMSrcSubDirs
+set(MHDSrcSubDirs
    1D
    2D
    3D

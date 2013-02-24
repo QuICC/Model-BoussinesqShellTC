@@ -20,7 +20,7 @@
 #include "Base/Typedefs.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of the base for data converter.
@@ -80,12 +80,12 @@ namespace EPMPhoenix {
           */
          virtual void initiateBackwardCommunication() = 0;
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
+      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const = 0;
-      #endif // EPMPHOENIX_STORAGEPROFILE
+      #endif // GEOMHDISCC_STORAGEPROFILE
 
          /**
           * @brief Set the communication buffers pointers

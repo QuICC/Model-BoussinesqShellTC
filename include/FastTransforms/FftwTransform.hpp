@@ -103,7 +103,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator);
+         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2R)
@@ -116,7 +116,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
+         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -129,7 +129,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -142,7 +142,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
+         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -190,7 +190,7 @@ namespace Transform {
          void cleanupFft();
    };
 
-   template <Arithmetics::Operation TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, FftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, FftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -213,7 +213,7 @@ namespace Transform {
       rFFTVal *= this->mspSetup->scale();
    }
 
-   template <Arithmetics::Operation TOperation> void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -257,7 +257,7 @@ namespace Transform {
       fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
    }
 
-   template <Arithmetics::Operation TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -280,7 +280,7 @@ namespace Transform {
       rFFTVal *= this->mspSetup->scale();
    }
 
-   template <Arithmetics::Operation TOperation> void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();

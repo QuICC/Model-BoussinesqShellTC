@@ -1,4 +1,4 @@
 # Create list of sources
-set(EPMSources
+set(MHDSources
    TScheme.cpp
 )

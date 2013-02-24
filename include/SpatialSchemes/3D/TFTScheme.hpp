@@ -61,7 +61,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~TFTScheme() {};
+         virtual ~TFTScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions

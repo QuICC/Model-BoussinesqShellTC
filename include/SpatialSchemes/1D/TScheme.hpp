@@ -22,7 +22,7 @@
 #include "SpatialSchemes/SpatialScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of Chebyshev scheme
@@ -51,7 +51,7 @@ namespace EPMPhoenix {
          /**
           * @brief Destructor
           */
-         virtual ~TScheme() {};
+         virtual ~TScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set

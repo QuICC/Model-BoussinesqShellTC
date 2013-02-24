@@ -103,7 +103,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
+         template <Arithmetics::Id TOperation> void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -116,7 +116,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
 
          /**
           * @brief Compute backward FFT (R2R)
@@ -129,7 +129,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
+         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -142,7 +142,7 @@ namespace Transform {
           *
           * @tparam TOperation   Arithmetic operation to perform
           */
-         template <Arithmetics::Operation TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
+         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -190,7 +190,7 @@ namespace Transform {
          void cleanupFft();
    };
 
-   template <Arithmetics::Operation TOperation> void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -210,7 +210,7 @@ namespace Transform {
       rChebVal *= this->mspSetup->scale();
    }
 
-   template <Arithmetics::Operation TOperation> void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -249,7 +249,7 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   template <Arithmetics::Operation TOperation> void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -277,7 +277,7 @@ namespace Transform {
       rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
    }
 
-   template <Arithmetics::Operation TOperation> void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();

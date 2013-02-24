@@ -17,7 +17,7 @@
 //
 #include "Base/Typedefs.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Templated implementation of a single data storage provider.
@@ -92,12 +92,12 @@ namespace EPMPhoenix {
           */
          std::vector<TData>&  rTmps();
 
-     #ifdef EPMPHOENIX_STORAGEPROFILE
+     #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
-         EPMFloat requiredStorage() const;
-     #endif // EPMPHOENIX_STORAGEPROFILE
+         MHDFloat requiredStorage() const;
+     #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
 
@@ -247,10 +247,10 @@ namespace EPMPhoenix {
       return *this->mpTmp;
    }
 
-   #ifdef EPMPHOENIX_STORAGEPROFILE
-   template <typename TData> EPMFloat  StorageProvider<TData>::required() const
+   #ifdef GEOMHDISCC_STORAGEPROFILE
+   template <typename TData> MHDFloat  StorageProvider<TData>::required() const
    {
-      EPMFloat mem = 0.0;
+      MHDFloat mem = 0.0;
 
       if(this->nTmp() > 0)
       {
@@ -259,7 +259,7 @@ namespace EPMPhoenix {
 
       return mem;
    }
-   #endif // EPMPHOENIX_STORAGEPROFILE
+   #endif // GEOMHDISCC_STORAGEPROFILE
 
 }
 

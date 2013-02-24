@@ -24,7 +24,7 @@
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * \brief Implementation of the serial data converter.
@@ -82,12 +82,12 @@ namespace EPMPhoenix {
           */
          void init(SharedResolution spRes, const int fwdDim);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
+      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const;
-      #endif // EPMPHOENIX_STORAGEPROFILE
+      #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
 
@@ -147,11 +147,11 @@ namespace EPMPhoenix {
       this->mspTRes = spRes->cpu()->dim(fwdDim);
    }
 
-#ifdef EPMPHOENIX_STORAGEPROFILE
+#ifdef GEOMHDISCC_STORAGEPROFILE
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::profileStorage() const
    {
    }
-#endif // EPMPHOENIX_STORAGEPROFILE
+#endif // GEOMHDISCC_STORAGEPROFILE
 
 }
 

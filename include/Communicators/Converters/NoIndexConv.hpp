@@ -17,7 +17,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * \brief Implementation of the index converter doing nothing

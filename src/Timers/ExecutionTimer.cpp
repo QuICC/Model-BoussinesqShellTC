@@ -27,6 +27,10 @@ namespace GeoMHDiSCC {
    {
    }
 
+   ExecutionTimer::~ExecutionTimer()
+   {
+   }
+
    void ExecutionTimer::update(BreakPoint point)
    {
       // Increment measured time
@@ -56,7 +60,7 @@ namespace GeoMHDiSCC {
          MPI_Allreduce(MPI_IN_PLACE, this->mTimes.data(), this->mTimes.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
          // Compute mean times per CPU
-         this->mTimes /= static_cast<EPMFloat>(FrameworkMacro::nCpu());
+         this->mTimes /= static_cast<MHDFloat>(FrameworkMacro::nCpu());
       #endif // GEOMHDISCC_MPI
    }
 
@@ -117,7 +121,7 @@ namespace GeoMHDiSCC {
       IoTools::Formatter::printCentered(stream, oss.str(), ' ', base);
       oss.str("");
 
-      IoTools::Formatter::printLine('-');
+      IoTools::Formatter::printLine(stream, '-');
 
       // Output total execution time
       oss << "Total execution time: " << std::fixed << std::setprecision(1) << this->mTimes(TOTAL);

@@ -24,11 +24,11 @@
 #include "Base/Communicators/Communicator1D.hpp"
 #include "Base/Communicators/Converters/ConverterBase.hpp"
 #include "Base/Communicators/Converters/SerialConverter.hpp"
-#ifdef EPMPHOENIX_MPI
+#ifdef GEOMHDISCC_MPI
    #include "Base/Communicators/Converters/MpiConverter.hpp"
-#endif // EPMPHOENIX_MPI
+#endif // GEOMHDISCC_MPI
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of 2D communicator
@@ -182,19 +182,19 @@ namespace EPMPhoenix {
       // Initialise second dimension storage
       this->mStorage2D.init(setupFwd2D, setupBwd2D);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
-         EPMFloat mem2D = this->mStorage2D.requiredStorage();
+      #ifdef GEOMHDISCC_STORAGEPROFILE
+         MHDFloat mem2D = this->mStorage2D.requiredStorage();
          StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem2D);
 
-         #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
-            EPMStorageProfiler_update(StorageProfiler::TRANSFORM2D, mem2D);
-         #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
-      #endif // EPMPHOENIX_STORAGEPROFILE
+         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+            StorageProfilerMacro_update(StorageProfiler::TRANSFORM2D, mem2D);
+         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> void Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splittings::Locations::Id split)
    {
-      #ifdef EPMPHOENIX_MPI
+      #ifdef GEOMHDISCC_MPI
          if(split == Splittings::Locations::FIRST)
          {
             // Initialise 2D serial converter
@@ -251,7 +251,7 @@ namespace EPMPhoenix {
          spConv->init(spRes, 0);
 
          this->mspConverter2D = spConv;
-      #endif // EPMPHOENIX_MPI
+      #endif // GEOMHDISCC_MPI
 
       // If only one dimension is split
       if(split != Splittings::Locations::BOTH)
@@ -260,10 +260,10 @@ namespace EPMPhoenix {
          this->mspConverter2D->setup();
       }
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
+      #ifdef GEOMHDISCC_STORAGEPROFILE
          // Do (MPI) storage profiling on 2D converter
          this->mspConverter2D->profileStorage();
-      #endif // EPMPHOENIX_STORAGEPROFILE
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> TFwd1D&  Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::receiveFwd1D()

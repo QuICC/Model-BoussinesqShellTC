@@ -7,7 +7,6 @@
 
 // Configuration includes
 //
-#include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
 //
@@ -28,36 +27,41 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
-          * @brief Create a shared simulation for the model
-          */
-         static SharedSimulation createSimulation();
-
-      protected:
-         /**
           * @brief Get the required equations
+          *
+          * @param spSim   Shared simulation object
           */
-         static void equations();
+         static void addEquations(SharedSimulation spSim);
 
          /**
           * @brief Get the required XML input files
+          *
+          * @param spSim   Shared simulation object
           */
-         static void xmlInputs();
+         static void setConfigurationFile(SharedSimulation spSim);
 
          /**
           * @brief Get the required HDF5 input files
+          *
+          * @param spSim   Shared simulation object
           */
-         static void hdf5Inputs();
+         static void setInitialStateFile(SharedSimulation spSim);
 
          /**
           * @brief Get the required ASCII output files
+          *
+          * @param spSim   Shared simulation object
           */
-         static void asciiOutputs();
+         static void addAsciiOutputFiles(SharedSimulation spSim);
 
          /**
           * @brief Get the required HDF5 output files
+          *
+          * @param spSim   Shared simulation object
           */
-         static void hdf5Outputs();
+         static void addHdf5OutputFiles(SharedSimulation spSim);
 
+      protected:
 
       private:
          /**
@@ -69,7 +73,6 @@ namespace GeoMHDiSCC {
           * @brief Simple empty destructor
           */
          ~ExampleModel();
-
    };
 
 }

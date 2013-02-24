@@ -15,7 +15,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    const int TFScheme::DIMENSIONS = 2;
 
@@ -132,11 +132,11 @@ namespace EPMPhoenix {
 
    double TFScheme::memoryScore(SharedResolution spRes)
    {
-      #ifdef EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
          return this->mMemory.prod();
       #else
          return 1.0;
-      #endif //EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 
 }

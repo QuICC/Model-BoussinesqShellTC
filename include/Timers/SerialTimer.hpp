@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Reset timer (stop and restart)
           */
-         virtual MHDFloat resetTimer() = 0;
+         virtual MHDFloat resetTimer();
          
       protected:
 

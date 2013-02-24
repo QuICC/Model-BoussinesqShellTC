@@ -16,7 +16,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    CoreResolution::CoreResolution(const std::vector<SharedTransformResolution>& transformRes)
       : mTransforms(transformRes)

@@ -62,7 +62,10 @@ endfunction (geomhdiscc_add_definition base)
 # Link to external libraries
 #
 function (geomhdiscc_link_external varName)
-   set(libName ${${varName}})
+   set(tmp ${${varName}})
+   if(NOT ${tmp} STREQUAL "")
+      string(TOUPPER ${tmp} libName)
+   endif(NOT ${tmp} STREQUAL "")
    # Check if variable is defined
    if(DEFINED GEOMHDISCC_LIBRARIES_${libName})
       list(LENGTH GEOMHDISCC_LIBRARIES_${libName} len)

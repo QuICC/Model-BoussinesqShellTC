@@ -18,7 +18,7 @@
 #include "Base/Typedefs.hpp"
 #include "Exceptions/Exception.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Templated implementation of a data pair storage provider.
@@ -137,12 +137,12 @@ namespace EPMPhoenix {
           */
          std::vector<TBackward>&  rBTmps();
 
-     #ifdef EPMPHOENIX_STORAGEPROFILE
+     #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
          */
-         EPMFloat requiredStorage() const;
-     #endif // EPMPHOENIX_STORAGEPROFILE
+         MHDFloat requiredStorage() const;
+     #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
 
@@ -392,10 +392,10 @@ namespace EPMPhoenix {
       return *this->mpBTmp;
    }
 
-   #ifdef EPMPHOENIX_STORAGEPROFILE
-   template <typename TForward, typename TBackward> EPMFloat  StoragePairProvider<TForward, TBackward>::requiredStorage() const
+   #ifdef GEOMHDISCC_STORAGEPROFILE
+   template <typename TForward, typename TBackward> MHDFloat  StoragePairProvider<TForward, TBackward>::requiredStorage() const
    {
-      EPMFloat mem = 0.0;
+      MHDFloat mem = 0.0;
 
       if(this->nFTmp() > 0)
       {
@@ -409,7 +409,7 @@ namespace EPMPhoenix {
 
       return mem;
    }
-   #endif // EPMPHOENIX_STORAGEPROFILE
+   #endif // GEOMHDISCC_STORAGEPROFILE
 
 }
 

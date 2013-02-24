@@ -22,7 +22,7 @@
 //
 #include "Base/Transforms/Transform1DCoordinator.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * 
@@ -123,14 +123,14 @@ namespace EPMPhoenix {
       // initialise the second
       this->mTransform2D.init(setup2D);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
-         EPMFloat mem2D = this->mTransform2D.requiredStorage();
+      #ifdef GEOMHDISCC_STORAGEPROFILE
+         MHDFloat mem2D = this->mTransform2D.requiredStorage();
          StorageProfilerMacro_update(StorageProfiler::TRANSFORMS, mem2D);
 
-         #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
+         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
             DetailedStorageProfilerMacro_update(StorageProfiler::TRANSFORM2D, mem2D);
-         #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
-      #endif // EPMPHOENIX_STORAGEPROFILE
+         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initCommunicator(SharedResolution spRes)

@@ -9,19 +9,18 @@
    // include storage profiler
    #include "StorageProfiler/MemorySize.hpp"
    #include "StorageProfiler/StorageProfiler.hpp"
+   #include "StorageProfiler/StorageProfilerTools.hpp"
 
    namespace GeoMHDiSCC {
-      namespace Debug {
-         /// Typedef for a profiler
-         typedef StorageProfiler  StorageProfilerMacro;
-      }
+      /// Typedef for a profiler
+      typedef Debug::StorageProfiler  StorageProfilerMacro;
    }
 
    /// Define storage profiler update macro function
    #define StorageProfilerMacro_update(P,m)  StorageProfiler::update(P,m)
 
    /// Define storage profiler printInfo macro function
-   #define StorageProfilerMacro_printInfo()  StorageProfiler::printInfo()
+   #define StorageProfilerMacro_printInfo()  Debug::StorageProfilerTools::printInfo()
 
 #else
    /// Define storage profiler update macro function

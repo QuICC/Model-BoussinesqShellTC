@@ -22,7 +22,7 @@
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Resolutions/Resolution.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * \brief Implementation of the FDSH MPI data converter.
@@ -104,12 +104,12 @@ namespace EPMPhoenix {
           */
          void init(SharedResolution spRes, const int fwdDim, std::vector<TFwdA>& fwdTmps, std::vector<TBwdB>& bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
+      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
          */
          virtual void profileStorage() const;
-      #endif // EPMPHOENIX_STORAGEPROFILE
+      #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
          /**
@@ -565,11 +565,11 @@ namespace EPMPhoenix {
       }
    }
 
-#ifdef EPMPHOENIX_STORAGEPROFILE
+#ifdef GEOMHDISCC_STORAGEPROFILE
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::profileStorage() const
    {
-      EPMFloat memTypes = 0.0;
-      EPMFloat memComm = 0.0;
+      MHDFloat memTypes = 0.0;
+      MHDFloat memComm = 0.0;
 
       // General communication storage
       memComm += 4.0*5.0;
@@ -585,13 +585,13 @@ namespace EPMPhoenix {
       memTypes += 0.0;
 
       StorageProfilerMacro_update(StorageProfilerMacro::MPI, memTypes + memComm);
-      #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
+      #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
          StorageProfilerMacro_update(StorageProfilerMacro::MPITYPES, memTypes);
 
          StorageProfilerMacro_update(StorageProfilerMacro::MPICOMM, memComm);
-      #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
    }
-#endif // EPMPHOENIX_STORAGEPROFILE
+#endif // GEOMHDISCC_STORAGEPROFILE
 
 }
 

@@ -1,8 +1,5 @@
 set(MHDSources
-   SystemBase.cpp
-   SimulationBase.cpp
-   SpatialSimulationBase.cpp
-)
-
-set(EPMSrcSubDirs
+   Simulation.cpp
+   SimulationRunControl.cpp
+   SimulationIoControl.cpp
 )

@@ -15,7 +15,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    const int Regular2DScheme::DIMENSIONS = 2;
 

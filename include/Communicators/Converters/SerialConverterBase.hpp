@@ -24,7 +24,7 @@
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Converters/ConverterBase.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * \brief Implementation of the serial data converter base.
@@ -198,7 +198,7 @@ namespace EPMPhoenix {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> const typename TBwdB::CoefficientType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdPoint(const TBwdB& in, const int i, const int j, const int k)
    {
-      #ifdef EPMPHOENIX_MPI
+      #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
             int idxI = this->mspTRes->idxFwd(i,j,k);
@@ -229,12 +229,12 @@ namespace EPMPhoenix {
          {
             return in.point(TIdx::i(i));
          }
-      #endif //EPMPHOENIX_MPI
+      #endif //GEOMHDISCC_MPI
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::CoefficientType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::rBwdPoint(TBwdB& rOut, const int i, const int j, const int k)
    {
-      #ifdef EPMPHOENIX_MPI
+      #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
             int idxI = this->mspTRes->idxFwd(i,j,k);
@@ -266,7 +266,7 @@ namespace EPMPhoenix {
          {
             return rOut.rPoint(TIdx::i(i));
          }
-      #endif //EPMPHOENIX_MPI
+      #endif //GEOMHDISCC_MPI
    }
 
 }

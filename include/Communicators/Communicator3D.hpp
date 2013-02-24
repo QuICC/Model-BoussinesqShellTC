@@ -24,11 +24,11 @@
 #include "Base/Communicators/Communicator2D.hpp"
 #include "Base/Communicators/Converters/ConverterBase.hpp"
 #include "Base/Communicators/Converters/SerialConverter.hpp"
-#ifdef EPMPHOENIX_MPI
+#ifdef GEOMHDISCC_MPI
    #include "Base/Communicators/Converters/MpiConverter.hpp"
-#endif // EPMPHOENIX_MPI
+#endif // GEOMHDISCC_MPI
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of 3D communicator
@@ -194,14 +194,14 @@ namespace EPMPhoenix {
       // Initialise third dimension storage
       this->mStorage3D.init(setupFwd3D, setupBwd3D);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
-         EPMFloat mem3D = this->mStorage3D.requiredStorage();
+      #ifdef GEOMHDISCC_STORAGEPROFILE
+         MHDFloat mem3D = this->mStorage3D.requiredStorage();
          StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem3D);
 
-         #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
-            EPMStorageProfiler_update(StorageProfiler::TRANSFORM3D, mem3D);
-         #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
-      #endif // EPMPHOENIX_STORAGEPROFILE
+         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+            StorageProfilerMacro_update(StorageProfiler::TRANSFORM3D, mem3D);
+         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D, typename TFwd3D, typename TBwd3D> void Communicator3D<TFwd1D, TBwd1D, TFwd2D, TBwd2D, TFwd3D, TBwd3D>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, const ArrayI& packs2DFwd, const ArrayI& packs2DBwd, Splittings::Locations::Id split)
@@ -209,7 +209,7 @@ namespace EPMPhoenix {
       // Initialise 2D converter
       Communicator2D<TFwd1D,TBwd1D, TFwd2D,TBwd2D>::initConverter(spRes, packs1DFwd, packs1DBwd, split);
      
-      #ifdef EPMPHOENIX_MPI
+      #ifdef GEOMHDISCC_MPI
          if(split == Splittings::Locations::FIRST)
          {
             // Initialise serial 3D converter
@@ -274,7 +274,7 @@ namespace EPMPhoenix {
          spConv->init(spRes, 1);
 
          this->mspConverter3D = spConv;
-      #endif // EPMPHOENIX_MPI
+      #endif // GEOMHDISCC_MPI
 
       // Setup converter
       this->mspConverter3D->setup();
@@ -285,10 +285,10 @@ namespace EPMPhoenix {
          this->mspConverter2D->setup();
       }
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
+      #ifdef GEOMHDISCC_STORAGEPROFILE
          // Do (MPI) storage profiling on 3D converter
          this->mspConverter3D->profileStorage();
-      #endif // EPMPHOENIX_STORAGEPROFILE
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D, typename TFwd3D, typename TBwd3D> TFwd2D&  Communicator3D<TFwd1D, TBwd1D, TFwd2D, TBwd2D, TFwd3D, TBwd3D>::receiveFwd2D()

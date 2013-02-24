@@ -19,7 +19,7 @@
 #include "Base/StorageProviders/StoragePairProvider.hpp"
 #include "Base/Communicators/CommunicatorBase.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of 1D communicator
@@ -127,14 +127,14 @@ namespace EPMPhoenix {
       // Initialise first dimension storage
       this->mStorage1D.init(setupFwd1D, setupBwd1D);
 
-      #ifdef EPMPHOENIX_STORAGEPROFILE
-         EPMFloat mem1D = this->mStorage1D.requiredStorage();
+      #ifdef GEOMHDISCC_STORAGEPROFILE
+         MHDFloat mem1D = this->mStorage1D.requiredStorage();
          StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem1D);
 
-         #ifdef EPMPHOENIX_STORAGEPROFILER_DETAILED
-            EPMStorageProfiler_update(StorageProfiler::TRANSFORM1D, mem1D);
-         #endif // EPMPHOENIX_STORAGEPROFILER_DETAILED
-      #endif // EPMPHOENIX_STORAGEPROFILE
+         #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
+            StorageProfilerMacro_update(StorageProfiler::TRANSFORM1D, mem1D);
+         #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
+      #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
    template <typename TFwd1D, typename TBwd1D> TFwd1D& Communicator1D<TFwd1D, TBwd1D>::receiveFwd1D()

@@ -20,32 +20,43 @@
 
 namespace GeoMHDiSCC {
 
-   SharedSimulation ExampleModel::createSimulation()
+   void ExampleModel::addEquations(SharedSimulation spSim)
    {
-      // Create simulation
-      SharedSimulation  spSim;
-
-      return spSim;
+      // Add equation
+      //pSim->addEquation(AN_EQUATION);
+      
+      // Add equation
+      //pSim->addEquation(AN_EQUATION);
    }
 
-   void ExampleModel::equations()
+   void ExampleModel::setConfigurationFile(SharedSimulation spSim)
    {
+      // Set Configuration file
+      //pSim->addConfigurationFile(A_CONFIGURATION);
    }
 
-   void ExampleModel::xmlInputs()
+   void ExampleModel::setInitialStateFile(SharedSimulation spSim)
    {
+      // Set Configuration file
+      //pSim->setInitialState(A_CONFIGURATION);
    }
 
-   void ExampleModel::hdf5Inputs()
+   void ExampleModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
+      // Add ASCII output file
+      //pSim->addOutputFile(AN_ASCIIFILE);
+      
+      // Add ASCII output file
+      //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void ExampleModel::asciiOutputs()
+   void ExampleModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
-   }
-
-   void ExampleModel::hdf5Outputs()
-   {
+      // Add HDF5 output file
+      //pSim->addOutputFile(AN_HDF5FILE);
+      
+      // Add HDF5 output file
+      //pSim->addOutputFile(AN_HDF5FILE);
    }
 
 }

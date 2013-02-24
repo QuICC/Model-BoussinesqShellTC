@@ -16,7 +16,7 @@
 // Project includes
 //
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    const int Regular3DScheme::DIMENSIONS = 3;
 

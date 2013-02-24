@@ -90,7 +90,7 @@ namespace IoXml {
           *
           * \tparam T Type of the value to write
           */
-         template <typename T> void writeValue(T& val, rapidxml::xml_node<>* base, const std::string& tag);
+         template <typename T> void writeValue(const T& val, rapidxml::xml_node<>* base, const std::string& tag);
 
          /**
           * @brief Operation to perform just before writing data
@@ -105,7 +105,7 @@ namespace IoXml {
       private:
    };
 
-   template <typename T>  void IXmlWriter::writeValue(T& val, rapidxml::xml_node<>* base, const std::string& tag)
+   template <typename T>  void IXmlWriter::writeValue(const T& val, rapidxml::xml_node<>* base, const std::string& tag)
    {
       // Pointer to node
       rapidxml::xml_node<>* node;

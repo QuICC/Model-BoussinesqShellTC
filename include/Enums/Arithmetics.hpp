@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
       /**
       * @name Enum for basic arithmetics to use a template argument
       */
-      enum Operation {SET, ADD, SUB};
+      enum Id {SET, ADD, SUB};
    };
 }
 

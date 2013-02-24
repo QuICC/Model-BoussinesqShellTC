@@ -4,6 +4,7 @@ set(MHDSources
    MpiTimer.cpp      # ONLY DEBUG, SHOULD BE REMOVED
    SerialTimer.cpp   # ONLY DEBUG, SHOULD BE REMOVED
    TimerTools.cpp
+   ExecutionTimer.cpp
 )
 
 # Add in the parallel or serial timers depending on setup

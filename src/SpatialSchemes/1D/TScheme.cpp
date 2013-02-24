@@ -16,7 +16,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
 
    const int TScheme::DIMENSIONS = 1;
 
@@ -98,11 +98,11 @@ namespace EPMPhoenix {
 
    double TScheme::memoryScore(SharedResolution spRes)
    {
-      #ifdef EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
          return this->mMemory.prod();
       #else
          return 1.0;
-      #endif //EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 
    void TScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splittings::Locations::Id flag)

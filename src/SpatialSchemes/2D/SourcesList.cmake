@@ -1,5 +1,5 @@
 # Create list of sources
-set(EPMSources
+set(MHDSources
    FFScheme.cpp
    TFScheme.cpp
    TTScheme.cpp

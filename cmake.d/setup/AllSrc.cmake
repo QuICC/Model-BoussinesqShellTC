@@ -39,17 +39,20 @@ set(MHDAllSrcDirs
    Framework         # SourcesList.txt IS IN DEBUG MODE
    IoAscii
    IoBinary
+   IoConfig
+   IoControl
    IoHdf5
    IoTools
    IoXml
    #   LoadSplitter
    Profiler
    #   Resolutions
-   #   Simulation
+   Simulation
    #   SpatialSchemes
    SpectralOperators
-   #   StorageProfiler
+   StorageProfiler
    Timers            # SourcesList.txt IS IN DEBUG MODE
+   #Timesteppers
 )
 
 

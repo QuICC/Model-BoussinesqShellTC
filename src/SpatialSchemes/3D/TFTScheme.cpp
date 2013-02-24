@@ -182,10 +182,10 @@ namespace GeoMHDiSCC {
 
    double TFTScheme::memoryScore(SharedResolution spRes)
    {
-      #ifdef EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
          return this->mMemory.prod();
       #else
          return 1.0;
-      #endif //EPMPHOENIX_MEMORYUSAGE_LIMITED
+      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 }
