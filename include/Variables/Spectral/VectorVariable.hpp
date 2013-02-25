@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * \brief Implementation of vector variable
     */
@@ -134,6 +136,7 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }
 
 #endif // VECTORVARIABLE_HPP

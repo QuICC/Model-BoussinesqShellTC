@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Component id, DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
       storage.second.block(start,0,rows*cols,inCols) = this->mNLMatrices.find(id)->second.at(matIdx)*storage.second.block(start,0,rows*cols,inCols);
    }
 
-   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Component id, MatrixZ& storage, const int matIdx, const int start)
+   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -44,7 +44,7 @@ namespace GeoMHDiSCC {
       storage.block(start,0,rows*cols,inCols) = this->mNLMatrices.find(id)->second.at(matIdx)*storage.block(start,0,rows*cols,inCols);
    }
 
-   void IScalarEquation::copyTInput(FieldComponents::Spectral::Component id, DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -71,7 +71,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void IScalarEquation::copyTInput(FieldComponents::Spectral::Component id, MatrixZ& storage, const int matIdx, const int start)
+   void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -94,7 +94,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Component id, const DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -121,7 +121,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Component id, const MatrixZ& storage, const int matIdx, const int start)
+   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();

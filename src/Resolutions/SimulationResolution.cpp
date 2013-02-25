@@ -29,13 +29,13 @@ namespace GeoMHDiSCC {
 
       ArrayI extPhys(phys.size() + 1);
       extPhys.segment(0,phys.size()) = phys;
-      extPhys(extPhys.size()-1) = this->mDim2D.find(DimensionSpace::PHYSICAL)->second.sum();
-      this->mSim.insert(std::make_pair(DimensionSpace::PHYSICAL, extPhys));
+      extPhys(extPhys.size()-1) = this->mDim2D.find(Dimensions::Space::PHYSICAL)->second.sum();
+      this->mSim.insert(std::make_pair(Dimensions::Space::PHYSICAL, extPhys));
 
       ArrayI extSpec(spec.size() + 1);
       extSpec.segment(0,spec.size()) = spec;
-      extSpec(extSpec.size()-1) = this->mDim2D.find(DimensionSpace::SPECTRAL)->second.sum();
-      this->mSim.insert(std::make_pair(DimensionSpace::SPECTRAL, extSpec));
+      extSpec(extSpec.size()-1) = this->mDim2D.find(Dimensions::Space::SPECTRAL)->second.sum();
+      this->mSim.insert(std::make_pair(Dimensions::Space::SPECTRAL, extSpec));
    }
 
    SimulationResolution::~SimulationResolution()
@@ -51,7 +51,7 @@ namespace GeoMHDiSCC {
 
       phys2D.setConstant(phys(2));
 
-      this->mDim2D.insert(std::make_pair(DimensionSpace::PHYSICAL, phys2D));
+      this->mDim2D.insert(std::make_pair(Dimensions::Space::PHYSICAL, phys2D));
 
       //
       // Create physical space second dimensions
@@ -70,10 +70,10 @@ namespace GeoMHDiSCC {
          spec2D.setConstant(spec(2));
       #endif // defined EPMPHOENIX_SPATIALSCHEME_WSH || defined EPMPHOENIX_SPATIALSCHEME_TSH || defined EPMPHOENIX_SPATIALSCHEME_FDSH || defined EPMPHOENIX_SPATIALSCHEME_TpSH
 
-      this->mDim2D.insert(std::make_pair(DimensionSpace::SPECTRAL, spec2D));
+      this->mDim2D.insert(std::make_pair(Dimensions::Space::SPECTRAL, spec2D));
    }
 
-   int SimulationResolution::dim(const DimensionSpace::Id id, const int dim) const
+   int SimulationResolution::dim(const Dimensions::Space::Id id, const int dim) const
    {
       // Safety assertion
       assert(this->mSim.find(id)->second.size() - 1 > dim);
@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
       return this->mSim.find(id)->second(dim);
    }
 
-   int SimulationResolution::dim2D(const DimensionSpace::Id id, const int j) const
+   int SimulationResolution::dim2D(const Dimensions::Space::Id id, const int j) const
    {
       // Safety assertion
       assert(this->mDim2D.find(id)->second.size() > j);
@@ -89,12 +89,12 @@ namespace GeoMHDiSCC {
       return this->mDim2D.find(id)->second(j);
    }
 
-   int SimulationResolution::nSlow(const DimensionSpace::Id id) const
+   int SimulationResolution::nSlow(const Dimensions::Space::Id id) const
    {
       return this->mSim.find(id)->second.tail(1)(0);
    }
 
-   int SimulationResolution::nFast(const DimensionSpace::Id id) const
+   int SimulationResolution::nFast(const Dimensions::Space::Id id) const
    {
       return this->mSim.find(id)->second(0);
    }

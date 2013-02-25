@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "ScalarField/ScalarFieldSetup.hpp"
+#include "ScalarFields/ScalarFieldSetup.hpp"
 
 namespace GeoMHDiSCC {
 

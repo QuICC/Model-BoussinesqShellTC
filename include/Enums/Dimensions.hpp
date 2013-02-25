@@ -22,6 +22,18 @@ namespace GeoMHDiSCC {
 namespace Dimensions {
 
    /**
+    * @brief Simple struc to label 1D, 2D or 3D simulations
+    */
+   enum Type {
+      /// 1D simulation
+      ONED,
+      /// 2D simulation
+      TWOD,
+      /// 3D simulation
+      THREED
+   };
+
+   /**
     * @brief Simple struct holding the IDs of transform spaces
     */
    struct Transform {
@@ -30,11 +42,11 @@ namespace Dimensions {
        */
       enum Id {
          /// First transform space
-         TRA1D;
+         TRA1D,
          /// Second transform space
-         TRA2D;
+         TRA2D,
          /// Third transform space
-         TRA2D;
+         TRA3D
       };
    };
 
@@ -47,30 +59,31 @@ namespace Dimensions {
        */
       enum Id {
          /// First dimension of data for forward transform
-         DATF1D;
+         DATF1D,
          /// First dimension of data for backward transform
-         DATB1D;
+         DATB1D,
          /// Second dimension of data
-         DAT2D;
+         DAT2D,
          /// Third dimension data
-         DAT3D;
+         DAT3D
       };
    };
 
    /**
     * @brief Simple struct holding IDs for the two spaces
     */
-   struct Spaces {
+   struct Space {
       /**
        * @name Enums for the dimension spaces
        */
       enum Id {
          /// Spectral space
-         SPECTRAL;
+         SPECTRAL,
          /// Physical space
-         PHYSICAL;
+         PHYSICAL
       };
    };
+}
 }
 
 #endif // DIMENSIONS_HPP

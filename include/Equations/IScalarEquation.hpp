@@ -8,8 +8,6 @@
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
-#include "Simulation/PrepMacros/ScalarTypedefsMacro.h"
-#include "Simulation/PrepMacros/VariableTypedefsMacro.h"
 
 // System includes
 //
@@ -22,6 +20,8 @@
 #include "Base/Typedefs.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
+#include "TypeSelectors/VariableSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -50,38 +50,38 @@ namespace GeoMHDiSCC {
           *
           * \param spUnknown Shared pointer to the unknown of the equation
           */
-         virtual void setUnknown(Code::SharedScalarVariable spUnknown);
+         virtual void setUnknown(Datatypes::SharedScalarVariableType spUnknown);
 
          /**
           * @brief Get the unknown variable
           */
-         const Code::ScalarVariable& unknown() const;
+         const Datatypes::ScalarVariableType& unknown() const;
 
          /**
           * @brief Set the unknown variable
           */
-         Code::ScalarVariable& rUnknown();
+         Datatypes::ScalarVariableType& rUnknown();
 
          /**
           * @brief Compute the nonlinear interaction term
           *
           * @param rNLComp Nonlinear term component
           */
-         virtual void computeNonlinear(Code::PhysicalScalarType& rNLComp) = 0;
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) = 0;
 
          /**
           * @brief Compute the linear term
           *
           * @param rRHS    RHS of timestepping equation
           */
-         virtual void computeLinear(Code::SpectralScalarType& rRHS);
+         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS);
 
          /**
           * @brief Prepare the RHS for the timestep computation
           *
           * @param rhs    RHS of timestepping equation
           */
-         virtual void prepareTimestep(const Code::SpectralScalarType& rhs) = 0;
+         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs) = 0;
 
          /**
           * @brief Transfer equation input to timestepper
@@ -91,7 +91,7 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void copyTInput(FieldComponents::Spectral::Component id, DecoupledZMatrix& storage, const int matIdx, const int start);
+         virtual void copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
 
          /**
           * @brief Transfer equation input to timestepper
@@ -101,7 +101,7 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void copyTInput(FieldComponents::Spectral::Component id, MatrixZ& storage, const int matIdx, const int start);
+         virtual void copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
          /**
           * @brief Transfer timestepper output to equation unknown
@@ -111,7 +111,7 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void copyTOutput(FieldComponents::Spectral::Component id, const DecoupledZMatrix& storage, const int matIdx, const int start);
+         virtual void copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
 
          /**
           * @brief Transfer timestepper output to equation unknown
@@ -121,7 +121,7 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void copyTOutput(FieldComponents::Spectral::Component id, const MatrixZ& storage, const int matIdx, const int start);
+         virtual void copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
          
       protected:
          /**
@@ -132,7 +132,7 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void applyQuasiInverse(FieldComponents::Spectral::Component id, DecoupledZMatrix& storage, const int matIdx, const int start);
+         virtual void applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
 
          /**
           * @brief Apply quasi-inverse to nonlinear values
@@ -142,32 +142,32 @@ namespace GeoMHDiSCC {
           * @param matIdx  Index of the given data
           * @param start   Start indx for the storage
           */
-         virtual void applyQuasiInverse(FieldComponents::Spectral::Component id, MatrixZ& storage, const int matIdx, const int start);
+         virtual void applyQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
          /**
           * @brief Storage for the shared scalar variable
           */
-         Code::SharedScalarVariable mspUnknown;
+         Datatypes::SharedScalarVariableType mspUnknown;
 
       private:
    };
 
-   inline void IScalarEquation::setUnknown(Code::SharedScalarVariable spUnknown)
+   inline void IScalarEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
    {
       this->mspUnknown = spUnknown;
    }
 
-   inline const Code::ScalarVariable& IScalarEquation::unknown() const
+   inline const Datatypes::ScalarVariableType& IScalarEquation::unknown() const
    {
       return *this->mspUnknown;
    }
 
-   inline Code::ScalarVariable& IScalarEquation::rUnknown()
+   inline Datatypes::ScalarVariableType& IScalarEquation::rUnknown()
    {
       return *this->mspUnknown;
    }
 
-   inline void IScalarEquation::computeLinear(Code::SpectralScalarType& rRHS)
+   inline void IScalarEquation::computeLinear(Datatypes::SpectralScalarType& rRHS)
    {
    }
 

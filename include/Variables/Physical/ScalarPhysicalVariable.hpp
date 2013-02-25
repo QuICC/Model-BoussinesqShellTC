@@ -24,6 +24,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * @brief Base of the implementation of the physical components of a scalar variable
     */
@@ -175,6 +177,7 @@ namespace GeoMHDiSCC {
       return mem;
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
+}
 }
 
 #endif // SCALARPHYSICALVARIABLE_HPP

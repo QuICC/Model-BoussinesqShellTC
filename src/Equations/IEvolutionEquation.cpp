@@ -25,25 +25,25 @@ namespace GeoMHDiSCC {
    {
    }
 
-   bool IEvolutionEquation::isComplex(FieldComponents::Spectral::Component id) const
+   bool IEvolutionEquation::isComplex(FieldComponents::Spectral::Id id) const
    {
       return (this->mEqIsComplex || this->boundaryIsComplex(id));
    }
 
-   bool IEvolutionEquation::boundaryIsComplex(FieldComponents::Spectral::Component id) const
+   bool IEvolutionEquation::boundaryIsComplex(FieldComponents::Spectral::Id id) const
    {
       bool status = false;
 
       return status;
    }
 
-   int IEvolutionEquation::nBC(FieldComponents::Spectral::Component id, Dimensions::Type dim) const
+   int IEvolutionEquation::nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const
    {
       int n = 0;
 
       if(this->mBCs.count(std::make_pair(id,dim)) > 0)
       {
-         std::map<std::pair<FieldComponents::Spectral::Component,Dimensions::Type>, std::map<BoundaryConditions::Id,BoundaryConditions::Position> >::const_iterator bcIt = this->mBCs.find(std::make_pair(id,dim));
+         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<BoundaryConditions::Id,BoundaryConditions::Position> >::const_iterator bcIt = this->mBCs.find(std::make_pair(id,dim));
          std::map<BoundaryConditions::Id,BoundaryConditions::Position>::const_iterator mapIt;
          for(mapIt = bcIt->second.begin(); mapIt != bcIt->second.end(); mapIt++)
          {
@@ -60,10 +60,10 @@ namespace GeoMHDiSCC {
       return n;
    }
 
-   void IEvolutionEquation::addBC(FieldComponents::Spectral::Component id, Dimensions::Type dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc, ArrayZ val)
+   void IEvolutionEquation::addBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc, ArrayZ val)
    {
       // Create boundary condition and boundary value maps if required
-      std::pair<FieldComponents::Spectral::Component,Dimensions::Type> myId = std::make_pair(id,dim);
+      std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
       if(this->mBCs.count(myId) == 0)
       {
          // Create boundary condition map
@@ -80,9 +80,9 @@ namespace GeoMHDiSCC {
       this->mBVals.find(myId)->second.insert(std::make_pair(bc.first,val));
    }
 
-   void IEvolutionEquation::addCBC(FieldComponents::Spectral::Component id, Dimensions::Type dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc)
+   void IEvolutionEquation::addCBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc)
    {
-      std::pair<FieldComponents::Spectral::Component,Dimensions::Type> myId = std::make_pair(id,dim);
+      std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
       if(this->mCBCs.count(myId) == 0)
       {
          this->mCBCs.insert(std::make_pair(myId, std::map<BoundaryConditions::Id,BoundaryConditions::Position>()));
@@ -118,7 +118,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int IEvolutionEquation::rowShift(FieldComponents::Spectral::Component id, const int j) const
+   int IEvolutionEquation::rowShift(FieldComponents::Spectral::Id id, const int j) const
    {
       if(this->mCMatrices.count(id) == 0)
       {
@@ -137,7 +137,7 @@ namespace GeoMHDiSCC {
       std::vector<DecoupledZSparse>::iterator bcIt;
 
       // Matrix map iterator
-      std::map<FieldComponents::Spectral::Component, std::vector<DecoupledZSparse> >::iterator mapIt;
+      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::iterator mapIt;
 
       // Loop over all components in time matrices map
       for(mapIt = this->mTMatrices.begin(); mapIt != this->mTMatrices.end(); ++mapIt)

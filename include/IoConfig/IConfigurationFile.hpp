@@ -77,11 +77,6 @@ namespace IoConfig {
          virtual ~IConfigurationFile();
 
          /**
-          * @brief Create configuration ID as string
-          */
-         std::string id() const;
-
-         /**
           * @brief Output run information
           */
          void printInfo() const;
@@ -92,37 +87,37 @@ namespace IoConfig {
           * @param id      ID of the simulation configuration block
           * @param spPart  Configuration part to add
           */
-         void addPart(SimulationBlocks::Block id, SharedConfigurationPart spPart);
+         void addPart(SimulationBlocks::Id id, SharedIConfigurationPart spPart);
 
          /**
           * @brief Get truncation part
           */
-         SharedConfigurationPart truncation() const;
+         SharedCIConfigurationPart truncation() const;
 
          /**
           * @brief Get parallel part
           */
-         SharedConfigurationPart parallel() const;
+         SharedCIConfigurationPart parallel() const;
 
          /**
           * @brief Get timestepping part
           */
-         SharedConfigurationPart timestepping() const;
+         SharedCIConfigurationPart timestepping() const;
 
          /**
           * @brief Get run part
           */
-         SharedConfigurationPart run() const;
+         SharedCIConfigurationPart run() const;
 
          /**
           * @brief Get run part
           */
-         SharedConfigurationPart io() const;
+         SharedCIConfigurationPart io() const;
 
          /**
           * @brief Get physical part
           */
-         SharedConfigurationPart physical() const;
+         SharedCIConfigurationPart physical() const;
          
       protected:
          /**
@@ -138,12 +133,12 @@ namespace IoConfig {
          /**
           * @brief Framework part of configuration file
           */
-         std::map<FrameworkBlocks::Block, SharedConfigurationPart>  mFramework;
+         std::map<FrameworkBlocks::Id, SharedIConfigurationPart>  mFramework;
 
          /**
           * @brief Simulation part of configuration file
           */
-         std::map<SimulationBlocks::Block, SharedConfigurationPart>  mSimulation;
+         std::map<SimulationBlocks::Id, SharedIConfigurationPart>  mSimulation;
 
          /**
           * @brief Initialise the different parts of the framework part
@@ -186,7 +181,7 @@ namespace IoConfig {
          static const std::string VERSION;
    };
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::truncation() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::truncation() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::TRUNCATION) != this->mFramework.end());
@@ -194,7 +189,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::TRUNCATION)->second;
    }
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::parallel() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::parallel() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::PARALLEL) != this->mFramework.end());
@@ -202,7 +197,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::PARALLEL)->second;
    }
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::timestepping() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::timestepping() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::TIMESTEPPING) != this->mFramework.end());
@@ -210,7 +205,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::TIMESTEPPING)->second;
    }
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::run() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::run() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::RUN) != this->mFramework.end());
@@ -218,7 +213,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::RUN)->second;
    }
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::io() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::io() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::IO) != this->mFramework.end());
@@ -226,7 +221,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::IO)->second;
    }
 
-   template <typename TBase> inline SharedCConfigurationPart IConfigurationFile<TBase>::physical() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::physical() const
    {
       // Make sure initialisation was correct
       assert(this->mSimulation.find(SimulationBlocks::PHYSICAL) != this->mSimulation.end());
@@ -234,12 +229,12 @@ namespace IoConfig {
       return this->mSimulation.find(SimulationBlocks::PHYSICAL)->second;
    }
 
-   template <typename TBase> std::string IConfigurationFile<TBase>::frameworkTag()
+   template <typename TBase> std::string IConfigurationFile<TBase>::frameworkTag() const
    {
       return IConfigurationFile<TBase>::FRAMEWORKTAG;
    }
 
-   template <typename TBase> std::string IConfigurationFile<TBase>::simulationTag()
+   template <typename TBase> std::string IConfigurationFile<TBase>::simulationTag() const
    {
       return IConfigurationFile<TBase>::SIMULATIONTAG;
    }
@@ -261,10 +256,14 @@ namespace IoConfig {
       this->initFramework(dim); 
    }
 
+   template <typename TBase> IConfigurationFile<TBase>::~IConfigurationFile()
+   {
+   }
+
    template <typename TBase> void IConfigurationFile<TBase>::initFramework(const int dim)
    {
       // Create shared pointer
-      SharedConfigurationPart spPart;
+      SharedIConfigurationPart spPart;
 
       //
       // Create framework content
@@ -290,14 +289,9 @@ namespace IoConfig {
       this->mFramework.insert(std::make_pair(FrameworkBlocks::IO, spPart));
    }
 
-   template <typename TBase> void IConfigurationFile<TBase>::addPart(SimulationBlocks::Block id, SharedConfigurationPart spPart)
+   template <typename TBase> void IConfigurationFile<TBase>::addPart(SimulationBlocks::Id id, SharedIConfigurationPart spPart)
    {
       this->mSimulation.insert(std::make_pair(id, spPart));
-   }
-
-   template <typename TBase> std::string IConfigurationFile<TBase>::id() const
-   {
-      return this->mFramework.find(FrameworkBlocks::TRUNCATION)->second->id();
    }
 
    template <typename TBase> void IConfigurationFile<TBase>::printInfo() const
@@ -313,7 +307,7 @@ namespace IoConfig {
          IoTools::Formatter::printNewline(std::cout);
 
          // Create framework constant part iterator
-         std::map<FrameworkBlocks::Block, SharedConfigurationPart>::const_iterator itF;
+         std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::const_iterator itF;
          // Iterate over all master components of framework configuration
          for(itF = this->mFramework.begin(); itF != this->mFramework.end(); itF++)
          {
@@ -321,7 +315,7 @@ namespace IoConfig {
          }
 
          // Create simulation constant part iterator
-         std::map<SimulationBlocks::Block, SharedConfigurationPart>::const_iterator itS;
+         std::map<SimulationBlocks::Id, SharedIConfigurationPart>::const_iterator itS;
          // Iterate over all master components of simulation configuration
          for(itS = this->mSimulation.begin(); itS != this->mSimulation.end(); itS++)
          {
@@ -347,7 +341,7 @@ namespace IoConfig {
       //
       
       // Create framework iterator
-      std::map<FrameworkBlocks::Block, SharedConfigurationPart>::const_iterator citF;
+      std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::const_iterator citF;
       // Iterate over all master components
       for(citF = this->mFramework.begin(); citF != this->mFramework.end(); citF++)
       {
@@ -369,7 +363,7 @@ namespace IoConfig {
       }
 
       // Create simulation iterator
-      std::map<SimulationBlocks::Block, SharedConfigurationPart>::const_iterator citS;
+      std::map<SimulationBlocks::Id, SharedIConfigurationPart>::const_iterator citS;
       // Iterate over all master components of the simulation data
       for(citS = this->mSimulation.begin(); citS != this->mSimulation.end(); citS++)
       {
@@ -433,7 +427,7 @@ namespace IoConfig {
       int fIdx = 0;
 
       // Create framework iterator
-      std::map<FrameworkBlocks::Block, SharedConfigurationPart>::iterator itF;
+      std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::iterator itF;
       // Iterate over all master components
       for(itF = this->mFramework.begin(); itF != this->mFramework.end(); itF++)
       {
@@ -459,7 +453,7 @@ namespace IoConfig {
       }
 
       // Create simulation iterator
-      std::map<SimulationBlocks::Block, SharedConfigurationPart>::iterator itS;
+      std::map<SimulationBlocks::Id, SharedIConfigurationPart>::iterator itS;
       // Iterate over all master components of the simulation data
       for(itS = this->mSimulation.begin(); itS != this->mSimulation.end(); itS++)
       {

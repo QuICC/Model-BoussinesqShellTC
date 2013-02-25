@@ -1,7 +1,8 @@
-/** \file FftwSetupTest.cpp
- *  \brief Implementation of test case for FftwSetup
+/** \file FftSetupTest.cpp
+ *  \brief Implementation of test case for FftSetup
  */
 
+#include "FastTransforms/FftSetup.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
@@ -9,21 +10,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the FftwSetup implementation
+    * @brief Test fixture for the FftSetup implementation
     */
-   class FftwSetupTest : public ::testing::Test {
+   class FftSetupTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         FftwSetupTest();
+         FftSetupTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~FftwSetupTest();
+         virtual ~FftSetupTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -36,26 +37,28 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   FftwSetupTest::FftwSetupTest()
+   FftSetupTest::FftSetupTest()
    {
    }
 
-   FftwSetupTest::~FftwSetupTest()
+   FftSetupTest::~FftSetupTest()
    {
    }
 
-//   void FftwSetupTest::SetUp()
+//   void FftSetupTest::SetUp()
 //   {
 //   }
 
-//   void FftwSetupTest::TearDown()
+//   void FftSetupTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Test default constructor
     */
-   TEST_F(FftwSetupTest, Constructor) {
+   TEST_F(FftSetupTest, Constructor) {
+      Transform::FftSetup setup(11,11,11,true);
+
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }
 

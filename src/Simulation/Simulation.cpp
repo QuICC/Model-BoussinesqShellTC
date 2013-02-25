@@ -130,15 +130,15 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo();
    }
 
-   void Simulation::addEquation(int spEq)//SharedScalarEquation spEq)
+   void Simulation::addEquation(int spEq)//SharedIScalarEquation spEq)
    {
    }
 
-   void Simulation::addEquation(double spEq)//SharedVectorEquation spEq)
+   void Simulation::addEquation(double spEq)//SharedIVectorEquation spEq)
    {
    }
 
-   void Simulation::setConfigurationFile(int spCfgFile)//SharedConfigurationFile spCfgFile)
+   void Simulation::setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile)
    {
    }
 
@@ -166,7 +166,7 @@ namespace GeoMHDiSCC {
       }
 
       // Write initial ASCII output
-      this->mSimIoCtrl.writeASCII();
+      this->mSimIoCtrl.writeAscii();
 
       // Write initial state file
       this->mSimIoCtrl.writeHdf5();
@@ -199,7 +199,7 @@ namespace GeoMHDiSCC {
          this->mTimestepper.update();
       
          // Update simulation control
-         this->simCtrl().update();
+         this->mSimRunCtrl.update();
       }
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
    }
@@ -207,10 +207,10 @@ namespace GeoMHDiSCC {
    void Simulation::writeOutput()
    {
       ProfilerMacro_start(ProfilerMacro::IO);
-      if(this->mTimestepper.finishedStep() && this->simCtrl().doIO())
+      if(this->mTimestepper.finishedStep() && this->mSimRunCtrl.doIO())
       {
          // Write initial ASCII output
-         this->mSimIoCtrl.writeASCII();
+         this->mSimIoCtrl.writeAscii();
       
          // Write initial state file
          this->mSimIoCtrl.writeHdf5();
@@ -221,7 +221,7 @@ namespace GeoMHDiSCC {
    void Simulation::postRun()
    {
       // Write final ASCII output
-      this->mSimIoCtrl.writeASCII();
+      this->mSimIoCtrl.writeAscii();
 
       // Write final state file
       this->mSimIoCtrl.writeHdf5();

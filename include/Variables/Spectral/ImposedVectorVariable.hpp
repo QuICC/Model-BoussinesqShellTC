@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Dataypes {
+
    /**
     * \brief Implementation of vector variable with an imposed component
     */
@@ -143,6 +145,7 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }
 
 #endif // IMPOSEDVECTORVARIABLE_HPP

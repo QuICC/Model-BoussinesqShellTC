@@ -25,9 +25,13 @@ namespace IoConfig {
    const std::string PhysicalPart::PARENTTAG = "physical";
 
    PhysicalPart::PhysicalPart(const std::vector<std::string>& names)
-      : ConfigurationPart(PhysicalPart::PARENTTAG)
+      : IConfigurationPart(PhysicalPart::PARENTTAG)
    {
       this->init(names);
+   }
+
+   PhysicalPart::~PhysicalPart()
+   {
    }
 
    void PhysicalPart::init(const std::vector<std::string>& names)

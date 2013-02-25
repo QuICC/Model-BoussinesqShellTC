@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/ScalarFields/ScalarFieldSetup.hpp"
+#include "ScalarFields/ScalarFieldSetup.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -113,12 +113,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the forward scalar field setup
           */
-         SharedScalarFieldSetup spFwdSetup() const;
+         Datatypes::SharedScalarFieldSetup spFwdSetup() const;
 
          /**
           * @brief Get the backward scalar field setup
           */
-         SharedScalarFieldSetup spBwdSetup() const;
+         Datatypes::SharedScalarFieldSetup spBwdSetup() const;
 
       protected:
 

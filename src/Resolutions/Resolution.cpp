@@ -78,22 +78,22 @@ namespace GeoMHDiSCC {
       return this->mCores.at(id);
    }
 
-   SharedScalarFieldSetup Resolution::spFwdSetup() const
+   Datatypes::SharedScalarFieldSetup Resolution::spFwdSetup() const
    {
       return this->cpu()->dim(this->cpu()->nDim()-1)->spFwdSetup();
    }
 
-   SharedScalarFieldSetup Resolution::spFwdSetup(const int dim) const
+   Datatypes::SharedScalarFieldSetup Resolution::spFwdSetup(const int dim) const
    {
       return this->cpu()->dim(dim)->spFwdSetup();
    }
 
-   SharedScalarFieldSetup Resolution::spBwdSetup() const
+   Datatypes::SharedScalarFieldSetup Resolution::spBwdSetup() const
    {
       return this->cpu()->dim(0)->spBwdSetup();
    }
 
-   SharedScalarFieldSetup Resolution::spBwdSetup(const int dim) const
+   Datatypes::SharedScalarFieldSetup Resolution::spBwdSetup(const int dim) const
    {
       return this->cpu()->dim(dim)->spBwdSetup();
    }

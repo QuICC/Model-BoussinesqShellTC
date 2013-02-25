@@ -27,7 +27,11 @@ namespace IoConfig {
    const std::string ConfigurationReader::NAME = "parameters";
 
    ConfigurationReader::ConfigurationReader(const int dim, const std::string& type)
-      : IConfigurationFile<XmlReader>(dim, ConfigurationReader::NAME, type)
+      : IConfigurationFile<IoXml::IXmlReader>(dim, ConfigurationReader::NAME, type)
+   {
+   }
+
+   ConfigurationReader::~ConfigurationReader()
    {
    }
 
@@ -50,7 +54,7 @@ namespace IoConfig {
             rapidxml::xml_node<> *pComponent;
 
             // Create master iterator
-            std::map<FrameworkBlocks::Block, SharedConfigurationPart>::iterator itM;
+            std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::iterator itM;
             // Iterate over all master components
             for(itM = this->mFramework.begin(); itM != this->mFramework.end(); itM++)
             {
@@ -70,7 +74,7 @@ namespace IoConfig {
                      this->readValue(val, pComponent, itIC->first);
 
                      // Store value
-                     itM->second->setIValue(itIC->first, value);
+                     itM->second->setIValue(itIC->first, val);
                   }
 
                   // Create float component iterator
@@ -83,7 +87,7 @@ namespace IoConfig {
                      this->readValue(val, pComponent, itIF->first);
 
                      // Store value
-                     itM->second->setFloatValue(itIF->first, value);
+                     itM->second->setFValue(itIF->first, val);
                   }
 
                   // Check if component data is correct
@@ -113,7 +117,7 @@ namespace IoConfig {
                rapidxml::xml_node<> *pComponent;
 
                // Create master iterator
-               std::map<SimulationBlocks::Block, SharedConfigurationPart>::iterator itM;
+               std::map<SimulationBlocks::Id, SharedIConfigurationPart>::iterator itM;
                // Iterate over all master components
                for(itM = this->mSimulation.begin(); itM != this->mSimulation.end(); itM++)
                {

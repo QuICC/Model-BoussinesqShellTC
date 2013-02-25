@@ -65,7 +65,7 @@ namespace GeoMHDiSCC {
           *
           * \mhdBug Fake implementation
           */
-         void addEquation(int spEq);//SharedScalarEquation  spEq);
+         void addEquation(int spEq);//SharedIScalarEquation  spEq);
 
          /**
           * @brief Add vector equation to solver
@@ -74,7 +74,7 @@ namespace GeoMHDiSCC {
           *
           * \mhdBug Fake implementation
           */
-         void addEquation(double spEq);//SharedVectorEquation  spEq);
+         void addEquation(double spEq);//SharedIVectorEquation  spEq);
 
          /**
           * @brief Set the simulation configuration file
@@ -83,7 +83,7 @@ namespace GeoMHDiSCC {
           *
           * \mhdBug Fake implementation
           */
-         void setConfigurationFile(SharedConfigurationFile spCfgFile);
+         void setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile);
 
          /**
           * @brief Set solver initial state file

@@ -7,7 +7,7 @@
 
 // Debug includes
 //
-#include "Debug/PrepMacros/StorageProfilerMacro.h"
+#include "StorageProfiler/StorageProfilerMacro.h"
 
 // Configuration includes
 //
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Base/Transforms/Transform1DCoordinator.hpp"
+#include "TransformCoordinators/Transform1DCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 

@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/DimensionSpace.hpp"
+#include "Enums/Dimensions.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -48,7 +48,7 @@ namespace GeoMHDiSCC {
           * @param id ID of the space (Physical, Spectral)
           * @param dim Dimension id
           */
-         int dim(const DimensionSpace::Id id, const int dim) const;
+         int dim(const Dimensions::Space::Id id, const int dim) const;
 
          /**
           * @brief Get simulation's second dimension
@@ -56,21 +56,21 @@ namespace GeoMHDiSCC {
           * @param id   ID of the space (Physical, Spectral)
           * @param j    Index of the second dimension
           */
-         int dim2D(const DimensionSpace::Id id, const int j) const;
+         int dim2D(const Dimensions::Space::Id id, const int j) const;
 
          /**
           * @brief Get simulation's fast dimension size
           *
           * @param id ID of the space (Physical, Spectral)
           */
-         int nSlow(const DimensionSpace::Id id) const;
+         int nSlow(const Dimensions::Space::Id id) const;
 
          /**
           * @brief Get simulation's slow dimension(s) total size
           *
           * @param id ID of the space (Physical, Spectral)
           */
-         int nFast(const DimensionSpace::Id id) const;
+         int nFast(const Dimensions::Space::Id id) const;
 
       protected:
 
@@ -78,12 +78,12 @@ namespace GeoMHDiSCC {
          /**
           * brief Storage
           */
-         std::map<DimensionSpace::Id, ArrayI> mSim;
+         std::map<Dimensions::Space::Id, ArrayI> mSim;
 
          /**
           * brief Storage
           */
-         std::map<DimensionSpace::Id, ArrayI> mDim2D;
+         std::map<Dimensions::Space::Id, ArrayI> mDim2D;
 
          /**
           * @brief Create second dimension values

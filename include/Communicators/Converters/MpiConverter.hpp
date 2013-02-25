@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "ommunicators/Converters/MpiConverterBase.hpp"
+#include "Communicators/Converters/MpiConverterBase.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Resolutions/Resolution.hpp"
 
@@ -179,9 +179,9 @@ namespace GeoMHDiSCC {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverter()
    {
       // Check that all dimensions match
-      StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
-      StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
-      StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
+      Debug::StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
       StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();

@@ -34,7 +34,7 @@ namespace IoConfig {
           *
           * @param names Names of the parameters
           */
-         PhysicalPart(const std::vector<std::string>& names);
+         explicit PhysicalPart(const std::vector<std::string>& names);
 
          /**
           * @brief Destructor

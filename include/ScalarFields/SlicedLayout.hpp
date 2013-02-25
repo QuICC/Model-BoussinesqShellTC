@@ -177,7 +177,7 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> inline const typename SlicedLayout<TData, DIMENSION>::StorageType& SlicedLayout<TData, DIMENSION>::slice(const int k) const
    {
       // Slices only make sense in 3D
-      StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
       // Check size
       assert(k < this->mField.size());
@@ -188,7 +188,7 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> inline typename SlicedLayout<TData, DIMENSION>::StorageType& SlicedLayout<TData, DIMENSION>::rSlice(const int k)
    {
       // Slices only make sense in 3D
-      StaticAssert< (DIMENSION == Dimensions::THREED) >();
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
       // Check size
       assert(k < this->mField.size());
@@ -199,7 +199,7 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> inline typename SlicedLayout<TData, DIMENSION>::StorageType::ConstColXpr SlicedLayout<TData, DIMENSION>::profile(const int j, const int k) const
    {
       // Profiles only make sense in 2D and 3D
-      StaticAssert< (DIMENSION == Dimensions::TWOD || DIMENSION == Dimensions::THREED) >();
+      Debug::StaticAssert< (DIMENSION == Dimensions::TWOD || DIMENSION == Dimensions::THREED) >();
 
       // 3D version
       if(DIMENSION == Dimensions::THREED)
@@ -224,7 +224,7 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> inline typename SlicedLayout<TData, DIMENSION>::StorageType::ColXpr SlicedLayout<TData, DIMENSION>::rProfile(const int j, const int k)
    {
       // Profiles only make sense in 2D and 3D
-      StaticAssert< (DIMENSION == Dimensions::TWOD || DIMENSION == Dimensions::THREED) >();
+      Debug::StaticAssert< (DIMENSION == Dimensions::TWOD || DIMENSION == Dimensions::THREED) >();
 
       // 3D version
       if(DIMENSION == Dimensions::THREED)
@@ -399,7 +399,7 @@ namespace Datatypes {
          mem += it->size();
       }
 
-      return static_cast<MHDFloat>(MemorySize<TData>::BYTES)*mem;
+      return static_cast<MHDFloat>(Debug::MemorySize<TData>::BYTES)*mem;
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 

@@ -30,6 +30,10 @@ namespace IoConfig {
       this->init();
    }
 
+   IOPart::~IOPart()
+   {
+   }
+
    void IOPart::init()
    {
       this->addFloatTag("arate", 0.0);

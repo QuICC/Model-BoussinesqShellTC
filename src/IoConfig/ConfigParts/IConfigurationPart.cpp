@@ -28,6 +28,10 @@ namespace IoConfig {
    {
    }
 
+   IConfigurationPart::~IConfigurationPart()
+   {
+   }
+
    const std::string& IConfigurationPart::parent() const
    {
       return this->mParent;
@@ -102,12 +106,12 @@ namespace IoConfig {
       IoTools::Formatter::printNewline(std::cout);
    }
 
-   void addIntegerTag(const std::string& name, int value)
+   void IConfigurationPart::addIntegerTag(const std::string& name, int value)
    {
       this->mIData.insert(std::make_pair(name, value));
    }
 
-   void addFloatTag(const std::string& name, MHDFloat value)
+   void IConfigurationPart::addFloatTag(const std::string& name, MHDFloat value)
    {
       this->mFData.insert(std::make_pair(name, value));
    }

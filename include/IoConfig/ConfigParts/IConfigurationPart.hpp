@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace IoConfig {
+
    /**
     * @brief Implementation of the truncation part of the configuration file
     */
@@ -32,7 +34,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         IConfigurationPart(const std::string& parent);
+         explicit IConfigurationPart(const std::string& parent);
 
          /**
           * @brief Destructor
@@ -125,6 +127,10 @@ namespace GeoMHDiSCC {
    /// Typedef for a shared pointer of a configuration file part
    typedef SharedPtrMacro<IConfigurationPart> SharedIConfigurationPart;
 
+   /// Typedef for a shared pointer of a configuration file part
+   typedef SharedPtrMacro<const IConfigurationPart> SharedCIConfigurationPart;
+
+}
 }
 
 #endif // ICONFIGURATIONPART_HPP

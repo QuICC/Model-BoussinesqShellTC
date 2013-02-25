@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for FftwTools
  */
 
+#include "FastTransforms/FftwTools.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
@@ -55,7 +56,13 @@ namespace TestSuite {
    /**
     * @brief Test default constructor
     */
-   TEST_F(FftwToolsTest, Constructor) {
+   TEST_F(FftwToolsTest, Constructor)
+   {
+      int size;
+      size = Transform::FftwTools::dealiasFft(10);
+      size = Transform::FftwTools::dealiasMixedFft(10);
+      size = Transform::FftwTools::optimizeFft(10);
+
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }
 

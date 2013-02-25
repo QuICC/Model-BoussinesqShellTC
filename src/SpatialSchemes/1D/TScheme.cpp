@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(0)->dimFwd();
       // Get spectral size of the FFT
-      int specSize = spRes->sim()->dim(DimensionSpace::SPECTRAL,0);
+      int specSize = spRes->sim()->dim(Dimensions::Space::SPECTRAL,0);
 
       // Get number of transforms
       int howmany = 0;

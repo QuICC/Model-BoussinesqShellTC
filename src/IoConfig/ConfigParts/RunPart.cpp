@@ -25,9 +25,13 @@ namespace IoConfig {
    const std::string RunPart::PARENTTAG = "run";
 
    RunPart::RunPart()
-      : ConfigurationPart(RunPart::PARENTTAG)
+      : IConfigurationPart(RunPart::PARENTTAG)
    {
       this->init();
+   }
+
+   RunPart::~RunPart()
+   {
    }
 
    void RunPart::init()
@@ -40,4 +44,5 @@ namespace IoConfig {
    {
    }
 
+}
 }

@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * \brief Implementation for a full sphere field
     *
@@ -156,6 +158,7 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }
 
 #endif // VARIABLEDOMAIN_HPP

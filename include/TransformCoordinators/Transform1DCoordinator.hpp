@@ -7,11 +7,11 @@
 
 // Debug includes
 //
-#include "Debug/PrepMacros/StorageProfilerMacro.h"
+#include "StorageProfiler/StorageProfilerMacro.h"
 
 // Configuration includes
 //
-#include "Base/PrepMacros/CommunicatorMacro.h"
+#include "Communicators/CommunicatorMacro.h"
 
 // System includes
 //
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "Simulation/Enums/PhysicalNames.hpp"
+#include "Enums/PhysicalNames.hpp"
 
 
 namespace GeoMHDiSCC {

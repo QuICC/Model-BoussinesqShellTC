@@ -25,9 +25,13 @@ namespace IoConfig {
    const std::string ParallelPart::PARENTTAG = "parallel";
 
    ParallelPart::ParallelPart()
-      : ConfigurationPart(ParallelPart::PARENTTAG)
+      : IConfigurationPart(ParallelPart::PARENTTAG)
    {
       this->init();
+   }
+
+   ParallelPart::~ParallelPart()
+   {
    }
 
    void ParallelPart::init()

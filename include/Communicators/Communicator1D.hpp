@@ -16,8 +16,8 @@
 
 // Project includes
 //
-#include "Base/StorageProviders/StoragePairProvider.hpp"
-#include "Base/Communicators/CommunicatorBase.hpp"
+#include "StorageProviders/StoragePairProvider.hpp"
+#include "Communicators/CommunicatorBase.hpp"
 
 namespace GeoMHDiSCC {
 

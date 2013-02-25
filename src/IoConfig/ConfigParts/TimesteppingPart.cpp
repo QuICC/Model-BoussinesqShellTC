@@ -25,9 +25,13 @@ namespace IoConfig {
    const std::string TimesteppingPart::PARENTTAG = "timestepping";
 
    TimesteppingPart::TimesteppingPart()
-      : ConfigurationPart(TimesteppingPart::PARENTTAG)
+      : IConfigurationPart(TimesteppingPart::PARENTTAG)
    {
       this->init();
+   }
+
+   TimesteppingPart::~TimesteppingPart()
+   {
    }
 
    void TimesteppingPart::init()

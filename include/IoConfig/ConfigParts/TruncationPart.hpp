@@ -36,7 +36,7 @@ namespace IoConfig {
           *
           * @param dim Dimensionality of truncation
           */
-         TruncationPart(const int dim);
+         explicit TruncationPart(const int dim);
 
          /**
           * @brief Destructor

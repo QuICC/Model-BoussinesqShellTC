@@ -44,7 +44,7 @@ namespace Transform {
           *
           * @param size Current size of the FFT
           */
-         static int optimiseFft(const int size);
+         static int optimizeFft(const int size);
          
       protected:
 

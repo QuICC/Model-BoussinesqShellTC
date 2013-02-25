@@ -8,8 +8,6 @@
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
-#include "Simulation/PrepMacros/ScalarTypedefsMacro.h"
-#include "Simulation/PrepMacros/VariableTypedefsMacro.h"
 
 // System includes
 //
@@ -20,9 +18,11 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/FieldComponents.h"
+#include "Enums/FieldComponents.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
+#include "TypeSelectors/VariableSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -51,17 +51,17 @@ namespace GeoMHDiSCC {
           *
           * \param spUnknown Shared pointer to the unknown of the equation
           */
-         void setUnknown(Code::SharedVectorVariable spUnknown);
+         void setUnknown(Datatypes::SharedVectorVariableType spUnknown);
          
          /**
           * @brief Get the unknown variable
           */
-         const Code::VectorVariable& unknown() const;
+         const Datatypes::VectorVariableType& unknown() const;
 
          /**
           * @brief Set the unknown variable
           */
-         Code::VectorVariable& rUnknown();
+         Datatypes::VectorVariableType& rUnknown();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
           * @param rNLComp Nonlinear term component
           * @param name    ID of the physical vector component
           */
-         virtual void computeNonlinear(Code::PhysicalScalarType& rNLComp, FieldComponents::Physical::Component id) = 0;
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) = 0;
 
          /**
           * @brief Compute the linear term
@@ -77,7 +77,7 @@ namespace GeoMHDiSCC {
           * @param rRHS RHS of timestepping equation
           * @param id   ID of the spectral vector component
           */
-         virtual void computeLinear(Code::SpectralScalarType& rRHS, FieldComponents::Spectral::Component id);
+         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id);
 
          /**
           * @brief Prepare the RHS for the timestep computation
@@ -85,33 +85,33 @@ namespace GeoMHDiSCC {
           * @param rhs    RHS of timestepping equation
           * @param compID  ID of the vector component
           */
-         virtual void prepareTimestep(const Code::SpectralScalarType& rhs, FieldComponents::Spectral::Component id) = 0;
+         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id) = 0;
 
       protected:
          /**
           * @brief Storage for the shared scalar variable
           */
-         Code::SharedVectorVariable mspUnknown;
+         Datatypes::SharedVectorVariableType mspUnknown;
 
       private:
    };
 
-   inline void IVectorEquation::setUnknown(Code::SharedVectorVariable spUnknown)
+   inline void IVectorEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
    {
       this->mspUnknown = spUnknown;
    }
 
-   inline const Code::VectorVariable& IVectorEquation::unknown() const
+   inline const Datatypes::VectorVariableType& IVectorEquation::unknown() const
    {
       return *this->mspUnknown;
    }
 
-   inline Code::VectorVariable& IVectorEquation::rUnknown()
+   inline Datatypes::VectorVariableType& IVectorEquation::rUnknown()
    {
       return *this->mspUnknown;
    }
 
-   inline void IVectorEquation::computeLinear(Code::SpectralScalarType& rRHS, FieldComponents::Spectral::Component id)
+   inline void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id)
    {
    }
 

@@ -7,7 +7,7 @@
 
 // Configuration includes
 //
-#include "Base/PrepMacros/SmartPointerMacro.h"
+#include "SmartPointers/SharedPtrMacro.h"
 #include "Base/PrepMacros/IndexConverterMacro.h"
 
 // System includes
@@ -19,13 +19,13 @@
 // Project includes
 //
 #include "Base/Enums/Splittings.hpp"
-#include "Base/Resolutions/Resolution.hpp"
-#include "Base/StorageProviders/StoragePairProvider.hpp"
-#include "Base/Communicators/Communicator1D.hpp"
-#include "Base/Communicators/Converters/ConverterBase.hpp"
-#include "Base/Communicators/Converters/SerialConverter.hpp"
+#include "Resolutions/Resolution.hpp"
+#include "StorageProviders/StoragePairProvider.hpp"
+#include "Communicators/Communicator1D.hpp"
+#include "Communicators/Converters/ConverterBase.hpp"
+#include "Communicators/Converters/SerialConverter.hpp"
 #ifdef GEOMHDISCC_MPI
-   #include "Base/Communicators/Converters/MpiConverter.hpp"
+   #include "Communicators/Converters/MpiConverter.hpp"
 #endif // GEOMHDISCC_MPI
 
 namespace GeoMHDiSCC {

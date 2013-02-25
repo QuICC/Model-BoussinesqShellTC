@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * @brief Base of the implementation of the variables
     */
@@ -64,6 +66,7 @@ namespace GeoMHDiSCC {
       return this->mspRes;
    }
 
+}
 }
 
 #endif // VARIABLEBASE_HPP

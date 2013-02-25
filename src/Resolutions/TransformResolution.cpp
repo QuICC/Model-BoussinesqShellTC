@@ -74,14 +74,14 @@ namespace GeoMHDiSCC {
       return this->mIdx3D.size();
    }
 
-   SharedScalarFieldSetup TransformResolution::spFwdSetup() const
+   Datatypes::SharedScalarFieldSetup TransformResolution::spFwdSetup() const
    {
-      return SharedScalarFieldSetup(new ScalarFieldSetup(this->mFwd, this->mIdx2D, this->mIdx3D));
+      return Datatypes::SharedScalarFieldSetup(new ScalarFieldSetup(this->mFwd, this->mIdx2D, this->mIdx3D));
    }
 
-   SharedScalarFieldSetup TransformResolution::spBwdSetup() const
+   Datatypes::SharedScalarFieldSetup TransformResolution::spBwdSetup() const
    {
-      return SharedScalarFieldSetup(new ScalarFieldSetup(this->mBwd, this->mIdx2D, this->mIdx3D));
+      return Datatypes::SharedScalarFieldSetup(new ScalarFieldSetup(this->mBwd, this->mIdx2D, this->mIdx3D));
    }
 
    int TransformResolution::idxFwd(const int i, const int j, const int k) const

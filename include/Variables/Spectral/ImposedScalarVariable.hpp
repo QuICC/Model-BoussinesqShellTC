@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * \brief Implementation of scalar field variable with imposed component
     */
@@ -143,6 +145,7 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }
 
 #endif // IMPOSEDSCALARVARIABLE_HPP

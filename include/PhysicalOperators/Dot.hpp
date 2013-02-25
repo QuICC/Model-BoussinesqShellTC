@@ -32,17 +32,17 @@ namespace Physical {
          /**
           * @brief Set S to scalar product
           */
-         template <int COMPONENTS> static void set(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void set(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add scalar product to S
           */
-         template <int COMPONENTS> static void add(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void add(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract scalar product from S
           */
-         template <int COMPONENTS> static void sub(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void sub(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
          
       protected:
 
@@ -58,7 +58,7 @@ namespace Physical {
          ~Dot();
    };
 
-   template <int COMPONENTS> void Dot::set(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS> void Dot::set(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -79,7 +79,7 @@ namespace Physical {
       }
    }
 
-   template <int COMPONENTS> void Dot::add(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS> void Dot::add(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -96,7 +96,7 @@ namespace Physical {
       }
    }
 
-   template <int COMPONENTS> void Dot::sub(Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS> void Dot::sub(Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {

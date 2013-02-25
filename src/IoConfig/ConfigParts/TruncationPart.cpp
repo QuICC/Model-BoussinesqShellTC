@@ -20,12 +20,18 @@
 
 namespace GeoMHDiSCC {
 
+namespace IoConfig {
+
    const std::string TruncationPart::PARENTTAG = "truncation";
 
    TruncationPart::TruncationPart(const int dim)
-      : ConfigurationPart(TruncationPart::PARENTTAG)
+      : IConfigurationPart(TruncationPart::PARENTTAG)
    {
       this->init(dim);
+   }
+
+   TruncationPart::~TruncationPart()
+   {
    }
 
    void TruncationPart::init(const int dim)
@@ -56,4 +62,5 @@ namespace GeoMHDiSCC {
    {
    }
 
+}
 }

@@ -30,6 +30,10 @@ namespace IoConfig {
       this->init();
    }
 
+   BoundaryPart::~BoundaryPart()
+   {
+   }
+
    void BoundaryPart::init()
    {
       this->addIntegerTag("codensity", 0);

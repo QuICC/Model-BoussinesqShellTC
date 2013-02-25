@@ -1,9 +1,9 @@
-/** \file ConverterBase.hpp
- *  \brief Implementation of the base for data converter.
+/** \file IConverter.hpp
+ *  \brief Implementation of the interface for a data converter.
  */
 
-#ifndef CONVERTERBASE_HPP
-#define CONVERTERBASE_HPP
+#ifndef ICONVERTER_HPP
+#define ICONVERTER_HPP
 
 // Configuration includes
 //
@@ -23,20 +23,20 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the base for data converter.
+    * @brief Implementation of the interface for a data converter.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class ConverterBase
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class IConverter
    {
       public:
          /**
           * @brief Constructor
           */
-         ConverterBase();
+         IConverter();
 
          /**
           * @brief Destructor
           */
-         virtual ~ConverterBase();
+         virtual ~IConverter();
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -202,63 +202,63 @@ namespace GeoMHDiSCC {
       private:
    };
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::fwdSizes() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::fwdSizes() const
    {
       return this->mFSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::bwdSizes() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::bwdSizes() const
    {
       return this->mBSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::nFCpu() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::nFCpu() const
    {
       return this->mFCpuGroup.size();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::nBCpu() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::nBCpu() const
    {
       return this->mBCpuGroup.size();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::fCpu(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::fCpu(const int id) const
    {
       return this->mFCpuGroup.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::bCpu(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::bCpu(const int id) const
    {
       return this->mBCpuGroup.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::sizeFPacket(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sizeFPacket(const int id) const
    {
       return this->mPacks*this->mFSizes.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::sizeBPacket(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sizeBPacket(const int id) const
    {
       return this->mPacks*this->mBSizes.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::ConverterBase()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::IConverter()
       : mIsSending(false), mIsReceiving(false), mPacks(0)
    {
       // Check that all dimensions match
-      StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
-      StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
-      StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
+      Debug::StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
       StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::~ConverterBase()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~IConverter()
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::setBuffers(std::vector<char *> &fBuffers,std::vector<char *> &bBuffers)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::setBuffers(std::vector<char *> &fBuffers,std::vector<char *> &bBuffers)
    {
       // Set TForward buffers pointer
       this->mpFBuffers = &fBuffers;
@@ -269,4 +269,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // CONVERTERBASE_HPP
+#endif // ICONVERTER_HPP

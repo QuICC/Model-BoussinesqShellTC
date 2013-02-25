@@ -23,6 +23,10 @@ namespace GeoMHDiSCC {
    {
    }
 
+   SimulationRunControl::~SimulationRunControl()
+   {
+   }
+
    Runtime::Status::Id SimulationRunControl::status() const
    {
       return this->mStatus;

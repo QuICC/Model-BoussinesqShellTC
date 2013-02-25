@@ -28,7 +28,11 @@ namespace IoConfig {
    const std::string ConfigurationWriter::NAME = "parameters_template";
 
    ConfigurationWriter::ConfigurationWriter(const int dim, const std::string& type)
-      : IConfigurationFile<XmlWriter>(dim, ConfigurationWriter::NAME, type)
+      : IConfigurationFile<IoXml::IXmlWriter>(dim, ConfigurationWriter::NAME, type)
+   {
+   }
+
+   ConfigurationWriter::~ConfigurationWriter()
    {
    }
 
@@ -56,7 +60,7 @@ namespace IoConfig {
             rapidxml::xml_node<> *pComponent;
 
             // Create master iterator
-            std::map<FrameworkBlocks::Block, SharedConfigurationPart>::const_iterator itM;
+            std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::const_iterator itM;
             // Iterate over all master components
             for(itM = this->mFramework.begin(); itM != this->mFramework.end(); itM++)
             {
@@ -113,7 +117,7 @@ namespace IoConfig {
                rapidxml::xml_node<> *pComponent;
 
                // Create master iterator
-               std::map<SimulationBlocks::Block, SharedConfigurationPart>::const_iterator itM;
+               std::map<SimulationBlocks::Id, SharedIConfigurationPart>::const_iterator itM;
                // Iterate over all master components
                for(itM = this->mSimulation.begin(); itM != this->mSimulation.end(); itM++)
                {

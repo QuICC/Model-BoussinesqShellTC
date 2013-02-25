@@ -97,9 +97,9 @@ namespace GeoMHDiSCC {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SerialConverter()
    {
       // Check that all dimensions match
-      StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
-      StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
-      StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
+      Debug::StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
       StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();

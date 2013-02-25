@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * @brief This class implements the abstract concept of a simulation variable
     *
@@ -57,6 +59,7 @@ namespace GeoMHDiSCC {
    {
    }
 
+}
 }
 
 #endif // VARIABLE_HPP

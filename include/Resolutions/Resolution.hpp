@@ -67,26 +67,26 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the forward scalar field setup for last dimension
           */
-         SharedScalarFieldSetup spFwdSetup() const;
+         Datatypes::SharedScalarFieldSetup spFwdSetup() const;
 
          /**
           * @brief Get the forward scalar field setup
           *
           * @param dim Dimension for which to get setup
           */
-         SharedScalarFieldSetup spFwdSetup(const int dim) const;
+         Datatypes::SharedScalarFieldSetup spFwdSetup(const int dim) const;
 
          /**
           * @brief Get the backward scalar field setup for the first dimension
           */
-         SharedScalarFieldSetup spBwdSetup() const;
+         Datatypes::SharedScalarFieldSetup spBwdSetup() const;
 
          /**
           * @brief Get the backward scalar field setup
           *
           * @param dim Dimension for which to get setup
           */
-         SharedScalarFieldSetup spBwdSetup(const int dim) const;
+         Datatypes::SharedScalarFieldSetup spBwdSetup(const int dim) const;
 
       protected:
 

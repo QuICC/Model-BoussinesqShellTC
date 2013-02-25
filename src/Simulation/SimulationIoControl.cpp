@@ -21,7 +21,11 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void SimulationIoControl::setConfigurationFile(SharedConfigurationReader spCfgFile)
+   SimulationIoControl::~SimulationIoControl()
+   {
+   }
+
+   void SimulationIoControl::setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile)
    {
       this->mspCfgFile = spCfgFile;
    }
@@ -48,31 +52,31 @@ namespace GeoMHDiSCC {
    {
       if(this->mspStdOut)
       {
-         this->mspStdOut->finalise();
+         this->mspStdOut->finalize();
       }
    }
 
-   void SimulationIoControl::addOutputFile(SharedIAsciiWriter spOutFile)
+   void SimulationIoControl::addOutputFile(IoAscii::SharedIAsciiWriter spOutFile)
    {
-      this->mAsciiFiles.push_back(spOutFile);
+      this->mAsciiWriters.push_back(spOutFile);
    }
 
-   void SimulationIoControl::addOutputFile(SharedIHdf5Writer spOutFile)
+   void SimulationIoControl::addOutputFile(IoHdf5::SharedIHdf5Writer spOutFile)
    {
-      this->mHdf5Files.push_back(spOutFile);
+      this->mHdf5Writers.push_back(spOutFile);
    }
 
    void SimulationIoControl::initWriters()
    {
       // Iterate over all ASCII writer
-      std::vector<SharedIAsciiWriter>::iterator itAscii;
+      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
          (*itAscii)->init();
       }
 
       // Iterate over all HDF5 writer
-      std::vector<SharedIHdf5Writer>::iterator itHdf5;
+      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          (*itHdf5)->init();
@@ -82,24 +86,24 @@ namespace GeoMHDiSCC {
    void SimulationIoControl::finalizeWriters()
    {
       // Iterate over all ASCII writer
-      std::vector<SharedIAsciiWriter>::iterator itAscii;
+      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
-         (*itAscii)->finalise();
+         (*itAscii)->finalize();
       }
 
       // Iterate over all HDF5 writer
-      std::vector<SharedIHdf5Writer>::iterator itHdf5;
+      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
-         (*itHdf5)->finalise();
+         (*itHdf5)->finalize();
       }
    }
 
    void SimulationIoControl::writeAscii()
    {
       // Iterate over all ASCII writer
-      std::vector<SharedIAsciiWriter>::iterator itAscii;
+      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
          (*itAscii)->write();
@@ -109,14 +113,14 @@ namespace GeoMHDiSCC {
    void SimulationIoControl::writeHdf5()
    {
       // Iterate over all HDF5 writer
-      std::vector<SharedIHdf5Writer>::iterator itHdf5;
+      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          (*itHdf5)->write();
       }
    }
 
-   void IOSystemBase::initCfg()
+   void SimulationIoControl::initCfg()
    {
       // Initialise config file
       this->mspCfgFile->init();
@@ -125,13 +129,13 @@ namespace GeoMHDiSCC {
       this->mspCfgFile->read();
 
       // Close the config file
-      this->mspCfgFile->finalise();
+      this->mspCfgFile->finalize();
    }
 
-   void IOSystemBase::initStdOut()
+   void SimulationIoControl::initStdOut()
    {
       // Create the StdOutPipe ouput
-      SharedStdOutPipe spStd(new StdOutPipe("OUT" + this->mspCfgFile->id()));
+      IoAscii::SharedStdOutPipe spStd(new IoAscii::StdOutPipe("OUT"));
 
       // Store the shared pointer
       this->mspStdOut = spStd;

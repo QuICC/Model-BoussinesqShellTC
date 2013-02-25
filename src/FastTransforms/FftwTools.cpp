@@ -37,7 +37,7 @@ namespace Transform {
       return std::ceil(FftwTools::MIXED_DEALIASING*static_cast<MHDFloat>(size));
    }
 
-   int FftwTools::optimiseFft(const int size)
+   int FftwTools::optimizeFft(const int size)
    {
       // Store the input size
       int factorised;

@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Dimensions.hpp"
+#include "Enums/Dimensions.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Converters/ConverterBase.hpp"
 
@@ -82,9 +82,9 @@ namespace GeoMHDiSCC {
       : ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>()
    {
       // Check that all dimensions match
-      StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
-      StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
-      StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
+      Debug::StaticAssert< (TBwdA::FieldDimension == TFwdB::FieldDimension) >();
+      Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
       StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();

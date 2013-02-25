@@ -145,7 +145,7 @@ namespace GeoMHDiSCC {
       int nFFT = FftwTools::dealias(this->nI());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimiseFft(nFFT);
+      nFFT = FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }
@@ -161,7 +161,7 @@ namespace GeoMHDiSCC {
       int nFFT = FftwTools::dealiasMixed(this->nJ());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimiseFft(nFFT);
+      nFFT = FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }
@@ -177,7 +177,7 @@ namespace GeoMHDiSCC {
       int nFFT = FftwTools::dealias(this->nK());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimiseFft(nFFT);
+      nFFT = FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }

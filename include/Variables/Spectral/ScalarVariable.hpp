@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Datatypes {
+
    /**
     * \brief Implementation of scalar field variable
     */
@@ -132,6 +134,7 @@ namespace GeoMHDiSCC {
    }
 #endif // GEOMHDISCC_STORAGEPROFILE
 
+}
 }
 
 #endif // SCALARVARIABLE_HPP

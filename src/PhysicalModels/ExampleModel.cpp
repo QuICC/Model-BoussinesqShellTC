@@ -1,5 +1,5 @@
 /** \file ExampleModel.cpp
- *  \brief Source of the dummy simulation for the cylindrical system
+ *  \brief Source of an example physical model
  */
 
 // Configuration includes

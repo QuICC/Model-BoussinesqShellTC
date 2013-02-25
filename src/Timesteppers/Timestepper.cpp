@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
       return this->mStep == 0;
    }
 
-   void Timestepper::getEqStepperType(SharedEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, int>& coupled, std::vector<bool>& typeInfo)
+   void Timestepper::getEqStepperType(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, int>& coupled, std::vector<bool>& typeInfo)
    {
       // Get Id for current unknown field
       FieldIdType myId = std::make_pair(spEq->name(),comp);
@@ -76,7 +76,7 @@ namespace GeoMHDiSCC {
       this->mEqInformation.insert(std::make_pair(myId,std::make_pair(spEq->isComplex(comp), pos)));
    }
 
-   void Timestepper::createEqStepper(SharedEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo)
+   void Timestepper::createEqStepper(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo)
    {
       // Get Id for current unknown field
       FieldIdType myId = std::make_pair(spEq->name(),comp);
@@ -130,14 +130,14 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::init(const std::vector<SharedScalarEquation>& scalEq, const std::vector<SharedVectorEquation>& vectEq)
+   void Timestepper::init(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
    {
       // Storage for the field coupling information
       std::map<FieldIdType, int>  coupled;
       std::vector<bool>  typeInfo;
 
       // Loop over all scalar equations
-      std::vector<SharedScalarEquation>::const_iterator scalEqIt;
+      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
@@ -145,7 +145,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedVectorEquation>::const_iterator vectEqIt;
+      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
@@ -215,7 +215,7 @@ namespace GeoMHDiSCC {
       this->initSolution(scalEq, vectEq);
    }
 
-   void Timestepper::createMatrices(SharedEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
+   void Timestepper::createMatrices(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
       FieldIdType myId = std::make_pair(spEq->name(),comp);
@@ -336,14 +336,14 @@ namespace GeoMHDiSCC {
       std::cerr << this->mTime << std::endl;
    }
 
-   void Timestepper::initSolution(const std::vector<SharedScalarEquation>& scalEq, const std::vector<SharedVectorEquation>& vectEq)
+   void Timestepper::initSolution(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedScalarEquation>::const_iterator scalEqIt;
+      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -372,7 +372,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedVectorEquation>::const_iterator vectEqIt;
+      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -425,7 +425,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::stepForward(const std::vector<SharedScalarEquation>& scalEq, const std::vector<SharedVectorEquation>& vectEq)
+   void Timestepper::stepForward(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
    {
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq);
@@ -443,14 +443,14 @@ namespace GeoMHDiSCC {
       this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
    }
 
-   void Timestepper::getInput(const std::vector<SharedScalarEquation>& scalEq, const std::vector<SharedVectorEquation>& vectEq)
+   void Timestepper::getInput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedScalarEquation>::const_iterator scalEqIt;
+      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -479,7 +479,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedVectorEquation>::const_iterator vectEqIt;
+      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -569,14 +569,14 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::transferOutput(const std::vector<SharedScalarEquation>& scalEq, const std::vector<SharedVectorEquation>& vectEq)
+   void Timestepper::transferOutput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedScalarEquation>::const_iterator scalEqIt;
+      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -605,7 +605,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedVectorEquation>::const_iterator vectEqIt;
+      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -658,7 +658,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   DecoupledZSparse  Timestepper::buildLHSMatrix(SharedEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   DecoupledZSparse  Timestepper::buildLHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
    {
       // Matrix coefficients
       MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
@@ -729,7 +729,7 @@ namespace GeoMHDiSCC {
       return lhs;
    }
 
-   DecoupledZSparse  Timestepper::buildRHSMatrix(SharedEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   DecoupledZSparse  Timestepper::buildRHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
    {
       // Matrix coefficients
       MHDFloat timeCoeff = -ImExRK3::rhsT(this->mStep)*1.0/this->mDt;

@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Set the configuration file
           */
-         void setConfigurationFile(SharedConfigurationFiel spCfgFile);
+         void setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile);
 
          /**
           * @brief Initialise the IO system
@@ -71,14 +71,14 @@ namespace GeoMHDiSCC {
           *
           * @param spOutFile Shared ASCII writer
           */
-         void addOutputFile(SharedIAsciiWriter spOutFile);
+         void addOutputFile(IoAscii::SharedIAsciiWriter spOutFile);
 
          /**
           * @brief Add a HDF5 output file
           *
           * @param spOutFile Shared HDF5 writer
           */
-         void addOutputFile(SharedIHdf5Writer  spOutFile);
+         void addOutputFile(IoHdf5::SharedIHdf5Writer  spOutFile);
 
          /**
           * @brief Write ASCII data
@@ -96,22 +96,22 @@ namespace GeoMHDiSCC {
          /**
           * @brief Vector of ASCII output files
           */
-         std::vector<SharedIAsciiWriter> mIAsciiFiles;
+         std::vector<IoAscii::SharedIAsciiWriter> mAsciiWriters;
 
          /**
           * @brief Vector of HDF5 output files
           */
-         std::vector<SharedIHdf5Writer> mHdf5Files;
+         std::vector<IoHdf5::SharedIHdf5Writer> mHdf5Writers;
 
          /**
           * @brief Handle to StdMessage buffer
           */
-         SharedStdOutPipe   mspStdOut;
+         IoAscii::SharedStdOutPipe   mspStdOut;
 
          /**
           * @brief Handle to the configuration file
           */
-         SharedConfigurationReader    mspCfgFile;
+         IoConfig::SharedConfigurationReader    mspCfgFile;
 
          /**
           * @brief Initialise the configuration file

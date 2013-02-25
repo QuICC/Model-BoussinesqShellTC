@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for Transform3DCoordinator
  */
 
+#include "TransformCoordinators/Transform3DCoordinator.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {

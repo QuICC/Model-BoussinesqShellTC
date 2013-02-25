@@ -33,17 +33,17 @@ namespace Physical {
          /**
           * @brief Set S to cross product component
           */
-         template <int COMPONENTS> static void set(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void set(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add cross product component to S
           */
-         template <int COMPONENTS> static void add(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void add(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract cross product component from S
           */
-         template <int COMPONENTS> static void sub(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
+         template <int COMPONENTS> static void sub(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c = 1.0);
          
       protected:
 
@@ -59,7 +59,7 @@ namespace Physical {
          ~Cross();
    };
 
-   template <int COMPONENTS>  void Cross::set(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS>  void Cross::set(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       { 
@@ -92,7 +92,7 @@ namespace Physical {
       }
    }
 
-   template <int COMPONENTS> void Cross::add(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS> void Cross::add(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -125,7 +125,7 @@ namespace Physical {
       }
    }
 
-   template <int COMPONENTS> void Cross::sub(FieldComponents::Physical::Component id, Code::PhysicalScalarType &rS, const VectorField<Code::PhysicalScalarType, COMPONENTS> &v, const VectorField<Code::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
+   template <int COMPONENTS> void Cross::sub(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &v, const VectorField<Datatypes::PhysicalScalarType, COMPONENTS> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
