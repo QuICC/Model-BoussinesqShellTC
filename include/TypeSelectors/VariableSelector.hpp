@@ -1,5 +1,5 @@
 /** \file VariableSelector.hpp
- *  \brief Definition of some useful typedefs for the variables used in the cartesian code
+ *  \brief Definition of some useful typedefs for the variables used in the code
  */
 
 #ifndef VARIABLESELECTOR_HPP

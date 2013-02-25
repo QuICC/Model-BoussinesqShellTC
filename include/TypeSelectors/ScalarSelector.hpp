@@ -22,7 +22,7 @@
 
 namespace GeoMHDiSCC {
 
-   /// Namespace containing the required typedefs for a cartesian simulation
+   /// Namespace containing the required typedefs for a simulation
    namespace Datatypes {
 
       template<Dimensions::Transform::Id TId> struct ScalarSelector;
@@ -47,7 +47,6 @@ namespace GeoMHDiSCC {
 
          typedef  ScalarField3D<MHDFloat, FlatLayout> BwdType;
       };
-
 
       /// Typedef for the physical space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA3D>::FwdType PhysicalScalarType;

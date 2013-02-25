@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * @brief Implementation of the interface for a data converter.
     */
@@ -251,7 +253,7 @@ namespace GeoMHDiSCC {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~IConverter()
@@ -267,6 +269,7 @@ namespace GeoMHDiSCC {
       this->mpBBuffers = &bBuffers;
    }
 
+}
 }
 
 #endif // ICONVERTER_HPP

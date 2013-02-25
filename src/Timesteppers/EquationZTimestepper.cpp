@@ -60,25 +60,12 @@ namespace GeoMHDiSCC {
    {  
       int start = step*this->nSystem();
 
-      // Set l = 0 mode to zero
+      // Set m = 0 mode to zero
       this->mSolution.at(0).setZero();
-
-      // Create real solver for m=0
-      // Eigen::SuperLU<SparseMatrix>  solverRe;
-      // SparseMatrix   tmp = this->mLHSMatrix.at(0+start).real();
-      // solverRe.compute(tmp);
-      // Matrix rhs;
-      //
-      // rhs = this->mRHSData.at(0).real();
-      // this->mSolution.at(0).real() = solverRe.solve(rhs);
-      // rhs = this->mRHSData.at(0).imag();
-      // this->mSolution.at(0).imag() = solverRe.solve(rhs);
 
       for(int i = 1; i < this->mRHSData.size(); i++)
       {
          this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
-         //std::cerr << (this->mSolution.at(i) - dealSol).array().abs().matrix().transpose() << std::endl;
-         //std::cerr << this->mSolution.at(i).transpose() << std::endl;
       }
    }
 
@@ -96,8 +83,6 @@ namespace GeoMHDiSCC {
       {
          if(i % this->nSystem() != 0)
          {
-            std::cerr << " --------- i = "<< i << " ---------------" << std::endl;
-            std::cerr << this->mLHSMatrix.at(i) << std::endl;
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
          }
       }

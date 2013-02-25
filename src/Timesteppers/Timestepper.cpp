@@ -141,7 +141,7 @@ namespace GeoMHDiSCC {
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
-         this->getEqStepperType((*scalEqIt), FieldComponents::Spectral::NONE, coupled, typeInfo);
+         this->getEqStepperType((*scalEqIt), FieldComponents::Spectral::SCALAR, coupled, typeInfo);
       }
 
       // Loop over all vector equations
@@ -149,10 +149,10 @@ namespace GeoMHDiSCC {
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
-         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::TOROIDAL, coupled, typeInfo);
+         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::ONE, coupled, typeInfo);
 
          // Get type information for the equation steppers for the poloidal component
-         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::POLOIDAL, coupled, typeInfo);
+         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::TWO, coupled, typeInfo);
       }
 
       // Storage for the field coupling information
@@ -162,17 +162,17 @@ namespace GeoMHDiSCC {
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
-         this->createEqStepper((*scalEqIt), FieldComponents::Spectral::NONE, coupledType, typeInfo);
+         this->createEqStepper((*scalEqIt), FieldComponents::Spectral::SCALAR, coupledType, typeInfo);
       }
 
       // Loop over all vector equations
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
-         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::TOROIDAL, coupledType, typeInfo);
+         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::ONE, coupledType, typeInfo);
 
          // Get type information for the equation steppers for the poloidal component
-         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::POLOIDAL, coupledType, typeInfo);
+         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::TWO, coupledType, typeInfo);
       }
 
       // Loop over all substeps of timestepper
@@ -182,17 +182,17 @@ namespace GeoMHDiSCC {
          for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
          {
             // Create (coupled) matrices
-            this->createMatrices((*scalEqIt), FieldComponents::Spectral::NONE);
+            this->createMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
 
          // Loop over all vector equations
          for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
          {
             // Create (coupled) matrices
-            this->createMatrices((*vectEqIt), FieldComponents::Spectral::TOROIDAL);
+            this->createMatrices((*vectEqIt), FieldComponents::Spectral::ONE);
 
             // Create (coupled) matrices
-            this->createMatrices((*vectEqIt), FieldComponents::Spectral::POLOIDAL);
+            this->createMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
          }
       }
 
@@ -333,7 +333,6 @@ namespace GeoMHDiSCC {
    void Timestepper::update()
    {
       this->mTime += this->mDt;
-      std::cerr << this->mTime << std::endl;
    }
 
    void Timestepper::initSolution(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
@@ -347,7 +346,7 @@ namespace GeoMHDiSCC {
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
-         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::NONE);
+         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -357,7 +356,7 @@ namespace GeoMHDiSCC {
             // Get timestep input
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->copyTInput(FieldComponents::Spectral::NONE, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -366,7 +365,7 @@ namespace GeoMHDiSCC {
             // Get timestep input
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->copyTInput(FieldComponents::Spectral::NONE, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }
@@ -376,7 +375,7 @@ namespace GeoMHDiSCC {
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TOROIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -386,7 +385,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for toroidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TOROIDAL, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -395,12 +394,12 @@ namespace GeoMHDiSCC {
             // Get timestep input for toroidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TOROIDAL, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
 
          // Get identity and corresponding equation information for poloidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::POLOIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -410,7 +409,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::POLOIDAL, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -419,7 +418,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::POLOIDAL, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }
@@ -454,7 +453,7 @@ namespace GeoMHDiSCC {
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
-         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::NONE);
+         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -464,7 +463,7 @@ namespace GeoMHDiSCC {
             // Get timestep input
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->timestepInput(FieldComponents::Spectral::NONE, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -473,7 +472,7 @@ namespace GeoMHDiSCC {
             // Get timestep input
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->timestepInput(FieldComponents::Spectral::NONE, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }
@@ -483,7 +482,7 @@ namespace GeoMHDiSCC {
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TOROIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -493,7 +492,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for toroidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TOROIDAL, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -502,12 +501,12 @@ namespace GeoMHDiSCC {
             // Get timestep input for toroidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TOROIDAL, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
 
          // Get identity and corresponding equation information for poloidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::POLOIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -517,7 +516,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::POLOIDAL, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -526,7 +525,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::POLOIDAL, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }
@@ -580,7 +579,7 @@ namespace GeoMHDiSCC {
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
-         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::NONE);
+         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -590,7 +589,7 @@ namespace GeoMHDiSCC {
             // Get timestep output
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::NONE, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -599,7 +598,7 @@ namespace GeoMHDiSCC {
             // Get timestep output
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::NONE, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }
@@ -609,7 +608,7 @@ namespace GeoMHDiSCC {
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TOROIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -619,7 +618,7 @@ namespace GeoMHDiSCC {
             // Get timestep output for toroidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TOROIDAL, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -628,12 +627,12 @@ namespace GeoMHDiSCC {
             // Get timestep output for toroidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TOROIDAL, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
 
          // Get identity and corresponding equation information for poloidal component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::POLOIDAL);
+         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
          // Get equation stepper information
          eqInfo = this->mEqInformation.find(myId)->second;
 
@@ -643,7 +642,7 @@ namespace GeoMHDiSCC {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::POLOIDAL, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -652,7 +651,7 @@ namespace GeoMHDiSCC {
             // Get timestep output for poloidal component
             for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::POLOIDAL, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
             }
          }
       }

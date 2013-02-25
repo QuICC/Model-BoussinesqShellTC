@@ -8,7 +8,6 @@
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
-#include "Base/PrepMacros/IndexConverterMacro.h"
 
 // System includes
 //
@@ -20,15 +19,18 @@
 //
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
+#include "TypeSelectors/IndexConverterSelector.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Communicator1D.hpp"
-#include "Communicators/Converters/ConverterBase.hpp"
+#include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/Converters/SerialConverter.hpp"
 #ifdef GEOMHDISCC_MPI
    #include "Communicators/Converters/MpiConverter.hpp"
 #endif // GEOMHDISCC_MPI
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    /**
     * @brief Implementation of 2D communicator
@@ -109,7 +111,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the first to second transform converter
           */
-         ConverterBase<TFwd1D, TBwd1D, TFwd2D, TBwd2D>&  converter2D();
+         IConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D>&  converter2D();
 
          /**
           * @brief Transfer TFwd1D to next step
@@ -146,7 +148,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Converter between first and second transform
           */
-         SharedPtrMacro<ConverterBase<TFwd1D, TBwd1D, TFwd2D, TBwd2D> > mspConverter2D;
+         SharedPtrMacro<IConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D> > mspConverter2D;
 
       private:
          /**
@@ -160,7 +162,7 @@ namespace GeoMHDiSCC {
       return this->mStorage2D;
    }
 
-   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> inline ConverterBase<TFwd1D, TBwd1D, TFwd2D, TBwd2D>& Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::converter2D()
+   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> inline IConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D>& Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::converter2D()
    {
       return *this->mspConverter2D;
    }
@@ -184,10 +186,10 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem2D = this->mStorage2D.requiredStorage();
-         StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem2D);
+         StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem2D);
 
          #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
-            StorageProfilerMacro_update(StorageProfiler::TRANSFORM2D, mem2D);
+            StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM2D, mem2D);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
@@ -220,7 +222,7 @@ namespace GeoMHDiSCC {
          } else if(split == Splitting::Locations::SECOND)
          {
             // Initialise 2D serial converter
-            SharedPtrMacro<SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro> > spConv(new SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro>());
+            SharedPtrMacro<SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
             // initialise the converter
             spConv->init(spRes, 0);
@@ -245,7 +247,7 @@ namespace GeoMHDiSCC {
          }
       #else 
          // Initialise 2D serial converter
-         SharedPtrMacro<SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro> > spConv(new SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro>());
+         SharedPtrMacro<SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
          // initialise the converter
          spConv->init(spRes, 0);
@@ -318,6 +320,7 @@ namespace GeoMHDiSCC {
       this->storage2D().holdFwd(rData);
    }
 
+}
 }
 
 #endif // COMMUNICATOR2D_HPP

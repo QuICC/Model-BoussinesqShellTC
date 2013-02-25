@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
     * The transform coordinator overlooks the whole transform process. Providing storage, communication
     * and the actual transforms
     */ 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator = CommunicatorMacro3D> class Transform3DCoordinator: public Transform2DCoordinator<T1D, T2D, TCommunicator>
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> class Transform3DCoordinator: public Transform2DCoordinator<T1D, T2D, TCommunicator>
    {
       public:
          /// Typedef for the first dimension transform
@@ -129,10 +129,10 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem3D = this->mTransform3D.requiredStorage();
-         StorageProfilerMacro_update(StorageProfiler::TRANSFORMS, mem3D);
+         StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORMS, mem3D);
 
          #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
-            DetailedStorageProfilerMacro_update(StorageProfiler::TRANSFORM3D, mem3D);
+            StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem3D);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
    }

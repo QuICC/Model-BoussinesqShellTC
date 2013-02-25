@@ -11,7 +11,6 @@
 
 // Configuration includes
 //
-#include "Communicators/CommunicatorMacro.h"
 
 // System includes
 //
@@ -22,6 +21,7 @@
 // Project includes
 //
 #include "Enums/PhysicalNames.hpp"
+#include "Resolutions/Resolution.hpp"
 
 
 namespace GeoMHDiSCC {
@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
     * The transform coordinator overlooks the whole transform process. Providing storage, communication
     * and the actual transforms
     */ 
-   template <typename T1D, typename TCommunicator = CommunicatorMacro1D> class Transform1DCoordinator
+   template <typename T1D, typename TCommunicator> class Transform1DCoordinator
    {
       public:
          /// Typedef for the first dimension transform
@@ -174,10 +174,10 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem1D = this->mTransform1D.requiredStorage();
-         StorageProfilerMacro_update(StorageProfiler::TRANSFORMS, mem1D);
+         StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORMS, mem1D);
 
          #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
-            DetailedStorageProfilerMacro_update(StorageProfiler::TRANSFORM1D, mem1D);
+            StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM1D, mem1D);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
    }

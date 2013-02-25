@@ -19,6 +19,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Implementation of the index converter for spherical harmonics
     */
@@ -187,6 +189,7 @@ namespace GeoMHDiSCC {
       return SHIndexConv::k(i,j,k,i,j,k);
    }
 
+}
 }
 
 #endif // SHINDEXCONV_HPP

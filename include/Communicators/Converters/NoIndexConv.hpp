@@ -19,6 +19,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Implementation of the index converter doing nothing
     */
@@ -187,6 +189,7 @@ namespace GeoMHDiSCC {
       return NoIndexConv::k(i,j,k,i,j,k);
    }
 
+}
 }
 
 #endif // NOINDEXCONV_HPP

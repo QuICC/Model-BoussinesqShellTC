@@ -22,14 +22,16 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
-#include "Communicators/Converters/ConverterBase.hpp"
+#include "Communicators/Converters/IConverter.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    /**
     * \brief Implementation of the serial data converter base.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverterBase: public ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB>
    {
       public:
          /**
@@ -79,7 +81,7 @@ namespace GeoMHDiSCC {
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SerialConverterBase()
-      : ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>()
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB>()
    {
       // Check that all dimensions match
       Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
@@ -87,7 +89,7 @@ namespace GeoMHDiSCC {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~SerialConverterBase()
@@ -269,6 +271,7 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_MPI
    }
 
+}
 }
 
 #endif // SERIALCONVERTERBASE_HPP

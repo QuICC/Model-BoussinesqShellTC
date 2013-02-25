@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * @brief Implementation of 1D communicator
     *
@@ -129,10 +131,10 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem1D = this->mStorage1D.requiredStorage();
-         StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem1D);
+         StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem1D);
 
          #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
-            StorageProfilerMacro_update(StorageProfiler::TRANSFORM1D, mem1D);
+            StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM1D, mem1D);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
@@ -170,6 +172,7 @@ namespace GeoMHDiSCC {
       this->storage1D().holdFwd(rData);
    }
 
+}
 }
 
 #endif // COMMUNICATOR1D_HPP

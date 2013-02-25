@@ -53,7 +53,9 @@ set(MHDAllSrcDirs
    SpectralOperators
    StorageProfiler
    Timers            # SourcesList.txt IS IN DEBUG MODE
-   #Timesteppers
+   Timesteppers
+   TransformConfigurators  # SourcesList.txt IS IN DEBUG MODE
+   TransformGroupers
 )
 
 

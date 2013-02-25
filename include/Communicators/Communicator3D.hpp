@@ -8,7 +8,6 @@
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
-#include "Base/PrepMacros/IndexConverterMacro.h"
 
 // System includes
 //
@@ -20,15 +19,18 @@
 //
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
+#include "TypeSelectors/IndexConverterSelector.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Communicator2D.hpp"
-#include "Communicators/Converters/ConverterBase.hpp"
+#include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/Converters/SerialConverter.hpp"
 #ifdef GEOMHDISCC_MPI
    #include "Communicators/Converters/MpiConverter.hpp"
 #endif // GEOMHDISCC_MPI
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    /**
     * @brief Implementation of 3D communicator
@@ -121,7 +123,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the second to third transform converter
           */
-         ConverterBase<TFwd2D, TBwd2D, TFwd3D, TBwd3D>&  converter3D();
+         IConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D>&  converter3D();
 
          /**
           * @brief Transfer TFwd2D to next step
@@ -158,7 +160,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Converter between second and third transform
           */
-         SharedPtrMacro<ConverterBase<TFwd2D, TBwd2D, TFwd3D, TBwd3D> > mspConverter3D;
+         SharedPtrMacro<IConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D> > mspConverter3D;
 
       private:
          /**
@@ -172,7 +174,7 @@ namespace GeoMHDiSCC {
       return this->mStorage3D;
    }
 
-   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D, typename TFwd3D, typename TBwd3D> inline ConverterBase<TFwd2D, TBwd2D, TFwd3D, TBwd3D>& Communicator3D<TFwd1D, TBwd1D, TFwd2D, TBwd2D, TFwd3D, TBwd3D>::converter3D()
+   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D, typename TFwd3D, typename TBwd3D> inline IConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D>& Communicator3D<TFwd1D, TBwd1D, TFwd2D, TBwd2D, TFwd3D, TBwd3D>::converter3D()
    {
       return *this->mspConverter3D;
    }
@@ -196,10 +198,10 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem3D = this->mStorage3D.requiredStorage();
-         StorageProfilerMacro_update(StorageProfiler::TEMPORARIES, mem3D);
+         StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem3D);
 
          #ifdef GEOMHDISCC_STORAGEPROFILER_DETAILED
-            StorageProfilerMacro_update(StorageProfiler::TRANSFORM3D, mem3D);
+            StorageProfilerMacro_update(Debug::StorageProfiler::TRANSFORM3D, mem3D);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
@@ -213,7 +215,7 @@ namespace GeoMHDiSCC {
          if(split == Splitting::Locations::FIRST)
          {
             // Initialise serial 3D converter
-            SharedPtrMacro<SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverter3DMacro> > spConv(new SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverter3DMacro>());
+            SharedPtrMacro<SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
             // Initialise the converter
             spConv->init(spRes, 1);
@@ -268,7 +270,7 @@ namespace GeoMHDiSCC {
          }
       #else 
          // Initialise serial 3D converter
-         SharedPtrMacro<SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverter3DMacro> > spConv(new SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverter3DMacro>());
+         SharedPtrMacro<SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<TFwd2D, TBwd2D, TFwd3D, TBwd3D, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
          // Initialise the converter
          spConv->init(spRes, 1);
@@ -343,6 +345,7 @@ namespace GeoMHDiSCC {
       this->storage3D().holdFwd(rData);
    }
 
+}
 }
 
 #endif // COMMUNICATOR3D_HPP

@@ -25,14 +25,16 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MpiTypes.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "Communicators/Converters/ConverterBase.hpp"
+#include "Communicators/Converters/IConverter.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    /**
     * \brief Templated implementation of the base of a MPI data converter.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverterBase: public ConverterBase<TFwdA,TBwdA,TFwdB,TBwdB>
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverterBase: public IConverter<TFwdA,TBwdA,TFwdB,TBwdB>
    {
       public:
          /**
@@ -221,7 +223,7 @@ namespace GeoMHDiSCC {
    }
       
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverterBase()
-      : ConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>(), mActiveFSendPacks(0), mActiveBSendPacks(0)
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB>(), mActiveFSendPacks(0), mActiveBSendPacks(0)
    {
    }
 
@@ -838,6 +840,7 @@ namespace GeoMHDiSCC {
       }
    }
 
+}
 }
 
 #endif // MPICONVERTERBASE_HPP

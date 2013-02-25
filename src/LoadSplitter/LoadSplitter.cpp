@@ -36,6 +36,10 @@ namespace GeoMHDiSCC {
    {
    }
 
+   LoadSplitter::~LoadSplitter()
+   {
+   }
+
    int LoadSplitter::nCpu() const
    {
       return this->mNCpu;

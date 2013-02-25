@@ -7,7 +7,6 @@
 
 // Configuration includes
 //
-#include "Simulation/PrepMacros/ScalarTypedefsMacro.h"
 
 // System includes
 //
@@ -19,6 +18,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "VectorField/VectorField.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
 

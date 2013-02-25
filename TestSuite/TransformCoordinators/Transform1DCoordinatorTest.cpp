@@ -36,6 +36,23 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
+   enum DummyEnum {TRA1D, TRA2D, TRA3D};
+
+   template <DummyEnum ID> class Nothing;
+
+   struct DummyConf {
+      template<DummyEnum  ID1, template<DummyEnum ID2> class STEP> static void  project(int dummy);
+   };
+
+   template<> void DummyConf::project<TRA1D, Nothing>(int dummy){};
+   template<> void DummyConf::project<TRA2D, Nothing>(int dummy){};
+   template<> void DummyConf::project<TRA3D, Nothing>(int dummy){};
+
+   template<> void DummyConf::project<TRA1D, Step>(int dummy)
+   {
+
+   }
+
    Transform1DCoordinatorTest::Transform1DCoordinatorTest()
    {
    }
