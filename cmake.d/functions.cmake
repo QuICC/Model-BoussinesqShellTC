@@ -10,7 +10,13 @@ function (geomhdiscc_create_choice choiceList choiceName chosen)
       endif(DEFINED str)
    endforeach(choice  ${${choiceList}})
    set(str "Available ${choiceName}(s): ${str}")
-   set(${chosen} ${${chosen}} CACHE STRING ${str} FORCE)
+   # Get Length of choice list
+   list(LENGTH ${choiceList} len)
+   if(${len} EQUAL 1)
+      set(${chosen} ${${choiceList}} CACHE STRING ${str} FORCE)
+   else(${len} EQUAL 1)
+      set(${chosen} ${${chosen}} CACHE STRING ${str} FORCE)
+   endif(${len} EQUAL 1)
 endfunction(geomhdiscc_create_choice)
 
 # 
@@ -47,7 +53,6 @@ endfunction(geomhdiscc_provide_choice)
 #
 function (geomhdiscc_load_platform platform)
    include("cmake.d/platforms/${${platform}}.cmake")
-   message(STATUS " --> Platform: "${${platform}})
 endfunction (geomhdiscc_load_platform)
 
 #
