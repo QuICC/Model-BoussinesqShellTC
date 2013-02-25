@@ -6,8 +6,6 @@
 file(GLOB PhysicalModels
    ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/*Model.hpp)
 
-message(STATUS ${PhysicalModels})
-
 # Loop over all physical models
 foreach(ModelFile ${PhysicalModels})
 
@@ -23,4 +21,7 @@ foreach(ModelFile ${PhysicalModels})
    # Set special properties of target
    set_target_properties(${ModelName} PROPERTIES OUTPUT_NAME ${ModelName}
       COMPILE_FLAGS "-D GEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+
+   # Show message
+   message(STATUS " --> Added ${ModelName} executable")
 endforeach(ModelFile)

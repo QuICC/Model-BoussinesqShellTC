@@ -59,6 +59,9 @@ if(platformTest)
    include(cmake.d/setup/automatic.cmake)
 
    # Executables setup
-   include(cmake.d/setup/executable.cmake)
+   include(cmake.d/setup/Executables.cmake)
+
+   # TestSuite setup
+   include(cmake.d/setup/TestSuite.cmake)
 
 endif(platformTest)

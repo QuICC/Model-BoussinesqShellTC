@@ -33,4 +33,7 @@
  *
  * @namespace GeoMHDiSCC::Transform
  * @brief This namespace provides all the transform related code
+ *
+ * @namespace GeoMHDiSCC::TestSuite
+ * @brief This namespace provides all the TestSuite related code
  */

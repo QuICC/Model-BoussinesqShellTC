@@ -23,6 +23,15 @@ namespace GeoMHDiSCC {
       if(autostart)
       {
          this->start();
+      } else
+      {
+         // Zero initialise start timespec structures
+         this->mStart.tv_sec = 0.0;
+         this->mStart.tv_nsec = 0.0;
+
+         // Zero initialise stop timespec structures
+         this->mStop.tv_sec = 0.0;
+         this->mStop.tv_nsec = 0.0;
       }
    }
 

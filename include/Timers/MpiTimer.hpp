@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
           *
           * @param autostart Should the timer start at creation ?
           */
-         MpiTimer(const bool autostart = false);
+         explicit MpiTimer(const bool autostart = false);
 
          /**
           * @brief Destructor

@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
           *
           * @param autostart Should the timer start at creation ?
           */
-         SerialTimer(const bool autostart = false);
+         explicit SerialTimer(const bool autostart = false);
 
          /**
           * @brief Destructor

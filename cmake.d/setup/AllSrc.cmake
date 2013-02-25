@@ -26,8 +26,6 @@ message(STATUS "***********************************************")
 ###################################################
 
 message(STATUS "!!!WARNING!!! AllSrc.cmake OVERRIDING ACTUAL DIRECTORY LIST WITH FULL LIST")
-add_definitions("-DGEOMHDISCC_PROFILE")
-add_definitions("-DGEOMHDISCC_STORAGEPROFILE")
 
 #
 # List of source subdirectories for the Framework part

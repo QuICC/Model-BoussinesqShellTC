@@ -37,7 +37,7 @@ namespace GeoMHDiSCC {
           *
           * @param autostart Should the timer start at creation ?
           */
-         ExecutionTimer(const bool autostart = false);
+         explicit ExecutionTimer(const bool autostart = false);
 
          /**
           * @brief Destructor

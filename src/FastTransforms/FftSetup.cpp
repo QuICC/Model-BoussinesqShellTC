@@ -33,6 +33,10 @@ namespace Transform {
       }
    }
 
+   FftSetup::~FftSetup()
+   {
+   }
+
    void FftSetup::setScale(const MHDFloat scale)
    {
       this->mScale = scale;

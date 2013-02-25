@@ -9,10 +9,6 @@ include(cmake.d/functions.cmake)
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
-message(STATUS "***********************************************")
-message(STATUS "**************** Debug setup ******************")
-message(STATUS "***********************************************")
-
 ###################################################
 #------------------- PROFILING -------------------#
 ###################################################
@@ -21,6 +17,12 @@ message(STATUS "***********************************************")
 # Use internal profiler and type of profiler
 #
 option(GEOMHDISCC_PROFILE "Activate internal profiler?" OFF)
+
+if(GEOMHDISCC_PROFILE)
+   message(STATUS "***********************************************")
+   message(STATUS "**************** Debug setup ******************")
+   message(STATUS "***********************************************")
+endif(GEOMHDISCC_PROFILE)
 
 if(GEOMHDISCC_PROFILE)
    add_definitions("-DGEOMHDISCC_PROFILE")
@@ -42,6 +44,12 @@ endif(GEOMHDISCC_PROFILE)
 # Used storage requirements profiler?
 #
 option(GEOMHDISCC_STORAGEPROFILE "Activate internal storage profiler?" OFF)
+
+if(NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
+   message(STATUS "***********************************************")
+   message(STATUS "**************** Debug setup ******************")
+   message(STATUS "***********************************************")
+endif(NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
 
 if(GEOMHDISCC_STORAGEPROFILE)
    add_definitions("-DGEOMHDISCC_STORAGEPROFILE")

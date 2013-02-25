@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
          *
          * \param msg Error message
          */
-         Exception(const std::string& msg);
+         explicit Exception(const std::string& msg);
 
          /**
          * @brief Simple empty destructor
