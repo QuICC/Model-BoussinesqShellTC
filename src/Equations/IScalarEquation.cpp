@@ -25,6 +25,10 @@ namespace GeoMHDiSCC {
    {
    }
 
+   IScalarEquation::~IScalarEquation()
+   {
+   }
+
    void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       int rows = 2*this->unknown().dom(0).perturbation().slice(matIdx).rows()/3;

@@ -16,9 +16,9 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "Enums/Splitting.hpp"
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
-#include "Base/Resolutions/TransformResolution.hpp"
+#include "Resolutions/TransformResolution.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
           * @param dim     Dimensions
           * @param split   Dimension to split
           */
-         SingleSplitting(const int id, const int nCpu, const ArrayI& dim, Splittings::Locations::Id split);
+         SingleSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Locations::Id split);
 
          /**
           * @brief Destructor
@@ -73,7 +73,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Dimension to split
           */
-         Splittings::Locations::Id mSplit;
+         Splitting::Locations::Id mSplit;
    };
 
 }

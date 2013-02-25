@@ -20,7 +20,7 @@ namespace GeoMHDiSCC {
 
    const int TFTScheme::DIMENSIONS = 3;
 
-   SharedFFTSetup TFTScheme::spSetup1D(SharedResolution spRes)
+   Transform::SharedFftSetup TFTScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(0)->dimFwd();
@@ -35,10 +35,10 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(0)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
-   SharedFFTSetup TFTScheme::spSetup2D(SharedResolution spRes)
+   Transform::SharedFftSetup TFTScheme::spSetup2D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(1)->dimFwd();
@@ -53,10 +53,10 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(1)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, true));
    }
 
-   SharedFFTSetup TFTScheme::spSetup3D(SharedResolution spRes)
+   Transform::SharedFftSetup TFTScheme::spSetup3D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(2)->dimFwd();
@@ -71,11 +71,15 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(2)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
    TFTScheme::TFTScheme(const ArrayI& dim)
       : Regular3DScheme(dim)
+   {
+   }
+
+   TFTScheme::~TFTScheme()
    {
    }
 

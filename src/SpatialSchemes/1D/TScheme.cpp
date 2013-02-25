@@ -20,7 +20,7 @@ namespace GeoMHDiSCC {
 
    const int TScheme::DIMENSIONS = 1;
 
-   SharedFFTSetup TScheme::spSetup1D(SharedResolution spRes)
+   Transform::SharedFftSetup TScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(0)->dimFwd();
@@ -34,11 +34,15 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(0)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
    TScheme::TScheme(const ArrayI& dim, const int shift)
       : SpatialScheme(dim.size()+shift), mI(dim(0))
+   {
+   }
+
+   TScheme::~TScheme()
    {
    }
 
@@ -105,7 +109,7 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 
-   void TScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splittings::Locations::Id flag)
+   void TScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
       assert(dim < 1);
@@ -113,7 +117,7 @@ namespace GeoMHDiSCC {
       // Safety assertions for default values
       assert( bins.size() == n0.size() );
       assert( n0.size() == nN.size() );
-      assert( (bins.size() == 0) || (flag != Splittings::Locations::NONE) );
+      assert( (bins.size() == 0) || (flag != Splitting::Locations::NONE) );
 
       // Set unused third dimension
       idx3D.resize(0);
@@ -144,8 +148,8 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int TScheme::splittableTotal(const int dim, Splittings::Locations::Id flag)
+   int TScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
    {
-      throw Exception("TScheme::splittableTotal", "There is no algorithm for 1D problems!");
+      throw Exception("There is no splitting algorithm for 1D problems!");
    }
 }

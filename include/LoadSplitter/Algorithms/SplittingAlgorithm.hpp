@@ -19,8 +19,8 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Resolutions/Resolution.hpp"
-#include "Base/SpatialSchemes/SpatialScheme.hpp"
+#include "Resolutions/Resolution.hpp"
+#include "SpatialSchemes/SpatialScheme.hpp"
 #include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
 namespace GeoMHDiSCC {
@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
           * @param dim     Dimensions
           * @param algo    ID of the algorithm
           */
-         SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splittings::Algorithms::Id algo);
+         SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splitting::Algorithms::Id algo);
 
          /**
           * @brief Destructor
@@ -72,12 +72,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief ID of the algorithm
           */
-         Splittings::Algorithms::Id mAlgo;
+         Splitting::Algorithms::Id mAlgo;
 
          /**
           * @brief ID of the grouper
           */
-         Splittings::Groupers::Id mGrouper;
+         Splitting::Groupers::Id mGrouper;
 
          /**
           * @brief Shared spatial scheme

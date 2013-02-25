@@ -14,13 +14,11 @@
 
 // Project includes
 //
-#include "Exceptions/Exception.hpp"
-#include "Base/IO/Ascii/FormatToolbox.hpp"
 
 namespace GeoMHDiSCC {
 
    TubularSplitting::TubularSplitting(const int id, const int nCpu, const ArrayI& dim)
-      : SplittingAlgorithm(id, nCpu, dim, Splittings::Algorithms::TUBULAR)
+      : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::TUBULAR)
    {
       // Factorise N_cpu into two factors
       this->factoriseNCpu(2);
@@ -29,17 +27,21 @@ namespace GeoMHDiSCC {
       this->filterFactors();
    }
 
+   TubularSplitting::~TubularSplitting()
+   {
+   }
+
    bool TubularSplitting::applicable() const
    {
       bool status = true;
 
       // Check that all three dimensions are splittable by factors
-      status = (status && (this->mspScheme->splittableTotal(0, Splittings::Locations::SECOND) >= this->factor(1)));
-      status = (status && (this->mspScheme->splittableTotal(0, Splittings::Locations::BOTH) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(1, Splittings::Locations::BOTH) >= this->factor(1)));
-      status = (status && (this->mspScheme->splittableTotal(1, Splittings::Locations::FIRST) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(2, Splittings::Locations::FIRST) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(2, Splittings::Locations::BOTH) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(0, Splitting::Locations::SECOND) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(0, Splitting::Locations::BOTH) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(1, Splitting::Locations::BOTH) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(1, Splitting::Locations::FIRST) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(2, Splitting::Locations::FIRST) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(2, Splitting::Locations::BOTH) >= this->factor(1)));
 
       // Check for scheme specific conditions
       if(status)
@@ -73,14 +75,14 @@ namespace GeoMHDiSCC {
       if(dim == 0)
       {
          // Get size of the dimension that needs to be compatible with previous step
-         int tot = this->mspScheme->splittableTotal(dim, Splittings::Locations::SECOND);
+         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::SECOND);
 
          // Build a balanced split (has to be the same as in dim == 1)
          int c0, cN;
          this->balancedSplit(c0, cN, tot, this->factor(1), ids(1));
 
          // Get the remaining splittable size
-         tot = cN*this->mspScheme->splittableTotal(dim, Splittings::Locations::BOTH);
+         tot = cN*this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
 
          // Build a simple balanced split over remaining modes
          int r0, rN;
@@ -133,13 +135,13 @@ namespace GeoMHDiSCC {
          nN.resize(2);
 
          // Get size of the splittable dimension(s)
-         int tot = this->mspScheme->splittableTotal(dim, Splittings::Locations::BOTH);
+         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
 
          // Build a simple balanced split
          this->balancedSplit(n0(0), nN(0), tot, this->factor(1), ids(1));
 
          // Get size of the splittable dimension(s)
-         tot = this->mspScheme->splittableTotal(dim, Splittings::Locations::FIRST);
+         tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::FIRST);
 
          // Compute a balanced splitting
          this->balancedSplit(n0(1), nN(1), tot, this->factor(0), ids(0));
@@ -147,7 +149,7 @@ namespace GeoMHDiSCC {
       } else if(dim == 2)
       {
          // Get size of the splittable dimension(s)
-         int tot = this->mspScheme->splittableTotal(dim, Splittings::Locations::FIRST);
+         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::FIRST);
 
          // Compute a balanced splitting
          int t0, tN;
@@ -162,7 +164,7 @@ namespace GeoMHDiSCC {
          nN(0) = tN;
 
          // Get total for second dimension
-         tot = nN(0)*this->mspScheme->splittableTotal(dim, Splittings::Locations::BOTH);
+         tot = nN(0)*this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
 
          // Get balanced splitting for second direction
          this->balancedSplit(t0, tN, tot, this->factor(1), ids(1));
@@ -193,7 +195,7 @@ namespace GeoMHDiSCC {
       }
 
       // Compute the indexes
-      this->mspScheme->fillIndexes(dim, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splittings::Locations::BOTH);
+      this->mspScheme->fillIndexes(dim, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::BOTH);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
@@ -203,19 +205,19 @@ namespace GeoMHDiSCC {
    {
       // TRANSFORM grouper setup
       #if defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
-         this->mGrouper = Splittings::Groupers::TRANSFORM;
+         this->mGrouper = Splitting::Groupers::TRANSFORM;
 
       // SINGLE1D grouper setup
       #elif defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
-         this->mGrouper = Splittings::Groupers::SINGLE1D;
+         this->mGrouper = Splitting::Groupers::SINGLE1D;
 
       // SINGLE2D grouper setup
       #elif defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
-         this->mGrouper = Splittings::Groupers::SINGLE2D;
+         this->mGrouper = Splitting::Groupers::SINGLE2D;
 
       // EQUATION grouper setup
       #else
-         this->mGrouper = Splittings::Groupers::EQUATION;
+         this->mGrouper = Splitting::Groupers::EQUATION;
       #endif //defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
    }
 

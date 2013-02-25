@@ -15,13 +15,14 @@
 
 // Class include
 //
-#include "Base/LoadSplitter/LoadSplitter.hpp"
+#include "LoadSplitter/LoadSplitter.hpp"
 
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
-#include "Base/Enums/Splittings.hpp"
-#include "Base/IO/Ascii/FormatToolbox.hpp"
+#include "Enums/Splitting.hpp"
+#include "IoTools/Formatter.hpp"
+
 // Splitting algorithms
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "LoadSplitter/Algorithms/SerialSplitting.hpp"
@@ -57,7 +58,7 @@ namespace GeoMHDiSCC {
       {
          #ifdef GEOMHDISCC_MPI
             // We don't deal with a single CPU in MPI mode
-            throw Exception("LoadSplitter::initAlgorithms", "Tried to initialise (MPI) parallelisation with a single CPU");
+            throw Exception("Tried to initialise (MPI) parallelisation with a single CPU");
          #else
             this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SerialSplitting(this->id(), this->nCpu(), dim)));
          #endif //GEOMHDISCC_MPI
@@ -71,7 +72,7 @@ namespace GeoMHDiSCC {
             {
                #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
                   // Add the single splitting algorithm for first data exchange
-                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splittings::Locations::FIRST)));
+                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splitting::Locations::FIRST)));
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
                // Check if problem is 3D
@@ -79,7 +80,7 @@ namespace GeoMHDiSCC {
                {
                   #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
                      // Add the single splitting algorithm for second data exchange
-                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splittings::Locations::SECOND)));
+                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splitting::Locations::SECOND)));
                   #endif //GEOMHDISCC_MPIALGO_SINGLE2D
 
                   #ifdef GEOMHDISCC_MPIALGO_TUBULAR
@@ -91,18 +92,18 @@ namespace GeoMHDiSCC {
             // 1D problems can't be parallelised with the current algorithms
             } else
             {
-               throw Exception("LoadSplitter::initAlgorithms", "There is no parallelisation algorithm for 1D problems!");
+               throw Exception("There is no parallelisation algorithm for 1D problems!");
             }
          #else
             // nCpu can't be bigger than one without MPI
-            throw Exception("LoadSplitter::initAlgorithms", "Initialisation of nCPU > 1 without MPI is not possible!");
+            throw Exception("Initialisation of nCPU > 1 without MPI is not possible!");
          #endif //GEOMHDISCC_MPI
       }
 
       // Safety check to make sure at least one algorithm has been initialised
       if(this->mAlgorithms.size() == 0)
       {
-         throw Exception("LoadSplitter::initAlgorithms", "No algorithm has been initialised!");
+         throw Exception("No algorithm has been initialised!");
       }
    }
 
@@ -145,7 +146,7 @@ namespace GeoMHDiSCC {
          return this->mScores.rbegin()->second;
       } else
       {
-         throw Exception("LoadSplitter::bestSplitting", "No usable splitting has been found!");
+         throw Exception("No usable splitting has been found!");
       }
    }
 
@@ -155,47 +156,47 @@ namespace GeoMHDiSCC {
       if(this->id() == 0)
       {
          // Print load splitting header
-         FormatToolbox::printLine('-');
-         FormatToolbox::printCentered("Load distribution", '*');
-         FormatToolbox::printLine('-');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "Load distribution", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
 
          std::string tmpStr;
 
          // Print grouper information
          switch(descr.grouper)
          {
-            case(Splittings::Groupers::EQUATION):
+            case(Splitting::Groupers::EQUATION):
                tmpStr = "Equation";
                break;
-            case(Splittings::Groupers::SINGLE1D):
+            case(Splitting::Groupers::SINGLE1D):
                tmpStr = "Single 1D";
                break;
-            case(Splittings::Groupers::SINGLE2D):
+            case(Splitting::Groupers::SINGLE2D):
                tmpStr = "Single 2D";
                break;
-            case(Splittings::Groupers::TRANSFORM):
+            case(Splitting::Groupers::TRANSFORM):
                tmpStr = "Transform";
                break;
          }
-         FormatToolbox::printCentered("Grouper: " + tmpStr);
+         IoTools::Formatter::printCentered(std::cout, "Grouper: " + tmpStr);
 
          // Print Algorithm information
          switch(descr.algorithm)
          {
-            case(Splittings::Algorithms::SERIAL):
+            case(Splitting::Algorithms::SERIAL):
                tmpStr = "Serial";
                break;
-            case(Splittings::Algorithms::SINGLE1D):
+            case(Splitting::Algorithms::SINGLE1D):
                tmpStr = "Single 1D";
                break;
-            case(Splittings::Algorithms::SINGLE2D):
+            case(Splitting::Algorithms::SINGLE2D):
                tmpStr = "Single 2D";
                break;
-            case(Splittings::Algorithms::TUBULAR):
+            case(Splitting::Algorithms::TUBULAR):
                tmpStr = "Tubular";
                break;
          }
-         FormatToolbox::printCentered("Algorithm: " + tmpStr);
+         IoTools::Formatter::printCentered(std::cout, "Algorithm: " + tmpStr);
 
          // Print factorisation information
          tmpStr = "";
@@ -210,20 +211,20 @@ namespace GeoMHDiSCC {
                tmpStr += " x ";
             }
          }
-         if(descr.algorithm == Splittings::Algorithms::SINGLE1D)
+         if(descr.algorithm == Splitting::Algorithms::SINGLE1D)
          {
             tmpStr += " x 1";
-         } else if(descr.algorithm == Splittings::Algorithms::SINGLE2D)
+         } else if(descr.algorithm == Splitting::Algorithms::SINGLE2D)
          {
             tmpStr = "1 x " + tmpStr;
          }
-         FormatToolbox::printCentered("Factorisation: " + tmpStr);
+         IoTools::Formatter::printCentered(std::cout, "Factorisation: " + tmpStr);
 
          oss.str("");
          oss << descr.score;
-         FormatToolbox::printCentered("Score: " + oss.str());
+         IoTools::Formatter::printCentered(std::cout, "Score: " + oss.str());
 
-         FormatToolbox::printNewline();
+         IoTools::Formatter::printNewline(std::cout);
       }
    }
 
@@ -251,7 +252,7 @@ namespace GeoMHDiSCC {
          return rit->second;
       } else
       {
-         throw Exception("LoadSplitter::nextSplitting", "No more usable splitting are available!");
+         throw Exception("No more usable splitting are available!");
       }
    }
 

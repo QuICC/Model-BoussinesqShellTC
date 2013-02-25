@@ -38,7 +38,7 @@ namespace GeoMHDiSCC {
          /**
           * \brief Simple constructor
           */
-         IEvolutionEquation(SharedEquationParameters spEqParams);
+         explicit IEvolutionEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

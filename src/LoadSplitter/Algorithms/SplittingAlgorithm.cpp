@@ -22,8 +22,8 @@
 
 namespace GeoMHDiSCC {
 
-   SplittingAlgorithm::SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splittings::Algorithms::Id algo)
-      :  mId(id), mNCpu(nCpu), mDims(dim.size()), mAlgo(algo), mSimDim(dim), mGrouper(Splittings::Groupers::EQUATION)
+   SplittingAlgorithm::SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splitting::Algorithms::Id algo)
+      :  mId(id), mNCpu(nCpu), mDims(dim.size()), mAlgo(algo), mSimDim(dim), mGrouper(Splitting::Groupers::EQUATION)
    {
    }
 
@@ -113,7 +113,7 @@ namespace GeoMHDiSCC {
          }
       } else
       {
-         throw Exception("SplittingAlgorithm::factoriseNCpu", "No factorisation algorithm available for requested factors!");
+         throw Exception("No factorisation algorithm available for requested factors!");
       }
    }
 
@@ -201,7 +201,7 @@ namespace GeoMHDiSCC {
       // Avoid splitting with zero elements
       if(tot < parts)
       {
-         throw Exception("SplittingAlgorithm::balancedSplit", "Number of parts is bigger than total!");
+         throw Exception("Number of parts is bigger than total!");
       }
 
       // Compute part assigned to id
@@ -230,7 +230,7 @@ namespace GeoMHDiSCC {
       // Can't split into less than 1 part
       } else
       {
-         throw Exception("SplittingAlgorithm::balancedSplit", "Number of parts < 1!");
+         throw Exception("Number of parts < 1!");
       }
    }
 
@@ -283,7 +283,7 @@ namespace GeoMHDiSCC {
       // Handle 1D resolution
       if(spRes->cpu(0)->nDim() == 1)
       {
-         throw Exception("SplittingAlgorithm::communicationScore", "Tried computation of communication structure score for 1D resolution!");
+         throw Exception("Requested computation of communication structure score for 1D resolution!");
 
       // Handle 2D resolution
       } else if(spRes->cpu(0)->nDim() == 2)
@@ -342,7 +342,7 @@ namespace GeoMHDiSCC {
          // Check that both sets have the same size
          if(fwdMap.size() != bwdMap.size())
          {
-            throw Exception("SplittingAlgorithm::communicationScore", "The size of the computed index sets don't match!");
+            throw Exception("The size of the computed index sets don't match!");
          }
 
          // Make sure the content is the same also
@@ -354,7 +354,7 @@ namespace GeoMHDiSCC {
             // Check that both position are the same
             if(it->first != mapPos->first)
             {
-               throw Exception("SplittingAlgorithm::communicationScore", "The computed index sets don't match!");
+               throw Exception("The computed index sets don't match!");
             }
 
             // Add corresponding communication edge to filter
@@ -444,7 +444,7 @@ namespace GeoMHDiSCC {
             // the safe side
             if(fwdMap.size() > bwdMap.size())
             {
-               throw Exception("SplittingAlgorithm::communicationScore", "The size of the computed index sets don't match!");
+               throw Exception("The size of the computed index sets don't match!");
             }
 
             // Make sure both maps contain the same and exctract communication structure
@@ -458,7 +458,7 @@ namespace GeoMHDiSCC {
                // Check that both position are the same
                if(mapPos == bwdMap.end())
                {
-                  throw Exception("SplittingAlgorithm::communicationScore", "The computed index sets don't match!");
+                  throw Exception("The computed index sets don't match!");
                }
 
                // Add corresponding communication edge to filter
@@ -506,7 +506,7 @@ namespace GeoMHDiSCC {
       // Handle 1D resolution
       if(spRes->cpu(0)->nDim() == 1)
       {
-         throw Exception("SplittingAlgorithm::balancingScore", "Tried computation of load balancing score for 1D resolution!");
+         throw Exception("Requested computation of load balancing score for 1D resolution!");
 
       // Handle 2D resolution
       } else if(spRes->cpu(0)->nDim() == 2)

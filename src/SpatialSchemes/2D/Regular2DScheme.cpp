@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Base/SpatialSchemes/2D/Regular2DScheme.hpp"
+#include "SpatialSchemes/2D/Regular2DScheme.hpp"
 
 // Project includes
 //
@@ -24,7 +24,11 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void Regular2DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splittings::Locations::Id flag)
+   Regular2DScheme::~Regular2DScheme()
+   {
+   }
+
+   void Regular2DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
       assert(dim < 2);
@@ -33,7 +37,7 @@ namespace GeoMHDiSCC {
       assert( (id.size() == 0) || (bins.size() > 0) );
       assert( id.size() == bins.size() );
       assert( n0.size() == nN.size() );
-      assert( (bins.size() == 0) || (flag != Splittings::Locations::NONE) );
+      assert( (bins.size() == 0) || (flag != Splitting::Locations::NONE) );
 
       // Set unused third dimension
       idx3D.resize(0);
@@ -46,11 +50,11 @@ namespace GeoMHDiSCC {
       int j0 = 0;
       int jN = this->dim2D(dim);
 
-      if(flag == Splittings::Locations::FIRST)
+      if(flag == Splitting::Locations::FIRST)
       {
          j0 = n0(0);
          jN = nN(0);
-      } else if(flag == Splittings::Locations::SECOND)
+      } else if(flag == Splitting::Locations::SECOND)
       {
          // There is only 1 possibility in 2D
          assert(false);
@@ -88,12 +92,12 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular2DScheme::splittableTotal(const int dim, Splittings::Locations::Id flag)
+   int Regular2DScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
    {
-      if(flag == Splittings::Locations::FIRST)
+      if(flag == Splitting::Locations::FIRST)
       {
          return this->dim2D(dim);
-      } else if(flag == Splittings::Locations::SECOND)
+      } else if(flag == Splitting::Locations::SECOND)
       {
          // Second splitting not possible in 2D problem
          assert(false);

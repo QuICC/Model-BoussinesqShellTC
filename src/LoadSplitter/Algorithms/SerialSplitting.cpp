@@ -14,18 +14,21 @@
 
 // Project includes
 //
-#include "Base/IO/Ascii/FormatToolbox.hpp"
 
 namespace GeoMHDiSCC {
 
    SerialSplitting::SerialSplitting(const int id, const int nCpu, const ArrayI& dim)
-      : SplittingAlgorithm(id, nCpu, dim, Splittings::Algorithms::SERIAL)
+      : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::SERIAL)
    {
       // Factorise N_cpu
       this->factoriseNCpu(1);
 
       // Filter factors
       this->filterFactors();
+   }
+
+   SerialSplitting::~SerialSplitting()
+   {
    }
 
    int SplittingAlgorithm::id() const

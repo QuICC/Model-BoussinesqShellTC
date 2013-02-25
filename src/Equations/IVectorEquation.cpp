@@ -18,10 +18,14 @@
 // Project includes
 //
 
-namespace GeoMDHiSCC {
+namespace GeoMHDiSCC {
 
    IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams)
       : IEvolutionEquation(spEqParams)
+   {
+   }
+
+   IVectorEquation::~IVectorEquation()
    {
    }
 }

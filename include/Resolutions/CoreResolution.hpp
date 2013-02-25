@@ -34,7 +34,7 @@ namespace GeoMHDiSCC {
           *
           * @param transformRes Resolution object for the transforms
           */
-         CoreResolution(const std::vector<SharedCTransformResolution>& transformRes);
+         explicit CoreResolution(const std::vector<SharedTransformResolution>& transformRes);
 
          /**
           * @brief Empty Destructor
@@ -59,7 +59,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Resolution information for all transforms
           */
-         std::vector<SharedCTransformResolution>   mTransforms;
+         std::vector<SharedTransformResolution>   mTransforms;
    };
 
    /// Typedef for a shared pointer to a CoreResolution object

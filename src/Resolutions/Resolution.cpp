@@ -4,7 +4,7 @@
 
 // Configuration includes
 //
-#include "PrepMacros/FrameworkMacro.h"
+#include "Framework/FrameworkMacro.h"
 
 // System includes
 //
@@ -22,7 +22,7 @@
 
 namespace GeoMHDiSCC {
 
-   Resolution::Resolution(const std::vector<SharedCCoreResolution>& coreRes, const ArrayI& simDim)
+   Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim)
       : mCores(coreRes)
    {
       // Init the simulation resolution

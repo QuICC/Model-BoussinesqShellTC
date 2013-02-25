@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Base/SpatialSchemes/2D/TTScheme.hpp"
+#include "SpatialSchemes/2D/TTScheme.hpp"
 
 // Project includes
 //
@@ -19,7 +19,7 @@ namespace GeoMHDiSCC {
 
    const int TTScheme::DIMENSIONS = 2;
 
-   SharedFFTSetup TTScheme::spSetup1D(SharedResolution spRes)
+   Transform::SharedFftSetup TTScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(0)->dimFwd();
@@ -34,10 +34,10 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(0)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
-   SharedFFTSetup TTScheme::spSetup2D(SharedResolution spRes)
+   Transform::SharedFftSetup TTScheme::spSetup2D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(1)->dimFwd();
@@ -52,11 +52,15 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(1)->dim2D(i);
       }
 
-      return SharedFFTSetup(new FFTSetup(size, howmany, specSize));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
    TTScheme::TTScheme(const ArrayI& dim)
       : Regular2DScheme(dim)
+   {
+   }
+
+   TTScheme::~TTScheme()
    {
    }
 

@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/2D/Regular2DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
@@ -38,12 +38,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Construct setup object for first transform
           */
-         static SharedFFTSetup  spSetup1D(SharedResolution spRes);
+         static Transform::SharedFftSetup  spSetup1D(SharedResolution spRes);
 
          /**
           * @brief Construct setup object for second transform
           */
-         static SharedFFTSetup  spSetup2D(SharedResolution spRes);
+         static Transform::SharedFftSetup  spSetup2D(SharedResolution spRes);
 
          /**
           * @brief Constructor

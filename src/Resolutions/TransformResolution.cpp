@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "Base/Resolutions/TransformResolution.hpp"
+#include "Resolutions/TransformResolution.hpp"
 
 // Project includes
 //
@@ -76,12 +76,12 @@ namespace GeoMHDiSCC {
 
    Datatypes::SharedScalarFieldSetup TransformResolution::spFwdSetup() const
    {
-      return Datatypes::SharedScalarFieldSetup(new ScalarFieldSetup(this->mFwd, this->mIdx2D, this->mIdx3D));
+      return Datatypes::SharedScalarFieldSetup(new Datatypes::ScalarFieldSetup(this->mFwd, this->mIdx2D, this->mIdx3D));
    }
 
    Datatypes::SharedScalarFieldSetup TransformResolution::spBwdSetup() const
    {
-      return Datatypes::SharedScalarFieldSetup(new ScalarFieldSetup(this->mBwd, this->mIdx2D, this->mIdx3D));
+      return Datatypes::SharedScalarFieldSetup(new Datatypes::ScalarFieldSetup(this->mBwd, this->mIdx2D, this->mIdx3D));
    }
 
    int TransformResolution::idxFwd(const int i, const int j, const int k) const

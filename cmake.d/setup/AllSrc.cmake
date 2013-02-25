@@ -32,8 +32,8 @@ message(STATUS "!!!WARNING!!! AllSrc.cmake OVERRIDING ACTUAL DIRECTORY LIST WITH
 #
 set(MHDAllSrcDirs
    Base
-   #  Communicators
-   #  Equations
+   Communicators
+   Equations
    Exceptions
    FastTransforms
    Framework         # SourcesList.txt IS IN DEBUG MODE
@@ -44,12 +44,12 @@ set(MHDAllSrcDirs
    IoHdf5
    IoTools
    IoXml
-   #  LoadSplitter
+   LoadSplitter
    Profiler
-   #  Resolutions
-   #  ScalarFields
+   Resolutions
+   ScalarFields
    Simulation
-   #  SpatialSchemes
+   SpatialSchemes
    SpectralOperators
    StorageProfiler
    Timers            # SourcesList.txt IS IN DEBUG MODE

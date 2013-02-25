@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
           * @param coreRes Resolution object for the different CPUs
           * @param simDim  Simulation dimensions
           */
-         Resolution(const std::vector<SharedCCoreResolution>& coreRes, const ArrayI& simDim);
+         Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim);
 
          /**
           * @brief Empty Destructor
@@ -106,7 +106,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for all the core resolutions
           */
-         std::vector<SharedCCoreResolution>   mCores;
+         std::vector<SharedCoreResolution>   mCores;
    };
 
    /// Typedef for a shared pointer to a Resolution object

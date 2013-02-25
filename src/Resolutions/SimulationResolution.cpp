@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Base/Resolutions/SimulationResolution.hpp"
+#include "Resolutions/SimulationResolution.hpp"
 
 // Project includes
 //

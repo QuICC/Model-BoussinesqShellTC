@@ -19,8 +19,8 @@
 
 // Project includes
 //
-#include "General/Typedefs.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "Base/Typedefs.hpp"
+#include "Enums/Splitting.hpp"
 #include "SpatialSchemes/SchemeBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
           *
           * @param dims Dimension of the domain
           */
-         SpatialScheme(const int dims);
+         explicit SpatialScheme(const int dims);
 
          /**
           * @brief Destructor
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splittings::Locations::Id flag = Splittings::Locations::NONE) = 0;
+         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
 
          /**
           * @brief Get total of splittable indexes 
@@ -70,7 +70,7 @@ namespace GeoMHDiSCC {
           * @param dim     Dimension for which to compute indexes
           * @param flag    Flag to specify location of splitting
           */
-         virtual int splittableTotal(const int dim, Splittings::Locations::Id flag) = 0;
+         virtual int splittableTotal(const int dim, Splitting::Locations::Id flag) = 0;
 
          /**
           * @brief Scheme specific splitting restrictions

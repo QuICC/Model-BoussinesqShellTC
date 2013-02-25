@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Dimensions.hpp"
+#include "Enums/Dimensions.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 

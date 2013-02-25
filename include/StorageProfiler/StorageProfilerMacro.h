@@ -17,7 +17,7 @@
    }
 
    /// Define storage profiler update macro function
-   #define StorageProfilerMacro_update(P,m)  StorageProfiler::update(P,m)
+   #define StorageProfilerMacro_update(P,m)  Debug::StorageProfiler::update(P,m)
 
    /// Define storage profiler printInfo macro function
    #define StorageProfilerMacro_printInfo()  Debug::StorageProfilerTools::printInfo()

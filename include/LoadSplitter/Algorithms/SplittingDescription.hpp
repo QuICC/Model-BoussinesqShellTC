@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "Enums/Splitting.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
           * @param factors    CPU splitting factors
           * @param score      Score 
           */
-         SplittingDescription(const Splittings::Algorithms::Id algorithm, const Splittings::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score);
+         SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score);
 
          /**
           * @brief Destructor
@@ -46,12 +46,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief ID of the algorithm
           */
-         Splittings::Algorithms::Id algorithm;
+         Splitting::Algorithms::Id algorithm;
 
          /**
           * @brief ID of the grouper
           */
-         Splittings::Groupers::Id grouper;
+         Splitting::Groupers::Id grouper;
 
          /**
           * @brief Number of dimensions

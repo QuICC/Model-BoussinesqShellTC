@@ -17,8 +17,8 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Transform/FftwTools.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "FastTransforms/FftwTools.hpp"
+#include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/3D/Regular3DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
@@ -39,24 +39,24 @@ namespace GeoMHDiSCC {
          /**
           * @brief Construct setup object for first transform
           */
-         static SharedFFTSetup  spSetup1D(SharedResolution spRes);
+         static Transform::SharedFftSetup  spSetup1D(SharedResolution spRes);
 
          /**
           * @brief Construct setup object for second transform
           */
-         static SharedFFTSetup  spSetup2D(SharedResolution spRes);
+         static Transform::SharedFftSetup  spSetup2D(SharedResolution spRes);
 
          /**
           * @brief Construct setup object for third transform
           */
-         static SharedFFTSetup  spSetup3D(SharedResolution spRes);
+         static Transform::SharedFftSetup  spSetup3D(SharedResolution spRes);
 
          /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations 
           */
-         TFTScheme(const ArrayI& dim);
+         explicit TFTScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
@@ -142,10 +142,10 @@ namespace GeoMHDiSCC {
    inline int TFTScheme::nX() const
    {
       // Get standard dealiased FFT size
-      int nFFT = FftwTools::dealias(this->nI());
+      int nFFT = Transform::FftwTools::dealiasFft(this->nI());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimizeFft(nFFT);
+      nFFT = Transform::FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }
@@ -158,10 +158,10 @@ namespace GeoMHDiSCC {
    inline int TFTScheme::nY() const
    {
       // Get standard dealiased size for mixed FFT
-      int nFFT = FftwTools::dealiasMixed(this->nJ());
+      int nFFT = Transform::FftwTools::dealiasMixedFft(this->nJ());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimizeFft(nFFT);
+      nFFT = Transform::FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }
@@ -174,10 +174,10 @@ namespace GeoMHDiSCC {
    inline int TFTScheme::nZ() const
    {
       // Get standard dealiased FFT size
-      int nFFT = FftwTools::dealias(this->nK());
+      int nFFT = Transform::FftwTools::dealiasFft(this->nK());
 
       // Check for optimised FFT sizes
-      nFFT = FftwTools::optimizeFft(nFFT);
+      nFFT = Transform::FftwTools::optimizeFft(nFFT);
 
       return nFFT;
    }

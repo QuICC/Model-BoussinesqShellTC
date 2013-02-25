@@ -25,6 +25,10 @@ namespace GeoMHDiSCC {
    {
    }
 
+   IEvolutionEquation::~IEvolutionEquation()
+   {
+   }
+
    bool IEvolutionEquation::isComplex(FieldComponents::Spectral::Id id) const
    {
       return (this->mEqIsComplex || this->boundaryIsComplex(id));
@@ -43,34 +47,28 @@ namespace GeoMHDiSCC {
 
       if(this->mBCs.count(std::make_pair(id,dim)) > 0)
       {
-         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<BoundaryConditions::Id,BoundaryConditions::Position> >::const_iterator bcIt = this->mBCs.find(std::make_pair(id,dim));
-         std::map<BoundaryConditions::Id,BoundaryConditions::Position>::const_iterator mapIt;
+         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> >::const_iterator bcIt = this->mBCs.find(std::make_pair(id,dim));
+         std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>::const_iterator mapIt;
          for(mapIt = bcIt->second.begin(); mapIt != bcIt->second.end(); mapIt++)
          {
-            if(mapIt->second == BoundaryConditions::BOTH)
-            {
-               n += 2;
-            } else
-            {
-               n++;
-            }
+            n++;
          }
       }
 
       return n;
    }
 
-   void IEvolutionEquation::addBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc, ArrayZ val)
+   void IEvolutionEquation::addBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc, ArrayZ val)
    {
       // Create boundary condition and boundary value maps if required
       std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
       if(this->mBCs.count(myId) == 0)
       {
          // Create boundary condition map
-         this->mBCs.insert(std::make_pair(myId, std::map<BoundaryConditions::Id,BoundaryConditions::Position>()));
+         this->mBCs.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
 
          // Create boundary value map
-         this->mBVals.insert(std::make_pair(myId, std::map<BoundaryConditions::Id,ArrayZ>()));
+         this->mBVals.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,ArrayZ>()));
       }
 
       // Insert boundary condition
@@ -80,12 +78,12 @@ namespace GeoMHDiSCC {
       this->mBVals.find(myId)->second.insert(std::make_pair(bc.first,val));
    }
 
-   void IEvolutionEquation::addCBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<BoundaryConditions::Id,BoundaryConditions::Position>& bc)
+   void IEvolutionEquation::addCBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc)
    {
       std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
       if(this->mCBCs.count(myId) == 0)
       {
-         this->mCBCs.insert(std::make_pair(myId, std::map<BoundaryConditions::Id,BoundaryConditions::Position>()));
+         this->mCBCs.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
       }
 
       this->mCBCs.find(myId)->second.insert(bc);
@@ -145,7 +143,7 @@ namespace GeoMHDiSCC {
          // Make sure there are the right number of operators vs boundary matrices
          if(mapIt->second.size() != this->mBCMatrices.find(mapIt->first)->second.size())
          {
-            throw Exception("IEvolutionEquation::finalizeMatrices", "Incompatible opertor and boundary matrices vectors");
+            throw Exception("Can't finalize matrices, incompatible operator and boundary matrices");
          }
 
          // Find the corresponding boundary condition matrix set
@@ -212,7 +210,7 @@ namespace GeoMHDiSCC {
          // Make sure there are the right number of operators vs boundary matrices
          if(mapIt->second.size() != this->mCBCMatrices.find(mapIt->first)->second.size())
          {
-            throw Exception("IEvolutionEquation::finalizeMatrices", "Incompatible opertor and boundary matrices vectors");
+            throw Exception("Can't finalize matrices, incompatible operator and boundary matrices");
          }
 
          // Find the corresponding boundary condition matrix set

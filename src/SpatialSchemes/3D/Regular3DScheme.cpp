@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "Base/SpatialSchemes/3D/Regular3DScheme.hpp"
+#include "SpatialSchemes/3D/Regular3DScheme.hpp"
 
 // Project includes
 //
@@ -25,7 +25,11 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void Regular3DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splittings::Locations::Id flag)
+   Regular3DScheme::~Regular3DScheme()
+   {
+   }
+
+   void Regular3DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
       assert(dim < 3);
@@ -34,7 +38,7 @@ namespace GeoMHDiSCC {
       assert( (id.size() == 0) || (bins.size() > 0) );
       assert( id.size() == bins.size() );
       assert( n0.size() == nN.size() );
-      assert( (bins.size() == 0) || (flag != Splittings::Locations::NONE) );
+      assert( (bins.size() == 0) || (flag != Splitting::Locations::NONE) );
 
       // Make sure we start with empty indexes
       fwd1D.clear();
@@ -48,7 +52,7 @@ namespace GeoMHDiSCC {
       int c0, cN;
 
       // No splitting
-      if(flag == Splittings::Locations::NONE)
+      if(flag == Splitting::Locations::NONE)
       {
          i0 = 0;
          iN = this->dim3D(dim);
@@ -63,7 +67,7 @@ namespace GeoMHDiSCC {
       } else if(dim == 0)
       {
          // Splitting is on first transform
-         if(flag == Splittings::Locations::FIRST)
+         if(flag == Splitting::Locations::FIRST)
          {
             i0 = 0;
             iN = this->dim3D(dim);
@@ -75,7 +79,7 @@ namespace GeoMHDiSCC {
             cN = n0(0) + nN(0);
 
          // Splitting is on second transform
-         } else if(flag == Splittings::Locations::SECOND)
+         } else if(flag == Splitting::Locations::SECOND)
          {
             i0 = 0;
             iN = this->dim3D(dim);
@@ -87,7 +91,7 @@ namespace GeoMHDiSCC {
             cN = this->dim2D(dim)*this->dim3D(dim);
 
          // Splitting is on both transforms
-         } else if(flag == Splittings::Locations::BOTH)
+         } else if(flag == Splitting::Locations::BOTH)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -101,7 +105,7 @@ namespace GeoMHDiSCC {
       } else if(dim == 1)
       {
          // Splitting is on first transform
-         if(flag == Splittings::Locations::FIRST)
+         if(flag == Splitting::Locations::FIRST)
          {
             i0 = 0;
             iN = this->dim3D(dim);
@@ -113,7 +117,7 @@ namespace GeoMHDiSCC {
             cN = this->dim2D(dim)*this->dim3D(dim);
 
          // Splitting is on second transform
-         } else if(flag == Splittings::Locations::SECOND)
+         } else if(flag == Splitting::Locations::SECOND)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -125,7 +129,7 @@ namespace GeoMHDiSCC {
             cN = this->dim2D(dim)*this->dim3D(dim);
 
          // Splitting is on both transforms
-         } else if(flag == Splittings::Locations::BOTH)
+         } else if(flag == Splitting::Locations::BOTH)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -141,7 +145,7 @@ namespace GeoMHDiSCC {
       } else if(dim == 2)
       {
          // Splitting is on first transform
-         if(flag == Splittings::Locations::FIRST)
+         if(flag == Splitting::Locations::FIRST)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -153,7 +157,7 @@ namespace GeoMHDiSCC {
             cN = this->dim2D(dim)*this->dim3D(dim);
 
          // Splitting is on second transform
-         } else if(flag == Splittings::Locations::SECOND)
+         } else if(flag == Splitting::Locations::SECOND)
          {
             i0 = 0;
             iN = this->dim3D(dim);
@@ -165,7 +169,7 @@ namespace GeoMHDiSCC {
             cN = n0(0) + nN(0);
 
          // Splitting is on both transforms
-         } else if(flag == Splittings::Locations::BOTH)
+         } else if(flag == Splitting::Locations::BOTH)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -270,10 +274,10 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular3DScheme::splittableTotal(const int dim, Splittings::Locations::Id flag)
+   int Regular3DScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
    {
       // Splittable size for first transform splitting
-      if(flag == Splittings::Locations::FIRST)
+      if(flag == Splitting::Locations::FIRST)
       {
          // Get total size for first transform
          if(dim == 0)
@@ -292,7 +296,7 @@ namespace GeoMHDiSCC {
          }
 
       // Splittable size for second transform splitting
-      } else if(flag == Splittings::Locations::SECOND)
+      } else if(flag == Splitting::Locations::SECOND)
       {
          // Get total size for first transform
          if(dim == 0)
@@ -310,7 +314,7 @@ namespace GeoMHDiSCC {
          }
 
       // Splittable size for both transforms splitting
-      } else if(flag == Splittings::Locations::BOTH)
+      } else if(flag == Splitting::Locations::BOTH)
       {
          // Get total size for first transform
          if(dim == 0)

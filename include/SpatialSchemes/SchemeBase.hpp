@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "General/Typedefs.hpp"
-#include "Base/Resolutions/Resolution.hpp"
+#include "Base/Typedefs.hpp"
+#include "Resolutions/Resolution.hpp"
 
 namespace GeoMHDiSCC {
 

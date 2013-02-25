@@ -37,7 +37,7 @@ namespace GeoMHDiSCC {
           *
           * \param spEqParams Shared equation parameters
           */
-         IVectorEquation(SharedEquationParameters spEqParams);
+         explicit IVectorEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

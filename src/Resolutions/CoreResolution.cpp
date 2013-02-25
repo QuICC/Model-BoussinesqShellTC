@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "Base/Resolutions/CoreResolution.hpp"
+#include "Resolutions/CoreResolution.hpp"
 
 // Project includes
 //

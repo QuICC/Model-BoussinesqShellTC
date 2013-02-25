@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Base/SpatialSchemes/SchemeBase.hpp"
+#include "SpatialSchemes/SchemeBase.hpp"
 
 // Project includes
 //

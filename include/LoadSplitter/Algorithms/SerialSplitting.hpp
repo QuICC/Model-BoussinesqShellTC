@@ -17,7 +17,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
-#include "Base/Resolutions/TransformResolution.hpp"
+#include "Resolutions/TransformResolution.hpp"
 
 namespace GeoMHDiSCC {
 

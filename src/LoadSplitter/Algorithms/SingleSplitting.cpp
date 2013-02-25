@@ -18,18 +18,16 @@
 
 // Project includes
 //
-#include "Exceptions/Exception.hpp"
-#include "Base/IO/Ascii/FormatToolbox.hpp"
 
 namespace GeoMHDiSCC {
 
-   SingleSplitting::SingleSplitting(const int id, const int nCpu, const ArrayI& dim, Splittings::Locations::Id split)
-      : SplittingAlgorithm(id, nCpu, dim, Splittings::Algorithms::SINGLE1D), mSplit(split)
+   SingleSplitting::SingleSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Locations::Id split)
+      : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::SINGLE1D), mSplit(split)
    {
       // Make sure the right algorithm is set
-      if(split == Splittings::Locations::SECOND)
+      if(split == Splitting::Locations::SECOND)
       {
-         this->mAlgo = Splittings::Algorithms::SINGLE2D;
+         this->mAlgo = Splitting::Algorithms::SINGLE2D;
       }
 
       // Factorise N_cpu
@@ -37,6 +35,10 @@ namespace GeoMHDiSCC {
 
       // Filter factors
       this->filterFactors();
+   }
+
+   SingleSplitting::~SingleSplitting()
+   {
    }
 
    bool SingleSplitting::applicable() const
@@ -47,7 +49,7 @@ namespace GeoMHDiSCC {
       status = (status && (this->dims() > 1));
 
       // Make sure split and dimensions are compatible
-      if(this->dims() > 2 || this->mSplit == Splittings::Locations::FIRST)
+      if(this->dims() > 2 || this->mSplit == Splitting::Locations::FIRST)
       {
          // All CPUs should have something to do
          int tot;
@@ -99,21 +101,21 @@ namespace GeoMHDiSCC {
    void SingleSplitting::selectGrouper()
    {
       // Different splitting directions require a different treatment
-      if(this->mSplit == Splittings::Locations::FIRST)
+      if(this->mSplit == Splitting::Locations::FIRST)
       {
          // SINGLE1D or TRANSFORM grouper setup
          #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
-            this->mGrouper = Splittings::Groupers::SINGLE1D;
+            this->mGrouper = Splitting::Groupers::SINGLE1D;
          #else
-            this->mGrouper = Splittings::Groupers::EQUATION;
+            this->mGrouper = Splitting::Groupers::EQUATION;
          #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
       } else
       {
          // SINGLE2D or TRANSFORM grouper setup
          #if defined GEOMHDISCC_TRANSGROUPER_SINGLE2D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
-            this->mGrouper = Splittings::Groupers::SINGLE2D;
+            this->mGrouper = Splitting::Groupers::SINGLE2D;
          #else
-            this->mGrouper = Splittings::Groupers::EQUATION;
+            this->mGrouper = Splitting::Groupers::EQUATION;
          #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE2D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
       }
    }

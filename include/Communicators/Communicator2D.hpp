@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Base/Enums/Splittings.hpp"
+#include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/Communicator1D.hpp"
@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
           * @param packs1DBwd Packs information for first backward exchange
           * @param split      Location where the MPI splitting takes place
           */
-         void initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splittings::Locations::Id split);
+         void initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splitting::Locations::Id split);
 
          /**
           * @brief Get the storage provider for the second transform
@@ -192,10 +192,10 @@ namespace GeoMHDiSCC {
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
-   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> void Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splittings::Locations::Id split)
+   template <typename TFwd1D, typename TBwd1D, typename TFwd2D, typename TBwd2D> void Communicator2D<TFwd1D, TBwd1D, TFwd2D, TBwd2D>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splitting::Locations::Id split)
    {
       #ifdef GEOMHDISCC_MPI
-         if(split == Splittings::Locations::FIRST)
+         if(split == Splitting::Locations::FIRST)
          {
             // Initialise 2D serial converter
             SharedPtrMacro<MpiConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D> > spConv(new MpiConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D>());
@@ -217,7 +217,7 @@ namespace GeoMHDiSCC {
 
             // Allocate second 2D buffers
             this->allocateBuffers(1, this->mspConverter2D->bwdSizes(), max2D);
-         } else if(split == Splittings::Locations::SECOND)
+         } else if(split == Splitting::Locations::SECOND)
          {
             // Initialise 2D serial converter
             SharedPtrMacro<SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro> > spConv(new SerialConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D, IndexConverter2DMacro>());
@@ -229,7 +229,7 @@ namespace GeoMHDiSCC {
 
             // Create the communication buffers
             this->createBuffers(2);
-         } else if(split == Splittings::Locations::BOTH)
+         } else if(split == Splitting::Locations::BOTH)
          {
             // Initialise 2D serial converter
             SharedPtrMacro<MpiConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D> > spConv(new MpiConverter<TFwd1D, TBwd1D, TFwd2D, TBwd2D>());
@@ -254,7 +254,7 @@ namespace GeoMHDiSCC {
       #endif // GEOMHDISCC_MPI
 
       // If only one dimension is split
-      if(split != Splittings::Locations::BOTH)
+      if(split != Splitting::Locations::BOTH)
       {
          // Setup converter
          this->mspConverter2D->setup();

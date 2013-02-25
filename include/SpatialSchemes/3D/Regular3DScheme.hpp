@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/Enums/Splittings.hpp"
+#include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/SpatialScheme.hpp"
 
@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
           *
           * @param dim     Chebyshev truncations 
           */
-         Regular3DScheme(const ArrayI& dim);
+         explicit Regular3DScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
@@ -60,7 +60,7 @@ namespace GeoMHDiSCC {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splittings::Locations::Id flag = Splittings::Locations::NONE);
+         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE);
 
          /**
           * @brief Get total of splittable indexes 
@@ -68,7 +68,7 @@ namespace GeoMHDiSCC {
           * @param dim     Dimension for which to compute indexes
           * @param flag    Flag to specify location of splitting
           */
-         virtual int splittableTotal(const int dim, Splittings::Locations::Id flag);
+         virtual int splittableTotal(const int dim, Splitting::Locations::Id flag);
          
       protected:
          /**

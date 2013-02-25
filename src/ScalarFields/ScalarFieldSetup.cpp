@@ -44,5 +44,9 @@ namespace Datatypes {
    {
    }
 
+   ScalarFieldSetup::~ScalarFieldSetup()
+   {
+   }
+
 }
 }
