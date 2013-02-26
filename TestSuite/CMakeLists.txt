@@ -21,7 +21,7 @@ foreach(TestDir ${TestDirs})
          get_filename_component(TestName ${TestFile} NAME_WE)
 
          # Get test specific sources list
-         include(${TestDir}/${TestName}SourcesList.cmake)
+         include(${TestDir}/cmake.d/${TestName}SourcesList.cmake)
 
          # Initialise sources list
          set(TestSrcsList ${TestFile})

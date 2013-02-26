@@ -17,8 +17,7 @@
 // Project includes
 //
 #include "Enums/Dimensions.hpp"
-#include "ScalarFields/FlatLayout.hpp"
-#include "ScalarFields/ScalarField3D.hpp"
+#include "ScalarFields/FlatScalarField.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,23 +28,23 @@ namespace GeoMHDiSCC {
 
       template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
       {
-         typedef  ScalarField3D<MHDComplex, FlatLayout> FwdType;
+         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
-         typedef  ScalarField3D<MHDComplex, FlatLayout> BwdType;
+         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
       };
 
       template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
       {
-         typedef  ScalarField3D<MHDComplex, FlatLayout> FwdType;
+         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
-         typedef  ScalarField3D<MHDFloat, FlatLayout> BwdType;
+         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
       };
 
       template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
       {
-         typedef  ScalarField3D<MHDFloat, FlatLayout> FwdType;
+         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
 
-         typedef  ScalarField3D<MHDFloat, FlatLayout> BwdType;
+         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
       };
 
       /// Typedef for the physical space scalar

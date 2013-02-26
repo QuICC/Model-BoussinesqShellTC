@@ -47,7 +47,6 @@ set(MHDAllSrcDirs
    LoadSplitter
    Profiler
    Resolutions
-   ScalarFields
    Simulation
    SpatialSchemes
    SpectralOperators
