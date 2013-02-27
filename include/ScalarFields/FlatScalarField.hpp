@@ -8,7 +8,7 @@
 // Debug includes
 //
 #include "StorageProfiler/StorageProfilerMacro.h"
-#include "StaticAssert/StaticAssert.hpp"
+#include "StaticAsserts/StaticAssert.hpp"
 #include "Exceptions/Exception.hpp"
 
 // Configuration includes

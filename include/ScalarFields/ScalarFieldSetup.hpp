@@ -5,6 +5,10 @@
 #ifndef SCALARFIELDSETUP_HPP
 #define SCALARFIELDSETUP_HPP
 
+// Debug includes
+//
+#include "StaticAsserts/StaticAssert.hpp"
+
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
@@ -63,7 +67,7 @@ namespace Datatypes {
          /**
           * @brief Get column index corresponding to the given 2D and 3D indexes
           */
-         int colIdx(const int j, const int k) const;
+         int colIdx(const int j, const int k = 0) const;
 
          /**
           * @brief Get index of start of block for 3D index
@@ -185,21 +189,36 @@ namespace Datatypes {
 
    template <Dimensions::Type DIMENSION> int ScalarFieldSetup<DIMENSION>::colIdx(const int j, const int k) const
    {
-      return this->blockIdx(k) + j;
+      // Only makes sense in 2D and 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+
+      // Safety assert
+      assert((k == 0) || (DIMENSION != Dimensions::TWOD));
+
+      return this->mspDim2D->head(k).sum() + j;
    }
 
    template <Dimensions::Type DIMENSION> int ScalarFieldSetup<DIMENSION>::blockIdx(const int k) const
    {
+      // Only makes sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
       return this->mspDim2D->head(k).sum();
    }
 
    template <Dimensions::Type DIMENSION> int ScalarFieldSetup<DIMENSION>::blockRows(const int k) const
    {
+      // Only makes sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
       return (*this->mspDim1D)(k);
    }
 
    template <Dimensions::Type DIMENSION> int ScalarFieldSetup<DIMENSION>::blockCols(const int k) const
    {
+      // Only makes sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
       return (*this->mspDim2D)(k);
    }
 

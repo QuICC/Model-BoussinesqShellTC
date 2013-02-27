@@ -5,9 +5,14 @@
 #ifndef SLICEDLAYOUT_HPP
 #define SLICEDLAYOUT_HPP
 
-// Configuration includes
+// Debug includes
 //
 #include "StorageProfiler/StorageProfilerMacro.h"
+#include "Exceptions/Exception.hpp"
+#include "StaticAsserts/StaticAssert.hpp"
+
+// Configuration includes
+//
 
 // System includes
 //
@@ -19,9 +24,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
-#include "StaticAssert/StaticAssert.hpp"
 
 namespace GeoMHDiSCC {
 

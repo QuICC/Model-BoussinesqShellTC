@@ -5,9 +5,13 @@
 #ifndef CHEBYSHEVFFTWTRANSFORM_HPP
 #define CHEBYSHEVFFTWTRANSFORM_HPP
 
-// Configuration includes
+// Debug includes
 //
 #include "StorageProfiler/StorageProfilerMacro.h"
+#include "StaticAsserts/StaticAssert.hpp"
+
+// Configuration includes
+//
 
 // System includes
 //
@@ -18,7 +22,6 @@
 
 // Project includes
 //
-#include "StaticAssert/StaticAssert.hpp"
 #include "Base/Typedefs.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"

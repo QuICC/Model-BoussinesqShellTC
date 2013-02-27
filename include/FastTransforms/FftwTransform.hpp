@@ -5,9 +5,13 @@
 #ifndef FFTWTRANSFORM_HPP
 #define FFTWTRANSFORM_HPP
 
-// Configuration includes
+// Debug includes
 //
 #include "StorageProfiler/StorageProfilerMacro.h"
+#include "StaticAsserts/StaticAssert.hpp"
+
+// Configuration includes
+//
 
 // System includes
 //
@@ -18,7 +22,6 @@
 
 // Project includes
 //
-#include "StaticAssert/StaticAssert.hpp"
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/Arithmetics.hpp"

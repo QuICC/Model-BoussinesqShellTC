@@ -5,10 +5,13 @@
 #ifndef SERIALCONVERTER_HPP
 #define SERIALCONVERTER_HPP
 
-// Configuration includes
+// Debug includes
 //
 #include "Profiler/ProfilerMacro.h"
-#include "StaticAssert/StaticAssert.hpp"
+#include "StaticAsserts/StaticAssert.hpp"
+
+// Configuration includes
+//
 
 // System includes
 //
