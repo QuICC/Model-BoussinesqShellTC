@@ -89,14 +89,4 @@ namespace GeoMHDiSCC {
       return this->mDim2D.find(id)->second(j);
    }
 
-   int SimulationResolution::nSlow(const Dimensions::Space::Id id) const
-   {
-      return this->mSim.find(id)->second.tail(1)(0);
-   }
-
-   int SimulationResolution::nFast(const Dimensions::Space::Id id) const
-   {
-      return this->mSim.find(id)->second(0);
-   }
-
 }

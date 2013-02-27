@@ -18,8 +18,11 @@
 
 // Project includes
 //
+#include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    SingleSplitting::SingleSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Locations::Id split)
       : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::SINGLE1D), mSplit(split)
@@ -30,11 +33,8 @@ namespace GeoMHDiSCC {
          this->mAlgo = Splitting::Algorithms::SINGLE2D;
       }
 
-      // Factorise N_cpu
-      this->factoriseNCpu(1);
-
-      // Filter factors
-      this->filterFactors();
+      // Initialise the NCpu factors
+      this->initFactors(1);
    }
 
    SingleSplitting::~SingleSplitting()
@@ -70,16 +70,16 @@ namespace GeoMHDiSCC {
       return status;
    }
 
-   SharedTransformResolution  SingleSplitting::splitDimension(const int dim, const int id)
+   SharedTransformResolution  SingleSplitting::splitDimension(const int dim, const int idconst Dimensions::Transform::Id transId, const int cpuId)
    {
       // Get size of the splittable dimension(s)
-      int tot = this->mspScheme->splittableTotal(dim, this->mSplit);
+      int tot = this->mspScheme->splittableTotal(transId, this->mSplit);
 
       // Build a simple balanced split
       ArrayI ids(1);
       ArrayI n0(1);
       ArrayI nN(1);
-      this->balancedSplit(n0(0), nN(0), tot, this->factor(0), id);
+      SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
 
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
@@ -91,8 +91,8 @@ namespace GeoMHDiSCC {
       ArrayI  idx3D;
 
       // Compute the indexes
-      ids(0) = id;
-      this->mspScheme->fillIndexes(dim, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, this->mSplit);
+      ids(0) = cpuId;
+      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, this->mSplit);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
@@ -142,4 +142,5 @@ namespace GeoMHDiSCC {
       return static_cast<int>(score);
    }
 
+}
 }

@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    SplittingDescription::SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score)
       :  algorithm(algorithm), grouper(grouper), dims(dims), factors(factors), score(score)
    {
@@ -26,4 +28,5 @@ namespace GeoMHDiSCC {
    {
    }
 
+}
 }

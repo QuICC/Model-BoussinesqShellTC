@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for LoadSplitter
  */
 
+#include "LoadSplitter/LoadSplitter.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
@@ -55,7 +56,12 @@ namespace TestSuite {
    /**
     * @brief Test default constructor
     */
-   TEST_F(LoadSplitterTest, Constructor) {
+   TEST_F(LoadSplitterTest, Constructor)
+   {  
+      int id = 0;
+      int nCpu = 16;
+      Parallel::LoadSplitter   splitter(id, nCpu);
+
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }
 

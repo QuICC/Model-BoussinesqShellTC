@@ -2,6 +2,10 @@
  *  \brief Source of the workload splitter
  */
 
+// Debug includes
+//
+#include "Exceptions/Exception.hpp"
+
 // Configuration includes
 //
 #include "Framework/FrameworkMacro.h"
@@ -19,7 +23,6 @@
 
 // Project includes
 //
-#include "Exceptions/Exception.hpp"
 #include "Enums/Splitting.hpp"
 #include "IoTools/Formatter.hpp"
 
@@ -31,8 +34,10 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    LoadSplitter::LoadSplitter(const int id, const int nCpu)
-      : mSkip(0), mId(id), mNCpu(nCpu)
+      : mId(id), mNCpu(nCpu)
    {
    }
 
@@ -40,31 +45,16 @@ namespace GeoMHDiSCC {
    {
    }
 
-   int LoadSplitter::nCpu() const
-   {
-      return this->mNCpu;
-   }
-
-   int LoadSplitter::id() const
-   {
-      return this->mId;
-   }
-
-   bool LoadSplitter::moreSplittings() const
-   {
-      return ((this->mScores.size() - this->mSkip) > 0);
-   }
-
    void LoadSplitter::initAlgorithms(const ArrayI& dim)
    {
       // Check for serial version of code request
-      if(this->nCpu() == 1)
+      if(this->mNCpu == 1)
       {
          #ifdef GEOMHDISCC_MPI
             // We don't deal with a single CPU in MPI mode
             throw Exception("Tried to initialise (MPI) parallelisation with a single CPU");
          #else
-            this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SerialSplitting(this->id(), this->nCpu(), dim)));
+            this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SerialSplitting(this->mId, this->mNCpu, dim)));
          #endif //GEOMHDISCC_MPI
 
       // Setup the parallel version (initialise all algorithms and then choose the best one)
@@ -76,7 +66,7 @@ namespace GeoMHDiSCC {
             {
                #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
                   // Add the single splitting algorithm for first data exchange
-                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splitting::Locations::FIRST)));
+                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST)));
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
                // Check if problem is 3D
@@ -84,12 +74,12 @@ namespace GeoMHDiSCC {
                {
                   #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
                      // Add the single splitting algorithm for second data exchange
-                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->id(), this->nCpu(), dim, Splitting::Locations::SECOND)));
+                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::SECOND)));
                   #endif //GEOMHDISCC_MPIALGO_SINGLE2D
 
                   #ifdef GEOMHDISCC_MPIALGO_TUBULAR
                      // Add the tubular splitting algorithm
-                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new TubularSplitting(this->id(), this->nCpu(), dim)));
+                     this->mAlgorithms.push_back(SharedSplittingAlgorithm(new TubularSplitting(this->mId, this->mNCpu, dim)));
                   #endif //GEOMHDISCC_MPIALGO_TUBULAR
                }
 
@@ -122,7 +112,7 @@ namespace GeoMHDiSCC {
          // Loop over possible factorisations of nCPU
          while((*it)->useNextFactors())
          {
-            // Check if obtained factorisation is applicable to problem
+            // Check if obtained factorisation is applicable to splitting algorithm
             if((*it)->applicable())
             {
                // Get scored resolution object
@@ -157,7 +147,7 @@ namespace GeoMHDiSCC {
    void LoadSplitter::describeSplitting(const SplittingDescription& descr) const
    {
       // Output a short description of the selected splitting. Make it look nice ;)
-      if(this->id() == 0)
+      if(this->mId == 0)
       {
          // Print load splitting header
          IoTools::Formatter::printLine(std::cout, '-');
@@ -232,32 +222,27 @@ namespace GeoMHDiSCC {
       }
    }
 
-   std::pair<SharedResolution,SplittingDescription> LoadSplitter::nextSplitting()
+   void LoadSplitter::showSplittings(const int n) const
    {
-      // Make sure there is at least an additional splitting
-      if(this->mScores.size() > this->mSkip)
+      // Get maximum between number of scores and n
+      int maxN = std::max(static_cast<int>(this->mScores.size()), n);
+
+      // Create reverse iterator
+      std::multimap<int, std::pair<SharedResolution,SplittingDescription> >::const_reverse_iterator rit;
+
+      // Set start iterator
+      rit = this->mScores.rbegin();
+
+      // Loop over scores
+      for(int i = 0; i < maxN; ++i)
       {
-         // Create reverse iterator
-         std::multimap<int, std::pair<SharedResolution,SplittingDescription> >::reverse_iterator   rit;
-
-         // Set start iterator
-         rit = this->mScores.rbegin();
-
-         // Advance iterator
-         std::advance(rit, this->mSkip);
-
-         // Increment the skipped splitting counter
-         this->mSkip++;
-
          // Describe the obtained splitting
          this->describeSplitting(rit->second.second);
 
-         // Return the splitting
-         return rit->second;
-      } else
-      {
-         throw Exception("No more usable splitting are available!");
+         // Increment iterator
+         rit++;
       }
    }
 
+}
 }

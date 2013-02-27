@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Implementation of the workload splitter over the available CPUs
     */
@@ -40,7 +42,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~LoadSplitter();
+         ~LoadSplitter();
 
          /**
           * @brief Initialise the algorithms
@@ -57,32 +59,15 @@ namespace GeoMHDiSCC {
          std::pair<SharedResolution,SplittingDescription> bestSplitting() const;
 
          /**
-          * @brief Check if more splittings are available
+          * @brief Show description of some splittings
+          *
+          * @param n Maximum number of splittings to show
           */
-         bool  moreSplittings() const;
-
-         /**
-          * @brief Get splitting information of the next splitting
-          */
-         std::pair<SharedResolution,SplittingDescription> nextSplitting();
+         void  showSplittings(const int n) const;
          
       protected:
-         /**
-          * @brief Get id of the CPU
-          */
-         int id() const;
-
-         /**
-          * @brief Get Number of CPUs
-          */
-         int nCpu() const;
 
       private:
-         /**
-          * @brief Counter to skip splittings
-          */
-         int mSkip;
-
          /**
           * @brief ID of CPU
           */
@@ -143,6 +128,7 @@ namespace GeoMHDiSCC {
       // Compute the core resolutions and corresponding scores
       this->initScores();
    }
+}
 }
 
 #endif // LOADSPLITTER_HPP

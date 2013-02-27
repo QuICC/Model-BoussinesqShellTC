@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Implementation of a single load splitting algorithm
     */
@@ -52,13 +54,15 @@ namespace GeoMHDiSCC {
          /**
           * @brief Split ith dimension transform
           *
-          * @param dim  Split the ith transform
-          * @param id   ID of the CPU
+          * @param transId Split the ith dimension
+          * @param cpuId   ID of the CPU
           */
-         virtual SharedTransformResolution splitDimension(const int dim, const int id);
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId);
 
          /**
           * @brief Select the transform grouper
+          *
+          * \mhdTodo Grouper selection is not correctly implemented
           */
          void selectGrouper();
 
@@ -76,6 +80,7 @@ namespace GeoMHDiSCC {
          Splitting::Locations::Id mSplit;
    };
 
+}
 }
 
 #endif // SINGLESPLITTING_HPP

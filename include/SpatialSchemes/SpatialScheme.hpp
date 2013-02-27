@@ -51,7 +51,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Create indexes for a possibly restricted set (to simplify implementation is is defined for 3D cases)
           *
-          * @param dim     Dimension for which to compute indexes
+          * @param transId Transform ID
           * @param fwd1D   Storage for forward indexes of first dimension
           * @param bwd1D   Storage for backward indexes of first dimension
           * @param idx2D   Storage for the indexes of second dimension
@@ -62,15 +62,15 @@ namespace GeoMHDiSCC {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
+         virtual void fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
 
          /**
           * @brief Get total of splittable indexes 
           *
-          * @param dim     Dimension for which to compute indexes
+          * @param transId Transform ID
           * @param flag    Flag to specify location of splitting
           */
-         virtual int splittableTotal(const int dim, Splitting::Locations::Id flag) = 0;
+         virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag) = 0;
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -88,28 +88,28 @@ namespace GeoMHDiSCC {
           *
           * @param i Transform index
           */
-         int dimFwd(const int i) const;
+         int dimFwd(const Dimensions::Transform::Id transId) const;
 
          /**
           * @brief Get backward dimension of given transform
           *
           * @param i Transform index
           */
-         int dimBwd(const int i) const;
+         int dimBwd(const Dimensions::Transform::Id transId) const;
 
          /**
           * @brief Get second dimension of given transform
           *
           * @param i Transform index
           */
-         int dim2D(const int i) const;
+         int dim2D(const Dimensions::Transform::Id transId) const;
 
          /**
           * @brief Get third dimension of given transform
           *
           * @param i Transform index
           */
-         int dim3D(const int i) const;
+         int dim3D(const Dimensions::Transform::Id transId) const;
 
          /**
           * @brief Get dimension of the domain
@@ -128,48 +128,48 @@ namespace GeoMHDiSCC {
          int   mDims;
    };
 
-   inline int SpatialScheme::dimFwd(const int i) const
+   inline int SpatialScheme::dimFwd(const Dimensions::Transform::Id transId) const
    {
       // Assert for domain dimensions
-      assert(i < this->mDims);
+      assert(static_cast<int>(transId) < this->mDims);
 
       // Assert for dimension size
-      assert(this->mDimensions.at(i).size() > 0);
+      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 0);
 
-      return this->mDimensions.at(i)(0);
+      return this->mDimensions.at(static_cast<int>(transId))(0);
    }
 
-   inline int SpatialScheme::dimBwd(const int i) const
+   inline int SpatialScheme::dimBwd(const Dimensions::Transform::Id transId) const
    {
       // Assert for domain dimensions
-      assert(i < this->mDims);
+      assert(static_cast<int>(transId) < this->mDims);
 
       // Assert for dimension size
-      assert(this->mDimensions.at(i).size() > 1);
+      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 1);
 
-      return this->mDimensions.at(i)(1);
+      return this->mDimensions.at(static_cast<int>(transId))(1);
    }
 
-   inline int SpatialScheme::dim2D(const int i) const
+   inline int SpatialScheme::dim2D(const Dimensions::Transform::Id transId) const
    {
       // Assert for domain dimensions
-      assert(i < this->mDims);
+      assert(static_cast<int>(transId) < this->mDims);
 
       // Assert for dimension size
-      assert(this->mDimensions.at(i).size() > 2);
+      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 2);
 
-      return this->mDimensions.at(i)(2);
+      return this->mDimensions.at(static_cast<int>(transId))(2);
    }
 
-   inline int SpatialScheme::dim3D(const int i) const
+   inline int SpatialScheme::dim3D(const Dimensions::Transform::Id transId) const
    {
       // Assert for domain dimensions
-      assert(i < this->mDims);
+      assert(static_cast<int>(transId) < this->mDims);
 
       // Assert for dimension size
-      assert(this->mDimensions.at(i).size() > 3);
+      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 3);
 
-      return this->mDimensions.at(i)(3);
+      return this->mDimensions.at(static_cast<int>(transId))(3);
    }
 
    inline int SpatialScheme::dims() const

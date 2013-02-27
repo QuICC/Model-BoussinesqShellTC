@@ -42,14 +42,14 @@ namespace GeoMHDiSCC {
          ~CoreResolution();
 
          /**
-          * @brief Get transform resolution for corresponding dimension
+          * @brief Get transform resolution for corresponding transform
           *
-          * @param i Index of the dimension
+          * @param id ID of the transform
           */
-         SharedCTransformResolution dim(const int i) const;
+         SharedCTransformResolution dim(const Dimensions::Transform::Id id) const;
 
          /**
-          * @brief Get number of dimensions
+          * @brief Get number of transforms/dimensions
           */
          int nDim() const;
 

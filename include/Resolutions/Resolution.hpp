@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "Enums/Dimensions.hpp"
 #include "Resolutions/SimulationResolution.hpp"
 #include "Resolutions/CoreResolution.hpp"
 
@@ -67,26 +68,26 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the forward scalar field setup for last dimension
           */
-         Datatypes::SharedScalarFieldSetup spFwdSetup() const;
+         Datatypes::SharedScalarFieldSetupType spFwdSetup() const;
 
          /**
           * @brief Get the forward scalar field setup
           *
           * @param dim Dimension for which to get setup
           */
-         Datatypes::SharedScalarFieldSetup spFwdSetup(const int dim) const;
+         Datatypes::SharedScalarFieldSetupType spFwdSetup(const Dimensions::Transform::Id dim) const;
 
          /**
           * @brief Get the backward scalar field setup for the first dimension
           */
-         Datatypes::SharedScalarFieldSetup spBwdSetup() const;
+         Datatypes::SharedScalarFieldSetupType spBwdSetup() const;
 
          /**
           * @brief Get the backward scalar field setup
           *
           * @param dim Dimension for which to get setup
           */
-         Datatypes::SharedScalarFieldSetup spBwdSetup(const int dim) const;
+         Datatypes::SharedScalarFieldSetupType spBwdSetup(const Dimensions::Transform::Id dim) const;
 
       protected:
 

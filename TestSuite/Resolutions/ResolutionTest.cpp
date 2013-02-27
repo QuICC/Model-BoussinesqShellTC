@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for Resolution
  */
 
+#include "Resolutions/Resolution.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {

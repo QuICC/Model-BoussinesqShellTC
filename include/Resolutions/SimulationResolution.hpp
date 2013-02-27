@@ -58,20 +58,6 @@ namespace GeoMHDiSCC {
           */
          int dim2D(const Dimensions::Space::Id id, const int j) const;
 
-         /**
-          * @brief Get simulation's fast dimension size
-          *
-          * @param id ID of the space (Physical, Spectral)
-          */
-         int nSlow(const Dimensions::Space::Id id) const;
-
-         /**
-          * @brief Get simulation's slow dimension(s) total size
-          *
-          * @param id ID of the space (Physical, Spectral)
-          */
-         int nFast(const Dimensions::Space::Id id) const;
-
       protected:
 
       private:

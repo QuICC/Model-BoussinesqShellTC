@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for TransformResolution
  */
 
+#include "Resolutions/TransformResolution.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {

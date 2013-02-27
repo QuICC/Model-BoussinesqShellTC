@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * @brief Implementation basic description of the obtained splitting (for any algorithm)
     */
@@ -41,7 +43,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~SplittingDescription();
+         ~SplittingDescription();
 
          /**
           * @brief ID of the algorithm
@@ -73,6 +75,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // SPLITTINGDESCRIPTION_HPP

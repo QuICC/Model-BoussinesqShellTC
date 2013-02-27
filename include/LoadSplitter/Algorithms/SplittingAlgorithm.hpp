@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Base of the implementation of the load splitting algorithms
     */
@@ -85,12 +87,19 @@ namespace GeoMHDiSCC {
          SharedSpatialScheme  mspScheme;
 
          /**
+          * @brief Initialise the CPU factors
+          *
+          * @param nFactors   Number of factors
+          */
+         void initFactors(const int nFactors);
+
+         /**
           * @brief Split dimension i
           *
-          * @param i    Split the ith dimension
-          * @param id   ID of the CPU
+          * @param transId Split the ith dimension
+          * @param cpuId   ID of the CPU
           */
-         virtual SharedTransformResolution splitDimension(const int i, const int id) = 0;
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId) = 0;
 
          /**
           * @brief Compute the score of the Resolution
@@ -147,51 +156,6 @@ namespace GeoMHDiSCC {
           */
          int maxFactor() const;
 
-         /**
-          * @brief Decompose \f$N_{cpu}\f$ into possible factors
-          *
-          * @param factors Number of factors in factorisation
-          */
-         void factoriseNCpu(const int factors);
-
-         /**
-          * @brief Filter out the unusable factors
-          */
-         void filterFactors();
-
-         /**
-          * @brief Test the splitting factors compatibility
-          */
-         bool confirmFactors() const;
-
-         /**
-          * @brief Convert ID to \f$F_{i}\f$ groupd ID
-          *
-          * @param i    ID of the factorisation group
-          * @param id   ID of CPU
-          */
-         int groupId(const int i, const int id) const;
-
-         /**
-          * @brief Compute a simple balanced split of the elements with regard to the given number of parts
-          *
-          * @param n0      Output start index
-          * @param nN      Output number of indexes
-          * @param tot     Total number of indexes
-          * @param parts   Number of parts to split total into
-          * @param id      ID of the CPU
-          */
-         void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id) const;
-
-         /**
-          * @brief Extract splitting from mapped indexes
-          *
-          * @param mapped  Mapped indexes to extract from
-          * @param rIdx    Output storage to put the indexes in
-          * @param id      ID of the CPU
-          */
-         void splitMapped(const std::multimap<int, int>& mapped, ArrayI &rIdx, const int id) const;
-
       private:
          /**
           * @brief ID of CPU
@@ -236,6 +200,7 @@ namespace GeoMHDiSCC {
    /// Typedef for a shared pointer to a SplittingAlgorithm object
    typedef SharedPtrMacro<SplittingAlgorithm>   SharedSplittingAlgorithm;
 
+}
 }
 
 #endif // SPLITTINGALGORITHM_HPP

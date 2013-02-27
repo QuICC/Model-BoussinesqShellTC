@@ -19,16 +19,52 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
+#include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    SplittingAlgorithm::SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splitting::Algorithms::Id algo)
-      :  mId(id), mNCpu(nCpu), mDims(dim.size()), mAlgo(algo), mSimDim(dim), mGrouper(Splitting::Groupers::EQUATION)
+      : mAlgo(algo), mGrouper(Splitting::Groupers::EQUATION), mId(id), mNCpu(nCpu), mDims(dim.size()), mSimDim(dim)
    {
    }
 
    SplittingAlgorithm::~SplittingAlgorithm()
    {
+   }
+
+   int SplittingAlgorithm::id() const
+   {
+      return this->mId;
+   }
+
+   int SplittingAlgorithm::nCpu() const
+   {
+      return this->mNCpu;
+   }
+
+   int SplittingAlgorithm::dims() const
+   {
+      return this->mDims;
+   }
+
+   int SplittingAlgorithm::factor(const int i) const
+   {
+      // Assert on index of requested factor
+      assert(i < this->mFactors.size());
+
+      return this->mFactors(i);
+   }
+
+   const ArrayI& SplittingAlgorithm::factors() const
+   {
+      return this->mFactors;
+   }
+
+   int SplittingAlgorithm::maxFactor() const
+   {
+      return this->mFactors.maxCoeff();
    }
 
    std::pair<int, std::pair<SharedResolution, SplittingDescription> > SplittingAlgorithm::scoreSplitting()
@@ -49,7 +85,7 @@ namespace GeoMHDiSCC {
          for(int j = 0; j < this->dims(); j++)
          {
             // Add new shared transform resolution
-            transformRes.push_back(this->splitDimension(j, id));
+            transformRes.push_back(this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id));
          }
 
          // Create new shared core resolution
@@ -69,107 +105,16 @@ namespace GeoMHDiSCC {
       return std::make_pair(score, std::make_pair(res,descr));
    }
 
-   void SplittingAlgorithm::factoriseNCpu(const int factors)
+   void SplittingAlgorithm::initFactors(const int nFactors)
    {
-      // Initialise the storage
-      this->mFactors.resize(factors);
+      // Initialise the storage for the factors
+      this->mFactors.resize(nFactors);
 
-      // Select factorisation algorithm depending on number of factors
-      if(factors == 1)
-      {
-         this->mFactors(0) = this->nCpu();
+      // Compute the factors
+      SplittingTools::factorizeNCpu(this->mNCpuFactors, nFactors, this->nCpu());
 
-         // Add factor
-         this->mNCpuFactors.push_back(this->nCpu());
-
-      // Factorise CPUs into two groups
-      } else if(factors == 2)
-      {
-         // Get the maximum factor
-         int factor = static_cast<int>(std::sqrt(this->nCpu()));
-
-         // Compute smaller factors
-         while(factor > 0)
-         {
-            if(this->nCpu() % factor == 0)
-            {
-               // Add factor
-               this->mNCpuFactors.push_back(factor);
-
-               // Add nCpu / factor
-               this->mNCpuFactors.push_back(this->nCpu()/factor);
-
-               // Add reversed splitting order
-               if(factor != this->nCpu()/factor)
-               {
-                  // Add factor
-                  this->mNCpuFactors.push_back(this->nCpu()/factor);
-
-                  // Add nCpu / factor
-                  this->mNCpuFactors.push_back(factor);
-               }
-            }
-            --factor;
-         }
-      } else
-      {
-         throw Exception("No factorisation algorithm available for requested factors!");
-      }
-   }
-
-   void SplittingAlgorithm::filterFactors()
-   {
-      // Get iterator through known factors
-      std::list<int>::iterator  it = this->mNCpuFactors.begin();
-      std::list<int>::iterator  itF;
-
-      bool suitable;
-
-      // Loop over all known factors
-      while(it != this->mNCpuFactors.end())
-      {
-         // Extract factors to test
-         itF = it;
-         for(int i = 0; i < this->mFactors.size(); i++)
-         {
-            this->mFactors(i) = *itF;
-            itF++;
-         }
-
-         // Test if factors are usable splitting factors
-         suitable = this->confirmFactors();
-
-         // Remove the unusable from list
-         if(not suitable)
-         {
-            // Erase the unusable factors
-            for(int i = 0; i < this->mFactors.size(); i++)
-            {
-               it = this->mNCpuFactors.erase(it);
-            }
-
-         // Move to the next set of factors
-         } else
-         {
-            std::advance(it, this->mFactors.size());
-         }
-      }
-   }
-
-   bool SplittingAlgorithm::confirmFactors() const
-   {
-      // Loop over all factors
-      for(int i =0; i < this->mFactors.size(); i++)
-      {
-         // We don't want the extrem cases (no splitting in one direction)
-         if(this->factor(i) == 1 && this->nCpu() > 1)
-         {
-            return false;
-         }
-      }
-
-      // In all other cases accept the splitting
-      return true;
+      // Filter the factors
+      SplittingTools::filterFactors(this->mNCpuFactors, nFactors, this->nCpu());
    }
 
    bool SplittingAlgorithm::useNextFactors()
@@ -193,77 +138,6 @@ namespace GeoMHDiSCC {
          }
 
          return true;
-      }
-   }
-
-   void SplittingAlgorithm::balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id) const
-   {
-      // Avoid splitting with zero elements
-      if(tot < parts)
-      {
-         throw Exception("Number of parts is bigger than total!");
-      }
-
-      // Compute part assigned to id
-      if(parts > 1)
-      {
-         nN = 0;
-         n0 = 0;
-         for(int i = 0; i < tot; i++)
-         {
-            if(i % parts == id)
-            {
-               nN++;
-            }
-            else if(i % parts < id)
-            {
-               n0++;
-            }
-         }
-
-      // Single part, use total
-      } else if(parts == 1)
-      {
-         n0 = 0;
-         nN = tot;
-
-      // Can't split into less than 1 part
-      } else
-      {
-         throw Exception("Number of parts < 1!");
-      }
-   }
-
-   void SplittingAlgorithm::splitMapped(const std::multimap<int, int>& mapped, ArrayI &rIdx, const int id) const
-   {
-      // Create typedef to simply notation
-      typedef  std::multimap<int, int>::const_iterator MapIt;
-
-      // Create iterator on map
-      MapIt it;
-
-      // Create pair of iterators for range
-      std::pair<MapIt, MapIt> range;
-
-      // resize the array of indexes
-      rIdx.resize(mapped.count(id));
-
-      // Get range of indexes for given id
-      range = mapped.equal_range(id);
-
-      // Put indexes into a set to be sure to get them sorted
-      std::set<int>  sorter;
-      for(it = range.first; it != range.second; ++it)
-      {
-         sorter.insert(it->second);
-      }
-
-      // Extract the ordered indexes from set and store in output array
-      std::set<int>::iterator setIt;
-      int i = 0;
-      for(setIt = sorter.begin(); setIt != sorter.end(); ++setIt, ++i)
-      {
-         rIdx(i) = *setIt;
       }
    }
 
@@ -301,20 +175,19 @@ namespace GeoMHDiSCC {
          std::map<std::tr1::tuple<int,int>, int>::iterator   mapPos;
 
          // Loop over CPUs
-         int ex = 0;
          for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
          {
             // Initialise the position hint for inserts
             mapPos = fwdMap.begin();
 
             // Loop over second dimension
-            for(int j = 0; j < spRes->cpu(cpu)->dim(ex)->dim2D(); j++)
+            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim2D(); j++)
             {
                // Loop over forward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(ex)->dimFwd(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dimFwd(j); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(ex)->idxFwd(k,j), spRes->cpu(cpu)->dim(ex)->idx2D(j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idxFwd(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx2D(j));
 
                   // Get insertion position to use as next starting point to speed up insertion
                   mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -325,13 +198,13 @@ namespace GeoMHDiSCC {
             mapPos = bwdMap.begin();
 
             // Loop over second dimension
-            for(int j = 0; j < spRes->cpu(cpu)->dim(ex+1)->dim2D(); j++)
+            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim2D(); j++)
             {
                // Loop over backward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(ex+1)->dimBwd(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dimBwd(j); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(ex+1)->idx2D(j), spRes->cpu(cpu)->dim(ex+1)->idxBwd(k,j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx2D(j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idxBwd(k,j));
 
                   // Get insertion position to use as next starting point to speed up insertion
                   mapPos = bwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -368,7 +241,7 @@ namespace GeoMHDiSCC {
          std::set<std::pair<int,int> >::iterator filIt;
          for(filIt = filter.begin(); filIt != filter.end(); filIt++)
          {
-            structure.at(ex).insert(*filIt);
+            structure.at(static_cast<int>(Dimensions::Transform::TRA1D)).insert(*filIt);
          }
 
          // Clear all the data
@@ -400,16 +273,16 @@ namespace GeoMHDiSCC {
                mapPos = fwdMap.begin();
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(ex)->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim3D(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(ex)->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim2D(i); j++)
                   {
                      // Loop over forward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(ex)->dimFwd(j,i); k++)
+                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dimFwd(j,i); k++)
                      {
                         // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(ex)->idxFwd(k,j,i), spRes->cpu(cpu)->dim(ex)->idx2D(j,i), spRes->cpu(cpu)->dim(ex)->idx3D(i));
+                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idxFwd(k,j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx2D(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx3D(i));
 
                         // Get insertion position to use as next starting point to speed up insertion
                         mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -421,16 +294,16 @@ namespace GeoMHDiSCC {
                mapPos = bwdMap.begin();
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(ex+1)->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim3D(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(ex+1)->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim2D(i); j++)
                   {
                      // Loop over backward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(ex+1)->dimBwd(j,i); k++)
+                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dimBwd(j,i); k++)
                      {
                         // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(ex+1)->idx2D(j, i), spRes->cpu(cpu)->dim(ex+1)->idx3D(i), spRes->cpu(cpu)->dim(ex+1)->idxBwd(k,j,i));
+                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx2D(j, i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx3D(i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idxBwd(k,j,i));
 
                         // Get insertion position to use as next starting point to speed up insertion
                         mapPos = bwdMap.insert(mapPos,std::make_pair(point, cpu));
@@ -524,7 +397,7 @@ namespace GeoMHDiSCC {
                loads.at(d)[cpu] = 0.0;
 
                // Loop over second dimension
-               for(int j = 0; j < spRes->cpu(cpu)->dim(d)->dim2D(); j++)
+               for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim2D(); j++)
                {
                   // Increment load by 1
                   loads.at(d).find(cpu)->second += 1.0;
@@ -548,10 +421,10 @@ namespace GeoMHDiSCC {
                loads.at(d)[cpu] = 0.0;
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(d)->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim3D(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(d)->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim2D(i); j++)
                   {
                      // Increment load by 1
                      loads.at(d).find(cpu)->second += 1.0;
@@ -606,4 +479,5 @@ namespace GeoMHDiSCC {
       return score;
    }
 
+}
 }

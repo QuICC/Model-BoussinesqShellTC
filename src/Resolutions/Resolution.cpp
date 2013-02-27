@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
       ArrayI phys(nDim);
       for(int i = 0; i < nDim; i++)
       {
-         phys(i) = this->cpu()->dim((nDim-1)-i)->dimFwd();
+         phys(i) = this->cpu()->dim(static_cast<Dimensions::Transform::Id>((nDim-1)-i))->dimFwd();
       }
 
       ArrayI spec = simDim;
@@ -78,24 +78,24 @@ namespace GeoMHDiSCC {
       return this->mCores.at(id);
    }
 
-   Datatypes::SharedScalarFieldSetup Resolution::spFwdSetup() const
+   Datatypes::SharedScalarFieldSetupType Resolution::spFwdSetup() const
    {
-      return this->cpu()->dim(this->cpu()->nDim()-1)->spFwdSetup();
+      return this->cpu()->dim(static_cast<Dimensions::Transform::Id>(this->cpu()->nDim()-1))->spFwdSetup();
    }
 
-   Datatypes::SharedScalarFieldSetup Resolution::spFwdSetup(const int dim) const
+   Datatypes::SharedScalarFieldSetupType Resolution::spFwdSetup(const Dimensions::Transform::Id id) const
    {
-      return this->cpu()->dim(dim)->spFwdSetup();
+      return this->cpu()->dim(id)->spFwdSetup();
    }
 
-   Datatypes::SharedScalarFieldSetup Resolution::spBwdSetup() const
+   Datatypes::SharedScalarFieldSetupType Resolution::spBwdSetup() const
    {
-      return this->cpu()->dim(0)->spBwdSetup();
+      return this->cpu()->dim(Dimensions::Transform::TRA1D)->spBwdSetup();
    }
 
-   Datatypes::SharedScalarFieldSetup Resolution::spBwdSetup(const int dim) const
+   Datatypes::SharedScalarFieldSetupType Resolution::spBwdSetup(const Dimensions::Transform::Id id) const
    {
-      return this->cpu()->dim(dim)->spBwdSetup();
+      return this->cpu()->dim(id)->spBwdSetup();
    }
 
 }

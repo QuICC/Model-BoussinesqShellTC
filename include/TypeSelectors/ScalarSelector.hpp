@@ -7,6 +7,7 @@
 
 // Configuration includes
 //
+#include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
 //
@@ -17,6 +18,7 @@
 // Project includes
 //
 #include "Enums/Dimensions.hpp"
+#include "ScalarFields/ScalarFieldSetup.hpp"
 #include "ScalarFields/FlatScalarField.hpp"
 
 namespace GeoMHDiSCC {
@@ -52,6 +54,12 @@ namespace GeoMHDiSCC {
 
       /// Typedef for the spectral space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA1D>::BwdType SpectralScalarType;
+
+      /// Typedef for a scalar field setup
+      typedef ScalarFieldSetup<Dimensions::THREED> ScalarFieldSetupType;
+
+      /// Typedef for a scalar field setup
+      typedef SharedPtrMacro<ScalarFieldSetupType> SharedScalarFieldSetupType;
 
    }
 }

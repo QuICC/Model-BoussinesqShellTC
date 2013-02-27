@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for CoreResolution
  */
 
+#include "Resolutions/CoreResolution.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {

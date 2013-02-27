@@ -16,10 +16,13 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/Dimensions.hpp"
 #include "LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "Resolutions/TransformResolution.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    /**
     * @brief Implementation of a double load splitting algorithm, aka "Tubular" splitting
@@ -50,13 +53,15 @@ namespace GeoMHDiSCC {
          /**
           * @brief Split ith dimension transform
           *
-          * @param dim  Split the ith transform
-          * @param id   ID of the CPU
+          * @param transId Split the ith dimension
+          * @param cpuId   ID of the CPU
           */
-         virtual SharedTransformResolution splitDimension(const int dim, const int id);
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId);
 
          /**
           * @brief Select the transform grouper
+          *
+          * \mhdTodo Grouper selection is not correctly implemented
           */
          void selectGrouper();
 
@@ -70,6 +75,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // TUBULARSPLITTING_HPP

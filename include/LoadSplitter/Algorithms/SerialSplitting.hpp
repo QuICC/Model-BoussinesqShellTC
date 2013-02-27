@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * \brief Implementation of a serial "load splitting" algorithm
     */
@@ -50,10 +52,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Split ith dimension transform
           *
-          * @param dim  Split the ith transform
-          * @param id   ID of the CPU
+          * @param transId Split the ith dimension
+          * @param cpuId   ID of the CPU
           */
-         virtual SharedTransformResolution splitDimension(const int dim, const int id);
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId);
 
          /**
           * @brief Compute the score of the Resolution
@@ -65,6 +67,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // SERIALSPLITTING_HPP

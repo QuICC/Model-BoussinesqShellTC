@@ -14,17 +14,17 @@
 
 // Project includes
 //
+#include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Parallel {
 
    TubularSplitting::TubularSplitting(const int id, const int nCpu, const ArrayI& dim)
       : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::TUBULAR)
    {
-      // Factorise N_cpu into two factors
-      this->factoriseNCpu(2);
-
-      // Filter factors
-      this->filterFactors();
+      // Initialise the NCpu factors
+      this->initFactors(2);
    }
 
    TubularSplitting::~TubularSplitting()
@@ -52,7 +52,7 @@ namespace GeoMHDiSCC {
       return status;
    }
 
-   SharedTransformResolution  TubularSplitting::splitDimension(const int dim, const int id)
+   SharedTransformResolution  TubularSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
    {
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
@@ -65,28 +65,28 @@ namespace GeoMHDiSCC {
 
       // Create arrays for the IDs
       ArrayI ids(2);
-      ids(0) = this->groupId(0, id);
-      ids(1) = this->groupId(1, id);
+      ids(0) = SplittingTools::groupId(0, cpuId);
+      ids(1) = SplittingTools::groupId(1, cpuId);
 
       // Create start indexes and length
       ArrayI n0;
       ArrayI nN;
 
-      if(dim == 0)
+      if(transId == Dimensions::Transform::TRA1D)
       {
          // Get size of the dimension that needs to be compatible with previous step
-         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::SECOND);
+         int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::SECOND);
 
-         // Build a balanced split (has to be the same as in dim == 1)
+         // Build a balanced split (has to be the same as in TRA2D)
          int c0, cN;
-         this->balancedSplit(c0, cN, tot, this->factor(1), ids(1));
+         SplittingTools::balancedSplit(c0, cN, tot, this->factor(1), ids(1));
 
          // Get the remaining splittable size
-         tot = cN*this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
+         tot = cN*this->mspScheme->splittableTotal(transId, Splitting::Locations::BOTH);
 
          // Build a simple balanced split over remaining modes
          int r0, rN;
-         this->balancedSplit(r0, rN, tot, this->factor(0), ids(0));
+         SplittingTools::balancedSplit(r0, rN, tot, this->factor(0), ids(0));
 
          // 
          // The compatible dimension is the second dimension, we will need to reorder the indexes
@@ -128,32 +128,32 @@ namespace GeoMHDiSCC {
          n0.tail(1).setConstant(c0);
          nN.tail(1).setConstant(tN);
 
-      } else if(dim == 1)
+      } else if(transId == Dimensions::Transform::TRA2D)
       {
          // Create start indexes and length
          n0.resize(2);
          nN.resize(2);
 
          // Get size of the splittable dimension(s)
-         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
+         int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::BOTH);
 
          // Build a simple balanced split
-         this->balancedSplit(n0(0), nN(0), tot, this->factor(1), ids(1));
+         SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(1), ids(1));
 
          // Get size of the splittable dimension(s)
-         tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::FIRST);
+         tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::FIRST);
 
          // Compute a balanced splitting
-         this->balancedSplit(n0(1), nN(1), tot, this->factor(0), ids(0));
+         SplittingTools::balancedSplit(n0(1), nN(1), tot, this->factor(0), ids(0));
 
-      } else if(dim == 2)
+      } else if(transId == Dimensions::Transform::TRA3D)
       {
          // Get size of the splittable dimension(s)
-         int tot = this->mspScheme->splittableTotal(dim, Splitting::Locations::FIRST);
+         int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::FIRST);
 
          // Compute a balanced splitting
          int t0, tN;
-         this->balancedSplit(t0, tN, tot, this->factor(0), ids(0));
+         SplittingTools::balancedSplit(t0, tN, tot, this->factor(0), ids(0));
 
          // Create start indexes and length
          n0.resize(tN+1);
@@ -164,10 +164,10 @@ namespace GeoMHDiSCC {
          nN(0) = tN;
 
          // Get total for second dimension
-         tot = nN(0)*this->mspScheme->splittableTotal(dim, Splitting::Locations::BOTH);
+         tot = nN(0)*this->mspScheme->splittableTotal(transId, Splitting::Locations::BOTH);
 
          // Get balanced splitting for second direction
-         this->balancedSplit(t0, tN, tot, this->factor(1), ids(1));
+         SplittingTools::balancedSplit(t0, tN, tot, this->factor(1), ids(1));
 
          // Compute starting point of grid points
          for(int i = 0; i < t0; ++i)
@@ -195,7 +195,7 @@ namespace GeoMHDiSCC {
       }
 
       // Compute the indexes
-      this->mspScheme->fillIndexes(dim, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::BOTH);
+      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::BOTH);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
@@ -242,4 +242,5 @@ namespace GeoMHDiSCC {
       return static_cast<int>(score);
    }
 
+}
 }

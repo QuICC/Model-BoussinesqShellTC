@@ -32,12 +32,12 @@ namespace GeoMHDiSCC {
       return this->mTransforms.size();
    }
 
-   SharedCTransformResolution CoreResolution::dim(const int i) const
+   SharedCTransformResolution CoreResolution::dim(const Dimensions::Transform::Id id) const
    {
       // Check for correct sizes
-      assert(i < this->mTransforms.size());
+      assert(static_cast<int>(id) < this->mTransforms.size());
 
-      return this->mTransforms.at(i);
+      return this->mTransforms.at(static_cast<int>(id));
    }
 
 }

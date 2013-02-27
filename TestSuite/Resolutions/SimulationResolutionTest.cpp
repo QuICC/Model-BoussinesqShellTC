@@ -2,6 +2,7 @@
  *  \brief Implementation of test case for SimulationResolution
  */
 
+#include "Resolutions/SimulationResolution.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
