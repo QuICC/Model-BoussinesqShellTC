@@ -51,6 +51,23 @@ namespace Dimensions {
    };
 
    /**
+    * @brief Simple struct holding the IDs of simulation dimensions
+    */
+   struct Simulation {
+      /**
+       * @name Enums for the simulation dimensions
+       */
+      enum Id {
+         /// First dimension data
+         SIM1D,
+         /// Second dimension of data
+         SIM2D,
+         /// Third dimension data
+         SIM3D
+      };
+   };
+
+   /**
     * @brief Simple struct holding the IDs of data dimensions
     */
    struct Data {

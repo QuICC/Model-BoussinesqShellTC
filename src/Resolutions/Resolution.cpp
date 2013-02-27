@@ -25,6 +25,9 @@ namespace GeoMHDiSCC {
    Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim)
       : mCores(coreRes)
    {
+      // Assert simulation dimensions are the same as cpu dimensions
+      assert(simDim.size() == this->cpu()->nDim());
+
       // Init the simulation resolution
       this->initSimResolution(simDim);
    }
@@ -65,7 +68,8 @@ namespace GeoMHDiSCC {
    SharedCCoreResolution Resolution::cpu() const
    {
       // Safety assert
-      assert(this->mCores.size() > FrameworkMacro::id());
+      assert(FrameworkMacro::id() >= 0);
+      assert(this->mCores.size() > static_cast<unsigned int>(FrameworkMacro::id()));
 
       return this->mCores.at(FrameworkMacro::id());
    }
@@ -73,7 +77,8 @@ namespace GeoMHDiSCC {
    SharedCCoreResolution Resolution::cpu(const int id) const
    {
       // Check sizes
-      assert(id < this->mCores.size());
+      assert(id >= 0);
+      assert(static_cast<unsigned int>(id) < this->mCores.size());
       
       return this->mCores.at(id);
    }

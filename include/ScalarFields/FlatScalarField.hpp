@@ -40,6 +40,9 @@ namespace Datatypes {
    {
       public:
          /// Typedef for the coefficient type
+         typedef ScalarFieldSetup<DIMENSION> SetupType;
+
+         /// Typedef for the coefficient type
          typedef TData PointType;
 
          /// Typedef for the storage type

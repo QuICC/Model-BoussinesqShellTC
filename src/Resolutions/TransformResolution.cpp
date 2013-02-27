@@ -32,13 +32,15 @@ namespace GeoMHDiSCC {
       if(this->dim3D() != 0)
       {
          // Check for correct sizes
-         assert(k < this->mFwd.size());
+         assert(k >= 0);
+         assert(static_cast<size_t>(k) < this->mFwd.size());
 
          return this->mFwd.at(k).rows();
       } else
       {
          // Check for correct sizes
-         assert(j < this->mFwd.size());
+         assert(j >= 0);
+         assert(static_cast<size_t>(j) < this->mFwd.size());
 
          return this->mFwd.at(j).rows();
       }
@@ -49,13 +51,15 @@ namespace GeoMHDiSCC {
       if(this->dim3D() != 0)
       {
          // Check for correct sizes
-         assert(k < this->mBwd.size());
+         assert(k >= 0);
+         assert(static_cast<size_t>(k) < this->mBwd.size());
 
          return this->mBwd.at(k).rows();
       } else
       {
          // Check for correct sizes
-         assert(j < this->mBwd.size());
+         assert(j >= 0);
+         assert(static_cast<size_t>(j) < this->mBwd.size());
 
          return this->mBwd.at(j).rows();
       }
@@ -64,7 +68,8 @@ namespace GeoMHDiSCC {
    int TransformResolution::dim2D(const int k) const
    {
       // Check for correct sizes
-      assert(k < this->mIdx2D.size());
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mIdx2D.size());
 
       return this->mIdx2D.at(k).size();
    }
@@ -89,14 +94,16 @@ namespace GeoMHDiSCC {
       if(this->dim3D() != 0)
       {
          // Check for correct sizes
-         assert(k < this->mFwd.size());
+         assert(k >= 0);
+         assert(static_cast<size_t>(k) < this->mFwd.size());
          assert(i < this->mFwd.at(k).size());
 
          return this->mFwd.at(k)(i);
       } else
       {
          // Check for correct sizes
-         assert(j < this->mFwd.size());
+         assert(j >= 0);
+         assert(static_cast<size_t>(j) < this->mFwd.size());
          assert(i < this->mFwd.at(j).size());
 
          return this->mFwd.at(j)(i);
@@ -109,14 +116,16 @@ namespace GeoMHDiSCC {
       if(this->dim3D() != 0)
       {
          // Check for correct sizes
-         assert(k < this->mBwd.size());
+         assert(k >= 0);
+         assert(static_cast<size_t>(k) < this->mBwd.size());
          assert(i < this->mBwd.at(k).size());
 
          return this->mBwd.at(k)(i);
       } else
       {
          // Check for correct sizes
-         assert(j < this->mBwd.size());
+         assert(j >= 0);
+         assert(static_cast<size_t>(j) < this->mBwd.size());
          assert(i < this->mBwd.at(j).size());
 
          return this->mBwd.at(j)(i);
@@ -126,7 +135,8 @@ namespace GeoMHDiSCC {
    int TransformResolution::idx2D(const int j, const int k) const
    {
       // Check for correct sizes
-      assert(k < this->mIdx2D.size());
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mIdx2D.size());
       assert(j < this->mIdx2D.at(k).size());
 
       return this->mIdx2D.at(k)(j);

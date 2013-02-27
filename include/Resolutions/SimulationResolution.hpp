@@ -40,23 +40,15 @@ namespace GeoMHDiSCC {
          /**
           * @brief Empty Destructor
           */
-         virtual ~SimulationResolution();
+         ~SimulationResolution();
 
          /**
           * @brief Get simulation's dimensions
           *
-          * @param id ID of the space (Physical, Spectral)
-          * @param dim Dimension id
+          * @param simId  ID of the simulation dimension (SIM1D, SIM2D, SIM3D)
+          * @param spaceId ID of the space (PHYSICAL, SPECTRAL)
           */
-         int dim(const Dimensions::Space::Id id, const int dim) const;
-
-         /**
-          * @brief Get simulation's second dimension
-          *
-          * @param id   ID of the space (Physical, Spectral)
-          * @param j    Index of the second dimension
-          */
-         int dim2D(const Dimensions::Space::Id id, const int j) const;
+         int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId) const;
 
       protected:
 
@@ -64,20 +56,7 @@ namespace GeoMHDiSCC {
          /**
           * brief Storage
           */
-         std::map<Dimensions::Space::Id, ArrayI> mSim;
-
-         /**
-          * brief Storage
-          */
-         std::map<Dimensions::Space::Id, ArrayI> mDim2D;
-
-         /**
-          * @brief Create second dimension values
-          *
-          * @param phys    Dimensions for the physical space
-          * @param spec    Dimensions for the spectral space
-          */
-         void initDim2D(const ArrayI& phys, const ArrayI& spec);
+         std::map<Dimensions::Space::Id, ArrayI> mDim;
    };
 
 

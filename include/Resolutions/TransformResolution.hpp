@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Empty Destructor
           */
-         virtual ~TransformResolution();
+         ~TransformResolution();
 
          /**
           * @brief Get first dimension (forward direction)

@@ -24,69 +24,25 @@ namespace GeoMHDiSCC {
 
    SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec)
    {
-      // Initialise 2D dimensions
-      this->initDim2D(phys, spec);
+      // Assert both spaces have same dimensionalisty
+      assert(phys.size() == spec.size());
 
-      ArrayI extPhys(phys.size() + 1);
-      extPhys.segment(0,phys.size()) = phys;
-      extPhys(extPhys.size()-1) = this->mDim2D.find(Dimensions::Space::PHYSICAL)->second.sum();
-      this->mSim.insert(std::make_pair(Dimensions::Space::PHYSICAL, extPhys));
-
-      ArrayI extSpec(spec.size() + 1);
-      extSpec.segment(0,spec.size()) = spec;
-      extSpec(extSpec.size()-1) = this->mDim2D.find(Dimensions::Space::SPECTRAL)->second.sum();
-      this->mSim.insert(std::make_pair(Dimensions::Space::SPECTRAL, extSpec));
+      // Add physical space dimensions
+      this->mDim.insert(std::make_pair(Dimensions::Space::PHYSICAL, phys));
+      // Add spectral space dimensions
+      this->mDim.insert(std::make_pair(Dimensions::Space::SPECTRAL, spec));
    }
 
    SimulationResolution::~SimulationResolution()
    {
    }
 
-   void SimulationResolution::initDim2D(const ArrayI& phys, const ArrayI& spec)
-   {  
-      //
-      // Create physical space second dimensions
-      //
-      ArrayI phys2D(phys(2));
-
-      phys2D.setConstant(phys(2));
-
-      this->mDim2D.insert(std::make_pair(Dimensions::Space::PHYSICAL, phys2D));
-
-      //
-      // Create physical space second dimensions
-      //
-      ArrayI spec2D(spec(2));
-
-      // If spherical harmonics based scheme
-      #if defined EPMPHOENIX_SPATIALSCHEME_WSH || defined EPMPHOENIX_SPATIALSCHEME_TSH || defined EPMPHOENIX_SPATIALSCHEME_FDSH || defined EPMPHOENIX_SPATIALSCHEME_TpSH
-         for(int k = 0; k < spec(2); k++)
-         {
-            spec2D(k) = k + 1;
-         }
-
-      // ... else simply set to constant
-      #else 
-         spec2D.setConstant(spec(2));
-      #endif // defined EPMPHOENIX_SPATIALSCHEME_WSH || defined EPMPHOENIX_SPATIALSCHEME_TSH || defined EPMPHOENIX_SPATIALSCHEME_FDSH || defined EPMPHOENIX_SPATIALSCHEME_TpSH
-
-      this->mDim2D.insert(std::make_pair(Dimensions::Space::SPECTRAL, spec2D));
-   }
-
-   int SimulationResolution::dim(const Dimensions::Space::Id id, const int dim) const
+   int SimulationResolution::dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId) const
    {
       // Safety assertion
-      assert(this->mSim.find(id)->second.size() - 1 > dim);
+      assert(this->mDim.find(spaceId)->second.size() > static_cast<int>(simId));
 
-      return this->mSim.find(id)->second(dim);
-   }
-
-   int SimulationResolution::dim2D(const Dimensions::Space::Id id, const int j) const
-   {
-      // Safety assertion
-      assert(this->mDim2D.find(id)->second.size() > j);
-
-      return this->mDim2D.find(id)->second(j);
+      return this->mDim.find(spaceId)->second(static_cast<int>(simId));
    }
 
 }
