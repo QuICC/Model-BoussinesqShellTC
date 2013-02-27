@@ -5,6 +5,12 @@
  * \mhdTodo Test stride FFT for chebyshev complex -> complex (should avoir copy of data and temporary storage)
  * \mhdTodo Implement a coupled storage data type (i.e. the storage required for the complex solves to avoid copies/temporary storage)
  *
+ * \mdhTodo TypeSelectors/IndexConverterSelector depends on model/scheme
+ * \mdhTodo TypeSelectors/ScalarSelector depends on model/scheme
+ * \mdhTodo TypeSelectors/SpectralSelector depends on model/scheme
+ * \mdhTodo TypeSelectors/TransformSelector depends on model/scheme
+ * \mdhTodo TypeSelectors/VariableSelector depends very loosly on model/scheme???
+ *
  * \mhdTodo Restructure IoHdf5
  * \mhdTodo Restructure LoadSplitters
  * \mhdTodo Restructure SpatialSchemes
