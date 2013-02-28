@@ -22,11 +22,11 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NONE>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
    {
    }
 
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NONE>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
    {
    }
 
@@ -84,11 +84,11 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
    }
 
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::Id::Fwd1D::NONE>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::Id::Fwd1D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
@@ -112,11 +112,11 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
    }
 
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::Id::Fwd2D::NONE>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::Id::Fwd2D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD2D);
@@ -140,11 +140,11 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
    }
 
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::Id::Fwd3D::NONE>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::Id::Fwd3D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD3D);

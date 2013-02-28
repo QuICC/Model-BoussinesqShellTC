@@ -52,22 +52,22 @@ namespace Datatypes {
          /**
           * @brief Get the physical field values
           */
-         const VectorField<TScalar,COMPONENTS>&   phys() const;
+         const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   phys() const;
 
          /**
           * @brief Set the physical field values
           */
-         VectorField<TScalar,COMPONENTS>&   rPhys();
+         VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rPhys();
 
          /**
           * @brief Get the physical curl values
           */
-         const VectorField<TScalar,COMPONENTS>&   curl() const;
+         const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   curl() const;
 
          /**
           * @brief Set the physical curl values
           */
-         VectorField<TScalar,COMPONENTS>&   rCurl();
+         VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rCurl();
 
          /**
           * @brief Initialise to zero
@@ -97,30 +97,30 @@ namespace Datatypes {
          /**
           * @brief Smart pointer for the physical space field values
           */
-         SharedPtrMacro<VectorField<TScalar,COMPONENTS> > mspPhys;
+         SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspPhys;
 
          /**
           * @brief Smart pointer for the physical curl values
           */
-         SharedPtrMacro<VectorField<TScalar,COMPONENTS> > mspCurl;
+         SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspCurl;
    };
 
-   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS>&  VectorPhysicalVariable<TScalar,COMPONENTS>::phys() const
+   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::phys() const
    {
       return *this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS>&  VectorPhysicalVariable<TScalar,COMPONENTS>::rPhys()
+   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::rPhys()
    {
       return *this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS>&  VectorPhysicalVariable<TScalar,COMPONENTS>::curl() const
+   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::curl() const
    {
       return *this->mspCurl;
    }
 
-   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS>&  VectorPhysicalVariable<TScalar,COMPONENTS>::rCurl()
+   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::rCurl()
    {
       return *this->mspCurl;
    }
@@ -151,12 +151,12 @@ namespace Datatypes {
 
    template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysical()
    {
-      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS> >(new VectorField<TScalar,COMPONENTS>(*this->spRes()->spFwdSetup()));
+      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spFwdSetup()));
    }
 
    template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysicalDiff()
    {
-      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS> >(new VectorField<TScalar,COMPONENTS>(*this->spRes()->spFwdSetup()));
+      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spFwdSetup()));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

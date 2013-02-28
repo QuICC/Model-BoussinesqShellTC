@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/FieldComponents.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +29,7 @@ namespace Datatypes {
    /**
     * @brief Implementation of a generic vector field
     */
-   template <typename TScalar, int COMPONENTS> class VectorField
+   template <typename TScalar, int COMPONENTS, typename TType> class VectorField
    {
       public:
          /**
@@ -48,14 +49,14 @@ namespace Datatypes {
           *
           * @param i Index of the component
           */
-         const TScalar& comp(const int i) const;
+         const TScalar& comp(const TType id) const;
 
          /**
           * @brief Set field component
           *
           * @param i Index of the component
           */
-         TScalar& rComp(const int i);
+         TScalar& rComp(const TType id);
 
          /**
           * @brief Get field components
@@ -88,23 +89,23 @@ namespace Datatypes {
       private:
    };
 
-   template <typename TScalar, int COMPONENTS> inline const TScalar& VectorField<TScalar,COMPONENTS>::comp(const int i) const
+   template <typename TScalar, int COMPONENTS, typename TType> inline const TScalar& VectorField<TScalar,COMPONENTS,TType>::comp(const TType id) const
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > i);
+      assert(this->mComponents.size() > static_cast<int>(id));
 
-      return this->mComponents.at(i);
+      return this->mComponents.at(static_cast<int>(id));
    }
 
-   template <typename TScalar, int COMPONENTS> inline TScalar& VectorField<TScalar,COMPONENTS>::rComp(const int i)
+   template <typename TScalar, int COMPONENTS, typename TType> inline TScalar& VectorField<TScalar,COMPONENTS,TType>::rComp(const TType id)
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > i);
+      assert(this->mComponents.size() > static_cast<int>(id));
 
-      return this->mComponents.at(i);
+      return this->mComponents.at(static_cast<int>(id));
    }
 
-   template <typename TScalar, int COMPONENTS> VectorField<TScalar, COMPONENTS>::VectorField(const typename TScalar::SetupType& setup)
+   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::VectorField(const typename TScalar::SetupType& setup)
    {
       // Initialise the components
       for(int i = 0; i < COMPONENTS; i++)
@@ -113,21 +114,21 @@ namespace Datatypes {
       }
    }
 
-   template <typename TScalar, int COMPONENTS> VectorField<TScalar, COMPONENTS>::~VectorField()
+   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::~VectorField()
    {
    }
 
-   template <typename TScalar, int COMPONENTS> inline const std::vector<TScalar>& VectorField<TScalar,COMPONENTS>::data() const
-   {
-      return this->mComponents;
-   }
-
-   template <typename TScalar, int COMPONENTS> inline std::vector<TScalar>& VectorField<TScalar,COMPONENTS>::rData()
+   template <typename TScalar, int COMPONENTS, typename TType> inline const std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::data() const
    {
       return this->mComponents;
    }
 
-   template <typename TScalar, int COMPONENTS> void VectorField<TScalar, COMPONENTS>::initialiseZeros()
+   template <typename TScalar, int COMPONENTS, typename TType> inline std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::rData()
+   {
+      return this->mComponents;
+   }
+
+   template <typename TScalar, int COMPONENTS, typename TType> void VectorField<TScalar, COMPONENTS, TType>::initialiseZeros()
    {
       // Initialise the components
       typename std::vector<TScalar>::iterator   it;
@@ -138,7 +139,7 @@ namespace Datatypes {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TScalar, int COMPONENTS> MHDFloat VectorField<TScalar, COMPONENTS>::requiredStorage() const
+   template <typename TScalar, int COMPONENTS, typename TType> MHDFloat VectorField<TScalar, COMPONENTS, TType>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
       typename std::vector<TScalar>::const_iterator   it;

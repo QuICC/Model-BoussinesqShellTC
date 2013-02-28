@@ -25,7 +25,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/TransformSteps.hpp"
 
-namespace GeoMDHiSCC {
+namespace GeoMHDiSCC {
 
 namespace Transform {
 
@@ -60,21 +60,21 @@ namespace Transform {
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::::Id::Fwd1D::Step TStep> static void integrate1D(TransformCoordinatorType& coord);
+         template <TransformSteps::ForwardBase::Step TStep> static void integrate1D(TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the second dimension
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::::Id::Fwd2D::Step TStep> static void integrate2D(TransformCoordinatorType& coord);
+         template <TransformSteps::ForwardBase::Step TStep> static void integrate2D(TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the third dimension
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::::Id::Fwd3D::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
+         template <TransformSteps::ForwardBase::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
 
          /**
           * @brief Compute linear interaction on a scalar
@@ -180,32 +180,32 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
    }
 
-   /// Specialised 1D integration for NONE
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::::Id::Fwd1D::NONE>(TransformCoordinatorType& coord);
+   /// Specialised integration to do nothing
+   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
 
-   /// Specialised 1D integration for SCALAR
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::::Id::Fwd1D::SCALAR>(TransformCoordinatorType& coord);
-
-
-   /// Specialised 2D integration for NONE
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::::Id::Fwd2D::NONE>(TransformCoordinatorType& coord);
-
-   /// Specialised 2D integration for SCALAR
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::::Id::Fwd2D::SCALAR>(TransformCoordinatorType& coord);
+   /// Specialised integration to compute scalar
+   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
 
 
-   /// Specialised 3D integration for NONE
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::::Id::Fwd3D::NONE>(TransformCoordinatorType& coord);
+   /// Specialised 2D integration to do nothing
+   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
 
-   /// Specialised 3D integration for SCALAR
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::::Id::Fwd3D::SCALAR>(TransformCoordinatorType& coord);
+   /// Specialised 2D integration to compute scalar
+   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
 
 
-   /// Specialised linear term for NONE
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NONE>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+   /// Specialised 3D integration to do nothing
+   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
 
-   /// Specialised timestep preparation for NONE
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NONE>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+   /// Specialised 3D integration to compute scalar
+   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
+
+
+   /// Specialised linear term to do nothing
+   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+
+   /// Specialised timestep preparation to do nothing
+   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
 }
 }

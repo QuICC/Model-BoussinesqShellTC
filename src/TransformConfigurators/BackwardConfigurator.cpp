@@ -22,19 +22,19 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   template <> void BackwardConfigurator::prepareProjection<FieldComponents::Spectral::NONE>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::prepareProjection<FieldComponents::Spectral::NOTUSED>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::prepareGradient<FieldComponents::Physical::NONE>(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::prepareGradient<FieldComponents::Physical::NOTUSED>(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::preparePhysical<FieldComponents::Physical::NONE>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::preparePhysical<FieldComponents::Physical::NOTUSED>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::prepareCurl<FieldComponents::Physical::NONE>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::prepareCurl<FieldComponents::Physical::NOTUSED>(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
    }
 
@@ -62,11 +62,11 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD3D);
    }
 
-   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::NONE>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::NOTUSED>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
@@ -90,7 +90,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::GRADX>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
@@ -114,11 +114,11 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::NONE>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::NOTUSED>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD2D);
@@ -142,7 +142,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
    }
 
-   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::GRADY>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD2D);
@@ -166,11 +166,11 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
    }
 
-   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::NONE>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::NOTUSED>(TransformCoordinatorType& coord)
    {
    }
 
-   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::SCALAR>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project3D<TransformSteps::BackwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);
@@ -194,7 +194,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD3D);
    }
 
-   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::GRADZ>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project3D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);

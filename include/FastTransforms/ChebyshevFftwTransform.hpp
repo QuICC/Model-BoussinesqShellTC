@@ -64,7 +64,10 @@ namespace Transform {
    class ChebyshevFftwTransform
    {
       public:
-         /// Typedef for the configuration class to use
+         /// Typedef for the configuration class
+         typedef FftSetup SetupType;
+
+         /// Typedef for the configuration class as a shared pointer
          typedef SharedFftSetup SharedSetupType;
 
          /// Typedef for the Projector type

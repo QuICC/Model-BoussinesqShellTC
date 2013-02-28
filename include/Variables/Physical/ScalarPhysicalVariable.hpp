@@ -62,12 +62,12 @@ namespace Datatypes {
          /**
           * @brief Get the physical gradient values
           */
-         const VectorField<TScalar,COMPONENTS>&   grad() const;
+         const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   grad() const;
 
          /**
           * @brief Set the physical gradient values
           */
-         VectorField<TScalar,COMPONENTS>&   rGrad();
+         VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rGrad();
 
          /**
           * @brief Initialise to zero
@@ -102,7 +102,7 @@ namespace Datatypes {
          /**
           * @brief Smart pointer for the physical gradient values
           */
-         SharedPtrMacro<VectorField<TScalar,COMPONENTS> > mspGrad;
+         SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspGrad;
    };
 
    template <typename TScalar, int COMPONENTS> inline const TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::phys() const
@@ -115,12 +115,12 @@ namespace Datatypes {
       return *this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::grad() const
+   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::grad() const
    {
       return *this->mspGrad;
    }
 
-   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rGrad()
+   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rGrad()
    {
       return *this->mspGrad;
    }
@@ -156,7 +156,7 @@ namespace Datatypes {
 
    template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initialisePhysicalDiff()
    {
-      this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS> >(new VectorField<TScalar,COMPONENTS>(*this->spRes()->spFwdSetup()));
+      this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spFwdSetup()));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

@@ -23,7 +23,9 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/ForwardConfigurator.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
+
+namespace Transform {
 
    /**
     * @brief This class defines the forward transform single first exchange splitting operations
@@ -34,7 +36,7 @@ namespace EPMPhoenix {
          /**
           * @brief Location of the splitting
           */
-         static const Splittings::Locations::Id  SplitLocation = Splittings::Locations::FIRST;
+         static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::FIRST;
 
          /**
           * @brief First step in transform, including the nonlinear interaction for a scalar field
@@ -148,6 +150,7 @@ namespace EPMPhoenix {
    {
    }
 
+}
 }
 
 #endif // FORWARDSINGLE1DCONFIGURATOR_HPP

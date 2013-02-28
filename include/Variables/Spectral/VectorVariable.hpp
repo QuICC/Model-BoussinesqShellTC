@@ -48,22 +48,22 @@ namespace Datatypes {
          /**
           * @brief Get spectral vector field (perturbation part)
           */
-         const VectorField<TSScalar,SCOMPONENTS>&  perturbation() const;
+         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  perturbation() const;
 
          /**
           * @brief Set spectral vector field (perturbation part)
           */
-         VectorField<TSScalar,SCOMPONENTS>&  rPerturbation();
+         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rPerturbation();
 
          /**
           * @brief Get spectral vector field (total field)
           */
-         const VectorField<TSScalar,SCOMPONENTS>&  total() const;
+         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  total() const;
 
          /**
           * @brief Set spectral vector field (total field)
           */
-         VectorField<TSScalar,SCOMPONENTS>&  rTotal();
+         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rTotal();
 
          /**
           * @brief initialise to zeros
@@ -82,27 +82,27 @@ namespace Datatypes {
          /**
           * @brief Spectral vector of the field
           */
-         VectorField<TSScalar,SCOMPONENTS>   mPerturbation;
+         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>   mPerturbation;
 
       private:
    };
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::perturbation() const
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::perturbation() const
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rPerturbation()
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rPerturbation()
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::total() const
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::total() const
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rTotal()
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rTotal()
    {
       return this->mPerturbation;
    }

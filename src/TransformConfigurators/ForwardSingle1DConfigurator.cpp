@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardSingle1DConfigurator::firstStep(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::firstStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(spEquation, coord);
@@ -31,73 +31,73 @@ namespace Transform {
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute scalar integration in the third dimension
-      ForwardConfigurator::integrate3D<TransformSteps::Fwd3D::SCALAR>(coord);
+      ForwardConfigurator::integrate3D<TransformSteps::Forward<Dimensions::Transform::TRA3D>::STEP_SCALAR>(coord);
 
       // Compute scalar integration in the second dimension
-      ForwardConfigurator::integrate2D<TransformSteps::Fwd2D::SCALAR>(coord);
+      ForwardConfigurator::integrate2D<TransformSteps::Forward<Dimensions::Transform::TRA2D>::STEP_SCALAR>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle1DConfigurator::firstStep(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::firstStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm<TransformSteps::Phys::NONLINEAR1D>(spEquation, coord);
+      ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_ONE>(spEquation, coord);
 
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in the third dimension
-      ForwardConfigurator::integrate3D<TransformSteps::Fwd3D::VECTOR1D>(coord);
+      ForwardConfigurator::integrate3D<TransformSteps::Forward<Dimensions::Transform::TRA3D>::STEP_VECTOR_ONE>(coord);
 
       // Compute integration in the second dimension
-      ForwardConfigurator::integrate2D<TransformSteps::Fwd2D::VECTOR1D>(coord);
+      ForwardConfigurator::integrate2D<TransformSteps::Forward<Dimensions::Transform::TRA2D>::STEP_VECTOR_ONE>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
 
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm<TransformSteps::Phys::NONLINEAR2D>(spEquation, coord);
+      ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_TWO>(spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in the third dimension
-      ForwardConfigurator::integrate3D<TransformSteps::Fwd3D::VECTOR2D>(coord);
+      ForwardConfigurator::integrate3D<TransformSteps::Forward<Dimensions::Transform::TRA3D>::STEP_VECTOR_TWO>(coord);
 
       // Compute integration in the second dimension
-      ForwardConfigurator::integrate2D<TransformSteps::Fwd2D::VECTOR2D>(coord);
+      ForwardConfigurator::integrate2D<TransformSteps::Forward<Dimensions::Transform::TRA2D>::STEP_VECTOR_TWO>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
 
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm<TransformSteps::Phys::NONLINEAR3D>(spEquation, coord);
+      ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_THREE>(spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in third dimension
-      ForwardConfigurator::integrate3D<TransformSteps::Fwd3D::VECTOR3D>(coord);
+      ForwardConfigurator::integrate3D<TransformSteps::Forward<Dimensions::Transform::TRA3D>::STEP_VECTOR_THREE>(coord);
 
       // Compute integration in second dimension
-      ForwardConfigurator::integrate2D<TransformSteps::Fwd2D::VECTOR3D>(coord);
+      ForwardConfigurator::integrate2D<TransformSteps::Forward<Dimensions::Transform::TRA2D>::STEP_VECTOR_THREE>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle1DConfigurator::lastStep(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::lastStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute scalar integration in the first dimension
-      ForwardConfigurator::integrate1D<TransformSteps::Fwd1D::SCALAR>(coord);
+      ForwardConfigurator::integrate1D<TransformSteps::Forward<Dimensions::Transform::TRA1D>::STEP_SCALAR>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
@@ -109,62 +109,62 @@ namespace Transform {
       ForwardConfigurator::prepareTimestep(spEquation, coord);
    }
 
-   void ForwardSingle1DConfigurator::lastStep(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::lastStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in the second dimension for second component
-      ForwardConfigurator::integrate1D<TransformSteps::Fwd1D::VECTOR1D>(coord);
+      ForwardConfigurator::integrate1D<TransformSteps::Forward<Dimensions::Transform::TRA1D>::STEP_VECTOR_ONE>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
       // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Fwd1D::SPECVECT1D>(spEquation, coord);
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Fwd1D::SPECVECT1D>(spEquation, coord);
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in the first dimension for third component
-      ForwardConfigurator::integrate1D<TransformSteps::Fwd1D::VECTOR2D>(coord);
+      ForwardConfigurator::integrate1D<TransformSteps::Forward<Dimensions::Transform::TRA1D>::STEP_VECTOR_TWO>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
       // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Fwd1D::SPECVECT2D>(spEquation, coord);
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
 
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Fwd1D::SPECVECT2D>(spEquation, coord);
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
 
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
       // Compute integration in first dimension for first component
-      ForwardConfigurator::integrate1D<TransformSteps::Fwd1D::VECTOR3D>(coord);
+      ForwardConfigurator::integrate1D<TransformSteps::Forward<Dimensions::Transform::TRA1D>::STEP_VECTOR_THREE>(coord);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
       // Add the poloidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Fwd1D::SPECVECT3D>(spEquation, coord);
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
 
       // Prepare the poloidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Fwd1D::SPECVECT3D>(spEquation, coord);
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
    }
 
-   void ForwardSingle1DConfigurator::secondStep(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::secondStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }
 
-   void ForwardSingle1DConfigurator::secondStep(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::secondStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }

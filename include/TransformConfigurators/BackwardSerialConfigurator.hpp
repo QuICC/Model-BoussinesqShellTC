@@ -35,7 +35,7 @@ namespace Transform {
          /**
           * @brief Location of the splitting
           */
-         static const Splittings::Locations::Id  SplitLocation = Splittings::Locations::NONE;
+         static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::NONE;
 
          /**
           * @brief Compute the first step in the backward transform
@@ -190,12 +190,12 @@ namespace Transform {
          /**
           * @brief Empty constructor
           */
-         BackwardSerialConfigurator(){};
+         BackwardSerialConfigurator();
 
          /**
           * @brief Empty destructor
           */
-         virtual ~BackwardSerialConfigurator(){};
+         virtual ~BackwardSerialConfigurator();
 
       private:
    };

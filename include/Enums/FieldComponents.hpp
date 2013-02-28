@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Enum for physical field vector components
           */
-         enum Id {ONE, TWO, THREE, SCALAR};
+         enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
 
          /**
           * @brief Get ID as tag (abbreviation)
@@ -51,7 +51,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Enum for Spectral field vector components
           */
-         enum Id {ONE, TWO, THREE, SCALAR};
+         enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
 
          /**
           * @brief Get ID as tag (abbreviation)

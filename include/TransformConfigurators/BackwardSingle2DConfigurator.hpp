@@ -22,7 +22,9 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/BackwardConfigurator.hpp"
 
-namespace EPMPhoenix {
+namespace GeoMHDiSCC {
+
+namespace Transform {
 
    /**
     * \brief This class defines the backward transform second exchange single splitting operations
@@ -33,7 +35,7 @@ namespace EPMPhoenix {
          /**
           * @brief Location of the splitting
           */
-         static const Splittings::Locations::Id  SplitLocation = Splittings::Locations::SECOND;
+         static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::SECOND;
 
          /**
           * @brief Compute the first step in the backward transform
@@ -250,6 +252,7 @@ namespace EPMPhoenix {
       coord.communicator().converter3D().initiateBackwardCommunication();
    }
 
+}
 }
 
 #endif // BACKWARDSINGLE2DCONFIGURATOR_HPP
