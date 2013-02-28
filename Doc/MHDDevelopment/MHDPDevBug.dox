@@ -1,5 +1,7 @@
 /** \page mhdBug Known bugs
  *
+ * \mhdBug FftwTools::optimizeFft() output is shown several times
+ *
  * \section mhdBugGlobal  Global
  *
  * \section mhdBugLocal  Local

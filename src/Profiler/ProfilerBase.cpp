@@ -7,7 +7,6 @@
 
 // System includes
 //
-#include <mpi.h>
 
 // External includes
 //

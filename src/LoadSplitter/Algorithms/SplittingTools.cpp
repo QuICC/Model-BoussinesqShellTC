@@ -27,13 +27,13 @@ namespace Parallel {
    void SplittingTools::factorizeNCpu(std::list<int>& cpuFactors, const int nFactors, const int nCpu)
    {
       // Select factorisation algorithm depending on number of factors
-      if(factors == 1)
+      if(nFactors == 1)
       {
          // Add factor
          cpuFactors.push_back(nCpu);
 
       // Factorise CPUs into two groups
-      } else if(factors == 2)
+      } else if(nFactors == 2)
       {
          // Get the maximum factor
          int factor = static_cast<int>(std::sqrt(nCpu));
@@ -113,7 +113,7 @@ namespace Parallel {
       for(int i =0; i < factors.size(); i++)
       {
          // We don't want the extrem cases (no splitting in one direction)
-         if(factors == 1 && nCpu > 1)
+         if(factors(i) == 1 && nCpu > 1)
          {
             return false;
          }
@@ -202,13 +202,13 @@ namespace Parallel {
       switch(i)
       {
          case(0):
-            return id % factor(0);
+            return id % factors(0);
             break;
          case(1):
-            return id / factor(0);
+            return id / factors(0);
             break;
          case(2):
-            return id / (factor(0)*factor(1));
+            return id / (factors(0)*factors(1));
             break;
       }
    }

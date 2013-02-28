@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
 

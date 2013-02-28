@@ -48,16 +48,16 @@ namespace Datatypes {
          /// Typedef for the storage type
          typedef typename Eigen::Matrix<PointType, Eigen::Dynamic, Eigen::Dynamic> StorageType;
 
-         /// Typedef for the Map to the storage type
+         /// Typedef for the profiles of the storage type
          typedef typename StorageType::ColXpr  ProfileType;
 
-         /// Typedef for the Map to the storage type
+         /// Typedef for the slices of the storage type
          typedef typename Eigen::Block<StorageType>  SliceType;
 
          /**
           * @brief Constructor
           */
-         FlatScalarField(SharedPtrMacro<ScalarFieldSetup<DIMENSION> > spSetup);
+         explicit FlatScalarField(SharedPtrMacro<ScalarFieldSetup<DIMENSION> > spSetup);
 
          /**
           * @brief Destructor
@@ -117,6 +117,22 @@ namespace Datatypes {
           * @param k    Index of the slice
           */
          template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
+
+         /**
+          * @brief Add to 2D slice of the field
+          *
+          * @param sl   Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void addSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
+
+         /**
+          * @brief Substract from 2D slice of the field
+          *
+          * @param sl   Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void subSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
 
          /**
           * @brief Get internal storage field data
@@ -206,6 +222,22 @@ namespace Datatypes {
       Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) += sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) -= sl;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setData(const Eigen::MatrixBase<Derived>& field)

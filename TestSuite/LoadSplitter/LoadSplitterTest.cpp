@@ -2,7 +2,10 @@
  *  \brief Implementation of test case for LoadSplitter
  */
 
+#include "Framework/FrameworkMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
+#include "SpatialSchemes/3D/TFTScheme.hpp"
+#include "IoTools/VisualizeResolution.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
@@ -58,9 +61,24 @@ namespace TestSuite {
     */
    TEST_F(LoadSplitterTest, Constructor)
    {  
+      FrameworkMacro::init();
+
       int id = 0;
-      int nCpu = 16;
+      int nCpu = 1;
+
+      FrameworkMacro::setup(nCpu);
+
       Parallel::LoadSplitter   splitter(id, nCpu);
+
+      ArrayI dims(3);
+      dims(0) = 10; dims(1) = 12; dims(2) = 15;
+      splitter.init<TFTScheme>(dims);
+
+      splitter.showSplittings(10);
+
+      IoTools::VisualizeResolution::show(std::cout, splitter.bestSplitting().first);
+
+      FrameworkMacro::finalize();
 
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

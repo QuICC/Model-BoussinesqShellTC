@@ -7,6 +7,10 @@
 
 // Configuration includes
 //
+#include "StaticAsserts/StaticAssert.hpp"
+
+// Configuration includes
+//
 #include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
@@ -45,70 +49,32 @@ namespace GeoMHDiSCC {
          ~TransformResolution();
 
          /**
-          * @brief Get first dimension (forward direction)
+          * @brief Get dimension
           *
-          * @param j Index of the second dimension
-          * @param k Index of the third dimension
+          * @param k Index of the last dimension
           */
-         int dimFwd(const int j = 0, const int k = 0) const;
+         template <Dimensions::Data::Id TDim> int dim(const int k) const;
 
          /**
-          * @brief Get first dimension (backward direction)
+          * @brief Get dimension
+          */
+         template <Dimensions::Data::Id TDim> int dim() const;
+
+         /**
+          * @brief Get index mapping to full resolution
           *
-          * @param j Index of the second dimension
-          * @param k Index of the third dimension
+          * @param i Index of dimension
+          * @param k Index of the last dimension
           */
-         int dimBwd(const int j = 0, const int k = 0) const;
+         template <Dimensions::Data::Id TDim> int idx(const int i, const int k) const;
 
          /**
-          * @brief Get second dimension
+          * @brief Get index mapping to full resolution
           *
-          * @param k Index of the third dimension 
+          * @param i Index of dimension
+          * @param k Index of the last dimension
           */
-         int dim2D(const int k = 0) const;
-
-         /**
-          * @brief Get third dimension
-          */
-         int dim3D() const;
-
-         /**
-          * @brief Get index mapping to full resolution for 1D (forward direction)
-          *
-          * @param i Index of the first dimension
-          * @param j Index of the second dimension
-          * @param k Index of the third dimension
-          */
-         int idxFwd(const int i, const int j = 0, const int k = 0) const;
-
-         /**
-          * @brief Get index mapping to full resolution for 1D (backward direction)
-          *
-          * @param i Index of the first dimension
-          * @param j Index of the second dimension
-          * @param k Index of the third dimension
-          */
-         int idxBwd(const int i, const int j = 0, const int k = 0) const;
-
-         /**
-          * @brief Get index mapping to full resolution for 2D
-          *
-          * @param j Index of the second dimension
-          * @param k Index of the third dimension 
-          */
-         int idx2D(const int j, const int k = 0) const;
-
-         /**
-          * @brief Get full set of index mapping to full resolution for 3D
-          */
-         const ArrayI& idx3D() const;
-
-         /**
-          * @brief Get index mapping to full resolution for 3D
-          *
-          * @param k Index of the third dimension 
-          */
-         int idx3D(const int k) const;
+         template <Dimensions::Data::Id TDim> int idx(const int i) const;
 
          /**
           * @brief Get the forward scalar field setup
@@ -143,6 +109,68 @@ namespace GeoMHDiSCC {
           */
          ArrayI   mIdx3D;
    };
+
+   template <Dimensions::Data::Id TID> int TransformResolution::dim(const int k) const
+   {
+      // This should never by used
+      Debug::StaticAssert< false >();
+
+      return -1;
+   }
+
+   template <Dimensions::Data::Id TID> int TransformResolution::dim() const
+   {
+      // This should never by used
+      Debug::StaticAssert< false >();
+
+      return -1;
+   }
+
+   template <Dimensions::Data::Id TID> int TransformResolution::idx(const int i, const int k) const
+   {
+      // This should never by used
+      Debug::StaticAssert< false>();
+
+      return -1;
+   }
+
+   template <Dimensions::Data::Id TID> int TransformResolution::idx(const int i) const
+   {
+      // This should never by used
+      Debug::StaticAssert< false>();
+
+      return -1;
+   }
+
+   /// Specialised for DATF1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int k) const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int k) const;
+   /// Specialised for DAT2D
+   template  <> int TransformResolution::dim<Dimensions::Data::DAT2D>(const int k) const;
+   /// Specialised for DATF1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATF1D>() const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATB1D>() const;
+   /// Specialised for DAT2D
+   template  <> int TransformResolution::dim<Dimensions::Data::DAT2D>() const;
+   /// Specialised for DAT3D
+   template  <> int TransformResolution::dim<Dimensions::Data::DAT3D>() const;
+
+   /// Specialised for DATF1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i, const int k) const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i, const int k) const;
+   /// Specialised for DAT2D
+   template  <> int TransformResolution::idx<Dimensions::Data::DAT2D>(const int i, const int k) const;
+   /// Specialised for DATF1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i) const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i) const;
+   /// Specialised for DAT2D
+   template  <> int TransformResolution::idx<Dimensions::Data::DAT2D>(const int i) const;
+   /// Specialised for DAT3D
+   template  <> int TransformResolution::idx<Dimensions::Data::DAT3D>(const int i) const;
 
    /// Typedef for a shared pointer to a TransformResolution object
    typedef SharedPtrMacro<TransformResolution>   SharedTransformResolution;

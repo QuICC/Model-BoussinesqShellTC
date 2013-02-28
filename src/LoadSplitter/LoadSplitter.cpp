@@ -225,7 +225,7 @@ namespace Parallel {
    void LoadSplitter::showSplittings(const int n) const
    {
       // Get maximum between number of scores and n
-      int maxN = std::max(static_cast<int>(this->mScores.size()), n);
+      int maxN = std::min(static_cast<int>(this->mScores.size()), n);
 
       // Create reverse iterator
       std::multimap<int, std::pair<SharedResolution,SplittingDescription> >::const_reverse_iterator rit;

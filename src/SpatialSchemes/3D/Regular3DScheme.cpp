@@ -29,11 +29,8 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void Regular3DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void Regular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
-      // Assert for dimension
-      assert(dim < 3);
-
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
       assert( id.size() == bins.size() );
@@ -55,26 +52,26 @@ namespace GeoMHDiSCC {
       if(flag == Splitting::Locations::NONE)
       {
          i0 = 0;
-         iN = this->dim3D(dim);
+         iN = this->dim3D(transId);
          j0.resize(iN);
          jN.resize(iN);
          j0.setConstant(0);
-         jN.setConstant(this->dim2D(dim));
+         jN.setConstant(this->dim2D(transId));
          c0 = 0;
-         cN = this->dim2D(dim)*this->dim3D(dim);
+         cN = this->dim2D(transId)*this->dim3D(transId);
 
       // Create index list for first transform
-      } else if(dim == 0)
+      } else if(transId == Dimensions::Transform::TRA1D)
       {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
          {
             i0 = 0;
-            iN = this->dim3D(dim);
+            iN = this->dim3D(transId);
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(0);
-            jN.setConstant(this->dim2D(dim));
+            jN.setConstant(this->dim2D(transId));
             c0 = n0(0);
             cN = n0(0) + nN(0);
 
@@ -82,13 +79,13 @@ namespace GeoMHDiSCC {
          } else if(flag == Splitting::Locations::SECOND)
          {
             i0 = 0;
-            iN = this->dim3D(dim);
+            iN = this->dim3D(transId);
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(n0(0));
             jN.setConstant(nN(0));
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
 
          // Splitting is on both transforms
          } else if(flag == Splitting::Locations::BOTH)
@@ -98,23 +95,23 @@ namespace GeoMHDiSCC {
             j0 = n0.tail(iN);
             jN = nN.tail(iN);
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
          }
 
       // Create index list for second transform
-      } else if(dim == 1)
+      } else if(transId == Dimensions::Transform::TRA2D)
       {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
          {
             i0 = 0;
-            iN = this->dim3D(dim);
+            iN = this->dim3D(transId);
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(n0(0));
             jN.setConstant(nN(0));
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
 
          // Splitting is on second transform
          } else if(flag == Splitting::Locations::SECOND)
@@ -124,9 +121,9 @@ namespace GeoMHDiSCC {
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(0);
-            jN.setConstant(this->dim2D(dim));
+            jN.setConstant(this->dim2D(transId));
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
 
          // Splitting is on both transforms
          } else if(flag == Splitting::Locations::BOTH)
@@ -138,11 +135,11 @@ namespace GeoMHDiSCC {
             j0.setConstant(n0(1));
             jN.setConstant(nN(1));
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
          }
 
       // Create index list for third transform
-      } else if(dim == 2)
+      } else if(transId == Dimensions::Transform::TRA3D)
       {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
@@ -152,19 +149,19 @@ namespace GeoMHDiSCC {
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(0);
-            jN.setConstant(this->dim2D(dim));
+            jN.setConstant(this->dim2D(transId));
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
 
          // Splitting is on second transform
          } else if(flag == Splitting::Locations::SECOND)
          {
             i0 = 0;
-            iN = this->dim3D(dim);
+            iN = this->dim3D(transId);
             j0.resize(iN);
             jN.resize(iN);
             j0.setConstant(0);
-            jN.setConstant(this->dim2D(dim));
+            jN.setConstant(this->dim2D(transId));
             c0 = n0(0);
             cN = n0(0) + nN(0);
 
@@ -178,7 +175,7 @@ namespace GeoMHDiSCC {
             j0 = n0.tail(iN);
             jN = nN.tail(iN);
             c0 = 0;
-            cN = this->dim2D(dim)*this->dim3D(dim);
+            cN = this->dim2D(transId)*this->dim3D(transId);
          }
       }
       // Counter
@@ -252,10 +249,10 @@ namespace GeoMHDiSCC {
       }
 
       // Make full list of indexes for first dimension
-      for(int i = 0; i < this->dim3D(dim); i++)
+      for(int i = 0; i < this->dim3D(transId); i++)
       {
          // Create storage for indexes
-         fwd1D.push_back(ArrayI(this->dimFwd(dim)));
+         fwd1D.push_back(ArrayI(this->dimFwd(transId)));
 
          // Fill array with indexes
          for(int j = 0; j < fwd1D.at(i).size(); j++)
@@ -264,7 +261,7 @@ namespace GeoMHDiSCC {
          }
 
          // Create storage for indexes
-         bwd1D.push_back(ArrayI(this->dimBwd(dim)));
+         bwd1D.push_back(ArrayI(this->dimBwd(transId)));
 
          // Fill array with indexes
          for(int j = 0; j < bwd1D.at(i).size(); j++)
@@ -274,62 +271,62 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular3DScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
+   int Regular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       // Splittable size for first transform splitting
       if(flag == Splitting::Locations::FIRST)
       {
          // Get total size for first transform
-         if(dim == 0)
+         if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim2D(dim)*this->dim3D(dim);
+            return this->dim2D(transId)*this->dim3D(transId);
 
          // Get total size for second transform
-         } else if(dim == 1)
+         } else if(transId == Dimensions::Transform::TRA2D)
          {
-            return this->dim2D(dim);
+            return this->dim2D(transId);
 
          // Get total size for third transform
-         } else if(dim == 2)
+         } else if(transId == Dimensions::Transform::TRA3D)
          {
-            return this->dim3D(dim);
+            return this->dim3D(transId);
          }
 
       // Splittable size for second transform splitting
       } else if(flag == Splitting::Locations::SECOND)
       {
          // Get total size for first transform
-         if(dim == 0)
+         if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim2D(dim);
+            return this->dim2D(transId);
          // Get total size for second transform
-         } else if(dim == 1)
+         } else if(transId == Dimensions::Transform::TRA2D)
          {
-            return this->dim3D(dim);
+            return this->dim3D(transId);
 
          // Get total size for third transform
-         } else if(dim == 2)
+         } else if(transId == Dimensions::Transform::TRA3D)
          {
-            return this->dim2D(dim)*this->dim3D(dim);
+            return this->dim2D(transId)*this->dim3D(transId);
          }
 
       // Splittable size for both transforms splitting
       } else if(flag == Splitting::Locations::BOTH)
       {
          // Get total size for first transform
-         if(dim == 0)
+         if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim3D(dim);
+            return this->dim3D(transId);
 
          // Get total size for second transform
-         } else if(dim == 1)
+         } else if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim3D(dim);
+            return this->dim3D(transId);
 
          // Get total size for third transform
-         } else if(dim == 2)
+         } else if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim2D(dim);
+            return this->dim2D(transId);
          }
       }
    }

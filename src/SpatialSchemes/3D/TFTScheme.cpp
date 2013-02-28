@@ -23,16 +23,16 @@ namespace GeoMHDiSCC {
    Transform::SharedFftSetup TFTScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
-      int size = spRes->cpu()->dim(0)->dimFwd();
+      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the FFT
-      int specSize = spRes->sim()->dim(Dimensions::Space::SPECTRAL,0);
+      int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
       int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(0)->dim3D(); i++)
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
-         howmany += spRes->cpu()->dim(0)->dim2D(i);
+         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
@@ -41,16 +41,16 @@ namespace GeoMHDiSCC {
    Transform::SharedFftSetup TFTScheme::spSetup2D(SharedResolution spRes)
    {
       // Get size of FFT transform
-      int size = spRes->cpu()->dim(1)->dimFwd();
+      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the FFT
-      int specSize = spRes->sim()->dim(Dimensions::Space::SPECTRAL,1);
+      int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
       int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(1)->dim3D(); i++)
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
-         howmany += spRes->cpu()->dim(1)->dim2D(i);
+         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, true));
@@ -59,16 +59,16 @@ namespace GeoMHDiSCC {
    Transform::SharedFftSetup TFTScheme::spSetup3D(SharedResolution spRes)
    {
       // Get size of FFT transform
-      int size = spRes->cpu()->dim(2)->dimFwd();
+      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the FFT
-      int specSize = spRes->sim()->dim(Dimensions::Space::SPECTRAL,2);
+      int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
       int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(2)->dim3D(); i++)
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
-         howmany += spRes->cpu()->dim(2)->dim2D(i);
+         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));

@@ -126,19 +126,19 @@ namespace Transform {
       } else
       {
          // Create nice looking warning message
-         IoTools::Formatter::printLine(std::cout, '%');
-         std::stringstream oss;
-         if(opt > 2)
-         {
-            oss << "WARNING: ";
-         }
          if(opt > 0)
          {
+            IoTools::Formatter::printLine(std::cout, '%');
+            std::stringstream oss;
+            if(opt > 2)
+            {
+               oss << "WARNING: ";
+            }
             oss << "Extended FFT size (+" << opt << ")!";
+            IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
+            IoTools::Formatter::printLine(std::cout, '%');
+            IoTools::Formatter::printNewline(std::cout);
          }
-         IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
-         IoTools::Formatter::printLine(std::cout, '%');
-         IoTools::Formatter::printNewline(std::cout);
 
          return size + opt;
       }

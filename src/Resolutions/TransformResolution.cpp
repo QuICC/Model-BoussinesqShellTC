@@ -27,45 +27,35 @@ namespace GeoMHDiSCC {
    {
    }
 
-   int TransformResolution::dimFwd(const int j, const int k) const
+   template <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int k) const
    {
-      if(this->dim3D() != 0)
-      {
-         // Check for correct sizes
-         assert(k >= 0);
-         assert(static_cast<size_t>(k) < this->mFwd.size());
+      // Check for correct sizes
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mFwd.size());
 
-         return this->mFwd.at(k).rows();
-      } else
-      {
-         // Check for correct sizes
-         assert(j >= 0);
-         assert(static_cast<size_t>(j) < this->mFwd.size());
-
-         return this->mFwd.at(j).rows();
-      }
+      return this->mFwd.at(k).rows();
    }
 
-   int TransformResolution::dimBwd(const int j, const int k) const
+   template <> int TransformResolution::dim<Dimensions::Data::DATF1D>() const
    {
-      if(this->dim3D() != 0)
-      {
-         // Check for correct sizes
-         assert(k >= 0);
-         assert(static_cast<size_t>(k) < this->mBwd.size());
-
-         return this->mBwd.at(k).rows();
-      } else
-      {
-         // Check for correct sizes
-         assert(j >= 0);
-         assert(static_cast<size_t>(j) < this->mBwd.size());
-
-         return this->mBwd.at(j).rows();
-      }
+      return this->dim<Dimensions::Data::DATF1D>(0);
    }
 
-   int TransformResolution::dim2D(const int k) const
+   template <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int k) const
+   {
+      // Check for correct sizes
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mBwd.size());
+
+      return this->mBwd.at(k).rows();
+   }
+
+   template <> int TransformResolution::dim<Dimensions::Data::DATB1D>() const
+   {
+      return this->dim<Dimensions::Data::DATB1D>(0);
+   }
+
+   template <> int TransformResolution::dim<Dimensions::Data::DAT2D>(const int k) const
    {
       // Check for correct sizes
       assert(k >= 0);
@@ -74,85 +64,115 @@ namespace GeoMHDiSCC {
       return this->mIdx2D.at(k).size();
    }
 
-   int TransformResolution::dim3D() const
+   template <> int TransformResolution::dim<Dimensions::Data::DAT2D>() const
+   {
+      return this->dim<Dimensions::Data::DAT2D>(0);
+   }
+
+   template <> int TransformResolution::dim<Dimensions::Data::DAT3D>() const
    {
       return this->mIdx3D.size();
    }
 
-   Datatypes::SharedScalarFieldSetupType TransformResolution::spFwdSetup() const
+   template <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i, const int k) const
    {
-      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(this->mFwd, this->mIdx2D, this->mIdx3D));
+      // Check for correct sizes
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mFwd.size());
+      assert(i < this->mFwd.at(k).size());
+
+      return this->mFwd.at(k)(i);
    }
 
-   Datatypes::SharedScalarFieldSetupType TransformResolution::spBwdSetup() const
+   template <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i) const
    {
-      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(this->mBwd, this->mIdx2D, this->mIdx3D));
+      return this->idx<Dimensions::Data::DATF1D>(i, 0);
    }
 
-   int TransformResolution::idxFwd(const int i, const int j, const int k) const
+   template <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i, const int k) const
    {
-      if(this->dim3D() != 0)
-      {
-         // Check for correct sizes
-         assert(k >= 0);
-         assert(static_cast<size_t>(k) < this->mFwd.size());
-         assert(i < this->mFwd.at(k).size());
+      // Check for correct sizes
+      assert(k >= 0);
+      assert(static_cast<size_t>(k) < this->mBwd.size());
+      assert(i < this->mBwd.at(k).size());
 
-         return this->mFwd.at(k)(i);
-      } else
-      {
-         // Check for correct sizes
-         assert(j >= 0);
-         assert(static_cast<size_t>(j) < this->mFwd.size());
-         assert(i < this->mFwd.at(j).size());
-
-         return this->mFwd.at(j)(i);
-      }
+      return this->mBwd.at(k)(i);
    }
 
-   int TransformResolution::idxBwd(const int i, const int j, const int k) const
+   template <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i) const
    {
-
-      if(this->dim3D() != 0)
-      {
-         // Check for correct sizes
-         assert(k >= 0);
-         assert(static_cast<size_t>(k) < this->mBwd.size());
-         assert(i < this->mBwd.at(k).size());
-
-         return this->mBwd.at(k)(i);
-      } else
-      {
-         // Check for correct sizes
-         assert(j >= 0);
-         assert(static_cast<size_t>(j) < this->mBwd.size());
-         assert(i < this->mBwd.at(j).size());
-
-         return this->mBwd.at(j)(i);
-      }
+      return this->idx<Dimensions::Data::DATB1D>(i, 0);
    }
 
-   int TransformResolution::idx2D(const int j, const int k) const
+   template <> int TransformResolution::idx<Dimensions::Data::DAT2D>(const int i, const int k) const
    {
       // Check for correct sizes
       assert(k >= 0);
       assert(static_cast<size_t>(k) < this->mIdx2D.size());
-      assert(j < this->mIdx2D.at(k).size());
+      assert(i < this->mIdx2D.at(k).size());
 
-      return this->mIdx2D.at(k)(j);
+      return this->mIdx2D.at(k)(i);
    }
 
-   const ArrayI& TransformResolution::idx3D() const
+   template <> int TransformResolution::idx<Dimensions::Data::DAT2D>(const int i) const
    {
-      return this->mIdx3D;
+      return this->idx<Dimensions::Data::DAT2D>(i, 0);
    }
 
-   int TransformResolution::idx3D(const int k) const
+   template <> int TransformResolution::idx<Dimensions::Data::DAT3D>(const int i) const
    {
       // Check for correct sizes
-      assert(k < this->mIdx3D.size());
+      assert(i < this->mIdx3D.size());
 
-      return this->mIdx3D(k);
+      return this->mIdx3D(i);
+   }
+
+   Datatypes::SharedScalarFieldSetupType TransformResolution::spFwdSetup() const
+   {
+      // Iterator for the vector based storages
+      std::vector<ArrayI>::const_iterator   vIt;
+      
+      // Get forward dimensions
+      SharedArrayI   spDim1D(new ArrayI(this->dim<Dimensions::Data::DAT3D>()));
+      int i = 0;
+      for(vIt = this->mFwd.begin(); vIt != this->mFwd.end(); ++vIt, ++i)
+      {
+         (*spDim1D)(i) = vIt->size();
+      }
+
+      // Get 2D dimensions
+      SharedArrayI   spDim2D(new ArrayI(this->dim<Dimensions::Data::DAT3D>()));
+      i = 0;
+      for(vIt = this->mIdx2D.begin(); vIt != this->mIdx2D.end(); ++vIt, ++i)
+      {
+         (*spDim2D)(i) = vIt->size();
+      }
+
+      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(spDim1D, spDim2D, this->dim<Dimensions::Data::DAT3D>()));
+   }
+
+   Datatypes::SharedScalarFieldSetupType TransformResolution::spBwdSetup() const
+   {
+      // Iterator for the vector based storages
+      std::vector<ArrayI>::const_iterator   vIt;
+      
+      // Get backward dimensions
+      SharedArrayI   spDim1D(new ArrayI(this->dim<Dimensions::Data::DAT3D>()));
+      int i = 0;
+      for(vIt = this->mBwd.begin(); vIt != this->mBwd.end(); ++vIt, ++i)
+      {
+         (*spDim1D)(i) = vIt->size();
+      }
+
+      // Get 2D dimensions
+      SharedArrayI   spDim2D(new ArrayI(this->dim<Dimensions::Data::DAT3D>()));
+      i = 0;
+      for(vIt = this->mIdx2D.begin(); vIt != this->mIdx2D.end(); ++vIt, ++i)
+      {
+         (*spDim2D)(i) = vIt->size();
+      }
+
+      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(spDim1D, spDim2D, this->dim<Dimensions::Data::DAT3D>()));
    }
 
 }

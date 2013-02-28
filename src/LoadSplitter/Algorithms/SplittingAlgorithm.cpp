@@ -181,13 +181,13 @@ namespace Parallel {
             mapPos = fwdMap.begin();
 
             // Loop over second dimension
-            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim2D(); j++)
+            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); j++)
             {
                // Loop over forward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dimFwd(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>(j); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idxFwd(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx2D(j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j));
 
                   // Get insertion position to use as next starting point to speed up insertion
                   mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -198,13 +198,13 @@ namespace Parallel {
             mapPos = bwdMap.begin();
 
             // Loop over second dimension
-            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim2D(); j++)
+            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(); j++)
             {
                // Loop over backward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dimBwd(j); k++)
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATB1D>(j); k++)
                {
                   // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx2D(j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idxBwd(k,j));
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT2D>(j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DATB1D>(k,j));
 
                   // Get insertion position to use as next starting point to speed up insertion
                   mapPos = bwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -273,16 +273,16 @@ namespace Parallel {
                mapPos = fwdMap.begin();
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
                   {
                      // Loop over forward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dimFwd(j,i); k++)
+                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
                      {
                         // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idxFwd(k,j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx2D(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx3D(i));
+                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
 
                         // Get insertion position to use as next starting point to speed up insertion
                         mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
@@ -294,16 +294,16 @@ namespace Parallel {
                mapPos = bwdMap.begin();
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT3D>(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT2D>(i); j++)
                   {
                      // Loop over backward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dimBwd(j,i); k++)
+                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DATB1D>(i); k++)
                      {
                         // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx2D(j, i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx3D(i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idxBwd(k,j,i));
+                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT2D>(j, i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT3D>(i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DATB1D>(k,i));
 
                         // Get insertion position to use as next starting point to speed up insertion
                         mapPos = bwdMap.insert(mapPos,std::make_pair(point, cpu));
@@ -397,7 +397,7 @@ namespace Parallel {
                loads.at(d)[cpu] = 0.0;
 
                // Loop over second dimension
-               for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim2D(); j++)
+               for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(); j++)
                {
                   // Increment load by 1
                   loads.at(d).find(cpu)->second += 1.0;
@@ -421,10 +421,10 @@ namespace Parallel {
                loads.at(d)[cpu] = 0.0;
 
                // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim3D(); i++)
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT3D>(); i++)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim2D(i); j++)
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(i); j++)
                   {
                      // Increment load by 1
                      loads.at(d).find(cpu)->second += 1.0;

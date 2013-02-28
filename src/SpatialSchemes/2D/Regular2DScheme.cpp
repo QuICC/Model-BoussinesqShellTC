@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void Regular2DScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void Regular2DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
       assert(dim < 2);
@@ -92,11 +92,11 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular2DScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
+   int Regular2DScheme::splittableTotal(const  Dimensions::Transform::Id transIdint dim, Splitting::Locations::Id flag)
    {
       if(flag == Splitting::Locations::FIRST)
       {
-         return this->dim2D(dim);
+         return this->dim2D(transId);
       } else if(flag == Splitting::Locations::SECOND)
       {
          // Second splitting not possible in 2D problem

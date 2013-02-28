@@ -178,33 +178,33 @@ namespace Transform {
 
 
    /// Specialised 1D projection for NONE
-   template <> void BackwardConfigurator::project1D<TransformSteps::::Id::Bwd1D::NONE>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::NONE>(TransformCoordinatorType& coord);
 
    /// Specialised 1D projection for SCALAR
-   template <> void BackwardConfigurator::project1D<TransformSteps::::Id::Bwd1D::SCALAR>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::SCALAR>(TransformCoordinatorType& coord);
 
    /// Specialised 1D projection for GRADX
-   template <> void BackwardConfigurator::project1D<TransformSteps::::Id::Bwd1D::GRADX>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::GRADX>(TransformCoordinatorType& coord);
 
 
    /// Specialised 2D projection for NONE
-   template <> void BackwardConfigurator::project2D<TransformSteps::::Id::Bwd2D::NONE>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::NONE>(TransformCoordinatorType& coord);
 
    /// Specialised 2D projection for SCALAR
-   template <> void BackwardConfigurator::project2D<TransformSteps::::Id::Bwd2D::SCALAR>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::SCALAR>(TransformCoordinatorType& coord);
 
    /// Specialised 2D projection for GRADY
-   template <> void BackwardConfigurator::project2D<TransformSteps::::Id::Bwd2D::GRADY>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::GRADY>(TransformCoordinatorType& coord);
 
 
    /// Specialised 3D projection for NONE
-   template <> void BackwardConfigurator::project3D<TransformSteps::::Id::Bwd3D::NONE>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::NONE>(TransformCoordinatorType& coord);
 
    /// Specialised 3D projection for SCALAR
-   template <> void BackwardConfigurator::project3D<TransformSteps::::Id::Bwd3D::SCALAR>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::SCALAR>(TransformCoordinatorType& coord);
 
    /// Specialised 3D projection for GRADZ
-   template <> void BackwardConfigurator::project3D<TransformSteps::::Id::Bwd3D::GRADZ>(TransformCoordinatorType& coord);
+   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::GRADZ>(TransformCoordinatorType& coord);
 
 }
 }
