@@ -1,5 +1,7 @@
 /** \file SingleSplitting.hpp
  *  \brief Implementation of a single load splitting algorithm
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SINGLESPLITTING_HPP

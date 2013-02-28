@@ -1,5 +1,7 @@
 /** \file IAsciiEWriter.hpp
  *  \brief General interface of an "extending" ASCII writer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IASCIIEWRITER_HPP

@@ -36,6 +36,8 @@ namespace GeoMHDiSCC {
 
    void Simulation::init()
    {
+      /// \mhdBug Fake implementation
+
       // Start timer
       this->mExecutionTimer.start();
 
@@ -130,28 +132,34 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo();
    }
 
-   void Simulation::addEquation(int spEq)//SharedIScalarEquation spEq)
+   void Simulation::addEquation(SharedIScalarEquation spEq)
    {
+      /// \mhdBug Fake implementation
    }
 
-   void Simulation::addEquation(double spEq)//SharedIVectorEquation spEq)
+   void Simulation::addEquation(SharedIVectorEquation spEq)
    {
+      /// \mhdBug Fake implementation
    }
 
    void Simulation::setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile)
    {
+      /// \mhdBug Fake implementation
    }
 
    void Simulation::setInitialStateFile(int spInitFile)//SharedStateFile spInitFile)
    {
+      /// \mhdBug Fake implementation
    }
 
    void Simulation::addOutputFile(int spOutFile)//SharedAscii spOutFile)
    {
+      /// \mhdBug Fake implementation
    }
 
    void Simulation::addOutputFile(double spOutFile)//SharedHdf5 spOutFile)
    {
+      /// \mhdBug Fake implementation
    }
 
    void Simulation::preRun()
@@ -177,6 +185,8 @@ namespace GeoMHDiSCC {
 
    void Simulation::computeNonlinear()
    {
+      /// \mhdBug Fake implementation
+      
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
       //this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->transformCoordinator());
@@ -188,6 +198,8 @@ namespace GeoMHDiSCC {
 
    void Simulation::timestepEquations()
    {
+      /// \mhdBug Fake implementation
+      
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
       //this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);

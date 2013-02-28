@@ -14,6 +14,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,7 +32,7 @@ namespace GeoMHDiSCC {
    void Regular2DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
-      assert(dim < 2);
+      assert(transId == Dimensions::Transform::TRA1D || (transId == Dimensions::Transform::TRA2D));
 
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -48,7 +49,7 @@ namespace GeoMHDiSCC {
       idx2D.clear();
 
       int j0 = 0;
-      int jN = this->dim2D(dim);
+      int jN = this->dim2D(transId);
 
       if(flag == Splitting::Locations::FIRST)
       {
@@ -73,35 +74,40 @@ namespace GeoMHDiSCC {
       for(int j = 0; j < idx2D.at(0).size(); j++)
       {
          // Create storage for forward indexes
-         fwd1D.push_back(ArrayI(this->dimFwd(dim)));
+         fwd1D.push_back(ArrayI(this->dimFwd(transId)));
 
          // Fill array with indexes
-         for(int k = 0; k < this->dimFwd(dim); k++)
+         for(int k = 0; k < this->dimFwd(transId); k++)
          {
             fwd1D.at(j)(k) = k;
          }
 
          // Create storage for forward indexes
-         bwd1D.push_back(ArrayI(this->dimBwd(dim)));
+         bwd1D.push_back(ArrayI(this->dimBwd(transId)));
 
          // Fill array with indexes
-         for(int k = 0; k < this->dimBwd(dim); k++)
+         for(int k = 0; k < this->dimBwd(transId); k++)
          {
             bwd1D.at(j)(k) = k;
          }
       }
    }
 
-   int Regular2DScheme::splittableTotal(const  Dimensions::Transform::Id transIdint dim, Splitting::Locations::Id flag)
+   int Regular2DScheme::splittableTotal(const  Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       if(flag == Splitting::Locations::FIRST)
       {
          return this->dim2D(transId);
-      } else if(flag == Splitting::Locations::SECOND)
-      {
-         // Second splitting not possible in 2D problem
-         assert(false);
       }
+      
+      // If condition has not been mached
+
+      // Second splitting not possible in 2D problem
+      assert(false);
+
+      throw Exception("Can't split in any other dimension than first dimension in 2D regular case");
+
+      return -1;
    }
 
 }

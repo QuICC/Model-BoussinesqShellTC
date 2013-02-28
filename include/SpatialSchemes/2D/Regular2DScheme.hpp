@@ -1,5 +1,7 @@
 /** \file Regular2DScheme.hpp
  *  \brief Implementation of a generic regular 2D scheme
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef REGULAR2DSCHEME_HPP
@@ -49,7 +51,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Create indexes for a possibly restricted set
           *
-          * @param dim     Dimension for which to compute indexes
+          * @param transId Transform ID
           * @param fwd1D   Storage for forward indexes of first dimension
           * @param bwd1D   Storage for backward indexes of first dimension
           * @param idx2D   Storage for the indexes of second dimension
@@ -60,15 +62,15 @@ namespace GeoMHDiSCC {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE);
+         virtual void fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE);
 
          /**
           * @brief Get total of splittable indexes 
           *
-          * @param dim     Dimension for which to compute indexes
+          * @param transId Transform ID
           * @param flag    Flag to specify location of splitting
           */
-         virtual int splittableTotal(const int dim, Splitting::Locations::Id flag);
+         virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag);
          
       protected:
          /**

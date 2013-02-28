@@ -1,5 +1,7 @@
 /** \file DirectAsciiWriter.hpp
  *  \brief Implementation of a direct access ASCII writer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef DIRECTASCIIWRITER_HPP

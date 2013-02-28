@@ -1,5 +1,7 @@
 /** \file TransformSteps.hpp
  *  \brief Definition of some useful enums for steps involved in a full transform
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef TRANSFORMSTEPS_HPP

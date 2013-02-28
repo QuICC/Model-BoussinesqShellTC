@@ -44,9 +44,11 @@ namespace GeoMHDiSCC {
 
       std::multimap<int,int> modes;
 
-      int i0, iN;
+      int i0 = -1;
+      int iN = -1;
       ArrayI j0, jN;
-      int c0, cN;
+      int c0 = -1;
+      int cN = -1;
 
       // No splitting
       if(flag == Splitting::Locations::NONE)
@@ -319,15 +321,22 @@ namespace GeoMHDiSCC {
             return this->dim3D(transId);
 
          // Get total size for second transform
-         } else if(transId == Dimensions::Transform::TRA1D)
+         } else if(transId == Dimensions::Transform::TRA2D)
          {
             return this->dim3D(transId);
 
          // Get total size for third transform
-         } else if(transId == Dimensions::Transform::TRA1D)
+         } else if(transId == Dimensions::Transform::TRA3D)
          {
             return this->dim2D(transId);
          }
       }
+      
+      // If none of the previous conditions were right
+      assert(false);
+
+      throw Exception("Tried to split in a unknown dimension for 3D regular case");
+
+      return -1;
    }
 }

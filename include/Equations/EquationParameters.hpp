@@ -1,5 +1,7 @@
 /** \file EquationParameters.hpp
  *  \brief Definition of the non-dimensional parameters
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef EQUATIONPARAMETERS_HPP

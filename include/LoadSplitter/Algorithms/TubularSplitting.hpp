@@ -1,5 +1,7 @@
 /** \file TubularSplitting.hpp
  *  \brief Implementation of a double load splitting algorithm, aka "Tubular" splitting
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef TUBULARSPLITTING_HPP

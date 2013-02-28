@@ -1,5 +1,7 @@
 /** \file FftSetup.hpp
  *  \brief Implementation of the FFT setup class
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FFTSETUP_HPP

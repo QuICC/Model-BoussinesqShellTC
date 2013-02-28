@@ -1,5 +1,7 @@
 /** \file BackwardSerialConfigurator.hpp
  *  \brief This defines the backward transform serial operations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BACKWARDSERIALCONFIGURATOR_HPP

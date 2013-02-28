@@ -1,5 +1,7 @@
 /** \file ScalarSelector.hpp
  *  \brief Small template to select the right scalar field types
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SCALARSELECTOR_HPP

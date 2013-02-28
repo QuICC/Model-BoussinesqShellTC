@@ -1,5 +1,7 @@
 /** \file DirectBinaryWriter.hpp
  *  \brief Implementation of a direct access binary writer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef DIRECTBINARYWRITER_HPP

@@ -1,5 +1,7 @@
 /** \file BackwardSingle1DGrouper.hpp
  *  \brief This class defines the backward single grouping exchange grouping algorithm for the first exchange
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BACKWARDSINGLE1DGROUPER_HPP

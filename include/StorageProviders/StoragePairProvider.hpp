@@ -1,5 +1,7 @@
 /** \file StoragePairProvider.hpp
  *  \brief Templated implementation of a data pair storage provider.
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef STORAGEPAIRPROVIDER_HPP

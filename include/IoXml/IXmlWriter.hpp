@@ -1,5 +1,7 @@
 /** \file IXmlWriter.hpp
  *  \brief Implementation of an XML writer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IXMLWRITER_HPP

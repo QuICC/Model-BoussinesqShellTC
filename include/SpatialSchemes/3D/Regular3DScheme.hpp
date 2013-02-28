@@ -1,5 +1,7 @@
 /** \file Regular3DScheme.hpp
  *  \brief Implementation of a generic regular 3D scheme
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef REGULAR3DSCHEME_HPP

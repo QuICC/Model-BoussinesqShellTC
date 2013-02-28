@@ -35,7 +35,7 @@ namespace GeoMHDiSCC {
 
       if(ImExRK3::rhsNN(step) == 0.0)
       {
-         for(int i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = 0; i < this->mRHSData.size(); i++)
          {
             this->mRHSOld.at(i).first = this->mRHSData.at(i).first;
             this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first;
@@ -45,7 +45,7 @@ namespace GeoMHDiSCC {
          }
       } else
       {
-         for(int i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = 0; i < this->mRHSData.size(); i++)
          {
             tmp = this->mRHSData.at(i).first;
             this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).first;
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
    {
       int start = step*this->nSystem();
 
-      for(int i = 0; i < this->mRHSData.size(); i++)
+      for(size_t i = 0; i < this->mRHSData.size(); i++)
       {
          // Solve for the real component
          this->mSolution.at(i).first = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).first);
@@ -75,14 +75,14 @@ namespace GeoMHDiSCC {
    void EquationDTimestepper::initSolver()
    {
       this->mSolver.reserve(this->mLHSMatrix.size());
-      for(int i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          SharedPtrMacro<Eigen::SuperLU<SparseMatrix> >  solver(new Eigen::SuperLU<SparseMatrix>());
 
          this->mSolver.push_back(solver);
       }
 
-      for(int i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
       }

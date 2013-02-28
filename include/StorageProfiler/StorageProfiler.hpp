@@ -2,6 +2,8 @@
  *  \brief Implementation of a storage profiler
  *
  *  \mhdTodo Cleanup the StorageProfiler class similarly to the Profiler class
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef STORAGEPROFILER_HPP

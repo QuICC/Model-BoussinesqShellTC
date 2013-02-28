@@ -1,5 +1,7 @@
 /** \file VariableSelector.hpp
  *  \brief Definition of some useful typedefs for the variables used in the code
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VARIABLESELECTOR_HPP

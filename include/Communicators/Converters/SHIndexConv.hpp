@@ -1,5 +1,7 @@
 /** \file SHIndexConv.hpp
  *  \brief Implementation of the index converter for spherical harmonics
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SHINDEXCONV_HPP

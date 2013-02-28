@@ -1,5 +1,7 @@
 /** \file VectorField.hpp
  *  \brief Implementation of a generic vector field
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VECTORFIELD_HPP

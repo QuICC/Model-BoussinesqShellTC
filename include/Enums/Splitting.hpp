@@ -1,5 +1,7 @@
 /** \file Splitting.hpp
  *  \brief Definition of some useful enums for splitting algorithms
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SPLITTING_HPP

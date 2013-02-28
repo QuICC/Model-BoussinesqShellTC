@@ -1,5 +1,7 @@
 /** \file VariableDomain.hpp
  *  \brief Implementation of the variable's domain
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VARIABLEDOMAIN_HPP

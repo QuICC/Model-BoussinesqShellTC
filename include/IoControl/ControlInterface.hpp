@@ -1,5 +1,7 @@
 /** \file ControlInterface.hpp
  *  \brief Implementation of a external runtime control file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef CONTROLINTERACE_HPP

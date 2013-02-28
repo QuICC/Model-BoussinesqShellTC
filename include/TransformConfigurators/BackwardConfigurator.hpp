@@ -1,5 +1,7 @@
 /** \file BackwardConfigurator.hpp
  *  \brief This class defines the base operations for a backward transform
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BACKWARDCONFIGURATOR_HPP

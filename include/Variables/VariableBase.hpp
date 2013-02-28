@@ -1,5 +1,7 @@
 /** \file VariableBase.hpp
  *  \brief Base of the implementation of the variables
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VARIABLEBASE_HPP

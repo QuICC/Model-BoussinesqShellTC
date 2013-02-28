@@ -1,5 +1,7 @@
 /** \file MpTypedefs.hpp
  *  \brief Definition of some useful typedefs used in the whole project
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef MPTYPEDEFS_HPP

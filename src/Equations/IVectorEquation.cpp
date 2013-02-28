@@ -28,4 +28,30 @@ namespace GeoMHDiSCC {
    IVectorEquation::~IVectorEquation()
    {
    }
+
+   void IVectorEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
+   {
+      /// \mhdBug Fake implementation
+      
+      this->mspUnknown = spUnknown;
+   }
+
+   const Datatypes::VectorVariableType& IVectorEquation::unknown() const
+   {
+      /// \mhdBug Fake implementation
+      
+      return *this->mspUnknown;
+   }
+
+   Datatypes::VectorVariableType& IVectorEquation::rUnknown()
+   {
+      /// \mhdBug Fake implementation
+      
+      return *this->mspUnknown;
+   }
+
+   void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id)
+   {
+      /// \mhdBug Fake implementation
+   }
 }

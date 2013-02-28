@@ -1,5 +1,7 @@
 /** \file BoundaryPart.hpp 
  *  \brief Implementation of the boundary part of the configuration file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BOUNDARYPART_HPP

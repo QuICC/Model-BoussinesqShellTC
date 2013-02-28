@@ -36,12 +36,12 @@ namespace Parallel {
       bool status = true;
 
       // Check that all three dimensions are splittable by factors
-      status = (status && (this->mspScheme->splittableTotal(0, Splitting::Locations::SECOND) >= this->factor(1)));
-      status = (status && (this->mspScheme->splittableTotal(0, Splitting::Locations::BOTH) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(1, Splitting::Locations::BOTH) >= this->factor(1)));
-      status = (status && (this->mspScheme->splittableTotal(1, Splitting::Locations::FIRST) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(2, Splitting::Locations::FIRST) >= this->factor(0)));
-      status = (status && (this->mspScheme->splittableTotal(2, Splitting::Locations::BOTH) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA1D, Splitting::Locations::SECOND) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA1D, Splitting::Locations::BOTH) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA2D, Splitting::Locations::BOTH) >= this->factor(1)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA2D, Splitting::Locations::FIRST) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA3D, Splitting::Locations::FIRST) >= this->factor(0)));
+      status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA3D, Splitting::Locations::BOTH) >= this->factor(1)));
 
       // Check for scheme specific conditions
       if(status)
@@ -65,8 +65,8 @@ namespace Parallel {
 
       // Create arrays for the IDs
       ArrayI ids(2);
-      ids(0) = SplittingTools::groupId(0, cpuId);
-      ids(1) = SplittingTools::groupId(1, cpuId);
+      ids(0) = SplittingTools::groupId(this->factors(), 0, cpuId);
+      ids(1) = SplittingTools::groupId(this->factors(), 1, cpuId);
 
       // Create start indexes and length
       ArrayI n0;

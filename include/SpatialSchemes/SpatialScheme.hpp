@@ -1,5 +1,7 @@
 /** \file SpatialScheme.hpp
  *  \brief Implementation of the basic components of the spatial scheme
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SPATIALSCHEME_HPP

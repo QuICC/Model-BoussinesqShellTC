@@ -1,5 +1,7 @@
 /** \file BackwardSingle1DConfigurator.hpp
  *  \brief This defines the backward transform first exchange single splitting operations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BACKWARDSINGLE1DCONFIGURATOR_HPP

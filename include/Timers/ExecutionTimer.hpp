@@ -1,5 +1,7 @@
 /** \file ExecutionTimer.hpp
  *  \brief Implementation of an execution timer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef EXECUTIONTIMER_HPP

@@ -1,5 +1,7 @@
 /** \file ScalarFieldSetup.hpp
  *  \brief Single configuration class for the different scalar fields
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SCALARFIELDSETUP_HPP

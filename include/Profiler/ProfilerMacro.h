@@ -1,5 +1,7 @@
 /** \file ProfilerMacro.h
  *  \brief Preprocessor macros to setup profiling timers if requested in configuration
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef PROFILERMACRO_H

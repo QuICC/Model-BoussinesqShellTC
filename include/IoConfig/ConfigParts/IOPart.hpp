@@ -1,5 +1,7 @@
 /** \file IOPart.hpp 
  *  \brief Implementation of the IO part of the configuration file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IOPART_HPP

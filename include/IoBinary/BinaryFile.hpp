@@ -1,5 +1,7 @@
 /** \file BinaryFile.hpp
  *  \brief Implementation of a general binary file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BINARYFILE_HPP

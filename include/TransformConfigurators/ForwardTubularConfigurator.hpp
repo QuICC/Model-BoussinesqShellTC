@@ -1,5 +1,7 @@
 /** \file ForwardTubularConfigurator.hpp
-    \brief This class defines the forward transform tubular splitting operations
+ *  \brief This class defines the forward transform tubular splitting operations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FORWARDTUBULARCONFIGURATOR_HPP

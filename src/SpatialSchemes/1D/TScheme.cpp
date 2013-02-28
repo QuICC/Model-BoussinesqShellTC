@@ -23,15 +23,15 @@ namespace GeoMHDiSCC {
    Transform::SharedFftSetup TScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
-      int size = spRes->cpu()->dim(0)->dimFwd();
+      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
       // Get spectral size of the FFT
-      int specSize = spRes->sim()->dim(Dimensions::Space::SPECTRAL,0);
+      int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
       int howmany = 0;
-      for(int i = 0; i < spRes->cpu()->dim(0)->dim3D(); i++)
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
-         howmany += spRes->cpu()->dim(0)->dim2D(i);
+         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
@@ -109,10 +109,10 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 
-   void TScheme::fillIndexes(const int dim, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void TScheme::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
-      // Assert for dimension
-      assert(dim < 1);
+      // Assert for right transform (1D case)
+      assert(transId == Dimensions::Transform::TRA1D);
 
       // Safety assertions for default values
       assert( bins.size() == n0.size() );
@@ -130,7 +130,7 @@ namespace GeoMHDiSCC {
       bwd1D.clear();
 
       // Create single forward storage for indexes
-      fwd1D.push_back(ArrayI(this->dimFwd(dim)));
+      fwd1D.push_back(ArrayI(this->dimFwd(transId)));
 
       // Fill array with indexes
       for(int i = 0; i < fwd1D.at(0).size(); i++)
@@ -139,7 +139,7 @@ namespace GeoMHDiSCC {
       }
 
       // Create single backward storage for indexes
-      bwd1D.push_back(ArrayI(this->dimBwd(dim)));
+      bwd1D.push_back(ArrayI(this->dimBwd(transId)));
 
       // Fill array with indexes
       for(int i = 0; i < bwd1D.at(0).size(); i++)
@@ -148,7 +148,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int TScheme::splittableTotal(const int dim, Splitting::Locations::Id flag)
+   int TScheme::splittableTotal(Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       throw Exception("There is no splitting algorithm for 1D problems!");
    }

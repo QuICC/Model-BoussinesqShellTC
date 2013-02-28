@@ -2,6 +2,8 @@
  *  \brief Implementation of a few useful tools to output resolution and load splitting
  *
  *  \mhdBug Implementation needs to be checked
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VISUALIZERESOLUTION_HPP

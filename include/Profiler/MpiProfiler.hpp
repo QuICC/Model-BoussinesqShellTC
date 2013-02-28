@@ -1,5 +1,7 @@
 /** \file MpiProfiler.hpp
  *  \brief Implementation of a MPI profiling timer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef MPIPROFILER_HPP

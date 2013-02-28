@@ -1,5 +1,7 @@
 /** \file SharedPtrMacro.h
  *  \brief Preprocessor macros used to setup the shared pointer implementation depending on CMake setup.
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SHAREDPTRMACRO_H

@@ -197,13 +197,13 @@ namespace GeoMHDiSCC {
       }
 
       // Initialise solvers from equation steppers
-      for(int i = 0; i < this->mEqZStepper.size(); i++)
+      for(size_t i = 0; i < this->mEqZStepper.size(); i++)
       {
          this->mEqZStepper.at(i).initSolver();
       }
 
       // Initialise solvers from real equation steppers
-      for(int i = 0; i < this->mEqDStepper.size(); i++)
+      for(size_t i = 0; i < this->mEqDStepper.size(); i++)
       {
          this->mEqDStepper.at(i).initSolver();
       }

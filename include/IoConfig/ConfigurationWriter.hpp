@@ -1,5 +1,7 @@
 /** \file ConfigurationWriter.hpp 
  *  \brief Implementation of the XML configuration file writer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef CONFIGURATIONWRITER_HPP

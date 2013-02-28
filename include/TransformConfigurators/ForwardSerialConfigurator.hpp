@@ -1,5 +1,7 @@
 /** \file ForwardSerialConfigurator.hpp
  *  \brief This class defines the forward transform serial operations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FORWARDSERIALCONFIGURATOR_HPP

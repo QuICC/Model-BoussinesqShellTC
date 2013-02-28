@@ -1,5 +1,8 @@
 /** \file SlicedScalarField.hpp
  *  \brief Base for a  scalar field with sliced data layout
+ *
+ *  \mhdBug Needs corrected implementation
+ *  \mhdBug Needs test
  */
 
 #ifndef SLICEDSCALARFIELD_HPP

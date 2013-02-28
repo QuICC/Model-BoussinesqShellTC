@@ -1,5 +1,7 @@
 /** \file StorageProvider.hpp
  *  \brief Templated implementation of a single data storage provider.
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef STORAGEPROVIDER_HPP

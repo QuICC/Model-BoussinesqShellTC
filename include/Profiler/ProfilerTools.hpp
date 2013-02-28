@@ -1,5 +1,7 @@
 /** \file ProfilerTools.hpp
  *  \brief Implementation of some tools for the profiling timer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef PROFILERTOOLS_HPP

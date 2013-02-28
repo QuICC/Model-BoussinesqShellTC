@@ -1,5 +1,7 @@
 /** \file Variable.hpp
  *  \brief Implementation of a generic simulation variable
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VARIABLE_HPP

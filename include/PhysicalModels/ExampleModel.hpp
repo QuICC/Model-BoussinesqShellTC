@@ -22,6 +22,9 @@ namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of an example physical model
+    *
+    *  \mhdBug Needs implementation
+    *  \mhdBug Needs test
     */
    class ExampleModel
    {

@@ -1,5 +1,7 @@
 /** \file FieldComponents.hpp
  *  \brief Definition of some useful enums used to access scalar fields and vector field components
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FIELDCOMPONENTS_HPP

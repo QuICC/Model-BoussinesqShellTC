@@ -1,5 +1,7 @@
 /** \file IHdf5Reader.hpp
  *  \brief Interface to a general HDF5 file reader
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IHDF5READER_HPP

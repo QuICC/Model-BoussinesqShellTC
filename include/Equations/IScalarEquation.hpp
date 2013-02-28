@@ -1,5 +1,7 @@
 /** \file IScalarEquation.hpp
  *  \brief Base for the implementation of a scalar equation
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef ISCALAREQUATION_HPP
@@ -144,32 +146,12 @@ namespace GeoMHDiSCC {
           */
          virtual void applyQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
+      private:
          /**
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedScalarVariableType mspUnknown;
-
-      private:
    };
-
-   inline void IScalarEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
-   {
-      this->mspUnknown = spUnknown;
-   }
-
-   inline const Datatypes::ScalarVariableType& IScalarEquation::unknown() const
-   {
-      return *this->mspUnknown;
-   }
-
-   inline Datatypes::ScalarVariableType& IScalarEquation::rUnknown()
-   {
-      return *this->mspUnknown;
-   }
-
-   inline void IScalarEquation::computeLinear(Datatypes::SpectralScalarType& rRHS)
-   {
-   }
 
    /// Typedef for a shared IScalarEquation
    typedef SharedPtrMacro<IScalarEquation> SharedIScalarEquation;

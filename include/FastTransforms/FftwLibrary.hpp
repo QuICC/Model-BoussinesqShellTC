@@ -1,5 +1,7 @@
 /** \file FftwLibrary.hpp
  *  \brief Static interface to the global features of the FFTW library 
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FFTWLIBRARY_HPP

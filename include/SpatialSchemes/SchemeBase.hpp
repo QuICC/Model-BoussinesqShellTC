@@ -1,5 +1,7 @@
 /** \file SchemeBase.hpp
  *  \brief Base implementation of a cost based spatial schemes
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SCHEMEBASE_HPP

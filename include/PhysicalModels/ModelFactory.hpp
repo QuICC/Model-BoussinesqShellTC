@@ -1,5 +1,7 @@
 /** \file ModelFactory.hpp
  *  \brief Implementation of an example physical model
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef MODELFACTORY_HPP

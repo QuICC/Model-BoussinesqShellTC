@@ -1,5 +1,7 @@
 /** \file ChebyshevFftwTransform.hpp
  *  \brief Implementation of the FFTW transform for a Chebyshev expansion
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef CHEBYSHEVFFTWTRANSFORM_HPP

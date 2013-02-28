@@ -1,5 +1,7 @@
 /** \file ConfigurationReader.hpp 
  *  \brief Implementation of the XML configuration file reader
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef CONFIGURATIONREADER_HPP

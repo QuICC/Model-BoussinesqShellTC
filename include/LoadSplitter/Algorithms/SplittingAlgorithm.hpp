@@ -1,5 +1,7 @@
 /** \file SplittingAlgorithm.hpp
  *  \brief Base of the implementation of the load splitting algorithms
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SPLITTINGALGORITHM_HPP

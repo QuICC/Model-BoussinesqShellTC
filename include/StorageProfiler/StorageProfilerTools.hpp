@@ -1,5 +1,7 @@
 /** \file StorageProfilerTools.hpp
  *  \brief Implementation of some tools for the storage profiler
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef STORAGEPROFILERTOOLS_HPP

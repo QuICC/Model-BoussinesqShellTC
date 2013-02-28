@@ -1,5 +1,7 @@
 /** \file IConverter.hpp
  *  \brief Implementation of the interface for a data converter.
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef ICONVERTER_HPP

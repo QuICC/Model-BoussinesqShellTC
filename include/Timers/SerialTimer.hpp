@@ -1,5 +1,7 @@
 /** \file SerialTimer.hpp
  *  \brief Implementation of a serial timer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SERIALTIMER_HPP

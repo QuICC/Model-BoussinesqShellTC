@@ -1,5 +1,7 @@
 /** \file TransformResolution.hpp
  *  \brief Definition of the required resolution information for a transform
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef TRANSFORMRESOLUTION_HPP

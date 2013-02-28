@@ -1,5 +1,7 @@
 /** \file ForwardSingle2DConfigurator.hpp
-    \brief This class defines the forward transform single second exchange splitting operations
+ *  \brief This class defines the forward transform single second exchange splitting operations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FORWARDSINGLE2DCONFIGURATOR_HPP

@@ -1,5 +1,7 @@
 /** \file ForwardEquationGrouper.hpp
  *  \brief This class defines a simple equation wise forward transform grouping algorithm (serial algorithm)
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef FORWARDEQUATIONGROUPER_HPP

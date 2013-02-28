@@ -1,5 +1,7 @@
 /** \file MpiFramework.hpp
  *  \brief Implementation of the MPI framework
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef MPIFRAMEWORK_HPP

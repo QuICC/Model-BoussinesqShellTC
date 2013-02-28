@@ -1,5 +1,7 @@
 /** \file TimerMacro.h
  *  \brief Preprocessor macros to setup timers depending on parallelisation options
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef TIMERMACRO_H

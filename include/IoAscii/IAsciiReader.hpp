@@ -1,5 +1,7 @@
 /** \file IAsciiReader.hpp
  *  \brief Interface to an ASCII file reader
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IASCIIREADER_HPP

@@ -1,5 +1,7 @@
 /** \file SerialProfiler.hpp
  *  \brief Implementation of a serial profiling timer
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SERIALPROFILER_HPP

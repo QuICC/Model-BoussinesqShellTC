@@ -1,5 +1,7 @@
 /** \file Hdf5File.hpp
  *  \brief Implementation of a general HDF5 file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef HDF5FILE_HPP

@@ -1,5 +1,7 @@
 /** \file BoundaryConditions.hpp
  *  \brief Implementation of the spectral boundary conditions
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BOUNDARYCONDITIONS_HPP

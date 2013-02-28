@@ -40,14 +40,14 @@ namespace GeoMHDiSCC {
 
       if(ImExRK3::rhsNN(step) == 0.0)
       {
-         for(int i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = 0; i < this->mRHSData.size(); i++)
          {
             this->mRHSOld.at(i) = this->mRHSData.at(i);
             this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i);
          }
       } else
       {
-         for(int i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = 0; i < this->mRHSData.size(); i++)
          {
             tmp = this->mRHSData.at(i);
             this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i) + ImExRK3::rhsNN(step)*this->mRHSOld.at(i);
@@ -63,7 +63,7 @@ namespace GeoMHDiSCC {
       // Set m = 0 mode to zero
       this->mSolution.at(0).setZero();
 
-      for(int i = 1; i < this->mRHSData.size(); i++)
+      for(size_t i = 1; i < this->mRHSData.size(); i++)
       {
          this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
       }
@@ -72,14 +72,14 @@ namespace GeoMHDiSCC {
    void EquationZTimestepper::initSolver()
    {
       this->mSolver.reserve(this->mLHSMatrix.size());
-      for(int i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          SharedPtrMacro<Eigen::SuperLU<SparseMatrixZ> >  solver(new Eigen::SuperLU<SparseMatrixZ>());
 
          this->mSolver.push_back(solver);
       }
 
-      for(int i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          if(i % this->nSystem() != 0)
          {

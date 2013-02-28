@@ -1,5 +1,7 @@
 /** \file CoreResolution.hpp
  *  \brief Definition of a resolution object for a single CPU
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef CORERESOLUTION_HPP

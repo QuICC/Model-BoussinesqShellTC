@@ -1,5 +1,7 @@
 /** \file Simulation.hpp
  *  \brief High level implementation of a simulation
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SIMULATION_HPP
@@ -20,6 +22,8 @@
 #include "Timers/ExecutionTimer.hpp"
 #include "Simulation/SimulationRunControl.hpp"
 #include "Simulation/SimulationIoControl.hpp"
+#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 #include "Timesteppers/Timestepper.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 
@@ -65,23 +69,19 @@ namespace GeoMHDiSCC {
           *
           * \mhdBug Fake implementation
           */
-         void addEquation(int spEq);//SharedIScalarEquation  spEq);
+         void addEquation(SharedIScalarEquation  spEq);
 
          /**
           * @brief Add vector equation to solver
           *
           * @param spEq Shared vector equation
-          *
-          * \mhdBug Fake implementation
           */
-         void addEquation(double spEq);//SharedIVectorEquation  spEq);
+         void addEquation(SharedIVectorEquation  spEq);
 
          /**
           * @brief Set the simulation configuration file
           *
           * @param spCfgFile Shared configuration file
-          *
-          * \mhdBug Fake implementation
           */
          void setConfigurationFile(IoConfig::SharedConfigurationReader spCfgFile);
 
@@ -90,7 +90,7 @@ namespace GeoMHDiSCC {
           *
           * @param spInitFile Shared initial state file
           *
-          * \mhdBug Fake implementation
+          * \mhdBug Fake declaration
           */
          void setInitialStateFile(int spInitFile);//Shared spInitFile);
 
@@ -99,7 +99,7 @@ namespace GeoMHDiSCC {
           *
           * @param spOutFile Shared ASCII output file
           *
-          * \mhdBug Fake implementation
+          * \mhdBug Fake declaration
           */
          void addOutputFile(int spOutFile);//SharedAscii spOutFile);
 
@@ -108,7 +108,7 @@ namespace GeoMHDiSCC {
           *
           * @param spOutFile Shared HDF5 output file
           *
-          * \mhdBug Fake implementation
+          * \mhdBug Fake declaration
           */
          void addOutputFile(double spOutFile);//SharedHdf5 spOutFile);
 

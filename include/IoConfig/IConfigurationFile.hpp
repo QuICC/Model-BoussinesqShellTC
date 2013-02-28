@@ -1,5 +1,7 @@
 /** \file IConfigurationFile.hpp 
  *  \brief Implementation of the base for a configuration file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef ICONFIGURATIONFILE_HPP

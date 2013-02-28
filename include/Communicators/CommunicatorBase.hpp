@@ -1,5 +1,7 @@
 /** \file CommunicatorBase.hpp
  *  \brief Implementation of a communicator base
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef COMMUNICATORBASE_HPP

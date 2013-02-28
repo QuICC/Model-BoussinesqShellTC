@@ -1,5 +1,7 @@
 /** \file Communicator3D.hpp
  *  \brief Implementation of a 3D communicator
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef COMMUNICATOR3D_HPP

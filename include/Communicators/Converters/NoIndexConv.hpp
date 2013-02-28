@@ -1,5 +1,7 @@
 /** \file NoIndexConv.hpp
  *  \brief Implementation of the index converter doing nothing
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef NOINDEXCONV_HPP

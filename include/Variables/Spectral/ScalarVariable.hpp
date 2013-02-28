@@ -1,5 +1,7 @@
 /** \file ScalarVariable.hpp
  *  \brief Implementation of scalar field variable
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SCALARVARIABLE_HPP

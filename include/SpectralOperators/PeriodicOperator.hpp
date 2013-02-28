@@ -1,5 +1,7 @@
 /** \file PeriodicOperator.hpp
  *  \brief Implementation of the multidimensional periodic operators
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef PERIODICOPERATOR_HPP

@@ -1,5 +1,7 @@
 /** \file IHdf5NWriter.hpp
  *  \brief Interface to a numbering HDF5 file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IHDF5NWRITER_HPP

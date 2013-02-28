@@ -1,5 +1,7 @@
 /** \file IndexConverterSelector.hpp
  *  \brief Preprocessor macros to setup the index converters
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef INDEXCONVERTERSELCTOR_HPP

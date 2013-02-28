@@ -1,5 +1,7 @@
 /** \file BackwardGrouperBase.hpp
  *  \brief This class defines some basic forward transform grouping tools
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef BACKWARDGROUPERBASE_HPP

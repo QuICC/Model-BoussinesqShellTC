@@ -1,5 +1,7 @@
 /** \file ScalarPhysicalVariable.hpp
  *  \brief Base of the implementation of the physical components of a scalar variable
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef SCALARPHYSICALVARIABLE_HPP

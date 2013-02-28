@@ -1,5 +1,7 @@
 /** \file IVectorEquation.hpp
  *  \brief Base for the implementation of a vector equation
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef IVECTOREQUATION_HPP
@@ -88,32 +90,13 @@ namespace GeoMHDiSCC {
          virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id) = 0;
 
       protected:
+
+      private:
          /**
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedVectorVariableType mspUnknown;
-
-      private:
    };
-
-   inline void IVectorEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
-   {
-      this->mspUnknown = spUnknown;
-   }
-
-   inline const Datatypes::VectorVariableType& IVectorEquation::unknown() const
-   {
-      return *this->mspUnknown;
-   }
-
-   inline Datatypes::VectorVariableType& IVectorEquation::rUnknown()
-   {
-      return *this->mspUnknown;
-   }
-
-   inline void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id)
-   {
-   }
 
    /// Typedef for a shared IVectorEquation
    typedef SharedPtrMacro<IVectorEquation> SharedIVectorEquation;

@@ -55,7 +55,7 @@ namespace Parallel {
          int tot;
          for(int i = 0; i < this->dims(); i++)
          {
-            tot = this->mspScheme->splittableTotal(i, this->mSplit);
+            tot = this->mspScheme->splittableTotal(static_cast<Dimensions::Transform::Id>(i), this->mSplit);
 
             status = (status && (tot >= this->factor(0)));
          }
@@ -70,7 +70,7 @@ namespace Parallel {
       return status;
    }
 
-   SharedTransformResolution  SingleSplitting::splitDimension(const int dim, const int idconst Dimensions::Transform::Id transId, const int cpuId)
+   SharedTransformResolution  SingleSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
    {
       // Get size of the splittable dimension(s)
       int tot = this->mspScheme->splittableTotal(transId, this->mSplit);

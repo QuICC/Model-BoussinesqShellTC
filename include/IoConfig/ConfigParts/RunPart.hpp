@@ -1,5 +1,7 @@
 /** \file RunPart.hpp 
  *  \brief Implementation of the run part of the configuration file
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef RUNPART_HPP

@@ -1,5 +1,7 @@
 /** \file CouplingInformation.hpp
  *  \brief Implemenation of container the coupling information of the equations
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef COUPLINGINFORMATION_HPP

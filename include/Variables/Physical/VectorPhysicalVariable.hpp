@@ -1,5 +1,7 @@
 /** \file VectorPhysicalVariable.hpp
  *  \brief Base of the implementation of the physical components of a vector variable
+ *
+ *  \mhdBug Needs test
  */
 
 #ifndef VECTORPHYSICALVARIABLE_HPP
