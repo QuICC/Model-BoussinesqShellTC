@@ -22,15 +22,15 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
    }
 
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
    }
 
-   void ForwardConfigurator::nonlinearTerm(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::nonlinearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::NONLINEAR);
@@ -48,7 +48,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator::linearTerm(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::linearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::LINEAR);
@@ -66,7 +66,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::LINEAR);
    }
 
-   void ForwardConfigurator::prepareTimestep(SharedScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::prepareTimestep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);

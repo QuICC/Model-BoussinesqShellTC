@@ -50,7 +50,7 @@ namespace Transform {
           * @param vectEqs Vector of vector equations
           * @param coord   Transform coord
           */
-         virtual void transform(std::vector<SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord);
+         virtual void transform(std::vector<SharedIScalarEquation>& scalEqs, std::vector<SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord);
 
          /**
           * @brief Get the number of required buffer packs for the first exchange
@@ -90,7 +90,7 @@ namespace Transform {
    {
    }
 
-   template <typename TConfigurator> inline void ForwardTransformGrouper<TConfigurator>::transform(std::vector<SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord)
+   template <typename TConfigurator> inline void ForwardTransformGrouper<TConfigurator>::transform(std::vector<SharedIScalarEquation>& scalEqs, std::vector<SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
    {
       //
       // Compute nonlinear interaction
@@ -105,7 +105,7 @@ namespace Transform {
       //
 
       // First treat the scalar equations
-      std::vector<SharedScalarEquation>::iterator scalEqIt;
+      std::vector<SharedIScalarEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
          // Compute first step of transform for scalar equation
@@ -113,7 +113,7 @@ namespace Transform {
       }
 
       // ... then the vector equations
-      std::vector<SharedVectorEquation>::iterator vectEqIt;
+      std::vector<SharedIVectorEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
          // Compute first step of transform for vector equation

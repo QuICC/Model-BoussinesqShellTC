@@ -62,19 +62,19 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.rData() = c*(v.comp(0).data().array()*w.comp(0).data().array()).matrix();
+         rS.setData(c*(v.comp(0).data().array()*w.comp(0).data().array()).matrix());
 
          for(int i = 1; i < COMPONENTS; i++)
          {
-            rS.rData() += c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.addData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       } else
       {
-         rS.rData() = (v.comp(0).data().array()*w.comp(0).data().array()).matrix();
+         rS.setData((v.comp(0).data().array()*w.comp(0).data().array()).matrix());
 
          for(int i = 1; i < COMPONENTS; i++)
          {
-            rS.rData() += (v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.addData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       }
    }
@@ -85,13 +85,13 @@ namespace Physical {
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.rData() += c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.addData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       } else
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.rData() += (v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.addData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       }
    }
@@ -102,13 +102,13 @@ namespace Physical {
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.rData() -= c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.subData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       } else
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.rData() -= (v.comp(i).data().array()*w.comp(i).data().array()).matrix();
+            rS.subData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
          }
       }
    }

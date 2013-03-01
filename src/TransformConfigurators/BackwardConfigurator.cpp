@@ -62,7 +62,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD3D);
    }
 
-   template <> void BackwardConfigurator::project1D<TransformSteps::Id::Bwd1D::NOTUSED>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 
@@ -114,7 +114,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   template <> void BackwardConfigurator::project2D<TransformSteps::Id::Bwd2D::NOTUSED>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 
@@ -166,7 +166,7 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
    }
 
-   template <> void BackwardConfigurator::project3D<TransformSteps::Id::Bwd3D::NOTUSED>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project3D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
    }
 

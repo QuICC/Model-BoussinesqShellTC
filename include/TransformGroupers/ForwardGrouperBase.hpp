@@ -39,7 +39,7 @@ namespace Transform {
           * @param vectEqs  Vector of vector equations
           * @param coord    Transform coord
           */
-         virtual void transform(std::vector<SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord) = 0;
+         virtual void transform(std::vector<SharedIScalarEquation>& scalEqs, std::vector<SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the first exchange

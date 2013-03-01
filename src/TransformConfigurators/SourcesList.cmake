@@ -1,4 +1,6 @@
 set(MHDSources
+   BackwardConfigurator.cpp
+   ForwardConfigurator.cpp
    BackwardSerialConfigurator.cpp
    ForwardSerialConfigurator.cpp
    BackwardSingle1DConfigurator.cpp
