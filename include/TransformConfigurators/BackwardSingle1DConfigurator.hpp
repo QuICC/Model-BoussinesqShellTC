@@ -236,7 +236,7 @@ namespace Transform {
 
    inline void BackwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      coord.communicator().converter2D().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
    }
 
    inline void BackwardSingle1DConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
@@ -245,7 +245,7 @@ namespace Transform {
 
    inline void BackwardSingle1DConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter2D().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardCommunication();
    }
 
    inline void BackwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)

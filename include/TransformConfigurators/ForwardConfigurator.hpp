@@ -150,13 +150,13 @@ namespace Transform {
       ProfilerMacro_start(ProfilerMacro::LINEAR);
 
       // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage1D().recoverBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
       spEquation->computeLinear(rComp, TComponent);
 
       // Hold the temporary storage
-      coord.communicator().storage1D().holdBwd(rComp);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rComp);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::LINEAR);
@@ -168,13 +168,13 @@ namespace Transform {
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
 
       // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage1D().recoverBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
       spEquation->prepareTimestep(rComp, TComponent);
 
       // Free the temporary storage
-      coord.communicator().storage1D().freeBwd(rComp);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rComp);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);

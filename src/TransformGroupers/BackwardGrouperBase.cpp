@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    BackwardGrouperBase::BackwardGrouperBase()
-      : split(Splittings::Locations::NONE), mScalarPacks1D(1), mGradientPacks1D(2), mVectorPacks1D(3), mCurlPacks1D(3), mScalarPacks2D(1), mGradientPacks2D(2), mVectorPacks2D(3), mCurlPacks2D(3)
+      : split(Splitting::Locations::NONE), mScalarPacks1D(1), mGradientPacks1D(2), mVectorPacks1D(3), mCurlPacks1D(3), mScalarPacks2D(1), mGradientPacks2D(2), mVectorPacks2D(3), mCurlPacks2D(3)
    {
    }
 

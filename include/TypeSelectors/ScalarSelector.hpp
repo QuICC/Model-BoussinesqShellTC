@@ -39,9 +39,9 @@ namespace GeoMHDiSCC {
 
       template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
       {
-         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
 
-         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
+         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
       };
 
       template<> struct ScalarSelector<Dimensions::Transform::TRA3D>

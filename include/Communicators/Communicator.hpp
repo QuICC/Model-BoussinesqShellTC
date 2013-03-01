@@ -159,9 +159,10 @@ namespace Parallel {
          return this->template storage<TID>().recoverFwd();
       } else
       {
-         typename TTypes<TID>::FwdType &rData = this->template converter<TID>().getFwd(this->template storage<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>());
+         return this->template storage<TID>().recoverFwd();
+         //typename TTypes<TID>::FwdType &rData = this->template converter<TID>().getFwd(this->template storage<Dimensions::Transform::jump<TID,-1>::id>());
 
-         return rData;
+         //return rData;
       }
    }
 
@@ -178,13 +179,13 @@ namespace Parallel {
    {
       Debug::StaticAssert< (static_cast<int>(TID) <= static_cast<int>(DIMENSION)) >();
 
-      if(static_cast<int>(TID) < static_cast<int>(DIMENSION))
+      if(static_cast<int>(TID) != static_cast<int>(DIMENSION))
       {
          // Convert data
-         this->template converter<TID>().convertFwd(rData, this->template storage<TID>());
+//         this->template converter<Dimensions::Transform::jump<TID,1>::id>().convertFwd(rData, this->template storage<Dimensions::Transform::jump<TID,1>::id>());
 
          // Free input data
-         this->template storage<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>().freeFwd(rData);
+         this->template storage<TID>().freeFwd(rData);
       }
    }
 
@@ -193,7 +194,7 @@ namespace Parallel {
       Debug::StaticAssert< (static_cast<int>(TID) > 0) && (static_cast<int>(TID) <= static_cast<int>(DIMENSION)) >();
 
       // Convert data
-      this->template converter<TID>().convertBwd(rData, this->template storage<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>());
+      this->template converter<TID>().convertBwd(rData, this->template storage<Dimensions::Transform::jump<TID,-1>::id>());
 
       // Free input data
       this->template storage<TID>().freeBwd(rData);

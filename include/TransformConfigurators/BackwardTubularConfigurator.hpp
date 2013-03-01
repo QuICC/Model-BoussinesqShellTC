@@ -247,22 +247,22 @@ namespace Transform {
 
    inline void BackwardTubularConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      coord.communicator().converter2D().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
    }
 
    inline void BackwardTubularConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      coord.communicator().converter3D().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs);
    }
 
    inline void BackwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter2D().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardCommunication();
    }
 
    inline void BackwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter3D().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardCommunication();
    }
 
 }

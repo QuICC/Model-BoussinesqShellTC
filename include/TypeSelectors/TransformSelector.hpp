@@ -56,7 +56,7 @@ namespace GeoMHDiSCC {
    namespace Transform {
 
       /// Typedef for a TransformCoordinatorType
-      typedef Transform3DCoordinator<TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA1D>::Type, Parallel::CommunicatorType> TransformCoordinatorType;
+      typedef Transform3DCoordinator<TransformSelector<Dimensions::Transform::TRA1D>::Type, TransformSelector<Dimensions::Transform::TRA2D>::Type, TransformSelector<Dimensions::Transform::TRA3D>::Type, Parallel::CommunicatorType> TransformCoordinatorType;
 
    }
 }

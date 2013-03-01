@@ -25,6 +25,8 @@
 //
 #include "StorageProviders/StoragePairProvider.hpp"
 #include "Communicators/CommunicatorBase.hpp"
+#include "Communicators/StorageDispatcher.hpp"
+#include "Communicators/ConverterDispatcher.hpp"
 #include "TypeSelectors/IndexConverterSelector.hpp"
 #include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/Converters/SerialConverter.hpp"
@@ -77,6 +79,16 @@ namespace Parallel {
 
       private:
          /**
+          * @brief Added friend storage dispatcher for 1D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 1D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
           * @brief Storage provider for 1D
           */
          StoragePairProvider<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
@@ -86,7 +98,7 @@ namespace Parallel {
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::ONED) >();
 
-      return this->mStorage1D;
+      return StorageDispatcher<TID>::get(*this);
    }
 
    template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType,typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::ONED,TTypes>::converter()
@@ -132,7 +144,7 @@ namespace Parallel {
          /**
           * @brief Get/Set data converter
           */
-         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
+         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
          
       protected:
          /**
@@ -141,6 +153,26 @@ namespace Parallel {
          SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > mspConverter2D;
 
       private:
+         /**
+          * @brief Added friend storage dispatcher for 1D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
+          * @brief Added friend storage dispatcher for 2D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA2D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 1D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 2D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA2D>;
+
          /**
           * @brief Storage provider for 1D
           */
@@ -156,16 +188,10 @@ namespace Parallel {
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::TWOD) >();
 
-      switch(TID)
-      {
-         case(Dimensions::Transform::TRA1D):
-            return this->mStorage1D;
-         case(Dimensions::Transform::TRA2D):
-            return this->mStorage2D;
-      }
+      return StorageDispatcher<TID>::get(*this);
    }
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::TWOD,TTypes>::converter()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::TWOD,TTypes>::converter()
    {
       Debug::StaticAssert< TID == Dimensions::Transform::TRA2D >();
 
@@ -214,7 +240,7 @@ namespace Parallel {
          /**
           * @brief Get/Set data converter
           */
-         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
+         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
          
       protected:
          /**
@@ -228,6 +254,36 @@ namespace Parallel {
          SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > mspConverter3D;
 
       private:
+         /**
+          * @brief Added friend storage dispatcher for 1D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
+          * @brief Added friend storage dispatcher for 2D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA2D>;
+
+         /**
+          * @brief Added friend storage dispatcher for 3D
+          */
+         friend class StorageDispatcher<Dimensions::Transform::TRA3D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 1D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA1D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 2D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA2D>;
+
+         /**
+          * @brief Added friend converter dispatcher for 3D
+          */
+         friend class ConverterDispatcher<Dimensions::Transform::TRA3D>;
+
          /**
           * @brief Storage provider for 1D
           */
@@ -248,28 +304,14 @@ namespace Parallel {
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::THREED) >();
 
-      switch(TID)
-      {
-         case(Dimensions::Transform::TRA1D):
-            return this->mStorage1D;
-         case(Dimensions::Transform::TRA2D):
-            return this->mStorage2D;
-         case(Dimensions::Transform::TRA3D):
-            return this->mStorage3D;
-      }
+      return StorageDispatcher<TID>::get(*this);
    }
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::THREED,TTypes>::converter()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::THREED,TTypes>::converter()
    {
       Debug::StaticAssert< TID != Dimensions::Transform::TRA1D >();
 
-      switch(TID)
-      {
-         case(Dimensions::Transform::TRA2D):
-            return *this->mspConverters2D;
-         case(Dimensions::Transform::TRA3D):
-            return *this->mspConverters3D;
-      }
+      return ConverterDispatcher<TID>::get(*this);
    }
 
 }

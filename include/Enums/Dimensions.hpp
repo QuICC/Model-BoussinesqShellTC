@@ -50,6 +50,14 @@ namespace Dimensions {
          /// Third transform space
          TRA3D
       };
+
+      /**
+       * @brief Jumb to another dimension
+       */
+      template<Id TID, int STEP> struct jump
+      {
+         static const Transform::Id id = static_cast<Transform::Id>(static_cast<int>(TID)+STEP);
+      };
    };
 
    /**

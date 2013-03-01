@@ -54,13 +54,13 @@ namespace Transform {
       ProfilerMacro_start(ProfilerMacro::LINEAR);
 
       // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage1D().recoverBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
       spEquation->computeLinear(rScalar);
 
       // Hold temporary storage
-      coord.communicator().storage1D().holdBwd(rScalar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rScalar);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::LINEAR);
@@ -72,13 +72,13 @@ namespace Transform {
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
 
       // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage1D().recoverBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
       spEquation->prepareTimestep(rScalar);
 
       // Free the temporary storage
-      coord.communicator().storage1D().freeBwd(rScalar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
@@ -94,19 +94,19 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
 
       // Get the transfered input data
-      TransformCoordinatorType::CommunicatorType::Fwd1DType &rInVar = coord.communicator().receiveFwd1D();
+      TransformCoordinatorType::CommunicatorType::Fwd1DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA1D>();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage1D().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
 
       // Compute integration transform of first dimension
       coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
       // Free temporary storage
-      coord.communicator().storage1D().freeFwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rInVar);
 
       // Hold temporary storage
-      coord.communicator().storage1D().holdBwd(rOutVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
@@ -122,19 +122,19 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD2D);
 
       // Get the transfered input data
-      TransformCoordinatorType::CommunicatorType::Fwd2DType &rInVar = coord.communicator().receiveFwd2D();
+      TransformCoordinatorType::CommunicatorType::Fwd2DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA2D>();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage2D().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
 
       // Compute integration transform of second dimension
       coord.transform2D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform2DType::IntegratorType::INTG);
 
       // Free temporary storage
-      coord.communicator().storage2D().freeFwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA2D>().freeFwd(rInVar);
 
       // Transfer output data to next step
-      coord.communicator().transferBwd2D(rOutVar);
+      coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
@@ -150,19 +150,19 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::FWD3D);
 
       // Get recover input data from hold
-      TransformCoordinatorType::CommunicatorType::Fwd3DType &rInVar = coord.communicator().receiveFwd3D();
+      TransformCoordinatorType::CommunicatorType::Fwd3DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA3D>();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage3D().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
 
       // Compute integration transform of third dimension
       coord.transform3D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform3DType::IntegratorType::INTG);
 
       // Free temporary input storage
-      coord.communicator().storage3D().freeFwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA3D>().freeFwd(rInVar);
 
       // Transfer output data to next step
-      coord.communicator().transferBwd3D(rOutVar);
+      coord.communicator().transferBackward<Dimensions::Transform::TRA3D>(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD3D);

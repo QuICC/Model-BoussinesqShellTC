@@ -170,7 +170,7 @@ namespace Datatypes {
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
           */
-         StorageType& rData() const;
+         StorageType& rData();
 
       protected:
 
@@ -208,6 +208,11 @@ namespace Datatypes {
    }
 
    template <typename TData, Dimensions::Type DIMENSION> inline const typename FlatScalarField<TData, DIMENSION>::StorageType& FlatScalarField<TData, DIMENSION>::data() const
+   {
+      return *this->mspField;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::StorageType& FlatScalarField<TData, DIMENSION>::rData()
    {
       return *this->mspField;
    }

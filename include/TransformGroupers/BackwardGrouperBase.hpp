@@ -59,7 +59,7 @@ namespace Transform {
          /**
           * @brief Location of the split in the configurator
           */
-         Splittings::Locations::Id split;
+         Splitting::Locations::Id split;
 
       protected:
          /**
