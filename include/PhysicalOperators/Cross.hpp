@@ -65,30 +65,30 @@ namespace Physical {
    {
       if(c != 1.0)
       { 
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() = (v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array()).matrix()*c;
+            case(FieldComponents::ONE):
+               rS.setData((v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array()).matrix()*c);
                break;
-            case(1):
-               rS.rData() = (v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array()).matrix()*c;
+            case(FieldComponents::TWO):
+               rS.setData((v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array()).matrix()*c);
                break;
-            case(2):
-               rS.rData() = (v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array()).matrix()*c;
+            case(FieldComponents::THREE):
+               rS.setData((v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array()).matrix()*c);
                break;
          }
       } else
       {
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() = v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array();
+            case(FieldComponents::ONE):
+               rS.setData(v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array());
                break;
-            case(1):
-               rS.rData() = v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array();
+            case(FieldComponents::TWO):
+               rS.setData(v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array());
                break;
-            case(2):
-               rS.rData() = v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array();
+            case(FieldComponents::THREE):
+               rS.setData(v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array());
                break;
          }
       }
@@ -98,30 +98,30 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() += (v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array()).matrix()*c;
+            case(FieldComponents::ONE):
+               rS.addData((v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array()).matrix()*c);
                break;
-            case(1):
-               rS.rData() += (v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array()).matrix()*c;
+            case(FieldComponents::TWO):
+               rS.addData((v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array()).matrix()*c);
                break;
-            case(2):
-               rS.rData() += (v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array()).matrix()*c;
+            case(FieldComponents::THREE):
+               rS.addData((v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array()).matrix()*c);
                break;
          }
       } else
       {
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() += v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array();
+            case(FieldComponents::ONE):
+               rS.addData(v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array());
                break;
-            case(1):
-               rS.rData() += v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array();
+            case(FieldComponents::TWO):
+               rS.addData(v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array());
                break;
-            case(2):
-               rS.rData() += v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array();
+            case(FieldComponents::THREE):
+               rS.addData(v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array());
                break;
          }
       }
@@ -131,30 +131,30 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() -= (v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array()).matrix()*c;
+            case(FieldComponents::ONE):
+               rS.subData((v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array()).matrix()*c);
                break;
-            case(1):
-               rS.rData() -= (v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array()).matrix()*c;
+            case(FieldComponents::TWO):
+               rS.subData((v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array()).matrix()*c);
                break;
-            case(2):
-               rS.rData() -= (v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array()).matrix()*c;
+            case(FieldComponents::THREE):
+               rS.subData((v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array()).matrix()*c);
                break;
          }
       } else
       {
-         switch(static_cast<int>(id))
+         switch(id)
          {
-            case(0):
-               rS.rData() -= v.comp(1).data().array() * w.comp(2).data().array() - v.comp(2).data().array() * w.comp(1).data().array();
+            case(FieldComponents::ONE):
+               rS.subData(v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array() - v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array());
                break;
-            case(1):
-               rS.rData() -= v.comp(2).data().array() * w.comp(0).data().array() - v.comp(0).data().array() * w.comp(2).data().array();
+            case(FieldComponents::TWO):
+               rS.subData(v.comp(FieldsComponents::Physical::THREE).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array() - v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::THREE).data().array());
                break;
-            case(2):
-               rS.rData() -= v.comp(0).data().array() * w.comp(1).data().array() - v.comp(1).data().array() * w.comp(0).data().array();
+            case(FieldComponents::THREE):
+               rS.subData(v.comp(FieldsComponents::Physical::ONE).data().array() * w.comp(FieldsComponents::Physical::TWO).data().array() - v.comp(FieldsComponents::Physical::TWO).data().array() * w.comp(FieldsComponents::Physical::ONE).data().array());
                break;
          }
       }

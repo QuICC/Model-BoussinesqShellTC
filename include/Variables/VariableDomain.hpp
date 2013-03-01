@@ -102,7 +102,8 @@ namespace Datatypes {
    template <typename TVariable, int DOMAINS> inline TVariable& VariableDomain<TVariable,DOMAINS>::rDom(const int i)
    {
       // Assert for valid index
-      assert(this->mDomains.size() > i);
+      assert(i >= 0);
+      assert(this->mDomains.size() > static_cast<size_t>(i));
 
       return this->mDomains.at(i);
    }

@@ -22,7 +22,7 @@
 #include "FastTransforms/FftwTransform.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Communicators/Communicator3D.hpp"
+#include "Communicators/Communicator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -50,7 +50,7 @@ namespace GeoMHDiSCC {
    }
 
    namespace Parallel {
-      typedef Communicator3D<Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FwdType, Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::BwdType, Datatypes::ScalarSelector<Dimensions::Transform::TRA2D>::FwdType, Datatypes::ScalarSelector<Dimensions::Transform::TRA2D>::BwdType, Datatypes::ScalarSelector<Dimensions::Transform::TRA3D>::FwdType, Datatypes::ScalarSelector<Dimensions::Transform::TRA3D>::BwdType> CommunicatorType;
+      typedef Communicator<Dimensions::THREED, Datatypes::ScalarSelector> CommunicatorType;
    }
 
    namespace Transform {

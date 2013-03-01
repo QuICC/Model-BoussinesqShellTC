@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    CommunicatorBase::CommunicatorBase()
    {
    }
@@ -131,4 +133,5 @@ namespace GeoMHDiSCC {
       }
    }
 
+}
 }

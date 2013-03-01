@@ -62,19 +62,19 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.setData(c*(v.comp(0).data().array()*w.comp(0).data().array()).matrix());
+         rS.setData(c*(v.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
          for(int i = 1; i < COMPONENTS; i++)
          {
-            rS.addData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.addData(c*(v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       } else
       {
-         rS.setData((v.comp(0).data().array()*w.comp(0).data().array()).matrix());
+         rS.setData((v.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
          for(int i = 1; i < COMPONENTS; i++)
          {
-            rS.addData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.addData((v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       }
    }
@@ -85,13 +85,13 @@ namespace Physical {
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.addData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.addData(c*(v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       } else
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.addData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.addData((v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       }
    }
@@ -102,13 +102,13 @@ namespace Physical {
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.subData(c*(v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.subData(c*(v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       } else
       {
          for(int i = 0; i < COMPONENTS; i++)
          {
-            rS.subData((v.comp(i).data().array()*w.comp(i).data().array()).matrix());
+            rS.subData((v.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()*w.comp(static_cast<FieldComponents::Physical::Id>(i)).data().array()).matrix());
          }
       }
    }

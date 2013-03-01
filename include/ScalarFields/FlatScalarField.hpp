@@ -165,6 +165,13 @@ namespace Datatypes {
          MHDFloat requiredStorage() const;
      #endif // GEOMHDISCC_STORAGEPROFILE
 
+         /**
+          * @brief Set internal storage field data
+          *
+          * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
+          */
+         StorageType& rData() const;
+
       protected:
 
       private:

@@ -97,16 +97,16 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd1DType &rInVar = coord.communicator().receiveFwd1D();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage1D().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage1D().provideBwd();
 
       // Compute integration transform of first dimension
-      coord.transform1D().integrate<Arithmetics::SET>(rScalar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
+      coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
 
       // Free temporary storage
       coord.communicator().storage1D().freeFwd(rInVar);
 
       // Hold temporary storage
-      coord.communicator().storage1D().holdBwd(rScalar);
+      coord.communicator().storage1D().holdBwd(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
@@ -125,16 +125,16 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd2DType &rInVar = coord.communicator().receiveFwd2D();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd2DType &rScalar = coord.communicator().storage2D().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage2D().provideBwd();
 
       // Compute integration transform of second dimension
-      coord.transform2D().integrate<Arithmetics::SET>(rScalar.rData(), rInVar.data(), TransformCoordinatorType::Transform2DType::IntegratorType::INTG);
+      coord.transform2D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform2DType::IntegratorType::INTG);
 
       // Free temporary storage
       coord.communicator().storage2D().freeFwd(rInVar);
 
       // Transfer output data to next step
-      coord.communicator().transferBwd2D(rScalar);
+      coord.communicator().transferBwd2D(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);

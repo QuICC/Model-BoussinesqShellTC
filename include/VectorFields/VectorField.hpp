@@ -64,11 +64,6 @@ namespace Datatypes {
          const std::vector<TScalar>& data() const;
 
          /**
-          * @brief Set field components
-          */
-         std::vector<TScalar>& rData();
-
-         /**
           * @brief Initialise field components to zero
           */
          void initialiseZeros();
@@ -119,11 +114,6 @@ namespace Datatypes {
    }
 
    template <typename TScalar, int COMPONENTS, typename TType> inline const std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::data() const
-   {
-      return this->mComponents;
-   }
-
-   template <typename TScalar, int COMPONENTS, typename TType> inline std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::rData()
    {
       return this->mComponents;
    }

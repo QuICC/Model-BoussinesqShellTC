@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Parallel {
+
    /**
     * 
     * @brief Implementation of communicator base
@@ -80,6 +82,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // COMMUNICATORBASE_HPP

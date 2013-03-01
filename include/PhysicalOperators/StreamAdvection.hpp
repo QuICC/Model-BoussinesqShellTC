@@ -64,14 +64,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.rData() = -c*(dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.setData(-c*(dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
                                                                               
-         rS.rData() += c*(dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.addData(c*(dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       } else
       {
-         rS.rData() = -(dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.setData(-(dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
-         rS.rData() += (dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.addData((dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       }
    }
 
@@ -79,14 +79,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.rData() -= c*(dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.subData(c*(dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
-         rS.rData() += c*(dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.addData(c*(dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       } else
       {
-         rS.rData() -= (dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.subData((dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
-         rS.rData() += (dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.addData((dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       }
    }
 
@@ -94,14 +94,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.rData() += c*(dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.addData(c*(dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
-         rS.rData() -= c*(dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.subData(c*(dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       } else
       {
-         rS.rData() += (dPsi.comp(1).data().array()*w.comp(0).data().array()).matrix();
+         rS.addData((dPsi.comp(FieldsComponents::Physical::TWO).data().array()*w.comp(FieldsComponents::Physical::ONE).data().array()).matrix());
 
-         rS.rData() -= (dPsi.comp(0).data().array()*w.comp(1).data().array()).matrix();
+         rS.subData((dPsi.comp(FieldsComponents::Physical::ONE).data().array()*w.comp(FieldsComponents::Physical::TWO).data().array()).matrix());
       }
    }
 }
