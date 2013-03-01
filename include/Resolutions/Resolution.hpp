@@ -70,7 +70,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the forward scalar field setup for last dimension
           */
-         Datatypes::SharedScalarFieldSetupType spFwdSetup() const;
+         Datatypes::SharedScalarFieldSetupType spPhysicalFwdSetup() const;
 
          /**
           * @brief Get the forward scalar field setup
@@ -82,7 +82,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the backward scalar field setup for the first dimension
           */
-         Datatypes::SharedScalarFieldSetupType spBwdSetup() const;
+         Datatypes::SharedScalarFieldSetupType spSpectralSetup() const;
 
          /**
           * @brief Get the backward scalar field setup
