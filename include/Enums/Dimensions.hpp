@@ -28,7 +28,7 @@ namespace Dimensions {
     */
    enum Type {
       /// 1D simulation
-      ONED,
+      ONED = 0,
       /// 2D simulation
       TWOD,
       /// 3D simulation
@@ -44,7 +44,7 @@ namespace Dimensions {
        */
       enum Id {
          /// First transform space
-         TRA1D,
+         TRA1D = 0,
          /// Second transform space
          TRA2D,
          /// Third transform space
@@ -69,7 +69,7 @@ namespace Dimensions {
        */
       enum Id {
          /// First dimension data
-         SIM1D,
+         SIM1D = 0,
          /// Second dimension of data
          SIM2D,
          /// Third dimension data
@@ -86,7 +86,7 @@ namespace Dimensions {
        */
       enum Id {
          /// First dimension of data for forward transform
-         DATF1D,
+         DATF1D = 0,
          /// First dimension of data for backward transform
          DATB1D,
          /// Second dimension of data
@@ -105,7 +105,7 @@ namespace Dimensions {
        */
       enum Id {
          /// Spectral space
-         SPECTRAL,
+         SPECTRAL = 0,
          /// Physical space
          PHYSICAL
       };

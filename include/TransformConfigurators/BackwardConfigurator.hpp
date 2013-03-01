@@ -123,7 +123,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
 
       // Put scalar into temporary hold storage
-      coord.communicator().holdSpectral(rVector.rDom(0).rTotal().rComp(TComponent));
+      coord.communicator().dealiasSpectral(rVector.rDom(0).rTotal().rComp(TComponent));
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);

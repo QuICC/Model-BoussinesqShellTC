@@ -23,6 +23,7 @@
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/CommunicatorStorage.hpp"
+#include "Communicators/EndDispatcher.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -126,20 +127,15 @@ namespace Parallel {
          void holdPhysical(typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(DIMENSION))>::FwdType& rData);
 
          /**
-          * @brief Hold starting spectral TBwd1D
+          * @brief Dealias the spectral data
           */
-         void holdSpectral(typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rData);
-
-         /**
-          * @brief Free the starting spectral TBwd1D
-          *
-          * This routine does nothing but is used to make sure storage doesn't end up in storage provider loop
-          */
-         void freeSpectral(typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rData);
+         void dealiasSpectral(const typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rData);
          
       protected:
 
       private:
+         template <bool COND, Dimensions::Transform::Id TID> friend class EndDispatcher;
+
    };
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> Communicator<DIMENSION,TTypes>::Communicator()
@@ -154,16 +150,7 @@ namespace Parallel {
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(DIMENSION) >();
 
-      if(static_cast<int>(TID) == static_cast<int>(DIMENSION))
-      {
-         return this->template storage<TID>().recoverFwd();
-      } else
-      {
-         return this->template storage<TID>().recoverFwd();
-         //typename TTypes<TID>::FwdType &rData = this->template converter<TID>().getFwd(this->template storage<Dimensions::Transform::jump<TID,-1>::id>());
-
-         //return rData;
-      }
+      return EndDispatcher<(static_cast<int>(DIMENSION) == static_cast<int>(TID)), TID>::receiveForward(*this);
    }
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> typename TTypes<TID>::BwdType&  Communicator<DIMENSION,TTypes>::receiveBackward()
@@ -179,14 +166,7 @@ namespace Parallel {
    {
       Debug::StaticAssert< (static_cast<int>(TID) <= static_cast<int>(DIMENSION)) >();
 
-      if(static_cast<int>(TID) != static_cast<int>(DIMENSION))
-      {
-         // Convert data
-//         this->template converter<Dimensions::Transform::jump<TID,1>::id>().convertFwd(rData, this->template storage<Dimensions::Transform::jump<TID,1>::id>());
-
-         // Free input data
-         this->template storage<TID>().freeFwd(rData);
-      }
+      EndDispatcher<(static_cast<int>(DIMENSION) == static_cast<int>(TID)), TID>::transferForward(*this, rData);
    }
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> void Communicator<DIMENSION,TTypes>::transferBackward(typename TTypes<TID>::BwdType& rData)
@@ -211,17 +191,16 @@ namespace Parallel {
       this->template storage<static_cast<Dimensions::Transform::Id>(static_cast<int>(DIMENSION))>().holdFwd(rData);
    }
 
-   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::holdSpectral(typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rData)
+   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::dealiasSpectral(const typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rInData)
    {
-      // Hold the input data
-      this->template storage<Dimensions::Transform::TRA1D>().holdBwd(rData);
-   }
+      // Get dealiased storage scalar
+      typename TTypes<Dimensions::Transform::TRA1D>::BwdType &rOutData = this->template storage<Dimensions::Transform::TRA1D>().provideBwd();
 
-   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::freeSpectral(typename TTypes<Dimensions::Transform::TRA1D>::BwdType& rData)
-   {
-      // 
-      // DO NOTHING BUT MAKE SURE IT IS THE CASE
-      //
+      // Dealias the data
+      rOutData.rData().topRows(rInData.data().rows()) = rInData.data(); 
+
+      // Hold the input data
+      this->template storage<Dimensions::Transform::TRA1D>().holdBwd(rOutData);
    }
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D)

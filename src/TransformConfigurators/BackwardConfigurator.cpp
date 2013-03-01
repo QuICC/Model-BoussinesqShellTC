@@ -44,7 +44,7 @@ namespace Transform {
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
 
       // Put scalar into temporary hold storage
-      coord.communicator().holdSpectral(rScalar.rDom(0).rTotal());
+      coord.communicator().dealiasSpectral(rScalar.rDom(0).rTotal());
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
@@ -81,7 +81,7 @@ namespace Transform {
       coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
 
       // Free spectral input
-      coord.communicator().freeSpectral(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
 
       // Transfer output data to next step
       coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
@@ -105,7 +105,7 @@ namespace Transform {
       coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::ProjectorType::DIFF);
 
       // Hold spectral input
-      coord.communicator().holdSpectral(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rInVar);
 
       // Transfer output data to next step
       coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
