@@ -203,6 +203,9 @@ namespace Transform {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
+      // Assert that a mixed transform was not setup
+      assert(!this->mspSetup->isMixed());
+
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
       assert(physVal.cols() == this->mspSetup->howmany());
@@ -222,6 +225,9 @@ namespace Transform {
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
+
+      // Assert that a mixed transform was not setup
+      assert(!this->mspSetup->isMixed());
 
       // assert on the padding size
       assert(this->mspSetup->padSize() >= 0);
@@ -262,6 +268,9 @@ namespace Transform {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->isMixed());
+
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
       assert(physVal.cols() == this->mspSetup->howmany());
@@ -289,6 +298,9 @@ namespace Transform {
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->isMixed());
 
       // assert on the padding size
       assert(this->mspSetup->padSize() >= 0);

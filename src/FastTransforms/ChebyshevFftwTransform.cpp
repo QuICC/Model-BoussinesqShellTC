@@ -66,12 +66,20 @@ namespace Transform {
 
    void ChebyshevFftwTransform::initFft()
    {  
+      /// \mhdBug implement strideed stranforms for complex <-> complex case
+
       int fwdSize = this->mspSetup->fwdSize();
       int bwdSize = this->mspSetup->bwdSize();
       int howmany = this->mspSetup->howmany();
 
       // Create the two plans
       const int  *fftSize = &fwdSize;
+
+      if(this->mspSetup->isMixed())
+      {
+      } else
+      {
+      }
 
       // Initialise temporary storage
       this->mTmpIn.setZero(fwdSize, howmany);
