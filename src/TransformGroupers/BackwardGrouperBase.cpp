@@ -32,19 +32,19 @@ namespace Transform {
    {
    }
 
-   ArrayI BackwardGrouperBase::listPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::listPacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mScalarPacks1D);
             } else
@@ -54,9 +54,9 @@ namespace Transform {
          }
 
          // add physical differential field packs first exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mGradientPacks1D);
             } else
@@ -81,19 +81,19 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::listPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::listPacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for second exchange
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mScalarPacks2D);
             } else
@@ -103,9 +103,9 @@ namespace Transform {
          }
 
          // add physical differential field packs for second exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mGradientPacks2D);
             } else
@@ -129,20 +129,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::namePacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::namePacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
       int tmp = 0;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                tmp += this->mScalarPacks1D;
             } else
@@ -152,9 +152,9 @@ namespace Transform {
          }
 
          // add physical differential field packs for first exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                tmp += this->mGradientPacks1D;
             } else
@@ -192,20 +192,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::namePacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::namePacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
       int tmp = 0;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for second exchange
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                tmp += this->mScalarPacks2D;
             } else
@@ -215,9 +215,9 @@ namespace Transform {
          }
 
          // add physical differential field packs for second exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                tmp += this->mGradientPacks2D + 1;
             } else
@@ -255,20 +255,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::groupPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::groupPacks1D(const VariableRequirement& varInfo)
    {
       // Initialise the number of packs
       ArrayI packs(1);
       packs.setConstant(0);
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange 
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mScalarPacks1D;
             } else
@@ -278,9 +278,9 @@ namespace Transform {
          }
 
          // add physical differential field packs for first exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mGradientPacks1D;
             } else
@@ -293,20 +293,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::groupPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI BackwardGrouperBase::groupPacks2D(const VariableRequirement& varInfo)
    {  
       // Initialise the number of packs
       ArrayI packs(1);
       packs.setConstant(0);
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for second exchange
-         if(infoIt->second.second(1))
+         if(infoIt->second.needPhysical())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mScalarPacks2D;
             } else
@@ -316,9 +316,9 @@ namespace Transform {
          }
 
          // add physical differential field packs for second exchange
-         if(infoIt->second.second(2))
+         if(infoIt->second.needPhysicalDiff())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mGradientPacks2D + 1;
             } else

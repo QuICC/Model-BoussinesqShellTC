@@ -57,14 +57,14 @@ namespace Transform {
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         virtual ArrayI packs1D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         virtual ArrayI packs2D(const VariableRequirement& varInfo);
 
       protected:
 
@@ -135,12 +135,12 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
    {
       return this->listPacks1D(varInfo);
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
    {  
       return this->listPacks2D(varInfo);
    }

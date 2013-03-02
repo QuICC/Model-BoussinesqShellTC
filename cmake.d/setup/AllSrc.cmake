@@ -55,6 +55,7 @@ set(MHDAllSrcDirs
    Timesteppers
    TransformConfigurators  # SourcesList.txt IS IN DEBUG MODE
    TransformGroupers
+   Variables
 )
 
 

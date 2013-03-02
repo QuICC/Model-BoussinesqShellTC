@@ -210,6 +210,8 @@ namespace Parallel {
          case(2):
             return id / (factors(0)*factors(1));
             break;
+         default:
+            throw Exception("Unknown input provided!");
       }
    }
 

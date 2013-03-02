@@ -56,14 +56,14 @@ namespace Transform {
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         virtual ArrayI packs1D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         virtual ArrayI packs2D(const VariableRequirement& varInfo);
 
       protected:
          /**
@@ -149,12 +149,12 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI BackwardSingle2DGrouper<TConfigurator>::packs1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename TConfigurator> ArrayI BackwardSingle2DGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
    {
       return this->namePacks1D(varInfo);
    }
 
-   template <typename TConfigurator> ArrayI BackwardSingle2DGrouper<TConfigurator>::packs2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename TConfigurator> ArrayI BackwardSingle2DGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
    {
       // Get size of grouped communication
       ArrayI packs = this->groupPacks2D(varInfo);

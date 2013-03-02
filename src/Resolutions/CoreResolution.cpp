@@ -4,7 +4,7 @@
 
 // System includes
 //
-#include <assert.h>
+#include <cassert>
 
 // External includes
 //

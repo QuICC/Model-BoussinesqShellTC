@@ -20,7 +20,7 @@
 
 // System includes
 //
-#include <assert.h>
+#include <cassert>
 #include <vector>
 
 // External includes

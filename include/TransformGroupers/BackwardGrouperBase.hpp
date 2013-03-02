@@ -22,6 +22,7 @@
 // Project includes
 //
 #include "Enums/PhysicalNames.hpp"
+#include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -47,14 +48,14 @@ namespace Transform {
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo) = 0;
+         virtual ArrayI packs1D(const VariableRequirement& varInfo) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
           */
-         virtual ArrayI packs2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo) = 0;
+         virtual ArrayI packs2D(const VariableRequirement& varInfo) = 0;
 
          /**
           * @brief Location of the split in the configurator
@@ -117,42 +118,42 @@ namespace Transform {
           *
           * @param varInfo Variable information
           */
-         ArrayI listPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI listPacks1D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get the list of pack numbers for the second exchange
           *
           * @param varInfo Variable information
           */
-         ArrayI listPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI listPacks2D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get and set the name pack numbers for the first exchange
           *
           * @param varInfo Variable information
           */
-         ArrayI namePacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI namePacks1D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get and set the named pack numbers for the second exchange
           *
           * @param varInfo Variable information
           */
-         ArrayI namePacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI namePacks2D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
           * @param varInfo Variable information
           */
-         ArrayI groupPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI groupPacks1D(const VariableRequirement& varInfo);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
           * @param varInfo Variable information
           */
-         ArrayI groupPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         ArrayI groupPacks2D(const VariableRequirement& varInfo);
 
          /**
           * @brief Empty constructor

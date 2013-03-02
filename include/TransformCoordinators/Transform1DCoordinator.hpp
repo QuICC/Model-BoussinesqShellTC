@@ -24,6 +24,7 @@
 //
 #include "Enums/PhysicalNames.hpp"
 #include "Resolutions/Resolution.hpp"
+#include "Variables/VariableRequirement.hpp"
 
 
 namespace GeoMHDiSCC {
@@ -60,7 +61,7 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           * @param varInfo Variables information
           */
-         void initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         void initTransforms(SharedResolution spRes, const VariableRequirement& varInfo);
 
          /**
           * @brief Initialise the data communicator
@@ -112,7 +113,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Variable information
           */
-         std::map<PhysicalNames::Id, TriBool>  mVarInfo;
+         VariableRequirement  mVarInfo;
 
          /**
           * @brief Initialise the transforms
@@ -134,18 +135,12 @@ namespace GeoMHDiSCC {
 
    template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysical(PhysicalNames::Id name)
    {
-      // Safety assertion
-      assert(this->mVarInfo.find(name) != this->mVarInfo.end());
-
-      return this->mVarInfo.find(name)->second(1);
+      return this->mVarInfo.requirement(name).needPhysical();
    }
 
    template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysicalDiff(PhysicalNames::Id name)
    {
-      // Safety assertion
-      assert(this->mVarInfo.find(name) != this->mVarInfo.end());
-
-      return this->mVarInfo.find(name)->second(2);
+      return this->mVarInfo.requirement(name).needPhysicalDiff();
    }
 
    template <typename T1D, typename TCommunicator> Transform1DCoordinator<T1D,TCommunicator>::Transform1DCoordinator()
@@ -156,17 +151,13 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
    {
       // Initialise the transforms
       this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA1D));
 
       // Store information about variables
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator   it;
-      for(it = varInfo.begin(); it != varInfo.end(); it++)
-      {
-         this->mVarInfo.insert(std::make_pair(it->first, it->second.second));
-      }
+      this->mVarInfo = varInfo;
    }
 
    template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransform(const typename T1D::SetupType& setup1D)

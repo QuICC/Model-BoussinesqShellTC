@@ -28,6 +28,7 @@
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
+#include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -196,19 +197,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get map of field storage requirements information
           */
-         const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& requirements() const;
-
-         /**
-          * @brief Get the field storage requirements information
-          *
-          * The TriBool vector contains the following information
-          *    TriBool(0): Requires spectral coefficients?
-          *    TriBool(1): Requires physical space values?
-          *    TriBool(2): Requires physical space gradient/curl values?
-          *
-          * @param name Physical name of the field
-          */
-         TriBool requirements(PhysicalNames::Id name) const;
+         const VariableRequirement& requirements() const;
 
          /**
           * @brief Set the equation matrices
@@ -412,7 +401,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the variable requirements
           */
-         std::map<PhysicalNames::Id, std::pair<bool, TriBool> >   mRequirements;
+         VariableRequirement mRequirements;
 
          /**
           * @brief Are timestepping matrices for this equation complex?
@@ -543,20 +532,9 @@ namespace GeoMHDiSCC {
       return this->mName;
    }
 
-   inline const std::map<PhysicalNames::Id, std::pair<bool, TriBool> >&  IEvolutionEquation::requirements() const
+   inline const VariableRequirement&  IEvolutionEquation::requirements() const
    {
       return this->mRequirements;
-   }
-
-   inline TriBool IEvolutionEquation::requirements(PhysicalNames::Id name) const
-   {
-      if(this->mRequirements.count(name) > 0)
-      {
-         return this->mRequirements.find(name)->second.second;
-      } else
-      {
-         return TriBool(false,false,false);
-      }
    }
 
    /// Typedef for a smart IEvolutionEquation

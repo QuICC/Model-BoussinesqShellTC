@@ -40,14 +40,6 @@ namespace GeoMHDiSCC {
    //@}
 
    /**
-    * @name Fixed size array types typedefs
-    */
-   //@{
-   /// Typedef for an array of boolean values
-   typedef Eigen::Matrix<bool, 3, 1>   TriBool;
-   //@}
-
-   /**
     * @name Array types typedefs
     */
    //@{

@@ -23,6 +23,7 @@
 // Project includes
 //
 #include "TransformCoordinators/Transform2DCoordinator.hpp"
+#include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -64,7 +65,7 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           * @param varInfo Variables information
           */
-         void initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         void initTransforms(SharedResolution spRes, const VariableRequirement& varInfo);
 
          /**
           * @brief Initialise the data communicator
@@ -113,7 +114,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
    {
       // initialise 2 other dimensions
       Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, varInfo);

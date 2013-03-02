@@ -32,19 +32,19 @@ namespace Transform {
    {
    }
 
-   ArrayI ForwardGrouperBase::listPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI ForwardGrouperBase::listPacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange
-         if(infoIt->second.second(0))
+         if(infoIt->second.needSpectral())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mScalarPacks1D);
             } else
@@ -68,19 +68,19 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::listPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI ForwardGrouperBase::listPacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physica field packs for second exchange
-         if(infoIt->second.second(0))
+         if(infoIt->second.needSpectral())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                list.insert(this->mScalarPacks2D);
             } else
@@ -104,20 +104,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::groupPacks1D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI ForwardGrouperBase::groupPacks1D(const VariableRequirement& varInfo)
    {
       // Initialise the number of packs
       ArrayI packs(1);
       packs.setConstant(0);
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange
-         if(infoIt->second.second(0))
+         if(infoIt->second.needSpectral())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mScalarPacks1D;
             } else
@@ -130,20 +130,20 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::groupPacks2D(const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   ArrayI ForwardGrouperBase::groupPacks2D(const VariableRequirement& varInfo)
    {  
       // Initialise the number of packs
       ArrayI packs(1);
       packs.setConstant(0);
 
       // loop over all variable information
-      std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator infoIt;
+      VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for second exchange
-         if(infoIt->second.second(0))
+         if(infoIt->second.needSpectral())
          {
-            if(infoIt->second.first)
+            if(infoIt->second.isScalar())
             {
                packs(0) += this->mScalarPacks2D;
             } else
