@@ -1,7 +1,7 @@
 # Create list of sources
 set(MHDSources
-   SchemeBase.cpp
-   SpatialScheme.cpp
+   ISchemeCosts.cpp
+   ISpatialScheme.cpp
 )
 
 set(MHDSrcSubDirs

@@ -116,6 +116,8 @@ namespace Parallel {
       #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
+
+      private:
          /**
           * @brief Initialise the datatypes
           *
@@ -176,8 +178,6 @@ namespace Parallel {
           * @brief Storage for the backward datatypes
           */
          std::vector<std::map<const TBwdB *, MPI_Datatype> > mBTypes;
-
-      private:
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverter()

@@ -22,7 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/SpatialScheme.hpp"
+#include "SpatialSchemes/ISpatialScheme.hpp"
 #include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
 namespace GeoMHDiSCC {
@@ -86,7 +86,7 @@ namespace Parallel {
          /**
           * @brief Shared spatial scheme
           */
-         SharedSpatialScheme  mspScheme;
+         SharedISpatialScheme  mspScheme;
 
          /**
           * @brief Initialise the CPU factors

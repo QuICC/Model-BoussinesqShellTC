@@ -1,11 +1,11 @@
-/** \file TFTScheme.hpp
- *  \brief Implementation of the Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme
+/** \file FFFScheme.hpp
+ *  \brief Implementation of the Fourier + Fourier + Fourier scheme
  *
  *  \mhdBug Needs test
  */
 
-#ifndef TFTSCHEME_HPP
-#define TFTSCHEME_HPP
+#ifndef FFFSCHEME_HPP
+#define FFFSCHEME_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme
+    * @brief Implementation of Fourier + Fourier + Fourier scheme
     */
-   class TFTScheme: public Regular3DScheme
+   class FFFScheme: public Regular3DScheme
    {
       public:
          /**
@@ -53,12 +53,12 @@ namespace GeoMHDiSCC {
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit TFTScheme(const ArrayI& dim);
+         explicit FFFScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~TFTScheme(); 
+         virtual ~FFFScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -91,4 +91,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // TFTSCHEME_HPP
+#endif // FFFSCHEME_HPP

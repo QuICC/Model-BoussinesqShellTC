@@ -5,11 +5,14 @@
 #ifndef MPICONVERTERBASE_HPP
 #define MPICONVERTERBASE_HPP
 
+// Debug includes
+//
+#include "StorageProfiler/StorageProfilerMacro.h"
+#include "Profiler/ProfilerMacro.h"
+
 // Configuration includes
 //
 #include "Framework/FrameworkMacro.h"
-#include "StorageProfiler/StorageProfilerMacro.h"
-#include "Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -49,7 +52,7 @@ namespace Parallel {
          
       protected:
          /**
-          * @brief Build an MPI Datatype
+          * @brief Build a forward MPI Datatype
           *
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
@@ -60,7 +63,7 @@ namespace Parallel {
          void buildFwdDatatype(SharedResolution spRes, const int fwdDim, TFwdA &data, MPI_Datatype &type, const int cpuId);
 
          /**
-          * @brief Build an MPI Datatype
+          * @brief Build a backward MPI Datatype
           *
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
@@ -340,7 +343,7 @@ namespace Parallel {
                   // Combine array indexes into coordinate tuple
                   coord = std::tr1::make_tuple(i, j, k);
 
-                  // Create key as (1D, 3D, 2D)
+                  // Create key as (1D, 2D, 3D)
                   key = std::tr1::make_tuple(i_, j_, k_);
 
                   // add key->coordinate to map
@@ -365,7 +368,7 @@ namespace Parallel {
                   // Extract "physical" index of first dimension
                   i_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idxBwd(i,j,k);
 
-                  // Create key as (1D, 3D, 2D)
+                  // Create key as (2D, 3D, 1D)
                   key = std::tr1::make_tuple(j_, k_, i_);
 
                   // Add key to remote set
@@ -497,7 +500,7 @@ namespace Parallel {
                   // Combine array indexes into coordinate tuple
                   coord = std::tr1::make_tuple(i, j, k);
 
-                  // Create key as (1D, 3D, 2D)
+                  // Create key as (2D, 3D, 1D)
                   key = std::tr1::make_tuple(j_, k_, i_);
 
                   // add key->coordinate to map
@@ -522,7 +525,7 @@ namespace Parallel {
                   // Extract "physical" index of first dimension
                   i_ = spRes->cpu(cpuId)->dim(fwdDim)->idxFwd(i,j,k);
 
-                  // Create key as (1D, 3D, 2D)
+                  // Create key as (1D, 2D, 3D)
                   key = std::tr1::make_tuple(i_, j_, k_);
 
                   // Add key to remote set
@@ -548,7 +551,7 @@ namespace Parallel {
                // Combine array indexes into coordinate tuple
                coord = std::tr1::make_tuple(i, j, 0);
 
-               // Create key as (1D, 2D, 0)
+               // Create key as (2D, 1D, 0)
                key = std::tr1::make_tuple(j_, i_, 0);
 
                // add key->coordinate to map

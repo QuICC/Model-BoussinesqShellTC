@@ -21,7 +21,7 @@ namespace GeoMHDiSCC {
    const int Regular2DScheme::DIMENSIONS = 2;
 
    Regular2DScheme::Regular2DScheme(const ArrayI& dim)
-      : SpatialScheme(dim.size()), mI(dim(0)), mJ(dim(1))
+      : ISpatialScheme(dim.size()), mI(dim(0)), mJ(dim(1))
    {
    }
 
@@ -49,7 +49,7 @@ namespace GeoMHDiSCC {
       idx2D.clear();
 
       int j0 = 0;
-      int jN = this->dim2D(transId);
+      int jN = this->dim(transId, Dimensions::Data::DAT2D);
 
       if(flag == Splitting::Locations::FIRST)
       {
@@ -59,6 +59,8 @@ namespace GeoMHDiSCC {
       {
          // There is only 1 possibility in 2D
          assert(false);
+
+         throw Exception("Can't split in any other dimension than first dimension in 2D regular case");
       }
 
       // Create single array for second dimension
@@ -74,19 +76,19 @@ namespace GeoMHDiSCC {
       for(int j = 0; j < idx2D.at(0).size(); j++)
       {
          // Create storage for forward indexes
-         fwd1D.push_back(ArrayI(this->dimFwd(transId)));
+         fwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATF1D)));
 
          // Fill array with indexes
-         for(int k = 0; k < this->dimFwd(transId); k++)
+         for(int k = 0; k < this->dim(transId, Dimensions::Data::DATF1D); k++)
          {
             fwd1D.at(j)(k) = k;
          }
 
          // Create storage for forward indexes
-         bwd1D.push_back(ArrayI(this->dimBwd(transId)));
+         bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D)));
 
          // Fill array with indexes
-         for(int k = 0; k < this->dimBwd(transId); k++)
+         for(int k = 0; k < this->dim(transId, Dimensions::Data::DATB1D); k++)
          {
             bwd1D.at(j)(k) = k;
          }
@@ -97,7 +99,7 @@ namespace GeoMHDiSCC {
    {
       if(flag == Splitting::Locations::FIRST)
       {
-         return this->dim2D(transId);
+         return this->dim(transId, Dimensions::Data::DAT2D);
       }
       
       // If condition has not been mached

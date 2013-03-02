@@ -83,24 +83,72 @@ namespace GeoMHDiSCC {
       return this->mCores.at(id);
    }
 
-   Datatypes::SharedScalarFieldSetupType Resolution::spFwdSetup() const
-   {
-      return this->cpu()->dim(static_cast<Dimensions::Transform::Id>(this->cpu()->nDim()-1))->spFwdSetup();
-   }
-
    Datatypes::SharedScalarFieldSetupType Resolution::spFwdSetup(const Dimensions::Transform::Id id) const
    {
-      return this->cpu()->dim(id)->spFwdSetup();
-   }
+      // Iterator for the vector based storages
+      std::vector<ArrayI>::const_iterator   vIt;
+      
+      // Get backward dimensions
+      SharedArrayI   spDim1D(new ArrayI(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
+      for(int i = 0; i < spDim1D->size(); ++i)
+      {
+         (*spDim1D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DATF1D>(i);
+      }
 
-   Datatypes::SharedScalarFieldSetupType Resolution::spBwdSetup() const
-   {
-      return this->cpu()->dim(Dimensions::Transform::TRA1D)->spBwdSetup();
+      // Get 2D dimensions
+      SharedArrayI   spDim2D(new ArrayI(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
+      for(int i = 0; i < spDim2D->size(); ++i)
+      {
+         (*spDim2D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DAT2D>(i);
+      }
+
+      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(spDim1D, spDim2D, this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
    }
 
    Datatypes::SharedScalarFieldSetupType Resolution::spBwdSetup(const Dimensions::Transform::Id id) const
    {
-      return this->cpu()->dim(id)->spBwdSetup();
+      // Iterator for the vector based storages
+      std::vector<ArrayI>::const_iterator   vIt;
+      
+      // Get backward dimensions
+      SharedArrayI   spDim1D(new ArrayI(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
+      for(int i = 0; i < spDim1D->size(); ++i)
+      {
+         (*spDim1D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DATB1D>(i);
+      }
+
+      // Get 2D dimensions
+      SharedArrayI   spDim2D(new ArrayI(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
+      for(int i = 0; i < spDim2D->size(); ++i)
+      {
+         (*spDim2D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DAT2D>(i);
+      }
+
+      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(spDim1D, spDim2D, this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
+   }
+
+   Datatypes::SharedScalarFieldSetupType Resolution::spSpectralSetup() const
+   {
+      // Iterator for the vector based storages
+      std::vector<ArrayI>::const_iterator   vIt;
+      
+      // Get backward dimensions
+      SharedArrayI   spDim1D(new ArrayI(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>()));
+      spDim1D->setConstant(this->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
+
+      // Get 2D dimensions
+      SharedArrayI   spDim2D(new ArrayI(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>()));
+      for(int i = 0; i < spDim2D->size(); ++i)
+      {
+         (*spDim2D)(i) = this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+      }
+
+      return Datatypes::SharedScalarFieldSetupType(new Datatypes::ScalarFieldSetupType(spDim1D, spDim2D, this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>()));
+   }
+
+   Datatypes::SharedScalarFieldSetupType Resolution::spPhysicalSetup() const
+   {
+      return this->spFwdSetup(static_cast<Dimensions::Transform::Id>(this->cpu()->nDim()-1));
    }
 
 }

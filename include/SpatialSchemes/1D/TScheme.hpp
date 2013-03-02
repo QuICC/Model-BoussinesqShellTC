@@ -1,5 +1,5 @@
 /** \file TScheme.hpp
- *  \brief Implementation of the Chebyshev scheme
+ *  \brief Implementation of the Chebyshev(FFT) scheme
  *
  *  \mhdBug Needs test
  */
@@ -21,22 +21,17 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/SpatialScheme.hpp"
+#include "SpatialSchemes/1D/Regular1DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of Chebyshev scheme
+    * @brief Implementation of Chebyshev(FFT) scheme
     */
-   class TScheme: public SpatialScheme
+   class TScheme: public Regular1DScheme
    {
       public:
-         /**
-          * @brief Dimensionality of the scheme
-          */
-         static const int DIMENSIONS;
-
          /**
           * @brief Construct setup object for X transform
           */
@@ -45,10 +40,9 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           *
-          * @param dim     Chebyshev truncation
-          * @param shift   Shift of the dimensions
+          * @param dim  Chebyshev truncation
           */
-         TScheme(const ArrayI& dim, const int shift = 0);
+         explicit TScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
@@ -56,57 +50,11 @@ namespace GeoMHDiSCC {
          virtual ~TScheme();
 
          /**
-          * @brief Create indexes for a possibly restricted set
-          *
-          * @param transId Transform ID
-          * @param fwd1D   Storage for forward indexes of first dimension
-          * @param bwd1D   Storage for backward indexes of first dimension
-          * @param idx2D   Storage for the indexes of second dimension
-          * @param idx3D   Storage for forward indexes of third dimension
-          * @param id      ID of the bin
-          * @param bins    Total number of bins (useful to build efficient pairs)
-          * @param n0      Starting index of restricted set
-          * @param nN      Length of restricted set
-          * @param flag    Flag to specify location of splitting
-          */
-         virtual void fillIndexes(const Dimensions::Transform::Id, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE);
-
-         /**
-          * @brief Get total of splittable indexes 
-          *
-          * @param transId Transform ID
-          * @param flag    Flag to specify location of splitting
-          */
-         virtual int splittableTotal(const Dimensions::Transform::Id, Splitting::Locations::Id flag);
-
-         /**
           * @brief Scheme specific splitting restrictions
           */
          virtual bool applicable() const;
-
-         /**
-          * @brief Get load balancing weights
-          */
-         virtual Array loadWeights();
-
-         /**
-          * @brief Get memory related score weight
-          *
-          * @param spRes Resolution information
-          */
-         virtual double memoryScore(SharedResolution spRes);
          
       protected:
-         /**
-          * @brief Get size of X truncation
-          */
-         int nI() const;
-
-         /**
-          * @brief Get size of X grid
-          */
-         int nX() const;
-
          /**
           * @brief Initialise the domain dimensions
           */
@@ -117,38 +65,24 @@ namespace GeoMHDiSCC {
           *
           * @param shift   Shift of the dimensions
           */
-         virtual void setCosts(const int shift = 0);
+         virtual void setCosts();
 
          /**
           * @brief Set transform scalings
           *
           * @param shift   Shift of the dimensions
           */
-         virtual void setScalings(const int shift = 0);
+         virtual void setScalings();
 
          /**
           * @brief Set transform memory footprint
           *
           * @param shift   Shift of the dimensions
           */
-         virtual void setMemory(const int shift = 0);
+         virtual void setMemoryScore();
 
       private:
-         /**
-          * @brief Radial truncation
-          */
-         int   mI;
    };
-
-   inline int TScheme::nI() const
-   {
-      return this->mI + 1;
-   }
-
-   inline int TScheme::nX() const
-   {
-      return std::ceil((3.0*this->nI())/2.0);
-   }
 
 }
 

@@ -281,10 +281,10 @@ namespace Parallel {
             int max2D = std::max(packs1DFwd(packs1DFwd.size()-1), packs1DBwd(packs1DBwd.size()-1));
 
             // Allocate first 2D buffers
-            this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA2D>()->fwdSizes(), max2D);
+            this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA2D>().fwdSizes(), max2D);
 
             // Allocate second 2D buffers
-            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>()->bwdSizes(), max2D);
+            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().bwdSizes(), max2D);
          } else if(split == Splitting::Locations::SECOND)
          {
             // Initialise 2D serial converter
@@ -391,7 +391,7 @@ namespace Parallel {
             this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA2D>().fwdSizes(), max2D, this->template converter<Dimensions::Transform::TRA3D>().bwdSizes(), max3D);
 
             // Allocate 2D buffers
-            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().wdSizes(), max2D);
+            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().bwdSizes(), max2D);
 
             // Allocate 3D buffers
             this->allocateBuffers(2, this->template converter<Dimensions::Transform::TRA3D>().fwdSizes(), max3D);

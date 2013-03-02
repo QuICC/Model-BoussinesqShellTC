@@ -151,12 +151,12 @@ namespace Datatypes {
 
    template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysical()
    {
-      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spFwdSetup()));
+      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spPhysicalSetup()));
    }
 
    template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysicalDiff()
    {
-      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spFwdSetup()));
+      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spPhysicalSetup()));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

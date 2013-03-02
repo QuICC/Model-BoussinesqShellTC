@@ -21,14 +21,14 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/SpatialScheme.hpp"
+#include "SpatialSchemes/ISpatialScheme.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of a generic regular 3D scheme
     */
-   class Regular3DScheme: public SpatialScheme
+   class Regular3DScheme: public ISpatialScheme
    {
       public:
          /**

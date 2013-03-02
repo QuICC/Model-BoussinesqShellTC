@@ -172,6 +172,13 @@ namespace Datatypes {
           */
          StorageType& rData();
 
+         /**
+          * @brief Set internal storage point data
+          *
+          * \warning This routine should only be used in exceptional cases. Use setPoint!
+          */
+         PointType& rPoint(const int i, const int j = 0, const int k = 0);
+
       protected:
 
       private:
@@ -220,6 +227,11 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> void FlatScalarField<TData, DIMENSION>::setPoint(const FlatScalarField<TData, DIMENSION>::PointType pt, const int i, const int j, const int k)
    {
       (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = pt;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::PointType& FlatScalarField<TData, DIMENSION>::rPoint(const int i, const int j, const int k)
+   {
+      return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)

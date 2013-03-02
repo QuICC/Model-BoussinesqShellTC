@@ -108,7 +108,7 @@ namespace Datatypes {
    }
 
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::VectorVariable(SharedResolution spRes)
-      : VectorPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(*spRes->spBwdSetup())
+      : VectorPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(*spRes->spSpectralSetup())
    {
    }
 

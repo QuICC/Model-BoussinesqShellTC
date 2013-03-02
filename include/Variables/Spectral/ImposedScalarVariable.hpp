@@ -112,7 +112,7 @@ namespace Datatypes {
    }
 
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ImposedScalarVariabl<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>e::ImposedScalarVariable(SharedResolution spRes)
-      : ScalarVariable(spRes), mImposed(*spRes->spBwdSetup()), mTotal(*spRes->spBwdSetup())
+      : ScalarVariable(spRes), mImposed(*spRes->spSpectralSetup()), mTotal(*spRes->spSpectralSetup())
    {
    }
 

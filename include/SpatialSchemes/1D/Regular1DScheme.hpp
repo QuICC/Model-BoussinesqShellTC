@@ -1,11 +1,11 @@
-/** \file Regular2DScheme.hpp
- *  \brief Implementation of a generic regular 2D scheme
+/** \file Regular1DScheme.hpp
+ *  \brief Implementation of a generic regular 1D scheme
  *
  *  \mhdBug Needs test
  */
 
-#ifndef REGULAR2DSCHEME_HPP
-#define REGULAR2DSCHEME_HPP
+#ifndef REGULAR1DSCHEME_HPP
+#define REGULAR1DSCHEME_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of a generic regular 2D scheme
+    * @brief Implementation of a generic regular 1D scheme
     */
-   class Regular2DScheme: public ISpatialScheme
+   class Regular1DScheme: public ISpatialScheme
    {
       public:
          /**
@@ -41,12 +41,12 @@ namespace GeoMHDiSCC {
           *
           * @param dim     Chebyshev truncations
           */
-         explicit Regular2DScheme(const ArrayI& dim);
+         explicit Regular1DScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~Regular2DScheme();
+         virtual ~Regular1DScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set
@@ -78,14 +78,9 @@ namespace GeoMHDiSCC {
           */
          int   mI;
 
-         /**
-          * @brief Second truncation
-          */
-         int   mJ;
-
       private:
    };
 
 }
 
-#endif // REGULAR2DSCHEME_HPP
+#endif // REGULAR1DSCHEME_HPP

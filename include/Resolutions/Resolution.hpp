@@ -68,11 +68,6 @@ namespace GeoMHDiSCC {
          int nCpu() const;
 
          /**
-          * @brief Get the forward scalar field setup for last dimension
-          */
-         Datatypes::SharedScalarFieldSetupType spPhysicalFwdSetup() const;
-
-         /**
           * @brief Get the forward scalar field setup
           *
           * @param dim Dimension for which to get setup
@@ -80,16 +75,21 @@ namespace GeoMHDiSCC {
          Datatypes::SharedScalarFieldSetupType spFwdSetup(const Dimensions::Transform::Id dim) const;
 
          /**
-          * @brief Get the backward scalar field setup for the first dimension
-          */
-         Datatypes::SharedScalarFieldSetupType spSpectralSetup() const;
-
-         /**
           * @brief Get the backward scalar field setup
           *
           * @param dim Dimension for which to get setup
           */
          Datatypes::SharedScalarFieldSetupType spBwdSetup(const Dimensions::Transform::Id dim) const;
+
+         /**
+          * @brief Get the forward scalar field setup for last dimension
+          */
+         Datatypes::SharedScalarFieldSetupType spPhysicalSetup() const;
+
+         /**
+          * @brief Get the backward scalar field setup for the first dimension
+          */
+         Datatypes::SharedScalarFieldSetupType spSpectralSetup() const;
 
       protected:
 

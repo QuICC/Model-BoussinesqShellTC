@@ -1,5 +1,5 @@
-/** \file TScheme.cpp
- *  \brief Source of the Chebyshev(FFT) scheme implementation
+/** \file FScheme.cpp
+ *  \brief Source of the Fourier scheme implementation
  */
 
 // System includes
@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/1D/TScheme.hpp"
+#include "SpatialSchemes/1D/FScheme.hpp"
 
 // Project includes
 //
@@ -19,7 +19,7 @@
 
 namespace GeoMHDiSCC {
 
-   Transform::SharedFftSetup TScheme::spSetup1D(SharedResolution spRes)
+   Transform::SharedFftSetup FScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -33,26 +33,26 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, true));
    }
 
-   TScheme::TScheme(const ArrayI& dim)
+   FScheme::FScheme(const ArrayI& dim)
       : Regular1DScheme(dim)
    {
    }
 
-   TScheme::~TScheme()
+   FScheme::~FScheme()
    {
    }
 
-   void TScheme::setDimensions()
+   void FScheme::setDimensions()
    {
       //
       // Compute sizes
       //
 
       // Get standard dealiased FFT size
-      int nX = Transform::FftwTools::dealiasFft(this->mI+1);
+      int nX = Transform::FftwTools::dealiasMixedFft(this->mI+1);
       // Check for optimised FFT sizes
       nX = Transform::FftwTools::optimizeFft(nX);
 
@@ -64,28 +64,28 @@ namespace GeoMHDiSCC {
       this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(nX/2 + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
    }
 
-   void TScheme::setCosts()
+   void FScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
    }
 
-   void TScheme::setScalings()
+   void FScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
    }
 
-   void TScheme::setMemoryScore()
+   void FScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
    }
 
-   bool TScheme::applicable() const
+   bool FScheme::applicable() const
    {
       return true;
    }

@@ -1,24 +1,24 @@
-/** \file FFScheme.cpp
- *  \brief Source of the Fourier + Fourier scheme implementation
+/** \file FFFScheme.cpp
+ *  \brief Source of the Fourier + Fourier + Fourier scheme implementation
  */
 
 // System includes
 //
+#include <set>
 
 // External includes
 //
 
 // Class include
 //
-#include "SpatialSchemes/2D/FFScheme.hpp"
+#include "SpatialSchemes/3D/FFFScheme.hpp"
 
 // Project includes
 //
-#include "FastTransforms/FftwTools.hpp"
 
 namespace GeoMHDiSCC {
 
-   Transform::SharedFftSetup FFScheme::spSetup1D(SharedResolution spRes)
+   Transform::SharedFftSetup FFFScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -36,7 +36,25 @@ namespace GeoMHDiSCC {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
-   Transform::SharedFftSetup FFScheme::spSetup2D(SharedResolution spRes)
+   Transform::SharedFftSetup FFFScheme::spSetup2D(SharedResolution spRes)
+   {
+      // Get size of FFT transform
+      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
+
+      // Get spectral size of the FFT
+      int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+
+      // Get number of transforms
+      int howmany = 0;
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
+      {
+         howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+      }
+
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
+   }
+
+   Transform::SharedFftSetup FFFScheme::spSetup3D(SharedResolution spRes)
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -54,16 +72,16 @@ namespace GeoMHDiSCC {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, true));
    }
 
-   FFScheme::FFScheme(const ArrayI& dim)
-      : Regular2DScheme(dim)
+   FFFScheme::FFFScheme(const ArrayI& dim)
+      : Regular3DScheme(dim)
    {
    }
 
-   FFScheme::~FFScheme()
+   FFFScheme::~FFFScheme()
    {
    }
 
-   void FFScheme::setDimensions()
+   void FFFScheme::setDimensions()
    {
       //
       // Compute sizes
@@ -75,9 +93,14 @@ namespace GeoMHDiSCC {
       nX = Transform::FftwTools::optimizeFft(nX);
 
       // Get standard dealiased FFT size
-      int nY = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
+      int nY = Transform::FftwTools::dealiasFft(this->mJ+1);
       // Check for optimised FFT sizes
       nY = Transform::FftwTools::optimizeFft(nY);
+
+      // Get standard dealiased FFT size
+      int nZ = Transform::FftwTools::dealiasMixedFft(this->mK+1);
+      // Check for optimised FFT sizes
+      nZ = Transform::FftwTools::optimizeFft(nZ);
 
       //
       // Initialise first transform
@@ -90,7 +113,10 @@ namespace GeoMHDiSCC {
       this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(this->mK + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of first transform
+      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform
@@ -100,42 +126,69 @@ namespace GeoMHDiSCC {
       this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of second transform
-      this->setDimension(nY/2 + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
+      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of second transform
       this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of second transform
+      this->setDimension(this->mK + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
+
+      //
+      // Initialise third transform
+      //
+
+      // Initialise forward dimension of third transform
+      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of third transform
+      this->setDimension(nZ/2 + 1, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of third transform
+      this->setDimension(nY, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of third transform
+      this->setDimension(nX, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void FFScheme::setCosts()
+   void FFFScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
 
       // Set second transform cost
       this->setCost(1.0, Dimensions::Transform::TRA2D);
+
+      // Set third transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void FFScheme::setScalings()
+   void FFFScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
 
       // Set second transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA2D);
+
+      // Set third transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void FFScheme::setMemoryScore()
+   void FFFScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
 
       // Set second transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA2D);
+
+      // Set third transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool FFScheme::applicable() const
+   bool FFFScheme::applicable() const
    {
       return true;
    }
-
 }

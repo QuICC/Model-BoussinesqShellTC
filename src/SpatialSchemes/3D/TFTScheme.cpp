@@ -18,8 +18,6 @@
 
 namespace GeoMHDiSCC {
 
-   const int TFTScheme::DIMENSIONS = 3;
-
    Transform::SharedFftSetup TFTScheme::spSetup1D(SharedResolution spRes)
    {
       // Get size of FFT transform
@@ -86,110 +84,111 @@ namespace GeoMHDiSCC {
    void TFTScheme::setDimensions()
    {
       //
+      // Compute sizes
+      //
+
+      // Get standard dealiased FFT size
+      int nX = Transform::FftwTools::dealiasFft(this->mI+1);
+      // Check for optimised FFT sizes
+      nX = Transform::FftwTools::optimizeFft(nX);
+
+      // Get standard dealiased FFT size
+      int nY = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
+      // Check for optimised FFT sizes
+      nY = Transform::FftwTools::optimizeFft(nY);
+
+      // Get standard dealiased FFT size
+      int nZ = Transform::FftwTools::dealiasFft(this->mK+1);
+      // Check for optimised FFT sizes
+      nZ = Transform::FftwTools::optimizeFft(nZ);
+
+      //
       // Initialise first transform
       //
 
       // Initialise forward dimension of first transform
-      this->mDimensions.at(0)(0) = this->nX();
+      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->mDimensions.at(0)(1) = this->nI();
+      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->mDimensions.at(0)(2) = this->nK();
+      this->setDimension(this->mK + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->mDimensions.at(0)(3) = this->nJ();
+      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform
       //
 
       // Initialise forward dimension of second transform
-      this->mDimensions.at(1)(0) = this->nY();
+      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of second transform
-      this->mDimensions.at(1)(1) = this->nY()/2 + 1;
+      this->setDimension(nY/2 + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of second transform
-      this->mDimensions.at(1)(2) = this->nX();
+      this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of second transform
-      this->mDimensions.at(1)(3) = this->nK();
+      this->setDimension(this->mK + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
 
       //
       // Initialise third transform
       //
 
       // Initialise forward dimension of third transform
-      this->mDimensions.at(2)(0) = this->nZ();
+      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of third transform
-      this->mDimensions.at(2)(1) = this->nZ();
+      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of third transform
-      this->mDimensions.at(2)(2) = this->nY();
+      this->setDimension(nY, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of third transform
-      this->mDimensions.at(2)(3) = this->nX();
+      this->setDimension(nX, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void TFTScheme::setCosts(const int shift)
+   void TFTScheme::setCosts()
    {
-      // Set first costs
-      this->mCosts(0) = 1.0;
+      // Set first transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second costs
-      this->mCosts(1) = 1.0;
+      // Set second transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA2D);
 
-      // Set third costs
-      this->mCosts(2) = 1.0;
+      // Set third transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void TFTScheme::setScalings(const int shift)
+   void TFTScheme::setScalings()
    {
-      // Set first scaling
-      this->mScalings(0) = 1.0;
+      // Set first transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second scaling
-      this->mScalings(1) = 1.0;
+      // Set second transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA2D);
 
-      // Set third scaling
-      this->mScalings(2) = 1.0;
+      // Set third transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void TFTScheme::setMemory(const int shift)
+   void TFTScheme::setMemoryScore()
    {
-      // Set first memory footprint
-      this->mMemory(0) = 1.0;
+      // Set first transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second memory footprint
-      this->mMemory(1) = 1.0;
+      // Set second transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA2D);
 
-      // Set third memory footprint
-      this->mMemory(2) = 1.0;
+      // Set third transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
    bool TFTScheme::applicable() const
    {
       return true;
-   }
-
-   Array TFTScheme::loadWeights()
-   {
-      Array weights(this->DIMENSIONS);
-
-      weights = this->mCosts.array() * this->mScalings.array();
-
-      return weights;
-   }
-
-   double TFTScheme::memoryScore(SharedResolution spRes)
-   {
-      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
-         return this->mMemory.prod();
-      #else
-         return 1.0;
-      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 }

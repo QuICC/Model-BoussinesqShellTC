@@ -1,11 +1,11 @@
-/** \file SpatialScheme.hpp
+/** \file ISpatialScheme.hpp
  *  \brief Implementation of the basic components of the spatial scheme
  *
  *  \mhdBug Needs test
  */
 
-#ifndef SPATIALSCHEME_HPP
-#define SPATIALSCHEME_HPP
+#ifndef ISPATIALSCHEME_HPP
+#define ISPATIALSCHEME_HPP
 
 // Configuration includes
 //
@@ -23,14 +23,14 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
-#include "SpatialSchemes/SchemeBase.hpp"
+#include "SpatialSchemes/ISchemeCosts.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
     * @brief Implementation of the basic components of the spatial scheme
     */
-   class SpatialScheme : public SchemeBase
+   class ISpatialScheme : public ISchemeCosts
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace GeoMHDiSCC {
           *
           * @param dims Dimension of the domain
           */
-         explicit SpatialScheme(const int dims);
+         explicit ISpatialScheme(const int dims);
 
          /**
           * @brief Destructor
           */
-         virtual ~SpatialScheme();
+         virtual ~ISpatialScheme();
 
          /**
           * @brief Initialise the scheme
@@ -90,98 +90,35 @@ namespace GeoMHDiSCC {
           *
           * @param i Transform index
           */
-         int dimFwd(const Dimensions::Transform::Id transId) const;
+         int dim(const Dimensions::Transform::Id transId, const Dimensions::Data::Id dataId) const;
 
          /**
-          * @brief Get backward dimension of given transform
+          * @brief Get forward dimension of given transform
           *
           * @param i Transform index
           */
-         int dimBwd(const Dimensions::Transform::Id transId) const;
-
-         /**
-          * @brief Get second dimension of given transform
-          *
-          * @param i Transform index
-          */
-         int dim2D(const Dimensions::Transform::Id transId) const;
-
-         /**
-          * @brief Get third dimension of given transform
-          *
-          * @param i Transform index
-          */
-         int dim3D(const Dimensions::Transform::Id transId) const;
+         void setDimension(int d, const Dimensions::Transform::Id transId, const Dimensions::Data::Id dataId);
 
          /**
           * @brief Get dimension of the domain
           */
          int dims() const;
 
-         /**
-          * @brief Full dimensions of the domain
-          */
-         std::vector<ArrayI>   mDimensions;
-
       private:
          /**
           * @brief Dimension of the domain
           */
          int   mDims;
+
+         /**
+          * @brief Full dimensions of the domain
+          */
+         std::vector<ArrayI>   mDimensions;
    };
 
-   inline int SpatialScheme::dimFwd(const Dimensions::Transform::Id transId) const
-   {
-      // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
-
-      // Assert for dimension size
-      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 0);
-
-      return this->mDimensions.at(static_cast<int>(transId))(0);
-   }
-
-   inline int SpatialScheme::dimBwd(const Dimensions::Transform::Id transId) const
-   {
-      // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
-
-      // Assert for dimension size
-      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 1);
-
-      return this->mDimensions.at(static_cast<int>(transId))(1);
-   }
-
-   inline int SpatialScheme::dim2D(const Dimensions::Transform::Id transId) const
-   {
-      // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
-
-      // Assert for dimension size
-      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 2);
-
-      return this->mDimensions.at(static_cast<int>(transId))(2);
-   }
-
-   inline int SpatialScheme::dim3D(const Dimensions::Transform::Id transId) const
-   {
-      // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
-
-      // Assert for dimension size
-      assert(this->mDimensions.at(static_cast<int>(transId)).size() > 3);
-
-      return this->mDimensions.at(static_cast<int>(transId))(3);
-   }
-
-   inline int SpatialScheme::dims() const
-   {
-      return this->mDims;
-   }
-
-   /// Typedef for a shared pointer to a SpatialScheme object
-   typedef SharedPtrMacro<SpatialScheme>   SharedSpatialScheme;
+   /// Typedef for a shared pointer to a ISpatialScheme object
+   typedef SharedPtrMacro<ISpatialScheme>   SharedISpatialScheme;
 }
 
 
-#endif // SPATIALSCHEME_HPP
+#endif // ISPATIALSCHEME_HPP

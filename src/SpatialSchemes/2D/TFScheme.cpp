@@ -14,10 +14,9 @@
 
 // Project includes
 //
+#include "FastTransforms/FftwTools.hpp"
 
 namespace GeoMHDiSCC {
-
-   const int TFScheme::DIMENSIONS = 2;
 
    Transform::SharedFftSetup TFScheme::spSetup1D(SharedResolution spRes)
    {
@@ -67,80 +66,76 @@ namespace GeoMHDiSCC {
    void TFScheme::setDimensions()
    {
       //
+      // Compute sizes
+      //
+
+      // Get standard dealiased FFT size
+      int nX = Transform::FftwTools::dealiasFft(this->mI+1);
+      // Check for optimised FFT sizes
+      nX = Transform::FftwTools::optimizeFft(nX);
+
+      // Get standard dealiased FFT size
+      int nY = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
+      // Check for optimised FFT sizes
+      nY = Transform::FftwTools::optimizeFft(nY);
+
+      //
       // Initialise first transform
       //
 
       // Initialise forward dimension of first transform
-      this->mDimensions.at(0)(0) = this->nX();
+      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->mDimensions.at(0)(1) = this->nI();
+      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->mDimensions.at(0)(2) = this->nI();
+      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       //
       // Initialise second transform
       //
 
       // Initialise forward dimension of second transform
-      this->mDimensions.at(1)(0) = this->nY();
+      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
 
-      // Initialise backward dimension of first transform
-      this->mDimensions.at(1)(1) = this->nI();
+      // Initialise backward dimension of second transform
+      this->setDimension(nY/2 + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
 
-      // Initialise second dimension of first transform
-      this->mDimensions.at(1)(2) = this->nX();
+      // Initialise second dimension of second transform
+      this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
    }
 
-   void TFScheme::setCosts(const int shift)
+   void TFScheme::setCosts()
    {
-      // Set first costs
-      this->mCosts(0) = 1.0;
+      // Set first transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second costs
-      this->mCosts(1) = 1.0;
+      // Set second transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA2D);
    }
 
-   void TFScheme::setScalings(const int shift)
+   void TFScheme::setScalings()
    {
-      // Set first scaling
-      this->mScalings(0) = 1.0;
+      // Set first transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second scaling
-      this->mScalings(1) = 1.0;
+      // Set second transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA2D);
    }
 
-   void TFScheme::setMemory(const int shift)
+   void TFScheme::setMemoryScore()
    {
-      // Set first memory footprint
-      this->mMemory(0) = 1.0;
+      // Set first transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA1D);
 
-      // Set second memory footprint
-      this->mMemory(1) = 1.0;
+      // Set second transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA2D);
    }
 
    bool TFScheme::applicable() const
    {
       return true;
-   }
-
-   Array TFScheme::loadWeights()
-   {
-      Array weights(this->DIMENSIONS);
-
-      weights = this->mCosts.array() * this->mScalings.array();
-
-      return weights;
-   }
-
-   double TFScheme::memoryScore(SharedResolution spRes)
-   {
-      #ifdef GEOMHDISCC_MEMORYUSAGE_LIMITED
-         return this->mMemory.prod();
-      #else
-         return 1.0;
-      #endif //GEOMHDISCC_MEMORYUSAGE_LIMITED
    }
 
 }

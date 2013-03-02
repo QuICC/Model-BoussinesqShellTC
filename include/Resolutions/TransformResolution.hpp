@@ -78,16 +78,6 @@ namespace GeoMHDiSCC {
           */
          template <Dimensions::Data::Id TDim> int idx(const int i) const;
 
-         /**
-          * @brief Get the forward scalar field setup
-          */
-         Datatypes::SharedScalarFieldSetupType spFwdSetup() const;
-
-         /**
-          * @brief Get the backward scalar field setup
-          */
-         Datatypes::SharedScalarFieldSetupType spBwdSetup() const;
-
       protected:
 
       private:

@@ -43,7 +43,7 @@ namespace Parallel {
          virtual ~IConverter();
 
          /**
-          * @brief Convert data from TFwdA to TBwdB
+          * @brief Set up the converter
           */
          virtual void setup() = 0;
 
@@ -58,12 +58,12 @@ namespace Parallel {
          virtual void convertBwd(const TBwdB &in, StoragePairProvider<TFwdA, TBwdA> &storage) = 0;
 
          /**
-          * @brief Get the converted data from TBwdA to TFwdB conversion
+          * @brief Get the converted data from TBwdB to TFwdA conversion
           */
          virtual TFwdA& getFwd(StoragePairProvider<TFwdA, TBwdA> &storage) = 0;
 
          /**
-          * @brief Get the converted data from TFwdB to TBwdA conversion
+          * @brief Get the converted data from TFwdA to TBwdB conversion
           */
          virtual TBwdB& getBwd(StoragePairProvider<TFwdB, TBwdB> &storage) = 0;
 
@@ -75,12 +75,12 @@ namespace Parallel {
          virtual void setupCommunication(const int packs) = 0;
 
          /**
-          * @brief Start communication for forward transform
+          * @brief Initiate communication for forward transform
           */
          virtual void initiateForwardCommunication() = 0;
 
          /**
-          * @brief Start communication for backward transform
+          * @brief Initiate communication for backward transform
           */
          virtual void initiateBackwardCommunication() = 0;
 
@@ -94,8 +94,8 @@ namespace Parallel {
          /**
           * @brief Set the communication buffers pointers
           *
-          * @brief fBuffers TForward communication buffers
-          * @brief bBuffers TBackward communication buffers
+          * @brief fBuffers Forward communication buffers
+          * @brief bBuffers Backward communication buffers
           */
          void setBuffers(std::vector<char *> &fBuffers, std::vector<char *> &bBuffers);
 
