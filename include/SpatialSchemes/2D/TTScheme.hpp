@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/2D/Regular2DScheme.hpp"
+#include "SpatialSchemes/2D/IRegular2DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
 namespace GeoMHDiSCC {
@@ -29,19 +29,9 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of Chebyshev(FFT) + Chebyshev(FFT) scheme
     */
-   class TTScheme: public Regular2DScheme
+   class TTScheme: public IRegular2DScheme
    {
       public:
-         /**
-          * @brief Construct setup object for first transform
-          */
-         static Transform::SharedFftSetup  spSetup1D(SharedResolution spRes);
-
-         /**
-          * @brief Construct setup object for second transform
-          */
-         static Transform::SharedFftSetup  spSetup2D(SharedResolution spRes);
-
          /**
           * @brief Constructor
           *
@@ -58,6 +48,11 @@ namespace GeoMHDiSCC {
           * @brief Scheme specific splitting restrictions
           */
          virtual bool applicable() const;
+
+         /**
+          * @brief Add the transform setups to resolution
+          */
+         virtual void addTransformSetups(SharedResolution spRes) const;
          
       protected:
          /**
@@ -81,6 +76,15 @@ namespace GeoMHDiSCC {
          virtual void setMemoryScore();
 
       private:
+         /**
+          * @brief Construct setup object for first transform
+          */
+         Transform::SharedFftSetup  spSetup1D(SharedResolution spRes) const;
+
+         /**
+          * @brief Construct setup object for second transform
+          */
+         Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
    };
 
 }

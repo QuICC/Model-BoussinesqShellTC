@@ -58,11 +58,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise transforms of the 2D coordinator
           *
-          * @param setup1D Setup object for 1D transform
-          * @param setup2D Setup object for 2D transform
+          * @param spRes   Resolution information object
           * @param varInfo Variables information
           */
-         void initTransforms(const typename T1D::SetupType& setup1D, const typename T2D::SetupType& setup2D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         void initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
 
          /**
           * @brief Initialise the data communicator
@@ -111,13 +110,13 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransforms(const typename T1D::SetupType& setup1D, const typename T2D::SetupType& setup2D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
    {
       // initialise the other dimension
-      Transform1DCoordinator<T1D, TCommunicator>::initTransforms(setup1D, varInfo);
+      Transform1DCoordinator<T1D, TCommunicator>::initTransforms(spRes, varInfo);
 
       // Initialise the transforms
-      this->initTransform(setup2D);
+      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA2D));
    }
 
    template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransform(const typename T2D::SetupType& setup2D)
@@ -138,7 +137,7 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(0), *spRes->spBwdSetup(0), *spRes->spFwdSetup(1), *spRes->spBwdSetup(1));
+      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D), *spRes->spFwdSetup(Dimensions::Transform::TRA2D), *spRes->spBwdSetup(Dimensions::Transform::TRA2D));
    }
 
    template <typename T1D, typename T2D, typename TCommunicator> std::vector<Array> Transform2DCoordinator<T1D, T2D, TCommunicator>::mesh()

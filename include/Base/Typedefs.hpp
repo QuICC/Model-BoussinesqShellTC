@@ -8,6 +8,7 @@
 #define TYPEDEFS_HPP
 
 /// Generate maximum precision diagnositics output
+#undef EIGEN_DEFAULT_IO_FORMAT
 #define EIGEN_DEFAULT_IO_FORMAT IOFormat(Eigen::FullPrecision)
 
 // Configuration includes

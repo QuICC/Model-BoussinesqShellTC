@@ -22,7 +22,7 @@
 #include "FastTransforms/FftwTools.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/3D/Regular3DScheme.hpp"
+#include "SpatialSchemes/3D/IRegular3DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
 namespace GeoMHDiSCC {
@@ -30,24 +30,9 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of Fourier + Fourier + Fourier scheme
     */
-   class FFFScheme: public Regular3DScheme
+   class FFFScheme: public IRegular3DScheme
    {
       public:
-         /**
-          * @brief Construct setup object for first transform
-          */
-         static Transform::SharedFftSetup  spSetup1D(SharedResolution spRes);
-
-         /**
-          * @brief Construct setup object for second transform
-          */
-         static Transform::SharedFftSetup  spSetup2D(SharedResolution spRes);
-
-         /**
-          * @brief Construct setup object for third transform
-          */
-         static Transform::SharedFftSetup  spSetup3D(SharedResolution spRes);
-
          /**
           * @brief Constructor
           *
@@ -64,6 +49,11 @@ namespace GeoMHDiSCC {
           * @brief Scheme specific splitting restrictions
           */
          virtual bool applicable() const;
+
+         /**
+          * @brief Add the transform setups to resolution
+          */
+         virtual void addTransformSetups(SharedResolution spRes) const;
          
       protected:
          /**
@@ -87,6 +77,20 @@ namespace GeoMHDiSCC {
          virtual void setMemoryScore();
 
       private:
+         /**
+          * @brief Construct setup object for first transform
+          */
+         Transform::SharedFftSetup  spSetup1D(SharedResolution spRes) const;
+
+         /**
+          * @brief Construct setup object for second transform
+          */
+         Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
+
+         /**
+          * @brief Construct setup object for third transform
+          */
+         Transform::SharedFftSetup  spSetup3D(SharedResolution spRes) const;
    };
 
 }

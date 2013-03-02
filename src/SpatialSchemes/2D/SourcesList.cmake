@@ -3,5 +3,5 @@ set(MHDSources
    FFScheme.cpp
    TFScheme.cpp
    TTScheme.cpp
-   Regular2DScheme.cpp
+   IRegular2DScheme.cpp
 )

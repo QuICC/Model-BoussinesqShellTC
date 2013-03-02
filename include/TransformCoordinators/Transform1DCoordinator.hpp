@@ -57,10 +57,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise transform of the 1D coordinator
           *
-          * @param setup1D Setup object for 1D transform
+          * @param spRes   Resolution information object
           * @param varInfo Variables information
           */
-         void initTransforms(const typename T1D::SetupType& setup1D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         void initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
 
          /**
           * @brief Initialise the data communicator
@@ -156,10 +156,10 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(const typename T1D::SetupType& setup1D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
    {
       // Initialise the transforms
-      this->initTransform(setup1D);
+      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA1D));
 
       // Store information about variables
       std::map<PhysicalNames::Id, std::pair<bool,TriBool> >::const_iterator   it;
@@ -187,7 +187,7 @@ namespace GeoMHDiSCC {
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(0), *spRes->spBwdSetup(0));
+      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D));
    }
 
    template <typename T1D, typename TCommunicator> std::vector<Array> Transform1DCoordinator<T1D,TCommunicator>::mesh()

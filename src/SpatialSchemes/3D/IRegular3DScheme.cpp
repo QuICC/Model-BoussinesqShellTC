@@ -1,4 +1,4 @@
-/** \file Regular3DScheme.cpp
+/** \file IRegular3DScheme.cpp
  *  \brief Source of the Chebyshev + Chebyshev scheme implementation
  */
 
@@ -11,25 +11,25 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/Regular3DScheme.hpp"
+#include "SpatialSchemes/3D/IRegular3DScheme.hpp"
 
 // Project includes
 //
 
 namespace GeoMHDiSCC {
 
-   const int Regular3DScheme::DIMENSIONS = 3;
+   const int IRegular3DScheme::DIMENSIONS = 3;
 
-   Regular3DScheme::Regular3DScheme(const ArrayI& dim)
+   IRegular3DScheme::IRegular3DScheme(const ArrayI& dim)
       : ISpatialScheme(dim.size()), mI(dim(0)), mJ(dim(1)), mK(dim(2))
    {
    }
 
-   Regular3DScheme::~Regular3DScheme()
+   IRegular3DScheme::~IRegular3DScheme()
    {
    }
 
-   void Regular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void IRegular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -273,7 +273,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
+   int IRegular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       // Splittable size for first transform splitting
       if(flag == Splitting::Locations::FIRST)

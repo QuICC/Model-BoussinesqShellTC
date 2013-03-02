@@ -93,16 +93,19 @@ namespace Parallel {
       }
 
       // Create shared resolution
-      SharedResolution  res(new Resolution(coreRes, this->mSimDim));
+      SharedResolution  spRes(new Resolution(coreRes, this->mSimDim));
+
+      // Add the transform setups to the resolution
+      this->mspScheme->addTransformSetups(spRes);
 
       // Compute the score of the obtained resolution
-      int score = this->computeScore(res);
+      int score = this->computeScore(spRes);
 
       // Create splitting description
       SplittingDescription descr(this->mAlgo, this->mGrouper, this->mDims, this->mFactors, score);
 
       // Return combination of score and shared resolution/description
-      return std::make_pair(score, std::make_pair(res,descr));
+      return std::make_pair(score, std::make_pair(spRes,descr));
    }
 
    void SplittingAlgorithm::initFactors(const int nFactors)

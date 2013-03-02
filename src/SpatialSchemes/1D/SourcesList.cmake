@@ -2,5 +2,5 @@
 set(MHDSources
    TScheme.cpp
    FScheme.cpp
-   Regular1DScheme.cpp
+   IRegular1DScheme.cpp
 )

@@ -17,7 +17,7 @@ set(MHDTestSources
    LoadSplitter/Algorithms/SerialSplitting.cpp
    SpatialSchemes/ISchemeCosts.cpp
    SpatialSchemes/ISpatialScheme.cpp
-   SpatialSchemes/3D/Regular3DScheme.cpp
+   SpatialSchemes/3D/IRegular3DScheme.cpp
    SpatialSchemes/3D/TFTScheme.cpp
    FastTransforms/FftSetup.cpp
    FastTransforms/FftwTools.cpp

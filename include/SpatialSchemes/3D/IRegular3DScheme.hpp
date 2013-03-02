@@ -1,11 +1,11 @@
-/** \file Regular3DScheme.hpp
+/** \file IRegular3DScheme.hpp
  *  \brief Implementation of a generic regular 3D scheme
  *
  *  \mhdBug Needs test
  */
 
-#ifndef REGULAR3DSCHEME_HPP
-#define REGULAR3DSCHEME_HPP
+#ifndef IREGULAR3DSCHEME_HPP
+#define IREGULAR3DSCHEME_HPP
 
 // Configuration includes
 //
@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of a generic regular 3D scheme
     */
-   class Regular3DScheme: public ISpatialScheme
+   class IRegular3DScheme: public ISpatialScheme
    {
       public:
          /**
@@ -41,12 +41,12 @@ namespace GeoMHDiSCC {
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit Regular3DScheme(const ArrayI& dim);
+         explicit IRegular3DScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~Regular3DScheme();
+         virtual ~IRegular3DScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set
@@ -93,4 +93,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // REGULAR3DSCHEME_HPP
+#endif // IREGULAR3DSCHEME_HPP

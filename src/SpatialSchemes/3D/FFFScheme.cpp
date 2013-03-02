@@ -18,7 +18,22 @@
 
 namespace GeoMHDiSCC {
 
-   Transform::SharedFftSetup FFFScheme::spSetup1D(SharedResolution spRes)
+   void FFFScheme::addTransformSetups(SharedResolution spRes) const
+   {
+      // Add setup for first transform
+      Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
+      spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
+
+      // Add setup for second transform
+      Transform::SharedFftSetup  spS2D = this->spSetup2D(spRes);
+      spRes->addTransformSetup(Dimensions::Transform::TRA2D, spS2D);
+
+      // Add setup for third transform
+      Transform::SharedFftSetup  spS3D = this->spSetup3D(spRes);
+      spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
+   }
+
+   Transform::SharedFftSetup FFFScheme::spSetup1D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -36,7 +51,7 @@ namespace GeoMHDiSCC {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
-   Transform::SharedFftSetup FFFScheme::spSetup2D(SharedResolution spRes)
+   Transform::SharedFftSetup FFFScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -54,7 +69,7 @@ namespace GeoMHDiSCC {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
    }
 
-   Transform::SharedFftSetup FFFScheme::spSetup3D(SharedResolution spRes)
+   Transform::SharedFftSetup FFFScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -73,7 +88,7 @@ namespace GeoMHDiSCC {
    }
 
    FFFScheme::FFFScheme(const ArrayI& dim)
-      : Regular3DScheme(dim)
+      : IRegular3DScheme(dim)
    {
    }
 

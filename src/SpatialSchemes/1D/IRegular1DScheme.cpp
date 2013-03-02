@@ -1,4 +1,4 @@
-/** \file Regular1DScheme.cpp
+/** \file IRegular1DScheme.cpp
  *  \brief Source of the generic regulard 2D scheme implementation
  */
 
@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/1D/Regular1DScheme.hpp"
+#include "SpatialSchemes/1D/IRegular1DScheme.hpp"
 
 // Project includes
 //
@@ -18,18 +18,18 @@
 
 namespace GeoMHDiSCC {
 
-   const int Regular1DScheme::DIMENSIONS = 1;
+   const int IRegular1DScheme::DIMENSIONS = 1;
 
-   Regular1DScheme::Regular1DScheme(const ArrayI& dim)
+   IRegular1DScheme::IRegular1DScheme(const ArrayI& dim)
       : ISpatialScheme(dim.size()), mI(dim(0))
    {
    }
 
-   Regular1DScheme::~Regular1DScheme()
+   IRegular1DScheme::~IRegular1DScheme()
    {
    }
 
-   void Regular1DScheme::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void IRegular1DScheme::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for right transform (1D case)
       assert(transId == Dimensions::Transform::TRA1D);
@@ -68,7 +68,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular1DScheme::splittableTotal(Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
+   int IRegular1DScheme::splittableTotal(Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       throw Exception("There is no splitting algorithm for 1D problems!");
    }

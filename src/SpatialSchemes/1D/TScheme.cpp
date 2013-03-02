@@ -19,7 +19,14 @@
 
 namespace GeoMHDiSCC {
 
-   Transform::SharedFftSetup TScheme::spSetup1D(SharedResolution spRes)
+   void TScheme::addTransformSetups(SharedResolution spRes) const
+   {
+      // Add setup for first transform
+      Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
+      spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
+   }
+
+   Transform::SharedFftSetup TScheme::spSetup1D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -37,7 +44,7 @@ namespace GeoMHDiSCC {
    }
 
    TScheme::TScheme(const ArrayI& dim)
-      : Regular1DScheme(dim)
+      : IRegular1DScheme(dim)
    {
    }
 

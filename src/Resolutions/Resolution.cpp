@@ -83,6 +83,19 @@ namespace GeoMHDiSCC {
       return this->mCores.at(id);
    }
 
+   void Resolution::addTransformSetup(const Dimensions::Transform::Id id, Transform::SharedFftSetup spSetup)
+   {
+      this->mTSetups.insert(std::make_pair(id, spSetup));
+   }
+
+   Transform::SharedFftSetup  Resolution::spTransformSetup(const Dimensions::Transform::Id id) const
+   {
+      // Assert for correct size
+      assert(this->mTSetups.size() > static_cast<size_t>(id));
+
+      return this->mTSetups.find(id)->second;
+   }
+
    Datatypes::SharedScalarFieldSetupType Resolution::spFwdSetup(const Dimensions::Transform::Id id) const
    {
       // Iterator for the vector based storages

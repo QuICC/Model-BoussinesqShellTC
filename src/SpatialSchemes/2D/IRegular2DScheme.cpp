@@ -1,4 +1,4 @@
-/** \file Regular2DScheme.cpp
+/** \file IRegular2DScheme.cpp
  *  \brief Source of the generic regulard 2D scheme implementation
  */
 
@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/2D/Regular2DScheme.hpp"
+#include "SpatialSchemes/2D/IRegular2DScheme.hpp"
 
 // Project includes
 //
@@ -18,18 +18,18 @@
 
 namespace GeoMHDiSCC {
 
-   const int Regular2DScheme::DIMENSIONS = 2;
+   const int IRegular2DScheme::DIMENSIONS = 2;
 
-   Regular2DScheme::Regular2DScheme(const ArrayI& dim)
+   IRegular2DScheme::IRegular2DScheme(const ArrayI& dim)
       : ISpatialScheme(dim.size()), mI(dim(0)), mJ(dim(1))
    {
    }
 
-   Regular2DScheme::~Regular2DScheme()
+   IRegular2DScheme::~IRegular2DScheme()
    {
    }
 
-   void Regular2DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void IRegular2DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Assert for dimension
       assert(transId == Dimensions::Transform::TRA1D || (transId == Dimensions::Transform::TRA2D));
@@ -95,7 +95,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   int Regular2DScheme::splittableTotal(const  Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
+   int IRegular2DScheme::splittableTotal(const  Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       if(flag == Splitting::Locations::FIRST)
       {

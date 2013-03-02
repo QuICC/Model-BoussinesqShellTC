@@ -4,5 +4,5 @@ set(MHDSources
    TFTScheme.cpp
    TFFScheme.cpp
    FFFScheme.cpp
-   Regular3DScheme.cpp
+   IRegular3DScheme.cpp
 )

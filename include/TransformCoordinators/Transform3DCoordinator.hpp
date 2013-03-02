@@ -61,12 +61,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transforms of the 3D coordinator
           *
-          * @param setup1D Setup object for 1D transform
-          * @param setup2D Setup object for 2D transform
-          * @param setup3D Setup object for 3D transform
+          * @param spRes   Resolution information object
           * @param varInfo Variables information
           */
-         void initTransforms(const typename T1D::SetupType& setup1D, const typename T2D::SetupType& setup2D, const typename T3D::SetupType& setup3D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
+         void initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo);
 
          /**
           * @brief Initialise the data communicator
@@ -115,13 +113,13 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(const typename T1D::SetupType& setup1D, const typename T2D::SetupType& setup2D, const typename T3D::SetupType& setup3D, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransforms(SharedResolution spRes, const std::map<PhysicalNames::Id, std::pair<bool,TriBool> >& varInfo)
    {
       // initialise 2 other dimensions
-      Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(setup1D, setup2D, varInfo);
+      Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, varInfo);
 
       // Initialise the transforms
-      this->initTransform(setup3D);
+      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA3D));
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransform(const typename T3D::SetupType& setup3D)
@@ -142,7 +140,7 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(0), *spRes->spBwdSetup(0), *spRes->spFwdSetup(1), *spRes->spBwdSetup(1), *spRes->spFwdSetup(2), *spRes->spBwdSetup(2));
+      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D), *spRes->spFwdSetup(Dimensions::Transform::TRA2D), *spRes->spBwdSetup(Dimensions::Transform::TRA2D), *spRes->spFwdSetup(Dimensions::Transform::TRA3D), *spRes->spBwdSetup(Dimensions::Transform::TRA3D));
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> std::vector<Array> Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::mesh()

@@ -78,6 +78,11 @@ namespace GeoMHDiSCC {
           * @brief Scheme specific splitting restrictions
           */
          virtual bool applicable() const = 0;
+
+         /**
+          * @brief Add scheme specific transform setups to resolution
+          */
+         virtual void addTransformSetups(SharedResolution spRes) const = 0;
          
       protected:
          /**

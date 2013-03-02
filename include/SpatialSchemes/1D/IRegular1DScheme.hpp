@@ -1,11 +1,11 @@
-/** \file Regular1DScheme.hpp
+/** \file IRegular1DScheme.hpp
  *  \brief Implementation of a generic regular 1D scheme
  *
  *  \mhdBug Needs test
  */
 
-#ifndef REGULAR1DSCHEME_HPP
-#define REGULAR1DSCHEME_HPP
+#ifndef IREGULAR1DSCHEME_HPP
+#define IREGULAR1DSCHEME_HPP
 
 // Configuration includes
 //
@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of a generic regular 1D scheme
     */
-   class Regular1DScheme: public ISpatialScheme
+   class IRegular1DScheme: public ISpatialScheme
    {
       public:
          /**
@@ -41,12 +41,12 @@ namespace GeoMHDiSCC {
           *
           * @param dim     Chebyshev truncations
           */
-         explicit Regular1DScheme(const ArrayI& dim);
+         explicit IRegular1DScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~Regular1DScheme();
+         virtual ~IRegular1DScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set
@@ -83,4 +83,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // REGULAR1DSCHEME_HPP
+#endif // IREGULAR1DSCHEME_HPP
