@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 namespace IoHdf5 {
 
    IHdf5Reader::IHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : Hdf5File(name, ext, header, type, version), mBlock(0), mCollIORead(0)
+      : Hdf5File(name, ext, header, type, version), mBlock(0), mCollIoRead(0)
    {
    }
 

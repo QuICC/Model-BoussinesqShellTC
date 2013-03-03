@@ -17,6 +17,11 @@
 //
 
 namespace GeoMHDiSCC {
+   
+   std::string FFFScheme::type()
+   {
+      return "FFF";
+   }
 
    void FFFScheme::addTransformSetups(SharedResolution spRes) const
    {

@@ -171,9 +171,9 @@ namespace GeoMHDiSCC {
       /// \mhdBug Fake implementation
    }
 
-   void Simulation::addOutputFile(double spOutFile)//SharedHdf5 spOutFile)
+   void Simulation::addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
    {
-      /// \mhdBug Fake implementation
+      this->mSimIoCtrl.addOutputFile(spOutFile);
    }
 
    void Simulation::preRun()
@@ -518,30 +518,27 @@ namespace GeoMHDiSCC {
 
    void Simulation::setupOutput()
    {
-//      // Loop over all scalar equations to add scalars
-//      std::vector<SharedIScalarEquation>::iterator scalEqIt;
-//      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-//      {
-//         pOutState->addScalar((*this->mScalarVariables.find((*scalEqIt)->name())));
-//         if((*scalEqIt)->requirements((*scalEqIt)->name())(1))
-//         {
-//            pVisState->addScalar((*this->mScalarVariables.find((*scalEqIt)->name())));
-//         }
-//      }
-//
-//      // Loop over all vector equations to add vectors
-//      std::vector<SharedIVectorEquation>::iterator vectEqIt;
-//      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-//      {
-//         pOutState->addVector((*this->mVectorVariables.find((*vectEqIt)->name())));
-//         if((*vectEqIt)->requirements((*vectEqIt)->name())(1))
-//         {
-//            pVisState->addVector((*this->mVectorVariables.find((*vectEqIt)->name())));
-//         }
-//      }
-//
-//      // init the output writers
-//      this->mSimIoCtrl.initWriters();
+      // Loop over all files added to the simulation control
+      SimulationIoControl::hdf5_iterator  fIt;
+      for(fIt = this->mSimIoCtrl.beginHdf5(); fIt != this->mSimIoCtrl.endHdf5(); ++fIt)
+      {
+         // Loop over all scalars
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
+         for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
+         {
+            (*fIt)->addScalar((*scalIt));
+         }
+
+         // Loop over all vector variables
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
+         for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
+         {
+            (*fIt)->addVector((*vectIt));
+         }
+      }
+
+      // init the output writers
+      this->mSimIoCtrl.initWriters();
    }
 
 }

@@ -17,6 +17,9 @@
 
 // Project includes
 //
+#include "Enums/PhysicalNames.hpp"
+#include "IoVariable/StateFileWriter.hpp"
+#include "IoVariable/VisualizationFileWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -46,11 +49,19 @@ namespace GeoMHDiSCC {
 
    void ExampleModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
-      // Add HDF5 output file
-      //pSim->addOutputFile(AN_HDF5FILE);
+      // Create and add state file to IO
+      IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type()));
+      spState->expect(PhysicalNames::STREAMFUNCTION);
+      spState->expect(PhysicalNames::VELOCITYZ);
+      spState->expect(PhysicalNames::TEMPERATURE);
+      spSim->addOutputFile(spState);
       
-      // Add HDF5 output file
-      //pSim->addOutputFile(AN_HDF5FILE);
+      // Create and add visualization file to IO
+//      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type(), mesh));
+//      spViz->expect(PhysicalNames::STREAMFUNCTION);
+//      spViz->expect(PhysicalNames::VELOCITYZ);
+//      spViz->expect(PhysicalNames::TEMPERATURE);
+//      spSim->addOutputFile(spViz);
    }
 
 }

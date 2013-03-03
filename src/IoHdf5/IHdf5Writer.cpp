@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace IoHdf5 {
 
    IHdf5Writer::IHdf5Writer(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : Hdf5File(name, ext, header, type, version), mCollIOWrite(10000)
+      : Hdf5File(name, ext, header, type, version), mCollIoWrite(10000)
    {
    }
 

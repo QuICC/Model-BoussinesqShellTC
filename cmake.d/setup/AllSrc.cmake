@@ -43,6 +43,7 @@ set(MHDAllSrcDirs
    IoControl
    IoHdf5
    IoTools
+   IoVariable
    IoXml
    LoadSplitter
    Profiler

@@ -61,13 +61,23 @@ namespace GeoMHDiSCC {
       this->mAsciiWriters.push_back(spOutFile);
    }
 
-   void SimulationIoControl::addOutputFile(IoHdf5::SharedIHdf5Writer spOutFile)
+   void SimulationIoControl::addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
    {
       this->mHdf5Writers.push_back(spOutFile);
    }
 
    void SimulationIoControl::initWriters()
-   {
+   {  
+      // First check that all HDF5 writers are full
+      SimulationIoControl::hdf5_iterator itHdf5;
+      for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
+      {
+         if((*itHdf5)->isFull())
+         {
+            throw Exception("There are missing variables in the HDF5 writers");
+         }
+      }
+
       // Iterate over all ASCII writer
       std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
@@ -76,7 +86,6 @@ namespace GeoMHDiSCC {
       }
 
       // Iterate over all HDF5 writer
-      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          (*itHdf5)->init();
@@ -93,7 +102,7 @@ namespace GeoMHDiSCC {
       }
 
       // Iterate over all HDF5 writer
-      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
+      SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          (*itHdf5)->finalize();
@@ -113,7 +122,7 @@ namespace GeoMHDiSCC {
    void SimulationIoControl::writeHdf5()
    {
       // Iterate over all HDF5 writer
-      std::vector<IoHdf5::SharedIHdf5Writer>::iterator itHdf5;
+      SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          (*itHdf5)->write();
@@ -172,5 +181,15 @@ namespace GeoMHDiSCC {
    const std::map<std::string, MHDFloat>& SimulationIoControl::configPhysical() const
    {
       return this->mspCfgFile->physical()->fMap();
+   }
+
+   SimulationIoControl::hdf5_iterator  SimulationIoControl::beginHdf5()
+   {
+      return this->mHdf5Writers.begin();
+   }
+
+   SimulationIoControl::hdf5_iterator  SimulationIoControl::endHdf5()
+   {
+      return this->mHdf5Writers.end();
    }
 }

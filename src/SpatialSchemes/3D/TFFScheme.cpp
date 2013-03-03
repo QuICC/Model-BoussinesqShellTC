@@ -17,6 +17,11 @@
 //
 
 namespace GeoMHDiSCC {
+   
+   std::string TFFScheme::type()
+   {
+      return "TFF";
+   }
 
    void TFFScheme::addTransformSetups(SharedResolution spRes) const
    {

@@ -17,6 +17,11 @@
 #include "FastTransforms/FftwTools.hpp"
 
 namespace GeoMHDiSCC {
+   
+   std::string FFScheme::type()
+   {
+      return "FF";
+   }
 
    void FFScheme::addTransformSetups(SharedResolution spRes) const
    {

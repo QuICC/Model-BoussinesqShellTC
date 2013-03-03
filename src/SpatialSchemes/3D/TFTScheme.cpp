@@ -17,6 +17,11 @@
 //
 
 namespace GeoMHDiSCC {
+   
+   std::string TFTScheme::type()
+   {
+      return "TFT";
+   }
 
    void TFTScheme::addTransformSetups(SharedResolution spRes) const
    {

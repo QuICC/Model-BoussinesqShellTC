@@ -77,12 +77,7 @@ namespace IoHdf5 {
          /**
           * @brief Max collective IO read operations over all CPUs
           */
-         int mCollIORead;
-
-         /**
-          * @brief Set the maximum number of collective IO operations
-          */
-         virtual void setCollIO() = 0;
+         int mCollIoRead;
 
          /**
           * @brief Set data parameters
@@ -315,7 +310,7 @@ namespace IoHdf5 {
       //
       // First do the collective reads
       //
-      for(int i = 0; i < this->mCollIORead; ++i)
+      for(int i = 0; i < this->mCollIoRead; ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();
@@ -349,7 +344,7 @@ namespace IoHdf5 {
       //
       // Then do the independent reads
       //
-      for(unsigned int i = this->mCollIORead; i < this->mFileOffsets.size(); ++i)
+      for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();
@@ -420,7 +415,7 @@ namespace IoHdf5 {
       //
       // First do the collective reads
       //
-      for(int i = 0; i < this->mCollIORead; ++i)
+      for(int i = 0; i < this->mCollIoRead; ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();
@@ -454,7 +449,7 @@ namespace IoHdf5 {
       //
       // Then do the independent reads
       //
-      for(unsigned int i = this->mCollIORead; i < this->mFileOffsets.size(); ++i)
+      for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();
@@ -533,7 +528,7 @@ namespace IoHdf5 {
       //
       // First do the collective reads
       //
-      for(int i = 0; i < this->mCollIORead; ++i)
+      for(int i = 0; i < this->mCollIoRead; ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();
@@ -567,7 +562,7 @@ namespace IoHdf5 {
       //
       // Then do the independent reads
       //
-      for(unsigned int i = this->mCollIORead; i < this->mFileOffsets.size(); ++i)
+      for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
       {
          // Set full memory space
          iDims[0] = storage.at(i).cols();

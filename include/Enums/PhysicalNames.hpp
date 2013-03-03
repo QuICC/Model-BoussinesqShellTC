@@ -31,11 +31,6 @@ namespace GeoMHDiSCC {
        * @name Enum for physical name to ID mapping
        */
       enum Id {CODENSITY, PRESSURE, TEMPERATURE, STREAMFUNCTION, VELOCITYZ, VORTICITYZ, PHI, MAGNETIC, VELOCITY, VORTICITY};
-
-      /**
-       * @brief Convert ID to string
-       */
-      static std::string toString(const Id id);
    };
 }
 

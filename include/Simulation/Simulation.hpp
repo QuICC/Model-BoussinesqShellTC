@@ -115,10 +115,8 @@ namespace GeoMHDiSCC {
           * @brief Add HDF5 output file to solver
           *
           * @param spOutFile Shared HDF5 output file
-          *
-          * \mhdBug Fake declaration
           */
-         void addOutputFile(double spOutFile);//SharedHdf5 spOutFile);
+         void addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile);
 
       protected:
 

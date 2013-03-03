@@ -34,6 +34,11 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
+          * @brief Get type string for the scheme
+          */
+         static std::string type();
+
+         /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations 

@@ -36,11 +36,6 @@ namespace GeoMHDiSCC {
           * @brief Enum for physical field vector components
           */
          enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
-
-         /**
-          * @brief Get ID as tag (abbreviation)
-          */
-         static std::string  toTag(Id comp);
       };
 
       /**
@@ -52,11 +47,6 @@ namespace GeoMHDiSCC {
           * @brief Enum for Spectral field vector components
           */
          enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
-
-         /**
-          * @brief Get ID as tag (abbreviation)
-          */
-         static std::string  toTag(Id comp);
       };
    };
 }

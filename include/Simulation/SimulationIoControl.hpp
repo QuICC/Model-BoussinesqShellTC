@@ -17,7 +17,7 @@
 //
 #include "IoAscii/IAsciiWriter.hpp"
 #include "IoAscii/StdOutPipe.hpp"
-#include "IoHdf5/IHdf5Writer.hpp"
+#include "IoVariable/IVariableHdf5NWriter.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,6 +28,9 @@ namespace GeoMHDiSCC {
    class SimulationIoControl
    {
       public:
+         /// Typedef for an iterator over all the HDF5 writers
+         typedef std::vector<IoVariable::SharedIVariableHdf5NWriter>::iterator hdf5_iterator;
+
          /**
           * @brief Constructor
           */
@@ -80,7 +83,7 @@ namespace GeoMHDiSCC {
           *
           * @param spOutFile Shared HDF5 writer
           */
-         void addOutputFile(IoHdf5::SharedIHdf5Writer  spOutFile);
+         void addOutputFile(IoVariable::SharedIVariableHdf5NWriter  spOutFile);
 
          /**
           * @brief Write ASCII data
@@ -106,6 +109,16 @@ namespace GeoMHDiSCC {
           * @brief Get the map of physical values read from the configuration file
           */
          const std::map<std::string, MHDFloat>& configPhysical() const;
+
+         /**
+          * @brief Get begin iterator to HDF5 files
+          */
+         hdf5_iterator beginHdf5();
+
+         /**
+          * @brief Get end iterator to HDF5 files
+          */
+         hdf5_iterator endHdf5();
          
       protected:
 
@@ -118,7 +131,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Vector of HDF5 output files
           */
-         std::vector<IoHdf5::SharedIHdf5Writer> mHdf5Writers;
+         std::vector<IoVariable::SharedIVariableHdf5NWriter> mHdf5Writers;
 
          /**
           * @brief Handle to StdMessage buffer

@@ -18,6 +18,11 @@
 #include "FastTransforms/FftwTools.hpp"
 
 namespace GeoMHDiSCC {
+   
+   std::string TScheme::type()
+   {
+      return "T";
+   }
 
    void TScheme::addTransformSetups(SharedResolution spRes) const
    {

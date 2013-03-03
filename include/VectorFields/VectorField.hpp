@@ -74,6 +74,13 @@ namespace Datatypes {
           */
          MHDFloat requiredStorage() const;
      #endif // GEOMHDISCC_STORAGEPROFILE
+
+         /**
+          * @brief Set internal storage field data
+          *
+          * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
+          */
+         std::vector<TScalar>& rData();
          
       protected:
          /**
@@ -114,6 +121,11 @@ namespace Datatypes {
    }
 
    template <typename TScalar, int COMPONENTS, typename TType> inline const std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::data() const
+   {
+      return this->mComponents;
+   }
+
+   template <typename TScalar, int COMPONENTS, typename TType> inline std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::rData()
    {
       return this->mComponents;
    }

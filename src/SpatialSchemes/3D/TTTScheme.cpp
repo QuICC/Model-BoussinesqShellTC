@@ -17,6 +17,11 @@
 //
 
 namespace GeoMHDiSCC {
+   
+   std::string TTTScheme::type()
+   {
+      return "TTT";
+   }
 
    void TTTScheme::addTransformSetups(SharedResolution spRes) const
    {

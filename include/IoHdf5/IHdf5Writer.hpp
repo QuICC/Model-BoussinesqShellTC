@@ -70,7 +70,7 @@ namespace IoHdf5 {
          /**
           * @brief Max collective IO Write operations over all CPUs
           */
-         int mCollIOWrite;
+         int mCollIoWrite;
 
          /**
           * @brief Open the file
@@ -356,7 +356,7 @@ namespace IoHdf5 {
       H5Sselect_none(filespace);
 
       // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIOWrite - storage.size()) ; ++i)
+      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()) ; ++i)
       {
          // Write memory into hyperslab
          H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
@@ -455,7 +455,7 @@ namespace IoHdf5 {
       H5Sselect_none(filespace);
 
       // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIOWrite - storage.size()) ; ++i)
+      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()) ; ++i)
       {
          // Write memory into hyperslab
          H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
@@ -541,7 +541,7 @@ namespace IoHdf5 {
       H5Sselect_none(filespace);
 
       // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIOWrite - storage.size()); ++i)
+      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()); ++i)
       {
          // Write memory into hyperslab
          H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
@@ -627,7 +627,7 @@ namespace IoHdf5 {
       H5Sselect_none(filespace);
 
       // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIOWrite - storage.size()); ++i)
+      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()); ++i)
       {
          // Write memory into hyperslab
          H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
