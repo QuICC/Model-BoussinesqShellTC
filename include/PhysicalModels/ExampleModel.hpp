@@ -17,6 +17,8 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
+#include "SpatialSchemes/3D/TFTScheme.hpp"
+#include "Equations/Parameters/PrRaXGParameters.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,6 +31,15 @@ namespace GeoMHDiSCC {
    class ExampleModel
    {
       public:
+         /// Typedef for the spatial scheme used
+         static const int DIMENSION = 3;
+
+         /// Typedef for the spatial scheme used
+         typedef TFTScheme SchemeType;
+
+         /// Typedef for the equation parameters used
+         typedef PrRaXGParameters  ParametersType;
+
          /**
           * @brief Get the required equations
           *

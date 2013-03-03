@@ -84,10 +84,10 @@ namespace Parallel {
          /**
           * @brief Initialise the converter
           *
-          * @param spRes      Shared Resolution
-          * @param fwdDim     Dimension index for forward transform
+          * @param spRes   Shared Resolution
+          * @param id      Dimension index for forward transform
           */
-         void init(SharedResolution spRes, const int fwdDim);
+         void init(SharedResolution spRes, const Dimensions::Transform::Id id);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -109,7 +109,7 @@ namespace Parallel {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~SerialConverter()
@@ -148,10 +148,10 @@ namespace Parallel {
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const int fwdDim)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id id)
    {
       // Store the shared pointer to the transform resolution
-      this->mspTRes = spRes->cpu()->dim(fwdDim);
+      this->mspTRes = spRes->cpu()->dim(id);
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

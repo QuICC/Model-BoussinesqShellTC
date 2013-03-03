@@ -72,17 +72,17 @@ namespace Datatypes {
          /**
           * @brief Initialise to zero
           */
-         void initialiseZeros();
+         void setZeros();
 
          /**
           * @brief Initialise the physical values storage
           */
-         void initialisePhysical();
+         void initializePhysical();
 
          /**
           * @brief Initialise the physical curl storage
           */
-         void initialisePhysicalDiff();
+         void initializePhysicalDiff();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -134,29 +134,29 @@ namespace Datatypes {
    {
    }
 
-   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialiseZeros()
+   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::setZeros()
    {
       // Initialise physical values to zero if required
       if(this->mspPhys)
       {
-         this->rPhys().initialiseZeros();
+         this->rPhys().setZeros();
       }
 
       // Initialise curl values to zero if required
       if(this->mspCurl)
       {
-         this->rCurl().initialiseZeros();
+         this->rCurl().setZeros();
       }
    }
 
-   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysical()
+   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initializePhysical()
    {
-      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spPhysicalSetup()));
+      this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initialisePhysicalDiff()
+   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initializePhysicalDiff()
    {
-      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(*this->spRes()->spPhysicalSetup()));
+      this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

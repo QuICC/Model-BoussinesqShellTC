@@ -67,7 +67,7 @@ namespace Datatypes {
          /**
           * @brief initialise to zeros
           */
-         void initialiseZeros();
+         void setZeros();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -106,7 +106,7 @@ namespace Datatypes {
    }
 
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::ScalarVariable(SharedResolution spRes)
-      : ScalarPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(*spRes->spSpectralSetup())
+      : ScalarPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(spRes->spSpectralSetup())
    {
    }
 
@@ -114,13 +114,13 @@ namespace Datatypes {
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::initialiseZeros()
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::setZeros()
    {
       // initialise the physical components to zero
-      ScalarPhysicalVariable<TPScalar,PCOMPONENTS>::initialiseZeros();
+      ScalarPhysicalVariable<TPScalar,PCOMPONENTS>::setZeros();
 
       // initialise scalar field to zero
-      this->rPerturbation().initialiseZeros();
+      this->rPerturbation().setZeros();
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

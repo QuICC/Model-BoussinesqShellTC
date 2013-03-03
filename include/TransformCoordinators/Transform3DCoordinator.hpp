@@ -95,9 +95,9 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transforms
           *
-          * @param setup3D Setup object for 3D transform
+          * @param spSetup3D Shared setup object for 3D transform
           */
-         void initTransform(const typename T3D::SetupType& setup3D);
+         void initTransform(typename T3D::SharedSetupType spSetup3D);
    };
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> inline T3D&  Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::transform3D()
@@ -120,13 +120,13 @@ namespace GeoMHDiSCC {
       Transform2DCoordinator<T1D,T2D, TCommunicator>::initTransforms(spRes, varInfo);
 
       // Initialise the transforms
-      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA3D));
+      this->initTransform(spRes->spTransformSetup(Dimensions::Transform::TRA3D));
    }
 
-   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransform(const typename T3D::SetupType& setup3D)
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initTransform(typename T3D::SharedSetupType spSetup3D)
    {
       // initialise the third transform
-      this->mTransform3D.init(setup3D);
+      this->mTransform3D.init(spSetup3D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem3D = this->mTransform3D.requiredStorage();
@@ -141,7 +141,7 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D), *spRes->spFwdSetup(Dimensions::Transform::TRA2D), *spRes->spBwdSetup(Dimensions::Transform::TRA2D), *spRes->spFwdSetup(Dimensions::Transform::TRA3D), *spRes->spBwdSetup(Dimensions::Transform::TRA3D));
+      this->mCommunicator.init(spRes->spFwdSetup(Dimensions::Transform::TRA1D), spRes->spBwdSetup(Dimensions::Transform::TRA1D), spRes->spFwdSetup(Dimensions::Transform::TRA2D), spRes->spBwdSetup(Dimensions::Transform::TRA2D), spRes->spFwdSetup(Dimensions::Transform::TRA3D), spRes->spBwdSetup(Dimensions::Transform::TRA3D));
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> std::vector<Array> Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::mesh()

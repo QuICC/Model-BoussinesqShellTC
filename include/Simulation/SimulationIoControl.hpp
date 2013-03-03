@@ -91,6 +91,21 @@ namespace GeoMHDiSCC {
           * @brief Write HDF5 data
           */
          void writeHdf5();
+
+         /**
+          * @brief Get the dimension read from the configuration file
+          */
+         ArrayI configDimension() const;
+
+         /**
+          * @brief Get the number of CPUs read from the configuration file
+          */
+         int configNCpu() const;
+
+         /**
+          * @brief Get the map of physical values read from the configuration file
+          */
+         const std::map<std::string, MHDFloat>& configPhysical() const;
          
       protected:
 

@@ -21,7 +21,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "TransformGroupers/ForwardGrouperBase.hpp"
+#include "TransformGroupers/IForwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,7 +30,7 @@ namespace Transform {
    /**
     * @brief This class defines a simple equation wise forward transform grouping algorithm (serial algorithm)
     */
-   template <typename TConfigurator> class ForwardEquationGrouper: public ForwardGrouperBase
+   template <typename TConfigurator> class ForwardEquationGrouper: public IForwardGrouper
    {
       public:
          /**

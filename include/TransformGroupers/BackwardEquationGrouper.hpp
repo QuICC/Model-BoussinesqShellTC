@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/BackwardGrouperBase.hpp"
+#include "TransformGroupers/IBackwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,7 +29,7 @@ namespace Transform {
    /**
     * @brief This class defines a simple equation wise backward transform grouping algorithm (serial algorithm)
     */
-   template <typename TConfigurator> class BackwardEquationGrouper: public BackwardGrouperBase
+   template <typename TConfigurator> class BackwardEquationGrouper: public IBackwardGrouper
    {
       public:
          /**

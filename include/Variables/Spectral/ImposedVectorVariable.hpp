@@ -67,7 +67,7 @@ namespace Dataypes {
          /**
           * @brief initialise to zeros
           */
-         void initialiseZeros();
+         void setZeros();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -120,16 +120,16 @@ namespace Dataypes {
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::initialiseZeros()
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::setZeros()
    {
       // initialise the perturbation field to zero
-      VectorVariable::initialiseZeros();
+      VectorVariable::setZeros();
 
       // initialise vector imposed field to zero
-      this->rImposed().initialiseZeros();
+      this->rImposed().setZeros();
 
       // initialise vector total field to zero
-      this->mTotal.initialiseZeros();
+      this->mTotal.setZeros();
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

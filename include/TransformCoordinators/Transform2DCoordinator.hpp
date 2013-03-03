@@ -92,9 +92,9 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transforms
           *
-          * @param setup2D Setup object for 2D transform
+          * @param spSetup2D Shared setup object for 2D transform
           */
-         void initTransform(const typename T2D::SetupType& setup2D);
+         void initTransform(typename T2D::SharedSetupType spSetup2D);
    };
 
    template <typename T1D, typename T2D, typename TCommunicator> inline T2D&  Transform2DCoordinator<T1D, T2D, TCommunicator>::transform2D()
@@ -117,13 +117,13 @@ namespace GeoMHDiSCC {
       Transform1DCoordinator<T1D, TCommunicator>::initTransforms(spRes, varInfo);
 
       // Initialise the transforms
-      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA2D));
+      this->initTransform(spRes->spTransformSetup(Dimensions::Transform::TRA2D));
    }
 
-   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransform(const typename T2D::SetupType& setup2D)
+   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransform(typename T2D::SharedSetupType spSetup2D)
    {
       // initialise the second
-      this->mTransform2D.init(setup2D);
+      this->mTransform2D.init(spSetup2D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem2D = this->mTransform2D.requiredStorage();
@@ -138,7 +138,7 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D), *spRes->spFwdSetup(Dimensions::Transform::TRA2D), *spRes->spBwdSetup(Dimensions::Transform::TRA2D));
+      this->mCommunicator.init(spRes->spFwdSetup(Dimensions::Transform::TRA1D), spRes->spBwdSetup(Dimensions::Transform::TRA1D), spRes->spFwdSetup(Dimensions::Transform::TRA2D), spRes->spBwdSetup(Dimensions::Transform::TRA2D));
    }
 
    template <typename T1D, typename T2D, typename TCommunicator> std::vector<Array> Transform2DCoordinator<T1D, T2D, TCommunicator>::mesh()

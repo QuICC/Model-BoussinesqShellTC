@@ -37,14 +37,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~StorageProvider();
+         ~StorageProvider();
 
          /**
           * @brief Initialise the provider
           *
-          * @param setup Setup for TData
+          * @param spSetup Shared setup for TData
           */
-         void init(const typename TData::SetupType& setup);
+         void init(typename TData::SharedSetupType spSetup);
 
          /**
           * @brief Resize the storage
@@ -132,9 +132,9 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise temporary storage
           *
-          * @param setup Setup for TData
+          * @param spSetup Shared setup for TData
           */
-         void initStorage(const typename TData::SetupType& setup);
+         void initStorage(typename TData::SharedSetupType spSetup);
 
          /**
           * @brief Initialise temporary storage queues (available storage)
@@ -183,13 +183,17 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename TData> void StorageProvider<TData>::init(const typename TData::SetupType& setup)
+   template <typename TData> StorageProvider<TData>::~StorageProvider()
+   {
+   }
+
+   template <typename TData> void StorageProvider<TData>::init(typename TData::SharedSetupType spSetup)
    {
       // Set initial number of TData storages
       this->mNTmp = 1;
 
       // Init the temporary storage
-      this->initStorage(setup);
+      this->initStorage(spSetup);
 
       // Init the temporary storage queues
       this->initQueues();
@@ -214,12 +218,12 @@ namespace GeoMHDiSCC {
       this->initQueues();
    }
 
-   template <typename TData> void StorageProvider<TData>::initStorage(const typename TData::SetupType& setup)
+   template <typename TData> void StorageProvider<TData>::initStorage(typename TData::SharedSetupType spSetup)
    {
       // Initialise the TData storage data
       for(int i=0; i < this->mNTmp; ++i)
       {
-         this->mTmp.push_back(TData(setup));
+         this->mTmp.push_back(TData(spSetup));
       }
    }
 

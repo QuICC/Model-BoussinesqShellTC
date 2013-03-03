@@ -67,7 +67,7 @@ namespace Datatypes {
          /**
           * @brief initialise to zeros
           */
-         void initialiseZeros();
+         void setZeros();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -112,7 +112,7 @@ namespace Datatypes {
    }
 
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ImposedScalarVariabl<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>e::ImposedScalarVariable(SharedResolution spRes)
-      : ScalarVariable(spRes), mImposed(*spRes->spSpectralSetup()), mTotal(*spRes->spSpectralSetup())
+      : ScalarVariable(spRes), mImposed(spRes->spSpectralSetup()), mTotal(spRes->spSpectralSetup())
    {
    }
 
@@ -120,16 +120,16 @@ namespace Datatypes {
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ImposedScalarVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::initialiseZeros()
+   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ImposedScalarVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::setZeros()
    {
       // initialise the pertubation component to zero
-      ScalarVariable::initialiseZeros();
+      ScalarVariable::setZeros();
 
       // initialise imposed scalar field to zero
-      this->rImposed().initialiseZeros();
+      this->rImposed().setZeros();
 
       // initialise total scalar field to zero
-      this->mTotal.initialiseZeros();
+      this->mTotal.setZeros();
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

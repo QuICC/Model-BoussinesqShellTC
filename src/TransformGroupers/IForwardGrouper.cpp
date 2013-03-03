@@ -1,4 +1,4 @@
-/** \file ForwardGrouperBase.cpp
+/** \file IForwardGrouper.cpp
  *  \brief Source of the implementation of the equation wise forward transform grouper
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "TransformGroupers/ForwardGrouperBase.hpp"
+#include "TransformGroupers/IForwardGrouper.hpp"
 
 // Project includes
 //
@@ -23,16 +23,16 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   ForwardGrouperBase::ForwardGrouperBase()
+   IForwardGrouper::IForwardGrouper()
       : split(Splitting::Locations::NONE), mScalarPacks1D(1), mScalarPacks2D(1), mVectorPacks1D(3), mVectorPacks2D(3)
    {
    }
 
-   ForwardGrouperBase::~ForwardGrouperBase()
+   IForwardGrouper::~IForwardGrouper()
    {
    }
 
-   ArrayI ForwardGrouperBase::listPacks1D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::listPacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
@@ -68,7 +68,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::listPacks2D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::listPacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
@@ -104,7 +104,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::groupPacks1D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::groupPacks1D(const VariableRequirement& varInfo)
    {
       // Initialise the number of packs
       ArrayI packs(1);
@@ -130,7 +130,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI ForwardGrouperBase::groupPacks2D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::groupPacks2D(const VariableRequirement& varInfo)
    {  
       // Initialise the number of packs
       ArrayI packs(1);

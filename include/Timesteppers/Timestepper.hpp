@@ -53,8 +53,8 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise timestepper
           *
-          * @param scalEq Scalar equations
-          * @param vectEq Vector equations
+          * @param scalEq Shared scalar equations
+          * @param vectEq Shared vector equations
           */
          void init(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
 
@@ -66,8 +66,8 @@ namespace GeoMHDiSCC {
          /**
           * @brief Compute (partial) forward step
           *
-          * @param scalEq Scalar equations
-          * @param vectEq Vector equations
+          * @param scalEq Shared scalar equations
+          * @param vectEq Shared vector equations
           */
          void stepForward(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
          
@@ -111,15 +111,15 @@ namespace GeoMHDiSCC {
          void computeRHS();
 
          /**
-          * @brief Solve the all the linear systems
+          * @brief Solve all the linear systems
           */
          void solve();
 
          /**
           * @brief Update equation unkowns with timestepper output 
           *
-          * @param scalEq Scalar equations
-          * @param vectEq Vector equations
+          * @param scalEq Shared scalar equations
+          * @param vectEq Shared vector equations
           */
          void transferOutput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
 

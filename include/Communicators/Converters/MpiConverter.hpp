@@ -106,7 +106,7 @@ namespace Parallel {
           * @param fwdPacks   Array of possible pack sizes for forward transform
           * @param bwdPacks   Array of possible pack sizes for backward transform
           */
-         void init(SharedResolution spRes, const int fwdDim, std::vector<TFwdA>& fwdTmps, std::vector<TBwdB>& bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks);
+         void init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA>& fwdTmps, std::vector<TBwdB>& bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -126,7 +126,7 @@ namespace Parallel {
           * @param fTmps   Vector of all the TFwdA temporaries
           * @param bTmps   Vector of all the TBwdB temporaries
           */
-         void initTypes(SharedResolution spRes, const int fwdDim, std::vector<TFwdA>& fTmps, std::vector<TBwdB>& bTmps);
+         void initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA>& fTmps, std::vector<TBwdB>& bTmps);
 
          /**
           * @brief Initialise the sizes and CPU lists
@@ -188,7 +188,7 @@ namespace Parallel {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~MpiConverter()
@@ -298,7 +298,7 @@ namespace Parallel {
       this->mIsSending = true;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const int fwdDim, std::vector<TFwdA> &fwdTmps, std::vector<TBwdB> &bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA> &fwdTmps, std::vector<TBwdB> &bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
       // Store the possible pack sizes
       this->mForwardPacks = fwdPacks;
@@ -315,7 +315,7 @@ namespace Parallel {
       this->initLists(fwdTmps.at(0), bwdTmps.at(0));
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initTypes(SharedResolution spRes, const int fwdDim, std::vector<TFwdA> &fTmps, std::vector<TBwdB> &bTmps)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA> &fTmps, std::vector<TBwdB> &bTmps)
    {
       // Loop over all the cpus
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)

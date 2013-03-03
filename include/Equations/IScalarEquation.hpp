@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/EquationParameters.hpp"
+#include "Equations/IEquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -38,7 +38,7 @@ namespace GeoMHDiSCC {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IScalarEquation(SharedEquationParameters spEqParams);
+         explicit IScalarEquation(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

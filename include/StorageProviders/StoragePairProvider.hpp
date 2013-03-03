@@ -39,15 +39,15 @@ namespace GeoMHDiSCC {
          /**
           * @brief Destructor
           */
-         virtual ~StoragePairProvider();
+         ~StoragePairProvider();
 
          /**
           * @brief Initialise the provider with one unit of each
           *
-          * @param setupFwd Setup for TForward
-          * @param setupBwd Setup for TBackward
+          * @param spSetupFwd Setup for TForward
+          * @param spSetupBwd Setup for TBackward
           */
-         void init(const typename TForward::SetupType& setupFwd, const typename TBackward::SetupType& setupBwd);
+         void init(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd);
 
          /**
           * @brief Resize the storage
@@ -202,10 +202,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise temporary storage
           *
-          * @param setupFwd Setup for TForward
-          * @param setupBwd Setup for TBackward
+          * @param spSetupFwd Shared setup for TForward
+          * @param spSetupBwd Shared setup for TBackward
           */
-         void initStorage(const typename TForward::SetupType& setupFwd, const typename TBackward::SetupType& setupBwd);
+         void initStorage(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd);
 
          /**
           * @brief Initialise temporary storage queues (available storage)
@@ -290,7 +290,11 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::init(const typename TForward::SetupType& setupFwd, const typename TBackward::SetupType& setupBwd)
+   template <typename TForward, typename TBackward> StoragePairProvider<TForward, TBackward>::~StoragePairProvider()
+   {
+   }
+
+   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::init(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
    {
       // Set initial number of TForward storages
       this->mNFTmp = 2;
@@ -299,7 +303,7 @@ namespace GeoMHDiSCC {
       this->mNBTmp = 2;
 
       // Init the temporary storage
-      this->initStorage(setupFwd, setupBwd);
+      this->initStorage(spSetupFwd, spSetupBwd);
 
       // Init the temporary storage queues
       this->initQueues();
@@ -330,18 +334,18 @@ namespace GeoMHDiSCC {
       this->initQueues();
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::initStorage(const typename TForward::SetupType& setupFwd, const typename TBackward::SetupType& setupBwd)
+   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::initStorage(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
    {
       // Initialise the TForward storage data
       for(int i=0; i < this->mNFTmp; ++i)
       {
-         this->mFTmp.push_back(TForward(setupFwd));
+         this->mFTmp.push_back(TForward(spSetupFwd));
       }
 
       // Initialise the TBackward storage data
       for(int i=0; i < this->mNBTmp; ++i)
       {
-         this->mBTmp.push_back(TBackward(setupBwd));
+         this->mBTmp.push_back(TBackward(spSetupBwd));
       }
    }
 

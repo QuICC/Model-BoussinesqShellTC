@@ -255,7 +255,7 @@ namespace Parallel {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~IConverter()

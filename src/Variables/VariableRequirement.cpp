@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   const FieldRequirement& VariableRequirement::requirement(const PhysicalNames::Id id) const
+   const FieldRequirement& VariableRequirement::field(const PhysicalNames::Id id) const
    {
       // Safety assert
       assert(this->mInfo.find(id) != this->mInfo.end());
@@ -47,5 +47,22 @@ namespace GeoMHDiSCC {
    VariableRequirement::const_iterator VariableRequirement::end() const
    {
       return this->mInfo.end();
+   }
+
+   void VariableRequirement::merge(const VariableRequirement& req)
+   {
+      // Create iterator
+      VariableRequirement::const_iterator it;
+
+      for(it = req.begin(); it != req.end(); it++)
+      {
+         if(this->mInfo.count(it->first) == 0)
+         {
+            this->mInfo.insert(*it);
+         } else
+         {
+            this->mInfo.find(it->first)->second.merge(it->second);
+         }
+      }
    }
 }

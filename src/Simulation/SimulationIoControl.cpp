@@ -143,4 +143,34 @@ namespace GeoMHDiSCC {
       // Initialise the StdOutPipe output
       this->mspStdOut->init(); 
    }
+
+   ArrayI SimulationIoControl::configDimension() const
+   {
+      // Get truncation map
+      std::map<std::string,int>  trunc = this->mspCfgFile->truncation()->iMap();
+
+      // Create storage for the dimensions
+      ArrayI dim(trunc.size());
+
+      // Extrac dimension from truncation read from file
+      std::map<std::string,int>::const_iterator  itI;
+      int i = 0;
+      for(itI = trunc.begin(); itI != trunc.end(); itI++)
+      {
+         dim(i) = itI->second;
+         i++;
+      }
+
+      return dim;
+   }
+
+   int SimulationIoControl::configNCpu() const
+   {
+      return this->mspCfgFile->parallel()->iValue("cpus");
+   }
+
+   const std::map<std::string, MHDFloat>& SimulationIoControl::configPhysical() const
+   {
+      return this->mspCfgFile->physical()->fMap();
+   }
 }

@@ -1,4 +1,4 @@
-/** \file BackwardGrouperBase.cpp
+/** \file IBackwardGrouper.cpp
  *  \brief Source of the implementation of the equation wise forward transform grouper
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "TransformGroupers/BackwardGrouperBase.hpp"
+#include "TransformGroupers/IBackwardGrouper.hpp"
 
 // Project includes
 //
@@ -23,16 +23,16 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   BackwardGrouperBase::BackwardGrouperBase()
+   IBackwardGrouper::IBackwardGrouper()
       : split(Splitting::Locations::NONE), mScalarPacks1D(1), mGradientPacks1D(2), mVectorPacks1D(3), mCurlPacks1D(3), mScalarPacks2D(1), mGradientPacks2D(2), mVectorPacks2D(3), mCurlPacks2D(3)
    {
    }
 
-   BackwardGrouperBase::~BackwardGrouperBase()
+   IBackwardGrouper::~IBackwardGrouper()
    {
    }
 
-   ArrayI BackwardGrouperBase::listPacks1D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::listPacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
@@ -81,7 +81,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::listPacks2D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::listPacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
@@ -129,7 +129,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::namePacks1D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::namePacks1D(const VariableRequirement& varInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
@@ -192,7 +192,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::namePacks2D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::namePacks2D(const VariableRequirement& varInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
@@ -255,7 +255,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::groupPacks1D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::groupPacks1D(const VariableRequirement& varInfo)
    {
       // Initialise the number of packs
       ArrayI packs(1);
@@ -293,7 +293,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI BackwardGrouperBase::groupPacks2D(const VariableRequirement& varInfo)
+   ArrayI IBackwardGrouper::groupPacks2D(const VariableRequirement& varInfo)
    {  
       // Initialise the number of packs
       ArrayI packs(1);

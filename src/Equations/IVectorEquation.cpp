@@ -20,7 +20,7 @@
 
 namespace GeoMHDiSCC {
 
-   IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams)
+   IVectorEquation::IVectorEquation(SharedIEquationParameters spEqParams)
       : IEvolutionEquation(spEqParams)
    {
    }

@@ -1,4 +1,4 @@
 set(MHDSources
-   ForwardGrouperBase.cpp
-   BackwardGrouperBase.cpp
+   IForwardGrouper.cpp
+   IBackwardGrouper.cpp
 )

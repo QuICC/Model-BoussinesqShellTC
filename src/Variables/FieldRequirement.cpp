@@ -4,6 +4,7 @@
 
 // System includes
 //
+#include <cassert>
 
 // External includes
 //
@@ -44,6 +45,21 @@ namespace GeoMHDiSCC {
    bool FieldRequirement::needPhysicalDiff() const
    {
       return this->mNeedDiff;
+   }
+
+   void FieldRequirement::merge(const FieldRequirement& req)
+   {
+      // Assert for same type
+      assert(this->mIsScalar == req.isScalar());
+
+      // Do OR operation on spectral requirement
+      this->mNeedSpectral = this->mNeedSpectral || req.needSpectral(); 
+
+      // Do OR operation on physical requirement
+      this->mNeedPhysical = this->mNeedPhysical || req.needPhysical(); 
+
+      // Do OR operation on physical differential requirement
+      this->mNeedDiff = this->mNeedDiff || req.needPhysicalDiff(); 
    }
 
 }

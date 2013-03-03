@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/BackwardGrouperBase.hpp"
+#include "TransformGroupers/IBackwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -29,7 +29,7 @@ namespace Transform {
    /**
     * @brief This class defines the backward single grouping exchange grouping algorithm for the first exchange
     */
-   template <typename TConfigurator> class BackwardSingle1DGrouper: public BackwardGrouperBase
+   template <typename TConfigurator> class BackwardSingle1DGrouper: public IBackwardGrouper
    {
       public:
          /**

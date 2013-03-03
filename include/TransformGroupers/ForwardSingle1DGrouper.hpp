@@ -21,7 +21,7 @@
 //
 #include "Equations/ScalarEquation.hpp"
 #include "Equations/VectorEquation.hpp"
-#include "TransformGroupers/ForwardGrouperBase.hpp"
+#include "TransformGroupers/IForwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,7 +30,7 @@ namespace Transform {
    /**
     * @brief This class defines the forward single grouping exchange grouping algorithm for the first exchange
     */
-   template <typename TConfigurator> class ForwardSingle1DGrouper: public ForwardGrouperBase
+   template <typename TConfigurator> class ForwardSingle1DGrouper: public IForwardGrouper
    {
       public:
          /**

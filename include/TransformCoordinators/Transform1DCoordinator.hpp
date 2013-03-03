@@ -118,9 +118,9 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transforms
           *
-          * @param setup1D Setup object for 1D transform
+          * @param spSetup1D Shared setup object for 1D transform
           */
-         void initTransform(const typename T1D::SetupType& setup1D);
+         void initTransform(typename T1D::SharedSetupType spSetup1D);
    };
 
    template <typename T1D, typename TCommunicator> inline T1D&  Transform1DCoordinator<T1D,TCommunicator>::transform1D()
@@ -154,16 +154,16 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
    {
       // Initialise the transforms
-      this->initTransform(*spRes->spTransformSetup(Dimensions::Transform::TRA1D));
+      this->initTransform(spRes->spTransformSetup(Dimensions::Transform::TRA1D));
 
       // Store information about variables
       this->mVarInfo = varInfo;
    }
 
-   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransform(const typename T1D::SetupType& setup1D)
+   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransform(typename T1D::SharedSetupType spSetup1D)
    {
       // initialise the first transform
-      this->mTransform1D.init(setup1D);
+      this->mTransform1D.init(spSetup1D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem1D = this->mTransform1D.requiredStorage();
@@ -178,7 +178,7 @@ namespace GeoMHDiSCC {
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initCommunicator(SharedResolution spRes)
    {
       // initialise the communicator
-      this->mCommunicator.init(*spRes->spFwdSetup(Dimensions::Transform::TRA1D), *spRes->spBwdSetup(Dimensions::Transform::TRA1D));
+      this->mCommunicator.init(spRes->spFwdSetup(Dimensions::Transform::TRA1D), spRes->spBwdSetup(Dimensions::Transform::TRA1D));
    }
 
    template <typename T1D, typename TCommunicator> std::vector<Array> Transform1DCoordinator<T1D,TCommunicator>::mesh()

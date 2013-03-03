@@ -43,7 +43,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Check if it is scalar field
           */
-         const FieldRequirement& requirement(const PhysicalNames::Id id) const;
+         const FieldRequirement& field(const PhysicalNames::Id id) const;
 
          /**
           * @brief Add field requirement
@@ -59,6 +59,13 @@ namespace GeoMHDiSCC {
           * @brief Const iterator to access all requirements
           */
          const_iterator end() const;
+
+         /**
+          * @brief Merge the information of two requirements
+          *
+          * The operation is basically a OR on the need? calls
+          */
+         void merge(const VariableRequirement& req);
          
       protected:
 

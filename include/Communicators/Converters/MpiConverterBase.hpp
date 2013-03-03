@@ -60,7 +60,7 @@ namespace Parallel {
           * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
-         void buildFwdDatatype(SharedResolution spRes, const int fwdDim, TFwdA &data, MPI_Datatype &type, const int cpuId);
+         void buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &data, MPI_Datatype &type, const int cpuId);
 
          /**
           * @brief Build a backward MPI Datatype
@@ -71,7 +71,7 @@ namespace Parallel {
           * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
-         void buildBwdDatatype(SharedResolution spRes, const int fwdDim, TBwdB &data, MPI_Datatype &type, const int cpuId);
+         void buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TBwdB &data, MPI_Datatype &type, const int cpuId);
 
          /**
           * @brief Extract shared indexes
@@ -300,12 +300,12 @@ namespace Parallel {
       }
 
       // Create MPI datatype
-      MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<typename TFwdA::CoefficientType>(), &type);
+      MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<typename TFwdA::PointType>(), &type);
       // Commit MPI datatype
       MPI_Type_commit(&type);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::buildFwdDatatype(SharedResolution spRes, const int fwdDim, TFwdA &data, MPI_Datatype &type, const int cpuId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &data, MPI_Datatype &type, const int cpuId)
    {
       // Create  map of the local indexes to unique keys
       std::map<std::tr1::tuple<int,int,int>,std::tr1::tuple<int,int,int> >  localIdxMap;
@@ -325,20 +325,20 @@ namespace Parallel {
       if(TFwdB::FieldDimension == Dimensions::THREED)
       {
          // Create the list of local indexes
-         for(int k=0; k < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim3D(); ++k)
+         for(int k=0; k < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // Extract "physical" index of third dimension
-            k_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx3D(k);
+            k_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data::DAT3D>(k);
 
-            for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim2D(k); ++j)
+            for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
                // Extract "physical" index of second dimension
-               j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx2D(j,k);
+               j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j,k);
 
-               for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dimFwd(j,k); ++i)
+               for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(j,k); ++i)
                {
                   // Extract "physical" index of first dimension
-                  i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idxFwd(i,j,k);
+                  i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,j,k);
 
                   // Combine array indexes into coordinate tuple
                   coord = std::tr1::make_tuple(i, j, k);
@@ -353,20 +353,20 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int k=0; k < spRes->cpu(cpuId)->dim(fwdDim+1)->dim3D(); ++k)
+         for(int k=0; k < spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // Extract "physical" index of third dimension
-            k_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idx3D(k);
+            k_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data::DAT3D>(k);
 
-            for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim+1)->dim2D(k); ++j)
+            for(int j=0; j < spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
                // Extract "physical" index of second dimension
-               j_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idx2D(j,k);
+               j_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data::DAT2D>(j,k);
 
-               for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim+1)->dimBwd(j,k); ++i)
+               for(int i=0; i < spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data::DATB1D>(j,k); ++i)
                {
                   // Extract "physical" index of first dimension
-                  i_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idxBwd(i,j,k);
+                  i_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data::DATB1D>(i,j,k);
 
                   // Create key as (2D, 3D, 1D)
                   key = std::tr1::make_tuple(j_, k_, i_);
@@ -381,15 +381,15 @@ namespace Parallel {
       } else if(TFwdB::FieldDimension == Dimensions::TWOD)
       {
          // Create the list of local indexes
-         for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim2D(); ++j)
+         for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data:DAT2D>(); ++j)
          {
             // Extract "physical" index of second dimension
-            j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx2D(j);
+            j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data:DAT2D>(j);
 
-            for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dimFwd(j); ++i)
+            for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data:DATF1D>(j); ++i)
             {
                // Extract "physical" index of first dimension
-               i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idxFwd(i,j);
+               i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data:DATF1D>(i,j);
 
                // Combine array indexes into coordinate tuple
                coord = std::tr1::make_tuple(i, j, 0);
@@ -403,15 +403,15 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim2D(); ++j)
+         for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DAT2D>(); ++j)
          {
             // Extract "physical" index of second dimension
-            j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx2D(j);
+            j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DAT2D>(j);
 
-            for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim+1)->dimBwd(j); ++i)
+            for(int i=0; i < spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DATB1D>(j); ++i)
             {
                // Extract "physical" index of first dimension
-               i_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idxBwd(i,j);
+               i_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATB1D>(i,j);
 
                // Create key as (1D, 2D, 0)
                key = std::tr1::make_tuple(j_, i_, 0);
@@ -425,10 +425,10 @@ namespace Parallel {
       } else if(TFwdB::FieldDimension == Dimensions::ONED)
       {
          // Create the list of local indexes
-         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dimFwd(); ++i)
+         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->dim<Dimensions::Data:DATF1D>(); ++i)
          {
             // Extract "physical" index of first dimension
-            i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idxFwd(i);
+            i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim)->idx<Dimensions::Data:DATF1D>(i);
 
             // Combine array indexes into coordinate tuple
             coord = std::tr1::make_tuple(i, 0, 0);
@@ -441,10 +441,10 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim+1)->dimBwd(); ++i)
+         for(int i=0; i < spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DATB1D>(); ++i)
          {
             // Extract "physical" index of first dimension
-            i_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idxBwd(i);
+            i_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATB1D>(i);
 
             // Create key as (1D, 0, 0)
             key = std::tr1::make_tuple(i_, 0, 0);
@@ -462,7 +462,7 @@ namespace Parallel {
       this->buildType(data, sharedMap, type);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::buildBwdDatatype(SharedResolution spRes, const int fwdDim, TBwdB &data, MPI_Datatype &type, const int cpuId)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TBwdB &data, MPI_Datatype &type, const int cpuId)
    {
       // Create  map of the local indexes to unique keys
       std::map<std::tr1::tuple<int,int,int>,std::tr1::tuple<int,int,int> >  localIdxMap;
@@ -482,20 +482,20 @@ namespace Parallel {
       if(TFwdB::FieldDimension == Dimensions::THREED)
       {
          // Create the list of local indexes
-         for(int k=0; k < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dim3D(); ++k)
+         for(int k=0; k < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DAT3D>(); ++k)
          {
             // Extract "physical" index of third dimension
-            k_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idx3D(k);
+            k_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DAT3D>(k);
 
-            for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dim2D(k); ++j)
+            for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DAT2D>(k); ++j)
             {
                // Extract "physical" index of second dimension
-               j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idx2D(j,k);
+               j_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DAT2D>(j,k);
 
-               for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dimBwd(j,k); ++i)
+               for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DATB1D>(j,k); ++i)
                {
                   // Extract "physical" index of first dimension
-                  i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idxBwd(i,j,k);
+                  i_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATB1D>(i,j,k);
 
                   // Combine array indexes into coordinate tuple
                   coord = std::tr1::make_tuple(i, j, k);
@@ -510,20 +510,20 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int k=0; k < spRes->cpu(cpuId)->dim(fwdDim)->dim3D(); ++k)
+         for(int k=0; k < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DAT3D>(); ++k)
          {
             // Extract "physical" index of third dimension
-            k_ = spRes->cpu(cpuId)->dim(fwdDim)->idx3D(k);
+            k_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DAT3D>(k);
 
-            for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim2D(k); ++j)
+            for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DAT2D>(k); ++j)
             {
                // Extract "physical" index of second dimension
-               j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx2D(j,k);
+               j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DAT2D>(j,k);
 
-               for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dimFwd(j,k); ++i)
+               for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DATF1D>(j,k); ++i)
                {
                   // Extract "physical" index of first dimension
-                  i_ = spRes->cpu(cpuId)->dim(fwdDim)->idxFwd(i,j,k);
+                  i_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DATF1D>(i,j,k);
 
                   // Create key as (1D, 2D, 3D)
                   key = std::tr1::make_tuple(i_, j_, k_);
@@ -538,15 +538,15 @@ namespace Parallel {
       } else if(TFwdB::FieldDimension == Dimensions::TWOD)
       {
          // Create the list of local indexes
-         for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dim2D(); ++j)
+         for(int j=0; j < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DAT2D>(); ++j)
          {
             // Extract "physical" index of second dimension
-            j_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idx2D(j);
+            j_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DAT2D>(j);
 
-            for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dimBwd(j); ++i)
+            for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DATB1D>(j); ++i)
             {
                // Extract "physical" index of first dimension
-               i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idxBwd(i,j);
+               i_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATB1D>(i,j);
 
                // Combine array indexes into coordinate tuple
                coord = std::tr1::make_tuple(i, j, 0);
@@ -560,15 +560,15 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim2D(); ++j)
+         for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DAT2D>(); ++j)
          {
             // Extract "physical" index of second dimension
-            j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx2D(j);
+            j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DAT2D>(j);
 
-            for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dimFwd(j); ++i)
+            for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DATF1D>(j); ++i)
             {
                // Extract "physical" index of first dimension
-               i_ = spRes->cpu(cpuId)->dim(fwdDim)->idxFwd(i,j);
+               i_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data:DATF1D>(i,j);
 
                // Create key as (1D, 2D, 0)
                key = std::tr1::make_tuple(i_, j_, 0);
@@ -582,10 +582,10 @@ namespace Parallel {
       } else if(TFwdB::FieldDimension == Dimensions::ONED)
       {
          // Create the list of local indexes
-         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->dimBwd(); ++i)
+         for(int i=0; i < spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->dim<Dimensions::Data:DATB1D>(); ++i)
          {
             // Extract "physical" index of first dimension
-            i_ = spRes->cpu(FrameworkMacro::id())->dim(fwdDim+1)->idxBwd(i);
+            i_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATB1D>(i);
 
             // Combine array indexes into coordinate tuple
             coord = std::tr1::make_tuple(i, 0, 0);
@@ -598,10 +598,10 @@ namespace Parallel {
          }
 
          // Create the list of remote indexes
-         for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dimFwd(); ++i)
+         for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data:DATF1D>(); ++i)
          {
             // Extract "physical" index of first dimension
-            i_ = spRes->cpu(cpuId)->dim(fwdDim+1)->idxFwd(i);
+            i_ = spRes->cpu(cpuId)->dim(Dimensions::Transform::jump<fwdDim,1>::id)->idx<Dimensions::Data:DATF1D>(i);
 
             // Create key as (1D, 0, 0)
             key = std::tr1::make_tuple(i_, 0, 0);

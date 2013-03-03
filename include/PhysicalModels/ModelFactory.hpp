@@ -52,11 +52,17 @@ namespace GeoMHDiSCC {
       // Create simulation
       SharedSimulation  spSim;
 
+      // Add configuration file and parameters
+      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>();
+
+      // Initialise simulation
+      spSim->initBase();
+
+      // Add equations
+      spSim->initResolution<typename TModel::SchemeType>();
+
       // Add equations
       TModel::addEquations(spSim);
-
-      // Add configuration file
-      TModel::setConfigurationFile(spSim);
 
       // Add initial state file
       TModel::setInitialStateFile(spSim);

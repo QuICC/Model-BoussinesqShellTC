@@ -35,9 +35,9 @@ namespace Datatypes {
          /**
           * @brief Constructor with simplified interface
           *
-          * @param setup Setup object for the scalar fields
+          * @param spSetup Shared setup object for the scalar fields
           */
-         VectorField(const typename TScalar::SetupType& setup);
+         VectorField(typename TScalar::SharedSetupType spSetup);
 
          /**
           * @brief Destructor
@@ -64,9 +64,9 @@ namespace Datatypes {
          const std::vector<TScalar>& data() const;
 
          /**
-          * @brief Initialise field components to zero
+          * @brief Set field components to zero
           */
-         void initialiseZeros();
+         void setZeros();
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -100,12 +100,12 @@ namespace Datatypes {
       return this->mComponents.at(static_cast<int>(id));
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::VectorField(const typename TScalar::SetupType& setup)
+   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::VectorField(typename TScalar::SharedSetupType spSetup)
    {
       // Initialise the components
       for(int i = 0; i < COMPONENTS; i++)
       {
-         this->mComponents.push_back(TScalar(setup));
+         this->mComponents.push_back(TScalar(spSetup));
       }
    }
 
@@ -118,13 +118,13 @@ namespace Datatypes {
       return this->mComponents;
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> void VectorField<TScalar, COMPONENTS, TType>::initialiseZeros()
+   template <typename TScalar, int COMPONENTS, typename TType> void VectorField<TScalar, COMPONENTS, TType>::setZeros()
    {
       // Initialise the components
       typename std::vector<TScalar>::iterator   it;
       for(it = this->mComponents.begin(); it != this->mComponents.end(); it++)
       {
-         it->initialiseZeros();
+         it->setZeros();
       }
    }
 

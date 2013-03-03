@@ -20,7 +20,7 @@
 
 namespace GeoMHDiSCC {
 
-   IScalarEquation::IScalarEquation(SharedEquationParameters spEqParams)
+   IScalarEquation::IScalarEquation(SharedIEquationParameters spEqParams)
       : IEvolutionEquation(spEqParams)
    {
    }

@@ -41,8 +41,14 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> class FlatScalarField
    {
       public:
+         /// Dimension of the scalar field
+         static const Dimensions::Type FieldDimension = DIMENSION;
+
          /// Typedef for the coefficient type
          typedef ScalarFieldSetup<DIMENSION> SetupType;
+
+         /// Typedef for the coefficient type
+         typedef SharedPtrMacro<ScalarFieldSetup<DIMENSION> > SharedSetupType;
 
          /// Typedef for the coefficient type
          typedef TData PointType;

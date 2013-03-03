@@ -63,17 +63,17 @@ namespace Datatypes {
          /**
           * @brief initialise to zeros
           */
-         void initialiseZeros();
+         void setZeros();
 
          /**
           * @brief Initialise the physical values storage
           */
-         void initialisePhysical();
+         void initializePhysical();
 
          /**
           * @brief Initialise the physical differential values storage
           */
-         void initialisePhysicalDiff();
+         void initializePhysicalDiff();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -94,7 +94,7 @@ namespace Datatypes {
    template <typename TVariable, int DOMAINS> inline const TVariable& VariableDomain<TVariable,DOMAINS>::dom(const int i) const
    {
       // Assert for valid index
-      assert(this->mDomains.size() > i);
+      assert(this->mDomains.size() > static_cast<size_t>(i));
 
       return this->mDomains.at(i);
    }
@@ -120,30 +120,30 @@ namespace Datatypes {
    {
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initialiseZeros()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::setZeros()
    {
       // Loop over all domains
-      for(int i = 0; i < this->mDomains.size(); i++)
+      for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initialiseZeros();
+         this->mDomains.at(i).setZeros();
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initialisePhysical()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initializePhysical()
    {
       // Loop over all domains
-      for(int i = 0; i < this->mDomains.size(); i++)
+      for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initialisePhysical();
+         this->mDomains.at(i).initializePhysical();
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initialisePhysicalDiff()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initializePhysicalDiff()
    {
       // Loop over all domains
-      for(int i = 0; i < this->mDomains.size(); i++)
+      for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initialisePhysicalDiff();
+         this->mDomains.at(i).initializePhysicalDiff();
       }
    }
 
@@ -153,7 +153,7 @@ namespace Datatypes {
       MHDFloat mem = 0.0;
 
       // Loop over all domains
-      for(int i = 0; i < this->mDomains.size(); i++)
+      for(size_t i = 0; i < this->mDomains.size(); i++)
       {
          mem += this->mDomains.at(i).requiredStorage();
       }

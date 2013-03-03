@@ -68,7 +68,7 @@ namespace Parallel {
           * @param j    Second index of TBwdB extracted from TFwdA
           * @param k    Third index of TBwdB extracted from TFwdA
           */
-         const typename TBwdB::CoefficientType& bwdPoint(const TBwdB& in, const int i, const int j = 0, const int k = 0);
+         typename TBwdB::PointType bwdPoint(const TBwdB& in, const int i, const int j = 0, const int k = 0);
 
          /**
           * @brief Set point data from TBwdB scalar (might involve modification of indexes)
@@ -78,9 +78,12 @@ namespace Parallel {
           * @param j    Second index of TBwdB extracted from TFwdA
           * @param k    Third index of TBwdB extracted from TFwdA
           */
-         typename TBwdB::CoefficientType& rBwdPoint(TBwdB& rOut, const int i, const int j = 0, const int k = 0);
+         typename TBwdB::PointType& rBwdPoint(TBwdB& rOut, const int i, const int j = 0, const int k = 0);
 
-         SharedTransformResolution mspTRes;
+         /**
+          * @brief Store the local transform resolution of the first transform
+          */
+         SharedCTransformResolution mspTRes;
 
       private:
    };
@@ -94,7 +97,7 @@ namespace Parallel {
       Debug::StaticAssert< (TFwdB::FieldDimension == TBwdB::FieldDimension) >();
 
       // Check that the data type is the same
-      Debug::StaticTypeAssert<typename TFwdA::CoefficientType , typename TBwdB::CoefficientType>();
+      Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~SerialConverterBase()
@@ -112,13 +115,13 @@ namespace Parallel {
       if(TFwdB::FieldDimension == Dimensions::THREED)
       {
          // Loop over slowest direction of output
-         for(int k = 0; k < rOut.dim3D(); k++)
+         for(int k = 0; k < this->mspTRes->template dim<Dimensions::Data::DAT3D>(); k++)
          {
             // Loop over slow direction of output
-            for(int j = 0; j < rOut.dim2D(k); j++)
+            for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(k); j++)
             {
                // Loop over fast direction of output
-               for(int i = 0; i < rOut.dim1D(j,k); i++)
+               for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(k); i++)
                {
                   rOut.rPoint(i,j,k) = this->bwdPoint(in, i, j, k);
                }
@@ -129,10 +132,10 @@ namespace Parallel {
       } else if(TFwdB::FieldDimension == Dimensions::TWOD)
       {
          // Loop over slow direction of output
-         for(int j = 0; j < rOut.dim2D(); j++)
+         for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
          {
             // Loop over fast direction of output
-            for(int i = 0; i < rOut.dim1D(j); i++)
+            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(j); i++)
             {
                rOut.rPoint(i,j) = this->bwdPoint(in, i, j);
             }
@@ -164,13 +167,13 @@ namespace Parallel {
       if(TFwdA::FieldDimension == Dimensions::THREED)
       {
          // Loop over slowest direction of input
-         for(int k = 0; k < in.dim3D(); k++)
+         for(int k = 0; k < this->mspTRes->template dim<Dimensions::Data::DAT3D>(); k++)
          {
             // Loop over slow direction of input
-            for(int j = 0; j < in.dim2D(k); j++)
+            for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(k); j++)
             {
                // Loop over fast direction of input
-               for(int i = 0; i < in.dim1D(j,k); i++)
+               for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(k); i++)
                {
                   this->rBwdPoint(rOut, i,j,k) = in.point(i,j,k);
                }
@@ -181,9 +184,9 @@ namespace Parallel {
       } else if(TFwdA::FieldDimension == Dimensions::TWOD)
       {
          // Loop over slow direction of output
-         for(int j = 0; j < in.dim2D(); j++)
+         for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
          {
-            for(int i = 0; i < in.dim1D(j); i++)
+            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(j); i++)
             {
                this->rBwdPoint(rOut, i,j) = in.point(i,j);
             }
@@ -203,20 +206,20 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> const typename TBwdB::CoefficientType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdPoint(const TBwdB& in, const int i, const int j, const int k)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::PointType SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdPoint(const TBwdB& in, const int i, const int j, const int k)
    {
       #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            int idxI = this->mspTRes->idxFwd(i,j,k);
-            int idxJ = this->mspTRes->idx2D(j,k);
-            int idxK = this->mspTRes->idx3D(k);
+            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j,k);
+            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j,k);
+            int idxK = this->mspTRes->idx<Dimensions::Data:DAT3D>(k);
             return in.point(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->idxFwd(i,j);
-            int idxJ = this->mspTRes->idx2D(j);
+            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j);
+            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j);
             return in.point(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::ONED)
@@ -239,21 +242,21 @@ namespace Parallel {
       #endif //GEOMHDISCC_MPI
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::CoefficientType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::rBwdPoint(TBwdB& rOut, const int i, const int j, const int k)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::PointType& SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::rBwdPoint(TBwdB& rOut, const int i, const int j, const int k)
    {
       #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            int idxI = this->mspTRes->idxFwd(i,j,k);
-            int idxJ = this->mspTRes->idx2D(j,k);
-            int idxK = this->mspTRes->idx3D(k);
+            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j,k);
+            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j,k);
+            int idxK = this->mspTRes->idx<Dimensions::Data:DAT3D>(k);
 
             return rOut.rPoint(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->idxFwd(i,j);
-            int idxJ = this->mspTRes->idx2D(j);
+            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j);
+            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j);
             return rOut.rPoint(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)

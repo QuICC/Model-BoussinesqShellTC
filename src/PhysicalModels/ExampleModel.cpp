@@ -23,21 +23,15 @@ namespace GeoMHDiSCC {
    void ExampleModel::addEquations(SharedSimulation spSim)
    {
       // Add equation
-      //pSim->addEquation(AN_EQUATION);
+      //pSim->addScalarEquation<AN_EQUATION>();
       
       // Add equation
-      //pSim->addEquation(AN_EQUATION);
-   }
-
-   void ExampleModel::setConfigurationFile(SharedSimulation spSim)
-   {
-      // Set Configuration file
-      //pSim->addConfigurationFile(A_CONFIGURATION);
+      //pSim->addVectorEquation<AN_EQUATION>();
    }
 
    void ExampleModel::setInitialStateFile(SharedSimulation spSim)
    {
-      // Set Configuration file
+      // Set initial state file
       //pSim->setInitialState(A_CONFIGURATION);
    }
 

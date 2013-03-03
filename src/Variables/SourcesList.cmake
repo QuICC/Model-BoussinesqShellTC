@@ -2,4 +2,5 @@
 set(MHDSources
    FieldRequirement.cpp
    VariableRequirement.cpp
+   VariableBase.cpp
 )

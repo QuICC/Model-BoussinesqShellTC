@@ -4,4 +4,10 @@ set(MHDSources
    IEvolutionEquation.cpp
    IScalarEquation.cpp
    IVectorEquation.cpp
+   EquationData.cpp
+   IEquationParameters.cpp
+)
+
+set(MHDSrcSubDirs
+   Parameters
 )

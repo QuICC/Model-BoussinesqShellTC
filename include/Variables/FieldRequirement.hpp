@@ -53,6 +53,13 @@ namespace GeoMHDiSCC {
           * @brief Get spectral requirement
           */
          bool needPhysicalDiff() const;
+
+         /**
+          * @brief Merge information from other requirements
+          *
+          * @param req Requirements to merge
+          */
+         void merge(const FieldRequirement& req);
          
       protected:
 

@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "TransformGroupers/BackwardGrouperBase.hpp"
+#include "TransformGroupers/IBackwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,7 +27,7 @@ namespace Transform {
    /**
     * @brief This class defines the backward transform grouping algorithm
     */
-   template <typename TConfigurator> class BackwardTransformGrouper: public BackwardGrouperBase
+   template <typename TConfigurator> class BackwardTransformGrouper: public IBackwardGrouper
    {
       public:
          /**

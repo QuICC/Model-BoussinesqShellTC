@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldComponents.hpp"
-#include "Equations/EquationParameters.hpp"
+#include "Equations/IEquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IVectorEquation(SharedEquationParameters spEqParams);
+         explicit IVectorEquation(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

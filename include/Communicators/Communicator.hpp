@@ -48,32 +48,32 @@ namespace Parallel {
          /**
           * @brief Initialise the coordinator
           *
-          * @param setupFwd1D Setup object for the forward 1D type
-          * @param setupBwd1D Setup object for the backward 1D type
+          * @param spSetupFwd1D Setup object for the forward 1D type
+          * @param spSetupBwd1D Setup object for the backward 1D type
           */
-         void init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D);
+         void init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D);
 
          /**
           * @brief Initialise the coordinator
           *
-          * @param setupFwd1D Setup object for the forward 1D type
-          * @param setupBwd1D Setup object for the backward 1D type
-          * @param setupFwd2D Setup object for the forward 2D type
-          * @param setupBwd2D Setup object for the backward 2D type
+          * @param spSetupFwd1D Setup object for the forward 1D type
+          * @param spSetupBwd1D Setup object for the backward 1D type
+          * @param spSetupFwd2D Setup object for the forward 2D type
+          * @param spSetupBwd2D Setup object for the backward 2D type
           */
-         void init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D, const typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SetupType& setupFwd2D, const typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SetupType& setupBwd2D);
+         void init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D);
 
          /**
           * @brief Initialise the coordinator
           *
-          * @param setupFwd1D Setup object for the forward 1D type
-          * @param setupBwd1D Setup object for the backward 1D type
-          * @param setupFwd2D Setup object for the forward 2D type
-          * @param setupBwd2D Setup object for the backward 2D type
-          * @param setupFwd3D Setup object for the forward 3D type
-          * @param setupBwd3D Setup object for the backward 3D type
+          * @param spSetupFwd1D Setup object for the forward 1D type
+          * @param spSetupBwd1D Setup object for the backward 1D type
+          * @param spSetupFwd2D Setup object for the forward 2D type
+          * @param spSetupBwd2D Setup object for the backward 2D type
+          * @param spSetupFwd3D Setup object for the forward 3D type
+          * @param spSetupBwd3D Setup object for the backward 3D type
           */
-         void init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D, const typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SetupType& setupFwd2D, const typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SetupType& setupBwd2D, const typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SetupType& setupFwd3D, const typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SetupType& setupBwd3D);
+         void init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D, typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SharedSetupType spSetupFwd3D, typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SharedSetupType spSetupBwd3D);
 
          /**
           * @brief Initialise the 1D/2D converter
@@ -203,12 +203,12 @@ namespace Parallel {
       this->template storage<Dimensions::Transform::TRA1D>().holdBwd(rOutData);
    }
 
-   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D)
+   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D)
    {
       Debug::StaticAssert< static_cast<int>(DIMENSION) >= 0 >();
 
       // Initialise storage for 1D
-      this->template storage<Dimensions::Transform::TRA1D>().init(setupFwd1D, setupBwd1D);
+      this->template storage<Dimensions::Transform::TRA1D>().init(spSetupFwd1D, spSetupBwd1D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem1D = this->template storage<Dimensions::Transform::TRA1D>().requiredStorage();
@@ -220,15 +220,15 @@ namespace Parallel {
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
-   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D, const typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SetupType& setupFwd2D, const typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SetupType& setupBwd2D)
+   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D)
    {
       Debug::StaticAssert< (static_cast<int>(DIMENSION) > 0) >();
 
       // Initialise 1D storage
-      this->init(setupFwd1D, setupBwd1D);
+      this->init(spSetupFwd1D, spSetupBwd1D);
 
       // Initialise storage for 2D
-      this->template storage<Dimensions::Transform::TRA2D>().init(setupFwd2D, setupBwd2D);
+      this->template storage<Dimensions::Transform::TRA2D>().init(spSetupFwd2D, spSetupBwd2D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem2D = this->template storage<Dimensions::Transform::TRA2D>().requiredStorage();
@@ -240,15 +240,15 @@ namespace Parallel {
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
-   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(const typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SetupType& setupFwd1D, const typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SetupType& setupBwd1D, const typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SetupType& setupFwd2D, const typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SetupType& setupBwd2D, const typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SetupType& setupFwd3D, const typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SetupType& setupBwd3D)
+   template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::init(typename TTypes<Dimensions::Transform::TRA1D>::FwdType::SharedSetupType spSetupFwd1D, typename TTypes<Dimensions::Transform::TRA1D>::BwdType::SharedSetupType spSetupBwd1D, typename TTypes<Dimensions::Transform::TRA2D>::FwdType::SharedSetupType spSetupFwd2D, typename TTypes<Dimensions::Transform::TRA2D>::BwdType::SharedSetupType spSetupBwd2D, typename TTypes<Dimensions::Transform::TRA3D>::FwdType::SharedSetupType spSetupFwd3D, typename TTypes<Dimensions::Transform::TRA3D>::BwdType::SharedSetupType spSetupBwd3D)
    {
       Debug::StaticAssert< (static_cast<int>(DIMENSION) > 1) >();
 
       // Initialise 2D storage
-      this->init(setupFwd1D, setupBwd1D, setupFwd2D, setupBwd2D);
+      this->init(spSetupFwd1D, spSetupBwd1D, spSetupFwd2D, spSetupBwd2D);
 
       // Initialise storage for 3D
-      this->template storage<Dimensions::Transform::TRA3D>().init(setupFwd3D, setupBwd3D);
+      this->template storage<Dimensions::Transform::TRA3D>().init(spSetupFwd3D, spSetupBwd3D);
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem3D = this->template storage<Dimensions::Transform::TRA3D>().requiredStorage();
@@ -267,7 +267,8 @@ namespace Parallel {
          {
             // Initialise 2D serial converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
-            spConv->init(spRes, 0, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
+
+            spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
 
             this->mspConverter2D = spConv;
 
@@ -291,7 +292,7 @@ namespace Parallel {
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
             // initialise the converter
-            spConv->init(spRes, 0);
+            spConv->init(spRes, Dimensions::Transform::TRA1D);
 
             this->mspConverter2D = spConv;
 
@@ -301,7 +302,8 @@ namespace Parallel {
          {
             // Initialise 2D serial converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
-            spConv->init(spRes, 0, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
+
+            spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
 
             this->mspConverter2D = spConv;
 
@@ -316,7 +318,7 @@ namespace Parallel {
          SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
          // initialise the converter
-         spConv->init(spRes, 0);
+         spConv->init(spRes, Dimensions::Transform::TRA1D);
 
          this->mspConverter2D = spConv;
       #endif // GEOMHDISCC_MPI
@@ -342,11 +344,11 @@ namespace Parallel {
       #ifdef GEOMHDISCC_MPI
          if(split == Splitting::Locations::FIRST)
          {
-            // Initialise serial 3D converter
+            // Initialise serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
             // Initialise the converter
-            spConv->init(spRes, 1);
+            spConv->init(spRes, Dimensions::Transform::TRA2D);
 
             this->mspConverter3D = spConv;
 
@@ -354,7 +356,8 @@ namespace Parallel {
          {
             // Initialise serial 3D converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
-            spConv->init(spRes, 1, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs2DFwd, packs2DBwd);
+
+            spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs2DFwd, packs2DBwd);
 
             this->mspConverter3D = spConv;
 
@@ -374,7 +377,8 @@ namespace Parallel {
          {
             // Initialise serial 3D converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
-            spConv->init(spRes, 1, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs1DFwd, packs1DBwd);
+
+            spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs1DFwd, packs1DBwd);
 
             this->mspConverter3D = spConv;
 
@@ -401,7 +405,7 @@ namespace Parallel {
          SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
          // Initialise the converter
-         spConv->init(spRes, 1);
+         spConv->init(spRes, Dimensions::Transform::TRA2D);
 
          this->mspConverter3D = spConv;
       #endif // GEOMHDISCC_MPI
