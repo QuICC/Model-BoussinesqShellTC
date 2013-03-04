@@ -27,6 +27,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * \brief Base for the implementation of a scalar equation
     */
@@ -69,21 +71,21 @@ namespace GeoMHDiSCC {
           *
           * @param rNLComp Nonlinear term component
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) = 0;
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const = 0;
 
          /**
           * @brief Compute the linear term
           *
           * @param rRHS    RHS of timestepping equation
           */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS);
+         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
 
          /**
           * @brief Prepare the RHS for the timestep computation
           *
           * @param rhs    RHS of timestepping equation
           */
-         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs) = 0;
+         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs);
 
          /**
           * @brief Transfer equation input to timestepper
@@ -156,6 +158,7 @@ namespace GeoMHDiSCC {
    /// Typedef for a shared IScalarEquation
    typedef SharedPtrMacro<IScalarEquation> SharedIScalarEquation;
 
+}
 }
 
 #endif // ISCALAREQUATION_HPP

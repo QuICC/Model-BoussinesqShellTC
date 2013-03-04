@@ -44,7 +44,7 @@ namespace Transform {
           * @param spEquation Scalar equation
           * @param coord      Transform coordinator
           */
-         static void firstStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         static void firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First step in transform, including the nonlinear interaction for a vector field
@@ -52,7 +52,7 @@ namespace Transform {
           * @param spEquation Vector equation
           * @param coord      Transform coordinator
           */
-         static void firstStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         static void firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Second step in transform for a scalar field
@@ -60,7 +60,7 @@ namespace Transform {
           * @param spEquation Scalar equation
           * @param coord      Transform coordinator
           */
-         static void secondStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         static void secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Second step in transform for a vector field
@@ -68,7 +68,7 @@ namespace Transform {
           * @param spEquation Vector equation
           * @param coord      Transform coordinator
           */
-         static void secondStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         static void secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Last step in transform for a scalar field
@@ -76,7 +76,7 @@ namespace Transform {
           * @param spEquation Scalar equation
           * @param coord      Transform coordinator
           */
-         static void lastStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         static void lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Last step in transform for a vector field
@@ -84,7 +84,7 @@ namespace Transform {
           * @param spEquation Vector equation
           * @param coord      Transform coordinator
           */
-         static void lastStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         static void lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First exchange communication setup

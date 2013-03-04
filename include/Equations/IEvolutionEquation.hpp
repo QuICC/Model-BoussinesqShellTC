@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * \brief Base building block for the implementation of a time dependend evolution equation
     */
@@ -175,6 +177,7 @@ namespace GeoMHDiSCC {
 
    /// Typedef for a smart IEvolutionEquation
    typedef SharedPtrMacro<IEvolutionEquation> SharedIEvolutionEquation;
+}
 }
 
 #endif // IEVOLUTIONEQUATION_HPP

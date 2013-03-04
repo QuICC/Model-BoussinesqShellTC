@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * \brief Implemenation of container the coupling information of the equations
     */
@@ -131,6 +133,7 @@ namespace GeoMHDiSCC {
    {
       return this->mField.equal_range(comp);
    }
+}
 }
 
 #endif // COUPLINGINFORMATION_HPP

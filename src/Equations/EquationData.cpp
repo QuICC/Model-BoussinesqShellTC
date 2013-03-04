@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    EquationData::EquationData(SharedIEquationParameters spEqParams)
       : mspEqParams(spEqParams), mBCCounter(-1), mEqIsComplex(false)
    {
@@ -375,4 +377,5 @@ namespace GeoMHDiSCC {
    {
       return this->mRequirements.field(id);
    }
+}
 }

@@ -178,7 +178,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Shared resolution
           */
-         SharedIEquationParameters mspEqParams;
+         Equations::SharedIEquationParameters mspEqParams;
 
          /**
           * @brief Simulation run control
@@ -188,7 +188,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Timestepper
           */
-         Timestepper mTimestepper;
+         Timestep::Timestepper mTimestepper;
 
          /**
           * @brief Simulation IO control
@@ -203,12 +203,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for scalar equations
           */
-         std::vector<SharedIScalarEquation> mScalarEquations;
+         std::vector<Equations::SharedIScalarEquation> mScalarEquations;
 
          /**
           * @brief Storage for vector equations
           */
-         std::vector<SharedIVectorEquation> mVectorEquations;
+         std::vector<Equations::SharedIVectorEquation> mVectorEquations;
 
          /**
           * @brief Map between name and pointer for the scalar variables
@@ -258,7 +258,7 @@ namespace GeoMHDiSCC {
       IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, "test"));
 
       // Create the equation parameter shared pointer
-      SharedIEquationParameters spEqParams(new TParam());
+      Equations::SharedIEquationParameters spEqParams(new TParam());
       this->mspEqParams = spEqParams;
 
       // Add the equation parameter dependent configuration to file

@@ -38,7 +38,7 @@ namespace GeoMHDiSCC {
          typedef TFTScheme SchemeType;
 
          /// Typedef for the equation parameters used
-         typedef PrRaXGParameters  ParametersType;
+         typedef Equations::PrRaXGParameters  ParametersType;
 
          /**
           * @brief Get the required equations

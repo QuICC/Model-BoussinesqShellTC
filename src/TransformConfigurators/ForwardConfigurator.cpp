@@ -22,33 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-   }
-
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-   }
-
-   void ForwardConfigurator::nonlinearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::NONLINEAR);
-
-      // Get physical storage
-      TransformCoordinatorType::CommunicatorType::Fwd3DType &rNLComp = coord.communicator().providePhysical();
-
-      // Compute nonlinear term component
-      spEquation->computeNonlinear(rNLComp);
-
-      // Transfer physical storage to next step
-      coord.communicator().holdPhysical(rNLComp);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
-   }
-
-   void ForwardConfigurator::linearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::linearStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::LINEAR);
@@ -66,7 +40,19 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::LINEAR);
    }
 
-   void ForwardConfigurator::prepareTimestep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::linearStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // Add the toroidal linear term
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+
+      // Add the toroidal linear term
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
+
+      // Add the poloidal linear term
+      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+   }
+
+   void ForwardConfigurator::prepareTimestep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
@@ -82,6 +68,44 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+   }
+
+   void ForwardConfigurator::prepareTimestep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // Prepare the toroidal timestep RHS
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+
+      // Prepare the toroidal timestep RHS
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
+
+      // Prepare the poloidal timestep RHS
+      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+   }
+
+   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   {
+   }
+
+   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   {
+   }
+
+   void ForwardConfigurator::nonlinearTerm(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // Start profiler
+      ProfilerMacro_start(ProfilerMacro::NONLINEAR);
+
+      // Get physical storage
+      TransformCoordinatorType::CommunicatorType::Fwd3DType &rNLComp = coord.communicator().providePhysical();
+
+      // Compute nonlinear term component
+      spEquation->computeNonlinear(rNLComp);
+
+      // Transfer physical storage to next step
+      coord.communicator().holdPhysical(rNLComp);
+
+      // Stop profiler
+      ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
    template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)

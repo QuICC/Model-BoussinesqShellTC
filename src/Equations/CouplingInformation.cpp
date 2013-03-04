@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    CouplingInformation::CouplingInformation()
       : mHasField(false)
    {
@@ -43,4 +45,5 @@ namespace GeoMHDiSCC {
       // Store internal coupling information
       this->mInternal.insert(std::make_pair(component,std::make_pair(nMat,dim)));
    }
+}
 }

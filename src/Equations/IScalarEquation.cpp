@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    IScalarEquation::IScalarEquation(SharedIEquationParameters spEqParams)
       : IEvolutionEquation(spEqParams)
    {
@@ -31,28 +33,38 @@ namespace GeoMHDiSCC {
 
    void IScalarEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
    {
-      /// \mhdBug Fake implementation
-
       this->mspUnknown = spUnknown;
    }
 
    const Datatypes::ScalarVariableType& IScalarEquation::unknown() const
    {
-      /// \mhdBug Fake implementation
+      // Safety assert
+      assert(this->mspUnknown);
 
       return *this->mspUnknown;
    }
 
    Datatypes::ScalarVariableType& IScalarEquation::rUnknown()
    {
-      /// \mhdBug Fake implementation
+      // Safety assert
+      assert(this->mspUnknown);
 
       return *this->mspUnknown;
    }
 
-   void IScalarEquation::computeLinear(Datatypes::SpectralScalarType& rRHS)
+   void IScalarEquation::computeLinear(Datatypes::SpectralScalarType& rRHS) const
    {
-      /// \mhdBug Fake implementation
+      // Empty default implementation
+   }
+
+   void IScalarEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs)
+   {
+      // Assert dealiasing has taken place!
+      assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
+      assert(this->rUnknown().rDom(0).rPerturbation().data().cols() < rhs.data().cols());
+
+      // Copy values over into unknown
+      this->rUnknown().rDom(0).rPerturbation().rData() = rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows());
    }
 
    void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
@@ -185,4 +197,5 @@ namespace GeoMHDiSCC {
 //         }
 //      }
    }
+}
 }

@@ -21,6 +21,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    Timestepper::Timestepper()
       : mStep(0), mDt(1e-4), mTime(0.0)
    {
@@ -35,109 +37,48 @@ namespace GeoMHDiSCC {
       return this->mStep == 0;
    }
 
-   void Timestepper::getEqStepperType(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, int>& coupled, std::vector<bool>& typeInfo)
+   void Timestepper::update()
    {
-      // Get Id for current unknown field
-      FieldIdType myId = std::make_pair(spEq->name(),comp);
-
-      int pos;
-
-      // Equation is not coupled (or is first of coupled equations)
-      if(coupled.count(myId) == 0)
-      {
-         // Get the range of coupled fields
-         CouplingInformation::FieldIteratorType it;
-         CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
-
-         pos = typeInfo.size();
-
-         // Get current position in the equation stepper list
-         for(it = range.first; it != range.second; it++)
-         {
-            coupled.insert(std::make_pair(it->second, pos));
-         }
-
-         typeInfo.push_back(spEq->isComplex(comp));
-
-      // Coupled equation
-      } else
-      {
-         // Get index of corresponding information
-         pos = coupled.find(myId)->second;
-
-         // Correct complex flag if required
-         typeInfo.at(pos) = typeInfo.at(pos) || spEq->isComplex(comp);
-
-         // Remove equation from coupled equation list
-         coupled.erase(myId);
-      }
-
-      // Store preliminary equation stepper information
-      this->mEqInformation.insert(std::make_pair(myId,std::make_pair(spEq->isComplex(comp), pos)));
+      this->mTime += this->mDt;
    }
 
-   void Timestepper::createEqStepper(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo)
+   void Timestepper::changeTimestep(MHDFloat dt)
    {
-      // Get Id for current unknown field
-      FieldIdType myId = std::make_pair(spEq->name(),comp);
+      // Safety assert
+      assert(dt > 0);
 
-      // Get the number of coupled fields
-      int nC = spEq->couplingInfo().nFields(comp);
+      // Set the new timestep
+      this->mDt = dt;
 
-      // Equation is not coupled (or is first of coupled equations)
-      if(coupled.count(myId) == 0)
-      {
-         int idx;
-
-         // Get the range of coupled fields
-         CouplingInformation::FieldIteratorType it;
-         CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
-
-         // Update data type information
-         this->mEqInformation.find(myId)->second.first = typeInfo.at(this->mEqInformation.find(myId)->second.second);
-
-         // Create correct equation timestepper
-         if(this->mEqInformation.find(myId)->second.first)
-         {
-            idx = this->mEqZStepper.size();
-            this->mEqZStepper.push_back(EquationZTimestepper(nC+1));
-         } else
-         {
-            idx = this->mEqDStepper.size();
-            this->mEqDStepper.push_back(EquationDTimestepper(nC+1));
-         }
-
-         // Update index information
-         this->mEqInformation.find(myId)->second.second = idx;
-
-         // Create list of coupled fields
-         for(it = range.first; it != range.second; it++)
-         {
-            coupled.insert(std::make_pair(it->second, std::make_pair(this->mEqInformation.find(myId)->second.first,idx)));
-         }
-
-      // Coupled equation
-      } else
-      {
-         // Update data type information
-         this->mEqInformation.find(myId)->second.first = coupled.find(myId)->second.first;
-
-         // Update index information
-         this->mEqInformation.find(myId)->second.second = coupled.find(myId)->second.second;
-
-         // Remove equation from coupled equation list
-         coupled.erase(myId);
-      }
+      // Update the timestep matrices
    }
 
-   void Timestepper::init(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
+   void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   {
+      // Update the equation input to the timestepper
+      this->getInput(scalEq, vectEq);
+
+      // Compute the RHS of the linear systems
+      this->computeRHS();
+
+      // Solve all the linear systems
+      this->solve();
+      
+      // Transfer timestep output back to equations
+      this->transferOutput(scalEq, vectEq);
+
+      // Update the internal step counter, counting from 0 to steps - 1
+      this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
+   }
+
+   void Timestepper::init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for the field coupling information
       std::map<FieldIdType, int>  coupled;
       std::vector<bool>  typeInfo;
 
       // Loop over all scalar equations
-      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
@@ -145,7 +86,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
@@ -196,7 +137,7 @@ namespace GeoMHDiSCC {
          }
       }
 
-      // Initialise solvers from equation steppers
+      // Initialise solvers from complex equation steppers
       for(size_t i = 0; i < this->mEqZStepper.size(); i++)
       {
          this->mEqZStepper.at(i).initSolver();
@@ -215,7 +156,102 @@ namespace GeoMHDiSCC {
       this->initSolution(scalEq, vectEq);
    }
 
-   void Timestepper::createMatrices(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
+   void Timestepper::getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, int>& coupled, std::vector<bool>& typeInfo)
+   {
+      // Get Id for current unknown field
+      FieldIdType myId = std::make_pair(spEq->name(),comp);
+
+      int pos;
+
+      // Equation is not coupled (or is first of coupled equations)
+      if(coupled.count(myId) == 0)
+      {
+         // Get the range of coupled fields
+         Equations::CouplingInformation::FieldIteratorType it;
+         Equations::CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
+
+         pos = typeInfo.size();
+
+         // Get current position in the equation stepper list
+         for(it = range.first; it != range.second; it++)
+         {
+            coupled.insert(std::make_pair(it->second, pos));
+         }
+
+         typeInfo.push_back(spEq->isComplex(comp));
+
+      // Coupled equation
+      } else
+      {
+         // Get index of corresponding information
+         pos = coupled.find(myId)->second;
+
+         // Correct complex flag if required
+         typeInfo.at(pos) = typeInfo.at(pos) || spEq->isComplex(comp);
+
+         // Remove equation from coupled equation list
+         coupled.erase(myId);
+      }
+
+      // Store preliminary equation stepper information
+      this->mEqInformation.insert(std::make_pair(myId,std::make_pair(spEq->isComplex(comp), pos)));
+   }
+
+   void Timestepper::createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo)
+   {
+      // Get Id for current unknown field
+      FieldIdType myId = std::make_pair(spEq->name(),comp);
+
+      // Get the number of coupled fields
+      int nC = spEq->couplingInfo().nFields(comp);
+
+      // Equation is not coupled (or is first of coupled equations)
+      if(coupled.count(myId) == 0)
+      {
+         int idx;
+
+         // Get the range of coupled fields
+         Equations::CouplingInformation::FieldIteratorType it;
+         Equations::CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
+
+         // Update data type information
+         this->mEqInformation.find(myId)->second.first = typeInfo.at(this->mEqInformation.find(myId)->second.second);
+
+         // Create correct equation timestepper
+         if(this->mEqInformation.find(myId)->second.first)
+         {
+            idx = this->mEqZStepper.size();
+            this->mEqZStepper.push_back(EquationZTimestepper(nC+1));
+         } else
+         {
+            idx = this->mEqDStepper.size();
+            this->mEqDStepper.push_back(EquationDTimestepper(nC+1));
+         }
+
+         // Update index information
+         this->mEqInformation.find(myId)->second.second = idx;
+
+         // Create list of coupled fields
+         for(it = range.first; it != range.second; it++)
+         {
+            coupled.insert(std::make_pair(it->second, std::make_pair(this->mEqInformation.find(myId)->second.first,idx)));
+         }
+
+      // Coupled equation
+      } else
+      {
+         // Update data type information
+         this->mEqInformation.find(myId)->second.first = coupled.find(myId)->second.first;
+
+         // Update index information
+         this->mEqInformation.find(myId)->second.second = coupled.find(myId)->second.second;
+
+         // Remove equation from coupled equation list
+         coupled.erase(myId);
+      }
+   }
+
+   void Timestepper::createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
       FieldIdType myId = std::make_pair(spEq->name(),comp);
@@ -330,19 +366,14 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::update()
-   {
-      this->mTime += this->mDt;
-   }
-
-   void Timestepper::initSolution(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
+   void Timestepper::initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -371,7 +402,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -424,32 +455,14 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::stepForward(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
-   {
-      // Update the equation input to the timestepper
-      this->getInput(scalEq, vectEq);
-
-      // Compute the RHS of the linear systems
-      this->computeRHS();
-
-      // Solve all the linear systems
-      this->solve();
-      
-      // Transfer timestep output back to equations
-      this->transferOutput(scalEq, vectEq);
-
-      // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
-   }
-
-   void Timestepper::getInput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
+   void Timestepper::getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -478,7 +491,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -551,7 +564,7 @@ namespace GeoMHDiSCC {
 
    void Timestepper::solve()
    {
-      // Compute RHS component for complex linear systems
+      // Solve complex linear systems
       std::vector<EquationZTimestepper>::iterator   zIt;
       for(zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
       {
@@ -559,7 +572,7 @@ namespace GeoMHDiSCC {
          zIt->solve(this->mStep);
       }
 
-      // Compute RHS component for real linear systems
+      // Solve real linear systems
       std::vector<EquationDTimestepper>::iterator   dIt;
       for(dIt = this->mEqDStepper.begin(); dIt != this->mEqDStepper.end(); ++dIt)
       {
@@ -568,14 +581,14 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Timestepper::transferOutput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq)
+   void Timestepper::transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
       std::pair<bool,int> eqInfo;
       FieldIdType myId;
 
       // Loop over all scalar equations
-      std::vector<SharedIScalarEquation>::const_iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get identity and corresponding equation information
@@ -604,7 +617,7 @@ namespace GeoMHDiSCC {
       }
 
       // Loop over all vector equations
-      std::vector<SharedIVectorEquation>::const_iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get identity and corresponding equation information for toroidal component
@@ -657,7 +670,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   DecoupledZSparse  Timestepper::buildLHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   DecoupledZSparse  Timestepper::buildLHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
    {
       // Matrix coefficients
       MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
@@ -728,7 +741,7 @@ namespace GeoMHDiSCC {
       return lhs;
    }
 
-   DecoupledZSparse  Timestepper::buildRHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   DecoupledZSparse  Timestepper::buildRHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
    {
       // Matrix coefficients
       MHDFloat timeCoeff = -ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
@@ -771,4 +784,5 @@ namespace GeoMHDiSCC {
 
       return rhs;
    }
+}
 }

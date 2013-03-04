@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    EquationZTimestepper::EquationZTimestepper(const int nField)
       : EquationTimestepperBase(nField)
    {
@@ -125,4 +127,5 @@ namespace GeoMHDiSCC {
       this->mSolution.push_back(MatrixZ(rows,cols));
       this->mSolution.back().setZero();
    }
+}
 }

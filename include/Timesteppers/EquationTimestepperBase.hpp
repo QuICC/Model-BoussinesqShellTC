@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    /**
     * \brief Implementation of the base for an equation timestepper
     */
@@ -94,6 +96,7 @@ namespace GeoMHDiSCC {
 
    /// Typedef for a shared pointer of a EquationTimestepperBase
    typedef SharedPtrMacro<EquationTimestepperBase>  SharedEquationTimestepperBase;
+}
 }
 
 #endif // EQUATIONTIMESTEPPERBASE_HPP

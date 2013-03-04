@@ -26,6 +26,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    /**
     * @brief Implementation of general timestepper structure
     */
@@ -56,7 +58,12 @@ namespace GeoMHDiSCC {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void init(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
+         void init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+
+         /**
+          * @brief Change the used timestep
+          */
+         void setTimestep(MHFloat dt);
 
          /**
           * @brief Update control status
@@ -69,7 +76,7 @@ namespace GeoMHDiSCC {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void stepForward(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
+         void stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
          
       protected:
 
@@ -77,17 +84,17 @@ namespace GeoMHDiSCC {
          /**
           * @brief Compute the type of the equation stepper (real or complex)
           */
-         void getEqStepperType(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, int>& coupled, std::vector<bool>& typeInfo);
+         void getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, int>& coupled, std::vector<bool>& typeInfo);
 
          /**
           * @brief Create the correct equation steppers
           */
-         void createEqStepper(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo);
+         void createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo);
 
          /**
           * @brief Compute (coupled) matrices
           */
-         void createMatrices(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
+         void createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Initialise the solution
@@ -95,7 +102,7 @@ namespace GeoMHDiSCC {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void initSolution(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
+         void initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Update equation input to timestepper
@@ -103,7 +110,7 @@ namespace GeoMHDiSCC {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void getInput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
+         void getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Compute the RHS of all linear systems
@@ -121,7 +128,7 @@ namespace GeoMHDiSCC {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void transferOutput(const std::vector<SharedIScalarEquation>& scalEq, const std::vector<SharedIVectorEquation>& vectEq);
+         void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Build the LHS matrix
@@ -132,7 +139,7 @@ namespace GeoMHDiSCC {
           * @param nC   Number of coupled fields
           * @param cRow Row index of coupled field
           */
-         DecoupledZSparse buildLHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         DecoupledZSparse buildLHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
 
          /**
           * @brief Build the RHS matrix
@@ -143,7 +150,7 @@ namespace GeoMHDiSCC {
           * @param nC   Number of coupled fields
           * @param cRow Row index of coupled field
           */
-         DecoupledZSparse buildRHSMatrix(SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         DecoupledZSparse buildRHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
 
          /**
           * @brief Current timestepper step (local)
@@ -175,6 +182,7 @@ namespace GeoMHDiSCC {
           */
          std::vector<EquationZTimestepper> mEqZStepper;
    };
+}
 }
 
 #endif // TIMESTEPPER_HPP

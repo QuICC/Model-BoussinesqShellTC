@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * @brief This class provides the constant coefficients apparearing in the equations
     *
@@ -73,6 +75,7 @@ namespace GeoMHDiSCC {
 
    /// Typedef for a shared pointer to an IEquationParameters object
    typedef SharedPtrMacro<IEquationParameters>   SharedIEquationParameters;
+}
 }
 
 #endif // IEQUATIONPARAMETERS_HPP

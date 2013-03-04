@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardSerialConfigurator::firstStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(spEquation, coord);
@@ -41,15 +41,9 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Compute the linear term
-      ForwardConfigurator::linearTerm(spEquation, coord);
-
-      // Prepare the timestep RHS
-      ForwardConfigurator::prepareTimestep(spEquation, coord);
    }
 
-   void ForwardSerialConfigurator::firstStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_ONE>(spEquation, coord);
@@ -68,12 +62,6 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
-
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
 
       // Compute the nonlinear interaction
@@ -94,12 +82,6 @@ namespace Transform {
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
 
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_THREE>(spEquation, coord);
@@ -118,30 +100,24 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Add the poloidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
-
-      // Prepare the poloidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
    }
 
-   void ForwardSerialConfigurator::secondStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
 
-   void ForwardSerialConfigurator::secondStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
    
-   void ForwardSerialConfigurator::lastStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }
 
-   void ForwardSerialConfigurator::lastStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }

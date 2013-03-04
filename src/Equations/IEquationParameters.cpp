@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    IEquationParameters::IEquationParameters()
    {
    }
@@ -30,4 +32,5 @@ namespace GeoMHDiSCC {
       return this->mND.at(name);
    }
 
+}
 }

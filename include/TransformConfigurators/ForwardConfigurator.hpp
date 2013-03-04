@@ -35,6 +35,37 @@ namespace Transform {
    class ForwardConfigurator
    {
       public:
+         /**
+          * @brief Compute linear interaction on a scalar
+          *
+          * @param spEquation Equation providing the linear computation
+          * @param coord      Transform coordinator
+          */
+         static void linearStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Compute the linear interaction on a vector
+          *
+          * @param spEquation Vector equation
+          * @param coord      Transform coordinator
+          */
+         static void linearStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Prepare the timestep RHS for a scalar
+          *
+          * @param spEquation Equation providing the timestep structure
+          * @param coord      Transform coordinator
+          */
+         static void prepareTimestep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Prepare the timestep RHS for a vector
+          *
+          * @param spEquation Equation providing the timestep structure
+          * @param coord      Transform coordinator
+          */
+         static void prepareTimestep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -43,7 +74,7 @@ namespace Transform {
           * @param spEquation Equation providing the nonlinear computation
           * @param coord      Transform coordinator
           */
-         static void nonlinearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         static void nonlinearTerm(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute nonlinear interaction on a vector field
@@ -53,7 +84,7 @@ namespace Transform {
           *
           * \tparam TComponent Physical vector field component
           */
-         template <FieldComponents::Physical::Id TComponent> static void nonlinearTerm(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <FieldComponents::Physical::Id TComponent> static void nonlinearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the first dimension
@@ -77,14 +108,6 @@ namespace Transform {
          template <TransformSteps::ForwardBase::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute linear interaction on a scalar
-          *
-          * @param spEquation Equation providing the linear computation
-          * @param coord      Transform coordinator
-          */
-         static void linearTerm(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
           * @brief Compute linear interaction on a vector field
           *
           * @param spEquation Equation providing the linear computation
@@ -92,15 +115,7 @@ namespace Transform {
           *
           * \tparam TComponent Spectral vector field component
           */
-         template <FieldComponents::Spectral::Id TComponent> static void linearTerm(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Prepare the timestep RHS for a scalar
-          *
-          * @param spEquation Equation providing the timestep structure
-          * @param coord      Transform coordinator
-          */
-         static void prepareTimestep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         template <FieldComponents::Spectral::Id TComponent> static void linearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare the timestep RHS for a vector field
@@ -110,7 +125,7 @@ namespace Transform {
           *
           * \tparam TComponent Spectral vector field component
           */
-         template <FieldComponents::Spectral::Id TComponent> static void prepareTimestep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <FieldComponents::Spectral::Id TComponent> static void prepareTimestep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -126,7 +141,7 @@ namespace Transform {
          template <Dimensions::Type, Dimensions::Type> TransformCoordinatorType::CommunicatorType::Fwd1DType& getFwd1D(TransformCoordinatorType& coord);
    };
 
-   template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::NONLINEAR);
@@ -144,7 +159,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::linearTerm(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::linearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::LINEAR);
@@ -162,7 +177,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::LINEAR);
    }
 
-   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::prepareTimestep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::prepareTimestep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
@@ -202,10 +217,10 @@ namespace Transform {
 
 
    /// Specialised linear term to do nothing
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
    /// Specialised timestep preparation to do nothing
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
 }
 }

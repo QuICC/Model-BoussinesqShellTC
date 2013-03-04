@@ -21,16 +21,22 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Beta3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Beta3DQGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Beta3DQGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
    void ExampleModel::addEquations(SharedSimulation spSim)
    {
-      // Add equation
-      //pSim->addScalarEquation<AN_EQUATION>();
+      // Add transport equation
+      spSim->addScalarEquation<Equations::Beta3DQGTransport>();
       
-      // Add equation
-      //pSim->addVectorEquation<AN_EQUATION>();
+      // Add streamfunction equation
+      spSim->addScalarEquation<Equations::Beta3DQGStreamfunction>();
+      
+      // Add vertical velocity equation
+      spSim->addScalarEquation<Equations::Beta3DQGVertical>();
    }
 
    void ExampleModel::setInitialState(SharedSimulation spSim)

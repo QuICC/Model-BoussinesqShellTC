@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    EquationTimestepperBase::EquationTimestepperBase(const int nField)
       : mNField(nField), mCurrent(0)
    {
@@ -35,4 +37,5 @@ namespace GeoMHDiSCC {
    {
       return this->mInformation.find(id)->second(i);
    }
+}
 }

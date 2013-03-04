@@ -22,6 +22,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    /**
     * \brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
     */
@@ -108,6 +110,7 @@ namespace GeoMHDiSCC {
          ~ImExRK3();
 
    };
+}
 }
 
 #endif // IMEXRK3_HPP

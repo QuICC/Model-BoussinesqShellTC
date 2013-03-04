@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardSingle1DConfigurator::firstStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(spEquation, coord);
@@ -40,7 +40,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle1DConfigurator::firstStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_ONE>(spEquation, coord);
@@ -91,7 +91,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle1DConfigurator::lastStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -101,15 +101,9 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Compute the linear term
-      ForwardConfigurator::linearTerm(spEquation, coord);
-
-      // Prepare the timestep RHS
-      ForwardConfigurator::prepareTimestep(spEquation, coord);
    }
 
-   void ForwardSingle1DConfigurator::lastStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -119,12 +113,6 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
-
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
 
       // Start profiler
@@ -136,12 +124,6 @@ namespace Transform {
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
 
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -151,20 +133,14 @@ namespace Transform {
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
-
-      // Add the poloidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
-
-      // Prepare the poloidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
    }
 
-   void ForwardSingle1DConfigurator::secondStep(SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }
 
-   void ForwardSingle1DConfigurator::secondStep(SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle1DConfigurator::secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }

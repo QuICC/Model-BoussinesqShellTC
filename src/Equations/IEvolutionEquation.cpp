@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    IEvolutionEquation::IEvolutionEquation(SharedIEquationParameters spEqParams)
       : EquationData(spEqParams)
    {
@@ -33,4 +35,5 @@ namespace GeoMHDiSCC {
    {
       this->setCoupling();
    }
+}
 }

@@ -50,7 +50,7 @@ namespace Transform {
           * @param vectEqs  Vector of vector equations
           * @param coord    Transform coord
           */
-         virtual void transform(std::vector<SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord);
+         virtual void transform(std::vector<Equations::SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquations::Equation>& vectEqs, TransformCoordinatorType& coord);
 
          /**
           * @brief Get the number of required buffer packs for the first exchange
@@ -80,16 +80,15 @@ namespace Transform {
    {
    }
 
-   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord)
+   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedScalarEquation>& scalEqs, std::vector<Equations::SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord)
    {
       //
       // Compute nonlinear interaction 
       // ... and forward transform
-      // ... and preparation of timestep
       //
 
       // First treat the scalar equations
-      std::vector<SharedScalarEquation>::iterator scalEqIt;
+      std::vector<Equations::SharedScalarEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
          // Setup the second exchange communication step for scalar equation
@@ -112,7 +111,7 @@ namespace Transform {
       }
 
       // ... then the vector equations
-      std::vector<SharedVectorEquation>::iterator vectEqIt;
+      std::vector<Equations::SharedVectorEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
          // Setup the second exchange communication step for vector equation
@@ -132,6 +131,42 @@ namespace Transform {
 
          // Compute last step of transform for vector equation
          TConfigurator::lastStep(*vectEqIt, coord);
+      }
+
+      //
+      // Compute linear step after transforms
+      //
+
+      // First treat the scalar equations
+      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      {
+         // Compute linear step after transforms for scalar equation
+         TConfigurator::linearStep(*scalEqIt, coord);
+      }
+
+      // ... then the vector equations
+      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      {
+         // Compute linear step after transforms for vector equation
+         TConfigurator::linearStep(*vectEqIt, coord);
+      }
+
+      //
+      // Prepare timestep after transforms
+      //
+
+      // First treat the scalar equations
+      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      {
+         // Prepare timestep after transforms for scalar equation
+         TConfigurator::prepareTimestep(*scalEqIt, coord);
+      }
+
+      // ... then the vector equations
+      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      {
+         // Prepare timestep after transforms for vector equation
+         TConfigurator::prepareTimestep(*vectEqIt, coord);
       }
    }
 

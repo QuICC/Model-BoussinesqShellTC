@@ -32,6 +32,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * \brief Base building block for the implementation of a time dependend evolution equation
     */
@@ -212,6 +214,12 @@ namespace GeoMHDiSCC {
           */
          bool boundaryIsComplex(FieldComponents::Spectral::Id id) const;
 
+      protected:
+         /**
+          * @brief Storage for the variable requirements
+          */
+         VariableRequirement mRequirements;
+
       private:
          /**
           * @brief Storage for smart equation parameters
@@ -289,11 +297,6 @@ namespace GeoMHDiSCC {
          PhysicalNames::Id mName;
 
          /**
-          * @brief Storage for the variable requirements
-          */
-         VariableRequirement mRequirements;
-
-         /**
           * @brief Are timestepping matrices for this equation complex?
           */
          bool mEqIsComplex;
@@ -301,6 +304,7 @@ namespace GeoMHDiSCC {
 
    /// Typedef for a smart EquationData
    typedef SharedPtrMacro<EquationData> SharedEquationData;
+}
 }
 
 #endif // EQUATIONDATA_HPP

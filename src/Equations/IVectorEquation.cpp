@@ -20,6 +20,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    IVectorEquation::IVectorEquation(SharedIEquationParameters spEqParams)
       : IEvolutionEquation(spEqParams)
    {
@@ -31,27 +33,38 @@ namespace GeoMHDiSCC {
 
    void IVectorEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
    {
-      /// \mhdBug Fake implementation
-      
       this->mspUnknown = spUnknown;
    }
 
    const Datatypes::VectorVariableType& IVectorEquation::unknown() const
    {
-      /// \mhdBug Fake implementation
-      
+      // Safety assert
+      assert(this->mspUnknown);
+
       return *this->mspUnknown;
    }
 
    Datatypes::VectorVariableType& IVectorEquation::rUnknown()
    {
-      /// \mhdBug Fake implementation
-      
+      // Safety assert
+      assert(this->mspUnknown);
+
       return *this->mspUnknown;
    }
 
-   void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id)
+   void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id) const
    {
-      /// \mhdBug Fake implementation
+      // Empty default implementation
    }
+
+   void IVectorEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id)
+   {
+      // Assert dealiasing has taken place!
+      assert(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().rows() < rhs.data().rows());
+      assert(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().cols() < rhs.data().cols());
+
+      // Copy values over into unknown
+      this->rUnknown().rDom(0).rPerturbation().rComp(id).rData() = rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().rows());
+   }
+}
 }

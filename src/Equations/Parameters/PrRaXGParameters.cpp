@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    PrRaXGParameters::PrRaXGParameters()
       : IEquationParameters()
    {
@@ -67,4 +69,5 @@ namespace GeoMHDiSCC {
       }
    }
 
+}
 }

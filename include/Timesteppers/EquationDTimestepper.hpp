@@ -24,6 +24,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    /**
     *  \brief Implementation of a real valued (coupled) equation timestepper
     */
@@ -178,6 +180,7 @@ namespace GeoMHDiSCC {
 
    /// Typedef for a shared pointer of a EquationDTimestepper
    typedef SharedPtrMacro<EquationDTimestepper>  SharedEquationDTimestepper;
+}
 }
 
 #endif // EQUATIONDTIMESTEPPER_HPP

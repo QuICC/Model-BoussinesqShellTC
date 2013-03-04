@@ -28,6 +28,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Equations {
+
    /**
     * \brief Base for the implementation of a vector equation
     */
@@ -71,7 +73,7 @@ namespace GeoMHDiSCC {
           * @param rNLComp Nonlinear term component
           * @param name    ID of the physical vector component
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) = 0;
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
 
          /**
           * @brief Compute the linear term
@@ -79,7 +81,7 @@ namespace GeoMHDiSCC {
           * @param rRHS RHS of timestepping equation
           * @param id   ID of the spectral vector component
           */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id);
+         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Prepare the RHS for the timestep computation
@@ -87,7 +89,7 @@ namespace GeoMHDiSCC {
           * @param rhs    RHS of timestepping equation
           * @param compID  ID of the vector component
           */
-         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id) = 0;
+         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id);
 
       protected:
 
@@ -101,6 +103,7 @@ namespace GeoMHDiSCC {
    /// Typedef for a shared IVectorEquation
    typedef SharedPtrMacro<IVectorEquation> SharedIVectorEquation;
 
+}
 }
 
 #endif // IVECTOREQUATION_HPP

@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Timestep {
+
    // Scheme requires 3 substeps
    const int ImExRK3::STEPS = 3;
 
@@ -62,4 +64,5 @@ namespace GeoMHDiSCC {
       return ImExRK3::mZeta(step)/ImExRK3::mBeta(step);
    }
 
+}
 }
