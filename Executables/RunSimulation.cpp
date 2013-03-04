@@ -20,6 +20,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 #include "Simulation/Simulation.hpp"
 #include "PhysicalModels/ModelFactory.hpp"
 #include MODELHEADER
@@ -29,26 +30,31 @@
  */
 int run()
 {
+   int status = 0;
+
    // Create simulation
-   GeoMHDiSCC::SharedSimulation   spSim = GeoMHDiSCC::ModelFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createSimulation();
+   GeoMHDiSCC::SharedSimulation   spSim;
 
    // Exception handling during the initialisation part
    try
    {
-      // Initialise the whole simulation
-      spSim->init();
+      // Create simulation
+      spSim = GeoMHDiSCC::ModelFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createSimulation();
    }
+
    // If exception is thrown, finalise (close files) and return
-   catch(int i)
+   catch(GeoMHDiSCC::Exception& e)
    {
-      // Cleanup and close file handles
-      spSim->finalize();
+      std::cout << e.what() << std::endl;
 
-      return i;
+      status = -1;
    }
 
-   // Run the simulation
-   spSim->run();
+   if(status == 0)
+   {
+      // Run the simulation
+      spSim->run();
+   }
 
    // Cleanup and close file handles
    spSim->finalize();

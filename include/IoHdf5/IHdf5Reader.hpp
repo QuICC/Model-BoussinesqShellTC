@@ -22,6 +22,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/Dimensions.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoHdf5/Hdf5Types.hpp"
 #include "IoHdf5/Hdf5File.hpp"
@@ -82,7 +83,7 @@ namespace IoHdf5 {
          /**
           * @brief Set data parameters
           */
-         virtual void setReadArguments() = 0;
+         virtual void setReadArguments(Dimensions::Space::Id id) = 0;
 
          /**
           * @brief Open the file

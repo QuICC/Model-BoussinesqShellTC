@@ -37,9 +37,8 @@ namespace IoVariable {
           *
           * @param spRes   Resolution information
           * @param type    Type of the file (typically scheme name)
-          * @param mesh    Grid arrays of the mesh
           */
-         VisualizationFileWriter(std::string type, const std::vector<Array>& mesh);
+         VisualizationFileWriter(std::string type);
 
          /**
           * @brief Destructor
@@ -82,10 +81,6 @@ namespace IoVariable {
          void writePhysicalVector(const std::string& name, const std::vector<Datatypes::PhysicalScalarType>& vector);
 
       private:
-         /**
-          * @brief Storage for the mesh
-          */
-         std::vector<Array> mMesh;
 
    };
 

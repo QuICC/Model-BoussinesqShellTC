@@ -32,6 +32,7 @@
 #include "TransformGroupers/IBackwardGrouper.hpp"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
+#include "IoVariable/IVariableHdf5Reader.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -94,13 +95,11 @@ namespace GeoMHDiSCC {
          template <int DIMENSION, typename TParam> void setConfiguration();
 
          /**
-          * @brief Set solver initial state file
+          * @brief Set initial state through input file
           *
           * @param spInitFile Shared initial state file
-          *
-          * \mhdBug Fake declaration
           */
-         void setInitialStateFile(int spInitFile);//Shared spInitFile);
+         void setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile);
 
          /**
           * @brief Add ASCII output file to solver

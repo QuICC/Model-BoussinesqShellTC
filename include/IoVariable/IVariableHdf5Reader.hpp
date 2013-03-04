@@ -152,6 +152,9 @@ namespace IoVariable {
          std::map<PhysicalNames::Id,Datatypes::SharedVectorVariableType>   mVectors;
    };
 
+   /// Typedef for a smart reference counting pointer of a Variable HDF5 numbering reader
+   typedef SharedPtrMacro<IVariableHdf5Reader>   SharedIVariableHdf5Reader;
+
 }
 }
 

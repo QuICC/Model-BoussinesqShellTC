@@ -54,6 +54,18 @@ namespace IoVariable {
          void expect(const PhysicalNames::Id id);
 
          /**
+          * @brief Get dimension space file is working on
+          */
+         Dimensions::Space::Id   space() const;
+
+         /**
+          * @brier Set the mesh grid arrays
+          *
+          * @param mesh    Grid arrays of the mesh
+          */
+         void setMesh(const std::vector<Array>& mesh);
+
+         /**
           * @brief Make sure all the expected variables have been added
           */
          bool isFull() const;
@@ -96,6 +108,11 @@ namespace IoVariable {
           * @param spRes      Resolution information
           */
          SharedResolution mspRes;
+
+         /**
+          * @brief Storage for the mesh
+          */
+         std::vector<Array> mMesh;
 
          /**
           * @brief Set the size of the dataset

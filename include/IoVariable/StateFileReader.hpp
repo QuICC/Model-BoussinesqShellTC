@@ -124,6 +124,9 @@ namespace IoVariable {
       return this->mTimestep;
    }
 
+   /// Typedef for a smart reference counting pointer of a HDF5 state file reader
+   typedef SharedPtrMacro<StateFileReader>   SharedStateFileReader;
+
 }
 }
 

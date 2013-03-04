@@ -64,14 +64,17 @@ namespace GeoMHDiSCC {
       // Add equations
       TModel::addEquations(spSim);
 
-      // Add initial state file
-      TModel::setInitialStateFile(spSim);
-
       // Add ASCII output files
       TModel::addAsciiOutputFiles(spSim);
 
       // Add HDF5 output files
       TModel::addHdf5OutputFiles(spSim);
+
+      // Initialise the simulation
+      spSim->init();
+
+      // Set initial state
+      TModel::setInitialState(spSim);
 
       return spSim;
    }

@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Enums/PhysicalNames.hpp"
+#include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 
@@ -32,10 +33,14 @@ namespace GeoMHDiSCC {
       //pSim->addVectorEquation<AN_EQUATION>();
    }
 
-   void ExampleModel::setInitialStateFile(SharedSimulation spSim)
+   void ExampleModel::setInitialState(SharedSimulation spSim)
    {
-      // Set initial state file
-      //pSim->setInitialState(A_CONFIGURATION);
+      // Create and add initial state file to IO
+      IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type()));
+      spInit->expect(PhysicalNames::STREAMFUNCTION);
+      spInit->expect(PhysicalNames::VELOCITYZ);
+      spInit->expect(PhysicalNames::TEMPERATURE);
+      spSim->setInitialState(spInit);
    }
 
    void ExampleModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -57,11 +62,11 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spState);
       
       // Create and add visualization file to IO
-//      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type(), mesh));
-//      spViz->expect(PhysicalNames::STREAMFUNCTION);
-//      spViz->expect(PhysicalNames::VELOCITYZ);
-//      spViz->expect(PhysicalNames::TEMPERATURE);
-//      spSim->addOutputFile(spViz);
+      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
+      spViz->expect(PhysicalNames::STREAMFUNCTION);
+      spViz->expect(PhysicalNames::VELOCITYZ);
+      spViz->expect(PhysicalNames::TEMPERATURE);
+      spSim->addOutputFile(spViz);
    }
 
 }

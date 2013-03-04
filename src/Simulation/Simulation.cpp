@@ -161,9 +161,30 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo();
    }
 
-   void Simulation::setInitialStateFile(int spInitFile)//SharedStateFile spInitFile)
+   void Simulation::setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile)
    {
-      /// \mhdBug Fake implementation
+      // Loop over all scalars
+      std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
+      for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
+      {
+         spInitFile->addScalar((*scalIt));
+      }
+
+      // Loop over all vector variables
+      std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
+      for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
+      {
+         spInitFile->addVector((*vectIt));
+      }
+
+      // Initialise file
+      spInitFile->init();
+
+      // Read in data
+      spInitFile->read();
+
+      // Finalise file
+      spInitFile->finalize();
    }
 
    void Simulation::addOutputFile(int spOutFile)//SharedAscii spOutFile)
@@ -534,6 +555,11 @@ namespace GeoMHDiSCC {
          for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
          {
             (*fIt)->addVector((*vectIt));
+         }
+
+         if((*fIt)->space() == Dimensions::Space::PHYSICAL)
+         {
+            (*fIt)->setMesh(this->mTransformCoordinator.mesh());
          }
       }
 

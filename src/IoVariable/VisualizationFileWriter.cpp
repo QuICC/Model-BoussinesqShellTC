@@ -26,8 +26,8 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   VisualizationFileWriter::VisualizationFileWriter(std::string type, const std::vector<Array>& mesh)
-      : IVariableHdf5NWriter(VisualizationFileTags::BASENAME, VisualizationFileTags::EXTENSION, VisualizationFileTags::HEADER, type, VisualizationFileTags::VERSION, Dimensions::Space::PHYSICAL, true), mMesh(mesh)
+   VisualizationFileWriter::VisualizationFileWriter(std::string type)
+      : IVariableHdf5NWriter(VisualizationFileTags::BASENAME, VisualizationFileTags::EXTENSION, VisualizationFileTags::HEADER, type, VisualizationFileTags::VERSION, Dimensions::Space::PHYSICAL, true)
    {
    }
 

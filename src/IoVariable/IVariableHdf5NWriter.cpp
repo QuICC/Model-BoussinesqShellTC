@@ -33,6 +33,16 @@ namespace IoVariable {
    {
    }
 
+   Dimensions::Space::Id IVariableHdf5NWriter::space() const
+   {
+      return this->mSpaceId;
+   }
+
+   void IVariableHdf5NWriter::setMesh(const std::vector<Array>& mesh)
+   {
+      this->mMesh = mesh;
+   }
+
    void IVariableHdf5NWriter::setResolution(SharedResolution spRes)
    {
       // Store resolution object

@@ -55,11 +55,11 @@ namespace GeoMHDiSCC {
          static void setConfigurationFile(SharedSimulation spSim);
 
          /**
-          * @brief Get the required HDF5 input files
+          * @brief Set the initial state
           *
           * @param spSim   Shared simulation object
           */
-         static void setInitialStateFile(SharedSimulation spSim);
+         static void setInitialState(SharedSimulation spSim);
 
          /**
           * @brief Get the required ASCII output files
