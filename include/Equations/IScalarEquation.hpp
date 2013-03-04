@@ -88,6 +88,46 @@ namespace Equations {
          virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs);
 
          /**
+          * @brief Basic implementatin of the method to transfer equation input to timestepper
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Basic implementation of the method to transfer equation input to timestepper
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Basic implementation of the method to transfer timestepper output to equation unknown
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Basic implementation of the method to transfer timestepper output to equation unknown
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
+
+         /**
           * @brief Transfer equation input to timestepper
           *
           * @param id      Component ID

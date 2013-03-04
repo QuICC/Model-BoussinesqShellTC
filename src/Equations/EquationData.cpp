@@ -363,6 +363,16 @@ namespace Equations {
       return this->mCouplingInfo;
    }
 
+   void EquationData::setName(PhysicalNames::Id name)
+   {
+      this->mName = name;
+   }
+
+   void EquationData::setComplex(bool isComplex)
+   {
+      this->mEqIsComplex = isComplex;
+   }
+
    PhysicalNames::Id   EquationData::name() const
    {
       return this->mName;

@@ -51,6 +51,7 @@ namespace Timestep {
       this->mDt = dt;
 
       // Update the timestep matrices
+      ///  \mhdBug Does not yet update the matrices!!!
    }
 
    void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
@@ -73,16 +74,16 @@ namespace Timestep {
 
    void Timestepper::init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
-      // Storage for the field coupling information
-      std::map<FieldIdType, int>  coupled;
-      std::vector<bool>  typeInfo;
+      //
+      // Determine if solvers need to be complex or not
+      //
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
-         this->getEqStepperType((*scalEqIt), FieldComponents::Spectral::SCALAR, coupled, typeInfo);
+         this->getEqStepperType((*scalEqIt), FieldComponents::Spectral::SCALAR);
       }
 
       // Loop over all vector equations
@@ -90,31 +91,36 @@ namespace Timestep {
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
-         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::ONE, coupled, typeInfo);
+         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::ONE);
 
          // Get type information for the equation steppers for the poloidal component
-         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::TWO, coupled, typeInfo);
+         this->getEqStepperType((*vectEqIt), FieldComponents::Spectral::TWO);
       }
 
-      // Storage for the field coupling information
-      std::map<FieldIdType, std::pair<bool,int> >  coupledType;
+      //
+      // Create real/complex timesteppers and update coupling information
+      //
 
       // Loop over all scalar equations
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
          // Get type information for the equation steppers
-         this->createEqStepper((*scalEqIt), FieldComponents::Spectral::SCALAR, coupledType, typeInfo);
+         this->createEqStepper((*scalEqIt), FieldComponents::Spectral::SCALAR);
       }
 
       // Loop over all vector equations
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
-         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::ONE, coupledType, typeInfo);
+         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::ONE);
 
          // Get type information for the equation steppers for the poloidal component
-         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::TWO, coupledType, typeInfo);
+         this->createEqStepper((*vectEqIt), FieldComponents::Spectral::TWO);
       }
+
+      //
+      // Create the timestep matrices
+      //
 
       // Loop over all substeps of timestepper
       for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
@@ -137,6 +143,10 @@ namespace Timestep {
          }
       }
 
+      //
+      // Initialise the solvers and the initial state
+      //
+
       // Initialise solvers from complex equation steppers
       for(size_t i = 0; i < this->mEqZStepper.size(); i++)
       {
@@ -156,69 +166,54 @@ namespace Timestep {
       this->initSolution(scalEq, vectEq);
    }
 
-   void Timestepper::getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, int>& coupled, std::vector<bool>& typeInfo)
+   void Timestepper::getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // Get Id for current unknown field
-      FieldIdType myId = std::make_pair(spEq->name(),comp);
+      TimestepCoupling::FieldIdType myId = std::make_pair(spEq->name(),comp);
 
-      int pos;
-
-      // Equation is not coupled (or is first of coupled equations)
-      if(coupled.count(myId) == 0)
+      // Equation is coupled to other equation and thus already stored
+      if(this->mTimeCoupling.isPresent(myId))
       {
-         // Get the range of coupled fields
-         Equations::CouplingInformation::FieldIteratorType it;
-         Equations::CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
+         // Get system index for field
+         int idx = this->mTimeCoupling.idx(myId);
 
-         pos = typeInfo.size();
+         // Update complex flag if required
+         this->mTimeCoupling.updateType(idx, spEq->isComplex(comp));
 
-         // Get current position in the equation stepper list
-         for(it = range.first; it != range.second; it++)
-         {
-            coupled.insert(std::make_pair(it->second, pos));
-         }
-
-         typeInfo.push_back(spEq->isComplex(comp));
-
-      // Coupled equation
+      // Equation is not coupled or is the first of coupled set
       } else
       {
-         // Get index of corresponding information
-         pos = coupled.find(myId)->second;
+         // Get a new index for the system
+         int idx = this->mTimeCoupling.newIndex();
 
-         // Correct complex flag if required
-         typeInfo.at(pos) = typeInfo.at(pos) || spEq->isComplex(comp);
-
-         // Remove equation from coupled equation list
-         coupled.erase(myId);
-      }
-
-      // Store preliminary equation stepper information
-      this->mEqInformation.insert(std::make_pair(myId,std::make_pair(spEq->isComplex(comp), pos)));
-   }
-
-   void Timestepper::createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<Timestepper::FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo)
-   {
-      // Get Id for current unknown field
-      FieldIdType myId = std::make_pair(spEq->name(),comp);
-
-      // Get the number of coupled fields
-      int nC = spEq->couplingInfo().nFields(comp);
-
-      // Equation is not coupled (or is first of coupled equations)
-      if(coupled.count(myId) == 0)
-      {
-         int idx;
+         // Add equation unknown to time coupling information
+         this->mTimeCoupling.addField(myId, spEq->isComplex(comp), idx);
 
          // Get the range of coupled fields
-         Equations::CouplingInformation::FieldIteratorType it;
-         Equations::CouplingInformation::FieldRangeType range = spEq->couplingInfo().fields(comp);
+         Equations::CouplingInformation::field_iterator it;
+         Equations::CouplingInformation::field_iterator_range range = spEq->couplingInfo().fieldRange(comp);
 
-         // Update data type information
-         this->mEqInformation.find(myId)->second.first = typeInfo.at(this->mEqInformation.find(myId)->second.second);
+         // Loop over coupled fields and add them to timestep coupling information
+         for(it = range.first; it != range.second; ++it)
+         {
+            this->mTimeCoupling.addField(it->second, false, idx);
+         }
+      }
+   }
 
+   void Timestepper::createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
+   {
+      // Get Id for current unknown field
+      TimestepCoupling::FieldIdType myId = std::make_pair(spEq->name(),comp);
+
+      if(this->mTimeCoupling.idx(myId) < 0)
+      {
+         // Get the number of coupled fields
+         int nC = spEq->couplingInfo().nFields(comp);
+
+         int idx;
          // Create correct equation timestepper
-         if(this->mEqInformation.find(myId)->second.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             idx = this->mEqZStepper.size();
             this->mEqZStepper.push_back(EquationZTimestepper(nC+1));
@@ -228,39 +223,20 @@ namespace Timestep {
             this->mEqDStepper.push_back(EquationDTimestepper(nC+1));
          }
 
-         // Update index information
-         this->mEqInformation.find(myId)->second.second = idx;
-
-         // Create list of coupled fields
-         for(it = range.first; it != range.second; it++)
-         {
-            coupled.insert(std::make_pair(it->second, std::make_pair(this->mEqInformation.find(myId)->second.first,idx)));
-         }
-
-      // Coupled equation
-      } else
-      {
-         // Update data type information
-         this->mEqInformation.find(myId)->second.first = coupled.find(myId)->second.first;
-
-         // Update index information
-         this->mEqInformation.find(myId)->second.second = coupled.find(myId)->second.second;
-
-         // Remove equation from coupled equation list
-         coupled.erase(myId);
+         this->mTimeCoupling.updateIndex(this->mTimeCoupling.idx(myId), idx);
       }
    }
 
    void Timestepper::createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
-      FieldIdType myId = std::make_pair(spEq->name(),comp);
+      TimestepCoupling::FieldIdType myId = std::make_pair(spEq->name(),comp);
+
+      // Index of the current field
+      int myIdx = this->mTimeCoupling.idx(myId);
 
       // Get internal information
       std::pair<int,ArrayI>  interInfo = spEq->couplingInfo().internal(comp);
-
-      // Get equation stepper information
-      std::pair<bool,int>  eqInfo = this->mEqInformation.find(myId)->second;
 
       // Get the number of coupled fields
       int nC = spEq->couplingInfo().nFields(comp);
@@ -275,24 +251,24 @@ namespace Timestep {
       int fieldIdx;
 
       // Complex matrices in linear solve
-      if(eqInfo.first)
+      if(this->mTimeCoupling.isComplex(myId))
       {
-         fieldIdx = this->mEqZStepper.at(eqInfo.second).current();
+         fieldIdx = this->mEqZStepper.at(myIdx).current();
 
          for(int i = 0; i < interInfo.first; i++)
          {
             if(fieldIdx == 0)
             {
                // Complete RHS matrix
-               this->mEqZStepper.at(eqInfo.second).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqZStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Complete RHS matrix
-               this->mEqZStepper.at(eqInfo.second).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqZStepper.at(myIdx).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                if(this->mStep == 0)
                {
                   // Create RHS and solution data storage
-                  this->mEqZStepper.at(eqInfo.second).addStorage(interInfo.second(i));
+                  this->mEqZStepper.at(myIdx).addStorage(interInfo.second(i));
                }
 
                // Set the start row
@@ -300,10 +276,10 @@ namespace Timestep {
             } else
             {
                // Complete RHS matrix
-               this->mEqZStepper.at(eqInfo.second).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqZStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Complete RHS matrix
-               this->mEqZStepper.at(eqInfo.second).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqZStepper.at(myIdx).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -313,31 +289,31 @@ namespace Timestep {
          if(this->mStep == 0)
          {
             // Store storage information
-            this->mEqZStepper.at(eqInfo.second).addInformation(myId,startRow);
+            this->mEqZStepper.at(myIdx).addInformation(myId,startRow);
          }
 
          // Move field counter to next field
-         this->mEqZStepper.at(eqInfo.second).next();
+         this->mEqZStepper.at(myIdx).next();
 
       // Real matrices in linear solve
       } else
       {
-         fieldIdx = this->mEqDStepper.at(eqInfo.second).current();
+         fieldIdx = this->mEqDStepper.at(myIdx).current();
 
          for(int i = 0; i < interInfo.first; i++)
          {
             if(fieldIdx == 0)
             {
                // Complete RHS matrix
-               this->mEqDStepper.at(eqInfo.second).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqDStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Complete RHS matrix
-               this->mEqDStepper.at(eqInfo.second).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqDStepper.at(myIdx).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                if(this->mStep == 0)
                {
                   // Create RHS and solution data storage
-                  this->mEqDStepper.at(eqInfo.second).addStorage(interInfo.second(i));
+                  this->mEqDStepper.at(myIdx).addStorage(interInfo.second(i));
                }
 
                // Set the start row
@@ -345,10 +321,10 @@ namespace Timestep {
             } else
             {
                // Complete RHS matrix
-               this->mEqDStepper.at(eqInfo.second).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqDStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Complete RHS matrix
-               this->mEqDStepper.at(eqInfo.second).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+               this->mEqDStepper.at(myIdx).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -358,19 +334,18 @@ namespace Timestep {
          if(this->mStep == 0)
          {
             // Store storage information
-            this->mEqDStepper.at(eqInfo.second).addInformation(myId,startRow);
+            this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
          }
 
          // Move field counter to next field
-         this->mEqDStepper.at(eqInfo.second).next();
+         this->mEqDStepper.at(myIdx).next();
       }
    }
 
    void Timestepper::initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
-      std::pair<bool,int> eqInfo;
-      FieldIdType myId;
+      TimestepCoupling::FieldIdType myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
@@ -378,25 +353,26 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(myIdx).rSolution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->copyTInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(myIdx).rSolution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }
@@ -407,49 +383,51 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information for toroidal component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input for toroidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(myIdx).rSolution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input for toroidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(myIdx).rSolution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
 
-         // Get identity and corresponding equation information for poloidal component
+         // Get identity and corresponding equation information for second component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input for poloidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).rSolution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(myIdx).rSolution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input for poloidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).rSolution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->copyTInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(myIdx).rSolution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }
@@ -458,8 +436,7 @@ namespace Timestep {
    void Timestepper::getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
-      std::pair<bool,int> eqInfo;
-      FieldIdType myId;
+      TimestepCoupling::FieldIdType myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
@@ -467,25 +444,26 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(myIdx).rRHSData(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepInput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(myIdx).rRHSData(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }
@@ -496,49 +474,51 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information for toroidal component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input for toroidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(myIdx).rRHSData(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input for toroidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(myIdx).rRHSData(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
 
          // Get identity and corresponding equation information for poloidal component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input for poloidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).rRHSData(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(myIdx).rRHSData(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep input for poloidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).rRHSData(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepInput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(myIdx).rRHSData(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }
@@ -584,8 +564,7 @@ namespace Timestep {
    void Timestepper::transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
-      std::pair<bool,int> eqInfo;
-      FieldIdType myId;
+      TimestepCoupling::FieldIdType myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
@@ -593,25 +572,26 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep output
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqZStepper.at(myIdx).solution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep output
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*scalEqIt)->timestepOutput(FieldComponents::Spectral::SCALAR, this->mEqDStepper.at(myIdx).solution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }
@@ -622,49 +602,51 @@ namespace Timestep {
       {
          // Get identity and corresponding equation information for toroidal component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         int myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep output for toroidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqZStepper.at(myIdx).solution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep output for toroidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::ONE, this->mEqDStepper.at(myIdx).solution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
 
          // Get identity and corresponding equation information for poloidal component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
-         // Get equation stepper information
-         eqInfo = this->mEqInformation.find(myId)->second;
+
+         // Get index of current field
+         myIdx = this->mTimeCoupling.idx(myId);
 
          // Linear solve matrices are complex
-         if(eqInfo.first)
+         if(this->mTimeCoupling.isComplex(myId))
          {
             // Get timestep input for poloidal component
-            for(int i = 0; i < this->mEqZStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(eqInfo.second).solution(i), i, this->mEqZStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqZStepper.at(myIdx).solution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
             }
 
          // Linear solve matrices are real
          } else
          {
             // Get timestep output for poloidal component
-            for(int i = 0; i < this->mEqDStepper.at(eqInfo.second).nSystem(); i++)
+            for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
-               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(eqInfo.second).solution(i), i, this->mEqDStepper.at(eqInfo.second).startRow(myId,i));
+               (*vectEqIt)->timestepOutput(FieldComponents::Spectral::TWO, this->mEqDStepper.at(myIdx).solution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
       }

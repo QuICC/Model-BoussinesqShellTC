@@ -37,10 +37,10 @@ namespace Equations {
          typedef std::multimap<FieldComponents::Spectral::Id, std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> > FieldCouplingType;
 
          /// Typedef for an iterator for the field coupling data
-         typedef FieldCouplingType::const_iterator  FieldIteratorType;
+         typedef FieldCouplingType::const_iterator  field_iterator;
 
          /// Typedef for a range iterator for the field coupling data
-         typedef std::pair<FieldIteratorType,FieldIteratorType>  FieldRangeType;
+         typedef std::pair<field_iterator,field_iterator>  field_iterator_range;
 
          /**
           * @brief Simple constructor
@@ -87,8 +87,7 @@ namespace Equations {
          /**
           * @brief Get iterator to field couplings
           */
-         FieldRangeType fields(const FieldComponents::Spectral::Id& comp) const;
-
+         field_iterator_range fieldRange(const FieldComponents::Spectral::Id& comp) const;
 
       protected:
 
@@ -129,7 +128,7 @@ namespace Equations {
       return this->mField.count(comp);
    }
 
-   inline CouplingInformation::FieldRangeType CouplingInformation::fields(const FieldComponents::Spectral::Id& comp) const
+   inline CouplingInformation::field_iterator_range CouplingInformation::fieldRange(const FieldComponents::Spectral::Id& comp) const
    {
       return this->mField.equal_range(comp);
    }

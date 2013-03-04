@@ -64,7 +64,7 @@ namespace Equations {
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().cols() < rhs.data().cols());
 
       // Copy values over into unknown
-      this->rUnknown().rDom(0).rPerturbation().rComp(id).rData() = rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().rows());
+      this->rUnknown().rDom(0).rPerturbation().rComp(id).setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().rows()));
    }
 }
 }

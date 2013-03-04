@@ -36,8 +36,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::initBase()
    {
-      /// \mhdBug Fake implementation
-
       // Start timer
       this->mExecutionTimer.start();
 
@@ -220,8 +218,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::computeNonlinear()
    {
-      /// \mhdBug Fake implementation
-      
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
@@ -233,10 +229,8 @@ namespace GeoMHDiSCC {
 
    void Simulation::timestepEquations()
    {
-      /// \mhdBug Fake implementation
-      
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
-      //this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
+      this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
 
       ProfilerMacro_start(ProfilerMacro::CONTROL);
@@ -464,6 +458,7 @@ namespace GeoMHDiSCC {
 
    void Simulation::initTimestepper()
    {
+      /// \mhdBug Fake implementation
 //      std::vector<SharedIScalarEquation>::iterator scalEqIt;
 //      std::vector<SharedIVectorEquation>::iterator vectEqIt;
 //

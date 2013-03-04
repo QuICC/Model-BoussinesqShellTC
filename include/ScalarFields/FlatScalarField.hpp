@@ -153,6 +153,16 @@ namespace Datatypes {
          template <typename Derived> void setData(const Eigen::MatrixBase<Derived>& field);
 
          /**
+          * @brief Add to internal storage field data
+          */
+         template <typename Derived> void addData(const Eigen::MatrixBase<Derived>& field);
+
+         /**
+          * @brief Substract from internal storage field data
+          */
+         template <typename Derived> void subData(const Eigen::MatrixBase<Derived>& field);
+
+         /**
           * @brief Set the complete field to zero
           */
          void setZeros();
@@ -275,6 +285,16 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setData(const Eigen::MatrixBase<Derived>& field)
    {
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addData(const Eigen::MatrixBase<Derived>& field)
+   {
+      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) += field;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subData(const Eigen::MatrixBase<Derived>& field)
+   {
+      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) -= field;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> FlatScalarField<TData, DIMENSION>::FlatScalarField(SharedPtrMacro<ScalarFieldSetup<DIMENSION> > spSetup)

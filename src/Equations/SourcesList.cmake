@@ -9,5 +9,6 @@ set(MHDSources
 )
 
 set(MHDSrcSubDirs
+   Asymptotics
    Parameters
 )

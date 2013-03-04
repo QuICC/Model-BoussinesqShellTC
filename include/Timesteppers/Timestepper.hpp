@@ -21,6 +21,7 @@
 //
 #include "Timesteppers/EquationDTimestepper.hpp"
 #include "Timesteppers/EquationZTimestepper.hpp"
+#include "Timesteppers/TimestepCoupling.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -34,9 +35,6 @@ namespace Timestep {
    class Timestepper
    {
       public:
-         /// Typedef for a field ID
-         typedef std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>  FieldIdType;
-
          /**
           * @brief Constructor
           */
@@ -63,7 +61,7 @@ namespace Timestep {
          /**
           * @brief Change the used timestep
           */
-         void setTimestep(MHFloat dt);
+         void changeTimestep(MHDFloat dt);
 
          /**
           * @brief Update control status
@@ -84,12 +82,12 @@ namespace Timestep {
          /**
           * @brief Compute the type of the equation stepper (real or complex)
           */
-         void getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, int>& coupled, std::vector<bool>& typeInfo);
+         void getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Create the correct equation steppers
           */
-         void createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, std::map<FieldIdType, std::pair<bool,int> >& coupled, const std::vector<bool>& typeInfo);
+         void createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Compute (coupled) matrices
@@ -168,9 +166,9 @@ namespace Timestep {
          MHDFloat mTime;
 
          /**
-          * @brief Map between field ID and corresponding storage
+          * @brief Timestep equation coupling
           */
-         std::map<FieldIdType,std::pair<bool,int> > mEqInformation;
+         TimestepCoupling mTimeCoupling;
 
          /**
           * @brief Vector of (coupled) real equation timesteppers

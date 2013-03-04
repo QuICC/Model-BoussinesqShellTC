@@ -29,8 +29,6 @@ namespace Equations {
 
    /**
     * @brief This class provides the constant coefficients apparearing in the equations
-    *
-    * \mhdBug This implementation is very buggy
     */
    class IEquationParameters
    {

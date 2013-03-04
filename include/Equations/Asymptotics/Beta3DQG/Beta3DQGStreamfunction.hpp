@@ -58,34 +58,7 @@ namespace Equations {
          virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
 
          /**
-          * @brief Prepare the RHS for the timestep computation
-          *
-          * @param rhs    RHS of timestepping equation
-          */
-         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs);
-
-         /**
-          * @brief Method to transfer equation input to timestepper
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
-
-         /**
-          * @brief Pure virtual method to transfer equation input to timestepper
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
-
-         /**
-          * @brief Pure virtual method to transfer timestepper output to equation unknown
+          * @brief Transfer timestepper output to unknown and update vorticity
           *
           * @param id      Component ID
           * @param storage Storage for the equation values
@@ -95,7 +68,7 @@ namespace Equations {
          virtual void timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
 
          /**
-          * @brief Pure virtual method to transfer timestepper output to equation unknown
+          * @brief Transfer timestepper output to unknown and update vorticity
           *
           * @param id      Component ID
           * @param storage Storage for the equation values

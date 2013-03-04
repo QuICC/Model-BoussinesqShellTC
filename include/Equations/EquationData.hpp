@@ -216,30 +216,24 @@ namespace Equations {
 
       protected:
          /**
+          * @brief Set the unknown name of equation
+          */
+         void setName(PhysicalNames::Id name);
+
+         /**
+          * @brief Set complex flag
+          */
+         void setComplex(bool isComplex);
+
+         /**
           * @brief Storage for the variable requirements
           */
          VariableRequirement mRequirements;
 
-      private:
          /**
-          * @brief Storage for smart equation parameters
+          * @brief Coupling information of the equation
           */
-         SharedIEquationParameters   mspEqParams;
-
-         /**
-          * @brief Boundary condition counter
-          */
-         int mBCCounter;
-
-         /**
-          * @brief Map of name and pointer for the scalar variables
-          */
-         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mScalars;
-
-         /**
-          * @brief Map of name and pointer for the vector variables
-          */
-         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectors;
+         CouplingInformation  mCouplingInfo;
 
          /**
           * @brief Map of component and time matrices 
@@ -271,6 +265,27 @@ namespace Equations {
           */
          std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
 
+      private:
+         /**
+          * @brief Storage for smart equation parameters
+          */
+         SharedIEquationParameters   mspEqParams;
+
+         /**
+          * @brief Boundary condition counter
+          */
+         int mBCCounter;
+
+         /**
+          * @brief Map of name and pointer for the scalar variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mScalars;
+
+         /**
+          * @brief Map of name and pointer for the vector variables
+          */
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectors;
+
          /**
           * @brief Storage for the boundary condition
           */
@@ -285,11 +300,6 @@ namespace Equations {
           * @brief Storage for the boundary value
           */
          std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,ArrayZ> > mBVals;
-
-         /**
-          * @brief Coupling information of the equation
-          */
-         CouplingInformation  mCouplingInfo;
 
          /**
           * @brief Name ID of the unknown
