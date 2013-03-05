@@ -22,16 +22,19 @@
 #include "Timers/ExecutionTimer.hpp"
 #include "Simulation/SimulationRunControl.hpp"
 #include "Simulation/SimulationIoControl.hpp"
+#include "Simulation/SimulationBoundary.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "Timesteppers/Timestepper.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/ParallelSelector.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 #include "TransformGroupers/IBackwardGrouper.hpp"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
+#include "IoConfig/ConfigParts/BoundaryPart.hpp"
 #include "IoVariable/IVariableHdf5Reader.hpp"
 
 namespace GeoMHDiSCC {
@@ -62,7 +65,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the different components of the simulation
           */
-         void init();
+         void init(const SimulationBoundary& bcs);
 
          /**
           * @brief Run the simulation
@@ -80,6 +83,11 @@ namespace GeoMHDiSCC {
          template <typename TScheme> void initResolution();
 
          /**
+          * @brief Create the simulation wide boundary conditions
+          */
+         template <typename TModel> SharedPtrMacro<SimulationBoundary> createBoundary();
+
+         /**
           * @brief Add scalar equation to solver
           */
          template <typename TEquation> void addScalarEquation();
@@ -91,8 +99,10 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Set the simulation configuration file and parameters
+          *
+          * @param bcNames Vector of names for the boundary conditions
           */
-         template <int DIMENSION, typename TParam> void setConfiguration();
+         template <int DIMENSION, typename TParam> void setConfiguration(const std::vector<std::string>& bcNames);
 
          /**
           * @brief Set initial state through input file
@@ -158,7 +168,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the timestepper
           */
-         void initTimestepper();
+         void initTimestepper(const SimulationBoundary& bcs);
 
          /**
           * @brief Setup the output files adde by the model
@@ -249,10 +259,15 @@ namespace GeoMHDiSCC {
       this->mspRes = best.first;
 
       // Initialise the transform grouper
-//      TransformGrouperMacro::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+      Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
    }
 
-   template <int DIMENSION, typename TParam> void Simulation::setConfiguration()
+   template <typename TModel> SharedPtrMacro<SimulationBoundary> Simulation::createBoundary()
+   {
+      return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
+   }
+
+   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::vector<std::string>& bcNames)
    {
       // Create shared configuration file
       IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, "test"));
@@ -261,11 +276,17 @@ namespace GeoMHDiSCC {
       Equations::SharedIEquationParameters spEqParams(new TParam());
       this->mspEqParams = spEqParams;
 
-      // Add the equation parameter dependent configuration to file
+      // Create the equation parameter dependent configuration part
       IoConfig::SharedPhysicalPart   spPhys(new IoConfig::PhysicalPart(this->mspEqParams->names()));
 
-      // Add simulation part to configuration file
+      // Add physical part to configuration file
       spCfgFile->addPart(IoConfig::SimulationBlocks::PHYSICAL, spPhys);
+
+      // Create the boundary condition configuration part
+      IoConfig::SharedBoundaryPart   spBound(new IoConfig::BoundaryPart(bcNames));
+
+      // Add boundary part to configuration file
+      spCfgFile->addPart(IoConfig::SimulationBlocks::BOUNDARY, spBound);
 
       // Set configuration file
       this->mSimIoCtrl.setConfigurationFile(spCfgFile);

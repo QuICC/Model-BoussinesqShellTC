@@ -47,6 +47,9 @@ namespace GeoMHDiSCC {
 
    bool FrameworkBase::allowsIO()
    {
+      // Safety assert to avoid uninitialised use
+      assert(FrameworkBase::id() >= 0);
+
       // Only IO_RANK is allowed to do (direct) IO
       return (FrameworkBase::id() == FrameworkBase::IO_RANK);
    }

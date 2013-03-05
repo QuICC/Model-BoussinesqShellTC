@@ -30,7 +30,7 @@
 #include "IoConfig/ConfigParts/ParallelPart.hpp"
 #include "IoConfig/ConfigParts/TimesteppingPart.hpp"
 #include "IoConfig/ConfigParts/RunPart.hpp"
-#include "IoConfig/ConfigParts/IOPart.hpp"
+#include "IoConfig/ConfigParts/IoPart.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -55,7 +55,7 @@ namespace IoConfig {
       /**
        * @name Enum of the possible blocks
        */
-      enum Id {PHYSICAL};
+      enum Id {PHYSICAL, BOUNDARY};
    };
 
    /**
@@ -94,32 +94,37 @@ namespace IoConfig {
          /**
           * @brief Get truncation part
           */
-         SharedCIConfigurationPart truncation() const;
+         SharedCIConfigurationPart spTruncation() const;
 
          /**
           * @brief Get parallel part
           */
-         SharedCIConfigurationPart parallel() const;
+         SharedCIConfigurationPart spParallel() const;
 
          /**
           * @brief Get timestepping part
           */
-         SharedCIConfigurationPart timestepping() const;
+         SharedCIConfigurationPart spTimestepping() const;
 
          /**
           * @brief Get run part
           */
-         SharedCIConfigurationPart run() const;
+         SharedCIConfigurationPart spRun() const;
 
          /**
           * @brief Get run part
           */
-         SharedCIConfigurationPart io() const;
+         SharedCIConfigurationPart spIo() const;
 
          /**
           * @brief Get physical part
           */
-         SharedCIConfigurationPart physical() const;
+         SharedCIConfigurationPart spPhysical() const;
+
+         /**
+          * @brief Get boundary part
+          */
+         SharedCIConfigurationPart spBoundary() const;
          
       protected:
          /**
@@ -183,7 +188,7 @@ namespace IoConfig {
          static const std::string VERSION;
    };
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::truncation() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spTruncation() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::TRUNCATION) != this->mFramework.end());
@@ -191,7 +196,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::TRUNCATION)->second;
    }
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::parallel() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spParallel() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::PARALLEL) != this->mFramework.end());
@@ -199,7 +204,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::PARALLEL)->second;
    }
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::timestepping() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spTimestepping() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::TIMESTEPPING) != this->mFramework.end());
@@ -207,7 +212,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::TIMESTEPPING)->second;
    }
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::run() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spRun() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::RUN) != this->mFramework.end());
@@ -215,7 +220,7 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::RUN)->second;
    }
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::io() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spIo() const
    {
       // Make sure initialisation was correct
       assert(this->mFramework.find(FrameworkBlocks::IO) != this->mFramework.end());
@@ -223,12 +228,20 @@ namespace IoConfig {
       return this->mFramework.find(FrameworkBlocks::IO)->second;
    }
 
-   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::physical() const
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spPhysical() const
    {
       // Make sure initialisation was correct
       assert(this->mSimulation.find(SimulationBlocks::PHYSICAL) != this->mSimulation.end());
 
       return this->mSimulation.find(SimulationBlocks::PHYSICAL)->second;
+   }
+
+   template <typename TBase> inline SharedCIConfigurationPart IConfigurationFile<TBase>::spBoundary() const
+   {
+      // Make sure initialisation was correct
+      assert(this->mSimulation.find(SimulationBlocks::BOUNDARY) != this->mSimulation.end());
+
+      return this->mSimulation.find(SimulationBlocks::BOUNDARY)->second;
    }
 
    template <typename TBase> std::string IConfigurationFile<TBase>::frameworkTag() const
@@ -287,7 +300,7 @@ namespace IoConfig {
       this->mFramework.insert(std::make_pair(FrameworkBlocks::RUN, spPart));
       
       // Add IO part
-      spPart = SharedIOPart(new IOPart());
+      spPart = SharedIoPart(new IoPart());
       this->mFramework.insert(std::make_pair(FrameworkBlocks::IO, spPart));
    }
 

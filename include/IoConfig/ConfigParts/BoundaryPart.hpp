@@ -33,8 +33,10 @@ namespace IoConfig {
       public:
          /**
           * @brief Constructor
+          *
+          * @param names Names of the parameters
           */
-         BoundaryPart();
+         BoundaryPart(const std::vector<std::string>& names);
 
          /**
           * @brief Destructor
@@ -57,7 +59,7 @@ namespace IoConfig {
          /**
           * @brief Initialise component
           */
-         void init();
+         void init(const std::vector<std::string>& names);
 
       private:
    };

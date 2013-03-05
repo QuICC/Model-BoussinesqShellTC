@@ -9,6 +9,7 @@
 
 // System includes
 //
+#include <cassert>
 
 // External includes
 //
@@ -78,11 +79,17 @@ namespace GeoMHDiSCC {
 
    inline int FrameworkBase::nCpu()
    {
+      // Safety assert to avoid uninitialised use
+      assert(FrameworkBase::mNCpu > 0);
+
       return FrameworkBase::mNCpu;
    }
 
    inline int FrameworkBase::id()
    {
+      // Safety assert to avoid uninitialised use
+      assert(FrameworkBase::mCpuId >= 0);
+
       return FrameworkBase::mCpuId;
    }
 

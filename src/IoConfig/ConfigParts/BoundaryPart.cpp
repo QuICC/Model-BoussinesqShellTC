@@ -24,27 +24,24 @@ namespace IoConfig {
 
    const std::string BoundaryPart::PARENTTAG = "boundary";
 
-   BoundaryPart::BoundaryPart()
+   BoundaryPart::BoundaryPart(const std::vector<std::string>& names)
       : IConfigurationPart(BoundaryPart::PARENTTAG)
    {
-      this->init();
+      this->init(names);
    }
 
    BoundaryPart::~BoundaryPart()
    {
    }
 
-   void BoundaryPart::init()
+   void BoundaryPart::init(const std::vector<std::string>& names)
    {
-      this->addIntegerTag("codensity", 0);
-
-      this->addIntegerTag("velocity", 0);
-
-      this->addIntegerTag("vorticity", 0);
-
-      this->addIntegerTag("magnetic", 0);
-
-      this->addIntegerTag("helicity", 0);
+      // Get iterator over vector
+      std::vector<std::string>::const_iterator  it;
+      for(it = names.begin(); it != names.end(); it++)
+      {
+         this->addIntegerTag(*it, -1);
+      }
    }
 
    void BoundaryPart::checkData()

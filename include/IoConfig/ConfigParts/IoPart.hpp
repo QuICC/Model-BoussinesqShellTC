@@ -1,4 +1,4 @@
-/** \file IOPart.hpp 
+/** \file IoPart.hpp 
  *  \brief Implementation of the IO part of the configuration file
  *
  *  \mhdBug Needs test
@@ -28,18 +28,18 @@ namespace IoConfig {
    /**
     * @brief Implementation of the IO part of the configuration file
     */
-   class IOPart: public IConfigurationPart
+   class IoPart: public IConfigurationPart
    {
       public:
          /**
           * @brief Constructor
           */
-         IOPart();
+         IoPart();
 
          /**
           * @brief Destructor
           */
-         virtual ~IOPart();
+         virtual ~IoPart();
 
          /**
           * @brief Check compatibility of data
@@ -63,10 +63,10 @@ namespace IoConfig {
    };
 
    /// Typedef for a shared pointer of a IO part
-   typedef SharedPtrMacro<IOPart> SharedIOPart;
+   typedef SharedPtrMacro<IoPart> SharedIoPart;
 
    /// Typedef for a const shared pointer of a IO part
-   typedef SharedPtrMacro<const IOPart> SharedCIOPart;
+   typedef SharedPtrMacro<const IoPart> SharedCIoPart;
 
 }
 }

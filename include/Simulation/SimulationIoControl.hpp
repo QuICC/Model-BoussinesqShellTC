@@ -111,6 +111,11 @@ namespace GeoMHDiSCC {
          const std::map<std::string, MHDFloat>& configPhysical() const;
 
          /**
+          * @brief Get the map of boundary conditions read from the configuration file
+          */
+         const std::map<std::string, int>& configBoundary() const;
+
+         /**
           * @brief Get begin iterator to HDF5 files
           */
          hdf5_iterator beginHdf5();

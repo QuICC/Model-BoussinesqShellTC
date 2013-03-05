@@ -25,10 +25,10 @@ namespace GeoMHDiSCC {
 
 namespace IoConfig {
 
-   const std::string ConfigurationWriter::NAME = "parameters_template";
+   const std::string ConfigurationWriter::NAME = "parameters_template_";
 
    ConfigurationWriter::ConfigurationWriter(const int dim, const std::string& type)
-      : IConfigurationFile<IoXml::IXmlWriter>(dim, ConfigurationWriter::NAME, type)
+      : IConfigurationFile<IoXml::IXmlWriter>(dim, ConfigurationWriter::NAME+type, type)
    {
    }
 
@@ -40,7 +40,6 @@ namespace IoConfig {
    {
       // Do pre writing processing
       this->preWrite();
-
 
       // Check if the framework allows IO to be performed
       if(FrameworkMacro::allowsIO())
@@ -168,6 +167,62 @@ namespace IoConfig {
 
       // Do post writing processing
       this->postWrite();
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspTruncation()
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::TRUNCATION) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::TRUNCATION)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspParallel()
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::PARALLEL) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::PARALLEL)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspTimestepping()
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::TIMESTEPPING) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::TIMESTEPPING)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspRun()
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::RUN) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::RUN)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspIo()
+   {
+      // Make sure initialisation was correct
+      assert(this->mFramework.find(FrameworkBlocks::IO) != this->mFramework.end());
+
+      return this->mFramework.find(FrameworkBlocks::IO)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspPhysical()
+   {
+      // Make sure initialisation was correct
+      assert(this->mSimulation.find(SimulationBlocks::PHYSICAL) != this->mSimulation.end());
+
+      return this->mSimulation.find(SimulationBlocks::PHYSICAL)->second;
+   }
+
+   SharedIConfigurationPart ConfigurationWriter::rspBoundary()
+   {
+      // Make sure initialisation was correct
+      assert(this->mSimulation.find(SimulationBlocks::BOUNDARY) != this->mSimulation.end());
+
+      return this->mSimulation.find(SimulationBlocks::BOUNDARY)->second;
    }
 }
 }

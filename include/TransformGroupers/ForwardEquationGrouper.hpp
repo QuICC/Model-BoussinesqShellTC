@@ -3,6 +3,7 @@
  *
  *  \mhdBug Needs test
  */
+#ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
 
 #ifndef FORWARDEQUATIONGROUPER_HPP
 #define FORWARDEQUATIONGROUPER_HPP
@@ -50,7 +51,7 @@ namespace Transform {
           * @param vectEqs  Vector of vector equations
           * @param coord    Transform coord
           */
-         virtual void transform(std::vector<Equations::SharedScalarEquation>& scalEqs, std::vector<SharedVectorEquations::Equation>& vectEqs, TransformCoordinatorType& coord);
+         virtual void transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord);
 
          /**
           * @brief Get the number of required buffer packs for the first exchange
@@ -80,7 +81,7 @@ namespace Transform {
    {
    }
 
-   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedScalarEquation>& scalEqs, std::vector<Equations::SharedVectorEquation>& vectEqs, TransformCoordinatorType& coord)
+   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
    {
       //
       // Compute nonlinear interaction 
@@ -88,7 +89,7 @@ namespace Transform {
       //
 
       // First treat the scalar equations
-      std::vector<Equations::SharedScalarEquation>::iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
          // Setup the second exchange communication step for scalar equation
@@ -111,7 +112,7 @@ namespace Transform {
       }
 
       // ... then the vector equations
-      std::vector<Equations::SharedVectorEquation>::iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
          // Setup the second exchange communication step for vector equation
@@ -184,3 +185,5 @@ namespace Transform {
 }
 
 #endif // FORWARDEQUATIONGROUPER_HPP
+
+#endif //GEOMHDISCC_TRANSGROUPER_EQUATION

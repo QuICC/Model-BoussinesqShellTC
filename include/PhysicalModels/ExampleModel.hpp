@@ -10,6 +10,7 @@
 
 // System includes
 //
+#include <string>
 
 // External includes
 //
@@ -41,18 +42,37 @@ namespace GeoMHDiSCC {
          typedef Equations::PrRaXGParameters  ParametersType;
 
          /**
-          * @brief Get the required equations
+          * @brief Get vector of names for the boundary conditions
+          */
+         static std::vector<std::string> boundaryNames();
+
+         /**
+          * @brief Add the required equations
           *
           * @param spSim   Shared simulation object
           */
          static void addEquations(SharedSimulation spSim);
 
          /**
-          * @brief Get the required XML input files
+          * @brief Add the required ASCII output files
           *
           * @param spSim   Shared simulation object
           */
-         static void setConfigurationFile(SharedSimulation spSim);
+         static void addAsciiOutputFiles(SharedSimulation spSim);
+
+         /**
+          * @brief Add the required HDF5 output files
+          *
+          * @param spSim   Shared simulation object
+          */
+         static void addHdf5OutputFiles(SharedSimulation spSim);
+
+         /**
+          * @brief Set the boundary conditions
+          *
+          * @param bcIds Boundary condition IDs
+          */
+         static SharedPtrMacro<SimulationBoundary> createBoundary(const std::map<std::string, int>& bcIds);
 
          /**
           * @brief Set the initial state
@@ -60,20 +80,6 @@ namespace GeoMHDiSCC {
           * @param spSim   Shared simulation object
           */
          static void setInitialState(SharedSimulation spSim);
-
-         /**
-          * @brief Get the required ASCII output files
-          *
-          * @param spSim   Shared simulation object
-          */
-         static void addAsciiOutputFiles(SharedSimulation spSim);
-
-         /**
-          * @brief Get the required HDF5 output files
-          *
-          * @param spSim   Shared simulation object
-          */
-         static void addHdf5OutputFiles(SharedSimulation spSim);
 
       protected:
 

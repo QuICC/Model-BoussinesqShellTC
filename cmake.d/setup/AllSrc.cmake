@@ -56,6 +56,7 @@ set(MHDAllSrcDirs
    Timesteppers
    TransformConfigurators
    TransformGroupers
+   TypeSelectors
    Variables
 )
 

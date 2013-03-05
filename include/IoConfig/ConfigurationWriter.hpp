@@ -52,6 +52,41 @@ namespace IoConfig {
           * @brief Read content of configuration file
           */
          virtual void write();
+
+         /**
+          * @brief Set truncation part
+          */
+         SharedIConfigurationPart rspTruncation();
+
+         /**
+          * @brief Set parallel part
+          */
+         SharedIConfigurationPart rspParallel();
+
+         /**
+          * @brief Set timestepping part
+          */
+         SharedIConfigurationPart rspTimestepping();
+
+         /**
+          * @brief Set run part
+          */
+         SharedIConfigurationPart rspRun();
+
+         /**
+          * @brief Set run part
+          */
+         SharedIConfigurationPart rspIo();
+
+         /**
+          * @brief Set physical part
+          */
+         SharedIConfigurationPart rspPhysical();
+
+         /**
+          * @brief Set boundary part
+          */
+         SharedIConfigurationPart rspBoundary();
          
       protected:
 

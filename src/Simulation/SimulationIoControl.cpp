@@ -156,7 +156,7 @@ namespace GeoMHDiSCC {
    ArrayI SimulationIoControl::configDimension() const
    {
       // Get truncation map
-      std::map<std::string,int>  trunc = this->mspCfgFile->truncation()->iMap();
+      std::map<std::string,int>  trunc = this->mspCfgFile->spTruncation()->iMap();
 
       // Create storage for the dimensions
       ArrayI dim(trunc.size());
@@ -175,12 +175,17 @@ namespace GeoMHDiSCC {
 
    int SimulationIoControl::configNCpu() const
    {
-      return this->mspCfgFile->parallel()->iValue("cpus");
+      return this->mspCfgFile->spParallel()->iValue("cpus");
    }
 
    const std::map<std::string, MHDFloat>& SimulationIoControl::configPhysical() const
    {
-      return this->mspCfgFile->physical()->fMap();
+      return this->mspCfgFile->spPhysical()->fMap();
+   }
+
+   const std::map<std::string, int>& SimulationIoControl::configBoundary() const
+   {
+      return this->mspCfgFile->spBoundary()->iMap();
    }
 
    SimulationIoControl::hdf5_iterator  SimulationIoControl::beginHdf5()

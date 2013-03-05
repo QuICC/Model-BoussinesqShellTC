@@ -50,12 +50,12 @@ namespace Parallel {
          /**
           * @brief ID of the algorithm
           */
-         Splitting::Algorithms::Id algorithm;
+         const Splitting::Algorithms::Id algorithm;
 
          /**
           * @brief ID of the grouper
           */
-         Splitting::Groupers::Id grouper;
+         const Splitting::Groupers::Id grouper;
 
          /**
           * @brief Number of dimensions

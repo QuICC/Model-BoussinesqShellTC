@@ -1,6 +1,7 @@
 /** \file BackwardTransformGrouper.hpp
  *  \brief This class defines the backward transform grouping algorithm
  */
+#ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
 
 #ifndef BACKWARDTRANSFORMGROUPER_HPP
 #define BACKWARDTRANSFORMGROUPER_HPP
@@ -188,3 +189,5 @@ namespace Transform {
 }
 
 #endif // BACKWARDTRANSFORMGROUPER_HPP
+
+#endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM

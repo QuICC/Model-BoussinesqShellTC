@@ -1,7 +1,7 @@
 set(MHDSources
    BoundaryPart.cpp
    IConfigurationPart.cpp
-   IOPart.cpp
+   IoPart.cpp
    ParallelPart.cpp
    PhysicalPart.cpp
    RunPart.cpp
