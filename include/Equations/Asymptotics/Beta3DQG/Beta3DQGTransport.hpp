@@ -52,8 +52,11 @@ namespace Equations {
 
          /**
           * @brief Set the equation matrices
+          *
+          * @param bcIds   List of boundary condition IDs
+          * @param cbcIds  List of coupled boundary condition IDs
           */
-         virtual void setSpectralMatrices(Spectral::SpectralSelector<Dimensions::Transform::TRA1D>::Type& spec1D, Spectral::SpectralSelector<Dimensions::Transform::TRA2D>::Type& spec2D, Spectral::SpectralSelector<Dimensions::Transform::TRA3D>::Type& spec3D);
+         virtual void setSpectralMatrices(const BcEqMapType& bcIds, const std::map<PhysicalNames::Id, BcEqMapType>& cbcIds);
          
       protected:
          /**

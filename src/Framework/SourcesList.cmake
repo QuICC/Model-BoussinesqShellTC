@@ -1,7 +1,5 @@
 set(MHDSources
    FrameworkBase.cpp
-   MpiFramework.cpp     # ONLY DEBUG, SHOULD BE REMOVED
-   SerialFramework.cpp  # ONLY DEBUG, SHOULD BE REMOVED
 )
 
 # Add in the parallel or serial framework depending on setup

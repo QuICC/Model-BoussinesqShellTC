@@ -27,7 +27,6 @@
 #include "Equations/IEquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
@@ -35,7 +34,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base building block for the implementation of a time dependend evolution equation
+    * @brief Base building block for the implementation of a time dependend evolution equation
     */
    class EquationData
    {
@@ -105,41 +104,6 @@ namespace Equations {
          int nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
 
          /**
-          * @brief Add boundary condition
-          *
-          * @param id   Spectral component ID
-          * @param dim  ID of the dimension
-          * @param bc   Boundary condition 
-          * @param val  Boundary value (default to zero)
-          */
-         void addBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc, ArrayZ val = ArrayZ());
-
-         /**
-          * @brief Get boundary conditions
-          */
-         const std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& getBCs(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
-
-         /**
-          * @brief Add boundary condition
-          */
-         void addCBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc);
-
-         /**
-          * @brief Get coupled boundary conditions
-          */
-         const std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& getCBCs(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
-
-         /**
-          * @brief Get boundary values
-          */
-         const std::map<Spectral::BoundaryConditions::Id,ArrayZ>& getBVals(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
-
-         /**
-          * @brief Check if equation is initialised correctly
-          */
-         virtual bool isInitialized() const;
-
-         /**
           * @brief Are equation timestepping matrices complex?
           */
          virtual bool isComplex(FieldComponents::Spectral::Id id) const;
@@ -190,11 +154,6 @@ namespace Equations {
          const FieldRequirement& requirements(PhysicalNames::Id id) const;
 
          /**
-          * @brief Set the equation matrices
-          */
-         virtual void setSpectralMatrices(Spectral::SpectralSelector<Dimensions::Transform::TRA1D>::Type& spec1D, Spectral::SpectralSelector<Dimensions::Transform::TRA2D>::Type& spec2D, Spectral::SpectralSelector<Dimensions::Transform::TRA3D>::Type& spec3D) = 0;
-
-         /**
           * @brief Finalize the initialise equation matrices
           */
          void finalizeMatrices();
@@ -203,16 +162,6 @@ namespace Equations {
           * @brief Get the equation parameters
           */
          const IEquationParameters& eqParams() const;
-
-         /**
-          * @brief Check if all BCs are set
-          */
-         bool initializedBCs() const;
-
-         /**
-          * @brief Check if boundary conditions are complex
-          */
-         bool boundaryIsComplex(FieldComponents::Spectral::Id id) const;
 
       protected:
          /**
@@ -272,11 +221,6 @@ namespace Equations {
          SharedIEquationParameters   mspEqParams;
 
          /**
-          * @brief Boundary condition counter
-          */
-         int mBCCounter;
-
-         /**
           * @brief Map of name and pointer for the scalar variables
           */
          std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mScalars;
@@ -285,21 +229,6 @@ namespace Equations {
           * @brief Map of name and pointer for the vector variables
           */
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectors;
-
-         /**
-          * @brief Storage for the boundary condition
-          */
-         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > mBCs;
-
-         /**
-          * @brief Storage for the coupled boundary condition
-          */
-         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > mCBCs;
-
-         /**
-          * @brief Storage for the boundary value
-          */
-         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,ArrayZ> > mBVals;
 
          /**
           * @brief Name ID of the unknown

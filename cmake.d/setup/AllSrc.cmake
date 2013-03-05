@@ -36,7 +36,7 @@ set(MHDAllSrcDirs
    Equations
    Exceptions
    FastTransforms
-   Framework         # SourcesList.txt IS IN DEBUG MODE
+   Framework
    IoAscii
    IoBinary
    IoConfig
@@ -52,9 +52,9 @@ set(MHDAllSrcDirs
    SpatialSchemes
    SpectralOperators
    StorageProfiler
-   Timers            # SourcesList.txt IS IN DEBUG MODE
+   Timers
    Timesteppers
-   TransformConfigurators  # SourcesList.txt IS IN DEBUG MODE
+   TransformConfigurators
    TransformGroupers
    Variables
 )

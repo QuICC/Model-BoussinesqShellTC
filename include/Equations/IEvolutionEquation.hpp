@@ -28,7 +28,6 @@
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
@@ -36,13 +35,22 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base building block for the implementation of a time dependend evolution equation
+    * @brief Base building block for the implementation of a time dependend evolution equation
     */
    class IEvolutionEquation : public EquationData
    {
       public:
+         /// Typedef for the boundary conditions map key type
+         typedef std::pair<FieldComponents::Spectral::Id, Dimensions::Simulation::Id> BcKeyType;
+
+         /// Typedef for the boundary conditions map storage type
+         typedef std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> BcMapType;
+
+         /// Typedef for the boundary conditions map storage type
+         typedef std::map<BcKeyType, BcMapType> BcEqMapType;
+
          /**
-          * \brief Simple constructor
+          * @brief Simple constructor
           */
          explicit IEvolutionEquation(SharedIEquationParameters spEqParams);
 
@@ -98,8 +106,11 @@ namespace Equations {
 
          /**
           * @brief Set the equation matrices
+          *
+          * @param bcIds   List of boundary condition IDs
+          * @param cbcIds  List of coupled boundary condition IDs
           */
-         virtual void setSpectralMatrices(Spectral::SpectralSelector<Dimensions::Transform::TRA1D>::Type& spec1D, Spectral::SpectralSelector<Dimensions::Transform::TRA2D>::Type& spec2D, Spectral::SpectralSelector<Dimensions::Transform::TRA3D>::Type& spec3D) = 0;
+         virtual void setSpectralMatrices(const BcEqMapType& bcIds, const std::map<PhysicalNames::Id, BcEqMapType>& cbcIds) = 0;
 
          /**
           * @brief Transfer equation input to timestepper

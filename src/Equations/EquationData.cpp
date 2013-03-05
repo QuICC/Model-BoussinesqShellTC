@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    EquationData::EquationData(SharedIEquationParameters spEqParams)
-      : mspEqParams(spEqParams), mBCCounter(-1), mEqIsComplex(false)
+      : mspEqParams(spEqParams), mEqIsComplex(false)
    {
    }
 
@@ -31,86 +31,9 @@ namespace Equations {
    {
    }
 
-   bool EquationData::isInitialized() const
-   {
-      bool status;
-
-      // Check boundary conditions initialisation
-      status = this->initializedBCs();
-
-      return status;
-   }
-
    bool EquationData::isComplex(FieldComponents::Spectral::Id id) const
    {
-      return (this->mEqIsComplex || this->boundaryIsComplex(id));
-   }
-
-   bool EquationData::boundaryIsComplex(FieldComponents::Spectral::Id id) const
-   {
-      bool status = false;
-
-      return status;
-   }
-
-   int EquationData::nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const
-   {
-      int n = 0;
-
-      if(this->mBCs.count(std::make_pair(id,dim)) > 0)
-      {
-         std::map<std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id>, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> >::const_iterator bcIt = this->mBCs.find(std::make_pair(id,dim));
-         std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>::const_iterator mapIt;
-         for(mapIt = bcIt->second.begin(); mapIt != bcIt->second.end(); mapIt++)
-         {
-            n++;
-         }
-      }
-
-      return n;
-   }
-
-   void EquationData::addBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc, ArrayZ val)
-   {
-      // Create boundary condition and boundary value maps if required
-      std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
-      if(this->mBCs.count(myId) == 0)
-      {
-         // Create boundary condition map
-         this->mBCs.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
-
-         // Create boundary value map
-         this->mBVals.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,ArrayZ>()));
-      }
-
-      // Insert boundary condition
-      this->mBCs.find(myId)->second.insert(bc);
-
-      // Insert boundary value
-      this->mBVals.find(myId)->second.insert(std::make_pair(bc.first,val));
-   }
-
-   void EquationData::addCBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim, const std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& bc)
-   {
-      std::pair<FieldComponents::Spectral::Id,Dimensions::Transform::Id> myId = std::make_pair(id,dim);
-      if(this->mCBCs.count(myId) == 0)
-      {
-         this->mCBCs.insert(std::make_pair(myId, std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
-      }
-
-      this->mCBCs.find(myId)->second.insert(bc);
-   }
-
-   bool EquationData::initializedBCs() const
-   {
-      // Check that all the boundary conditions have been set
-      if(this->mBCCounter == 0)
-      {
-         return true;
-      } else
-      {
-         return false;
-      }
+      return this->mEqIsComplex;
    }
 
    int EquationData::rowShift(FieldComponents::Spectral::Id id, const int j) const
@@ -292,30 +215,6 @@ namespace Equations {
    const IEquationParameters& EquationData::eqParams() const
    {
       return *this->mspEqParams;
-   }
-
-   const std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& EquationData::getBCs(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const
-   {
-      // Safety assert
-      assert(this->mBCs.count(std::make_pair(id,dim)) > 0);
-
-      return this->mBCs.find(std::make_pair(id,dim))->second;
-   }
-
-   const std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>& EquationData::getCBCs(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const
-   {
-      // Safety assert
-      assert(this->mCBCs.count(std::make_pair(id,dim)) > 0);
-      
-      return this->mCBCs.find(std::make_pair(id,dim))->second;
-   }
-
-   const std::map<Spectral::BoundaryConditions::Id,ArrayZ>& EquationData::getBVals(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const
-   {
-      // Safety assert
-      assert(this->mBVals.count(std::make_pair(id,dim)) > 0);
-
-      return this->mBVals.find(std::make_pair(id,dim))->second;
    }
 
    const DecoupledZSparse& EquationData::timeMatrix(FieldComponents::Spectral::Id id, const int j) const

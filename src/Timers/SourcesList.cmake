@@ -1,8 +1,6 @@
 # Create list of sources
 set(MHDSources
    ITimer.cpp
-   MpiTimer.cpp      # ONLY DEBUG, SHOULD BE REMOVED
-   SerialTimer.cpp   # ONLY DEBUG, SHOULD BE REMOVED
    TimerTools.cpp
    ExecutionTimer.cpp
 )

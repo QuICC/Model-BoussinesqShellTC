@@ -49,6 +49,14 @@ namespace Spectral {
           * @param bcId Map of boundary condition IDs
           */
          static DecoupledZMatrix tauLines(const IBoundary& bcOp, const std::map<BoundaryConditions::Id,IBoundary::Position>& bcId);
+
+         /**
+          * @brief Convert boundary condition ids into Tau matrices
+          *
+          * @param bcOp Spectral boundary operator
+          * @param bcId Map of boundary condition IDs
+          */
+         static DecoupledZSparse tauMatrix(const IBoundary& bcOp, const std::map<BoundaryConditions::Id,IBoundary::Position>& bcId);
          
       protected:
 

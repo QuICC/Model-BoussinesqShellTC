@@ -22,6 +22,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
+#include "SpectralOperators/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -458,78 +459,72 @@ namespace GeoMHDiSCC {
 
    void Simulation::initTimestepper()
    {
-      /// \mhdBug Fake implementation
-//      std::vector<SharedIScalarEquation>::iterator scalEqIt;
-//      std::vector<SharedIVectorEquation>::iterator vectEqIt;
-//
-//      // Storage for the dimension and parameters
-//      ArrayI dims(3);
-//      dims.setConstant(1);
-//      ArrayI specIdx(3);
-//      specIdx.setConstant(-1);
-//
-//      // Create spectral operators for the three dimensions
-//      Code::SpectralOperator1DType  spec1D(2, dims(0), specIdx);
-//      Code::SpectralOperator2DType  spec2D(2, dims(2), specIdx);
-//      Code::SpectralOperator3DType  spec3D(2, dims(1), specIdx);
-//
-//      bool status = false;
-//      bool newMatrix = false;
-//
-//      dims(2) = this->mspRes->cpu()->dim(0)->dim3D();
-//      for(int k = 0; k < dims(2); k++)
-//      {
-//         specIdx(2) = this->mspRes->cpu()->dim(0)->idx3D(k); 
-//         dims(1) = this->mspRes->cpu()->dim(0)->dim2D(k);
-//         for(int j = 0; j < dims(1); j++)
-//         {
-//            specIdx(1) = this->mspRes->cpu()->dim(0)->idx2D(j,k); 
-//            dims(0) = this->mspRes->cpu()->dim(0)->dimBwd(j,k);
-//            for(int i = 0; i < dims(0); i++)
-//            {
-//               specIdx(0) = this->mspRes->cpu()->dim(0)->idxBwd(i,j,k); 
-//
-//               // Reset spectral operator 1D
-//               status = spec1D.loopNext(2*dims(0)/3, specIdx);
-//               newMatrix = status;
-//               // Reset spectral operator 2D
-//               status = spec2D.loopNext(dims(2), specIdx);
-//               newMatrix = newMatrix || status;
-//               // Reset spectral operator 3D
-//               status = spec3D.loopNext(dims(1), specIdx);
-//               newMatrix = newMatrix || status;
-//               if(newMatrix)
-//               {
-//                  // Loop over all scalar equations
-//                  for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-//                  {
-//                     (*scalEqIt)->setSpectralMatrices(spec1D, spec2D, spec3D);
-//                  }
-//
-//                  // Loop over all vector equations
-//                  for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-//                  {
-//                     (*vectEqIt)->setSpectralMatrices(spec1D, spec2D, spec3D);
-//                  }
-//               }
-//            }
-//         }
-//      }
-//
-//      // Loop over all scalar equations
-//      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-//      {
-//         (*scalEqIt)->finalizeMatrices();
-//      }
-//
-//      // Loop over all vector equations
-//      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-//      {
-//         (*vectEqIt)->finalizeMatrices();
-//      }
-//
-//      // Init timestepper
-//      this->timestepper().init(this->mScalarEquations, this->mVectorEquations);
+      // Create iterators over scalar equations
+      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
+      // Create iterators over vector equations
+      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
+
+      std::map<PhysicalNames::Id, Equations::IEvolutionEquation::BcEqMapType> bcStorage;
+      std::map<PhysicalNames::Id, std::map<PhysicalNames::Id, Equations::IEvolutionEquation::BcEqMapType> > cbcStorage;
+
+      // Temperature equation
+      //    ... boundary conditiosn
+      bcStorage.insert(std::make_pair(PhysicalNames::TEMPERATURE, Equations::IEvolutionEquation::BcEqMapType()));
+      bcStorage.find(PhysicalNames::TEMPERATURE)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D), Equations::IEvolutionEquation::BcMapType()));
+      bcStorage.find(PhysicalNames::TEMPERATURE)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::LEFT));
+      bcStorage.find(PhysicalNames::TEMPERATURE)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::RIGHT));
+
+      // Streamfunction equation
+      //    ... boundary conditiosn
+      bcStorage.insert(std::make_pair(PhysicalNames::STREAMFUNCTION, Equations::IEvolutionEquation::BcEqMapType()));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D), Equations::IEvolutionEquation::BcMapType()));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::LEFT));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::RIGHT));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE,Spectral::IBoundary::LEFT));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE,Spectral::IBoundary::RIGHT));
+      //bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE,Spectral::IBoundary::LEFT));
+      //bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE,Spectral::IBoundary::RIGHT));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D), std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
+      bcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D))->second.insert(std::make_pair(Spectral::BoundaryConditions::BETA_SLOPE,Spectral::IBoundary::LEFT));
+      //    ... coupled boundary conditiosn
+      cbcStorage.insert(std::make_pair(PhysicalNames::STREAMFUNCTION, std::map<PhysicalNames::Id, Equations::IEvolutionEquation::BcEqMapType>()));
+      cbcStorage.find(PhysicalNames::STREAMFUNCTION)->second.insert(std::make_pair(PhysicalNames::VELOCITYZ, Equations::IEvolutionEquation::BcEqMapType()));
+      cbcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(PhysicalNames::VELOCITYZ)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D), Equations::IEvolutionEquation::BcMapType()));
+      cbcStorage.find(PhysicalNames::STREAMFUNCTION)->second.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::LEFT));
+
+      // Axial velocity equation
+      //    ... boundary conditiosn
+      bcStorage.insert(std::make_pair(PhysicalNames::VELOCITYZ, Equations::IEvolutionEquation::BcEqMapType()));
+      bcStorage.find(PhysicalNames::VELOCITYZ)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D), Equations::IEvolutionEquation::BcMapType()));
+      bcStorage.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::LEFT));
+      bcStorage.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::RIGHT));
+      //bcStorage.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE,Spectral::IBoundary::LEFT));
+      //bcStorage.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D))->second.insert(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE,Spectral::IBoundary::RIGHT));
+      bcStorage.find(PhysicalNames::VELOCITYZ)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D), std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position>()));
+      bcStorage.find(PhysicalNames::VELOCITYZ)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D))->second.insert(std::make_pair(Spectral::BoundaryConditions::VALUE,Spectral::IBoundary::RIGHT));
+      //    ... coupled boundary conditiosn
+      //    ... coupled boundary conditiosn
+      cbcStorage.insert(std::make_pair(PhysicalNames::VELOCITYZ, std::map<PhysicalNames::Id, Equations::IEvolutionEquation::BcEqMapType>()));
+      cbcStorage.find(PhysicalNames::VELOCITYZ)->second.insert(std::make_pair(PhysicalNames::VELOCITYZ, Equations::IEvolutionEquation::BcEqMapType()));
+      cbcStorage.find(PhysicalNames::VELOCITYZ)->second.find(PhysicalNames::STREAMFUNCTION)->second.insert(std::make_pair(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D), Equations::IEvolutionEquation::BcMapType()));
+      cbcStorage.find(PhysicalNames::VELOCITYZ)->second.find(PhysicalNames::STREAMFUNCTION)->second.find(std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D))->second.insert(std::make_pair(Spectral::BoundaryConditions::BETA_SLOPE,Spectral::IBoundary::RIGHT));
+
+      // Loop over all scalar equations
+      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
+      {
+         (*scalEqIt)->setSpectralMatrices(bcStorage.find((*scalEqIt)->name())->second, cbcStorage.find((*scalEqIt)->name())->second);
+         (*scalEqIt)->finalizeMatrices();
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
+      {
+         (*vectEqIt)->setSpectralMatrices(bcStorage.find((*vectEqIt)->name())->second, cbcStorage.find((*vectEqIt)->name())->second);
+         (*vectEqIt)->finalizeMatrices();
+      }
+
+      // Init timestepper
+      this->mTimestepper.init(this->mScalarEquations, this->mVectorEquations);
    }
 
    void Simulation::setupOutput()

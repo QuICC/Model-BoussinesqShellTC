@@ -19,27 +19,35 @@
 // Project includes
 //
 #include "SpectralOperators/ChebyshevOperator.hpp"
+#include "SpectralOperators/ChebyshevBoundary.hpp"
 #include "SpectralOperators/UnitOperator.hpp"
 
 namespace GeoMHDiSCC {
 
    namespace Spectral {
 
-      template <Dimensions::Transform::Id TId>  struct SpectralSelector;
+      template <Dimensions::Simulation::Id TId>  struct SpectralSelector;
 
-      template <> struct SpectralSelector<Dimensions::Transform::TRA1D>
+      template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
       {
-         typedef  ChebyshevOperator  Type;
+         /// Typedef for the spectral operator
+         typedef  ChebyshevOperator  OpType;
+
+         /// Typedef for the spectral boundary operator
+         typedef  ChebyshevBoundary  BcType;
       };
 
-      template <> struct SpectralSelector<Dimensions::Transform::TRA2D>
+      template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
       {
-         typedef  UnitOperator  Type;
       };
 
-      template <> struct SpectralSelector<Dimensions::Transform::TRA3D>
+      template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
       {
-         typedef  ChebyshevOperator  Type;
+         /// Typedef for the spectral operator
+         typedef  ChebyshevOperator  OpType;
+
+         /// Typedef for the spectral boundary operator
+         typedef  ChebyshevBoundary  BcType;
       };
 
    }
