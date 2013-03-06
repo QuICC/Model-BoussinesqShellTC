@@ -41,6 +41,8 @@ namespace GeoMHDiSCC {
       {
          this->mTimes(TOTAL) += this->time();
       }
+
+      std::cerr << this->mTimes.transpose() << std::endl;
    }
 
    void ExecutionTimer::analyze(Array& min, Array& max)
@@ -81,7 +83,7 @@ namespace GeoMHDiSCC {
 
       // get a nice base for info
       int base = 20;
-      oss << std::fixed << std::setprecision(1) <<  this->mTimes.maxCoeff();
+      oss << std::fixed << std::setprecision(1) << this->mTimes.maxCoeff();
       base += oss.str().size() + 1;
       oss.str("");
 

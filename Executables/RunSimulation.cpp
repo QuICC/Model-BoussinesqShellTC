@@ -59,7 +59,7 @@ int run()
    // Cleanup and close file handles
    spSim->finalize();
 
-   return 0;
+   return status;
 }
 
 /**

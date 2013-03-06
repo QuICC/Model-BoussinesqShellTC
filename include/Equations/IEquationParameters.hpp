@@ -44,11 +44,6 @@ namespace Equations {
          virtual ~IEquationParameters();
 
          /**
-          * @brief Get the names of the equation parameters
-          */
-         virtual std::vector<std::string>  names() const = 0;
-
-         /**
           * @brief Initialise the values from given parameters
           *
           * @param parameters Parameter values read from configuration

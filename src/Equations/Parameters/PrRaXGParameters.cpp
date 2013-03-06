@@ -28,7 +28,7 @@ namespace Equations {
    {
    }
 
-   std::vector<std::string> PrRaXGParameters::names() const
+   std::vector<std::string> PrRaXGParameters::names()
    {
       // Storage for the names
       std::vector<std::string> names;

@@ -41,10 +41,10 @@ namespace GeoMHDiSCC {
    namespace Transform {
 
       /// Transform configurator selector template
-      template <Splitting::Algorithms::Id TAlgo> class ConfigSelector;
+      template <Splitting::Algorithms::Id TAlgo> struct ConfigSelector;
 
       /// Transform configurator selector specialised for SERIAL case
-      template <> class ConfigSelector<Splitting::Algorithms::SERIAL>
+      template <> struct ConfigSelector<Splitting::Algorithms::SERIAL>
       {
          /// Typedef for forward configurator
          typedef ForwardSerialConfigurator   FwdConfigType;
@@ -55,7 +55,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
       /// Transform configurator selector specialised for SINGLE1D case
-      template <> class ConfigSelector<Splitting::Algorithms::SINGLE1D>
+      template <> struct ConfigSelector<Splitting::Algorithms::SINGLE1D>
       {
          /// Typedef for forward configurator
          typedef ForwardSingle1DConfigurator   FwdConfigType;
@@ -67,7 +67,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
       /// Transform configurator selector specialised for SINGLE2D case
-      template <> class ConfigSelector<Splitting::Algorithms::SINGLE2D>
+      template <> struct ConfigSelector<Splitting::Algorithms::SINGLE2D>
       {
          /// Typedef for forward configurator
          typedef ForwardSingle2DConfigurator   FwdConfigType;
@@ -79,7 +79,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_MPIALGO_TUBULAR
       /// Transform configurator selector specialised for TUBULAR case
-      template <> class ConfigSelector<Splitting::Algorithms::TUBULAR>
+      template <> struct ConfigSelector<Splitting::Algorithms::TUBULAR>
       {
          /// Typedef for forward configurator
          typedef ForwardTubularConfigurator   FwdConfigType;
@@ -90,11 +90,11 @@ namespace GeoMHDiSCC {
       #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
       /// Transform grouper selector template
-      template <Splitting::Groupers::Id TGrouper,Splitting::Algorithms::Id TAlgo> class GrouperSelector;
+      template <Splitting::Groupers::Id TGrouper,Splitting::Algorithms::Id TAlgo> struct GrouperSelector;
 
       #ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
       /// Transform grouper selector for EQUATION grouper
-      template <Splitting::Algorithms::Id TAlgo> class GrouperSelector<Splitting::Groupers::EQUATION,TAlgo>: public ConfigSelector<TAlgo>
+      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::EQUATION,TAlgo>: public ConfigSelector<TAlgo>
       {
          /// Typedef for forward grouper
          typedef ForwardEquationGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
@@ -106,7 +106,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE1D
       /// Transform grouper selector for SINGLE1D grouper
-      template <Splitting::Algorithms::Id TAlgo> class GrouperSelector<Splitting::Groupers::SINGLE1D,TAlgo>: public ConfigSelector<TAlgo>
+      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::SINGLE1D,TAlgo>: public ConfigSelector<TAlgo>
       {
          /// Typedef for forward grouper
          typedef ForwardSingle1DGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
@@ -118,7 +118,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
       /// Transform grouper selector for SINGLE2D grouper
-      template <Splitting::Algorithms::Id TAlgo> class GrouperSelector<Splitting::Groupers::SINGLE2D,TAlgo>: public ConfigSelector<TAlgo>
+      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::SINGLE2D,TAlgo>: public ConfigSelector<TAlgo>
       {
          /// Typedef for forward grouper
          typedef ForwardSingle2DGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
@@ -130,7 +130,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
       /// Transform grouper selector for TRANSFORM grouper
-      template <Splitting::Algorithms::Id TAlgo> class GrouperSelector<Splitting::Groupers::TRANSFORM,TAlgo>: public ConfigSelector<TAlgo>
+      template <Splitting::Algorithms::Id TAlgo> struct GrouperSelector<Splitting::Groupers::TRANSFORM,TAlgo>: public ConfigSelector<TAlgo>
       {
          /// Typedef for forward grouper
          typedef ForwardTransformGrouper<typename ConfigSelector<TAlgo>::FwdConfigType>   FwdGrouperType;
@@ -165,19 +165,27 @@ namespace GeoMHDiSCC {
       {
          if(algo == Splitting::Algorithms::SERIAL)
          {
-            setGrouper<Splitting::Groupers::SINGLE1D,Splitting::Algorithms::SERIAL>(spFwdGrouper, spBwdGrouper);
+            setGrouper<TGroup,Splitting::Algorithms::SERIAL>(spFwdGrouper, spBwdGrouper);
+
+      #ifdef GEOMHDISCC_MPI
+         #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
          } else if(algo == Splitting::Algorithms::SINGLE1D)
          {
-            setGrouper<Splitting::Groupers::SINGLE1D,Splitting::Algorithms::SINGLE1D>(spFwdGrouper, spBwdGrouper);
+            setGrouper<TGroup,Splitting::Algorithms::SINGLE1D>(spFwdGrouper, spBwdGrouper);
+         #endif //GEOMHDISCC_MPIALGO_SINGLE1D
+         #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
          } else if(algo == Splitting::Algorithms::SINGLE2D)
          {
-            setGrouper<Splitting::Groupers::SINGLE1D,Splitting::Algorithms::SINGLE2D>(spFwdGrouper, spBwdGrouper);
+            setGrouper<TGroup,Splitting::Algorithms::SINGLE2D>(spFwdGrouper, spBwdGrouper);
+         #endif //GEOMHDISCC_MPIALGO_SINGLE2D
+         #ifdef GEOMHDISCC_MPIALGO_TUBULAR
          } else if(algo == Splitting::Algorithms::TUBULAR)
          {
-            setGrouper<Splitting::Groupers::SINGLE1D,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
+            setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
+         #endif //GEOMHDISCC_MPIALGO_TUBULAR
+      #endif //GEOMHDISCC_MPI
          }
       }
-
    }
 
 }

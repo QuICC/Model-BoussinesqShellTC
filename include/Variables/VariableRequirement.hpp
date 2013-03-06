@@ -41,7 +41,7 @@ namespace GeoMHDiSCC {
          ~VariableRequirement();
 
          /**
-          * @brief Check if it is scalar field
+          * @brief Get field requirements
           */
          const FieldRequirement& field(const PhysicalNames::Id id) const;
 
@@ -70,6 +70,11 @@ namespace GeoMHDiSCC {
       protected:
 
       private:
+         /**
+          * @brief Not required field (all answers are false)
+          */
+         FieldRequirement  mNoField;
+
          /**
           * @brief Storage for all the information
           */

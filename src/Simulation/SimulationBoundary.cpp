@@ -72,12 +72,23 @@ namespace GeoMHDiSCC {
       this->mCBcs.find(eqId)->second.find(cpId)->second.insert(std::make_pair(key, Equations::IEvolutionEquation::BcMapType()));
    }
 
-   void SimulationBoundary::addBc(const PhysicalNames::Id, const Equations::IEvolutionEquation::BcKeyType& key, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
+   void SimulationBoundary::addBc(const PhysicalNames::Id id, const Equations::IEvolutionEquation::BcKeyType& key, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
    {
+      // Safey assert
+      assert(this->mBcs.count(id) > 0);
+      assert(this->mBcs.find(id)->second.count(key) > 0);
+
+      this->mBcs.find(id)->second.find(key)->second.push_back(std::make_pair(bcId,pos));
    }
 
    void SimulationBoundary::addCBc(const PhysicalNames::Id eqId, const PhysicalNames::Id cpId, const Equations::IEvolutionEquation::BcKeyType& key, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
    {
+      // Safey assert
+      assert(this->mCBcs.count(eqId) > 0);
+      assert(this->mCBcs.find(eqId)->second.count(cpId) > 0);
+      assert(this->mCBcs.find(eqId)->second.find(cpId)->second.count(key) > 0);
+
+      this->mCBcs.find(eqId)->second.find(cpId)->second.find(key)->second.push_back(std::make_pair(bcId,pos));
    }
 
 }

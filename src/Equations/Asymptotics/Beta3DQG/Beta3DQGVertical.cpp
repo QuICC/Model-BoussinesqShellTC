@@ -178,6 +178,7 @@ namespace Equations {
          it = pos.first;
 
          // Set coupling matrices
+         it->second.push_back(DecoupledZSparse());
          tmpA = (1.0/this->eqParams().nd(NonDimensional::GAMMA))*spec3D.id(1);
          Eigen::kroneckerProduct(tmpA, spec1D.qDiff(2,0), it->second.back().first);
       }

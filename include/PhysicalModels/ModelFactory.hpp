@@ -50,10 +50,10 @@ namespace GeoMHDiSCC {
    template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
    {
       // Create simulation
-      SharedSimulation  spSim;
+      SharedSimulation  spSim(new Simulation);
 
       // Add configuration file and parameters
-      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>(TModel::boundaryNames());
+      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>(TModel::SchemeType::type(),TModel::boundaryNames());
 
       // Initialise simulation
       spSim->initBase();

@@ -19,6 +19,7 @@
 namespace GeoMHDiSCC {
 
    VariableRequirement::VariableRequirement()
+      : mNoField(false,false,false,false)
    {
    }
 
@@ -28,10 +29,13 @@ namespace GeoMHDiSCC {
 
    const FieldRequirement& VariableRequirement::field(const PhysicalNames::Id id) const
    {
-      // Safety assert
-      assert(this->mInfo.find(id) != this->mInfo.end());
-
-      return this->mInfo.find(id)->second;
+      if(this->mInfo.count(id) == 0)
+      {
+         return this->mNoField;
+      } else
+      {
+         return this->mInfo.find(id)->second;
+      }
    }
 
    void VariableRequirement::addField(const PhysicalNames::Id id, const FieldRequirement& req)

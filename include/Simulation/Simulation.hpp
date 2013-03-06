@@ -102,7 +102,7 @@ namespace GeoMHDiSCC {
           *
           * @param bcNames Vector of names for the boundary conditions
           */
-         template <int DIMENSION, typename TParam> void setConfiguration(const std::vector<std::string>& bcNames);
+         template <int DIMENSION, typename TParam> void setConfiguration(const std::string& type, const std::vector<std::string>& bcNames);
 
          /**
           * @brief Set initial state through input file
@@ -267,17 +267,17 @@ namespace GeoMHDiSCC {
       return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
    }
 
-   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::vector<std::string>& bcNames)
+   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::string& type, const std::vector<std::string>& bcNames)
    {
       // Create shared configuration file
-      IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, "test"));
+      IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, type));
 
       // Create the equation parameter shared pointer
-      Equations::SharedIEquationParameters spEqParams(new TParam());
+      SharedPtrMacro<TParam> spEqParams(new TParam);
       this->mspEqParams = spEqParams;
 
       // Create the equation parameter dependent configuration part
-      IoConfig::SharedPhysicalPart   spPhys(new IoConfig::PhysicalPart(this->mspEqParams->names()));
+      IoConfig::SharedPhysicalPart   spPhys(new IoConfig::PhysicalPart(TParam::names()));
 
       // Add physical part to configuration file
       spCfgFile->addPart(IoConfig::SimulationBlocks::PHYSICAL, spPhys);

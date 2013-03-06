@@ -45,7 +45,7 @@ namespace Equations {
          /**
           * @brief Get the names of the equation parameters
           */
-         virtual std::vector<std::string>  names() const;
+         static std::vector<std::string>  names();
 
          /**
           * @brief Initialise the values from given parameters

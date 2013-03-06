@@ -192,7 +192,7 @@ namespace Equations {
 
          // Set coupled boundary condition matrices
          it->second.push_back(DecoupledZSparse());
-         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::VELOCITYZ)->second.find(bc1D)->second);
+         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::VELOCITYZ)->second.find(bc3D)->second);
          Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), it->second.back().first);
 
          //////////////////////////////////////////////

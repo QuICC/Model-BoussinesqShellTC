@@ -157,7 +157,7 @@ namespace GeoMHDiSCC {
       spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       //    ... coupled boundary conditions
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
-      spBcs->initCBcStorage(PhysicalNames::VELOCITY, PhysicalNames::STREAMFUNCTION, key); 
+      spBcs->initCBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key); 
       spBcs->addCBc(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
 
       return spBcs;

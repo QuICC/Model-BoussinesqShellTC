@@ -44,7 +44,7 @@ namespace Equations {
          typedef std::pair<FieldComponents::Spectral::Id, Dimensions::Simulation::Id> BcKeyType;
 
          /// Typedef for the boundary conditions map storage type
-         typedef std::map<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> BcMapType;
+         typedef std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > BcMapType;
 
          /// Typedef for the boundary conditions map storage type
          typedef std::map<BcKeyType, BcMapType> BcEqMapType;

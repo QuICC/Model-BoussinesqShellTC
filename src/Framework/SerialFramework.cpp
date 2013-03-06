@@ -29,15 +29,15 @@ namespace GeoMHDiSCC {
 
       // Initialise the precision framework
       Precision::init();
+
+      // Set ID
+      SerialFramework::mCpuId = 0;
    }
 
    void SerialFramework::setup(const int nCpu)
    {
       // Set the number of CPUs
       SerialFramework::mNCpu = nCpu;
-
-      // Set ID
-      SerialFramework::mCpuId = 0;
 
       // Check that the framework setup is right
       SerialFramework::checkFramework(1);

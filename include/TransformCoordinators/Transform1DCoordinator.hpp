@@ -135,12 +135,12 @@ namespace GeoMHDiSCC {
 
    template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysical(PhysicalNames::Id name)
    {
-      return this->mVarInfo.requirement(name).needPhysical();
+      return this->mVarInfo.field(name).needPhysical();
    }
 
    template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysicalDiff(PhysicalNames::Id name)
    {
-      return this->mVarInfo.requirement(name).needPhysicalDiff();
+      return this->mVarInfo.field(name).needPhysicalDiff();
    }
 
    template <typename T1D, typename TCommunicator> Transform1DCoordinator<T1D,TCommunicator>::Transform1DCoordinator()

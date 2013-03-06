@@ -33,15 +33,15 @@ namespace GeoMHDiSCC {
 
       // Initialise MPI system
       MPI_Init(0, 0);
+
+      // Set MPI rank of local CPU
+      MPI_Comm_rank(MPI_COMM_WORLD, &MpiFramework::mCpuId);
    }
 
    void MpiFramework::setup(const int nCpu)
    {
       // Set the number of CPUs
       MpiFramework::mNCpu = nCpu;
-
-      // Set MPI rank of local CPU
-      MPI_Comm_rank(MPI_COMM_WORLD, &MpiFramework::mCpuId);
 
       // Get MPI size
       int size;
