@@ -41,8 +41,6 @@ namespace GeoMHDiSCC {
       {
          this->mTimes(TOTAL) += this->time();
       }
-
-      std::cerr << this->mTimes.transpose() << std::endl;
    }
 
    void ExecutionTimer::analyze(Array& min, Array& max)

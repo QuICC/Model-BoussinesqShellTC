@@ -100,7 +100,7 @@ namespace IoHdf5 {
       // Read attribute
       H5Aread(attr, type, cStr);
       // Create string
-      std::string fileHeader(cStr);
+      std::string fileHeader(cStr, size);
       // Check compatibility
       if(this->header() != fileHeader)
       {
@@ -128,7 +128,7 @@ namespace IoHdf5 {
       // Read attribute
       H5Aread(attr, type, cStr);
       // Create string
-      std::string fileType(cStr);
+      std::string fileType(cStr, size);
       // Check compatibility
       if(this->type() != fileType)
       {
@@ -156,7 +156,7 @@ namespace IoHdf5 {
       // Read attribute
       H5Aread(attr, type, cStr);
       // Create string
-      std::string fileVersion(cStr);
+      std::string fileVersion(cStr, size);
       // Check compatibility
       if(this->version() != fileVersion)
       {

@@ -32,9 +32,6 @@ namespace GeoMHDiSCC {
       this->mDim.insert(std::make_pair(Dimensions::Space::PHYSICAL, phys));
       // Add spectral space dimensions
       this->mDim.insert(std::make_pair(Dimensions::Space::SPECTRAL, spec));
-
-      std::cerr << phys.transpose() << std::endl;
-      std::cerr << spec.transpose() << std::endl;
    }
 
    SimulationResolution::~SimulationResolution()
