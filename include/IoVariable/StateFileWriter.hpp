@@ -33,16 +33,16 @@ namespace IoVariable {
    {
       public:
          /**
-         * @brief Constructor
-         *
-         * @param spRes  Shared resolution information
-         * @param type  Type of the file (typically scheme name)
-         */
-         StateFileWriter(std::string type);
+          * @brief Constructor
+          *
+          * @param type       Type of the file (typically scheme name)
+          * @param isRegular  Is data regular?
+          */
+         StateFileWriter(std::string type, bool isRegular);
 
          /**
-         * @brief Destructor
-         */
+          * @brief Destructor
+          */
          virtual ~StateFileWriter();
 
          /**

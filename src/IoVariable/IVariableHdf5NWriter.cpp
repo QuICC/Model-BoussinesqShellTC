@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    IVariableHdf5NWriter::IVariableHdf5NWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular)
-      : IHdf5NWriter(name, ext, header, type, version), mSpaceId(id), mIsRegular(isRegular)
+      : IHdf5NWriter(name, ext, header, type, version), mIsRegular(isRegular), mSpaceId(id)
    {
    }
 
@@ -118,14 +118,18 @@ namespace IoVariable {
    {
       if(this->mIsRegular)
       {
-         for(int i = this->mspRes->cpu()->nDim()-1; i > -1 ; i--)
+         // Get dimensions ordered by index access speed (fast -> slow)
+         ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
+
+         for(int i = 0; i < oDims.size(); ++i)
          {
             // Set the dimension size
-            this->mFileDims.push_back(this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),this->mSpaceId));
+            this->mFileDims.push_back(oDims(i));
          }
       } else
       {
-         /// \mhdBug Irregular grid is not working
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
 //         // Set the slow dimension size
 //         this->mFileDims.push_back(this->mspRes->sim()->nSlow(this->mSpaceId));
 //
@@ -142,7 +146,7 @@ namespace IoVariable {
       if(this->mSpaceId == Dimensions::Space::SPECTRAL)
       {
          transId = Dimensions::Transform::TRA1D;
-      } else
+      } else //if(this->mSpaceId == Dimensions::Space::PHYSICAL)
       {
          transId = Dimensions::Transform::TRA3D;
       }
@@ -166,11 +170,8 @@ namespace IoVariable {
          }
       } else
       {
-         // Code is not yet ready to handle irregular grids
-         /// \mhdBug Irregular grid is not working
-         throw Exception("Irregular grid writing is not yet implemented");
-         
-
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
 //         // offset HDF5 type
 //         hsize_t  offset;
 //
@@ -182,7 +183,7 @@ namespace IoVariable {
 //            offset = 0;
 //            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i); ++j)
 //            {
-//               offset += this->mspRes->sim()->dim2D(this->mSpaceId,j);
+//               offset += this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, this->mSpaceId);
 //            }
 //
 //            // Compute the offset for the local indexes

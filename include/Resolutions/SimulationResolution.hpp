@@ -52,6 +52,11 @@ namespace GeoMHDiSCC {
           */
          int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId) const;
 
+         /**
+          * @brief Get the simulation dimensions ordered by index access speed (fast -> slow)
+          */
+         ArrayI orderedDims(const Dimensions::Space::Id spaceId) const;
+
       protected:
 
       private:

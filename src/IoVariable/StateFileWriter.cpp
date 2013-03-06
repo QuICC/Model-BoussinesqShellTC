@@ -26,8 +26,8 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   StateFileWriter::StateFileWriter(std::string type)
-      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, false)
+   StateFileWriter::StateFileWriter(std::string type, const bool isRegular)
+      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, isRegular)
    {
    }
 
@@ -76,6 +76,8 @@ namespace IoVariable {
    {
       // Create the Physical parameters group
       hid_t group = H5Gcreate(this->file(), StateFileTags::PHYSICAL.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      /// \mhdBug This has not yet been implemented!
       
       // close group
       H5Gclose(group);
@@ -101,10 +103,19 @@ namespace IoVariable {
       // Create the scalar group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      /// \mhdBug Irregular grid writing is not supported yet
-
-      // Write the scalar values
-      //this->writeIrregularField(group, name, scalar.sliced());
+      // Check for data regularity
+      if(this->mIsRegular)
+      {
+         /// \mhdBug Need to to produce a "sliced" data type out of the flat storage
+         // Write the scalar values
+         //this->writeRegularField(group, name, scalar.sliced());
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+         // Write the scalar values
+         //this->writeIrregularField(group, name, scalar.sliced());
+      }
       
       // close group
       H5Gclose(group);
@@ -115,12 +126,25 @@ namespace IoVariable {
       // Create the vector field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      /// \mhdBug Irregular grid writing is not supported yet
-      //for(int i = 0; i < vector.size(); i++)
-      //{
-      //   // Write vector component
-      //   this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), vector.at(i).sliced());
-      //}
+      // Check for data regularity
+      if(this->mIsRegular)
+      {
+         for(size_t i = 0; i < vector.size(); i++)
+         {
+            /// \mhdBug Need to to produce a "sliced" data type out of the flat storage
+            // Write vector component
+            //this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), vector.at(i).sliced());
+         }
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+         for(size_t i = 0; i < vector.size(); i++)
+         {
+            // Write vector component
+            //this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), vector.at(i).sliced());
+         }
+      }
       
       // close group
       H5Gclose(group);

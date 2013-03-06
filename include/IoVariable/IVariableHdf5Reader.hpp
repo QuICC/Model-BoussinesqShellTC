@@ -33,13 +33,14 @@ namespace IoVariable {
          /**
           * @brief Constructor
           *
-          * @param name    File name
-          * @param ext     File extension
-          * @param header  File header
-          * @param type    Type string of file
-          * @param version Version string of file
+          * @param name       File name
+          * @param ext        File extension
+          * @param header     File header
+          * @param type       Type string of file
+          * @param version    Version string of file
+          * @param isRegular  Is data regular?
           */
-         IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version);
+         IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const bool isRegular);
 
          /**
           * @brief Destructor
@@ -117,6 +118,11 @@ namespace IoVariable {
           * @brief Get iterator range to vectors
           */
          vector_iterator_range   vectorRange();
+
+         /**
+          * @brief Is file working on regular data?
+          */
+         bool mIsRegular;
 
       private:
          /**

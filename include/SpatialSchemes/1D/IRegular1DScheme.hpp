@@ -37,6 +37,11 @@ namespace GeoMHDiSCC {
          static const int DIMENSIONS;
 
          /**
+          * @brief Data regularity flag
+          */
+         static bool isRegular();
+
+         /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations

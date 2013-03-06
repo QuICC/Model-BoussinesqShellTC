@@ -26,8 +26,8 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   IVariableHdf5Reader::IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : IHdf5Reader(name, ext, header, type, version)
+   IVariableHdf5Reader::IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const bool isRegular)
+      : IHdf5Reader(name, ext, header, type, version), mIsRegular(isRegular)
    {
    }
 

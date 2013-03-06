@@ -139,6 +139,11 @@ namespace IoVariable {
           */
          vector_iterator_range   vectorRange();
 
+         /**
+          * @brief Is file working on regular data?
+          */
+         bool mIsRegular;
+
       private:
          /**
           * @brief Set the resolution and use it for preliminary initialisation
@@ -156,11 +161,6 @@ namespace IoVariable {
           * @brief The dimension space the file is working on
           */
          Dimensions::Space::Id mSpaceId;
-
-         /**
-          * @brief Is file working on regular data?
-          */
-         bool mIsRegular;
 
          /**
           * @brief Storage for the names of the expecte variables

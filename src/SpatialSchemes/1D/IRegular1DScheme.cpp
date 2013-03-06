@@ -20,6 +20,11 @@ namespace GeoMHDiSCC {
 
    const int IRegular1DScheme::DIMENSIONS = 1;
 
+   bool IRegular1DScheme::isRegular()
+   {
+      return true;
+   }
+
    IRegular1DScheme::IRegular1DScheme(const ArrayI& dim)
       : ISpatialScheme(dim.size()), mI(dim(0))
    {

@@ -68,7 +68,7 @@ namespace GeoMHDiSCC {
    void ExampleModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Create and add state file to IO
-      IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type()));
+      IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spState->expect(PhysicalNames::STREAMFUNCTION);
       spState->expect(PhysicalNames::VELOCITYZ);
       spState->expect(PhysicalNames::TEMPERATURE);
@@ -166,7 +166,7 @@ namespace GeoMHDiSCC {
    void ExampleModel::setInitialState(SharedSimulation spSim)
    {
       // Create and add initial state file to IO
-      IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type()));
+      IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));
       spInit->expect(PhysicalNames::STREAMFUNCTION);
       spInit->expect(PhysicalNames::VELOCITYZ);
       spInit->expect(PhysicalNames::TEMPERATURE);

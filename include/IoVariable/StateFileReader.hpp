@@ -33,16 +33,17 @@ namespace IoVariable {
    {
       public:
          /**
-         * @brief Constructor
-         *
-         * @param name  Name of the file
-         * @param type  Type of the file (typically scheme name)
-         */
-         StateFileReader(std::string name, std::string type);
+          * @brief Constructor
+          *
+          * @param name       Name of the file
+          * @param type       Type of the file (typically scheme name)
+          * @param isRegular  Is data regular?
+          */
+         StateFileReader(std::string name, std::string type, const bool isRegular);
 
          /**
-         * @brief Destructor
-         */
+          * @brief Destructor
+          */
          virtual ~StateFileReader();
 
          /**
