@@ -19,6 +19,7 @@
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldComponents.hpp"
+#include "ScalarFields/FieldTools.hpp"
 #include "IoVariable/StateFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
@@ -103,18 +104,20 @@ namespace IoVariable {
       // Create the scalar group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
+
       // Check for data regularity
       if(this->mIsRegular)
       {
-         /// \mhdBug Need to to produce a "sliced" data type out of the flat storage
          // Write the scalar values
-         //this->writeRegularField(group, name, scalar.sliced());
+         this->writeRegularField(group, name, fieldInfo);
       } else
       {
          /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
          throw Exception("Irregular data is not yet implemented in HDF5 storage");
          // Write the scalar values
-         //this->writeIrregularField(group, name, scalar.sliced());
+         //this->writeIrregularField(group, name, fieldInfo);
       }
       
       // close group
@@ -126,14 +129,19 @@ namespace IoVariable {
       // Create the vector field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo;
+
       // Check for data regularity
       if(this->mIsRegular)
       {
          for(size_t i = 0; i < vector.size(); i++)
          {
-            /// \mhdBug Need to to produce a "sliced" data type out of the flat storage
+            // create component field information
+            fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+
             // Write vector component
-            //this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), vector.at(i).sliced());
+            this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
          }
       } else
       {
@@ -141,8 +149,11 @@ namespace IoVariable {
          throw Exception("Irregular data is not yet implemented in HDF5 storage");
          for(size_t i = 0; i < vector.size(); i++)
          {
+            // create component field information
+            fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+
             // Write vector component
-            //this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), vector.at(i).sliced());
+            //this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
          }
       }
       

@@ -26,8 +26,8 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   IVariableHdf5Reader::IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const bool isRegular)
-      : IHdf5Reader(name, ext, header, type, version), mIsRegular(isRegular)
+   IVariableHdf5Reader::IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular)
+      : IHdf5Reader(name, ext, header, type, version), mIsRegular(isRegular), mSpaceId(id)
    {
    }
 
@@ -105,55 +105,91 @@ namespace IoVariable {
       this->mCollIoRead = 0;
    }
 
-   void IVariableHdf5Reader::setReadArguments(const Dimensions::Space::Id id)
+   void IVariableHdf5Reader::setReadArguments()
    {
-      /// \mhdBug Code assumes regular data
+      /// \mhdBug Code assumes irregular data
 
       Dimensions::Transform::Id  transId;
+      Dimensions::Simulation::Id simId;
 
       // Select transform dimension depending on dimension space
-      if(id == Dimensions::Space::SPECTRAL)
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
       {
          transId = Dimensions::Transform::TRA1D;
+         simId = Dimensions::Simulation::SIM2D;
       } else
       {
          transId = Dimensions::Transform::TRA3D;
+         simId = Dimensions::Simulation::SIM3D;
       }
 
+      // Get the ordered dimensions
+      ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
+      // Get the ordered file dimensions
+      ArrayI oFDims = this->mspFileRes->orderedDims(this->mSpaceId);
+
       // Set block size (i.e. number of contiguous elements)
-      this->mBlock = std::min(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,id), this->mspFileRes->dim(Dimensions::Simulation::SIM1D,id));
+      this->mBlock = std::min(oDims(0), oFDims(0));
 
-      // offset HDF5 type
-      hsize_t offset;
-
-      // Loop over the stored indexes
-      std::vector<hsize_t>  offV;
-      for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+      if(this->mIsRegular)
       {
-         int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
-         // Check if value is available in file
-         if(idx3D < this->mspFileRes->dim(Dimensions::Simulation::SIM3D,id))
+         // Loop over the stored indexes
+         std::vector<hsize_t>  offV;
+         offV.push_back(0);
+         offV.push_back(0);
+         for(int i = 0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            // Compute offset from previous index
-            offset = 0;
-            for(int j = 0; j < idx3D; ++j)
+            int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            // Check if value is available in file
+            if(idx3D < this->mspFileRes->dim(simId,this->mSpaceId))
             {
-               offset += this->mspFileRes->dim(Dimensions::Simulation::SIM2D,id);
-            }
+               // Compute offset for third dimension
+               offV.at(0) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
 
-            // Compute the offset for the local indexes
-            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(i); ++j)
-            {
-               if(this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i) < this->mspFileRes->dim(Dimensions::Simulation::SIM2D,id))
-               {
-                  offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
-               }
-            }
+               // Compute offset for second dimension
+               offV.at(1) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
-            // Add offset to vector
-            this->mFileOffsets.push_back(offV);
-            offV.clear();
+               // Add offset to vector
+               this->mFileOffsets.push_back(offV);
+            }
          }
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+
+//         // offset HDF5 type
+//         hsize_t offset;
+//
+//         // Loop over the stored indexes
+//         std::vector<hsize_t>  offV;
+//         for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+//         {
+//            int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+//            // Check if value is available in file
+//IS WRONG            if(idx3D < this->mspFileRes->dim(Dimensions::Simulation::SIM3D,this->mSpaceId))
+//            {
+//               // Compute offset from previous index
+//               offset = 0;
+//               for(int j = 0; j < idx3D; ++j)
+//               {
+//IS WRONG                  offset += this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId);
+//               }
+//
+//               // Compute the offset for the local indexes
+//               for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(i); ++j)
+//               {
+//                  if(this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i) < this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId))
+//                  {
+//IS WRONG                     offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
+//                  }
+//               }
+//
+//               // Add offset to vector
+//               this->mFileOffsets.push_back(offV);
+//               offV.clear();
+//            }
+//         }
       }
 
       // Get the "global" local minimum for MPI code
@@ -185,6 +221,7 @@ namespace IoVariable {
 
          oss.str("");
       }
+      // Increment by one to get size
       spec.array() += 1;
       
       // close group
@@ -205,8 +242,9 @@ namespace IoVariable {
 
          oss.str("");
       }
+      // Increment by one to get size
       phys.array() += 1;
-      
+
       // close group
       H5Gclose(subGroup);
       
@@ -216,19 +254,19 @@ namespace IoVariable {
       this->mspFileRes = SharedSimulationResolution(new SimulationResolution(phys,spec));
    }
 
-   void IVariableHdf5Reader::checkTruncation(Dimensions::Space::Id id)
+   void IVariableHdf5Reader::checkTruncation()
    {
       std::ostringstream   oss;
 
       for(int i = 0; i < this->mspRes->cpu()->nDim(); i++)
       {
-         if(this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),id) != this->mspFileRes->dim(static_cast<Dimensions::Simulation::Id>(i),id))
+         if(this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),this->mSpaceId) != this->mspFileRes->dim(static_cast<Dimensions::Simulation::Id>(i),this->mSpaceId))
          {
             oss << "Dimension " << i+1 <<  " doesn't fit";
             IoTools::Formatter::printLine(std::cout, '-');
             IoTools::Formatter::printCentered(std::cout, oss.str(), '*');
 
-            if(this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),id) > this->mspFileRes->dim(static_cast<Dimensions::Simulation::Id>(i),id))
+            if(this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),this->mSpaceId) > this->mspFileRes->dim(static_cast<Dimensions::Simulation::Id>(i),this->mSpaceId))
             {
                IoTools::Formatter::printCentered(std::cout, " ---> Zeros have been added!", ' ');
             } else

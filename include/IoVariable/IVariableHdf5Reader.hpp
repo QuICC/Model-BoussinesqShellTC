@@ -38,9 +38,10 @@ namespace IoVariable {
           * @param header     File header
           * @param type       Type string of file
           * @param version    Version string of file
+          * @param id         ID of the dimension space
           * @param isRegular  Is data regular?
           */
-         IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const bool isRegular);
+         IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular);
 
          /**
           * @brief Destructor
@@ -97,7 +98,7 @@ namespace IoVariable {
          /**
           * @brief Set the read arguments
           */
-         void setReadArguments(const Dimensions::Space::Id id);
+         void setReadArguments();
 
          /**
           * @brief Read truncation information
@@ -107,7 +108,7 @@ namespace IoVariable {
          /**
           * @brief Check truncation compatibily between data and file
           */
-         void checkTruncation(const Dimensions::Space::Id id);
+         void checkTruncation();
 
          /**
           * @brief Get iterator range to scalars
@@ -136,6 +137,11 @@ namespace IoVariable {
           * @brief Set the maximum number of IO operations
           */
          void setCollIo();
+
+         /**
+          * @brief The dimension space the file is working on
+          */
+         Dimensions::Space::Id mSpaceId;
 
          /**
           * @brief Simulation resolution based on file parameters

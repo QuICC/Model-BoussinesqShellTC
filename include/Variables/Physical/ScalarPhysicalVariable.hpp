@@ -77,12 +77,12 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical values storage
           */
-         void initializePhysical();
+         void initPhysical();
 
          /**
           * @brief Initialise the physical gradient storage
           */
-         void initializePhysicalDiff();
+         void initPhysicalDiff();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -107,21 +107,33 @@ namespace Datatypes {
 
    template <typename TScalar, int COMPONENTS> inline const TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::phys() const
    {
+      // Safety assertion
+      assert(this->mspPhys);
+
       return *this->mspPhys;
    }
 
    template <typename TScalar, int COMPONENTS> inline TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rPhys()
    {
+      // Safety assertion
+      assert(this->mspPhys);
+
       return *this->mspPhys;
    }
 
    template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::grad() const
    {
+      // Safety assertion
+      assert(this->mspGrad);
+
       return *this->mspGrad;
    }
 
    template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rGrad()
    {
+      // Safety assertion
+      assert(this->mspGrad);
+
       return *this->mspGrad;
    }
 
@@ -149,12 +161,12 @@ namespace Datatypes {
       }
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initializePhysical()
+   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysical()
    {
       this->mspPhys = SharedPtrMacro<TScalar>(new TScalar(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initializePhysicalDiff()
+   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysicalDiff()
    {
       this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }

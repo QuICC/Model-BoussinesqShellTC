@@ -52,7 +52,7 @@ namespace Transform {
    {
       int gridSize = this->mspSetup->fwdSize();
 
-      // Initialize grid storage
+      // Initialise grid storage
       Array grid(gridSize);
 
       // Create Chebyshev grid

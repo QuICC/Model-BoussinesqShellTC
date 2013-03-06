@@ -85,6 +85,11 @@ namespace Datatypes {
           * @brief Get number of columns of block for 3D index
           */
          int blockCols(const int k) const;
+
+         /**
+          * @brief Get number of blocks
+          */
+         int nBlock() const;
          
       protected:
 
@@ -222,6 +227,14 @@ namespace Datatypes {
       Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
       return (*this->mspDim2D)(k);
+   }
+
+   template <Dimensions::Type DIMENSION> int ScalarFieldSetup<DIMENSION>::nBlock() const
+   {
+      // Only makes sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      return this->mDim3D;
    }
 
 }

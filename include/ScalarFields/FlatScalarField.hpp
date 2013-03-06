@@ -182,6 +182,11 @@ namespace Datatypes {
      #endif // GEOMHDISCC_STORAGEPROFILE
 
          /**
+          * @brief Get the number of slices
+          */
+         int nSlice() const;
+
+         /**
           * @brief Set internal storage field data
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
@@ -314,6 +319,14 @@ namespace Datatypes {
    template <typename TData, Dimensions::Type DIMENSION> void FlatScalarField<TData, DIMENSION>::rescale(const MHDFloat scale)
    {
       *this->mspField *= scale;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> int FlatScalarField<TData, DIMENSION>::nSlice() const
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      return this->mspSetup->nBlock();
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

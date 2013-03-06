@@ -68,12 +68,12 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical values storage
           */
-         void initializePhysical();
+         void initPhysical();
 
          /**
           * @brief Initialise the physical differential values storage
           */
-         void initializePhysicalDiff();
+         void initPhysicalDiff();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -129,21 +129,21 @@ namespace Datatypes {
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initializePhysical()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysical()
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initializePhysical();
+         this->mDomains.at(i).initPhysical();
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initializePhysicalDiff()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalDiff()
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initializePhysicalDiff();
+         this->mDomains.at(i).initPhysicalDiff();
       }
    }
 

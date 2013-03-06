@@ -325,10 +325,10 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  this->mScalarVariables.at(infoIt->first)->initializePhysical();
+                  this->mScalarVariables.at(infoIt->first)->initPhysical();
                } else
                {
-                  this->mVectorVariables.at(infoIt->first)->initializePhysical();
+                  this->mVectorVariables.at(infoIt->first)->initPhysical();
                }
             }
 
@@ -338,10 +338,10 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  this->mScalarVariables.at(infoIt->first)->initializePhysicalDiff();
+                  this->mScalarVariables.at(infoIt->first)->initPhysicalDiff();
                } else
                {
-                  this->mVectorVariables.at(infoIt->first)->initializePhysicalDiff();
+                  this->mVectorVariables.at(infoIt->first)->initPhysicalDiff();
                }
             }
 

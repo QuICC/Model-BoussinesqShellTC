@@ -5,6 +5,9 @@
 #include "gtest/gtest.h"
 
 #include "Framework/FrameworkMacro.h"
+#include "IoVariable/VisualizationFileWriter.hpp"
+#include "LoadSplitter/LoadSplitter.hpp"
+#include "SpatialSchemes/3D/TFTScheme.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -76,7 +79,78 @@ namespace TestSuite {
     */
    TEST_F(VisualizationFileWriterTest, Constructor)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      // Set type string
+      std::string type = TFTScheme::type();
+
+      // Set spectral and physical dimensions
+      ArrayI dim(3); dim(0) = 11; dim(1) = 13; dim(2) = 12;
+     
+      // Create the load splitter
+      Parallel::LoadSplitter splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
+
+      // Initialise the load splitter
+      splitter.init<TFTScheme>(dim);
+
+      // Get best splitting resolution object
+      std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
+
+      // Store the shared resolution object
+      SharedResolution spRes = best.first;
+
+      // Create scalar variable
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
+
+      // Initialise physical component
+      spScalar->initPhysical();
+
+      // Create test data
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      {
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(); ++j)
+         {
+            for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(); ++i)
+            {
+               spScalar->rDom(0).rPhys().setPoint(static_cast<MHDFloat>(i) + static_cast<MHDFloat>(j)*0.0001 + static_cast<MHDFloat>(k)*0.01,i,j,k);
+            }
+         }
+      }
+
+      // Create state file
+      IoVariable::VisualizationFileWriter viz(type);
+
+      // Set expected variable
+      viz.expect(PhysicalNames::TEMPERATURE);
+      viz.addScalar(std::make_pair(PhysicalNames::TEMPERATURE, spScalar));
+
+      // Set fake mesh
+      std::vector<Array>   meshs;
+      int n;
+      for(int i = 0; i < dim.size(); ++i)
+      {
+         n = spRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),Dimensions::Space::PHYSICAL);
+         meshs.push_back(Array(n));
+         meshs.back().setLinSpaced(n,0, n - 1);
+      }
+      viz.setMesh(meshs);
+
+      // Make sure all information was provided
+      if(viz.isFull())
+      {
+         // Initialise state file
+         viz.init();
+
+         // Write state file
+         viz.write();
+
+         // Finalize state file
+         viz.finalize();
+      } else
+      {
+         ASSERT_TRUE(false);
+      }
+
+      ASSERT_TRUE(true);
+
    }
 
 }

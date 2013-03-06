@@ -65,13 +65,20 @@ namespace IoVariable {
 
    bool IVariableHdf5NWriter::isFull() const
    {
+      bool status = true;
+
       // Check that all expected scalars and vectors are present
-      bool sizeStatus = (this->mScalars.size() + this->mVectors.size() == this->mExpected.size());
+      status = status && (this->mScalars.size() + this->mVectors.size() == this->mExpected.size());
 
       // Check that the resolution has been set
-      bool resStatus = this->mspRes;
+      status = status && this->mspRes;
 
-      return (sizeStatus && resStatus);
+      if(this->mspRes && (this->mSpaceId == Dimensions::Space::PHYSICAL))
+      {
+         status = status && (this->mMesh.size() == static_cast<size_t>(this->mspRes->cpu()->nDim()));
+      }
+
+      return status;
    }
 
    void IVariableHdf5NWriter::addScalar(const std::pair<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalar)
@@ -121,20 +128,21 @@ namespace IoVariable {
          // Get dimensions ordered by index access speed (fast -> slow)
          ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
 
-         for(int i = 0; i < oDims.size(); ++i)
+         int nDims = oDims.size();
+         for(int i = 0; i < nDims; ++i)
          {
-            // Set the dimension size
-            this->mFileDims.push_back(oDims(i));
+            // Set the dimension size in reverse order for HDF5
+            this->mFileDims.push_back(oDims(nDims-1-i));
          }
       } else
       {
          /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
          throw Exception("Irregular data is not yet implemented in HDF5 storage");
 //         // Set the slow dimension size
-//         this->mFileDims.push_back(this->mspRes->sim()->nSlow(this->mSpaceId));
+//IS WRONG         this->mFileDims.push_back(this->mspRes->sim()->nSlow(this->mSpaceId));
 //
 //         // Set the second dimension size (fastest in C ordering)
-//         this->mFileDims.push_back(this->mspRes->sim()->nFast(this->mSpaceId));
+//IS WRONG         this->mFileDims.push_back(this->mspRes->sim()->nFast(this->mSpaceId));
       }
    }
 
@@ -172,30 +180,31 @@ namespace IoVariable {
       {
          /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
          throw Exception("Irregular data is not yet implemented in HDF5 storage");
-//         // offset HDF5 type
-//         hsize_t  offset;
-//
-//         // Loop over the stored indexes
-//         std::vector<hsize_t>  offV;
-//         for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
-//         {
-//            // Compute offset from previous index
-//            offset = 0;
-//            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i); ++j)
-//            {
-//               offset += this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, this->mSpaceId);
-//            }
-//
-//            // Compute the offset for the local indexes
-//            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(); ++j)
-//            {
-//               offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
-//            }
-//
-//            // Add offset to vector
-//            this->mFileOffsets.push_back(offV);
-//            offV.clear();
-//         }
+
+         // offset HDF5 type
+         hsize_t  offset;
+
+         // Loop over the stored indexes
+         std::vector<hsize_t>  offV;
+         for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+         {
+            // Compute offset from previous index
+            offset = 0;
+            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i); ++j)
+            {
+//IS WRONG              offset += this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, this->mSpaceId);
+            }
+
+            // Compute the offset for the local indexes
+            for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(); ++j)
+            {
+//IS WRONG               offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
+            }
+
+            // Add offset to vector
+            this->mFileOffsets.push_back(offV);
+            offV.clear();
+         }
       }
    }
 

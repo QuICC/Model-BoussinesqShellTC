@@ -101,6 +101,18 @@ namespace TestSuite {
       // Create scalar variable
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
+      // Create test data
+      for(int k = 0; k <= dim(1); ++k)
+      {
+         for(int j = 0; j <= dim(2); ++j)
+         {
+            for(int i = 0; i <= dim(0); ++i)
+            {
+               spScalar->rDom(0).rPerturbation().setPoint(MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)),i,j,k);
+            }
+         }
+      }
+
       // Create state file
       IoVariable::StateFileWriter   state(type, isRegular);
 

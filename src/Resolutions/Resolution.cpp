@@ -45,7 +45,7 @@ namespace GeoMHDiSCC {
       ArrayI phys(nDim);
       for(int i = 0; i < nDim; i++)
       {
-         phys(i) = this->cpu()->dim(static_cast<Dimensions::Transform::Id>((nDim-1)-i))->dim<Dimensions::Data::DATF1D>();
+         phys(i) = this->cpu()->dim(static_cast<Dimensions::Transform::Id>(i))->dim<Dimensions::Data::DATF1D>();
       }
 
       ArrayI spec = simDim;

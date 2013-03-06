@@ -167,9 +167,13 @@ namespace GeoMHDiSCC {
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));
+
+      // Set expected field names
       spInit->expect(PhysicalNames::STREAMFUNCTION);
       spInit->expect(PhysicalNames::VELOCITYZ);
       spInit->expect(PhysicalNames::TEMPERATURE);
+
+      // Set simulation state
       spSim->setInitialState(spInit);
    }
 

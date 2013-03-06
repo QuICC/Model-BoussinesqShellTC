@@ -19,6 +19,7 @@
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldComponents.hpp"
+#include "ScalarFields/FieldTools.hpp"
 #include "IoVariable/VisualizationFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
@@ -105,9 +106,11 @@ namespace IoVariable {
       // Create the Codensity scalar group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
+
       // Write the scalar field
-      /// \mhdBug need to restructure general HDF5 data writer
-      //this->writeRegularField(group, name, scalar.sliced());
+      this->writeRegularField(group, name, fieldInfo);
       
       // close group
       H5Gclose(group);
@@ -118,12 +121,17 @@ namespace IoVariable {
       // Create the Magnetic Field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      /// \mhdBug need to restructure general HDF5 data writer
-      //for(int i = 0; i < vector.size(); i++)
-      //{
-      //   // Write the vector field
-      //   this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), vector.at(i).sliced());
-      //}
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
+
+      for(size_t i = 0; i < vector.size(); i++)
+      {
+         // create component field information
+         fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+
+         // Write the vector field
+         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), fieldInfo);
+      }
       
       // close group
       H5Gclose(group);

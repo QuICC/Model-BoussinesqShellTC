@@ -15,6 +15,7 @@
 // System includes
 //
 #include <string>
+#include <tr1/tuple>
 
 // External includes
 //
@@ -135,42 +136,11 @@ namespace IoHdf5 {
           *
           * @param loc     Base location in HDF5 file
           * @param dsname  HDF5 dataset name
-          * @param storage Special data to write
+          * @param storage Storage for the data to read (0 -> rows, 1 -> cols, 2 -> const data pointer)
           *
           * \tparam T Type of the scalars
           */
-         template <typename T> void writeIrregularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& storage);
-
-         /**
-          * @brief Write an irregular field vector dataset
-          *
-          * For irregular field data the values gets stored in a 2D array
-          *
-          * \warning This method does not work for 1D data
-          *
-          * @param loc     Base location in HDF5 file
-          * @param dsname  HDF5 dataset name
-          * @param storage Special data to write
-          *
-          * \tparam T Type of the scalars
-          */
-         template <typename T> void writeIrregularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > >& storage);
-
-         /**
-          * @brief Write a regular field vector dataset
-          *
-          * For regular field data the values gets stored in a array of the same
-          * dimensionality as the data i.e. 3D in 3D array, 2D data in 2D array
-          *
-          * \warning This method does not work for 1D data
-          *
-          * @param loc     Base location in HDF5 file
-          * @param dsname  HDF5 dataset name
-          * @param storage Special data to write
-          *
-          * \tparam T Type of the scalars
-          */
-         template <typename T> void writeRegularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& storage);
+         template <typename T> void writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage);
 
          /**
           * @brief Write a regular field vector dataset (on sliced map)
@@ -182,11 +152,11 @@ namespace IoHdf5 {
           *
           * @param loc     Base location in HDF5 file
           * @param dsname  HDF5 dataset name
-          * @param storage Special data to write
+          * @param storage Storage for the data to read (0 -> rows, 1 -> cols, 2 -> const data pointer)
           *
           * \tparam T Type of the scalars
           */
-         template <typename T> void writeRegularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > >& storage);
+         template <typename T> void writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage);
 
       private:
    };
@@ -283,7 +253,7 @@ namespace IoHdf5 {
       H5Dclose(dataset);
    }
 
-   template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& storage)
+   template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage)
    {
       // Get dimensionality of file data
       int nDims = this->mFileDims.size();
@@ -302,15 +272,19 @@ namespace IoHdf5 {
 
       // Create offset storage
       hsize_t pOffsets[nDims];
+      // Fix offset for the fastest dimension (always full on each CPU)
       pOffsets[nDims-1] = 0;
 
       // Compute size of the dataspace
       hsize_t dims[nDims];
+      // Always write one block of the slowest dimension
       dims[0] = 1;
+      // Fastest dimension is always simulation dimension (even in MPI mode)
       dims[nDims-1] = this->mFileDims.back();
 
-      // Compute size of the memory dataspace
+      // Compute size of the memory dataspace (2D blocks)
       hsize_t iDims[2];
+      // Fast dimension is always simulation dimension (even in MPI mode)
       iDims[1] = this->mFileDims.back();
 
       // Set PList to parallel access
@@ -319,8 +293,8 @@ namespace IoHdf5 {
       // Loop over matrices to store in file
       for(unsigned int i = 0; i < storage.size() ; ++i)
       {
-         // Set memory space
-         iDims[0] = storage.at(i).cols();
+         // Set memory space (number of columns of block)
+         iDims[0] = std::tr1::get<1>(storage.at(i));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Set offsets
@@ -329,12 +303,12 @@ namespace IoHdf5 {
             pOffsets[j] = this->mFileOffsets.at(i).at(j);
          }
 
-         // Select corresponding hyperslab
-         dims[nDims-2] = storage.at(i).cols();
+         // Select corresponding hyperslab (medium dimension is number of block columns)
+         dims[nDims-2] = std::tr1::get<1>(storage.at(i));
          H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffsets, NULL, dims, NULL);
 
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(i).data());
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);
@@ -359,7 +333,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()) ; ++i)
       {
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(0)));
       }
 
       // Close memspace
@@ -375,106 +349,7 @@ namespace IoHdf5 {
       this->freePList(dsPList);
    }
 
-   template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > >& storageMap)
-   {
-      std::vector<Matrix> storage;
-      for(int i = 0; i < storageMap.size(); i++)
-      {
-         storage.push_back(Matrix(storageMap.at(i).rows(), storageMap.at(i).rows()));
-         storage.back() = storageMap.at(i);
-      }
-
-      // Get dimensionality of file data
-      int nDims = this->mFileDims.size();
-
-      // Set data type correctly
-      hid_t type = Hdf5Types::type<T>();
-
-      // Create file dataspace
-      hid_t filespace = H5Screate_simple(nDims, &this->mFileDims.front(), NULL);
-
-      // Create dataset in file
-      hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      // Memory dataspace 
-      hid_t  memspace;
-
-      // Create offset storage
-      hsize_t pOffsets[nDims];
-      pOffsets[nDims-1] = 0;
-
-      // Compute size of the dataspace
-      hsize_t dims[nDims];
-      dims[0] = 1;
-      dims[nDims-1] = this->mFileDims.back();
-
-      // Compute size of the memory dataspace
-      hsize_t iDims[2];
-      iDims[1] = this->mFileDims.back();
-
-      // Set PList to parallel access
-      hid_t dsPList = this->datasetPList();
-
-      // Loop over matrices to store in file
-      for(unsigned int i = 0; i < storage.size() ; ++i)
-      {
-         // Set memory space
-         iDims[0] = storage.at(i).cols();
-         memspace = H5Screate_simple(2, iDims, NULL);
-
-         // Set offsets
-         for(int j = 0; j < nDims -1; j++)
-         {
-            pOffsets[j] = this->mFileOffsets.at(i).at(j);
-         }
-
-         // Select corresponding hyperslab
-         dims[nDims-2] = storage.at(i).cols();
-         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffsets, NULL, dims, NULL);
-
-         // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(i).data());
-
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
-
-         // Close memory space
-         H5Sclose(memspace);
-      }
-
-      //
-      // Add some ZERO IO calls to allow for collective writes
-      //
-
-      // Set zero memory space
-      iDims[0] = 1;
-      memspace = H5Screate_simple(1, iDims, NULL);
-      H5Sselect_none(memspace);
-
-      // Select zero file space
-      H5Sselect_none(filespace);
-
-      // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()) ; ++i)
-      {
-         // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
-      }
-
-      // Close memspace
-      H5Sclose(memspace);
-
-      // Close Dataset
-      H5Dclose(dataset);
-
-      // Close filespace
-      H5Sclose(filespace);
-
-      // Free the dataset PList
-      this->freePList(dsPList);
-   }
-
-   template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& storage)
+   template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tr1::tuple<int, int, const T *> >& storage)
    {
       // Get dimensionality of file data
       int nDims = this->mFileDims.size();
@@ -506,7 +381,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < storage.size() ; ++i)
       {
          // Set memory space
-         iDims[0] = storage.at(i).cols();
+         iDims[0] = std::tr1::get<1>(storage.at(i));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Create non regular hyperslab selection in file
@@ -519,7 +394,7 @@ namespace IoHdf5 {
          }
 
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(i).data());
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);
@@ -544,93 +419,7 @@ namespace IoHdf5 {
       for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()); ++i)
       {
          // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
-      }
-
-      // close memspace
-      H5Sclose(memspace);
-
-      // Close Dataset
-      H5Dclose(dataset);
-
-      // Close filespace
-      H5Sclose(filespace);
-
-      // Free the dataset PList
-      this->freePList(dsPList);
-   }
-
-   template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > >& storage)
-   {
-      // Get dimensionality of file data
-      int nDims = this->mFileDims.size();
-
-      // Set data type correctly
-      hid_t type = Hdf5Types::type<T>();
-
-      // Create file dataspace
-      hid_t filespace = H5Screate_simple(nDims, &(this->mFileDims.front()), NULL);
-
-      // Create dataset in file
-      hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      // Memory dataspace 
-      hid_t  memspace;
-
-      // Create offset storage
-      hsize_t pOffset[2];
-      pOffset[1] = 0;
-
-      // Compute size of the memory dataspace
-      hsize_t iDims[2];
-      iDims[1] = this->mFileDims.back();
-
-      // Set PList to parallel access
-      hid_t dsPList = this->datasetPList();
-
-      // Loop over matrices to store in file
-      for(unsigned int i = 0; i < storage.size() ; ++i)
-      {
-         // Set memory space
-         iDims[0] = storage.at(i).cols();
-         memspace = H5Screate_simple(2, iDims, NULL);
-
-         // Create non regular hyperslab selection in file
-         H5Sselect_none(filespace);
-         iDims[0] = 1;
-         for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
-         {
-            pOffset[0] = this->mFileOffsets.at(i).at(j);
-            H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
-         }
-
-         // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(i).data());
-
-         // Reset hyperslab to whole dataset
-         H5Sselect_all(filespace);
-
-         // Close memory space
-         H5Sclose(memspace);
-      }
-
-      //
-      // Add some ZERO IO calls to allow for collective writes
-      //
-      
-      // Create zero memory space
-      iDims[0] = 1;
-      memspace = H5Screate_simple(1, iDims, NULL);
-      H5Sselect_none(memspace);
-
-      // Create zero file selection space
-      H5Sselect_none(filespace);
-
-      // Zero write IO
-      for(unsigned int i = 0; i < (this->mCollIoWrite - storage.size()); ++i)
-      {
-         // Write memory into hyperslab
-         H5Dwrite(dataset, type, memspace, filespace, dsPList, storage.at(0).data());
+         H5Dwrite(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(0)));
       }
 
       // close memspace

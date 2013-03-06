@@ -74,7 +74,7 @@ namespace Transform {
 
    MHDFloat FftSetup::scale() const
    {
-      // Assert to make sure scale is initialiZed
+      // Assert to make sure scale is initialised
       assert(this->mScale > 0.0);
 
       return this->mScale;

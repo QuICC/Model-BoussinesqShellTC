@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Enums/FieldComponents.hpp"
+#include "ScalarFields/FieldTools.hpp"
 #include "IoVariable/StateFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
@@ -26,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    StateFileReader::StateFileReader(std::string name, std::string type, const bool isRegular)
-      : IVariableHdf5Reader(StateFileTags::BASENAME + name, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, isRegular), mTime(-1.0), mTimestep(-1.0)
+      : IVariableHdf5Reader(StateFileTags::BASENAME + name, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, isRegular), mTime(-1.0), mTimestep(-1.0)
    {
    }
 
@@ -40,10 +41,10 @@ namespace IoVariable {
       this->readTruncation();
 
       // Check file compatibility with data truncation
-      this->checkTruncation(Dimensions::Space::SPECTRAL);
+      this->checkTruncation();
 
       // Set Read arguments
-      this->setReadArguments(Dimensions::Space::SPECTRAL);
+      this->setReadArguments();
 
       // Read the run information
       this->readRun();
@@ -79,10 +80,10 @@ namespace IoVariable {
       this->readTruncation();
 
       // Check file compatibility with data truncation
-      this->checkTruncation(Dimensions::Space::SPECTRAL);
+      this->checkTruncation();
 
       // Set Read arguments
-      this->setReadArguments(Dimensions::Space::SPECTRAL);
+      this->setReadArguments();
 
       // Read the run information
       this->readRun();
@@ -108,9 +109,21 @@ namespace IoVariable {
       // Open the codensity scalar group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
 
-      /// \mhdBug Irregular grid writing is not supported yet
-      // Read the codensity expansion
-      //this->readIrregularField(group, name, rScalar.rSliced());
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rScalar);
+
+      // Check for data regularity
+      if(this->mIsRegular)
+      {
+         // Read the codensity expansion
+         this->readRegularField(group, name, fieldInfo);
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+         // Read the codensity expansion
+         //this->readIrregularField(group, name, rScalar.rSliced());
+      }
       
       // close group
       H5Gclose(group);
@@ -121,12 +134,33 @@ namespace IoVariable {
       // Open the magnetic field group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
 
-      /// \mhdBug Irregular grid writing is not supported yet
-      //for(int i = 0; i < rVector.size(); i++)
-      //{
-      //   // Read component from file 
-      //   this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Component>(i)), rVector.at(i).rSliced());
-      //}
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
+
+      // Check for data regularity
+      if(this->mIsRegular)
+      {
+         for(size_t i = 0; i < rVector.size(); i++)
+         { 
+            // create component field information
+            fieldInfo = Datatypes::FieldTools::createInfo(rVector.at(i));
+
+            // Read component from file 
+            this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+         }
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+         for(size_t i = 0; i < rVector.size(); i++)
+         {
+            // create component field information
+            fieldInfo = Datatypes::FieldTools::createInfo(rVector.at(i));
+
+            // Read component from file 
+//IS WRONG            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+         }
+      }
       
       // close group
       H5Gclose(group);
@@ -137,9 +171,21 @@ namespace IoVariable {
       // Open the vector field group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
 
-      /// \mhdBug Irregular grid writing is not supported yet
-      // Read the field component
-      //this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), rComp.rSliced());
+      // Storage for the field information
+      std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(rComp);
+
+      // Check for data regularity
+      if(this->mIsRegular)
+      {
+         // Read the field component
+         this->readRegularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+      } else
+      {
+         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+         // Read the field component
+         //this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+      }
       
       // close group
       H5Gclose(group);
