@@ -20,7 +20,6 @@
 // Project includes
 //
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
    SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec)

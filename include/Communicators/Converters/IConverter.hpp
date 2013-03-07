@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "StorageProviders/StoragePairProvider.hpp"
+#include "StorageProviders/StoragePairProviderMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -50,22 +50,22 @@ namespace Parallel {
          /**
           * @brief Convert data from TFwdA to TBwdB
           */
-         virtual void convertFwd(const TFwdA &in, StoragePairProvider<TFwdB, TBwdB> &storage) = 0;
+         virtual void convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB> &storage) = 0;
 
          /**
           * @brief Convert data from TBwdB to TFwdA
           */
-         virtual void convertBwd(const TBwdB &in, StoragePairProvider<TFwdA, TBwdA> &storage) = 0;
+         virtual void convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA> &storage) = 0;
 
          /**
           * @brief Get the converted data from TBwdB to TFwdA conversion
           */
-         virtual TFwdA& getFwd(StoragePairProvider<TFwdA, TBwdA> &storage) = 0;
+         virtual TFwdA& getFwd(StoragePairProviderMacro<TFwdA, TBwdA> &storage) = 0;
 
          /**
           * @brief Get the converted data from TFwdA to TBwdB conversion
           */
-         virtual TBwdB& getBwd(StoragePairProvider<TFwdB, TBwdB> &storage) = 0;
+         virtual TBwdB& getBwd(StoragePairProviderMacro<TFwdB, TBwdB> &storage) = 0;
 
          /**
           * @brief Setup upcoming communication

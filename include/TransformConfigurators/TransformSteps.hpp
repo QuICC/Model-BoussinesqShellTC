@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
             enum Step {NOTHING, DO_SCALAR};
 
             /// Transform step for a scalar
-            static const Step STEP_SCALAR = NOTHING;
+            static const Step STEP_SCALAR = DO_SCALAR;
 
 
             /// Transform step for the first component of a vector
@@ -74,7 +74,7 @@ namespace GeoMHDiSCC {
             enum Step {NOTHING, DO_SCALAR, DO_GRAD};
 
             /// Transform step for a scalar
-            static const Step STEP_SCALAR = NOTHING;
+            static const Step STEP_SCALAR = DO_SCALAR;
 
 
             /// Transform step for the first component of a gradient
@@ -151,7 +151,8 @@ namespace GeoMHDiSCC {
          /**
           * @brief Simple struct holding the physical components order
           */
-         struct Physical {
+         struct PhysicalBase
+         {
             /// First physical field component used for gradient
             static const FieldComponents::Physical::Id GRAD_ONE = FieldComponents::Physical::NOTUSED;
 
@@ -193,10 +194,30 @@ namespace GeoMHDiSCC {
          };
 
          /**
+          * @brief Simple struct holding the physical components order
+          */
+         struct Physical: public PhysicalBase
+         {
+            /// First physical field component used for gradient
+            static const FieldComponents::Physical::Id GRAD_ONE = FieldComponents::Physical::ONE;
+
+            /// Second physical field component used for gradient
+            static const FieldComponents::Physical::Id GRAD_TWO = FieldComponents::Physical::TWO;
+
+            /// Third physical field component used for gradient
+            static const FieldComponents::Physical::Id GRAD_THREE = FieldComponents::Physical::THREE;
+         };
+
+         /**
           * @brief Simple struct holding the backward transform steps for the first dimension
           */
          template<>  struct Backward<Dimensions::Transform::TRA1D>: public BackwardBase
          {
+            /// Transform step for the first component of a gradient
+            static const Step STEP_GRAD_ONE = DO_GRAD;
+
+            /// Transform step for the second component of a gradient
+            static const Step STEP_GRAD_TWO = DO_SCALAR;
          };
 
          /**
@@ -204,6 +225,14 @@ namespace GeoMHDiSCC {
           */
          template<>  struct Backward<Dimensions::Transform::TRA2D>: public BackwardBase
          {
+            /// Transform step for the first component of a gradient
+            static const Step STEP_GRAD_ONE = DO_SCALAR;
+
+            /// Transform step for the second component of a gradient
+            static const Step STEP_GRAD_TWO = DO_GRAD;
+
+            /// Transform step for the third component of a gradient
+            static const Step STEP_GRAD_THREE = DO_SCALAR;
          };
 
          /**
@@ -211,6 +240,14 @@ namespace GeoMHDiSCC {
           */
          template<>  struct Backward<Dimensions::Transform::TRA3D>: public BackwardBase
          {
+            /// Transform step for the first component of a gradient
+            static const Step STEP_GRAD_ONE = DO_SCALAR;
+
+            /// Transform step for the second component of a gradient
+            static const Step STEP_GRAD_TWO = DO_SCALAR;
+
+            /// Transform step for the third component of a gradient
+            static const Step STEP_GRAD_THREE = DO_GRAD;
          };
       }
    }

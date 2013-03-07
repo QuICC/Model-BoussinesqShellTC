@@ -26,7 +26,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "StorageProviders/StoragePairProvider.hpp"
+#include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/IConverter.hpp"
 
 namespace GeoMHDiSCC {
@@ -52,12 +52,12 @@ namespace Parallel {
          /**
           * @brief Convert data from TFwdA to TBwdB
           */
-         virtual void convertFwd(const TFwdA& in, StoragePairProvider<TFwdB, TBwdB>& storage);
+         virtual void convertFwd(const TFwdA& in, StoragePairProviderMacro<TFwdB, TBwdB>& storage);
 
          /**
           * @brief Convert data from TBwdB to TFwdA
           */
-         virtual void convertBwd(const TBwdB& in, StoragePairProvider<TFwdA, TBwdA>& storage);
+         virtual void convertBwd(const TBwdB& in, StoragePairProviderMacro<TFwdA, TBwdA>& storage);
          
       protected:
          /**
@@ -104,7 +104,7 @@ namespace Parallel {
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertBwd(const TBwdB& in, StoragePairProvider<TFwdA, TBwdA>& storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertBwd(const TBwdB& in, StoragePairProviderMacro<TFwdA, TBwdA>& storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::BWDCONVSEND);
 
@@ -156,7 +156,7 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertFwd(const TFwdA& in, StoragePairProvider<TFwdB, TBwdB>& storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertFwd(const TFwdA& in, StoragePairProviderMacro<TFwdB, TBwdB>& storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::FWDCONVSEND);
 

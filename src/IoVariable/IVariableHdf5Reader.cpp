@@ -275,6 +275,7 @@ namespace IoVariable {
             }
             IoTools::Formatter::printLine(std::cout, '-');
             IoTools::Formatter::printNewline(std::cout);
+            oss.str("");
          }
       }
       IoTools::Formatter::printNewline(std::cout);

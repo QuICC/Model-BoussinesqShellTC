@@ -26,7 +26,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "StorageProviders/StoragePairProvider.hpp"
+#include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -52,12 +52,12 @@ namespace Parallel {
          /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
           */
-         virtual TFwdA& getFwd(StoragePairProvider<TFwdA, TBwdA>& storage);
+         virtual TFwdA& getFwd(StoragePairProviderMacro<TFwdA, TBwdA>& storage);
 
          /**
           * @brief Get the converted data from TFwdB to TBwdA conversion
           */
-         virtual TBwdB& getBwd(StoragePairProvider<TFwdB, TBwdB>& storage);
+         virtual TBwdB& getBwd(StoragePairProviderMacro<TFwdB, TBwdB>& storage);
 
          /**
           * @brief Setup the converter
@@ -116,7 +116,7 @@ namespace Parallel {
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TFwdA& SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getFwd(StoragePairProvider<TFwdA, TBwdA>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TFwdA& SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getFwd(StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
       // Recover storage from provider
       TFwdA &rOut = storage.recoverFwd();
@@ -124,7 +124,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TBwdB& SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getBwd(StoragePairProvider<TFwdB, TBwdB>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TBwdB& SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getBwd(StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
       // Recover storage from provider
       TBwdB &rOut = storage.recoverBwd();

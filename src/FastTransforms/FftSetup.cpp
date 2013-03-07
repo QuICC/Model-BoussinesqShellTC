@@ -38,6 +38,10 @@ namespace Transform {
       {
          throw Exception("Unknown FFT setup type requested");
       }
+
+      // Safety assert
+      assert(this->mBwdSize > this->mSpecSize);
+      assert(this->mFwdSize >= this->mBwdSize);
    }
 
    FftSetup::~FftSetup()

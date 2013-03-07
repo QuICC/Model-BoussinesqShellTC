@@ -23,7 +23,7 @@
 
 // Project includes
 //
-#include "StorageProviders/StoragePairProvider.hpp"
+#include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/CommunicatorBase.hpp"
 #include "Communicators/StorageDispatcher.hpp"
 #include "Communicators/ConverterDispatcher.hpp"
@@ -68,7 +68,7 @@ namespace Parallel {
          /**
           * @brief Get/Set storage provider
           */
-         template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
+         template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
 
          /**
           * @brief Get/Set data converter
@@ -91,10 +91,10 @@ namespace Parallel {
          /**
           * @brief Storage provider for 1D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
    };
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::ONED,TTypes>::storage()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::ONED,TTypes>::storage()
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::ONED) >();
 
@@ -139,7 +139,7 @@ namespace Parallel {
          /**
           * @brief Get/Set storage provider
           */
-         template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
+         template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
 
          /**
           * @brief Get/Set data converter
@@ -176,15 +176,15 @@ namespace Parallel {
          /**
           * @brief Storage provider for 1D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
 
          /**
           * @brief Storage provider for 2D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType>  mStorage2D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType>  mStorage2D; 
    };
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::TWOD,TTypes>::storage()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::TWOD,TTypes>::storage()
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::TWOD) >();
 
@@ -235,7 +235,7 @@ namespace Parallel {
          /**
           * @brief Get/Set storage provider
           */
-         template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
+         template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& storage();
 
          /**
           * @brief Get/Set data converter
@@ -287,20 +287,20 @@ namespace Parallel {
          /**
           * @brief Storage provider for 1D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>  mStorage1D; 
 
          /**
           * @brief Storage provider for 2D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType>  mStorage2D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType>  mStorage2D; 
 
          /**
           * @brief Storage provider for 3D
           */
-         StoragePairProvider<typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType>  mStorage3D; 
+         StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType>  mStorage3D; 
    };
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProvider<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::THREED,TTypes>::storage()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> StoragePairProviderMacro<typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::THREED,TTypes>::storage()
    {
       Debug::StaticAssert< static_cast<int>(TID) <= static_cast<int>(Dimensions::THREED) >();
 

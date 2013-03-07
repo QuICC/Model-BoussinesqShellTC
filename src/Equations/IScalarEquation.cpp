@@ -61,7 +61,7 @@ namespace Equations {
    {
       // Assert dealiasing has taken place!
       assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
-      assert(this->rUnknown().rDom(0).rPerturbation().data().cols() < rhs.data().cols());
+      assert(this->rUnknown().rDom(0).rPerturbation().data().cols() == rhs.data().cols());
 
       // Copy values over into unknown
       this->rUnknown().rDom(0).rPerturbation().setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));

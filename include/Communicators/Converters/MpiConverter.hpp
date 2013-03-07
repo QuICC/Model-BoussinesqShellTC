@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Communicators/Converters/MpiConverterBase.hpp"
-#include "StorageProviders/StoragePairProvider.hpp"
+#include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
 namespace GeoMHDiSCC {
@@ -50,7 +50,7 @@ namespace Parallel {
           * @param in      Input forward data
           * @param storage Storage provider
           */
-         virtual void convertFwd(const TFwdA &in, StoragePairProvider<TFwdB, TBwdB> &storage);
+         virtual void convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB> &storage);
 
          /**
           * @brief Convert data from TBwdB to TFwdA
@@ -58,21 +58,21 @@ namespace Parallel {
           * @param in      Input backward data
           * @param storage Storage provider
           */
-         virtual void convertBwd(const TBwdB &in, StoragePairProvider<TFwdA, TBwdA> &storage);
+         virtual void convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA> &storage);
 
          /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
           *
           * @param storage Storage provider
           */
-         virtual TFwdA& getFwd(StoragePairProvider<TFwdA, TBwdA> &storage);
+         virtual TFwdA& getFwd(StoragePairProviderMacro<TFwdA, TBwdA> &storage);
 
          /**
           * @brief Get the converted data from TFwdB to TBwdA conversion
           *
           * @param storage Storage provider
           */
-         virtual TBwdB& getBwd(StoragePairProvider<TFwdB, TBwdB> &storage);
+         virtual TBwdB& getBwd(StoragePairProviderMacro<TFwdB, TBwdB> &storage);
 
          /**
           * @brief Finish the setup of the converter
@@ -197,7 +197,7 @@ namespace Parallel {
       this->cleanupTypes();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertFwd(const TFwdA &in, StoragePairProvider<TFwdB, TBwdB>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::FWDCONVSEND);
 
@@ -207,7 +207,7 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertBwd(const TBwdB &in, StoragePairProvider<TFwdA, TBwdA>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::BWDCONVSEND);
 
@@ -217,7 +217,7 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TFwdA& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getFwd(StoragePairProvider<TFwdA, TBwdA>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TFwdA& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getFwd(StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::BWDCONVRECV);
 
@@ -232,7 +232,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TBwdB& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getBwd(StoragePairProvider<TFwdB, TBwdB>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TBwdB& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getBwd(StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::FWDCONVRECV);
 

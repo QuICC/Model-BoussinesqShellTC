@@ -101,7 +101,7 @@ namespace GeoMHDiSCC {
       // Iterator for the vector based storages
       std::vector<ArrayI>::const_iterator   vIt;
       
-      // Get backward dimensions
+      // Get forward dimensions
       SharedArrayI   spDim1D(new ArrayI(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>()));
       for(int i = 0; i < spDim1D->size(); ++i)
       {

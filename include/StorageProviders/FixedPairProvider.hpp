@@ -1,11 +1,11 @@
-/** \file StoragePairProvider.hpp
- *  \brief Templated implementation of a data pair storage provider.
+/** \file FixedPairProvider.hpp
+ *  \brief Templated implementation of a data pair storage provider with fixed size.
  *
  *  \mhdBug Needs test
  */
 
-#ifndef STORAGEPAIRPROVIDER_HPP
-#define STORAGEPAIRPROVIDER_HPP
+#ifndef FIXEDPAIRPROVIDER_HPP
+#define FIXEDPAIRPROVIDER_HPP
 
 // System includes
 //
@@ -23,23 +23,23 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Templated implementation of a data pair storage provider.
+    * @brief Templated implementation of a data pair storage provider with fixed size.
     *
     * \tparam TForward Input type of a forward transform
     * \tparam TBackward Input type of a backward transform
     */
-   template <typename TForward, typename TBackward> class StoragePairProvider
+   template <typename TForward, typename TBackward> class FixedPairProvider
    {
       public:
          /**
           * @brief Constructor
           */
-         StoragePairProvider();
+         FixedPairProvider();
 
          /**
           * @brief Destructor
           */
-         ~StoragePairProvider();
+         ~FixedPairProvider();
 
          /**
           * @brief Initialise the provider with one unit of each
@@ -106,30 +106,6 @@ namespace GeoMHDiSCC {
          void  freeBwd(TBackward &tmp);
 
          /**
-          * @brief Number of TForward temporaries
-          */
-         int nFTmp() const;
-
-         /**
-          * @brief Number of TBackward temporaries
-          */
-         int nBTmp() const;
-
-         /**
-          * @brief Direct access to the temporaries
-          *
-          * @param i Index of the temporary
-          */
-         TForward& rFTmp(const int i);
-
-         /**
-          * @brief Direct access to the temporaries
-          *
-          * @param i Index of the temporary
-          */
-         TBackward& rBTmp(const int i);
-
-         /**
           * @brief Direct assess to the vector of TForward of temporaries
           */
          std::vector<TForward>&  rFTmps();
@@ -147,7 +123,6 @@ namespace GeoMHDiSCC {
      #endif // GEOMHDISCC_STORAGEPROFILE
          
       protected:
-
          /**
           * @brief Number of forward tempory storage scalars
           */
@@ -213,57 +188,37 @@ namespace GeoMHDiSCC {
          void initQueues();
    };
 
-   template <typename TForward, typename TBackward> inline int StoragePairProvider<TForward, TBackward>::nFTmp() const
-   {
-      return this->mNFTmp;
-   }
-
-   template <typename TForward, typename TBackward> inline int StoragePairProvider<TForward, TBackward>::nBTmp() const
-   {
-      return this->mNBTmp;
-   }
-
-   template <typename TForward, typename TBackward> inline TForward& StoragePairProvider<TForward, TBackward>::rFTmp(const int i)
-   {
-      return this->mFTmp.at(i);
-   }
-
-   template <typename TForward, typename TBackward> inline TBackward& StoragePairProvider<TForward, TBackward>::rBTmp(const int i)
-   {
-      return this->mBTmp.at(i);
-   }
-
-   template <typename TForward, typename TBackward> inline std::vector<TForward>& StoragePairProvider<TForward, TBackward>::rFTmps()
+   template <typename TForward, typename TBackward> inline std::vector<TForward>& FixedPairProvider<TForward, TBackward>::rFTmps()
    {
       return this->mFTmp;
    }
 
-   template <typename TForward, typename TBackward> inline std::vector<TBackward>& StoragePairProvider<TForward, TBackward>::rBTmps()
+   template <typename TForward, typename TBackward> inline std::vector<TBackward>& FixedPairProvider<TForward, TBackward>::rBTmps()
    {
       return this->mBTmp;
    }
 
-   template <typename TForward, typename TBackward> inline void StoragePairProvider<TForward, TBackward>::freeFwd(TForward &tmp)
+   template <typename TForward, typename TBackward> inline void FixedPairProvider<TForward, TBackward>::freeFwd(TForward &tmp)
    {
       this->mFQueue.push(&tmp);
    }
 
-   template <typename TForward, typename TBackward> inline void StoragePairProvider<TForward, TBackward>::freeBwd(TBackward &tmp)
+   template <typename TForward, typename TBackward> inline void FixedPairProvider<TForward, TBackward>::freeBwd(TBackward &tmp)
    {
       this->mBQueue.push(&tmp);
    }
 
-   template <typename TForward, typename TBackward> inline void StoragePairProvider<TForward, TBackward>::holdFwd(TForward &tmp)
+   template <typename TForward, typename TBackward> inline void FixedPairProvider<TForward, TBackward>::holdFwd(TForward &tmp)
    {
       this->mUsedFQueue.push(&tmp);
    }
 
-   template <typename TForward, typename TBackward> inline void StoragePairProvider<TForward, TBackward>::holdBwd(TBackward &tmp)
+   template <typename TForward, typename TBackward> inline void FixedPairProvider<TForward, TBackward>::holdBwd(TBackward &tmp)
    {
       this->mUsedBQueue.push(&tmp);
    }
 
-   template <typename TForward, typename TBackward> TForward&  StoragePairProvider<TForward, TBackward>::recoverFwd()
+   template <typename TForward, typename TBackward> TForward&  FixedPairProvider<TForward, TBackward>::recoverFwd()
    {
       // Add in an assert for non empty queue
       assert(this->mUsedFQueue.size());
@@ -274,7 +229,7 @@ namespace GeoMHDiSCC {
       return *this->mpFTmp;
    }
 
-   template <typename TForward, typename TBackward> TBackward&  StoragePairProvider<TForward, TBackward>::recoverBwd()
+   template <typename TForward, typename TBackward> TBackward&  FixedPairProvider<TForward, TBackward>::recoverBwd()
    {
       // Add in an assert for non empty queue
       assert(this->mUsedBQueue.size());
@@ -285,16 +240,16 @@ namespace GeoMHDiSCC {
       return *this->mpBTmp;
    }
 
-   template <typename TForward, typename TBackward> StoragePairProvider<TForward, TBackward>::StoragePairProvider()
+   template <typename TForward, typename TBackward> FixedPairProvider<TForward, TBackward>::FixedPairProvider()
       : mNFTmp(0), mNBTmp(0)
    {
    }
 
-   template <typename TForward, typename TBackward> StoragePairProvider<TForward, TBackward>::~StoragePairProvider()
+   template <typename TForward, typename TBackward> FixedPairProvider<TForward, TBackward>::~FixedPairProvider()
    {
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::init(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
+   template <typename TForward, typename TBackward> void FixedPairProvider<TForward, TBackward>::init(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
    {
       // Set initial number of TForward storages
       this->mNFTmp = 2;
@@ -309,7 +264,7 @@ namespace GeoMHDiSCC {
       this->initQueues();
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::resize(const int nFTmp, const int nBTmp)
+   template <typename TForward, typename TBackward> void FixedPairProvider<TForward, TBackward>::resize(const int nFTmp, const int nBTmp)
    {
       // Set number of TForward storages
       this->mNFTmp = nFTmp;
@@ -320,7 +275,7 @@ namespace GeoMHDiSCC {
       // Make sure storage has been initialised
       if(this->mFTmp.size() == 0 || this->mBTmp.size())
       {
-         throw Exception("StoragePairProvider::resize", "Can't resize uninitialised memory storage");
+         throw Exception("FixedPairProvider::resize", "Can't resize uninitialised memory storage");
       } else
       {
          // Resize TForward storage
@@ -334,7 +289,7 @@ namespace GeoMHDiSCC {
       this->initQueues();
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::initStorage(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
+   template <typename TForward, typename TBackward> void FixedPairProvider<TForward, TBackward>::initStorage(typename TForward::SharedSetupType spSetupFwd, typename TBackward::SharedSetupType spSetupBwd)
    {
       // Initialise the TForward storage data
       for(int i=0; i < this->mNFTmp; ++i)
@@ -349,7 +304,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   template <typename TForward, typename TBackward> void StoragePairProvider<TForward, TBackward>::initQueues()
+   template <typename TForward, typename TBackward> void FixedPairProvider<TForward, TBackward>::initQueues()
    {
       // Make sure queue is empty
       if(!this->mFQueue.empty())
@@ -376,7 +331,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   template <typename TForward, typename TBackward> TForward&  StoragePairProvider<TForward, TBackward>::provideFwd()
+   template <typename TForward, typename TBackward> TForward&  FixedPairProvider<TForward, TBackward>::provideFwd()
    {
       // Add in an assert for non empty queue
       assert(this->mFQueue.size());
@@ -387,7 +342,7 @@ namespace GeoMHDiSCC {
       return *this->mpFTmp;
    }
 
-   template <typename TForward, typename TBackward> TBackward&  StoragePairProvider<TForward, TBackward>::provideBwd()
+   template <typename TForward, typename TBackward> TBackward&  FixedPairProvider<TForward, TBackward>::provideBwd()
    {
       // Add in an assert for non empty queue
       assert(this->mBQueue.size());
@@ -399,18 +354,18 @@ namespace GeoMHDiSCC {
    }
 
    #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TForward, typename TBackward> MHDFloat  StoragePairProvider<TForward, TBackward>::requiredStorage() const
+   template <typename TForward, typename TBackward> MHDFloat  FixedPairProvider<TForward, TBackward>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
-      if(this->nFTmp() > 0)
+      if(this->mFTmp.size() > 0)
       {
-         mem += this->nFTmp()*this->mFTmp.at(0).requiredStorage();
+         mem += this->mFTmp.size()*this->mFTmp.at(0).requiredStorage();
       }
 
-      if(this->nBTmp() > 0)
+      if(this->mBTmp.size() > 0)
       {
-         mem += this->nBTmp()*this->mBTmp.at(0).requiredStorage();
+         mem += this->mBTmp.size()*this->mBTmp.at(0).requiredStorage();
       }
 
       return mem;
@@ -419,4 +374,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // STORAGEPAIRPROVIDER_HPP
+#endif // FIXEDPAIRPROVIDER_HPP

@@ -68,6 +68,11 @@ namespace Datatypes {
          explicit FlatScalarField(SharedPtrMacro<ScalarFieldSetup<DIMENSION> > spSetup);
 
          /**
+          * @brief Copy constructor
+          */
+         FlatScalarField(const FlatScalarField<TData,DIMENSION>& other);
+
+         /**
           * @brief Destructor
           */
          ~FlatScalarField();
@@ -141,6 +146,36 @@ namespace Datatypes {
           * @param k    Index of the slice
           */
          template <typename Derived> void subSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
+
+         /**
+          * @brief Set the top rows of a 2D slice of the field
+          *
+          * Use this to adapt to differentenlty dealiased data
+          *
+          * @param sl   Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
+
+         /**
+          * @brief Add to the top rows of a 2D slice of the field
+          *
+          * Use this to adapt to differentenlty dealiased data
+          *
+          * @param sl   Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
+
+         /**
+          * @brief Substract from the top rows of a 2D slice of the field
+          *
+          * Use this to adapt to differentenlty dealiased data
+          *
+          * @param sl   Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
 
          /**
           * @brief Get internal storage field data
@@ -237,21 +272,37 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> inline const typename FlatScalarField<TData, DIMENSION>::StorageType& FlatScalarField<TData, DIMENSION>::data() const
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       return *this->mspField;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::StorageType& FlatScalarField<TData, DIMENSION>::rData()
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       return *this->mspField;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> void FlatScalarField<TData, DIMENSION>::setPoint(const FlatScalarField<TData, DIMENSION>::PointType pt, const int i, const int j, const int k)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = pt;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> inline typename FlatScalarField<TData, DIMENSION>::PointType& FlatScalarField<TData, DIMENSION>::rPoint(const int i, const int j, const int k)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
    }
 
@@ -259,6 +310,10 @@ namespace Datatypes {
    {
       // Profiles only make sense in 2D and 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
 
       this->mspField->col(this->mspSetup->colIdx(j,k)) = pf;
    }
@@ -268,6 +323,10 @@ namespace Datatypes {
       // Slices only make sense in 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
    }
 
@@ -275,6 +334,10 @@ namespace Datatypes {
    {
       // Slices only make sense in 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
 
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) += sl;
    }
@@ -284,27 +347,95 @@ namespace Datatypes {
       // Slices only make sense in 3D
       Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
 
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) -= sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Should not be called as a replacement of the shorter version
+      assert(rows < this->mspSetup->blockRows(k));
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) = sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Should not be called as a replacement of the shorter version
+      assert(rows < this->mspSetup->blockRows(k));
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) += sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Should not be called as a replacement of the shorter version
+      assert(rows < this->mspSetup->blockRows(k));
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) -= sl;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setData(const Eigen::MatrixBase<Derived>& field)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Assert for positive sizes
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addData(const Eigen::MatrixBase<Derived>& field)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) += field;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::subData(const Eigen::MatrixBase<Derived>& field)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) -= field;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> FlatScalarField<TData, DIMENSION>::FlatScalarField(SharedPtrMacro<ScalarFieldSetup<DIMENSION> > spSetup)
       : mspSetup(spSetup), mspField(new StorageType(spSetup->dataRows(), spSetup->dataCols()))
    {
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> FlatScalarField<TData, DIMENSION>::FlatScalarField(const FlatScalarField<TData, DIMENSION>& other)
+      : mspSetup(other.mspSetup), mspField(new StorageType(other.mspField->rows(),other.mspField->cols()))
+   {
+      *this->mspField = *(other.mspField);
    }
 
    template <typename TData, Dimensions::Type DIMENSION> FlatScalarField<TData, DIMENSION>::~FlatScalarField()
@@ -318,6 +449,10 @@ namespace Datatypes {
 
    template <typename TData, Dimensions::Type DIMENSION> void FlatScalarField<TData, DIMENSION>::rescale(const MHDFloat scale)
    {
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
       *this->mspField *= scale;
    }
 
