@@ -1,7 +1,7 @@
 /** \file TransformSteps.hpp
  *  \brief Definition of some useful enums for steps involved in a full transform
  *
- *  \mhdBug Needs test
+ *  \mhdBug Needs documentation and splitting out model/scheme part
  *  \mhdBug Might depend on model/scheme
  */
 

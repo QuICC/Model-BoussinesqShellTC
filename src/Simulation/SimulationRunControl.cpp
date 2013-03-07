@@ -32,11 +32,6 @@ namespace GeoMHDiSCC {
       return this->mStatus;
    }
 
-   bool SimulationRunControl::doIO() const
-   {
-      return (this->mSteps % 100) == 0;
-   }
-
    void SimulationRunControl::update()
    {
       // Not ideal but OK for the moment

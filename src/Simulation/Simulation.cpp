@@ -240,8 +240,11 @@ namespace GeoMHDiSCC {
          // Update timestepper
          this->mTimestepper.update();
       
-         // Update simulation control
+         // Update simulation run control
          this->mSimRunCtrl.update();
+      
+         // Update simulation IO control
+         this->mSimIoCtrl.update();
       }
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
    }
@@ -249,13 +252,10 @@ namespace GeoMHDiSCC {
    void Simulation::writeOutput()
    {
       ProfilerMacro_start(ProfilerMacro::IO);
-      if(this->mTimestepper.finishedStep() && this->mSimRunCtrl.doIO())
+      if(this->mTimestepper.finishedStep())
       {
-         // Write initial ASCII output
-         this->mSimIoCtrl.writeAscii();
-      
-         // Write initial state file
-         this->mSimIoCtrl.writeHdf5();
+         // Write initial ASCII and HDF5 output files if applicable
+         this->mSimIoCtrl.writeFiles()
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
    }

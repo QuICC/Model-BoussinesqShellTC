@@ -67,6 +67,11 @@ namespace GeoMHDiSCC {
          void initWriters();
 
          /**
+          * @brief Write output files
+          */
+         void writeFiles();
+
+         /**
           * @brief Finalise the writer files
           */
          void finalizeWriters();
@@ -84,16 +89,6 @@ namespace GeoMHDiSCC {
           * @param spOutFile Shared HDF5 writer
           */
          void addOutputFile(IoVariable::SharedIVariableHdf5NWriter  spOutFile);
-
-         /**
-          * @brief Write ASCII data
-          */
-         void writeAscii();
-
-         /**
-          * @brief Write HDF5 data
-          */
-         void writeHdf5();
 
          /**
           * @brief Get the dimension read from the configuration file
@@ -124,10 +119,25 @@ namespace GeoMHDiSCC {
           * @brief Get end iterator to HDF5 files
           */
          hdf5_iterator endHdf5();
+
+         /**
+          * @brief Update IO status
+          */
+         void update();
          
       protected:
 
       private:
+         /**
+          * @brief Write ASCII data
+          */
+         void writeAscii();
+
+         /**
+          * @brief Write HDF5 data
+          */
+         void writeHdf5();
+
          /**
           * @brief Vector of ASCII output files
           */

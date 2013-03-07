@@ -18,6 +18,7 @@
 namespace GeoMHDiSCC {
 
    SimulationIoControl::SimulationIoControl()
+      : mSteps(0), mAsciiRate(-1), mHdf5Rate(-1)
    {
    }
 
@@ -46,6 +47,19 @@ namespace GeoMHDiSCC {
    {
       // reset the configuration file
       this->mspCfgFile.reset();
+   }
+
+   void SimulationIoControl::update()
+   {
+      // Increment timestep counter
+      this->mSteps++;
+   }
+
+   void SimulationIoControl::writeFiles()
+   {
+      this->writeAscii();
+
+      this->writeHdf5();
    }
 
    void SimulationIoControl::finalize()

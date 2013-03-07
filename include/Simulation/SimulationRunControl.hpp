@@ -54,11 +54,6 @@ namespace GeoMHDiSCC {
           * @brief Update the status from control file
           */
          void checkFile();
-
-         /**
-          * @brief Do IO
-          */
-         bool doIO() const;
          
       protected:
          /**
