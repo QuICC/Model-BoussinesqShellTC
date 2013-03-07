@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
    }
 
    Transform::SharedFftSetup TTTScheme::spSetup2D(SharedResolution spRes) const
@@ -71,7 +71,7 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
    }
 
    Transform::SharedFftSetup TTTScheme::spSetup3D(SharedResolution spRes) const
@@ -89,7 +89,7 @@ namespace GeoMHDiSCC {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, false));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
    }
 
    TTTScheme::TTTScheme(const ArrayI& dim)

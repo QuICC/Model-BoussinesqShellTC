@@ -15,21 +15,28 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   FftSetup::FftSetup(const int size, const int howmany, const int specSize, const bool isMixed)
-      : mFwdSize(size), mBwdSize(0), mHowmany(howmany), mSpecSize(specSize), mIsMixed(isMixed), mScale(-1)
+   FftSetup::FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type)
+      : mFwdSize(size), mBwdSize(0), mHowmany(howmany), mSpecSize(specSize), mType(type), mScale(-1)
    {
       // Set the backward size
-      if(this->mIsMixed)
+      if(this->mType == FftSetup::MIXED)
       {
          this->mBwdSize = this->mFwdSize/2 + 1;
-      } else
+      } else if(this->mType == FftSetup::EQUAL)
       {
          this->mBwdSize = this->mFwdSize;
+      } else if(this->mType == FftSetup::COMPONENT)
+      {
+         this->mBwdSize = this->mFwdSize;
+      } else
+      {
+         throw Exception("Unknown FFT setup type requested");
       }
    }
 
@@ -42,9 +49,9 @@ namespace Transform {
       this->mScale = scale;
    }
 
-   bool FftSetup::isMixed() const
+   FftSetup::Type FftSetup::type() const
    {
-      return this->mIsMixed;
+      return this->mType;
    }
 
    int FftSetup::fwdSize() const

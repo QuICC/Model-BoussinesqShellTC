@@ -66,7 +66,7 @@ namespace Transform {
 
    void ChebyshevFftwTransform::initFft()
    {  
-      /// \mhdBug implement strideed stranforms for complex <-> complex case
+      /// \mhdBug implement strideed stranforms for complex <-> complex case if possible
 
       int fwdSize = this->mspSetup->fwdSize();
       int bwdSize = this->mspSetup->bwdSize();
@@ -75,7 +75,7 @@ namespace Transform {
       // Create the two plans
       const int  *fftSize = &fwdSize;
 
-      if(this->mspSetup->isMixed())
+      if(this->mspSetup->type() == FftSetup::COMPONENT)
       {
       } else
       {

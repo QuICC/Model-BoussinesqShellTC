@@ -32,14 +32,26 @@ namespace Transform {
    {
       public:
          /**
+          * List of possible size combinations
+          */
+         enum Type {
+            /// Input and output size are the same
+            EQUAL,
+            /// Complex -> real, real -> complex sizes
+            MIXED,
+            /// Complex -> complex but componentwise
+            COMPONENT
+         };
+
+         /**
           * @brief Constructor
           *
           * @param size       Size of the transform
           * @param howmany    Number of similar transforms
           * @param specSize   Spectral output size (i.e without the padding)
-          * @param isMixed    FFT involves real and complex values (ie C2R and R2C)
+          * @param type       Type of the transform involved
           */
-         FftSetup(const int size, const int howmany, const int specSize, const bool isMixed);
+         FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type);
 
          /**
           * @brief Empty destructor
@@ -49,7 +61,7 @@ namespace Transform {
          /**
           * @brief Does setup define a mixed real/complex transform?
           */
-         bool isMixed() const;
+         FftSetup::Type type() const;
 
          /**
           * @brief Set the transform scaling factor
@@ -112,7 +124,7 @@ namespace Transform {
          /**
           * @brief Transform is of C2R/R2C type?
           */
-         bool mIsMixed;
+         FftSetup::Type mType;
 
          /**
           * @brief Storage for the scale factor

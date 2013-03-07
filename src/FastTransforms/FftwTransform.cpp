@@ -73,7 +73,7 @@ namespace Transform {
       // Create the two plans
       const int  *fftSize = &fwdSize;
 
-      if(this->mspSetup->isMixed())
+      if(this->mspSetup->type() == FftSetup::MIXED)
       {
          // create temporary storage for plan computation
          Matrix    tmpReal(fwdSize, howmany);

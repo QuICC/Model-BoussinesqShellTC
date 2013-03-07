@@ -204,7 +204,7 @@ namespace Transform {
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a mixed transform was not setup
-      assert(!this->mspSetup->isMixed());
+      assert(this->mspSetup->type() == FftSetup::EQUAL);
 
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
@@ -227,7 +227,7 @@ namespace Transform {
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a mixed transform was not setup
-      assert(!this->mspSetup->isMixed());
+      assert(this->mspSetup->type() == FftSetup::EQUAL);
 
       // assert on the padding size
       assert(this->mspSetup->padSize() >= 0);
@@ -269,7 +269,7 @@ namespace Transform {
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a mixed transform was setup
-      assert(this->mspSetup->isMixed());
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
@@ -300,7 +300,7 @@ namespace Transform {
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a mixed transform was setup
-      assert(this->mspSetup->isMixed());
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
 
       // assert on the padding size
       assert(this->mspSetup->padSize() >= 0);
