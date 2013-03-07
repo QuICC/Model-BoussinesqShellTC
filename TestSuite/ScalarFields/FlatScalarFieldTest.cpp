@@ -2,9 +2,11 @@
  *  \brief Implementation of test case for FlatScalarField
  */
 
+#include "gtest/gtest.h"
+
+#include "Framework/FrameworkMacro.h"
 #include "ScalarFields/FlatScalarField.hpp"
 #include "Enums/Dimensions.hpp"
-#include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
 
@@ -40,10 +42,27 @@ namespace TestSuite {
 
    FlatScalarFieldTest::FlatScalarFieldTest()
    {
+      // Initilise framework
+      FrameworkMacro::init();
+
+      // Set nCpu for serial run
+      int nCpu = 1;
+
+      // Set ID and nCpu in MPI case
+      #ifdef GEOMHDISCC_MPI
+         // Get MPI size
+         int size;
+         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+      #endif //GEOMHDISCC_MPI
+
+      // Setup framework
+      FrameworkMacro::setup(nCpu);
    }
 
    FlatScalarFieldTest::~FlatScalarFieldTest()
    {
+      // Finalise framework
+      FrameworkMacro::finalize();
    }
 
 //   void FlatScalarFieldTest::SetUp()
@@ -57,7 +76,8 @@ namespace TestSuite {
    /**
     * @brief Test 1D scalar field
     */
-   TEST_F(FlatScalarFieldTest, OneDimensional) {
+   TEST_F(FlatScalarFieldTest, OneDimensional)
+   {
       // Create 1D ScalarField setup
       int dim1D = 10;
       SharedPtrMacro<Datatypes::ScalarFieldSetup<Dimensions::ONED> >   spSetup(new Datatypes::ScalarFieldSetup<Dimensions::ONED>(dim1D));
@@ -123,7 +143,8 @@ namespace TestSuite {
    /**
     * @brief Test 2D scalar field
     */
-   TEST_F(FlatScalarFieldTest, TwoDimensional) {
+   TEST_F(FlatScalarFieldTest, TwoDimensional)
+   {
       // Create 2D scalar field setup
       int dim2D = 10;
       SharedArrayI   spDim1D(new ArrayI(dim2D));
@@ -225,7 +246,8 @@ namespace TestSuite {
    /**
     * @brief Test 3D scalar field
     */
-   TEST_F(FlatScalarFieldTest, ThreeDimensional) {
+   TEST_F(FlatScalarFieldTest, ThreeDimensional)
+   {
       // Create 3D scalar field setup
       int dim3D = 10;
       SharedArrayI   spDim1D(new ArrayI(dim3D));

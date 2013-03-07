@@ -2,9 +2,11 @@
  *  \brief Implementation of test case for ScalarFieldSetup
  */
 
+#include "gtest/gtest.h"
+
+#include "Framework/FrameworkMacro.h"
 #include "Enums/Dimensions.hpp"
 #include "ScalarFields/ScalarFieldSetup.hpp"
-#include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
 
@@ -40,10 +42,27 @@ namespace TestSuite {
 
    ScalarFieldSetupTest::ScalarFieldSetupTest()
    {
+      // Initilise framework
+      FrameworkMacro::init();
+
+      // Set nCpu for serial run
+      int nCpu = 1;
+
+      // Set ID and nCpu in MPI case
+      #ifdef GEOMHDISCC_MPI
+         // Get MPI size
+         int size;
+         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+      #endif //GEOMHDISCC_MPI
+
+      // Setup framework
+      FrameworkMacro::setup(nCpu);
    }
 
    ScalarFieldSetupTest::~ScalarFieldSetupTest()
    {
+      // Finalise framework
+      FrameworkMacro::finalize();
    }
 
 //   void ScalarFieldSetupTest::SetUp()

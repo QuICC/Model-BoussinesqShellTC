@@ -44,6 +44,11 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get vector of names for the boundary conditions
           */
+         static std::vector<PhysicalNames::Id> fieldIds();
+
+         /**
+          * @brief Get vector of names for the boundary conditions
+          */
          static std::vector<std::string> boundaryNames();
 
          /**

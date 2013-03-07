@@ -35,6 +35,11 @@ namespace IoTools {
       static std::string toString(const PhysicalNames::Id id);
 
       /**
+       * @brief Convert ID to tag
+       */
+      static std::string toTag(const PhysicalNames::Id id);
+
+      /**
        * @brief Convert ID to string
        */
       static std::string toString(const FieldComponents::Physical::Id id);

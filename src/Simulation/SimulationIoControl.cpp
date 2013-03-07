@@ -72,7 +72,7 @@ namespace GeoMHDiSCC {
       SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
-         if((*itHdf5)->isFull())
+         if(!(*itHdf5)->isFull())
          {
             throw Exception("There are missing variables in the HDF5 writers");
          }

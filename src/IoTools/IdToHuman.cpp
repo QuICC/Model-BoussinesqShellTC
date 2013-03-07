@@ -51,6 +51,35 @@ namespace IoTools {
       }
    }
 
+   std::string IdToHuman::toTag(const PhysicalNames::Id id)
+   {
+      switch(id)
+      {
+         case PhysicalNames::CODENSITY:
+            return "codensity";
+         case PhysicalNames::PRESSURE:
+            return "pressure";
+         case PhysicalNames::TEMPERATURE:
+            return "temperature";
+         case PhysicalNames::STREAMFUNCTION:
+            return "streamfunction";
+         case PhysicalNames::VELOCITYZ:
+            return "velocityz";
+         case PhysicalNames::VORTICITYZ:
+            return "vorticityz";
+         case PhysicalNames::PHI:
+            return "phi";
+         case PhysicalNames::VELOCITY:
+            return "velocity";
+         case PhysicalNames::MAGNETIC:
+            return ",agnetic";
+         case PhysicalNames::VORTICITY:
+            return "vorticity";
+         default:
+            return "unknown";
+      }
+   }
+
    std::string IdToHuman::toString(const FieldComponents::Physical::Id id)
    {
       switch(id)

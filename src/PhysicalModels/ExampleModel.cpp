@@ -21,25 +21,43 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
+#include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGStreamfunction.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGVertical.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
+   std::vector<PhysicalNames::Id> ExampleModel::fieldIds()
+   {
+      // Create storage
+      std::vector<PhysicalNames::Id> ids;
+
+      // Add streamfunction
+      ids.push_back(PhysicalNames::STREAMFUNCTION);
+
+      // Add axial velocity
+      ids.push_back(PhysicalNames::VELOCITYZ);
+
+      // Add temperature
+      ids.push_back(PhysicalNames::TEMPERATURE);
+
+      return ids;
+   }
+
    std::vector<std::string> ExampleModel::boundaryNames()
    {
       // Create storage
       std::vector<std::string>   names;
 
-      // Add streamfunction
-      names.push_back("streamfunction");
+      // Field IDs iterator
+      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
 
-      // Add streamfunction
-      names.push_back("velocityz");
-
-      // Add streamfunction
-      names.push_back("temperature");
+      for(it = ids.begin(); it != ids.end(); ++it)
+      {
+         names.push_back(IoTools::IdToHuman::toTag(*it));
+      }
 
       return names;
    }
@@ -67,18 +85,24 @@ namespace GeoMHDiSCC {
 
    void ExampleModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
+      // Field IDs iterator
+      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
+
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spState->expect(PhysicalNames::STREAMFUNCTION);
-      spState->expect(PhysicalNames::VELOCITYZ);
-      spState->expect(PhysicalNames::TEMPERATURE);
+      for(it = ids.begin(); it != ids.end(); ++it)
+      {
+         spState->expect(*it);
+      }
       spSim->addOutputFile(spState);
       
       // Create and add visualization file to IO
       IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      spViz->expect(PhysicalNames::STREAMFUNCTION);
-      spViz->expect(PhysicalNames::VELOCITYZ);
-      spViz->expect(PhysicalNames::TEMPERATURE);
+      for(it = ids.begin(); it != ids.end(); ++it)
+      {
+         spViz->expect(*it);
+      }
       spSim->addOutputFile(spViz);
    }
 
@@ -95,7 +119,7 @@ namespace GeoMHDiSCC {
       spBcs->initStorage(PhysicalNames::TEMPERATURE);
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
       spBcs->initBcStorage(PhysicalNames::TEMPERATURE, key);
-      if(bcIds.find("temperature")->second == 0)
+      if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::TEMPERATURE))->second == 0)
       {
          spBcs->addBc(PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
          spBcs->addBc(PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
@@ -112,12 +136,12 @@ namespace GeoMHDiSCC {
       spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
       spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       // No-slip boundary conditions
-      if(bcIds.find("streamfunction")->second == 0)
+      if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))->second == 0)
       {
          spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
          spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
-      } else if(bcIds.find("streamfunction")->second == 1)
+      } else if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))->second == 1)
       {
          spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
          spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
@@ -139,12 +163,12 @@ namespace GeoMHDiSCC {
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
       spBcs->initBcStorage(PhysicalNames::VELOCITYZ, key);
       // No-slip boundary conditions
-      if(bcIds.find("velocityz")->second == 0)
+      if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::VELOCITYZ))->second == 0)
       {
          spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
          spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
-      } else if(bcIds.find("velocityz")->second == 1)
+      } else if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::VELOCITYZ))->second == 1)
       {
          spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
          spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
@@ -165,13 +189,18 @@ namespace GeoMHDiSCC {
 
    void ExampleModel::setInitialState(SharedSimulation spSim)
    {
+      // Field IDs iterator
+      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
+
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected field names
-      spInit->expect(PhysicalNames::STREAMFUNCTION);
-      spInit->expect(PhysicalNames::VELOCITYZ);
-      spInit->expect(PhysicalNames::TEMPERATURE);
+      for(it = ids.begin(); it != ids.end(); ++it)
+      {
+         spInit->expect(*it);
+      }
 
       // Set simulation state
       spSim->setInitialState(spInit);
