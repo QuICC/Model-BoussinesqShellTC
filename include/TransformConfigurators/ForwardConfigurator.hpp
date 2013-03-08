@@ -138,7 +138,6 @@ namespace Transform {
          virtual ~ForwardConfigurator() {};
 
       private: 
-         template <Dimensions::Type, Dimensions::Type> TransformCoordinatorType::CommunicatorType::Fwd1DType& getFwd1D(TransformCoordinatorType& coord);
    };
 
    template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)

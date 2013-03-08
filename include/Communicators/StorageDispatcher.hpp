@@ -28,11 +28,20 @@ namespace GeoMHDiSCC {
 
 namespace Parallel {
 
+   /**
+    * @brief Template class to provide different storage dispatcher for each transform
+    */
    template <Dimensions::Transform::Id TID> class StorageDispatcher;
 
+   /**
+    * @brief Specialised storage dispatcher for the first transform
+    */
    template <> class StorageDispatcher<Dimensions::Transform::TRA1D>
    {
       public:
+         /**
+          * @brief Get the storage provider corresponding the transform
+          */
          template<Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType>&  get(TComm<DIMENSION,TTypes>& comm);
    };
    
@@ -41,9 +50,15 @@ namespace Parallel {
       return comm.mStorage1D;
    }
 
+   /**
+    * @brief Specialised storage dispatcher for the second transform
+    */
    template <> class StorageDispatcher<Dimensions::Transform::TRA2D>
    {
       public:
+         /**
+          * @brief Get the storage provider corresponding the transform
+          */
          template<Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType>&  get(TComm<DIMENSION,TTypes>& comm);
    };
 
@@ -52,9 +67,15 @@ namespace Parallel {
       return comm.mStorage2D;
    }
 
+   /**
+    * @brief Specialised storage dispatcher for the third transform
+    */
    template <> class StorageDispatcher<Dimensions::Transform::TRA3D>
    {
       public:
+         /**
+          * @brief Get the storage provider corresponding the transform
+          */
          template<Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> static StoragePairProviderMacro<typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType>&  get(TComm<DIMENSION,TTypes>& comm);
    };
 

@@ -19,15 +19,26 @@ namespace GeoMHDiSCC {
 
    namespace Parallel {
 
+      /**
+       * @brief Template class to selec the index converter for different transform
+       */
       template<Dimensions::Transform::Id TId> struct IndexConverterSelector;
 
+      /**
+       * @brief Specialialised IndexConverterSelector for the second transform
+       */
       template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
       {
+         /// Typedef for the type of the index converter
          typedef NoIndexConv  Type;
       };
 
+      /**
+       * @brief Specialialised IndexConverterSelector for the second transform
+       */
       template <> struct IndexConverterSelector<Dimensions::Transform::TRA3D>
       {
+         /// Typedef for the type of the index converter
          typedef NoIndexConv  Type;
       };
    }

@@ -106,21 +106,21 @@ namespace Timestep {
          /**
           * @brief Set RHS data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
          DecoupledZMatrix& rRHSData(const int idx);
 
          /**
           * @brief Get solution data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
          const DecoupledZMatrix& solution(const int idx) const;
 
          /**
           * @brief Set solution data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
          DecoupledZMatrix& rSolution(const int idx);
          

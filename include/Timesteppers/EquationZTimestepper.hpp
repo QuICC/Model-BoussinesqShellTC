@@ -106,23 +106,23 @@ namespace Timestep {
          /**
           * @brief Set RHS data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
-         MatrixZ& rRHSData(const int i);
+         MatrixZ& rRHSData(const int idx);
 
          /**
           * @brief Get solution data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
-         const MatrixZ& solution(const int i) const;
+         const MatrixZ& solution(const int idx) const;
 
          /**
           * @brief Set solution data
           *
-          * @para idx   Index of the data
+          * @param idx   Index of the data
           */
-         MatrixZ& rSolution(const int i);
+         MatrixZ& rSolution(const int idx);
          
       protected:
          /**
