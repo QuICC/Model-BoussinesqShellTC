@@ -59,6 +59,13 @@ namespace IoVariable {
          Dimensions::Space::Id   space() const;
 
          /**
+          * @brier Set the physical parameters of the simulation
+          *
+          * @param parameters Physical parameters
+          */
+         void setPhysical(const std::map<std::string,MHDFloat>& parameters);
+
+         /**
           * @brier Set the mesh grid arrays
           *
           * @param mesh    Grid arrays of the mesh
@@ -110,6 +117,11 @@ namespace IoVariable {
          SharedResolution mspRes;
 
          /**
+          * @brief Physical parameters of the simulation
+          */
+         std::map<std::string,MHDFloat> mPhysical;
+
+         /**
           * @brief Storage for the mesh
           */
          std::vector<Array> mMesh;
@@ -128,6 +140,11 @@ namespace IoVariable {
           * @brief Write truncation information
           */
          void writeTruncation();
+
+         /**
+          * @brief Write Physical parameters to file
+          */
+         void writePhysical();
 
          /**
           * @brief Get iterator range to scalars

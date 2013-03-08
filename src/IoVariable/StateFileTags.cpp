@@ -27,12 +27,10 @@ namespace IoVariable {
 
    const std::string StateFileTags::EXTENSION = ".hdf5";
 
-   const std::string StateFileTags::RUN = "Run";
+   const std::string StateFileTags::RUN = "run";
 
-   const std::string StateFileTags::RUNTIME = "Time";
+   const std::string StateFileTags::RUNTIME = "time";
 
-   const std::string StateFileTags::RUNSTEP = "Step";
-
-   const std::string StateFileTags::PHYSICAL = "Physical";
+   const std::string StateFileTags::RUNSTEP = "step";
 }
 }

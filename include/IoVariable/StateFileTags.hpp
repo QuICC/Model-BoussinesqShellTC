@@ -46,11 +46,6 @@ namespace IoVariable {
          static const std::string   EXTENSION;
 
          /**
-          * @brief Physical parameters part for State file
-          */
-         static const std::string   PHYSICAL;
-
-         /**
           * @brief Run parameters part for State file
           */
          static const std::string   RUN;

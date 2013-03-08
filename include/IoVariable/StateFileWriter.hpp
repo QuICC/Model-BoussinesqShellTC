@@ -52,11 +52,6 @@ namespace IoVariable {
          
       protected:
          /**
-          * @brief Write Physical parameters to file
-          */
-         void writePhysical();
-
-         /**
           * @brief Write run information to file
           *
           * @param time Reached simulation time

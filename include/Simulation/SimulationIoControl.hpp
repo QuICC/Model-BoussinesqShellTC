@@ -67,11 +67,6 @@ namespace GeoMHDiSCC {
          void initWriters();
 
          /**
-          * @brief Write output files
-          */
-         void writeFiles();
-
-         /**
           * @brief Finalise the writer files
           */
          void finalizeWriters();
@@ -124,10 +119,12 @@ namespace GeoMHDiSCC {
           * @brief Update IO status
           */
          void update();
-         
-      protected:
 
-      private:
+         /**
+          * @brief Write output files if conditions are met
+          */
+         void writeFiles();
+
          /**
           * @brief Write ASCII data
           */
@@ -137,7 +134,10 @@ namespace GeoMHDiSCC {
           * @brief Write HDF5 data
           */
          void writeHdf5();
+         
+      protected:
 
+      private:
          /**
           * @brief Vector of ASCII output files
           */
@@ -157,6 +157,21 @@ namespace GeoMHDiSCC {
           * @brief Handle to the configuration file
           */
          IoConfig::SharedConfigurationReader    mspCfgFile;
+
+         /**
+          * @brief Timestep counter
+          */
+         int mSteps;
+
+         /**
+          * @brief ASCII output rate
+          */
+         int mAsciiRate;
+
+         /**
+          * @brief HDF5 output rate
+          */
+         int mHdf5Rate;
 
          /**
           * @brief Initialise the configuration file

@@ -255,7 +255,7 @@ namespace GeoMHDiSCC {
       if(this->mTimestepper.finishedStep())
       {
          // Write initial ASCII and HDF5 output files if applicable
-         this->mSimIoCtrl.writeFiles()
+         this->mSimIoCtrl.writeFiles();
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
    }

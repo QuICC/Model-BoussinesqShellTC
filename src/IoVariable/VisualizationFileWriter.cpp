@@ -45,6 +45,9 @@ namespace IoVariable {
       this->createFileInfo();
 
       // Write the Physical parameters
+      this->writePhysical();
+
+      // Write the Physical parameters
       this->writeMesh();
 
       // Write the truncation information
@@ -58,7 +61,7 @@ namespace IoVariable {
       VisualizationFileWriter::scalar_iterator sit;
       for(sit = sRange.first; sit != sRange.second; ++sit)
       {
-         this->writePhysicalScalar(IoTools::IdToHuman::toString(sit->first), sit->second->dom(0).phys());
+         this->writePhysicalScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->dom(0).phys());
       }
 
       // Write all the vectors
@@ -66,7 +69,7 @@ namespace IoVariable {
       VisualizationFileWriter::vector_iterator vit;
       for(vit = vRange.first; vit != vRange.second; ++vit)
       {
-         this->writePhysicalVector(IoTools::IdToHuman::toString(vit->first), vit->second->dom(0).phys().data());
+         this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).phys().data());
       }
 
       // Close file

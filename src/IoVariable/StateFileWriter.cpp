@@ -58,7 +58,7 @@ namespace IoVariable {
       StateFileWriter::scalar_iterator sit;
       for(sit = sRange.first; sit != sRange.second; ++sit)
       {
-         this->writeSpectralScalar(IoTools::IdToHuman::toString(sit->first), sit->second->dom(0).perturbation());
+         this->writeSpectralScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->dom(0).perturbation());
       }
 
       // Write all the vectors
@@ -66,22 +66,11 @@ namespace IoVariable {
       StateFileWriter::vector_iterator vit;
       for(vit = vRange.first; vit != vRange.second; ++vit)
       {
-         this->writeSpectralVector(IoTools::IdToHuman::toString(vit->first), vit->second->dom(0).perturbation().data());
+         this->writeSpectralVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).perturbation().data());
       }
 
       // Close file
       this->postWrite();
-   }
-
-   void StateFileWriter::writePhysical()
-   {
-      // Create the Physical parameters group
-      hid_t group = H5Gcreate(this->file(), StateFileTags::PHYSICAL.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      /// \mhdBug This has not yet been implemented!
-      
-      // close group
-      H5Gclose(group);
    }
 
    void StateFileWriter::writeRun(const MHDFloat time, const MHDFloat step)

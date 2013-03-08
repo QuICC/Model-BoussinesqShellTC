@@ -57,9 +57,15 @@ namespace GeoMHDiSCC {
 
    void SimulationIoControl::writeFiles()
    {
-      this->writeAscii();
+      if(this->mSteps % this->mAsciiRate == 0)
+      {
+         this->writeAscii();
+      }
 
-      this->writeHdf5();
+      if(this->mSteps % this->mHdf5Rate == 0)
+      {
+         this->writeHdf5();
+      }
    }
 
    void SimulationIoControl::finalize()
@@ -99,9 +105,18 @@ namespace GeoMHDiSCC {
          (*itAscii)->init();
       }
 
+      // Create physical parameters map
+      std::map<std::string,MHDFloat> phys = this->configPhysical();
+      std::map<std::string,int>::const_iterator it;
+      for(it = this->configBoundary().begin(); it != this->configBoundary().end(); ++it)
+      {
+         phys.insert(std::make_pair("bc_"+it->first, it->second));
+      }
+
       // Iterate over all HDF5 writer
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
+         (*itHdf5)->setPhysical(phys);
          (*itHdf5)->init();
       }
    }
@@ -153,6 +168,12 @@ namespace GeoMHDiSCC {
 
       // Close the config file
       this->mspCfgFile->finalize();
+
+      // Set ASCII rate from config file
+      this->mAsciiRate = this->mspCfgFile->spIo()->fValue("ascii");
+
+      // Set HDF5 rate from config file
+      this->mHdf5Rate = this->mspCfgFile->spIo()->fValue("hdf5");
    }
 
    void SimulationIoControl::initStdOut()

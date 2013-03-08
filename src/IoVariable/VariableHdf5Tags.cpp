@@ -19,12 +19,14 @@ namespace GeoMHDiSCC {
 
 namespace IoVariable {
 
-   const std::string VariableHdf5Tags::TRUNCATION = "Truncation";
+   const std::string VariableHdf5Tags::TRUNCATION = "truncation";
 
-   const std::string VariableHdf5Tags::TRUNCPHYSICAL = "Physical";
+   const std::string VariableHdf5Tags::TRUNCPHYSICAL = "physical";
 
-   const std::string VariableHdf5Tags::TRUNCSPECTRAL = "Spectral";
+   const std::string VariableHdf5Tags::TRUNCSPECTRAL = "spectral";
 
-   const std::string VariableHdf5Tags::TRUNCDIM = "Dim";
+   const std::string VariableHdf5Tags::TRUNCDIM = "dim";
+
+   const std::string VariableHdf5Tags::PHYSICAL = "physical";
 }
 }

@@ -72,7 +72,7 @@ namespace IoTools {
          case PhysicalNames::VELOCITY:
             return "velocity";
          case PhysicalNames::MAGNETIC:
-            return ",agnetic";
+            return "magnetic";
          case PhysicalNames::VORTICITY:
             return "vorticity";
          default:

@@ -45,6 +45,11 @@ namespace IoVariable {
           */
          static const std::string   TRUNCDIM;
 
+         /**
+          * @brief Physical parameters part for State file
+          */
+         static const std::string   PHYSICAL;
+
       private:
          /**
          * @brief Empty destructor

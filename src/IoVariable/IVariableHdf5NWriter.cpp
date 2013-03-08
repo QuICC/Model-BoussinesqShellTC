@@ -38,6 +38,11 @@ namespace IoVariable {
       return this->mSpaceId;
    }
 
+   void IVariableHdf5NWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters)
+   {
+      this->mPhysical = parameters;
+   }
+
    void IVariableHdf5NWriter::setMesh(const std::vector<Array>& mesh)
    {
       this->mMesh = mesh;
@@ -275,6 +280,22 @@ namespace IoVariable {
       
       // close group
       H5Gclose(base);
+   }
+
+   void IVariableHdf5NWriter::writePhysical()
+   {
+      // Create the Physical parameters group
+      hid_t group = H5Gcreate(this->file(), VariableHdf5Tags::PHYSICAL.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      std::map<std::string,MHDFloat>::const_iterator it;
+      for(it = this->mPhysical.begin(); it != this->mPhysical.end(); ++it)
+      {
+         // Write reached simulation time to file
+         this->writeScalar(group, it->first, it->second);
+      }
+      
+      // close group
+      H5Gclose(group);
    }
 
 }
