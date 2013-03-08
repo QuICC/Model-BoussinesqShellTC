@@ -72,7 +72,13 @@ namespace Spectral {
                break;
             case BoundaryConditions::BETA_SLOPE:
                /// \warning Beta slope boundary conditions does not include the wave number factor
-               lines.second.col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->second);
+               if(it->second == IBoundary::RIGHT)
+               {
+                  lines.second.col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->second);
+               } else //if(it->second == IBoundary::LEFT)
+               {
+                  lines.second.col(idx) = bcOp.value(it->second);
+               }
                idx++;
                hasImag = true;
                break;

@@ -58,7 +58,7 @@ namespace IoVariable {
          sit->second->setZeros();
 
          // Read field values
-         this->readSpectralScalar(IoTools::IdToHuman::toString(sit->first), sit->second->rDom(0).rPerturbation());
+         this->readSpectralScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->rDom(0).rPerturbation());
       }
 
       // Read all the vectors
@@ -70,7 +70,7 @@ namespace IoVariable {
          vit->second->setZeros();
 
          // Read field values
-         this->readSpectralVector(IoTools::IdToHuman::toString(vit->first), vit->second->rDom(0).rPerturbation().rData());
+         this->readSpectralVector(IoTools::IdToHuman::toTag(vit->first), vit->second->rDom(0).rPerturbation().rData());
       }
    }
 

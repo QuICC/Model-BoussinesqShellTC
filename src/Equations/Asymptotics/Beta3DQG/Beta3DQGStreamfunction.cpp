@@ -180,7 +180,7 @@ namespace Equations {
          pos = this->mBCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set boundary condition matrices
+         // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
          Eigen::kroneckerProduct(spec3D.id(1), tau1D.first, it->second.back().first);
@@ -193,15 +193,17 @@ namespace Equations {
          pos = this->mCBCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set coupled boundary condition matrices
+         // Set coupled boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::VELOCITYZ)->second.find(bc3D)->second);
          Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), it->second.back().first);
 
          //////////////////////////////////////////////
-         // Set nonlinear multiplication matrix
+         // Initialise nonlinear multiplication matrix
          itNL = this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>())).first;
          itNL->second.push_back(SparseMatrix());
+
+         // Set nonlinear multiplication matrix (kronecker(A,B,out) => out = A(i,j)*A)
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(4,0), itNL->second.back());
 
          //////////////////////////////////////////////
@@ -209,7 +211,7 @@ namespace Equations {
          pos = this->mTMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set time matrices
+         // Set time matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 4), it->second.back().first);
 
@@ -218,7 +220,7 @@ namespace Equations {
          pos = this->mLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set linear matrices
+         // Set linear matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4), it->second.back().first);
 
@@ -227,7 +229,7 @@ namespace Equations {
          pos = this->mCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set coupling matrices
+         // Set coupling matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tmpA = (-1.0/this->eqParams().nd(NonDimensional::GAMMA))*spec3D.id(1);
          Eigen::kroneckerProduct(tmpA, spec1D.qDiff(4,0), it->second.back().first);

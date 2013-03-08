@@ -120,7 +120,7 @@ namespace Equations {
          pos = this->mBCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set boundary condition matrices
+         // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
@@ -130,9 +130,11 @@ namespace Equations {
          // NONE
 
          //////////////////////////////////////////////
-         // Set nonlinear multiplication matrix
+         // Initialise nonlinear multiplication matrix
          itNL = this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>())).first;
          itNL->second.push_back(SparseMatrix());
+
+         // Set nonlinear multiplication matrix (kronecker(A,B,out) => out = A(i,j)*A)
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), itNL->second.back());
 
          //////////////////////////////////////////////
@@ -140,7 +142,7 @@ namespace Equations {
          pos = this->mTMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set time matrices
+         // Set time matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), it->second.back().first);
 
@@ -149,7 +151,7 @@ namespace Equations {
          pos = this->mLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set linear matrices
+         // Set linear matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tmpA = (1.0/this->eqParams().nd(NonDimensional::PRANDTL))*Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2);
          Eigen::kroneckerProduct(spec3D.id(0),tmpA, it->second.back().first);

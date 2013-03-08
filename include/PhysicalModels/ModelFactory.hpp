@@ -1,5 +1,5 @@
 /** \file ModelFactory.hpp
- *  \brief Implementation of an example physical model
+ *  \brief Implementation of the physical model factory
  *
  *  \mhdBug Needs test
  */
@@ -23,7 +23,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of an example physical model
+    * @brief Implementation of the physical model factory 
     */
    template <class TModel> class ModelFactory
    {

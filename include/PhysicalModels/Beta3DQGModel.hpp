@@ -1,9 +1,9 @@
-/** \file ExampleModel.hpp
- *  \brief Implementation of an example physical model
+/** \file Beta3DQGModel.hpp
+ *  \brief Implementation of the beta 3DQG physical model
  */
 
-#ifndef EXAMPLEMODEL_HPP
-#define EXAMPLEMODEL_HPP
+#ifndef BETA3DQGMODEL_HPP
+#define BETA3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -24,12 +24,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of an example physical model
-    *
-    *  \mhdBug Needs implementation
-    *  \mhdBug Needs test
+    * @brief Implementation of the beta 3DQG physical model
     */
-   class ExampleModel
+   class Beta3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -92,14 +89,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         ExampleModel();
+         Beta3DQGModel();
 
          /**
-          * @brief Simple empty destructor
+          * @brief Destructor
           */
-         ~ExampleModel();
+         ~Beta3DQGModel();
    };
 
 }
 
-#endif // EXAMPLEMODEL_HPP
+#endif // BETA3DQGMODEL_HPP

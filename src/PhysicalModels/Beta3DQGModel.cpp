@@ -1,5 +1,5 @@
-/** \file ExampleModel.cpp
- *  \brief Source of an example physical model
+/** \file Beta3DQGModel.cpp
+ *  \brief Source of the beta 3DQG physical model
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/ExampleModel.hpp"
+#include "PhysicalModels/Beta3DQGModel.hpp"
 
 // Project includes
 //
@@ -28,7 +28,7 @@
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> ExampleModel::fieldIds()
+   std::vector<PhysicalNames::Id> Beta3DQGModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -45,14 +45,14 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> ExampleModel::boundaryNames()
+   std::vector<std::string> Beta3DQGModel::boundaryNames()
    {
       // Create storage
       std::vector<std::string>   names;
 
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
 
       for(it = ids.begin(); it != ids.end(); ++it)
       {
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
       return names;
    }
 
-   void ExampleModel::addEquations(SharedSimulation spSim)
+   void Beta3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
       spSim->addScalarEquation<Equations::Beta3DQGTransport>();
@@ -74,7 +74,7 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::Beta3DQGVertical>();
    }
 
-   void ExampleModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void Beta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -83,11 +83,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void ExampleModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void Beta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -106,7 +106,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedPtrMacro<SimulationBoundary> ExampleModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedPtrMacro<SimulationBoundary> Beta3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedPtrMacro<SimulationBoundary>  spBcs(new SimulationBoundary());
@@ -182,16 +182,16 @@ namespace GeoMHDiSCC {
       //    ... coupled boundary conditions
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
       spBcs->initCBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key); 
-      spBcs->addCBc(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->addCBc(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
 
       return spBcs;
    }
 
-   void ExampleModel::setInitialState(SharedSimulation spSim)
+   void Beta3DQGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = ExampleModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    Timestepper::Timestepper()
-      : mStep(0), mDt(1e-2), mTime(0.0)
+      : mStep(0), mDt(1e-1), mTime(0.0)
    {
    }
 
