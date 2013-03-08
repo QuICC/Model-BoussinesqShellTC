@@ -67,7 +67,7 @@ namespace Spectral {
       int pq = p - q;
 
       // Create temporary object
-      SparseMatrix tmp(this->basisN() + pq, this->basisN() + pq);
+      SparseMatrix tmp(this->basisN() + p, this->basisN() + p);
 
       // Build the inverse
       this->buildInverse(tmp);
@@ -83,15 +83,15 @@ namespace Spectral {
       SparseMatrix invMat(this->basisN(), this->basisN());
 
       // Create left preudo identity to extract rows
-      SparseMatrix idL(this->basisN(), this->basisN() + pq);
-      idL.reserve(idL.rows()-pq);
+      SparseMatrix idL(this->basisN(), this->basisN() + p);
+      idL.reserve(idL.rows()-p);
       for(int j = 0; j < idL.rows(); ++j)
       {
          // Create column j
          idL.startVec(j);
 
          // Add diagonal
-         if(j >= pq)
+         if(j >= p)
          {
             idL.insertBack(j,j) = 1.0;
          }
@@ -99,7 +99,7 @@ namespace Spectral {
       idL.finalize(); 
 
       // Create right preudo identity to extract rows
-      SparseMatrix idR(this->basisN() + pq, this->basisN());
+      SparseMatrix idR(this->basisN() + p, this->basisN());
       idR.reserve(idR.cols()-pq);
       for(int j = 0; j < idR.cols()-pq; ++j)
       {
