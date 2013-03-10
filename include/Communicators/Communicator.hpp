@@ -24,6 +24,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/CommunicatorStorage.hpp"
 #include "Communicators/EndDispatcher.hpp"
+#include "Communicators/CommunicationBuffer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +37,7 @@ namespace Parallel {
    {
       public:
          /**
-         * @brief Very basic constructor
+         * @brief Constructor
          */
          Communicator();
 
@@ -262,10 +263,15 @@ namespace Parallel {
 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> void Communicator<DIMENSION,TTypes>::initConverter(SharedResolution spRes, const ArrayI& packs1DFwd, const ArrayI& packs1DBwd, Splitting::Locations::Id split)
    {
+      //
+      // MPI code needs to come first
+      // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
+      //
       #ifdef GEOMHDISCC_MPI
+         // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST)
          {
-            // Initialise 2D serial converter
+            // Initialise MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
             spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
@@ -273,6 +279,8 @@ namespace Parallel {
             this->mspConverter2D = spConv;
 
             // Create the communication buffers
+            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
+            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
             this->createBuffers(2);
 
             // Set communicattion buffers' pointers
@@ -286,9 +294,11 @@ namespace Parallel {
 
             // Allocate second 2D buffers
             this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().bwdSizes(), max2D);
+
+         // Load splitting has been done on second dimension
          } else if(split == Splitting::Locations::SECOND)
          {
-            // Initialise 2D serial converter
+            // Initialise serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
             // initialise the converter
@@ -298,9 +308,11 @@ namespace Parallel {
 
             // Create the communication buffers
             this->createBuffers(2);
+
+         // Load splitting has been done on two dimensions
          } else if(split == Splitting::Locations::BOTH)
          {
-            // Initialise 2D serial converter
+            // Initialise MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
             spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
@@ -308,13 +320,18 @@ namespace Parallel {
             this->mspConverter2D = spConv;
 
             // Create the communication buffers
+            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer);
+            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer);
             this->createBuffers(3);
 
             // Set communicattion buffers' pointers
             this->template converter<Dimensions::Transform::TRA2D>()->setBuffers(this->mBuffers.at(0), this->mBuffers.at(1));
          }
+      //
+      // Serial implementation
+      //
       #else 
-         // Initialise 2D serial converter
+         // Initialise serial converter
          SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
          // initialise the converter
@@ -323,7 +340,7 @@ namespace Parallel {
          this->mspConverter2D = spConv;
       #endif // GEOMHDISCC_MPI
 
-      // If only one dimension is split
+      // If only one dimension is split. Else the setup will be done at a later stage to optimise memory/buffer usage.
       if(split != Splitting::Locations::BOTH)
       {
          // Setup converter
@@ -341,7 +358,12 @@ namespace Parallel {
       // Initialise 1D/2D converter
       this->initConverter(spRes, packs1DFwd, packs1DBwd, split);
      
+      //
+      // MPI code needs to come first
+      // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
+      //
       #ifdef GEOMHDISCC_MPI
+         // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST)
          {
             // Initialise serial converter
@@ -352,9 +374,10 @@ namespace Parallel {
 
             this->mspConverter3D = spConv;
 
+         // Load splitting has been done on second dimension
          } else if(split == Splitting::Locations::SECOND)
          {
-            // Initialise serial 3D converter
+            // Initialise MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
             spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs2DFwd, packs2DBwd);
@@ -373,9 +396,10 @@ namespace Parallel {
             // Allocate second 3D buffers
             this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA3D>().bwdSizes(), max3D);
 
+         // Load splitting has been done on two dimensions
          } else if(split == Splitting::Locations::BOTH)
          {
-            // Initialise serial 3D converter
+            // Initialise MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
             spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs1DFwd, packs1DBwd);
@@ -400,6 +424,9 @@ namespace Parallel {
             // Allocate 3D buffers
             this->allocateBuffers(2, this->template converter<Dimensions::Transform::TRA3D>().fwdSizes(), max3D);
          }
+      //
+      // Serial implementation
+      //
       #else 
          // Initialise serial 3D converter
          SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
@@ -413,7 +440,7 @@ namespace Parallel {
       // Setup converter
       this->template converter<Dimensions::Transform::TRA3D>().setup();
 
-      // If both dimensions are split
+      // If both dimensions are split. In the other cases setup() has already been called.
       if(split == Splitting::Locations::BOTH)
       {
          this->template converter<Dimensions::Transform::TRA2D>().setup();

@@ -202,8 +202,99 @@ namespace Parallel {
           */
          std::map<int, std::vector<MPI_Request> >  mSendBRequests;
 
+
+
+         /**
+          * @brief Size of the forward packet
+          *
+          * @param id ID of the node
+          */
+         int sizeFPacket(const int id) const;
+
+         /**
+          * @brief Size of the backward packet
+          *
+          * @param id ID of the node
+          */
+         int sizeBPacket(const int id) const;
+
+         /**
+          * @brief Get size of the forward CPU group
+          */
+         int nFCpu() const;
+
+         /**
+          * @brief Get size of the backward CPU group
+          */
+         int nBCpu() const;
+
+         /**
+          * @brief Get global MPI rank of CPU from forward CPU group
+          *
+          * @param id CPU group id
+          */
+         int fCpu(const int id) const;
+
+         /**
+          * @brief Get global MPI rank of CPU from backward CPU group
+          *
+          * @param id CPU group id
+          */
+         int bCpu(const int id) const;
+
+         /**
+          * @brief Sending communication status
+          */
+         bool  mIsSending;
+
+         /**
+          * @brief Receiving communication status
+          */
+         bool  mIsReceiving;
+
+         /**
+          * @brief List of CPU ranks involved in the forward conversion
+          */
+         std::vector<int>  mFCpuGroup;
+
+         /**
+          * @brief List of CPU ranks involved in the backward conversion
+          */
+         std::vector<int>  mBCpuGroup;
+
+
       private:
    };
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::nFCpu() const
+   {
+      return this->mFCpuGroup.size();
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::nBCpu() const
+   {
+      return this->mBCpuGroup.size();
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::fCpu(const int id) const
+   {
+      return this->mFCpuGroup.at(id);
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::bCpu(const int id) const
+   {
+      return this->mBCpuGroup.at(id);
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sizeFPacket(const int id) const
+   {
+      return this->mPacks*this->mFSizes.at(id);
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sizeBPacket(const int id) const
+   {
+      return this->mPacks*this->mBSizes.at(id);
+   }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pRecvBRequests(const int size)
    {
