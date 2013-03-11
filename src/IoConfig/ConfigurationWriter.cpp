@@ -52,6 +52,9 @@ namespace IoConfig {
          rapidxml::xml_node<> *pMaster = this->mXML.allocate_node(rapidxml::node_element, this->frameworkTag().c_str());
          this->mXML.append_node(pMaster);
 
+         std::pair<std::map<std::string,int>::const_iterator,std::map<std::string,int>::const_iterator> iRange;
+         std::pair<std::map<std::string,MHDFloat>::const_iterator,std::map<std::string,MHDFloat>::const_iterator> fRange;
+
          // Check if master node exists
          if(pMaster)
          {
@@ -72,8 +75,9 @@ namespace IoConfig {
                {
                   // Create integer component iterator
                   std::map<std::string, int>::const_iterator itIC;
+                  iRange = itM->second->iRange();
                   // Iterate over all component entries
-                  for(itIC = itM->second->iMap().begin(); itIC != itM->second->iMap().end(); itIC++)
+                  for(itIC = iRange.first; itIC != iRange.second; itIC++)
                   {
                      // Create entry value
                      this->writeValue(itIC->second, pComponent, itIC->first);
@@ -81,8 +85,9 @@ namespace IoConfig {
 
                   // Create float component iterator
                   std::map<std::string, MHDFloat>::const_iterator itIF;
+                  fRange = itM->second->fRange();
                   // Iterate over all component entries
-                  for(itIF = itM->second->fMap().begin(); itIF != itM->second->fMap().end(); itIF++)
+                  for(itIF = fRange.first; itIF != fRange.second; itIF++)
                   {
                      // Create entry value
                      this->writeValue(itIF->second, pComponent, itIF->first);
@@ -129,8 +134,9 @@ namespace IoConfig {
                   {
                      // Create integer component iterator
                      std::map<std::string, int>::const_iterator itIC;
+                     iRange = itM->second->iRange();
                      // Iterate over all component entries
-                     for(itIC = itM->second->iMap().begin(); itIC != itM->second->iMap().end(); itIC++)
+                     for(itIC = iRange.first; itIC != iRange.second; itIC++)
                      {
                         // Create entry value
                         this->writeValue(itIC->second, pComponent, itIC->first);
@@ -138,8 +144,9 @@ namespace IoConfig {
 
                      // Create float component iterator
                      std::map<std::string, MHDFloat>::const_iterator itIF;
+                     fRange = itM->second->fRange();
                      // Iterate over all component entries
-                     for(itIF = itM->second->fMap().begin(); itIF != itM->second->fMap().end(); itIF++)
+                     for(itIF = fRange.first; itIF != fRange.second; itIF++)
                      {
                         // Create entry value
                         this->writeValue(itIF->second, pComponent, itIF->first);

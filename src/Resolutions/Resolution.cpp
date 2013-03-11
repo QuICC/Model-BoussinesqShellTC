@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
    {
       // Safety assert
       assert(FrameworkMacro::id() >= 0);
-      assert(this->mCores.size() > static_cast<unsigned int>(FrameworkMacro::id()));
+      assert(this->mCores.size() > static_cast<size_t>(FrameworkMacro::id()));
 
       return this->mCores.at(FrameworkMacro::id());
    }
@@ -78,7 +78,7 @@ namespace GeoMHDiSCC {
    {
       // Check sizes
       assert(id >= 0);
-      assert(static_cast<unsigned int>(id) < this->mCores.size());
+      assert(static_cast<size_t>(id) < this->mCores.size());
       
       return this->mCores.at(id);
    }

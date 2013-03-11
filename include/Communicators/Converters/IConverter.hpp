@@ -90,76 +90,13 @@ namespace Parallel {
          */
          virtual void profileStorage() const = 0;
       #endif // GEOMHDISCC_STORAGEPROFILE
-
-         /**
-          * @brief Set the communication buffers pointers
-          *
-          * @brief fBuffers Forward communication buffers
-          * @brief bBuffers Backward communication buffers
-          */
-         void setBuffers(std::vector<char *> &fBuffers, std::vector<char *> &bBuffers);
-
-         /**
-          * @brief Get forward buffer sizes
-          */
-         const std::vector<int> & fwdSizes() const;
-
-         /**
-          * @brief Get backward buffer sizes
-          */
-         const std::vector<int> & bwdSizes() const;
          
       protected:
-         /**
-          * @brief List of the forward buffer sizes
-          */
-         std::vector<int>  mFSizes;
-
-         /**
-          * @brief List of the backward buffer sizes
-          */
-         std::vector<int>  mBSizes;
-
-         /**
-          * @brief Forward communication buffer pointer
-          */
-         std::vector<char *> *mpFBuffers;
-
-         /**
-          * @brief Backward communication buffer pointer
-          */
-         std::vector<char *> *mpBBuffers;
-
-         /**
-          * @brief Communication packs counter
-          */
-         int mPacks;
-
-         /**
-          * @brief Possible forward transform packs
-          */
-         ArrayI   mForwardPacks;
-
-         /**
-          * @brief Possible backward transform packs
-          */
-         ArrayI   mBackwardPacks;
 
       private:
    };
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::fwdSizes() const
-   {
-      return this->mFSizes;
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::bwdSizes() const
-   {
-      return this->mBSizes;
-   }
-
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::IConverter()
-      : mIsSending(false), mIsReceiving(false), mPacks(0)
    {
       // Check that all dimensions match
       Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
@@ -172,15 +109,6 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~IConverter()
    {
-   }
-
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::setBuffers(std::vector<char *> &fBuffers,std::vector<char *> &bBuffers)
-   {
-      // Set TForward buffers pointer
-      this->mpFBuffers = &fBuffers;
-
-      // Set TBackward buffers pointer
-      this->mpBBuffers = &bBuffers;
    }
 
 }

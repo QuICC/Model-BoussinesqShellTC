@@ -69,6 +69,11 @@ namespace IoConfig {
          const std::map<std::string, int>& iMap() const;
 
          /**
+          * @brief Get integer name to value map iterator range
+          */
+         std::pair<std::map<std::string, int>::const_iterator, std::map<std::string, int>::const_iterator> iRange() const;
+
+         /**
           * @brief Get float value by name
           *
           * @param name Name of the value
@@ -87,6 +92,11 @@ namespace IoConfig {
           * @brief Get float name to value map
           */
          const std::map<std::string, MHDFloat>& fMap() const;
+
+         /**
+          * @brief Get float name to value map iterator range
+          */
+         std::pair<std::map<std::string, MHDFloat>::const_iterator, std::map<std::string, MHDFloat>::const_iterator> fRange() const;
 
          /**
           * @brief Check compatibility of data

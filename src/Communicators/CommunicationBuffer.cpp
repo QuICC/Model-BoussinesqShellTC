@@ -1,5 +1,5 @@
 /** \file CommunicationBuffer.cpp
- *  \brief Source of the implementation of the buffer for the MPI converter
+ *  \brief Source of the implementation of the "raw" communication buffer
  */
 
 // Configuration includes
@@ -33,18 +33,18 @@ namespace Parallel {
       this->cleanupBuffers();
    }
 
-   void CommunicationBuffer::allocateBuffers(const int idx, const std::vector<int>& sizes, const int maxPacks)
+   void CommunicationBuffer::allocate(const std::vector<int>& sizes, const int maxPacks)
    {
       // Create CPU group buffers
-      for(unsigned int id = 0; id < sizes.size(); ++id)
+      for(size_t id = 0; id < sizes.size(); ++id)
       {
-         this->mBuffers.at(idx).push_back(new char[maxPacks*sizes.at(id)]);
+         this->mData.push_back(new char[maxPacks*sizes.at(id)]);
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
-         for(unsigned int id = 0; id < sizes.size(); ++id)
+         for(size_t id = 0; id < sizes.size(); ++id)
          {
             mem += maxPacks*sizes.at(id);
          }
@@ -57,33 +57,33 @@ namespace Parallel {
       #endif // GEOMHDISCC_STORAGEPROFILE
    }
 
-   void CommunicationBuffer::allocateBuffers(const int idx, const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks)
+   void CommunicationBuffer::allocateMax(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks)
    {
       // Create CPU group buffers
-      for(unsigned int id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
+      for(size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
       {
-         this->mBuffers.at(idx).push_back(new char[std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id))]);
+         this->mData.push_back(new char[std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id))]);
       }
 
       // Deal with different number of CPUs in groups
       if(aSizes.size() > bSizes.size())
       {
-         for(unsigned int id = bSizes.size(); id < aSizes.size(); ++id)
+         for(size_t id = bSizes.size(); id < aSizes.size(); ++id)
          {
-            this->mBuffers.at(idx).push_back(new char[maxAPacks*aSizes.at(id)]);
+            this->mData.push_back(new char[maxAPacks*aSizes.at(id)]);
          }
       } else if(bSizes.size() > aSizes.size())
       {
-         for(unsigned int id = aSizes.size(); id < bSizes.size(); ++id)
+         for(size_t id = aSizes.size(); id < bSizes.size(); ++id)
          {
-            this->mBuffers.at(idx).push_back(new char[maxBPacks*bSizes.at(id)]);
+            this->mData.push_back(new char[maxBPacks*bSizes.at(id)]);
          }
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          MHDFloat mem = 0.0;
 
-         for(unsigned int id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
+         for(size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
          {
             mem += std::max(maxAPacks*aSizes.at(id), maxBPacks*bSizes.at(id));
          }
@@ -91,13 +91,13 @@ namespace Parallel {
          // Deal with different number of CPUs in groups
          if(aSizes.size() > bSizes.size())
          {
-            for(unsigned int id = bSizes.size(); id < aSizes.size(); ++id)
+            for(size_t id = bSizes.size(); id < aSizes.size(); ++id)
             {
                mem += maxAPacks*aSizes.at(id);
             }
          } else if(bSizes.size() > aSizes.size())
          {
-            for(unsigned int id = aSizes.size(); id < bSizes.size(); ++id)
+            for(size_t id = aSizes.size(); id < bSizes.size(); ++id)
             {
                mem += maxBPacks*bSizes.at(id);
             }
@@ -113,14 +113,10 @@ namespace Parallel {
 
    void CommunicationBuffer::cleanupBuffers()
    {
-      // loop over all buffers
-      for(unsigned int n = 0; n < this->mBuffers.size(); ++n)
+      // Free the buffers memory
+      for(size_t id = 0; id < this->mData.size(); ++id)
       {
-         // Free the buffers memory
-         for(unsigned int id = 0; id < this->mBuffers.at(n).size(); ++id)
-         {
-            delete[] this->mBuffers.at(n).at(id);
-         }
+         delete[] this->mData.at(id);
       }
    }
 

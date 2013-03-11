@@ -24,7 +24,6 @@
 // Project includes
 //
 #include "StorageProviders/StoragePairProviderMacro.h"
-#include "Communicators/CommunicatorBase.hpp"
 #include "Communicators/StorageDispatcher.hpp"
 #include "Communicators/ConverterDispatcher.hpp"
 #include "TypeSelectors/IndexConverterSelector.hpp"
@@ -46,7 +45,7 @@ namespace Parallel {
    /**
     * @brief Specialisation of the implementation of the storage providers for the communicators
     */ 
-   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::ONED, TTypes>: public CommunicatorBase
+   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::ONED, TTypes>
    {
       public:
          /// Typedef for the forward data type in 1D
@@ -111,7 +110,7 @@ namespace Parallel {
    /**
     * @brief Specialisation of the implementation of the storage providers for 2D the communicators
     */ 
-   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::TWOD, TTypes>: public CommunicatorBase
+   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::TWOD, TTypes>
    {
       public:
          /// Typedef for the forward data type in 1D
@@ -201,7 +200,7 @@ namespace Parallel {
    /**
     * @brief Specialisation of the implementation of the storage providers for the 3D communicators
     */ 
-   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::THREED, TTypes>: public CommunicatorBase
+   template <template <Dimensions::Transform::Id> class TTypes> class CommunicatorStorage<Dimensions::THREED, TTypes>
    {
       public:
          /// Typedef for the forward data type in 1D

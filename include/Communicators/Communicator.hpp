@@ -271,72 +271,63 @@ namespace Parallel {
          // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST)
          {
-            // Initialise MPI converter
+            // Create shared MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
-            spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
-
-            this->mspConverter2D = spConv;
+            // Initialise the MPI converter
+            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp = this->storage1D.provideFwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp = this->storage2D.provideBwd();
+            spConv->init(spRes, Dimensions::Transform::TRA1D, rFTmp, rBTmp, packs1DFwd, packs1DBwd);
+            this->storage1D().freeFwd(rFtmp);
+            this->storage2D().freeBwd(rBtmp);
 
             // Create the communication buffers
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
             SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
-            this->createBuffers(2);
-
-            // Set communicattion buffers' pointers
-            this->template converter<Dimensions::Transform::TRA2D>().setBuffers(this->mBuffers.at(0), this->mBuffers.at(1));
 
             // Get maximum number of packs
             int max2D = std::max(packs1DFwd(packs1DFwd.size()-1), packs1DBwd(packs1DBwd.size()-1));
 
             // Allocate first 2D buffers
-            this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA2D>().fwdSizes(), max2D);
+            spBufferOne->allocate(spConv->fwdSizes(), max2D);
 
             // Allocate second 2D buffers
-            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().bwdSizes(), max2D);
+            spBufferTwo->allocate(spConv->bwdSizes(), max2D);
+
+            // Set communication buffers
+            spConv->setBuffers(spBufferOne, spBufferTwo);
+
+            // Set the 1D/2D converter
+            this->mspConverter2D = spConv;
 
          // Load splitting has been done on second dimension
          } else if(split == Splitting::Locations::SECOND)
          {
-            // Initialise serial converter
+            // Create shared serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
-            // initialise the converter
+            // Initialise serial converter
             spConv->init(spRes, Dimensions::Transform::TRA1D);
 
+            // Set the 1D/2D converter
             this->mspConverter2D = spConv;
-
-            // Create the communication buffers
-            this->createBuffers(2);
 
          // Load splitting has been done on two dimensions
-         } else if(split == Splitting::Locations::BOTH)
-         {
-            // Initialise MPI converter
-            SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
-
-            spConv->init(spRes, Dimensions::Transform::TRA1D, this->storage1D().rFTmps(), this->storage2D().rBTmps(), packs1DFwd, packs1DBwd);
-
-            this->mspConverter2D = spConv;
-
-            // Create the communication buffers
-            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer);
-            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer);
-            this->createBuffers(3);
-
-            // Set communicattion buffers' pointers
-            this->template converter<Dimensions::Transform::TRA2D>()->setBuffers(this->mBuffers.at(0), this->mBuffers.at(1));
-         }
+         } // else if(split == Splitting::Locations::BOTH)
+         // {
+         //    Initialisation of this part is done at a higher level to optimise storage/buffer use
+         // }
       //
       // Serial implementation
       //
       #else 
-         // Initialise serial converter
+         // Create shared serial converter
          SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
 
-         // initialise the converter
+         // Initialise shared converter
          spConv->init(spRes, Dimensions::Transform::TRA1D);
 
+         // Set 1D/2D converter
          this->mspConverter2D = spConv;
       #endif // GEOMHDISCC_MPI
 
@@ -366,48 +357,74 @@ namespace Parallel {
          // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST)
          {
-            // Initialise serial converter
+            // Create shared serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
 
-            // Initialise the converter
+            // Initialise serial converter
             spConv->init(spRes, Dimensions::Transform::TRA2D);
 
+            // Set 2D/3D converter
             this->mspConverter3D = spConv;
 
          // Load splitting has been done on second dimension
          } else if(split == Splitting::Locations::SECOND)
          {
-            // Initialise MPI converter
+            // Create shared MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
-            spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs2DFwd, packs2DBwd);
+            // Initialise MPI converter
+            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp = this->storage2D.provideFwd();
+            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp = this->storage3D.provideBwd();
+            spConv->init(spRes, Dimensions::Transform::TRA2D, rFTmp, rBTmp, packs2DFwd, packs2DBwd);
+            this->storage2D().freeFwd(rFtmp);
+            this->storage3D().freeBwd(rBtmp);
 
-            this->mspConverter3D = spConv;
-
-            // Set communicattion buffers' pointers
-            this->template converter<Dimensions::Transform::TRA3D>().setBuffers(this->mBuffers.at(0), this->mBuffers.at(1));
+            // Create the communication buffers
+            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
+            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
 
             // Get maximum number of packs
             int max3D = std::max(packs2DFwd(packs2DFwd.size()-1), packs2DBwd(packs2DBwd.size()-1));
 
             // Allocate first 3D buffers
-            this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA3D>().fwdSizes(), max3D);
+            spBufferOne->allocate(spConv->fwdSizes(), max3D);
 
-            // Allocate second 3D buffers
-            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA3D>().bwdSizes(), max3D);
+            // Allocate second 2D buffers
+            spBufferTwo->allocates(spConv->bwdSizes(), max3D);
+
+            // Set communication buffers
+            spConv->setBuffers(spBufferOne, spBufferTwo);
+
+            // Set 2D/3D converter
+            this->mspConverter3D = spConv;
 
          // Load splitting has been done on two dimensions
          } else if(split == Splitting::Locations::BOTH)
          {
-            // Initialise MPI converter
-            SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
+            // Create shared 1D/2D MPI converter
+            SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv12(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
-            spConv->init(spRes, Dimensions::Transform::TRA2D, this->storage2D().rFTmps(), this->storage3D().rBTmps(), packs1DFwd, packs1DBwd);
+            // Initialise the 1D/2D MPI converter
+            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp1D = this->storage1D.provideFwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp2D = this->storage2D.provideBwd();
+            spConv12->init(spRes, Dimensions::Transform::TRA1D, rFTmp1D, rBTmp2D, packs1DFwd, packs1DBwd);
+            this->storage1D().freeFwd(rFtmp1D);
+            this->storage2D().freeBwd(rBtmp2D);
 
-            this->mspConverter3D = spConv;
+            //Crate shared 2D/3D MPI converter
+            SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv23(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
-            // Set communicattion buffers' pointers
-            this->template converter<Dimensions::Transform::TRA3D>().setBuffers(this->mBuffers.at(2), this->mBuffers.at(0));
+            // Initialise 2D/3D MPI converter
+            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp2D = this->storage2D.provideFwd();
+            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp3D = this->storage3D.provideBwd();
+            spConv23->init(spRes, Dimensions::Transform::TRA2D, rFTmp2D, rBTmp3D, packs2DFwd, packs2DBwd);
+            this->storage2D().freeFwd(rFtmp2D);
+            this->storage3D().freeBwd(rBtmp3D);
+
+            // Create the communication buffers
+            SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
+            SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
+            SharedCommunicationBuffer  spBufferThree(new CommunicationBuffer());
 
             // Get maximum number of packs
             int max2D = std::max(packs1DFwd(packs1DFwd.size()-1), packs1DBwd(packs1DBwd.size()-1));
@@ -415,14 +432,26 @@ namespace Parallel {
             // Get maximum number of packs
             int max3D = std::max(packs2DFwd(packs2DFwd.size()-1), packs2DBwd(packs2DBwd.size()-1));
 
-            // Allocate shared buffers
-            this->allocateBuffers(0, this->template converter<Dimensions::Transform::TRA2D>().fwdSizes(), max2D, this->template converter<Dimensions::Transform::TRA3D>().bwdSizes(), max3D);
+            // Allocate shared buffer
+            spBufferOne->allocateMax(spConv12->fwdSizes(), max2D, spConv23->bwdSizes(), max3D);
 
             // Allocate 2D buffers
-            this->allocateBuffers(1, this->template converter<Dimensions::Transform::TRA2D>().bwdSizes(), max2D);
+            spBufferTwo->allocate(spConv12->bwdSizes(), max2D);
 
             // Allocate 3D buffers
-            this->allocateBuffers(2, this->template converter<Dimensions::Transform::TRA3D>().fwdSizes(), max3D);
+            spBufferThree->allocate(spConv23->fwdSizes(), max3D);
+
+            // Set communication buffers for 1D/2D converter
+            spConv12->setBuffers(spBufferOne, spBufferTwo);
+
+            // Set communication buffers for 2D/3D converter
+            spConv23->setBuffers(spBufferThree, spBufferOne);
+
+            // Set 1D/2D converter
+            this->mspConverter2D = spConv12;
+
+            // Set 2D/3D converter
+            this->mspConverter3D = spConv23;
          }
       //
       // Serial implementation

@@ -1,5 +1,5 @@
 /** \file CommunicationBuffer.hpp
- *  \brief Implementation of a buffer for the MPI converter
+ *  \brief Implementation of a "raw" communication buffer
  */
 
 #ifndef COMMUNICATIONBUFFER_HPP
@@ -25,7 +25,7 @@ namespace Parallel {
 
    /**
     * 
-    * @brief Implementation of a bffer for the MPI converter
+    * @brief Implementation of a "raw" communication buffer
     */ 
    class CommunicationBuffer
    {
@@ -38,7 +38,7 @@ namespace Parallel {
          /**
          * @brief Destructor
          */
-         virtual ~CommunicationBuffer();
+         ~CommunicationBuffer();
 
          /**
           * @brief Allocate buffers
@@ -49,14 +49,14 @@ namespace Parallel {
          void allocate(const std::vector<int>& sizes, const int maxPacks);
 
          /**
-          * @brief Allocate buffers
+          * @brief Allocate buffers to fit both requested sizes
           *
           * @param aSizes      Sizes per node
           * @param maxAPacks   Maximum number of packs
           * @param bSizes      Sizes per node
           * @param maxBPacks   Maximum number of packs
           */
-         void allocate(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks);
+         void allocateMax(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks);
          
       protected:
 

@@ -50,6 +50,19 @@ namespace Parallel {
          virtual ~SerialConverter();
 
          /**
+          * @brief Initialise the converter
+          *
+          * @param spRes   Shared Resolution
+          * @param id      Dimension index for forward transform
+          */
+         void init(SharedResolution spRes, const Dimensions::Transform::Id id);
+
+         /**
+          * @brief Setup the converter
+          */
+         virtual void setup();
+
+         /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
           */
          virtual TFwdA& getFwd(StoragePairProviderMacro<TFwdA, TBwdA>& storage);
@@ -60,34 +73,21 @@ namespace Parallel {
          virtual TBwdB& getBwd(StoragePairProviderMacro<TFwdB, TBwdB>& storage);
 
          /**
-          * @brief Setup the converter
-          */
-         virtual void setup();
-
-         /**
           * @brief Setup upcoming communication
           *
           * @param packs Number of packets in communication packing
           */
-         void setupCommunication(const int packs);
+         virtual void setupCommunication(const int packs);
 
          /**
           * @brief Start communication for forward transform
           */
-         void initiateForwardCommunication();
+         virtual void initiateForwardCommunication();
 
          /**
           * @brief Start communication for backward transform
           */
-         void initiateBackwardCommunication();
-
-         /**
-          * @brief Initialise the converter
-          *
-          * @param spRes   Shared Resolution
-          * @param id      Dimension index for forward transform
-          */
-         void init(SharedResolution spRes, const Dimensions::Transform::Id id);
+         virtual void initiateBackwardCommunication();
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

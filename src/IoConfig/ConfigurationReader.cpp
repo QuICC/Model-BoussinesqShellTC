@@ -47,6 +47,9 @@ namespace IoConfig {
          // Get master pointer to framework XML code
          rapidxml::xml_node<> *pMaster = this->mXML.first_node(this->frameworkTag().c_str());
 
+         std::pair<std::map<std::string,int>::const_iterator,std::map<std::string,int>::const_iterator> iRange;
+         std::pair<std::map<std::string,MHDFloat>::const_iterator,std::map<std::string,MHDFloat>::const_iterator> fRange;
+
          // Check if master node exists
          if(pMaster)
          {
@@ -66,8 +69,9 @@ namespace IoConfig {
                {
                   // Create integer component iterator
                   std::map<std::string, int>::const_iterator itIC;
+                  iRange = itM->second->iRange();
                   // Iterate over all component entries
-                  for(itIC = itM->second->iMap().begin(); itIC != itM->second->iMap().end(); itIC++)
+                  for(itIC = iRange.first; itIC != iRange.second; itIC++)
                   {
                      // Read entry value from file
                      int val;
@@ -79,8 +83,9 @@ namespace IoConfig {
 
                   // Create float component iterator
                   std::map<std::string, MHDFloat>::const_iterator itIF;
+                  fRange = itM->second->fRange();
                   // Iterate over all component entries
-                  for(itIF = itM->second->fMap().begin(); itIF != itM->second->fMap().end(); itIF++)
+                  for(itIF = fRange.first; itIF != fRange.second; itIF++)
                   {
                      // Read entry value from file
                      MHDFloat val;
@@ -129,8 +134,9 @@ namespace IoConfig {
                   {
                      // Create integer component iterator
                      std::map<std::string, int>::const_iterator itIC;
+                     iRange = itM->second->iRange();
                      // Iterate over all component entries
-                     for(itIC = itM->second->iMap().begin(); itIC != itM->second->iMap().end(); itIC++)
+                     for(itIC = iRange.first; itIC != iRange.second; itIC++)
                      {
                         // Read entry value from file
                         int value;
@@ -142,8 +148,9 @@ namespace IoConfig {
 
                      // Create float component iterator
                      std::map<std::string, MHDFloat>::const_iterator itIF;
+                     fRange = itM->second->fRange();
                      // Iterate over all component entries
-                     for(itIF = itM->second->fMap().begin(); itIF != itM->second->fMap().end(); itIF++)
+                     for(itIF = fRange.first; itIF != fRange.second; itIF++)
                      {
                         // Read entry value from file
                         MHDFloat value;

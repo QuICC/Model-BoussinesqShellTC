@@ -21,6 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Communicators/Converters/MpiConverterBase.hpp"
+#include "Communicators/Converters/MpiConverterTools.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
@@ -43,6 +44,23 @@ namespace Parallel {
           * @brief Destructor
           */
          virtual ~MpiConverter();
+
+         /**
+          * @brief Initialise the packs
+          *
+          * @param spRes      Shared Resolution
+          * @param fwdDim     Dimension index for forward transform
+          * @param fwdTmp     TFwdA temporary
+          * @param bwdTmp     TBwdB temporary
+          * @param fwdPacks   Array of possible pack sizes for forward transform
+          * @param bwdPacks   Array of possible pack sizes for backward transform
+          */
+         void init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA& fwdTmp, TBwdB& bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks);
+
+         /**
+          * @brief Finish the setup of the converter
+          */
+         virtual void setup();
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -75,38 +93,21 @@ namespace Parallel {
          virtual TBwdB& getBwd(StoragePairProviderMacro<TFwdB, TBwdB> &storage);
 
          /**
-          * @brief Finish the setup of the converter
-          */
-         virtual void setup();
-
-         /**
           * @brief Setup upcoming communication
           *
           * @param packs Number of packets in communication packing
           */
-         void setupCommunication(const int packs);
+         virtual void setupCommunication(const int packs);
 
          /**
           * @brief Start communication for forward transform
           */
-         void initiateForwardCommunication();
+         virtual void initiateForwardCommunication();
 
          /**
           * @brief Start communication for backward transform
           */
-         void initiateBackwardCommunication();
-
-         /**
-          * @brief Initialise the packs
-          *
-          * @param spRes      Shared Resolution
-          * @param fwdDim     Dimension index for forward transform
-          * @param fwdTmps    Vector of all the TFwdA temporaries
-          * @param bwdTmps    Vector of all the TBwdB temporaries
-          * @param fwdPacks   Array of possible pack sizes for forward transform
-          * @param bwdPacks   Array of possible pack sizes for backward transform
-          */
-         void init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA>& fwdTmps, std::vector<TBwdB>& bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks);
+         virtual void initiateBackwardCommunication();
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -123,18 +124,15 @@ namespace Parallel {
           *
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
-          * @param fTmps   Vector of all the TFwdA temporaries
-          * @param bTmps   Vector of all the TBwdB temporaries
+          * @param fTmp    TFwdA temporary
+          * @param bTmp    TBwdB temporary
           */
-         void initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA>& fTmps, std::vector<TBwdB>& bTmps);
+         void initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA& fTmp, TBwdB& bTmp);
 
          /**
           * @brief Initialise the sizes and CPU lists
-          *
-          * @param rFTmp   Example forward data
-          * @param rBTmp   Example backward data
           */
-         void initLists(TFwdA &rFTmp, TBwdB &rBTmp);
+         void initLists();
 
          /**
           * @brief Send forward data 
@@ -172,12 +170,12 @@ namespace Parallel {
          /**
           * @brief Storage for the forward datatypes
           */
-         std::vector<std::map<const TFwdA *, MPI_Datatype> >  mFTypes;
+         std::vector<MPI_Datatype>  mFTypes;
 
          /**
           * @brief Storage for the backward datatypes
           */
-         std::vector<std::map<const TBwdB *, MPI_Datatype> > mBTypes;
+         std::vector<MPI_Datatype> mBTypes;
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverter()
@@ -298,7 +296,7 @@ namespace Parallel {
       this->mIsSending = true;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA> &fwdTmps, std::vector<TBwdB> &bwdTmps, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
       // Store the possible pack sizes
       this->mForwardPacks = fwdPacks;
@@ -309,38 +307,24 @@ namespace Parallel {
       this->mActiveBSendPacks = this->mForwardPacks(0);
 
       // initialise the data types
-      this->initTypes(spRes, fwdDim, fwdTmps, bwdTmps);
+      this->initTypes(spRes, fwdDim, fwdTmp, bwdTmp);
 
       // initialise the size and CPU lists
-      this->initLists(fwdTmps.at(0), bwdTmps.at(0));
+      this->initLists();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, std::vector<TFwdA> &fTmps, std::vector<TBwdB> &bTmps)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
    {
       // Loop over all the cpus
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)
       {
          // Create TBwdB datatypes
-         std::map<const TBwdB*, MPI_Datatype> tBMap;
-         // Loop over the temporaries
-         for(unsigned int j = 0; j < bTmps.size(); ++j)
-         {
-            MPI_Datatype   type;
-            this->buildBwdDatatype(spRes, fwdDim, bTmps.at(j), type, id);
-            tBMap.insert(std::make_pair(&bTmps.at(j), type));
-         }
-         this->mBTypes.push_back(tBMap);
+         MPI_Datatype type = MpiConverterTools::buildBwdDatatype(spres, fwdDim, bTmp, id);
+         this->BTypes.push_back(type);
 
          // Create TFwdA datatypes
-         std::map<const TFwdA*, MPI_Datatype> tFMap;
-         // Loop over the temporaries
-         for(unsigned int j = 0; j < fTmps.size(); ++j)
-         {
-            MPI_Datatype   type;
-            this->buildFwdDatatype(spRes, fwdDim, fTmps.at(j), type, id);
-            tFMap.insert(std::make_pair(&fTmps.at(j), type));
-         }
-         this->mFTypes.push_back(tFMap);
+         type = MpiConverterTools::buildFwdDatatype(spres, fwdDim, fTmp, id);
+         this->FTypes.push_back(type);
       }
    }
 
@@ -377,7 +361,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         MPI_Pack(MPI_BOTTOM, 1, this->mFTypes.at(id)[&data], this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(data.data().data(), 1, this->mFTypes.at(id), this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
    }
 
@@ -412,7 +396,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         MPI_Pack(MPI_BOTTOM, 1, this->mBTypes.at(id)[&data], this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(data.data().data(), 1, this->mBTypes.at(id), this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
    }
 
@@ -435,7 +419,7 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mpFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), MPI_BOTTOM, 1, this->mFTypes.at(idx(id))[&rData], MPI_COMM_WORLD);
+               MPI_Unpack(this->mpFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mFTypes.at(idx(id)), MPI_COMM_WORLD);
             }
 
             // Update the number of missing receives
@@ -449,7 +433,7 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            MPI_Unpack(this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), MPI_BOTTOM, 1, this->mFTypes.at(id)[&rData], MPI_COMM_WORLD);
+            MPI_Unpack(this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
          }
       }
    }
@@ -473,7 +457,7 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mpBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), MPI_BOTTOM, 1, this->mBTypes.at(idx(id))[&rData], MPI_COMM_WORLD);
+               MPI_Unpack(this->mpBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mBTypes.at(idx(id)), MPI_COMM_WORLD);
             }
 
             // Update the number of missing receives
@@ -487,12 +471,12 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            MPI_Unpack(this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), MPI_BOTTOM, 1, this->mBTypes.at(id)[&rData], MPI_COMM_WORLD);
+            MPI_Unpack(this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
          }
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initLists(TFwdA& rFTmp, TBwdB& rBTmp)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initLists()
    {
       int sze;
       std::vector<int> unusedF;
@@ -502,7 +486,7 @@ namespace Parallel {
       for(int id = 0; id < FrameworkMacro::nCpu(); ++id)
       {
          // Compute buffer sizes for F group
-         MPI_Pack_size(1, this->mFTypes.at(id)[&rFTmp], MPI_COMM_WORLD, &sze);
+         MPI_Pack_size(1, this->mFTypes.at(id), MPI_COMM_WORLD, &sze);
          if(sze != 0)
          {
             this->mFSizes.push_back(sze);
@@ -515,7 +499,7 @@ namespace Parallel {
          }
 
          // Compute buffer sizes for B group
-         MPI_Pack_size(1, this->mBTypes.at(id)[&rBTmp], MPI_COMM_WORLD, &sze);
+         MPI_Pack_size(1, this->mBTypes.at(id), MPI_COMM_WORLD, &sze);
          if(sze != 0)
          {
             this->mBSizes.push_back(sze);
@@ -530,13 +514,13 @@ namespace Parallel {
 
       std::vector<int>::reverse_iterator rit;
       // Erase the unused forward datatypes
-      for(rit = unusedF.rbegin(); rit < unusedF.rend(); ++rit)
+      for(rit = unusedF.rbegin(); rit != unusedF.rend(); ++rit)
       {
          this->mFTypes.erase(this->mFTypes.begin() + *rit);
       }
 
       // Erase the unused backward datatypes
-      for(rit = unusedB.rbegin(); rit < unusedB.rend(); ++rit)
+      for(rit = unusedB.rbegin(); rit != unusedB.rend(); ++rit)
       {
          this->mBTypes.erase(this->mBTypes.begin() + *rit);
       }
@@ -545,27 +529,16 @@ namespace Parallel {
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::cleanupTypes()
    {
       // Cleanup the F Types
-      typename std::vector<std::map<const TFwdA*, MPI_Datatype> >::iterator  itFT;
-      typename std::map<const TFwdA*, MPI_Datatype>::iterator itF;
+      typename std::vector<MPI_Datatype>::iterator  it;
 
-      for(itFT = this->mFTypes.begin(); itFT != this->mFTypes.begin(); ++itFT)
+      for(it = this->mFTypes.begin(); it != this->mFTypes.end(); ++it)
       {
-         for(itF = (*itFT).begin(); itF != (*itFT).end(); ++itF)
-         {
-            MPI_Type_free(&((*itF).second));
-         }
+         MPI_Type_free(&(itF->second));
       }
 
-      // Cleanup the B Types
-      typename std::vector<std::map<const TBwdB*, MPI_Datatype> >::iterator  itBT;
-      typename std::map<const TBwdB*, MPI_Datatype>::iterator  itB;
-
-      for(itBT = this->mBTypes.begin(); itBT != this->mBTypes.begin(); ++itBT)
+      for(it = this->mBTypes.begin(); it != this->mBTypes.end(); ++it)
       {
-         for(itB = (*itBT).begin(); itB != (*itBT).end(); ++itB)
-         {
-            MPI_Type_free(&((*itB).second));
-         }
+         MPI_Type_free(&(itB->second));
       }
    }
 

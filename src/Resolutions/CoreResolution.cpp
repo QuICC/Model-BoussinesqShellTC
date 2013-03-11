@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
    {
       // Check for correct sizes
       assert(static_cast<int>(id) >= 0);
-      assert(static_cast<unsigned int>(id) < this->mTransforms.size());
+      assert(static_cast<size_t>(id) < this->mTransforms.size());
 
       return this->mTransforms.at(static_cast<int>(id));
    }

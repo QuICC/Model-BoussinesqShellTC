@@ -58,6 +58,11 @@ namespace IoConfig {
       return this->mIData;
    }
 
+   std::pair<std::map<std::string, int>::const_iterator,std::map<std::string, int>::const_iterator> IConfigurationPart::iRange() const
+   {
+      return std::make_pair(this->mIData.begin(),this->mIData.end());
+   }
+
    MHDFloat IConfigurationPart::fValue(std::string name) const
    {
       // Make sure initialisation was correct
@@ -77,6 +82,11 @@ namespace IoConfig {
    const std::map<std::string, MHDFloat>& IConfigurationPart::fMap() const
    {
       return this->mFData;
+   }
+
+   std::pair<std::map<std::string, MHDFloat>::const_iterator,std::map<std::string, MHDFloat>::const_iterator> IConfigurationPart::fRange() const
+   {
+      return std::make_pair(this->mFData.begin(),this->mFData.end());
    }
 
    void IConfigurationPart::printInfo() const

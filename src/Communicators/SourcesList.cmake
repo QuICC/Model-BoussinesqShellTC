@@ -1,3 +1,3 @@
 set(MHDSources
-   CommunicatorBase.cpp
+   CommunicationBuffer.cpp
 )

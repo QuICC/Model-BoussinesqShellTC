@@ -211,15 +211,15 @@ namespace Parallel {
       #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j,k);
-            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j,k);
-            int idxK = this->mspTRes->idx<Dimensions::Data:DAT3D>(k);
+            int idxI = this->mspTRes->idx<Dimensions::Data::DATF1D>(i,j,k);
+            int idxJ = this->mspTRes->idx<Dimensions::Data::DAT2D>(j,k);
+            int idxK = this->mspTRes->idx<Dimensions::Data::DAT3D>(k);
             return in.point(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j);
-            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j);
+            int idxI = this->mspTRes->idx<Dimensions::Data::DATF1D>(i,j);
+            int idxJ = this->mspTRes->idx<Dimensions::Data::DAT2D>(j);
             return in.point(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::ONED)
@@ -247,16 +247,16 @@ namespace Parallel {
       #ifdef GEOMHDISCC_MPI
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j,k);
-            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j,k);
-            int idxK = this->mspTRes->idx<Dimensions::Data:DAT3D>(k);
+            int idxI = this->mspTRes->idx<Dimensions::Data::DATF1D>(i,j,k);
+            int idxJ = this->mspTRes->idx<Dimensions::Data::DAT2D>(j,k);
+            int idxK = this->mspTRes->idx<Dimensions::Data::DAT3D>(k);
 
             return rOut.rPoint(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            int idxI = this->mspTRes->idx<Dimensions::Data:DATF1D>(i,j);
-            int idxJ = this->mspTRes->idx<Dimensions::Data:DAT2D>(j);
+            int idxI = this->mspTRes->idx<Dimensions::Data::DATF1D>(i,j);
+            int idxJ = this->mspTRes->idx<Dimensions::Data::DAT2D>(j);
             return rOut.rPoint(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
