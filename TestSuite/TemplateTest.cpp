@@ -40,27 +40,10 @@ namespace TestSuite {
 
    ++TESTNAME++Test::++TESTNAME++Test()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    ++TESTNAME++Test::~++TESTNAME++Test()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void ++TESTNAME++Test::SetUp()
@@ -83,7 +66,28 @@ namespace TestSuite {
 }
 
 /// Main to execute all test from test case
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }

@@ -441,8 +441,8 @@ namespace IoConfig {
       // Global float index
       int fIdx = 0;
 
-      std::pair<std::map<std::string, int>::iterator,std::map<std::string, int>::iterator> iRange;
-      std::pair<std::map<std::string, MHDFloat>::iterator,std::map<std::string, MHDFloat>::iterator> fRange;
+      std::pair<std::map<std::string, int>::const_iterator,std::map<std::string, int>::const_iterator> iRange;
+      std::pair<std::map<std::string, MHDFloat>::const_iterator,std::map<std::string, MHDFloat>::const_iterator> fRange;
 
       // Create framework iterator
       std::map<FrameworkBlocks::Id, SharedIConfigurationPart>::iterator itF;
@@ -450,7 +450,7 @@ namespace IoConfig {
       for(itF = this->mFramework.begin(); itF != this->mFramework.end(); itF++)
       {
          // Create integer component iterator
-         std::map<std::string, int>::iterator itIC;
+         std::map<std::string, int>::const_iterator itIC;
          iRange = itF->second->iRange();
          // Iterate over all component entries
          for(itIC = iRange.first; itIC != iRange.second; itIC++)
@@ -461,7 +461,7 @@ namespace IoConfig {
          }
 
          // Create float component iterator
-         std::map<std::string, MHDFloat>::iterator itIF;
+         std::map<std::string, MHDFloat>::const_iterator itIF;
          fRange = itF->second->fRange();
          // Iterate over all component entries
          for(itIF = fRange.first; itIF != fRange.second; itIF++)
@@ -478,10 +478,10 @@ namespace IoConfig {
       for(itS = this->mSimulation.begin(); itS != this->mSimulation.end(); itS++)
       {
          // Create integer component iterator
-         std::map<std::string, int>::iterator itIC;
+         std::map<std::string, int>::const_iterator itIC;
          iRange = itS->second->iRange();
          // Iterate over all component entries
-         for(itIC = iRange.first(); itIC != iRange.second; itIC++)
+         for(itIC = iRange.first; itIC != iRange.second; itIC++)
          {
             itS->second->setIValue(itIC->first, iData.at(iIdx));
             // Increment integer index
@@ -489,7 +489,7 @@ namespace IoConfig {
          }
 
          // Create float component iterator
-         std::map<std::string, MHDFloat>::iterator itIF;
+         std::map<std::string, MHDFloat>::const_iterator itIF;
          fRange = itS->second->fRange();
          // Iterate over all component entries
          for(itIF = fRange.first; itIF != fRange.second; itIF++)

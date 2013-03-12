@@ -319,12 +319,12 @@ namespace Parallel {
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)
       {
          // Create TBwdB datatypes
-         MPI_Datatype type = MpiConverterTools::buildBwdDatatype(spres, fwdDim, bTmp, id);
-         this->BTypes.push_back(type);
+         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id);
+         this->mBTypes.push_back(type);
 
          // Create TFwdA datatypes
-         type = MpiConverterTools::buildFwdDatatype(spres, fwdDim, fTmp, id);
-         this->FTypes.push_back(type);
+         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id);
+         this->mFTypes.push_back(type);
       }
    }
 
@@ -361,7 +361,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
-         MPI_Pack(data.data().data(), 1, this->mFTypes.at(id), this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
    }
 
@@ -396,7 +396,7 @@ namespace Parallel {
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
-         MPI_Pack(data.data().data(), 1, this->mBTypes.at(id), this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
+         MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
    }
 
@@ -419,7 +419,7 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mpFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mFTypes.at(idx(id)), MPI_COMM_WORLD);
+               MPI_Unpack(this->mspFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mFTypes.at(idx(id)), MPI_COMM_WORLD);
             }
 
             // Update the number of missing receives
@@ -433,7 +433,7 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            MPI_Unpack(this->mpFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
+            MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
          }
       }
    }
@@ -457,7 +457,7 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mpBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mBTypes.at(idx(id)), MPI_COMM_WORLD);
+               MPI_Unpack(this->mspBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mBTypes.at(idx(id)), MPI_COMM_WORLD);
             }
 
             // Update the number of missing receives
@@ -471,7 +471,7 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            MPI_Unpack(this->mpBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
+            MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
          }
       }
    }
@@ -533,12 +533,12 @@ namespace Parallel {
 
       for(it = this->mFTypes.begin(); it != this->mFTypes.end(); ++it)
       {
-         MPI_Type_free(&(itF->second));
+         MPI_Type_free(&(*it));
       }
 
       for(it = this->mBTypes.begin(); it != this->mBTypes.end(); ++it)
       {
-         MPI_Type_free(&(itB->second));
+         MPI_Type_free(&(*it));
       }
    }
 

@@ -57,6 +57,11 @@ namespace Parallel {
           * @param maxBPacks   Maximum number of packs
           */
          void allocateMax(const std::vector<int>& aSizes, const int maxAPacks, const std::vector<int>& bSizes, const int maxBPacks);
+
+         /**
+          * @brief Get pointer to raw buffer storage
+          */
+         char* at(const int id);
          
       protected:
 

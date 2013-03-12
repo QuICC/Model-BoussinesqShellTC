@@ -7,6 +7,7 @@
 
 // System includes
 //
+#include <mpi.h>
 
 // External includes
 //
@@ -55,7 +56,7 @@ namespace Debug {
       ts.resize(ProfilerBase::NBREAKPOINT);
       for(int i = 0; i < ts.size(); ++i)
       {
-         ts(i) = ProfilerBase::time(static_cast<ProfilerBase::BreakPoint(i));
+         ts(i) = ProfilerBase::time(static_cast<ProfilerBase::BreakPoint>(i));
       }
 
       // Resize the storage

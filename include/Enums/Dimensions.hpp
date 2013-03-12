@@ -52,7 +52,7 @@ namespace Dimensions {
       };
 
       /**
-       * @brief Jumb to another dimension
+       * @brief Jump to another dimension at compilation time
        */
       template<Id TID, int STEP> struct jump
       {

@@ -275,11 +275,11 @@ namespace Parallel {
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
             // Initialise the MPI converter
-            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp = this->storage1D.provideFwd();
-            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp = this->storage2D.provideBwd();
+            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp = this->template storage<Dimensions::Transform::TRA1D>().provideFwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp = this->template storage<Dimensions::Transform::TRA2D>().provideBwd();
             spConv->init(spRes, Dimensions::Transform::TRA1D, rFTmp, rBTmp, packs1DFwd, packs1DBwd);
-            this->storage1D().freeFwd(rFtmp);
-            this->storage2D().freeBwd(rBtmp);
+            this->template storage<Dimensions::Transform::TRA1D>().freeFwd(rFTmp);
+            this->template storage<Dimensions::Transform::TRA2D>().freeBwd(rBTmp);
 
             // Create the communication buffers
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
@@ -373,11 +373,11 @@ namespace Parallel {
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
             // Initialise MPI converter
-            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp = this->storage2D.provideFwd();
-            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp = this->storage3D.provideBwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp = this->template storage<Dimensions::Transform::TRA2D>().provideFwd();
+            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp = this->template storage<Dimensions::Transform::TRA3D>().provideBwd();
             spConv->init(spRes, Dimensions::Transform::TRA2D, rFTmp, rBTmp, packs2DFwd, packs2DBwd);
-            this->storage2D().freeFwd(rFtmp);
-            this->storage3D().freeBwd(rBtmp);
+            this->template storage<Dimensions::Transform::TRA2D>().freeFwd(rFTmp);
+            this->template storage<Dimensions::Transform::TRA3D>().freeBwd(rBTmp);
 
             // Create the communication buffers
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
@@ -389,8 +389,8 @@ namespace Parallel {
             // Allocate first 3D buffers
             spBufferOne->allocate(spConv->fwdSizes(), max3D);
 
-            // Allocate second 2D buffers
-            spBufferTwo->allocates(spConv->bwdSizes(), max3D);
+            // Allocate second 3D buffers
+            spBufferTwo->allocate(spConv->bwdSizes(), max3D);
 
             // Set communication buffers
             spConv->setBuffers(spBufferOne, spBufferTwo);
@@ -405,21 +405,21 @@ namespace Parallel {
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv12(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
 
             // Initialise the 1D/2D MPI converter
-            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp1D = this->storage1D.provideFwd();
-            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp2D = this->storage2D.provideBwd();
+            typename TTypes<Dimensions::Transform::TRA1D>::FwdType &rFTmp1D = this->template storage<Dimensions::Transform::TRA1D>().provideFwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::BwdType &rBTmp2D = this->template storage<Dimensions::Transform::TRA2D>().provideBwd();
             spConv12->init(spRes, Dimensions::Transform::TRA1D, rFTmp1D, rBTmp2D, packs1DFwd, packs1DBwd);
-            this->storage1D().freeFwd(rFtmp1D);
-            this->storage2D().freeBwd(rBtmp2D);
+            this->template storage<Dimensions::Transform::TRA1D>().freeFwd(rFTmp1D);
+            this->template storage<Dimensions::Transform::TRA2D>().freeBwd(rBTmp2D);
 
             //Crate shared 2D/3D MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > spConv23(new MpiConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType>());
 
             // Initialise 2D/3D MPI converter
-            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp2D = this->storage2D.provideFwd();
-            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp3D = this->storage3D.provideBwd();
+            typename TTypes<Dimensions::Transform::TRA2D>::FwdType &rFTmp2D = this->template storage<Dimensions::Transform::TRA2D>().provideFwd();
+            typename TTypes<Dimensions::Transform::TRA3D>::BwdType &rBTmp3D = this->template storage<Dimensions::Transform::TRA3D>().provideBwd();
             spConv23->init(spRes, Dimensions::Transform::TRA2D, rFTmp2D, rBTmp3D, packs2DFwd, packs2DBwd);
-            this->storage2D().freeFwd(rFtmp2D);
-            this->storage3D().freeBwd(rBtmp3D);
+            this->template storage<Dimensions::Transform::TRA2D>().freeFwd(rFTmp2D);
+            this->template storage<Dimensions::Transform::TRA3D>().freeBwd(rBTmp3D);
 
             // Create the communication buffers
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());

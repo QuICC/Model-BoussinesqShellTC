@@ -43,27 +43,10 @@ namespace TestSuite {
 
    StateFileReaderTest::StateFileReaderTest()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    StateFileReaderTest::~StateFileReaderTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void StateFileReaderTest::SetUp()
@@ -79,6 +62,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, FullFile)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -123,17 +109,24 @@ namespace TestSuite {
          ASSERT_TRUE(false);
       }
 
-      // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      // Chect test data
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -141,6 +134,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Trunc1D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -186,16 +182,23 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -203,6 +206,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Trunc2D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -248,16 +254,23 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -265,6 +278,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Trunc3D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -310,16 +326,23 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -327,6 +350,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Extended1D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -372,15 +398,19 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               if( i < 12)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( i_ < 12)
                {
-                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(0,0));
@@ -388,6 +418,9 @@ namespace TestSuite {
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -395,6 +428,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Extended2D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -440,15 +476,19 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               if( k < 14)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( k_ < 14)
                {
-                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(0,0));
@@ -456,6 +496,9 @@ namespace TestSuite {
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
    /**
@@ -463,6 +506,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileReaderTest, Extended3D)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -508,15 +554,19 @@ namespace TestSuite {
       }
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
             {
-               if( j < 13)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( j_ < 13)
                {
-                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)));
+                  EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(0,0));
@@ -524,13 +574,37 @@ namespace TestSuite {
             }
          }
       }
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
 }
 }
 
 /// Main to execute all test from test case
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }

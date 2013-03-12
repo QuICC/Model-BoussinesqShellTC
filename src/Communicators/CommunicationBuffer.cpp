@@ -8,6 +8,7 @@
 
 // System includes
 //
+#include <cassert>
 
 // External includes
 //
@@ -109,6 +110,14 @@ namespace Parallel {
             StorageProfilerMacro_update(StorageProfilerMacro::MPIBUFFERS, mem);
          #endif // GEOMHDISCC_STORAGEPROFILER_DETAILED
       #endif // GEOMHDISCC_STORAGEPROFILE
+   }
+
+   char* CommunicationBuffer::at(const int id)
+   {
+      // Safety assert
+      assert(this->mData.size() > static_cast<size_t>(id));
+
+      return this->mData.at(id);
    }
 
    void CommunicationBuffer::cleanupBuffers()

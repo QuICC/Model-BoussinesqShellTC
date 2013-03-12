@@ -34,6 +34,7 @@ set(MHDAllSrcDirs
    Base
    Communicators
    Equations
+   Enums
    Exceptions
    FastTransforms
    Framework

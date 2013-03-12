@@ -7,12 +7,22 @@ set(MHDSources
 
 # Add in the MPI based configuration if required
 if(GEOMHDISCC_MPI)
-   list(APPEND MHDSources
-      BackwardSingle1DConfigurator.cpp
-      BackwardSingle2DConfigurator.cpp
-      BackwardTubularConfigurator.cpp
-      ForwardSingle1DConfigurator.cpp
-      ForwardSingle2DConfigurator.cpp
-      ForwardTubularConfigurator.cpp
-   )
+   if(GEOMHDISCC_MPIALGO STREQUAL "Single1D")
+      list(APPEND MHDSources
+         BackwardSingle1DConfigurator.cpp
+         ForwardSingle1DConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Single1D")
+   if(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
+      list(APPEND MHDSources
+         BackwardSingle2DConfigurator.cpp
+         ForwardSingle2DConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
+   if(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
+      list(APPEND MHDSources
+         BackwardTubularConfigurator.cpp
+         ForwardTubularConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
 endif(GEOMHDISCC_MPI)

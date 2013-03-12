@@ -31,6 +31,7 @@ namespace GeoMHDiSCC {
    {
       // Check for correct sizes
       assert(k >= 0);
+      assert(this->mFwd.size() > 0);
       assert(static_cast<size_t>(k) < this->mFwd.size());
 
       return this->mFwd.at(k).rows();
@@ -45,6 +46,7 @@ namespace GeoMHDiSCC {
    {
       // Check for correct sizes
       assert(k >= 0);
+      assert(this->mBwd.size() > 0);
       assert(static_cast<size_t>(k) < this->mBwd.size());
 
       return this->mBwd.at(k).rows();
@@ -59,6 +61,7 @@ namespace GeoMHDiSCC {
    {
       // Check for correct sizes
       assert(k >= 0);
+      assert(this->mIdx2D.size() > 0);
       assert(static_cast<size_t>(k) < this->mIdx2D.size());
 
       return this->mIdx2D.at(k).size();
@@ -71,6 +74,9 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DAT3D>() const
    {
+      // Check for correct size
+      assert(this->mIdx3D.size() > 0);
+
       return this->mIdx3D.size();
    }
 
@@ -79,6 +85,7 @@ namespace GeoMHDiSCC {
       // Check for correct sizes
       assert(k >= 0);
       assert(static_cast<size_t>(k) < this->mFwd.size());
+      assert(this->mFwd.at(k).size() > 0);
       assert(i < this->mFwd.at(k).size());
 
       return this->mFwd.at(k)(i);
@@ -94,6 +101,7 @@ namespace GeoMHDiSCC {
       // Check for correct sizes
       assert(k >= 0);
       assert(static_cast<size_t>(k) < this->mBwd.size());
+      assert(this->mBwd.at(k).size() > 0);
       assert(i < this->mBwd.at(k).size());
 
       return this->mBwd.at(k)(i);
@@ -109,6 +117,7 @@ namespace GeoMHDiSCC {
       // Check for correct sizes
       assert(k >= 0);
       assert(static_cast<size_t>(k) < this->mIdx2D.size());
+      assert(this->mIdx2D.at(k).size() > 0);
       assert(i < this->mIdx2D.at(k).size());
 
       return this->mIdx2D.at(k)(i);
@@ -122,6 +131,7 @@ namespace GeoMHDiSCC {
    template <> int TransformResolution::idx<Dimensions::Data::DAT3D>(const int i) const
    {
       // Check for correct sizes
+      assert(this->mIdx3D.size() > 0);
       assert(i < this->mIdx3D.size());
 
       return this->mIdx3D(i);

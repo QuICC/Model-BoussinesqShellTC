@@ -15,6 +15,7 @@ set(MHDTestSources
    LoadSplitter/LoadSplitter.cpp
    LoadSplitter/Algorithms/SplittingDescription.cpp
    LoadSplitter/Algorithms/SerialSplitting.cpp
+   LoadSplitter/Algorithms/SingleSplitting.cpp
    LoadSplitter/Algorithms/SplittingAlgorithm.cpp
    LoadSplitter/Algorithms/SplittingTools.cpp
    FastTransforms/FftwTools.cpp

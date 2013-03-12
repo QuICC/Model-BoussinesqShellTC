@@ -8,6 +8,7 @@
 // System includes
 //
 #include <complex>
+#include <mpi.h>
 
 // External includes
 //

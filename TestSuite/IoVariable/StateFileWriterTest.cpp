@@ -43,27 +43,10 @@ namespace TestSuite {
 
    StateFileWriterTest::StateFileWriterTest()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    StateFileWriterTest::~StateFileWriterTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void StateFileWriterTest::SetUp()
@@ -79,6 +62,9 @@ namespace TestSuite {
     */
    TEST_F(StateFileWriterTest, TFTState)
    {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
       // Set type string
       std::string type = TFTScheme::type();
       bool isRegular = TFTScheme::isRegular();
@@ -102,13 +88,17 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Create test data
-      for(int k = 0; k <= dim(1); ++k)
+      int i_, j_, k_;
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         for(int j = 0; j <= dim(2); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); ++j)
          {
-            for(int i = 0; i <= dim(0); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); ++i)
             {
-               spScalar->rDom(0).rPerturbation().setPoint(MHDComplex(static_cast<MHDFloat>(-k),static_cast<MHDFloat>(i)*0.01+static_cast<MHDFloat>(j)),i,j,k);
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               spScalar->rDom(0).rPerturbation().setPoint(MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)),i,j,k);
             }
          }
       }
@@ -136,13 +126,37 @@ namespace TestSuite {
       }
 
       ASSERT_TRUE(true);
+
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
    }
 
 }
 }
 
 /// Main to execute all test from test case
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }
