@@ -37,7 +37,7 @@ namespace IoTools {
          /**
           * @brief Show the resolution in usable format
           */
-         static void show(std::ostream& stream, SharedResolution spRes);
+         static void show(std::ostream& stream, std::string graphName, SharedResolution spRes);
          
       protected:
 
@@ -45,17 +45,17 @@ namespace IoTools {
          /**
           * @brief Show the 1D resolution in usable format
           */
-         static void show1D(std::ostream& stream, SharedResolution spRes);
+         static void show1D(std::ostream& stream, std::string graphName, SharedResolution spRes);
 
          /**
           * @brief Show the 2D resolution in usable format
           */
-         static void show2D(std::ostream& stream, SharedResolution spRes);
+         static void show2D(std::ostream& stream, std::string graphName, SharedResolution spRes);
          
          /**
           * @brief Show the 3D resolution in usable format
           */
-         static void show3D(std::ostream& stream, SharedResolution spRes);
+         static void show3D(std::ostream& stream, std::string graphName, SharedResolution spRes);
          
          /**
          * @brief Constructor 

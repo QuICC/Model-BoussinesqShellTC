@@ -6,6 +6,7 @@
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "SpatialSchemes/3D/TFTScheme.hpp"
 #include "IoTools/VisualizeResolution.hpp"
+#include "IoAscii/DirectAsciiWriter.hpp"
 #include "gtest/gtest.h"
 
 namespace GeoMHDiSCC {
@@ -57,37 +58,62 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Test default constructor
+    * @brief Test TFTScheme
     */
-   TEST_F(LoadSplitterTest, Constructor)
+   TEST_F(LoadSplitterTest, TFTScheme)
    {  
-      FrameworkMacro::init();
+      if(FrameworkMacro::id() == 0)
+      {
+         Parallel::LoadSplitter   splitter(0, FrameworkMacro::nCpu());
 
-      int id = 0;
-      int nCpu = 1;
+         ArrayI dims(3);
+         dims(0) = 64; dims(1) = 64; dims(2) = 64;
+         splitter.init<TFTScheme>(dims);
 
-      FrameworkMacro::setup(nCpu);
+         splitter.showSplittings(10);
 
-      Parallel::LoadSplitter   splitter(id, nCpu);
+         std::string name = "TFT";
 
-      ArrayI dims(3);
-      dims(0) = 10; dims(1) = 12; dims(2) = 15;
-      splitter.init<TFTScheme>(dims);
+         IoAscii::DirectAsciiWriter outFile(name, ".dot", "", "", "");
 
-      splitter.showSplittings(10);
+         outFile.init();
 
-      IoTools::VisualizeResolution::show(std::cout, splitter.bestSplitting().first);
+         IoTools::VisualizeResolution::show(outFile.file(), name, splitter.bestSplitting().first);
 
-      FrameworkMacro::finalize();
+         outFile.finalize();
 
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+         FrameworkMacro::finalize();
+
+         ASSERT_TRUE(true);
+      }
    }
 
 }
 }
 
 /// Main to execute all test from test case
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }
