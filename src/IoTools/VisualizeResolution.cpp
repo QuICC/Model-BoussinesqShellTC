@@ -120,6 +120,7 @@ namespace IoTools {
 
          // Create forward coordinates list
          std::vector<std::set<std::tr1::tuple<int,int,int> > > coordFwd;
+         coordFwd.reserve(spRes->nCpu());
 
          // Loop over all CPUs
          for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
@@ -155,6 +156,7 @@ namespace IoTools {
 
          // Create backward coordinate list
          std::vector<std::set<std::tr1::tuple<int,int,int> > > coordBwd;
+         coordBwd.reserve(spRes->nCpu());
 
          // Loop over all CPUs
          for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
@@ -169,20 +171,20 @@ namespace IoTools {
                // Get global slow index
                k_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT3D>(k);
 
-               // Loop over middle data dimension
-               for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
+               // Loop over middle backward data dimension
+               for(int i = 0; i < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
                {
-                  // Get global middle index
-                  j_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
+                  // Get global fast index
+                  i_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
 
-                  // Loop over middle backward data dimension
-                  for(int i = 0; i < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
+                  // Loop over middle data dimension
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
                   {
-                     // Get global fast index
-                     i_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
+                     // Get global middle index
+                     j_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
 
                      // Add coordinate to list
-                     coordBwd.back().insert(std::tr1::make_tuple(j_,i_,k_));
+                     coordBwd.back().insert(coordBwd.back().end()--,std::tr1::make_tuple(j_,i_,k_));
                   }
                }
             }

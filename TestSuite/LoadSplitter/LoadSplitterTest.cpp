@@ -62,27 +62,36 @@ namespace TestSuite {
     */
    TEST_F(LoadSplitterTest, TFTScheme)
    {  
+      // Only one cPU needs to work
       if(FrameworkMacro::id() == 0)
       {
+         // Create load splitter
          Parallel::LoadSplitter   splitter(0, FrameworkMacro::nCpu());
 
+         // Create test resolution
          ArrayI dims(3);
          dims(0) = 64; dims(1) = 64; dims(2) = 64;
+
+         // Initialise the load splitter with TFT scheme
          splitter.init<TFTScheme>(dims);
 
-         splitter.showSplittings(10);
+         // Show the 5 best splittings' description
+         splitter.showSplittings(5);
 
+         // Set dot file name
          std::string name = "TFT";
 
-         IoAscii::DirectAsciiWriter outFile(name, ".dot", "", "", "");
+         // Create direct access ASCII file
+         IoAscii::DirectAsciiWriter outFile(name, ".dot", "Transpose communication graph", "Graphviz dot file", "1.0");
 
+         // Initialise output file
          outFile.init();
 
+         // Write communication graph structure to file
          IoTools::VisualizeResolution::show(outFile.file(), name, splitter.bestSplitting().first);
 
+         // Finalise output file
          outFile.finalize();
-
-         FrameworkMacro::finalize();
 
          ASSERT_TRUE(true);
       }
