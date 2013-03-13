@@ -90,7 +90,31 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
 
-   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::FINISH_SCALAR>(TransformCoordinatorType& coord)
+   {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
+
+      // Get the input data from hold
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::ProjectorType::PROJ);
+
+      // Free spectral input
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+
+      // Transfer output data to next step
+      coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
+   }
+
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::START_GRAD>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
@@ -142,7 +166,31 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
    }
 
-   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::FINISH_SCALAR>(TransformCoordinatorType& coord)
+   {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD2D);
+
+      // Get the input data from hold
+      TransformCoordinatorType::CommunicatorType::Bwd2DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverBwd();
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
+
+      // Compute projection transform for second dimension 
+      coord.transform2D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform2DType::ProjectorType::PROJ);
+
+      // Free temporary input storage
+      coord.communicator().storage<Dimensions::Transform::TRA2D>().freeBwd(rInVar);
+
+      // Transfer output to next step
+      coord.communicator().transferForward<Dimensions::Transform::TRA2D>(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
+   }
+
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::START_GRAD>(TransformCoordinatorType& coord)
    {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD2D);

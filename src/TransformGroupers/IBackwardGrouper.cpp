@@ -41,7 +41,7 @@ namespace Transform {
       VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
-         // add physical field packs for first exchange
+         // add spectral -> physical field packs for first exchange
          if(infoIt->second.needPhysical())
          {
             if(infoIt->second.isScalar())
@@ -53,7 +53,7 @@ namespace Transform {
             }
          }
 
-         // add physical differential field packs first exchange
+         // add spectral -> physical differential field packs first exchange
          if(infoIt->second.needPhysicalDiff())
          {
             if(infoIt->second.isScalar())
@@ -90,7 +90,7 @@ namespace Transform {
       VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
-         // add physical field packs for second exchange
+         // add spectral -> physical field packs for second exchange
          if(infoIt->second.needPhysical())
          {
             if(infoIt->second.isScalar())
@@ -102,7 +102,7 @@ namespace Transform {
             }
          }
 
-         // add physical differential field packs for second exchange
+         // add spectral -> physical differential field packs for second exchange
          if(infoIt->second.needPhysicalDiff())
          {
             if(infoIt->second.isScalar())

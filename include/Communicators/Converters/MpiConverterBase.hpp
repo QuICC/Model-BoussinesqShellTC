@@ -142,48 +142,6 @@ namespace Parallel {
          void cleanupRequests();
 
          /**
-          * @brief The number of packs in the "previous/active" forward send
-          */
-         int   mActiveFSendPacks;
-
-         /**
-          * @brief The number of packs in the "previous/active" backward send
-          */
-         int   mActiveBSendPacks;
-
-         /**
-          * @brief Storage for the receive position pointers
-          */
-         std::vector<int>  mRecvPositions;
-
-         /**
-          * @brief Storage for the send position pointers
-          */
-         std::vector<int>  mSendPositions;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Recv F
-          */
-         std::map<int, std::vector<MPI_Request> >  mRecvFRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Recv B
-          */
-         std::map<int, std::vector<MPI_Request> >  mRecvBRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Send F
-          */
-         std::map<int, std::vector<MPI_Request> >  mSendFRequests;
-
-         /**
-          * @brief Storage for the non blocking communication requests: Send B
-          */
-         std::map<int, std::vector<MPI_Request> >  mSendBRequests;
-
-
-
-         /**
           * @brief Size of the forward packet
           *
           * @param id ID of the node
@@ -232,6 +190,31 @@ namespace Parallel {
          bool  mIsReceiving;
 
          /**
+          * @brief Communication packs counter
+          */
+         int mPacks;
+
+         /**
+          * @brief The number of packs in the "previous/active" forward send
+          */
+         int   mActiveFSendPacks;
+
+         /**
+          * @brief The number of packs in the "previous/active" backward send
+          */
+         int   mActiveBSendPacks;
+
+         /**
+          * @brief Storage for the receive position pointers
+          */
+         std::vector<int>  mRecvPositions;
+
+         /**
+          * @brief Storage for the send position pointers
+          */
+         std::vector<int>  mSendPositions;
+
+         /**
           * @brief List of CPU ranks involved in the forward conversion
           */
          std::vector<int>  mFCpuGroup;
@@ -262,11 +245,6 @@ namespace Parallel {
          std::vector<int>  mBSizes;
 
          /**
-          * @brief Communication packs counter
-          */
-         int mPacks;
-
-         /**
           * @brief Possible forward transform packs
           */
          ArrayI   mForwardPacks;
@@ -277,6 +255,25 @@ namespace Parallel {
          ArrayI   mBackwardPacks;
 
       private:
+         /**
+          * @brief Storage for the non blocking communication requests: Recv F
+          */
+         std::map<int, std::vector<MPI_Request> >  mRecvFRequests;
+
+         /**
+          * @brief Storage for the non blocking communication requests: Recv B
+          */
+         std::map<int, std::vector<MPI_Request> >  mRecvBRequests;
+
+         /**
+          * @brief Storage for the non blocking communication requests: Send F
+          */
+         std::map<int, std::vector<MPI_Request> >  mSendFRequests;
+
+         /**
+          * @brief Storage for the non blocking communication requests: Send B
+          */
+         std::map<int, std::vector<MPI_Request> >  mSendBRequests;
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::fwdSizes() const

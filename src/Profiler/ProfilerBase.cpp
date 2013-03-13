@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    #ifdef GEOMHDISCC_PROFILER_DETAILED
-      const int ProfilerBase::NBREAKPOINT = ProfilerBase::BWDCONVRECV;
+      const int ProfilerBase::NBREAKPOINT = ProfilerBase::BWDCONVRECV + 1;
    #else
       const int ProfilerBase::NBREAKPOINT = ProfilerBase::IO + 1;
    #endif // GEOMHDISCC_PROFILER_DETAILED

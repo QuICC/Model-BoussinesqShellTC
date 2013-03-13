@@ -71,9 +71,9 @@ namespace Parallel {
 
    template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> typename TTypes<TID>::FwdType& EndDispatcher<false,TID>::receiveForward(TComm<DIMENSION,TTypes>& comm)
    {
-         typename TTypes<TID>::FwdType &rData = comm.template converter<Dimensions::Transform::jump<TID,1>::id>().getFwd(comm.template storage<TID>());
+      typename TTypes<TID>::FwdType &rData = comm.template converter<Dimensions::Transform::jump<TID,1>::id>().getFwd(comm.template storage<TID>());
 
-         return rData;
+      return rData;
    }
 
    template <Dimensions::Transform::Id TID> template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes, template <Dimensions::Type, template<Dimensions::Transform::Id> class > class TComm> void EndDispatcher<false,TID>::transferForward(TComm<DIMENSION,TTypes>& comm, typename TTypes<TID>::FwdType& rData)

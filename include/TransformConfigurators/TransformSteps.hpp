@@ -27,6 +27,12 @@ namespace GeoMHDiSCC {
 
       /**
        * @brief Struct to contain the full field transform steps
+       *
+       * The steps should respect the following naming structure:
+       *    DO_???         : Step receives data, does computation, frees input and transfers output
+       *    START_???      : Step receives data, does computation, holds input data and transfers output
+       *    CONTINUE_???   : Step recovers data, does computations, holds input and transfers output
+       *    FINISH_???     : Step recovers data, does computations, frees input and transfers output
        */
       namespace TransformSteps
       {
@@ -71,7 +77,7 @@ namespace GeoMHDiSCC {
          struct BackwardBase
          {
             /// Enum of the possible steps
-            enum Step {NOTHING, DO_SCALAR, DO_GRAD};
+            enum Step {NOTHING, DO_SCALAR, FINISH_SCALAR, START_GRAD, DO_GRAD};
 
             /// Transform step for a scalar
             static const Step STEP_SCALAR = DO_SCALAR;
@@ -214,10 +220,10 @@ namespace GeoMHDiSCC {
          template<>  struct Backward<Dimensions::Transform::TRA1D>: public BackwardBase
          {
             /// Transform step for the first component of a gradient
-            static const Step STEP_GRAD_ONE = DO_GRAD;
+            static const Step STEP_GRAD_ONE = START_GRAD;
 
             /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = DO_SCALAR;
+            static const Step STEP_GRAD_TWO = FINISH_SCALAR;
          };
 
          /**
@@ -229,10 +235,10 @@ namespace GeoMHDiSCC {
             static const Step STEP_GRAD_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = DO_GRAD;
+            static const Step STEP_GRAD_TWO = START_GRAD;
 
             /// Transform step for the third component of a gradient
-            static const Step STEP_GRAD_THREE = DO_SCALAR;
+            static const Step STEP_GRAD_THREE = FINISH_SCALAR;
          };
 
          /**

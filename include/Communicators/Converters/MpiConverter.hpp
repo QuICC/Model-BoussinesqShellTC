@@ -262,6 +262,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateForwardCommunication()
    {
+      // Synchronize CPUs
       FrameworkMacro::synchronize();
 
       // Store the number of packs in active send
@@ -280,6 +281,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateBackwardCommunication()
    {
+      // Synchronize CPUs
       FrameworkMacro::synchronize();
 
       // Store the number of packs in active send
