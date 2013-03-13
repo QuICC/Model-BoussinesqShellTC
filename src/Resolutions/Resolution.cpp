@@ -60,6 +60,11 @@ namespace GeoMHDiSCC {
       return this->mCores.size();
    }
 
+   void Resolution::setBoxScale(const Array& boxScale)
+   {
+      this->mspSim->setBoxScale(boxScale);
+   }
+
    SharedCSimulationResolution Resolution::sim() const
    {
       return this->mspSim;

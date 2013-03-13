@@ -105,6 +105,9 @@ namespace Equations {
       DecoupledZSparse   tau1D;
       DecoupledZSparse   tau3D;
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       // Get third dimension size
       int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
 
@@ -112,7 +115,7 @@ namespace Equations {
       for(int k = 0; k < dim3D; k++)
       {
          // Get global index in third data dimension (second physical dimension)
-         int k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k); 
+         MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
 
          // Reset spectral operator 1D
          spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
@@ -145,7 +148,7 @@ namespace Equations {
          // Set coupled boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::STREAMFUNCTION)->second.find(bc3D)->second);
-         tau3D.second *= static_cast<MHDFloat>(k_)*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
+         tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
          Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
 
          //////////////////////////////////////////////

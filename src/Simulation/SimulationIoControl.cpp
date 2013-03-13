@@ -208,6 +208,33 @@ namespace GeoMHDiSCC {
       return dim;
    }
 
+   Array SimulationIoControl::configBoxScale() const
+   {
+      // Create storage for box scales
+      Array box = Array::Ones(this->mspCfgFile->spTruncation()->iMap().size()); 
+
+      // Get box scale truncation map
+      std::map<std::string,MHDFloat>  trunc = this->mspCfgFile->spTruncation()->fMap();
+
+      // Extract box scale from truncation read from file
+      std::map<std::string,MHDFloat>::const_iterator  it;
+      for(it = trunc.begin(); it != trunc.end(); it++)
+      {
+         if(it->first == "kc1D")
+         {
+            box(0) = it->second/trunc.find("box1D")->second;
+         } else if(it->first == "kc2D")
+         {
+            box(1) = it->second/trunc.find("box2D")->second;
+         } else if(it->first == "kc3D")
+         {
+            box(2) = it->second/trunc.find("box3D")->second;
+         }
+      }
+
+      return box;
+   }
+
    int SimulationIoControl::configNCpu() const
    {
       return this->mspCfgFile->spParallel()->iValue("cpus");

@@ -38,7 +38,7 @@ namespace IoConfig {
           *
           * @param dim Dimensionality of truncation
           */
-         explicit TruncationPart(const int dim);
+         explicit TruncationPart(const int dim, const std::vector<bool>& isPeriodicBox);
 
          /**
           * @brief Destructor
@@ -63,7 +63,7 @@ namespace IoConfig {
           *
           * @param dim Dimensionality of truncation
           */
-         void init(const int dim);
+         void init(const int dim, const std::vector<bool>& isPeriodicBox);
 
       private:
 

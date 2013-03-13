@@ -102,7 +102,7 @@ namespace GeoMHDiSCC {
           *
           * @param bcNames Vector of names for the boundary conditions
           */
-         template <int DIMENSION, typename TParam> void setConfiguration(const std::string& type, const std::vector<std::string>& bcNames);
+         template <int DIMENSION, typename TParam> void setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames);
 
          /**
           * @brief Set initial state through input file
@@ -258,6 +258,12 @@ namespace GeoMHDiSCC {
       // Store the shared resolution object
       this->mspRes = best.first;
 
+      // Extract box scale from configuration file
+      Array box = this->mSimIoCtrl.configBoxScale();
+
+      // Set the box scale
+      this->mspRes->setBoxScale(box);
+
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
    }
@@ -267,10 +273,10 @@ namespace GeoMHDiSCC {
       return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
    }
 
-   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::string& type, const std::vector<std::string>& bcNames)
+   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames)
    {
       // Create shared configuration file
-      IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, type));
+      IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, isPeriodicBox, type));
 
       // Create the equation parameter shared pointer
       SharedPtrMacro<TParam> spEqParams(new TParam);

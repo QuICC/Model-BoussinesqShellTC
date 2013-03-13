@@ -26,7 +26,26 @@ namespace GeoMHDiSCC {
          /**
           * @brief Enums of the different nondimensional factors
           */
-         enum Id {EKMAN, ROBERTS, RAYLEIGH, ROSSBY, MAGEKMAN, PRANDTL, MAGPRANDTL, CHI, GAMMA};
+         enum Id {
+            /// Ekman number
+            EKMAN,
+            /// Roberts number
+            ROBERTS,
+            /// Rayleigh number
+            RAYLEIGH,
+            /// Rossby number
+            ROSSBY,
+            /// Magnetic Ekman number
+            MAGEKMAN,
+            /// Prandtl number
+            PRANDTL,
+            /// Magnetic Prandtl number
+            MAGPRANDTL,
+            /// Chi angle
+            CHI,
+            /// Topographic ratio
+            GAMMA,
+         };
       };
 }
 

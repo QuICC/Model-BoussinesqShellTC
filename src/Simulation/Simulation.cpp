@@ -65,15 +65,6 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::INIT);
 
-      // Print message to signal successful completion of initialisation step
-      if(FrameworkMacro::allowsIO())
-      {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "Simulation initialisation successfull", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printNewline(std::cout);
-      }
-
       // Make sure nodes are synchronised after initialisation
       FrameworkMacro::synchronize();
    }
@@ -94,6 +85,15 @@ namespace GeoMHDiSCC {
 
       // Cleanup IO control
       this->mSimIoCtrl.cleanup();
+
+      // Print message to signal successful completion of initialisation step
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "Simulation initialisation successfull", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printNewline(std::cout);
+      }
    }
 
    void Simulation::run()

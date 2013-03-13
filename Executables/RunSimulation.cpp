@@ -45,7 +45,7 @@ int run()
    // If exception is thrown, finalise (close files) and return
    catch(GeoMHDiSCC::Exception& e)
    {
-      std::cout << e.what() << std::endl;
+      std::cerr << e.what() << std::endl;
 
       status = -1;
    }

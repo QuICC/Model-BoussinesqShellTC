@@ -30,11 +30,13 @@ namespace Runtime {
 
       /**
        * @name Enum for useful runtime statuses
-       *
-       *  - GOON: Keep going
-       *  - STOP: Abort simulation
        */
-      enum Id {GOON = 0, STOP};
+      enum Id {
+         /// Keep going
+         GOON = 0, 
+         /// Abort simulation
+         STOP
+      };
    };
 }
 }

@@ -71,7 +71,7 @@ namespace IoConfig {
           * @param name Name of the file
           * @param type Type of the simulation
           */
-         IConfigurationFile(const int dim, const std::string& name, const std::string& type);
+         IConfigurationFile(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& name, const std::string& type);
 
          /**
           * @brief Destructor
@@ -152,7 +152,7 @@ namespace IoConfig {
           *
           * @param dim Dimensionality of simulation
           */
-         void initFramework(const int dim);
+         void initFramework(const int dim, const std::vector<bool>& isPeriodicBox);
 
          /**
           * @brief Spread parameters over parallel simulation
@@ -264,18 +264,18 @@ namespace IoConfig {
 
    template <typename TBase> const std::string IConfigurationFile<TBase>::VERSION = "1.0";
 
-   template <typename TBase> IConfigurationFile<TBase>::IConfigurationFile(const int dim, const std::string& name, const std::string& type)
+   template <typename TBase> IConfigurationFile<TBase>::IConfigurationFile(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& name, const std::string& type)
       : TBase(name, IConfigurationFile<TBase>::EXTENSION, IConfigurationFile<TBase>::HEADER, type, IConfigurationFile<TBase>::VERSION)
    {
       // Initialise the file descriptors
-      this->initFramework(dim); 
+      this->initFramework(dim, isPeriodicBox); 
    }
 
    template <typename TBase> IConfigurationFile<TBase>::~IConfigurationFile()
    {
    }
 
-   template <typename TBase> void IConfigurationFile<TBase>::initFramework(const int dim)
+   template <typename TBase> void IConfigurationFile<TBase>::initFramework(const int dim, const std::vector<bool>& isPeriodicBox)
    {
       // Create shared pointer
       SharedIConfigurationPart spPart;
@@ -284,7 +284,7 @@ namespace IoConfig {
       // Create framework content
       
       // Add truncation part
-      spPart = SharedTruncationPart(new TruncationPart(dim));
+      spPart = SharedTruncationPart(new TruncationPart(dim, isPeriodicBox));
       this->mFramework.insert(std::make_pair(FrameworkBlocks::TRUNCATION, spPart));
       
       // Add parallel part

@@ -107,6 +107,11 @@ namespace GeoMHDiSCC {
           */
          Datatypes::SharedScalarFieldSetupType spSpectralSetup() const;
 
+         /**
+          * @brief Set the box scale for the periodic box dimensions
+          */
+         void setBoxScale(const Array& boxScale);
+
       protected:
 
       private:

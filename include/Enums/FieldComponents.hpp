@@ -35,7 +35,18 @@ namespace GeoMHDiSCC {
          /**
           * @brief Enum for physical field vector components
           */
-         enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
+         enum Id {
+            /// First vector component
+            ONE,
+            /// Second vector component
+            TWO,
+            /// Third vector component
+            THREE,
+            /// Is a scalar
+            SCALAR,
+            /// Is not used
+            NOTUSED
+         };
       };
 
       /**
@@ -46,7 +57,18 @@ namespace GeoMHDiSCC {
          /**
           * @brief Enum for Spectral field vector components
           */
-         enum Id {ONE, TWO, THREE, SCALAR, NOTUSED};
+         enum Id {
+            /// First spectral vector component
+            ONE,
+            /// Second spectral vector component
+            TWO,
+            /// Third spectral vector component
+            THREE,
+            /// Is spectral scalar
+            SCALAR,
+            /// Is not used
+            NOTUSED
+         };
       };
    };
 }

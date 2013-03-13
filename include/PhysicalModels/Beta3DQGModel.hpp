@@ -49,6 +49,11 @@ namespace GeoMHDiSCC {
          static std::vector<std::string> boundaryNames();
 
          /**
+          * @brief Get vector of bools about periodic box
+          */
+         static std::vector<bool> isPeriodicBox();
+
+         /**
           * @brief Add the required equations
           *
           * @param spSim   Shared simulation object

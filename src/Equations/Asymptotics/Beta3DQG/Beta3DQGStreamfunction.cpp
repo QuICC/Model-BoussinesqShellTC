@@ -58,10 +58,13 @@ namespace Equations {
 
       int dealiasedRows = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       int nSlice = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
       for(int m = 0; m < nSlice; m++)
       {
-         m_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
+         m_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
 
          rRHS.addSlice((MathConstants::cI*m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
       }
@@ -99,8 +102,11 @@ namespace Equations {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       // Get right wave number
-      int m_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(matIdx);
+      MHDFloat m_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -114,8 +120,11 @@ namespace Equations {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       // Get right wave number
-      int m_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(matIdx);
+      MHDFloat m_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -160,11 +169,14 @@ namespace Equations {
       // Get third dimension size
       int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       // Loop over third dimension
       for(int k = 0; k < dim3D; k++)
       {
          // Get global index in third data dimension (second physical dimension)
-         int k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k); 
+         MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
 
          // Reset spectral operator 1D
          spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
@@ -185,7 +197,7 @@ namespace Equations {
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
          Eigen::kroneckerProduct(spec3D.id(1), tau1D.first, it->second.back().first);
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
-         tau3D.second *= static_cast<MHDFloat>(k_)*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
+         tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
          Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
 
          //////////////////////////////////////////////

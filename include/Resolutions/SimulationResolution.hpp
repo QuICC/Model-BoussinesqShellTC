@@ -57,6 +57,18 @@ namespace GeoMHDiSCC {
           */
          ArrayI orderedDims(const Dimensions::Space::Id spaceId) const;
 
+         /**
+          * @brief Get the box scale
+          *
+          * @para id ID of the simulation dimension
+          */
+         MHDFloat boxScale(const Dimensions::Simulation::Id id) const;
+
+         /**
+          * @brief Set the box scale (if not it will be initialised to 1)
+          */
+         void setBoxScale(const Array& boxScale);
+
       protected:
 
       private:
@@ -64,6 +76,11 @@ namespace GeoMHDiSCC {
           * brief Storage
           */
          std::map<Dimensions::Space::Id, ArrayI> mDim;
+
+         /**
+          * @brief Storage for the box scale
+          */
+         Array mBoxScale;
    };
 
 

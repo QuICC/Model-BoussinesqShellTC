@@ -62,6 +62,22 @@ namespace GeoMHDiSCC {
       return names;
    }
 
+   std::vector<bool> Beta3DQGModel::isPeriodicBox()
+   {
+      std::vector<bool> box;
+
+      // X direction is not periodic box
+      box.push_back(false);
+
+      // Y direction is periodic box
+      box.push_back(true);
+
+      // Z direction is not periodic box
+      box.push_back(false);
+
+      return box;
+   }
+
    void Beta3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation

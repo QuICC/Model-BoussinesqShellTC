@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
       SharedSimulation  spSim(new Simulation);
 
       // Add configuration file and parameters
-      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>(TModel::SchemeType::type(),TModel::boundaryNames());
+      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>(TModel::SchemeType::type(), TModel::isPeriodicBox(), TModel::boundaryNames());
 
       // Initialise simulation
       spSim->initBase();

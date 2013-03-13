@@ -30,7 +30,28 @@ namespace GeoMHDiSCC {
       /**
        * @name Enum for physical name to ID mapping
        */
-      enum Id {CODENSITY, PRESSURE, TEMPERATURE, STREAMFUNCTION, VELOCITYZ, VORTICITYZ, PHI, MAGNETIC, VELOCITY, VORTICITY};
+      enum Id {
+         /// Codensity field
+         CODENSITY,
+         /// Pressure field
+         PRESSURE,
+         /// Temperature field
+         TEMPERATURE,
+         /// Streamfunction field
+         STREAMFUNCTION,
+         /// Axial velocity field
+         VELOCITYZ,
+         /// Axial vorticity field
+         VORTICITYZ,
+         /// Phi field
+         PHI,
+         /// Magnetic field
+         MAGNETIC,
+         /// Velocity field
+         VELOCITY, 
+         /// Vorticity field
+         VORTICITY
+      };
    };
 }
 

@@ -41,7 +41,7 @@ namespace IoConfig {
           * @param dim  Dimensionality of simulation
           * @param type Type of the simulation
           */
-         ConfigurationReader(const int dim, const std::string& type);
+         ConfigurationReader(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& type);
 
          /**
           * @brief Destructor

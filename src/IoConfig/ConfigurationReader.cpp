@@ -26,8 +26,8 @@ namespace IoConfig {
 
    const std::string ConfigurationReader::NAME = "parameters";
 
-   ConfigurationReader::ConfigurationReader(const int dim, const std::string& type)
-      : IConfigurationFile<IoXml::IXmlReader>(dim, ConfigurationReader::NAME, type)
+   ConfigurationReader::ConfigurationReader(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& type)
+      : IConfigurationFile<IoXml::IXmlReader>(dim, isPeriodicBox, ConfigurationReader::NAME, type)
    {
    }
 

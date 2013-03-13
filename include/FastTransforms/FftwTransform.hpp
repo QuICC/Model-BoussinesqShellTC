@@ -256,6 +256,8 @@ namespace Transform {
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
       }
+
+      // Set the padded values to zero
       this->mTmpRIn.row(0).imag().setConstant(0);
 
       // Set the padded values to zero

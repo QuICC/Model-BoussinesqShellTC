@@ -27,8 +27,8 @@ namespace IoConfig {
 
    const std::string ConfigurationWriter::NAME = "parameters_template_";
 
-   ConfigurationWriter::ConfigurationWriter(const int dim, const std::string& type)
-      : IConfigurationFile<IoXml::IXmlWriter>(dim, ConfigurationWriter::NAME+type, type)
+   ConfigurationWriter::ConfigurationWriter(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& type)
+      : IConfigurationFile<IoXml::IXmlWriter>(dim, isPeriodicBox, ConfigurationWriter::NAME+type, type)
    {
    }
 

@@ -91,6 +91,11 @@ namespace GeoMHDiSCC {
          ArrayI configDimension() const;
 
          /**
+          * @brief Get the box scale read from the configuration file
+          */
+         Array configBoxScale() const;
+
+         /**
           * @brief Get the number of CPUs read from the configuration file
           */
          int configNCpu() const;

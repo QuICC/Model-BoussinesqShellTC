@@ -23,6 +23,7 @@
 namespace GeoMHDiSCC {
 
    SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec)
+      : mBoxScale(Array::Ones(spec.size()))
    {
       // Assert both spaces have same dimensionalisty
       assert(phys.size() == spec.size());
@@ -68,6 +69,16 @@ namespace GeoMHDiSCC {
       }
 
       return oDims;
+   }
+
+   MHDFloat SimulationResolution::boxScale(const Dimensions::Simulation::Id id) const
+   {
+      return this->mBoxScale(static_cast<Dimensions::Simulation::Id>(id));
+   }
+
+   void SimulationResolution::setBoxScale(const Array& boxScale)
+   {
+      this->mBoxScale = boxScale;
    }
 
 }

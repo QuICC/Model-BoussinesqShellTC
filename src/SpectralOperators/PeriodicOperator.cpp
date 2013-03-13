@@ -20,10 +20,10 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   SparseMatrix PeriodicOperator::laplacian2D(const IOperator& op, const int k, const int nBC)
+   SparseMatrix PeriodicOperator::laplacian2D(const IOperator& op, const MHDFloat k, const int nBC)
    {
       // Compute sparse laplacian
-      SparseMatrix lapl = (op.diff(nBC, 2) - static_cast<MHDFloat>(std::pow(k,2))*op.id(nBC));
+      SparseMatrix lapl = (op.diff(nBC, 2) - std::pow(k,2)*op.id(nBC));
 
       // Prune sparse laplacian
       lapl.prune(1e-32);
@@ -31,7 +31,7 @@ namespace Spectral {
       return lapl;
    }
 
-   SparseMatrix PeriodicOperator::bilaplacian2D(const IOperator& op, const int k, const int nBC)
+   SparseMatrix PeriodicOperator::bilaplacian2D(const IOperator& op, const MHDFloat k, const int nBC)
    {
       // Compute sparse laplacian
       SparseMatrix lapl = PeriodicOperator::laplacian2D(op, k, nBC);
@@ -45,10 +45,10 @@ namespace Spectral {
       return lapl;
    }
 
-   SparseMatrix PeriodicOperator::laplacian3D(const IOperator& op, const int k, const int m, const int nBC)
+   SparseMatrix PeriodicOperator::laplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int nBC)
    {
       // Compute sparse laplacian
-      SparseMatrix lapl = (op.diff(nBC, 2) - static_cast<MHDFloat>(std::pow(k,2))*op.id(nBC) - static_cast<MHDFloat>(std::pow(m,2))*op.id(nBC));
+      SparseMatrix lapl = (op.diff(nBC, 2) - std::pow(k,2)*op.id(nBC) - std::pow(m,2)*op.id(nBC));
 
       // Prune sparse laplacian
       lapl.prune(1e-32);
@@ -56,7 +56,7 @@ namespace Spectral {
       return lapl;
    }
 
-   SparseMatrix PeriodicOperator::bilaplacian3D(const IOperator& op, const int k, const int m, const int nBC)
+   SparseMatrix PeriodicOperator::bilaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int nBC)
    {
       // Compute sparse laplacian
       SparseMatrix lapl = PeriodicOperator::laplacian3D(op, k, m, nBC);
@@ -70,10 +70,10 @@ namespace Spectral {
       return lapl;
    }
 
-   SparseMatrix PeriodicOperator::qLaplacian2D(const IOperator& op, const int k, const int p)
+   SparseMatrix PeriodicOperator::qLaplacian2D(const IOperator& op, const MHDFloat k, const int p)
    {
       // Ccompute quasi inverse of laplacian
-      SparseMatrix qLapl = (op.qDiff(p,2) - static_cast<MHDFloat>(std::pow(k,2))*op.qDiff(p,0));
+      SparseMatrix qLapl = (op.qDiff(p,2) - std::pow(k,2)*op.qDiff(p,0));
 
       // Prune sparse matrix
       qLapl.prune(1e-32);
@@ -81,10 +81,10 @@ namespace Spectral {
       return qLapl;
    }
 
-   SparseMatrix PeriodicOperator::qBilaplacian2D(const IOperator& op, const int k, const int p)
+   SparseMatrix PeriodicOperator::qBilaplacian2D(const IOperator& op, const MHDFloat k, const int p)
    {
       // Compute quasi-inverse of bilaplacian
-      SparseMatrix qLapl = (op.qDiff(p,4) - static_cast<MHDFloat>(2*std::pow(k,2))*op.qDiff(p,2) + static_cast<MHDFloat>(std::pow(k,4))*op.qDiff(p,0));
+      SparseMatrix qLapl = (op.qDiff(p,4) - 2*std::pow(k,2)*op.qDiff(p,2) + std::pow(k,4)*op.qDiff(p,0));
 
       // Prune sparse matrix
       qLapl.prune(1e-32);
@@ -92,10 +92,10 @@ namespace Spectral {
       return qLapl;
    }
 
-   SparseMatrix PeriodicOperator::qLaplacian3D(const IOperator& op, const int k, const int m, const int p)
+   SparseMatrix PeriodicOperator::qLaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int p)
    {
       // Ccompute quasi inverse of laplacian
-      SparseMatrix qLapl = (op.qDiff(p,2) - static_cast<MHDFloat>(std::pow(k,2))*op.qDiff(p,0) - static_cast<MHDFloat>(std::pow(m,2))*op.qDiff(p,0));
+      SparseMatrix qLapl = (op.qDiff(p,2) - (std::pow(k,2) - std::pow(m,2))*op.qDiff(p,0));
 
       // Prune sparse matrix
       qLapl.prune(1e-32);
@@ -103,10 +103,10 @@ namespace Spectral {
       return qLapl;
    }
 
-   SparseMatrix PeriodicOperator::qBilaplacian3D(const IOperator& op, const int k, const int m, const int p)
+   SparseMatrix PeriodicOperator::qBilaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int p)
    {
       // Compute quasi-inverse of bilaplacian
-      SparseMatrix qLapl = (op.qDiff(p,4) - static_cast<MHDFloat>(2*std::pow(k,2)+2*std::pow(m,2))*op.qDiff(p,2) + static_cast<MHDFloat>(std::pow(k,4) + 2*std::pow(k,2)*std::pow(m,2) + std::pow(m,4))*op.qDiff(p,0));
+      SparseMatrix qLapl = (op.qDiff(p,4) - (2*std::pow(k,2)+2*std::pow(m,2))*op.qDiff(p,2) + (std::pow(k,4) + 2*std::pow(k,2)*std::pow(m,2) + std::pow(m,4))*op.qDiff(p,0));
 
       // Prune sparse matrix
       qLapl.prune(1e-32);

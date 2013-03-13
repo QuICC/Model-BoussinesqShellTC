@@ -102,11 +102,14 @@ namespace Equations {
       // Get third dimension size
       int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
 
+      // Get the box scale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
       // Loop over third dimension
       for(int k = 0; k < dim3D; k++)
       {
          // Get global index in third data dimension (second physical dimension)
-         int k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k); 
+         MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
 
          // Reset spectral operator 1D
          spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));

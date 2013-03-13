@@ -29,7 +29,14 @@ namespace GeoMHDiSCC {
       /**
       * @name Enum for basic arithmetics to use a template argument
       */
-      enum Id {SET, ADD, SUB};
+      enum Id {
+         /// Set new value
+         SET,
+         /// Add to value
+         ADD,
+         /// Substract from value
+         SUB
+      };
    };
 }
 

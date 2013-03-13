@@ -39,8 +39,11 @@ int run()
    // Set type string
    std::string type = PModel::SchemeType::type();
 
+   // Box periodicity
+   std::vector<bool> isPeriodicBox = PModel::isPeriodicBox();
+
    // Create configuration writer
-   GeoMHDiSCC::IoConfig::ConfigurationWriter writer(dim, type);
+   GeoMHDiSCC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
 
    // Add the physical part
    std::vector<std::string>   names = PModel::ParametersType::names();
