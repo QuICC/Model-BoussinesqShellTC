@@ -112,7 +112,7 @@ namespace GeoMHDiSCC {
       // Check for optimised FFT sizes
       nX = Transform::FftwTools::optimizeFft(nX);
 
-      // Get standard dealiased FFT size
+      // Get mixed dealiased FFT size
       int nY = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
       // Check for optimised FFT sizes
       nY = Transform::FftwTools::optimizeFft(nY);
