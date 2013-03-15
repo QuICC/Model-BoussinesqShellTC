@@ -1,5 +1,5 @@
-/** \file Beta3DQGTransport.cpp
- *  \brief Source of the implementation of the transport equation in the 3DQG beta model
+/** \file LargeBeta3DQGTransport.cpp
+ *  \brief Source of the implementation of the transport equation in the 3DQG large beta model
  */
 
 // Configuration includes
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGTransport.hpp"
+#include "Equations/Asymptotics/LargeBeta3DQG/LargeBeta3DQGTransport.hpp"
 
 // Project includes
 //
@@ -29,18 +29,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   Beta3DQGTransport::Beta3DQGTransport(SharedIEquationParameters spEqParams)
+   LargeBeta3DQGTransport::LargeBeta3DQGTransport(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   Beta3DQGTransport::~Beta3DQGTransport()
+   LargeBeta3DQGTransport::~LargeBeta3DQGTransport()
    {
    }
 
-   void Beta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void LargeBeta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -51,7 +51,7 @@ namespace Equations {
       rNLComp.rData().setConstant(0.0);
    }
 
-   void Beta3DQGTransport::computeLinear(Datatypes::SpectralScalarType& rRHS) const
+   void LargeBeta3DQGTransport::computeLinear(Datatypes::SpectralScalarType& rRHS) const
    {  
       ///
       /// Compute \f$-\frac{1}{16}\frac{Ra}{Pr}\partial_y\overline{T} = -\frac{1}{16}\frac{Ra}{Pr} i m \overline{T}\f$
@@ -71,13 +71,13 @@ namespace Equations {
       int nSlice = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
       for(int m = 0; m < nSlice; m++)
       {
-         m_ = 0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
+         m_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
 
          rRHS.setSlice((m_*c)*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).perturbation().slice(m), m, dealiasedRows);
       }
    }
 
-   void Beta3DQGTransport::setRequirements()
+   void LargeBeta3DQGTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -89,7 +89,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
-   void Beta3DQGTransport::setCoupling()
+   void LargeBeta3DQGTransport::setCoupling()
    {
       // Set field coupling
       // NONE 
@@ -101,7 +101,7 @@ namespace Equations {
       this->mCouplingInfo.addInternal(FieldComponents::Spectral::SCALAR, nMat, dim);
    }
 
-   void Beta3DQGTransport::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void LargeBeta3DQGTransport::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
    {
       // Get local copy of a shared resolution
       SharedResolution  spRes = this->unknown().dom(0).spRes();
@@ -148,7 +148,7 @@ namespace Equations {
       for(int k = 0; k < dim3D; k++)
       {
          // Get global index in third data dimension (second physical dimension)
-         MHDFloat k_ = boxScale*0.5*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
+         MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
 
          // Reset spectral operator 1D
          spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));

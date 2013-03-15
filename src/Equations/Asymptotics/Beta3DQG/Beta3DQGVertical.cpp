@@ -45,7 +45,13 @@ namespace Equations {
 
    void Beta3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
-      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      /// 
+      /// Computation of the jacobian:
+      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
+      ///
+      //Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      //
+      rNLComp.rData().setConstant(0.0);
    }
 
    void Beta3DQGVertical::setRequirements()
@@ -110,6 +116,13 @@ namespace Equations {
 
       // Get third dimension size
       int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+
+      /// 
+      /// The timestepper will buid the full implici timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
+      /// The  left-hand side following equation is setup here: 
+      ///
+      ///    \f$ \nabla_{\perp}^2 w - \partial_t w + \frac{1}{\Gamma}\partial_Z \psi = \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
+      ///
 
       // Loop over third dimension
       for(int k = 0; k < dim3D; k++)

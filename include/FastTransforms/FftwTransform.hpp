@@ -245,7 +245,7 @@ namespace Transform {
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = (3.1174/(2.*4.))*MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
 
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());

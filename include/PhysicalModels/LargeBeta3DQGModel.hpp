@@ -1,9 +1,9 @@
-/** \file SimpleBeta3DQGModel.hpp
- *  \brief Implementation of the simple beta 3DQG physical model
+/** \file LargeBeta3DQGModel.hpp
+ *  \brief Implementation of the large beta 3DQG physical model
  */
 
-#ifndef SIMPLEBETA3DQGMODEL_HPP
-#define SIMPLEBETA3DQGMODEL_HPP
+#ifndef LARGEBETA3DQGMODEL_HPP
+#define LARGEBETA3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of the simple beta 3DQG physical model
     */
-   class SimpleBeta3DQGModel
+   class LargeBeta3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         SimpleBeta3DQGModel();
+         LargeBeta3DQGModel();
 
          /**
           * @brief Destructor
           */
-         ~SimpleBeta3DQGModel();
+         ~LargeBeta3DQGModel();
    };
 
 }
 
-#endif // SIMPLEBETA3DQGMODEL_HPP
+#endif // LARGEBETA3DQGMODEL_HPP

@@ -187,6 +187,56 @@ namespace TestSuite {
    }
 
    /**
+    * @brief Test accuracy for backward mixed derivative transform
+    */
+   TEST_F(FftwTransformTest, BackwardMixedDiffAccuracy)
+   {
+      // Set spectral and physical sizes
+      int maxN = 11;
+      int nN = maxN + 1;
+      int xN = Transform::FftwTools::dealiasMixedFft(nN);
+      int howmany = 13;
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::MIXED));
+
+      // Create FftwTransform
+      Transform::FftwTransform fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get phi grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->specSize(); ++i)
+      {
+         phys.col(i) = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+      }
+
+      // Compute backward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftwTransform::IntegratorType::INTG);
+
+      // Compute backward transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftwTransform::ProjectorType::DIFF);
+
+      // Check the solution
+      for(int i = 0; i < spSetup->specSize(); ++i)
+      {
+         for(int j = 0; j < phi.size(); ++j)
+         {
+            EXPECT_NEAR(phys(j,i), -static_cast<MHDFloat>(i)*std::sin(static_cast<MHDFloat>(i)*phi(j)) + static_cast<MHDFloat>(i)*std::cos(static_cast<MHDFloat>(i)*phi(j)), this->mError);
+         }
+      }
+   }
+
+   /**
     * @brief Test accuracy for forward transform
     */
    TEST_F(FftwTransformTest, ForwardAccuracy)

@@ -1,9 +1,9 @@
-/** \file Beta3DQGTransport.hpp
- *  \brief Implementation of the transport equation for the 3DQG beta model
+/** \file LargeBeta3DQGVertical.hpp
+ *  \brief Implementation of the vertical velocity equation for the 3DQG large beta model
  */
 
-#ifndef BETA3DQGTRANSPORT_HPP
-#define BETA3DQGTRANSPORT_HPP
+#ifndef LARGEBETA3DQGVERTICAL_HPP
+#define LARGEBETA3DQGVERTICAL_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the 3DQG beta model
+    * \brief Implementation of the vertical velocity equation for the 3DQG large beta model
     */
-   class Beta3DQGTransport: public IScalarEquation
+   class LargeBeta3DQGVertical: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Beta3DQGTransport(SharedIEquationParameters spEqParams);
+         LargeBeta3DQGVertical(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGTransport();
+         virtual ~LargeBeta3DQGVertical();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -49,13 +49,6 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
-
-         /**
-          * @brief Compute the linear term
-          *
-          * @param rRHS    RHS of timestepping equation
-          */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
 
          /**
           * @brief Set the equation matrices
@@ -82,4 +75,4 @@ namespace Equations {
 }
 }
 
-#endif // BETA3DQGTRANSPORT_HPP
+#endif // LARGEBETA3DQGVERTICAL_HPP

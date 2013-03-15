@@ -1,9 +1,9 @@
-/** \file Beta3DQGTransport.hpp
- *  \brief Implementation of the transport equation for the 3DQG beta model
+/** \file LargeBeta3DQGTransport.hpp
+ *  \brief Implementation of the transport equation for the 3DQG large beta model
  */
 
-#ifndef BETA3DQGTRANSPORT_HPP
-#define BETA3DQGTRANSPORT_HPP
+#ifndef LARGEBETA3DQGTRANSPORT_HPP
+#define LARGEBETA3DQGTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the 3DQG beta model
+    * \brief Implementation of the transport equation for the 3DQG large beta model
     */
-   class Beta3DQGTransport: public IScalarEquation
+   class LargeBeta3DQGTransport: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Beta3DQGTransport(SharedIEquationParameters spEqParams);
+         LargeBeta3DQGTransport(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGTransport();
+         virtual ~LargeBeta3DQGTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -82,4 +82,4 @@ namespace Equations {
 }
 }
 
-#endif // BETA3DQGTRANSPORT_HPP
+#endif // LARGEBETA3DQGTRANSPORT_HPP

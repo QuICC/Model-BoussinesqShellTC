@@ -1,9 +1,9 @@
-/** \file Beta3DQGTransport.hpp
- *  \brief Implementation of the transport equation for the 3DQG beta model
+/** \file LargeBeta3DQGStreamfunction.hpp
+ *  \brief Implementation of the streamfunction equation for the 3DQG large beta model
  */
 
-#ifndef BETA3DQGTRANSPORT_HPP
-#define BETA3DQGTRANSPORT_HPP
+#ifndef LARGEBETA3DQGSTREAMFUNCTION_HPP
+#define LARGEBETA3DQGSTREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the 3DQG beta model
+    * \brief Implementation of the streamfunction equation for the large 3DQG beta model
     */
-   class Beta3DQGTransport: public IScalarEquation
+   class LargeBeta3DQGStreamfunction: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Beta3DQGTransport(SharedIEquationParameters spEqParams);
+         LargeBeta3DQGStreamfunction(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGTransport();
+         virtual ~LargeBeta3DQGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -58,7 +58,27 @@ namespace Equations {
          virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
 
          /**
-          * @brief Set the equation matrices
+          * @brief Transfer timestepper output to unknown and update vorticity
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Transfer timestepper output to unknown and update vorticity
+          *
+          * @param id      Component ID
+          * @param storage Storage for the equation values
+          * @param matIdx  Index of the given data
+          * @param start   Start indx for the storage
+          */
+         virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Set equation matrices
           *
           * @param bcIds   List of boundary condition IDs
           * @param cbcIds  List of coupled boundary condition IDs
@@ -82,4 +102,4 @@ namespace Equations {
 }
 }
 
-#endif // BETA3DQGTRANSPORT_HPP
+#endif // LARGEBETA3DQGSTREAMFUNCTION_HPP

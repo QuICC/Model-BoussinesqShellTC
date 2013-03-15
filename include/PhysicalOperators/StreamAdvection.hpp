@@ -34,16 +34,22 @@ namespace Physical {
       public:
          /**
           * @brief Set S to streamfunction advection product
+          *
+          *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)q = -\partial_y\psi\partial_x q + \partial_x\psi\partial_y q\f$
           */
          template <int COMPONENTS> static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add streamfunction advection product to S
+          *
+          *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)q = -\partial_y\psi\partial_x q + \partial_x\psi\partial_y q\f$
           */
          template <int COMPONENTS> static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract streamfunction advection product from S
+          *
+          *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)q = -\partial_y\psi\partial_x q + \partial_x\psi\partial_y q\f$
           */
          template <int COMPONENTS> static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
          
