@@ -54,14 +54,11 @@ namespace Equations {
    void Beta3DQGTransport::computeLinear(Datatypes::SpectralScalarType& rRHS) const
    {  
       ///
-      /// Compute \f$-\frac{1}{16}\frac{Ra}{Pr}\partial_y\overline{T} = -\frac{1}{16}\frac{Ra}{Pr} i m \overline{T}\f$
+      /// Compute the background state advection term
       ///
 
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
-
-      // Compute Ra/(16 Pr As)
-      MHDComplex c = -boxScale*MathConstants::cI;
+      // Compute the complex box scale factor
+      MHDComplex c = -this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*MathConstants::cI;
 
       // Get size of dealiased output (at this stage data has still dealiasing rows)
       int dealiasedRows = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);

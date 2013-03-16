@@ -7,7 +7,6 @@
 
 // System includes
 //
-#include <iostream>
 
 // External includes
 #include <Eigen/Sparse>
@@ -217,7 +216,7 @@ namespace Equations {
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
-         Eigen::kroneckerProduct(spec3D.id(1), tau1D.first, it->second.back().first);
+         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
          tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
          Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);

@@ -1,5 +1,5 @@
-/** \file LargeBeta3DQGStreamfunction.cpp
- *  \brief Source of the implementation of the streamfunction equation in the 3DQG large beta model
+/** \file RotatingRBStreamfunction.cpp
+ *  \brief Source of the implementation of the streamfunction equation in the rotating Rayleigh-Benard model
  */
 
 // Configuration includes
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/LargeBeta3DQG/LargeBeta3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/RotatingRB/RotatingRBStreamfunction.hpp"
 
 // Project includes
 //
@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   LargeBeta3DQGStreamfunction::LargeBeta3DQGStreamfunction(SharedIEquationParameters spEqParams)
+   RotatingRBStreamfunction::RotatingRBStreamfunction(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Equation is always complex due to the sloping boundary condition
@@ -39,11 +39,11 @@ namespace Equations {
       this->setRequirements();
    }
 
-   LargeBeta3DQGStreamfunction::~LargeBeta3DQGStreamfunction()
+   RotatingRBStreamfunction::~RotatingRBStreamfunction()
    {
    }
 
-   void LargeBeta3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void RotatingRBStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -54,17 +54,17 @@ namespace Equations {
       rNLComp.rData().setConstant(0.0);
    }
 
-   void LargeBeta3DQGStreamfunction::computeLinear(Datatypes::SpectralScalarType& rRHS) const
+   void RotatingRBStreamfunction::computeLinear(Datatypes::SpectralScalarType& rRHS) const
    {  
       ///
-      /// Compute \f$-\frac{1}{16}\frac{Ra}{Pr}\partial_y\overline{T} = -\frac{1}{16}\frac{Ra}{Pr} i m \overline{T}\f$
+      /// Compute \f$-\frac{1}{16}\frac{Ra}{Pr}\partial_y\overline{T} = -\frac{1}{16}\frac{Ra}{Pr} i m/2 \overline{T}\f$
       ///
 
       // Get the box scale
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       // Compute Ra/(16 Pr As)
-      MHDComplex c = -this->eqParams().nd(NonDimensional::RAYLEIGH)/(16.*this->eqParams().nd(NonDimensional::PRANDTL))*boxScale*MathConstants::cI;
+      MHDComplex c = -this->eqParams().nd(NonDimensional::RAYLEIGH)/(32.*this->eqParams().nd(NonDimensional::PRANDTL))*boxScale*MathConstants::cI;
 
       // Get size of dealiased output (at this stage data has still dealiasing rows)
       int dealiasedRows = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -76,11 +76,11 @@ namespace Equations {
       {
          m_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
 
-         rRHS.addSlice((m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
+         rRHS.setSlice((m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
       }
    }
 
-   void LargeBeta3DQGStreamfunction::setRequirements()
+   void RotatingRBStreamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
@@ -95,7 +95,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
    }
 
-   void LargeBeta3DQGStreamfunction::setCoupling()
+   void RotatingRBStreamfunction::setCoupling()
    {
       // Set field coupling to vertical velocity
       this->mCouplingInfo.addField(FieldComponents::Spectral::SCALAR, std::make_pair(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR));
@@ -107,7 +107,7 @@ namespace Equations {
       this->mCouplingInfo.addInternal(FieldComponents::Spectral::SCALAR, nMat, dim);
    }
 
-   void LargeBeta3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
+   void RotatingRBStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
@@ -116,7 +116,7 @@ namespace Equations {
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       // Get right wave number
-      MHDFloat m_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -127,7 +127,7 @@ namespace Equations {
       this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
    }
 
-   void LargeBeta3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
+   void RotatingRBStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
@@ -136,7 +136,7 @@ namespace Equations {
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       // Get right wave number
-      MHDFloat m_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -147,7 +147,7 @@ namespace Equations {
       this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
    }
  
-   void LargeBeta3DQGStreamfunction::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void RotatingRBStreamfunction::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
    {
       // Get local copy of a shared resolution
       SharedResolution  spRes = this->unknown().dom(0).spRes();
@@ -197,7 +197,7 @@ namespace Equations {
       for(int k = 0; k < dim3D; k++)
       {
          // Get global index in third data dimension (second physical dimension)
-         MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
+         MHDFloat k_ = boxScale*0.5*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
 
          // Reset spectral operator 1D
          spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));

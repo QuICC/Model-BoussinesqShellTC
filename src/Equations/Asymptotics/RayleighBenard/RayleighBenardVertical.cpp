@@ -1,5 +1,5 @@
-/** \file Beta3DQGVertical.cpp
- *  \brief Source of the implementation of the vertical velocity equation in the 3DQG beta model
+/** \file RayleighBenardVertical.cpp
+ *  \brief Source of the implementation of the vertical velocity equation in the Rayleigh-Benard model
  */
 
 // Configuration includes
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGVertical.hpp"
+#include "Equations/Asymptotics/RayleighBenard/RayleighBenardVertical.hpp"
 
 // Project includes
 //
@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   Beta3DQGVertical::Beta3DQGVertical(SharedIEquationParameters spEqParams)
+   RayleighBenardVertical::RayleighBenardVertical(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Equation is always complex due to the sloping boundary condition
@@ -39,11 +39,11 @@ namespace Equations {
       this->setRequirements();
    }
 
-   Beta3DQGVertical::~Beta3DQGVertical()
+   RayleighBenardVertical::~RayleighBenardVertical()
    {
    }
 
-   void Beta3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void RayleighBenardVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -54,7 +54,7 @@ namespace Equations {
       rNLComp.rData().setConstant(0.0);
    }
 
-   void Beta3DQGVertical::setRequirements()
+   void RayleighBenardVertical::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
@@ -66,7 +66,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
-   void Beta3DQGVertical::setCoupling()
+   void RayleighBenardVertical::setCoupling()
    {
       // Set field coupling to vertical velocity
       this->mCouplingInfo.addField(FieldComponents::Spectral::SCALAR, std::make_pair(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR));
@@ -78,7 +78,7 @@ namespace Equations {
       this->mCouplingInfo.addInternal(FieldComponents::Spectral::SCALAR, nMat, dim);
    }
  
-   void Beta3DQGVertical::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void RayleighBenardVertical::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
    {
       // Get local copy of a shared resolution
       SharedResolution  spRes = this->unknown().dom(0).spRes();
@@ -147,7 +147,7 @@ namespace Equations {
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
-         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
+         Eigen::kroneckerProduct(spec3D.id(1), tau1D.first, it->second.back().first);
 
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
          Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), tmpA);
