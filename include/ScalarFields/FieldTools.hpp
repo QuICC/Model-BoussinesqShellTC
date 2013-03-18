@@ -67,6 +67,7 @@ namespace Datatypes {
       int shift = 0;
 
       // Loop over all slices
+      fieldInfo.reserve(field.nSlice());
       for(int i = 0; i < field.nSlice(); i++)
       {
          int rows = field.slice(i).rows();
@@ -89,6 +90,7 @@ namespace Datatypes {
       int shift = 0;
 
       // Loop over all slices
+      fieldInfo.reserve(rField.nSlice());
       for(int i = 0; i < rField.nSlice(); i++)
       {
          int rows = rField.slice(i).rows();

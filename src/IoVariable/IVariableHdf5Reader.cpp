@@ -139,9 +139,9 @@ namespace IoVariable {
          offV.push_back(0);
          for(int i = 0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            int i_ = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
             // Check if value is available in file
-            if(idx3D < this->mspFileRes->dim(simId,this->mSpaceId))
+            if(i_ < this->mspFileRes->dim(simId,this->mSpaceId))
             {
                // Compute offset for third dimension
                offV.at(0) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
