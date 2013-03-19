@@ -111,6 +111,11 @@ namespace GeoMHDiSCC {
          const std::map<std::string, int>& configBoundary() const;
 
          /**
+          * @brief Get the run options read from the configuration file
+          */
+         Array configRun() const;
+
+         /**
           * @brief Get begin iterator to HDF5 files
           */
          hdf5_iterator beginHdf5();
@@ -127,18 +132,27 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Write output files if conditions are met
+          *
+          * @param time    Current simulation time
+          * @param time    Current simulation timestep
           */
-         void writeFiles();
+         void writeFiles(const MHDFloat time, const MHDFloat timestep);
 
          /**
           * @brief Write ASCII data
+          *
+          * @param time    Current simulation time
+          * @param time    Current simulation timestep
           */
-         void writeAscii();
+         void writeAscii(const MHDFloat time, const MHDFloat timestep);
 
          /**
           * @brief Write HDF5 data
+          *
+          * @param time    Current simulation time
+          * @param time    Current simulation timestep
           */
-         void writeHdf5();
+         void writeHdf5(const MHDFloat time, const MHDFloat timestep);
          
       protected:
 

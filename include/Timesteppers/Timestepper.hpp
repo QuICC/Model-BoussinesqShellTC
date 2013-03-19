@@ -59,9 +59,12 @@ namespace Timestep {
          void init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
-          * @brief Change the used timestep
+          * @brief Adapt the timestep used
+          *
+          * @param scalEq Shared scalar equations
+          * @param vectEq Shared vector equations
           */
-         void changeTimestep(MHDFloat dt);
+         void adaptTimestep(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Update control status
@@ -75,6 +78,16 @@ namespace Timestep {
           * @param vectEq Shared vector equations
           */
          void stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+
+         /**
+          * @brief Get current simulation time
+          */
+         MHDFloat time() const;
+
+         /**
+          * @brief Get current simulation timestep
+          */
+         MHDFloat timestep() const;
          
       protected:
 
@@ -93,6 +106,11 @@ namespace Timestep {
           * @brief Compute (coupled) matrices
           */
          void createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
+
+         /**
+          * @brief Update (coupled) matrices
+          */
+         void updateMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Initialise the solution

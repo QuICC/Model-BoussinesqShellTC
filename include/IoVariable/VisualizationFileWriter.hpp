@@ -57,14 +57,6 @@ namespace IoVariable {
          void writeMesh();
 
          /**
-          * @brief Write run information to file
-          *
-          * @param time Reached simulation time
-          * @param step Current timestep
-          */
-         void writeRun(const MHDFloat time, const MHDFloat step);
-
-         /**
           * @brief Create group for scalar field
           *
           * @param name    Name of the field

@@ -54,7 +54,7 @@ namespace IoVariable {
       this->writeTruncation();
 
       // Write the run information
-      this->writeRun(0.0, 0.0);
+      this->writeRun();
 
       // Write all the scalars
       VisualizationFileWriter::scalar_iterator_range sRange = this->scalarRange();
@@ -84,21 +84,6 @@ namespace IoVariable {
       {
          this->writeArray(group, VisualizationFileTags::GRID+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), this->mMesh.at(i));
       }
-      
-      // close group
-      H5Gclose(group);
-   }
-
-   void VisualizationFileWriter::writeRun(const MHDFloat time, const MHDFloat step)
-   {
-      // Create the Run parameters group
-      hid_t group = H5Gcreate(this->file(), VisualizationFileTags::RUN.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      // Write reached simulation time to file
-      this->writeScalar(group, VisualizationFileTags::RUNTIME, time);
-
-      // Write last timestep to file
-      this->writeScalar(group, VisualizationFileTags::RUNSTEP, step);
       
       // close group
       H5Gclose(group);

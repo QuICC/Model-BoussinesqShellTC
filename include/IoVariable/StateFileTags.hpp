@@ -45,21 +45,6 @@ namespace IoVariable {
           */
          static const std::string   EXTENSION;
 
-         /**
-          * @brief Run parameters part for State file
-          */
-         static const std::string   RUN;
-
-         /**
-          * @brief Time tag for State file
-          */
-         static const std::string   RUNTIME;
-
-         /**
-          * @brief Timestep tag for State file
-          */
-         static const std::string   RUNSTEP;
-
       private:
          /**
          * @brief Empty destructor

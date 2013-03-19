@@ -32,6 +32,16 @@ namespace Timestep {
    {
    }
 
+   MHDFloat Timestepper::time() const
+   {
+      return this->mTime;
+   }
+
+   MHDFloat Timestepper::timestep() const
+   {
+      return this->mDt;
+   }
+
    bool Timestepper::finishedStep() const
    {
       return this->mStep == 0;
@@ -42,16 +52,56 @@ namespace Timestep {
       this->mTime += this->mDt;
    }
 
-   void Timestepper::changeTimestep(MHDFloat dt)
+   void Timestepper::adaptTimestep(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
-      // Safety assert
-      assert(dt > 0);
-
       // Set the new timestep
-      this->mDt = dt;
+      //this->mDt = this->mDt;
 
-      // Update the timestep matrices
-      ///  \mhdBug Does not yet update the matrices!!!
+      bool newTimestep = false;
+
+      //
+      // Update the timestep matrices if necessary
+      //
+      if(newTimestep)
+      {
+         // Loop over all substeps of timestepper
+         for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
+         {
+            // Loop over all scalar equations
+            std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
+            for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+            {
+               // Create (coupled) matrices
+               this->updateMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
+            }
+
+            // Loop over all vector equations
+            std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
+            for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+            {
+               // Create (coupled) matrices
+               this->updateMatrices((*vectEqIt), FieldComponents::Spectral::ONE);
+
+               // Create (coupled) matrices
+               this->updateMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
+            }
+         }
+
+         // Update solvers from complex equation steppers
+         for(size_t i = 0; i < this->mEqZStepper.size(); i++)
+         {
+            this->mEqZStepper.at(i).updateSolver();
+         }
+
+         // Update solvers from real equation steppers
+         for(size_t i = 0; i < this->mEqDStepper.size(); i++)
+         {
+            this->mEqDStepper.at(i).updateSolver();
+         }
+
+         // Reset the step index
+         this->mStep = 0;
+      }
    }
 
    void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
@@ -259,10 +309,10 @@ namespace Timestep {
          {
             if(fieldIdx == 0)
             {
-               // Complete RHS matrix
+               // Add RHS matrix
                this->mEqZStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
-               // Complete RHS matrix
+               // Add RHS matrix
                this->mEqZStepper.at(myIdx).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                if(this->mStep == 0)
@@ -304,10 +354,10 @@ namespace Timestep {
          {
             if(fieldIdx == 0)
             {
-               // Complete RHS matrix
+               // Add RHS matrix
                this->mEqDStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
 
-               // Complete RHS matrix
+               // Add RHS matrix
                this->mEqDStepper.at(myIdx).addRHSMatrix(this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
 
                if(this->mStep == 0)
@@ -335,6 +385,97 @@ namespace Timestep {
          {
             // Store storage information
             this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
+         }
+
+         // Move field counter to next field
+         this->mEqDStepper.at(myIdx).next();
+      }
+   }
+
+   void Timestepper::updateMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
+   {
+      // ID of the current field
+      TimestepCoupling::FieldIdType myId = std::make_pair(spEq->name(),comp);
+
+      // Index of the current field
+      int myIdx = this->mTimeCoupling.idx(myId);
+
+      // Get internal information
+      std::pair<int,ArrayI>  interInfo = spEq->couplingInfo().internal(comp);
+
+      // Get the number of coupled fields
+      int nC = spEq->couplingInfo().nFields(comp);
+
+      // start index for matrices
+      int start = this->mStep*interInfo.first;
+
+      // Start row for storage information
+      ArrayI startRow(interInfo.first);
+
+      // Storage for the field index
+      int fieldIdx;
+
+      // Complex matrices in linear solve
+      if(this->mTimeCoupling.isComplex(myId))
+      {
+         fieldIdx = this->mEqZStepper.at(myIdx).current();
+
+         for(int i = 0; i < interInfo.first; i++)
+         {
+            if(fieldIdx == 0)
+            {
+               // Set RHS matrix
+               this->mEqZStepper.at(myIdx).setLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set RHS matrix
+               this->mEqZStepper.at(myIdx).setRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set the start row
+               startRow(i) = 0;
+            } else
+            {
+               // Complete RHS matrix
+               this->mEqZStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Complete RHS matrix
+               this->mEqZStepper.at(myIdx).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set the start row
+               startRow(i) = spEq->rowShift(comp, i);
+            }
+         }
+
+         // Move field counter to next field
+         this->mEqZStepper.at(myIdx).next();
+
+      // Real matrices in linear solve
+      } else
+      {
+         fieldIdx = this->mEqDStepper.at(myIdx).current();
+
+         for(int i = 0; i < interInfo.first; i++)
+         {
+            if(fieldIdx == 0)
+            {
+               // Set RHS matrix
+               this->mEqDStepper.at(myIdx).setLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set RHS matrix
+               this->mEqDStepper.at(myIdx).setRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set the start row
+               startRow(i) = 0;
+            } else
+            {
+               // Complete RHS matrix
+               this->mEqDStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Complete RHS matrix
+               this->mEqDStepper.at(myIdx).completeRHSMatrix(start+i,this->buildRHSMatrix(spEq,comp,i,nC,fieldIdx));
+
+               // Set the start row
+               startRow(i) = spEq->rowShift(comp, i);
+            }
          }
 
          // Move field counter to next field

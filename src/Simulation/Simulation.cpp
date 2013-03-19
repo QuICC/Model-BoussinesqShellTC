@@ -53,6 +53,16 @@ namespace GeoMHDiSCC {
 
          // Initialise the workflow
          FrameworkMacro::setup(nCpu);
+
+         // Get the run configuration
+         Array cfgRun = this->mSimIoCtrl.configRun();
+
+         // Set the maximum simulation time
+         this->mSimRunCtrl.setMaxSimTime(cfgRun(0));
+
+         // Set the maximum wall time
+         this->mSimRunCtrl.setMaxWallTime(cfgRun(1));
+
       }
       catch(Exception &e)
       {
@@ -208,10 +218,10 @@ namespace GeoMHDiSCC {
       }
 
       // Write initial ASCII output
-      this->mSimIoCtrl.writeAscii();
+      this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
 
       // Write initial state file
-      this->mSimIoCtrl.writeHdf5();
+      this->mSimIoCtrl.writeHdf5(this->mTimestepper.time(), this->mTimestepper.timestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
@@ -240,8 +250,11 @@ namespace GeoMHDiSCC {
          // Update timestepper
          this->mTimestepper.update();
       
+         // Adapt timestepper time step
+         this->mTimestepper.adaptTimestep(this->mScalarEquations, this->mVectorEquations);
+      
          // Update simulation run control
-         this->mSimRunCtrl.update();
+         this->mSimRunCtrl.update(this->mTimestepper.time());
       
          // Update simulation IO control
          this->mSimIoCtrl.update();
@@ -255,7 +268,7 @@ namespace GeoMHDiSCC {
       if(this->mTimestepper.finishedStep())
       {
          // Write initial ASCII and HDF5 output files if applicable
-         this->mSimIoCtrl.writeFiles();
+         this->mSimIoCtrl.writeFiles(this->mTimestepper.time(), this->mTimestepper.timestep());
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
    }
@@ -263,10 +276,10 @@ namespace GeoMHDiSCC {
    void Simulation::postRun()
    {
       // Write final ASCII output
-      this->mSimIoCtrl.writeAscii();
+      this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
 
       // Write final state file
-      this->mSimIoCtrl.writeHdf5();
+      this->mSimIoCtrl.writeHdf5(this->mTimestepper.time(), this->mTimestepper.timestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();

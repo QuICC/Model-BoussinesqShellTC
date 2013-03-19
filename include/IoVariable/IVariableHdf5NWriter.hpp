@@ -73,6 +73,14 @@ namespace IoVariable {
          void setMesh(const std::vector<Array>& mesh);
 
          /**
+          * @brief Set the simulation time parameters
+          *
+          * @param time    Reached simulation time
+          * @param time    Last timestep size
+          */
+         void setSimTime(const MHDFloat time, const MHDFloat timestep);
+
+         /**
           * @brief Make sure all the expected variables have been added
           */
          bool isFull() const;
@@ -110,21 +118,9 @@ namespace IoVariable {
          typedef std::pair<vector_iterator, vector_iterator>  vector_iterator_range;
 
          /**
-          * @brief Resolution information
-          * 
-          * @param spRes      Resolution information
+          * @brief Write run information to file
           */
-         SharedResolution mspRes;
-
-         /**
-          * @brief Physical parameters of the simulation
-          */
-         std::map<std::string,MHDFloat> mPhysical;
-
-         /**
-          * @brief Storage for the mesh
-          */
-         std::vector<Array> mMesh;
+         void writeRun();
 
          /**
           * @brief Set the size of the dataset
@@ -155,6 +151,33 @@ namespace IoVariable {
           * @brief Get iterator range to vectors
           */
          vector_iterator_range   vectorRange();
+
+         /**
+          * @brief Resolution information
+          * 
+          * @param spRes      Resolution information
+          */
+         SharedResolution mspRes;
+
+         /**
+          * @brief Physical parameters of the simulation
+          */
+         std::map<std::string,MHDFloat> mPhysical;
+
+         /**
+          * @brief Storage for the mesh
+          */
+         std::vector<Array> mMesh;
+
+         /**
+          * @brief Time
+          */
+         MHDFloat mTime;
+
+         /**
+          * @brief Timestep
+          */
+         MHDFloat mTimestep;
 
          /**
           * @brief Is file working on regular data?

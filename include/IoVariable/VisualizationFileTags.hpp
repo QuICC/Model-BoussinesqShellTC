@@ -55,21 +55,6 @@ namespace IoVariable {
           */
          static const std::string   GRID;
 
-         /**
-          * @brief Run parameters part for visualisation file
-          */
-         static const std::string   RUN;
-
-         /**
-          * @brief Time tag for visualisation file
-          */
-         static const std::string   RUNTIME;
-
-         /**
-          * @brief Timestep tag for visualisation file
-          */
-         static const std::string   RUNSTEP;
-
       private:
          /**
          * @brief Empty destructor

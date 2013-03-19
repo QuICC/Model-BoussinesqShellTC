@@ -28,5 +28,11 @@ namespace IoVariable {
    const std::string VariableHdf5Tags::TRUNCDIM = "dim";
 
    const std::string VariableHdf5Tags::PHYSICAL = "physical";
+
+   const std::string VariableHdf5Tags::RUN = "run";
+
+   const std::string VariableHdf5Tags::RUNTIME = "time";
+
+   const std::string VariableHdf5Tags::RUNSTEP = "timestep";
 }
 }

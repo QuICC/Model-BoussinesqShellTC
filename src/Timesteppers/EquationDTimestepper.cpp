@@ -84,6 +84,12 @@ namespace Timestep {
          this->mSolver.push_back(solver);
       }
 
+      // Compute the factorisations
+      this->updateSolver();
+   }
+
+   void EquationDTimestepper::updateSolver()
+   {
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
@@ -98,6 +104,16 @@ namespace Timestep {
    void EquationDTimestepper::addRHSMatrix(const DecoupledZSparse& rhs)
    {
       this->mRHSMatrix.push_back(rhs.first);
+   }
+
+   void EquationDTimestepper::setLHSMatrix(const int idx, const DecoupledZSparse& lhs)
+   {
+      this->mLHSMatrix.at(idx) = lhs.first;
+   }
+
+   void EquationDTimestepper::setRHSMatrix(const int idx, const DecoupledZSparse& rhs)
+   {
+      this->mRHSMatrix.at(idx) = rhs.first;
    }
 
    void EquationDTimestepper::completeLHSMatrix(const int idx, const DecoupledZSparse& lhs)

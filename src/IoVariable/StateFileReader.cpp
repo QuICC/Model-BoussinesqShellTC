@@ -20,6 +20,7 @@
 #include "Enums/FieldComponents.hpp"
 #include "ScalarFields/FieldTools.hpp"
 #include "IoVariable/StateFileTags.hpp"
+#include "IoVariable/VariableHdf5Tags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
@@ -92,13 +93,13 @@ namespace IoVariable {
    void StateFileReader::readRun()
    {
       // Open the run paramters group
-      hid_t group = H5Gopen(this->file(), StateFileTags::RUN.c_str(), H5P_DEFAULT);
+      hid_t group = H5Gopen(this->file(), VariableHdf5Tags::RUN.c_str(), H5P_DEFAULT);
 
       // Read the reached simulation time from file
-      this->readScalar(group, StateFileTags::RUNTIME, this->mTime);
+      this->readScalar(group, VariableHdf5Tags::RUNTIME, this->mTime);
 
       // Read the last used timestep from file
-      this->readScalar(group, StateFileTags::RUNSTEP, this->mTimestep);
+      this->readScalar(group, VariableHdf5Tags::RUNSTEP, this->mTimestep);
       
       // close group
       H5Gclose(group);

@@ -55,16 +55,16 @@ namespace GeoMHDiSCC {
       this->mSteps++;
    }
 
-   void SimulationIoControl::writeFiles()
+   void SimulationIoControl::writeFiles(const MHDFloat time, const MHDFloat timestep)
    {
       if(this->mSteps % this->mAsciiRate == 0)
       {
-         this->writeAscii();
+         this->writeAscii(time,timestep);
       }
 
       if(this->mSteps % this->mHdf5Rate == 0)
       {
-         this->writeHdf5();
+         this->writeHdf5(time,timestep);
       }
    }
 
@@ -138,7 +138,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void SimulationIoControl::writeAscii()
+   void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all ASCII writer
       std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
@@ -148,12 +148,15 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void SimulationIoControl::writeHdf5()
+   void SimulationIoControl::writeHdf5(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all HDF5 writer
       SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
+         // Set simulation time
+         (*itHdf5)->setSimTime(time,timestep);
+
          (*itHdf5)->write();
       }
    }
@@ -258,5 +261,18 @@ namespace GeoMHDiSCC {
    SimulationIoControl::hdf5_iterator  SimulationIoControl::endHdf5()
    {
       return this->mHdf5Writers.end();
+   }
+
+   Array SimulationIoControl::configRun() const
+   {
+      Array run(2);
+
+      // Get simulation time configuration
+      run(0) = this->mspCfgFile->spRun()->fValue("sim");
+
+      // Get wall time configuration
+      run(1) = this->mspCfgFile->spRun()->fValue("wall");
+
+      return run;
    }
 }

@@ -27,14 +27,8 @@ namespace IoVariable {
 
    const std::string VisualizationFileTags::EXTENSION = ".hdf5";
 
-   const std::string VisualizationFileTags::RUN = "Run";
+   const std::string VisualizationFileTags::MESH = "mesh";
 
-   const std::string VisualizationFileTags::RUNTIME = "Time";
-
-   const std::string VisualizationFileTags::RUNSTEP = "Step";
-
-   const std::string VisualizationFileTags::MESH = "Mesh";
-
-   const std::string VisualizationFileTags::GRID = "Grid";
+   const std::string VisualizationFileTags::GRID = "grid";
 }
 }

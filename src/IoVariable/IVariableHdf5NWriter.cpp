@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    IVariableHdf5NWriter::IVariableHdf5NWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular)
-      : IHdf5NWriter(name, ext, header, type, version), mIsRegular(isRegular), mSpaceId(id)
+      : IHdf5NWriter(name, ext, header, type, version), mTime(-1.0), mTimestep(-1.0), mIsRegular(isRegular), mSpaceId(id)
    {
    }
 
@@ -46,6 +46,13 @@ namespace IoVariable {
    void IVariableHdf5NWriter::setMesh(const std::vector<Array>& mesh)
    {
       this->mMesh = mesh;
+   }
+
+   void IVariableHdf5NWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)
+   {
+      this->mTime = time;
+
+      this->mTimestep = timestep;
    }
 
    void IVariableHdf5NWriter::setResolution(SharedResolution spRes)
@@ -293,6 +300,21 @@ namespace IoVariable {
          // Write reached simulation time to file
          this->writeScalar(group, it->first, it->second);
       }
+      
+      // close group
+      H5Gclose(group);
+   }
+
+   void IVariableHdf5NWriter::writeRun()
+   {
+      // Create the Run parameters group
+      hid_t group = H5Gcreate(this->file(), VariableHdf5Tags::RUN.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      // Write reached simulation time to file
+      this->writeScalar(group, VariableHdf5Tags::RUNTIME, this->mTime);
+
+      // Write last timestep to file
+      this->writeScalar(group, VariableHdf5Tags::RUNSTEP, this->mTimestep);
       
       // close group
       H5Gclose(group);

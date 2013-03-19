@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 #include "Enums/Runtime.hpp"
 #include "IoControl/ControlInterface.hpp"
 
@@ -42,8 +43,10 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Update control status
+          *
+          * @param simTime Simulation time
           */
-         void update();
+         void update(const MHDFloat simTime);
 
          /**
           * @brief Should the simulation keep running?
@@ -54,6 +57,20 @@ namespace GeoMHDiSCC {
           * @brief Update the status from control file
           */
          void checkFile();
+
+         /***
+          * @brief Set the maximum simulation time
+          *
+          * @param maxTime New maximum simulation time
+          */
+         void setMaxSimTime(const MHDFloat maxTime);
+
+         /***
+          * @brief Set the maximum wall time
+          *
+          * @param maxTime New maximum wall time
+          */
+         void setMaxWallTime(const MHDFloat maxTime);
          
       protected:
          /**
@@ -70,6 +87,16 @@ namespace GeoMHDiSCC {
           * @brief Number of timesteps done
           */
          int   mSteps;
+
+         /**
+          * @brief Maximum simulation time
+          */
+         MHDFloat mMaxSimTime;
+
+         /**
+          * @brief Maximum wall time
+          */
+         MHDFloat mMaxWallTime;
 
       private:
    };

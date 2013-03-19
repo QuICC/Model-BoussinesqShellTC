@@ -51,7 +51,7 @@ namespace IoVariable {
       this->writeTruncation();
 
       // Write the run information
-      this->writeRun(0.0, 0.0);
+      this->writeRun();
 
       // Write all the scalars
       StateFileWriter::scalar_iterator_range sRange = this->scalarRange();
@@ -71,21 +71,6 @@ namespace IoVariable {
 
       // Close file
       this->postWrite();
-   }
-
-   void StateFileWriter::writeRun(const MHDFloat time, const MHDFloat step)
-   {
-      // Create the Run parameters group
-      hid_t group = H5Gcreate(this->file(), StateFileTags::RUN.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      // Write reached simulation time to file
-      this->writeScalar(group, StateFileTags::RUNTIME, time);
-
-      // Write last timestep to file
-      this->writeScalar(group, StateFileTags::RUNSTEP, step);
-      
-      // close group
-      H5Gclose(group);
    }
 
    void StateFileWriter::writeSpectralScalar(const std::string& name, const Datatypes::SpectralScalarType& scalar)

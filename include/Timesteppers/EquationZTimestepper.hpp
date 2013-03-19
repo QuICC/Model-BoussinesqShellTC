@@ -43,9 +43,14 @@ namespace Timestep {
          virtual ~EquationZTimestepper();
 
          /**
-          * @brief Initialise solvers
+          * @brief Initialise solver
           */
          void initSolver();
+
+         /**
+          * @brief Update solver
+          */
+         void updateSolver();
 
          /**
           * @brief Compute the RHS of the linear systems
@@ -79,6 +84,22 @@ namespace Timestep {
           * @param rhs RHS matrix to add
           */
          void addRHSMatrix(const DecoupledZSparse& rhs);
+
+         /**
+          * @brief Set existing LHS Matrix with new values
+          *
+          * @param idx  Index of the matrix
+          * @param lhs LHS matrix to add
+          */
+         void setLHSMatrix(const int idx, const DecoupledZSparse& lhs);
+
+         /**
+          * @brief Se existing RHS Matrix with new values
+          *
+          * @param idx  Index of the matrix
+          * @param rhs RHS matrix to add
+          */
+         void setRHSMatrix(const int idx, const DecoupledZSparse& rhs);
 
          /**
           * @brief Complete LHS Matrix with additional values
