@@ -32,14 +32,14 @@ namespace IoTools {
             return "Pressure";
          case PhysicalNames::TEMPERATURE:
             return "Temperature";
+         case PhysicalNames::MEANTEMPERATURE:
+            return "Mean temperature";
          case PhysicalNames::STREAMFUNCTION:
             return "Streamfunction";
          case PhysicalNames::VELOCITYZ:
             return "VelocityZ";
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
-         case PhysicalNames::PHI:
-            return "Phi";
          case PhysicalNames::VELOCITY:
             return "Velocity";
          case PhysicalNames::MAGNETIC:
@@ -61,14 +61,14 @@ namespace IoTools {
             return "pressure";
          case PhysicalNames::TEMPERATURE:
             return "temperature";
+         case PhysicalNames::MEANTEMPERATURE:
+            return "meantemperature";
          case PhysicalNames::STREAMFUNCTION:
             return "streamfunction";
          case PhysicalNames::VELOCITYZ:
             return "velocityz";
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
-         case PhysicalNames::PHI:
-            return "phi";
          case PhysicalNames::VELOCITY:
             return "velocity";
          case PhysicalNames::MAGNETIC:

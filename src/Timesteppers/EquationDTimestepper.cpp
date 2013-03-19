@@ -84,15 +84,19 @@ namespace Timestep {
          this->mSolver.push_back(solver);
       }
 
-      // Compute the factorisations
-      this->updateSolver();
+      // Compute the pattern and the factorisations
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
+      {
+         this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+      }
    }
 
    void EquationDTimestepper::updateSolver()
    {
+      // Compute the factorisations
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+         this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
       }
    }
 

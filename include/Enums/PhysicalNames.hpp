@@ -37,14 +37,14 @@ namespace GeoMHDiSCC {
          PRESSURE,
          /// Temperature field
          TEMPERATURE,
+         /// Mean temperature field
+         MEANTEMPERATURE,
          /// Streamfunction field
          STREAMFUNCTION,
          /// Axial velocity field
          VELOCITYZ,
          /// Axial vorticity field
          VORTICITYZ,
-         /// Phi field
-         PHI,
          /// Magnetic field
          MAGNETIC,
          /// Velocity field

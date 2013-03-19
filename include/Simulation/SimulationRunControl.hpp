@@ -45,8 +45,9 @@ namespace GeoMHDiSCC {
           * @brief Update control status
           *
           * @param simTime Simulation time
+          * @param simDt   Simulation timestep
           */
-         void update(const MHDFloat simTime);
+         void update(const MHDFloat simTime, const MHDFloat simDt);
 
          /**
           * @brief Should the simulation keep running?

@@ -32,7 +32,7 @@ namespace GeoMHDiSCC {
       return this->mStatus;
    }
 
-   void SimulationRunControl::update(const MHDFloat simTime)
+   void SimulationRunControl::update(const MHDFloat simTime, const MHDFloat simDt)
    {
       // Increment timestep counter
       this->mSteps++;
@@ -50,6 +50,12 @@ namespace GeoMHDiSCC {
 
       // Check for maximum simulation steps
       if(this->mMaxSimTime < 0 && this->mSteps > std::abs(this->mMaxSimTime))
+      {
+         this->mStatus = Runtime::Status::STOP;
+      }
+
+      // Check if timestepper requested abort due to too small timestep
+      if(simDt < 0)
       {
          this->mStatus = Runtime::Status::STOP;
       }

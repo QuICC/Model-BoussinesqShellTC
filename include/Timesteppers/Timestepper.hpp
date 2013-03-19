@@ -61,10 +61,11 @@ namespace Timestep {
          /**
           * @brief Adapt the timestep used
           *
-          * @param scalEq Shared scalar equations
-          * @param vectEq Shared vector equations
+          * @param cfl     CFL condition
+          * @param scalEq  Shared scalar equations
+          * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Update control status
@@ -167,6 +168,21 @@ namespace Timestep {
           * @param cRow Row index of coupled field
           */
          DecoupledZSparse buildRHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Maximum timestep jump per step (See Soederlind)
+          */
+         const MHDFloat mcMaxJump;
+
+         /**
+          * @brief No update window for timestep increase
+          */
+         const MHDFloat mcUpWindow;
+
+         /**
+          * @brief Minimal timestep allowed before simulation abort
+          */
+         const MHDFloat mcMinDt;
 
          /**
           * @brief Current timestepper step (local)

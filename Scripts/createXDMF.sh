@@ -6,6 +6,7 @@ NZ=`h5ls -r $1 | grep /mesh/grid_z | awk '{print $3}' | sed -e 's/{//' -e 's/}//
 
 FID=`basename -s .hdf5 $1 | sed -e 's/visState//'`
 SCALARS=`h5ls -r $1 | grep "{${NX}, ${NY}, ${NZ}}" | awk '{print $1}' | sed -e 's/\// /' -e 's/\// /' | awk '{print $1}'`
+TIME=`h5dump -y -d '/run/time' $1 | grep -A 1 'DATA {' | tail -n 1 | awk '{print $1}'`
 
 cat > vis${FID}.xdmf <<EOF
 <?xml version="1.0" ?>
@@ -36,6 +37,7 @@ cat >> vis${FID}.xdmf << EOF
 EOF
 done
 cat >> vis${FID}.xdmf <<EOF
+         <Time Value="${TIME}" />
       </Grid>
    </Domain>
 </Xdmf>

@@ -36,6 +36,7 @@
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
 #include "IoVariable/IVariableHdf5Reader.hpp"
+#include "Diagnostics/DiagnosticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -239,6 +240,11 @@ namespace GeoMHDiSCC {
           * @brief Storage for a shared backward transform grouper
           */
          Transform::SharedIBackwardGrouper   mspBwdGrouper;
+
+         /**
+          * @brief Diagnostic coordinator
+          */
+         Diagnostics::DiagnosticCoordinator  mDiagnostics;
    };
 
    template <typename TScheme> void Simulation::initResolution()

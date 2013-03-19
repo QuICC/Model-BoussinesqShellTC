@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    Simulation::Simulation()
-      : mExecutionTimer(), mSimRunCtrl()
+      : mExecutionTimer(), mSimRunCtrl(), mDiagnostics()
    {
    }
 
@@ -92,6 +92,9 @@ namespace GeoMHDiSCC {
 
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
+
+      // Initialise the diagnostics
+      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables);
 
       // Cleanup IO control
       this->mSimIoCtrl.cleanup();
@@ -249,12 +252,18 @@ namespace GeoMHDiSCC {
       {
          // Update timestepper
          this->mTimestepper.update();
-      
+
+         // Update CFL condition
+         this->mDiagnostics.updateCfl();
+
+         // Update kinetic energy condition
+         this->mDiagnostics.updateKineticEnergy();
+
          // Adapt timestepper time step
-         this->mTimestepper.adaptTimestep(this->mScalarEquations, this->mVectorEquations);
+         this->mTimestepper.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarEquations, this->mVectorEquations);
       
          // Update simulation run control
-         this->mSimRunCtrl.update(this->mTimestepper.time());
+         this->mSimRunCtrl.update(this->mTimestepper.time(), this->mTimestepper.timestep());
       
          // Update simulation IO control
          this->mSimIoCtrl.update();

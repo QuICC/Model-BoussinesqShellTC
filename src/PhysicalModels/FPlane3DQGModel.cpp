@@ -39,8 +39,11 @@ namespace GeoMHDiSCC {
       // Add axial velocity
       ids.push_back(PhysicalNames::VELOCITYZ);
 
-      // Add temperature
+      // Add temperature fluctuations
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add mean temperature
+      ids.push_back(PhysicalNames::MEANTEMPERATURE);
 
       return ids;
    }
@@ -80,6 +83,9 @@ namespace GeoMHDiSCC {
 
    void FPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
+      // Add mean temperature equation
+      spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
+      
       // Add transport equation
       spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
       

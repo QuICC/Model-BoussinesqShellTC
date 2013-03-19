@@ -19,12 +19,14 @@
 //
 #include "Timesteppers/ImExRK3.hpp"
 
+#include <iostream>
+
 namespace GeoMHDiSCC {
 
 namespace Timestep {
 
    Timestepper::Timestepper()
-      : mStep(0), mDt(1e-3), mTime(0.0)
+      : mcMaxJump(1.602), mcUpWindow(0.05), mcMinDt(1e-8), mStep(0), mDt(this->mcMinDt), mTime(0.0)
    {
    }
 
@@ -52,21 +54,60 @@ namespace Timestep {
       this->mTime += this->mDt;
    }
 
-   void Timestepper::adaptTimestep(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
-      // Set the new timestep
-      //this->mDt = this->mDt;
+      // Flag to update timestep
+      bool hasNewDt = false;
 
-      bool newTimestep = false;
+      // Check if CFL allows for a larger timestep
+      if(cfl > this->mDt)
+      {
+         // Activate matrices update
+         hasNewDt = true;
 
+         // Set new timestep
+         this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
+      
+      // Check if CFL is below minimal timestep
+      } else if(cfl < this->mcMinDt)
+      {
+         // Don't update matrices
+         hasNewDt = false;
+ 
+         // Signal simulation abort
+         this->mDt = -cfl;
+     
+      // Check if CFL requires a lower timestep
+      } else if(cfl < this->mDt)
+      {
+         // Activate matrices update
+         hasNewDt = true;
+
+         // Set new timestep
+         this->mDt = cfl;
+
+      // No need to change timestep
+      } else
+      {
+         hasNewDt = false;
+      }
+
+      std::cerr << "New CFL: " << cfl << std::endl;
+      if(hasNewDt)
+      {
+         std::cerr << "Updating timestep and matrices" << std::endl;
+      }
+
+      std::cerr << "START timestep update" << std::endl;
       //
       // Update the timestep matrices if necessary
       //
-      if(newTimestep)
+      if(hasNewDt)
       {
          // Loop over all substeps of timestepper
          for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
          {
+std::cerr << "START scalar matrix update" << std::endl;
             // Loop over all scalar equations
             std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
             for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
@@ -74,7 +115,9 @@ namespace Timestep {
                // Create (coupled) matrices
                this->updateMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
             }
+std::cerr << "FINISH scalar matrix update" << std::endl;
 
+std::cerr << "START Vector matrix update" << std::endl;
             // Loop over all vector equations
             std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
             for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
@@ -85,23 +128,29 @@ namespace Timestep {
                // Create (coupled) matrices
                this->updateMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
             }
+std::cerr << "FINISH Vector matrix update" << std::endl;
          }
 
+std::cerr << "START complex solver update" << std::endl;
          // Update solvers from complex equation steppers
          for(size_t i = 0; i < this->mEqZStepper.size(); i++)
          {
             this->mEqZStepper.at(i).updateSolver();
          }
+std::cerr << "FINISH complex solver update" << std::endl;
 
+std::cerr << "START real solver update" << std::endl;
          // Update solvers from real equation steppers
          for(size_t i = 0; i < this->mEqDStepper.size(); i++)
          {
             this->mEqDStepper.at(i).updateSolver();
          }
+std::cerr << "FINISH real solver update" << std::endl;
 
          // Reset the step index
          this->mStep = 0;
       }
+      std::cerr << "FINISHED matrix update" << std::endl;
    }
 
    void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)

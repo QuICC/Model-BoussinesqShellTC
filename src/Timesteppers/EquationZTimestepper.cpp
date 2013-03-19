@@ -81,17 +81,24 @@ namespace Timestep {
          this->mSolver.push_back(solver);
       }
 
-      // Compute factorisation
-      this->updateSolver();
-   }
-
-   void EquationZTimestepper::updateSolver()
-   {
+      // Compute pattern and factorisation
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          if(i % this->nSystem() != 0)
          {
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+         }
+      }
+   }
+
+   void EquationZTimestepper::updateSolver()
+   {
+      // Compute factorisation
+      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
+      {
+         if(i % this->nSystem() != 0)
+         {
+            this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
          }
       }
    }

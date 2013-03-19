@@ -33,6 +33,7 @@ message(STATUS "!!!WARNING!!! AllSrc.cmake OVERRIDING ACTUAL DIRECTORY LIST WITH
 set(MHDAllSrcDirs
    Base
    Communicators
+   Diagnostics
    Equations
    Enums
    Exceptions
