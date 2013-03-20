@@ -21,12 +21,14 @@
 #include "Exceptions/Exception.hpp"
 #include "Diagnostics/StreamVerticalWrapper.hpp"
 
+#include <iostream>
+
 namespace GeoMHDiSCC {
 
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mCfl(0.0), mKinetic(0.0), mMinSpacing(0.0)
+      : mcCourant(0.65), mCfl(0.0), mKinetic(0.0)
    {
    }
 
@@ -49,16 +51,32 @@ namespace Diagnostics {
          throw Exception("Unknown velocity wrapper is required!");
       }
 
-      // Get the minimal grid spacing
-      /// \mhdBug Computationg of the minimal grid spacing is very strict
-      Array minSpace(mesh.size());
+      // Compute the mesh spacings
+      this->mMeshSpacings.reserve(mesh.size());
+      // Loop over all dimensions
       for(size_t i = 0; i < mesh.size(); i++)
       {
-         minSpace(i) = (mesh.at(i).segment(0, mesh.at(i).size()-1) - mesh.at(i).segment(1, mesh.at(i).size()-1)).array().abs().minCoeff();
-      }
+         // Create storage
+         this->mMeshSpacings.push_back(Array(mesh.at(i).size()));
 
-      // Set the minimal spacing
-      this->mMinSpacing = minSpace.array().minCoeff();
+         // Extract minimal spacing for each grid in current direction
+         for(int j = 0; j < mesh.at(i).size(); ++j)
+         {
+            // Get internal points grid spacing
+            if(j > 0 && j < mesh.at(i).size() - 1)
+            {
+               this->mMeshSpacings.back()(j) = std::min(std::abs(mesh.at(i)(j) - mesh.at(i)(j-1)), std::abs(mesh.at(i)(j) - mesh.at(i)(j+1)));
+            // Get left endpoint grid spacing
+            } else if(j > 0)
+            {
+               this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j-1));
+            // Get right endpoint grid spacing
+            } else
+            {
+               this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j+1));
+            }
+         }
+      }
    }
 
    void DiagnosticCoordinator::updateCfl()
@@ -66,11 +84,14 @@ namespace Diagnostics {
       // Safety assert
       assert(this->mspVelocityWrapper);
 
-      // Compute the maximum velocity amplitude on the grid
-      MHDFloat maxVel = std::sqrt((this->mspVelocityWrapper->one().data().array().pow(2) + this->mspVelocityWrapper->two().data().array().pow(2) + this->mspVelocityWrapper->three().data().array().pow(2)).maxCoeff());
+      // Compute most stringent CFL condition
+      this->mCfl = this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/this->mspVelocityWrapper->one().data().array().abs().maxCoeff();
+      this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
+      this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
 
+      std::cerr << "Raw CFL: " << this->mCfl << std::endl;
       /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
-      this->mCfl = std::min(this->mcCourant, this->mcCourant*this->mMinSpacing/maxVel);
+      this->mCfl = std::min(this->mcCourant, this->mCfl);
    }
 
    void DiagnosticCoordinator::updateKineticEnergy()

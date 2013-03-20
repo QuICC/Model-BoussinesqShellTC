@@ -69,8 +69,14 @@ namespace Timestep {
          // Solve for the real component
          this->mSolution.at(i).first = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).first);
 
+         // Safety assert for successful solve
+         assert(this->mSolver.at(i+start)->info() == Eigen::Success);
+
          // Solve for the imaginary component
          this->mSolution.at(i).second = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).second);
+
+         // Safety assert for successful solve
+         assert(this->mSolver.at(i+start)->info() == Eigen::Success);
       }
    }
 
@@ -79,7 +85,7 @@ namespace Timestep {
       this->mSolver.reserve(this->mLHSMatrix.size());
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         SharedPtrMacro<Eigen::SuperLU<SparseMatrix> >  solver(new Eigen::SuperLU<SparseMatrix>());
+         SharedPtrMacro<SparseSolverMacro<SparseMatrix> >  solver(new SparseSolverMacro<SparseMatrix>());
 
          this->mSolver.push_back(solver);
       }
@@ -87,7 +93,13 @@ namespace Timestep {
       // Compute the pattern and the factorisations
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
+         // Safety assert to make sur matrix is compressed
+         assert(this->mLHSMatrix.at(i).isCompressed());
+
          this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+
+         // Safety assert for successful factorisation
+         assert(this->mSolver.at(i)->info() == Eigen::Success);
       }
    }
 
@@ -96,8 +108,23 @@ namespace Timestep {
       // Compute the factorisations
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
+         // Safety assert to make sur matrix is compressed
+         assert(this->mLHSMatrix.at(i).isCompressed());
+
          this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
+
+         // Safety assert for successful factorisation
+         assert(this->mSolver.at(i)->info() == Eigen::Success);
       }
+   }
+
+   void EquationDTimestepper::reserveMatrices(const int n)
+   {
+      // Reserve space for the LHS matrices
+      this->mLHSMatrix.reserve(n);
+
+      // Reserve space for the RHS matrices
+      this->mRHSMatrix.reserve(n);
    }
 
    void EquationDTimestepper::addLHSMatrix(const DecoupledZSparse& lhs)

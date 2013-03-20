@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    Simulation::Simulation()
-      : mExecutionTimer(), mSimRunCtrl(), mDiagnostics()
+      : mExecutionTimer(true), mSimRunCtrl(), mDiagnostics()
    {
    }
 
@@ -37,9 +37,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::initBase()
    {
-      // Start timer
-      this->mExecutionTimer.start();
-
       // Make sure to catch raised exception in initialisation steps
       try{
          // Initialise the IO system
@@ -70,10 +67,6 @@ namespace GeoMHDiSCC {
 
          throw -1;
       }
-
-      // Stop timer and update initialisation time
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::INIT);
 
       // Make sure nodes are synchronised after initialisation
       FrameworkMacro::synchronize();
@@ -111,6 +104,10 @@ namespace GeoMHDiSCC {
 
    void Simulation::run()
    {
+      // Stop timer and update initialisation time
+      this->mExecutionTimer.stop();
+      this->mExecutionTimer.update(ExecutionTimer::INIT);
+
       // Start timer
       this->mExecutionTimer.start();
 

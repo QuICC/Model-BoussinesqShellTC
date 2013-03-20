@@ -16,10 +16,10 @@
 
 // External includes
 //
-#include <Eigen/SuperLUSupport>
 
 // Project includes
 //
+#include "Timesteppers/SparseSolverMacro.h"
 #include "Timesteppers/EquationTimestepperBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -41,6 +41,11 @@ namespace Timestep {
           * @brief Destructor
           */
          virtual ~EquationZTimestepper();
+
+         /**
+          * @brief Reserve storage for the matrices
+          */
+         void reserveMatrices(const int n);
 
          /**
           * @brief Initialise solver
@@ -174,7 +179,7 @@ namespace Timestep {
          /**
           * @brief Create sparse solvers
           */
-         std::vector<SharedPtrMacro<Eigen::SuperLU<SparseMatrixZ> > >  mSolver;
+         std::vector<SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> > >  mSolver;
 
       private:
    };

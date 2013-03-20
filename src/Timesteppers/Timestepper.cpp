@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    Timestepper::Timestepper()
-      : mcMaxJump(1.602), mcUpWindow(0.05), mcMinDt(1e-8), mStep(0), mDt(this->mcMinDt), mTime(0.0)
+      : mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mStep(0), mDt(1e-2), mTime(0.0)
    {
    }
 
@@ -60,7 +60,7 @@ namespace Timestep {
       bool hasNewDt = false;
 
       // Check if CFL allows for a larger timestep
-      if(cfl > this->mDt)
+      if(cfl > this->mcUpWindow*this->mDt)
       {
          // Activate matrices update
          hasNewDt = true;
@@ -68,8 +68,8 @@ namespace Timestep {
          // Set new timestep
          this->mDt = std::min(cfl, this->mcMaxJump*this->mDt);
       
-      // Check if CFL is below minimal timestep
-      } else if(cfl < this->mcMinDt)
+      // Check if CFL is below minimal timestep or downard jump is large
+      } else if(cfl < this->mcMinDt || cfl < this->mDt/this->mcMaxJump)
       {
          // Don't update matrices
          hasNewDt = false;
@@ -92,13 +92,11 @@ namespace Timestep {
          hasNewDt = false;
       }
 
-      std::cerr << "New CFL: " << cfl << std::endl;
       if(hasNewDt)
       {
-         std::cerr << "Updating timestep and matrices" << std::endl;
+         std::cerr << "Updating timestep and matrices with new Dt = " << this->mDt << std::endl;
       }
 
-      std::cerr << "START timestep update" << std::endl;
       //
       // Update the timestep matrices if necessary
       //
@@ -107,7 +105,6 @@ namespace Timestep {
          // Loop over all substeps of timestepper
          for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
          {
-std::cerr << "START scalar matrix update" << std::endl;
             // Loop over all scalar equations
             std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
             for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
@@ -115,9 +112,7 @@ std::cerr << "START scalar matrix update" << std::endl;
                // Create (coupled) matrices
                this->updateMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
             }
-std::cerr << "FINISH scalar matrix update" << std::endl;
 
-std::cerr << "START Vector matrix update" << std::endl;
             // Loop over all vector equations
             std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
             for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
@@ -128,7 +123,6 @@ std::cerr << "START Vector matrix update" << std::endl;
                // Create (coupled) matrices
                this->updateMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
             }
-std::cerr << "FINISH Vector matrix update" << std::endl;
          }
 
 std::cerr << "START complex solver update" << std::endl;
@@ -150,7 +144,6 @@ std::cerr << "FINISH real solver update" << std::endl;
          // Reset the step index
          this->mStep = 0;
       }
-      std::cerr << "FINISHED matrix update" << std::endl;
    }
 
    void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
@@ -354,9 +347,15 @@ std::cerr << "FINISH real solver update" << std::endl;
       {
          fieldIdx = this->mEqZStepper.at(myIdx).current();
 
-         for(int i = 0; i < interInfo.first; i++)
+         if(fieldIdx == 0)
          {
-            if(fieldIdx == 0)
+            // Reserve space for the matrices to avoid large number of expensive reallocations
+            if(this->mStep == 0)
+            {
+               this->mEqZStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*interInfo.first);
+            }
+
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Add RHS matrix
                this->mEqZStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -372,7 +371,10 @@ std::cerr << "FINISH real solver update" << std::endl;
 
                // Set the start row
                startRow(i) = 0;
-            } else
+            }
+         } else
+         {
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Complete RHS matrix
                this->mEqZStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -399,9 +401,15 @@ std::cerr << "FINISH real solver update" << std::endl;
       {
          fieldIdx = this->mEqDStepper.at(myIdx).current();
 
-         for(int i = 0; i < interInfo.first; i++)
+         if(fieldIdx == 0)
          {
-            if(fieldIdx == 0)
+            // Reserve space for the matrices to avoid large number of expensive reallocations
+            if(this->mStep == 0)
+            {
+               this->mEqDStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*interInfo.first);
+            }
+
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Add RHS matrix
                this->mEqDStepper.at(myIdx).addLHSMatrix(this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -417,7 +425,10 @@ std::cerr << "FINISH real solver update" << std::endl;
 
                // Set the start row
                startRow(i) = 0;
-            } else
+            }
+         } else
+         {
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Complete RHS matrix
                this->mEqDStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -469,9 +480,9 @@ std::cerr << "FINISH real solver update" << std::endl;
       {
          fieldIdx = this->mEqZStepper.at(myIdx).current();
 
-         for(int i = 0; i < interInfo.first; i++)
+         if(fieldIdx == 0)
          {
-            if(fieldIdx == 0)
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Set RHS matrix
                this->mEqZStepper.at(myIdx).setLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -481,7 +492,10 @@ std::cerr << "FINISH real solver update" << std::endl;
 
                // Set the start row
                startRow(i) = 0;
-            } else
+            }
+         } else
+         {
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Complete RHS matrix
                this->mEqZStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -502,9 +516,9 @@ std::cerr << "FINISH real solver update" << std::endl;
       {
          fieldIdx = this->mEqDStepper.at(myIdx).current();
 
-         for(int i = 0; i < interInfo.first; i++)
+         if(fieldIdx == 0)
          {
-            if(fieldIdx == 0)
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Set RHS matrix
                this->mEqDStepper.at(myIdx).setLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));
@@ -514,7 +528,10 @@ std::cerr << "FINISH real solver update" << std::endl;
 
                // Set the start row
                startRow(i) = 0;
-            } else
+            }
+         } else
+         {
+            for(int i = 0; i < interInfo.first; i++)
             {
                // Complete RHS matrix
                this->mEqDStepper.at(myIdx).completeLHSMatrix(start+i,this->buildLHSMatrix(spEq,comp,i,nC,fieldIdx));

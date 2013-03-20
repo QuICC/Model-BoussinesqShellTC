@@ -11,6 +11,7 @@
 // System includes
 //
 #include <string>
+#include <vector>
 
 // External includes
 //
@@ -89,9 +90,9 @@ namespace Diagnostics {
          MHDFloat mKinetic;
 
          /**
-          * @brief Minimal spacing between grid points
+          * @brief Spacing between grid points
           */
-         MHDFloat mMinSpacing;
+         std::vector<Array> mMeshSpacings;
 
          /**
           * @brief Shared pointer to a velocity field wrapper

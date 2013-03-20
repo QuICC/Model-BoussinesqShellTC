@@ -68,6 +68,9 @@ namespace Timestep {
       for(size_t i = 1; i < this->mRHSData.size(); i++)
       {
          this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
+
+         // Safety assert for successful solve
+         assert(this->mSolver.at(i+start)->info() == Eigen::Success);
       }
    }
 
@@ -76,7 +79,7 @@ namespace Timestep {
       this->mSolver.reserve(this->mLHSMatrix.size());
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         SharedPtrMacro<Eigen::SuperLU<SparseMatrixZ> >  solver(new Eigen::SuperLU<SparseMatrixZ>());
+         SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> >  solver(new SparseSolverMacro<SparseMatrixZ>());
 
          this->mSolver.push_back(solver);
       }
@@ -86,7 +89,13 @@ namespace Timestep {
       {
          if(i % this->nSystem() != 0)
          {
+            // Safety assert to make sur matrix is compressed
+            assert(this->mLHSMatrix.at(i).isCompressed());
+
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+
+            // Safety assert for successful factorisation
+            assert(this->mSolver.at(i)->info() == Eigen::Success);
          }
       }
    }
@@ -98,9 +107,24 @@ namespace Timestep {
       {
          if(i % this->nSystem() != 0)
          {
+            // Safety assert to make sur matrix is compressed
+            assert(this->mLHSMatrix.at(i).isCompressed());
+
             this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
+
+            // Safety assert for successful factorisation
+            assert(this->mSolver.at(i)->info() == Eigen::Success);
          }
       }
+   }
+
+   void EquationZTimestepper::reserveMatrices(const int n)
+   {
+      // Reserve space for the LHS matrices
+      this->mLHSMatrix.reserve(n);
+
+      // Reserve space for the RHS matrices
+      this->mRHSMatrix.reserve(n);
    }
 
    void EquationZTimestepper::addLHSMatrix(const DecoupledZSparse& lhs)
