@@ -36,9 +36,10 @@ namespace Timestep {
          /**
           * @brief Constructor
           *
-          * @param nField Number of fields
+          * @param nField  Number of fields
+          * @param start   Starting index (for example without m=0)
           */
-         EquationTimestepperBase(const int nField);
+         EquationTimestepperBase(const int nField, const int start);
 
          /**
           * @brief Destructor
@@ -70,6 +71,11 @@ namespace Timestep {
           * @brief Storage for the number of fields
           */
          int mNField;
+         
+         /**
+          * @brief Starting index
+          */
+         int mZeroIdx;
 
          /**
           * @brief Storage for the current field index

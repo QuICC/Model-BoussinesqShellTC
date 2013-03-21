@@ -25,8 +25,8 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationZTimestepper::EquationZTimestepper(const int nField)
-      : EquationTimestepperBase(nField)
+   EquationZTimestepper::EquationZTimestepper(const int nField, const int start)
+      : EquationTimestepperBase(nField, start)
    {
    }
 
@@ -42,14 +42,14 @@ namespace Timestep {
 
       if(ImExRK3::rhsNN(step) == 0.0)
       {
-         for(size_t i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             this->mRHSOld.at(i) = this->mRHSData.at(i);
             this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i);
          }
       } else
       {
-         for(size_t i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             tmp = this->mRHSData.at(i);
             this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i) + ImExRK3::rhsNN(step)*this->mRHSOld.at(i);
@@ -65,7 +65,7 @@ namespace Timestep {
       // Set m = 0 mode to zero
       this->mSolution.at(0).setZero();
 
-      for(size_t i = 1; i < this->mRHSData.size(); i++)
+      for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
 
@@ -87,7 +87,7 @@ namespace Timestep {
       // Compute pattern and factorisation
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         if(i % this->nSystem() != 0)
+         if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
             // Safety assert to make sur matrix is compressed
             assert(this->mLHSMatrix.at(i).isCompressed());
@@ -105,7 +105,7 @@ namespace Timestep {
       // Compute factorisation
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         if(i % this->nSystem() != 0)
+         if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
             // Safety assert to make sur matrix is compressed
             assert(this->mLHSMatrix.at(i).isCompressed());

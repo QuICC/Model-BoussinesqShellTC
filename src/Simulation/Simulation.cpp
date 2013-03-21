@@ -232,6 +232,9 @@ namespace GeoMHDiSCC {
       // Update CFL condition
       this->mDiagnostics.updateCfl();
 
+      // Synchronise diagnostics
+      this->mDiagnostics.synchronize();
+
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepper.init(this->mDiagnostics.cfl()/100., this->mScalarEquations, this->mVectorEquations);
    }
@@ -264,6 +267,9 @@ namespace GeoMHDiSCC {
 
          // Update kinetic energy condition
          this->mDiagnostics.updateKineticEnergy();
+
+         // Synchronise diagnostics
+         this->mDiagnostics.synchronize();
 
          // Adapt timestepper time step
          this->mTimestepper.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarEquations, this->mVectorEquations);

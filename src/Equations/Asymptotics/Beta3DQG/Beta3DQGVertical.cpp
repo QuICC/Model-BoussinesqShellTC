@@ -32,9 +32,6 @@ namespace Equations {
    Beta3DQGVertical::Beta3DQGVertical(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
-      // Equation is always complex due to the sloping boundary condition
-      this->setComplex(true);
-
       // Set the variable requirements
       this->setRequirements();
    }
@@ -56,6 +53,9 @@ namespace Equations {
 
    void Beta3DQGVertical::setRequirements()
    {
+      // Equation is always complex due to the sloping boundary condition
+      this->setComplex(true);
+
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
 
@@ -68,6 +68,12 @@ namespace Equations {
 
    void Beta3DQGVertical::setCoupling()
    {
+      // Set the timestep starting index (exclude m = 0) mode
+      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+      {
+         this->setStartIndex(1);
+      }
+
       // Set field coupling to vertical velocity
       this->mCouplingInfo.addField(FieldComponents::Spectral::SCALAR, std::make_pair(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR));
 

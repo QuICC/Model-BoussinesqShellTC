@@ -13,6 +13,7 @@
 
 // System includes
 //
+#include <tr1/tuple>
 
 // External includes
 //
@@ -76,7 +77,15 @@ namespace Timestep {
           * @param idx        Index to update
           * @param isComplex  Complex flag
           */
-         void updateType(int idx, bool isComplex);
+         void updateType(const int idx, const bool isComplex);
+
+         /**
+          * @brief Check starting index
+          *
+          * @param idx     Index to update
+          * @param start   Starting index
+          */
+         void checkStart(const int idx, const int start);
 
          /**
           * @brief Update the index
@@ -84,7 +93,7 @@ namespace Timestep {
           * @param oldIdx  Old index
           * @param newIdx  New index
           */
-         void updateIndex(int oldIdx, int newIdx);
+         void updateIndex(const int oldIdx, const int newIdx);
 
          /**
           * @brief Add a field
@@ -92,8 +101,9 @@ namespace Timestep {
           * @param id         ID of the field
           * @param isComplex  Complex flag
           * @param idx        Index
+          * @param start      Starting index
           */
-         void addField(const FieldIdType& id, bool isComplex, int idx);
+         void addField(const FieldIdType& id, const bool isComplex, const int idx, const int start);
 
       protected:
 
@@ -106,7 +116,7 @@ namespace Timestep {
          /** 
           * Storage for the field coupling information
           */
-         std::map<FieldIdType, std::pair<bool,int> >  mFields;
+         std::map<FieldIdType, std::tr1::tuple<bool,int,int> >  mFields;
    };
 }
 }

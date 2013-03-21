@@ -109,6 +109,11 @@ namespace Equations {
          virtual bool isComplex(FieldComponents::Spectral::Id id) const;
 
          /**
+          * @brief Get starting index for equation (useful to exclude m=0 for example)
+          */
+         virtual int startIndex(FieldComponents::Spectral::Id id) const;
+
+         /**
           * @brief Get the Time derivative matrices (sparse matrices)
           */
          const DecoupledZSparse& timeMatrix(FieldComponents::Spectral::Id id, const int j) const;
@@ -175,6 +180,11 @@ namespace Equations {
          void setComplex(bool isComplex);
 
          /**
+          * @brief Set starting index
+          */
+         void setStartIndex(int start);
+
+         /**
           * @brief Storage for the variable requirements
           */
          VariableRequirement mRequirements;
@@ -239,6 +249,11 @@ namespace Equations {
           * @brief Are timestepping matrices for this equation complex?
           */
          bool mEqIsComplex;
+
+         /**
+          * @brief Starting index for timestepping matrices
+          */
+         int mZeroIdx;
    };
 
    /// Typedef for a smart EquationData

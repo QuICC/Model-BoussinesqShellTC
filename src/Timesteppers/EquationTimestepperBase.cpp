@@ -4,6 +4,7 @@
 
 // System includes
 //
+#include <cassert>
 
 // External includes
 //
@@ -19,9 +20,12 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationTimestepperBase::EquationTimestepperBase(const int nField)
-      : mNField(nField), mCurrent(0)
+   EquationTimestepperBase::EquationTimestepperBase(const int nField, const int start)
+      : mNField(nField), mZeroIdx(start), mCurrent(0)
    {
+      // Safety assert
+      assert(start >= 0);
+      assert(start < nField);
    }
 
    EquationTimestepperBase::~EquationTimestepperBase()

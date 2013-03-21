@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Diagnostics/StreamVerticalWrapper.hpp"
 
@@ -100,6 +101,22 @@ namespace Diagnostics {
       // Safety assert
       assert(this->mspVelocityWrapper);
 
+   }
+
+   void DiagnosticCoordinator::synchronize()
+   {
+      //
+      // Start of MPI block
+      //
+      #ifdef GEOMHDISCC_MPI
+
+      // Reduce CFL on all CPUs to the global minimum
+      MPI_Allreduce(MPI_IN_PLACE, &this->mCfl, 1, Parallel::MpiTypes::type<MHDFloat>(), MPI_MIN, MPI_COMM_WORLD);
+
+      //
+      // End of MPI block
+      //
+      #endif // GEOMHDISCC_MPI
    }
 
    MHDFloat DiagnosticCoordinator::cfl() const

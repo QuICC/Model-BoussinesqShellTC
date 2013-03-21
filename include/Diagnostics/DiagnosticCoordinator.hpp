@@ -71,6 +71,11 @@ namespace Diagnostics {
           */
          MHDFloat kineticEnergy() const;
 
+         /**
+          * @brief Synchronize diagnostics among CPUs
+          */
+         void synchronize();
+
       protected:
 
       private:

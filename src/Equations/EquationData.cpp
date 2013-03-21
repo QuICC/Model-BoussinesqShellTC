@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    EquationData::EquationData(SharedIEquationParameters spEqParams)
-      : mspEqParams(spEqParams), mEqIsComplex(false)
+      : mspEqParams(spEqParams), mEqIsComplex(false), mZeroIdx(0)
    {
    }
 
@@ -34,6 +34,11 @@ namespace Equations {
    bool EquationData::isComplex(FieldComponents::Spectral::Id id) const
    {
       return this->mEqIsComplex;
+   }
+
+   int EquationData::startIndex(FieldComponents::Spectral::Id id) const
+   {
+      return this->mZeroIdx;
    }
 
    int EquationData::rowShift(FieldComponents::Spectral::Id id, const int j) const
@@ -270,6 +275,11 @@ namespace Equations {
    void EquationData::setComplex(bool isComplex)
    {
       this->mEqIsComplex = isComplex;
+   }
+
+   void EquationData::setStartIndex(int start)
+   {
+      this->mZeroIdx = start;
    }
 
    PhysicalNames::Id   EquationData::name() const

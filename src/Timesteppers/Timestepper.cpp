@@ -275,6 +275,9 @@ std::cerr << "FINISH real solver update" << std::endl;
          // Update complex flag if required
          this->mTimeCoupling.updateType(idx, spEq->isComplex(comp));
 
+         // Check the starting index
+         this->mTimeCoupling.checkStart(idx, spEq->startIndex(comp));
+
       // Equation is not coupled or is the first of coupled set
       } else
       {
@@ -282,7 +285,7 @@ std::cerr << "FINISH real solver update" << std::endl;
          int idx = this->mTimeCoupling.newIndex();
 
          // Add equation unknown to time coupling information
-         this->mTimeCoupling.addField(myId, spEq->isComplex(comp), idx);
+         this->mTimeCoupling.addField(myId, spEq->isComplex(comp), idx, spEq->startIndex(comp));
 
          // Get the range of coupled fields
          Equations::CouplingInformation::field_iterator it;
@@ -291,7 +294,7 @@ std::cerr << "FINISH real solver update" << std::endl;
          // Loop over coupled fields and add them to timestep coupling information
          for(it = range.first; it != range.second; ++it)
          {
-            this->mTimeCoupling.addField(it->second, false, idx);
+            this->mTimeCoupling.addField(it->second, false, idx, spEq->startIndex(comp));
          }
       }
    }
@@ -311,11 +314,11 @@ std::cerr << "FINISH real solver update" << std::endl;
          if(this->mTimeCoupling.isComplex(myId))
          {
             idx = this->mEqZStepper.size();
-            this->mEqZStepper.push_back(EquationZTimestepper(nC+1));
+            this->mEqZStepper.push_back(EquationZTimestepper(nC+1, spEq->startIndex(comp)));
          } else
          {
             idx = this->mEqDStepper.size();
-            this->mEqDStepper.push_back(EquationDTimestepper(nC+1));
+            this->mEqDStepper.push_back(EquationDTimestepper(nC+1, spEq->startIndex(comp)));
          }
 
          this->mTimeCoupling.updateIndex(this->mTimeCoupling.idx(myId), idx);

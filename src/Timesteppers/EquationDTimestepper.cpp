@@ -20,8 +20,8 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationDTimestepper::EquationDTimestepper(const int nField)
-      : EquationTimestepperBase(nField)
+   EquationDTimestepper::EquationDTimestepper(const int nField, const int start)
+      : EquationTimestepperBase(nField, start)
    {
    }
 
@@ -37,7 +37,7 @@ namespace Timestep {
 
       if(ImExRK3::rhsNN(step) == 0.0)
       {
-         for(size_t i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             this->mRHSOld.at(i).first = this->mRHSData.at(i).first;
             this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first;
@@ -47,7 +47,7 @@ namespace Timestep {
          }
       } else
       {
-         for(size_t i = 0; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
             tmp = this->mRHSData.at(i).first;
             this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).first;
@@ -64,7 +64,7 @@ namespace Timestep {
    {
       int start = step*this->nSystem();
 
-      for(size_t i = 0; i < this->mRHSData.size(); i++)
+      for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          // Solve for the real component
          this->mSolution.at(i).first = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).first);
@@ -93,13 +93,16 @@ namespace Timestep {
       // Compute the pattern and the factorisations
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         // Safety assert to make sur matrix is compressed
-         assert(this->mLHSMatrix.at(i).isCompressed());
+         if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
+         {
+            // Safety assert to make sur matrix is compressed
+            assert(this->mLHSMatrix.at(i).isCompressed());
 
-         this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+            this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
 
-         // Safety assert for successful factorisation
-         assert(this->mSolver.at(i)->info() == Eigen::Success);
+            // Safety assert for successful factorisation
+            assert(this->mSolver.at(i)->info() == Eigen::Success);
+         }
       }
    }
 
@@ -108,13 +111,16 @@ namespace Timestep {
       // Compute the factorisations
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         // Safety assert to make sur matrix is compressed
-         assert(this->mLHSMatrix.at(i).isCompressed());
+         if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
+         {
+            // Safety assert to make sur matrix is compressed
+            assert(this->mLHSMatrix.at(i).isCompressed());
 
-         this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
+            this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
 
-         // Safety assert for successful factorisation
-         assert(this->mSolver.at(i)->info() == Eigen::Success);
+            // Safety assert for successful factorisation
+            assert(this->mSolver.at(i)->info() == Eigen::Success);
+         }
       }
    }
 

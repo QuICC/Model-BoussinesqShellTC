@@ -34,8 +34,11 @@ namespace Timestep {
       public:
          /**
           * @brief Constructor
+          *
+          * @param nField  Number of fields
+          * @param start   Starting index (for example without m=0)
           */
-         EquationZTimestepper(const int nField);
+         EquationZTimestepper(const int nField, const int start);
 
          /**
           * @brief Destructor

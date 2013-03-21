@@ -32,9 +32,6 @@ namespace Equations {
    Beta3DQGStreamfunction::Beta3DQGStreamfunction(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
-      // Equation is always complex due to the sloping boundary condition
-      this->setComplex(true);
-
       // Set the variable requirements
       this->setRequirements();
    }
@@ -63,7 +60,7 @@ namespace Equations {
       // Get the box scale
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
-      // Compute Ra/(16 Pr As)
+      // Compute Ra/(2 16 Pr)
       MHDComplex c = -this->eqParams().nd(NonDimensional::RAYLEIGH)/(32.*this->eqParams().nd(NonDimensional::PRANDTL))*boxScale*MathConstants::cI;
 
       // Get size of dealiased output (at this stage data has still dealiasing rows)
@@ -82,6 +79,9 @@ namespace Equations {
 
    void Beta3DQGStreamfunction::setRequirements()
    {
+      // Equation is always complex due to the sloping boundary condition
+      this->setComplex(true);
+
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
 
@@ -97,6 +97,12 @@ namespace Equations {
 
    void Beta3DQGStreamfunction::setCoupling()
    {
+      // Set the timestep starting index (exclude m = 0) mode
+      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+      {
+         this->setStartIndex(1);
+      }
+
       // Set field coupling to vertical velocity
       this->mCouplingInfo.addField(FieldComponents::Spectral::SCALAR, std::make_pair(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR));
 
