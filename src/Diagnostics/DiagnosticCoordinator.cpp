@@ -91,7 +91,8 @@ namespace Diagnostics {
 
       std::cerr << "Raw CFL: " << this->mCfl << std::endl;
       /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
-      this->mCfl = std::min(this->mcCourant, this->mCfl);
+      //this->mCfl = std::min(this->mcCourant, this->mCfl);
+      this->mCfl = std::min(0.1, this->mCfl);
    }
 
    void DiagnosticCoordinator::updateKineticEnergy()

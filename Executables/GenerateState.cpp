@@ -82,7 +82,7 @@ int run()
    {
       GeoMHDiSCC::Datatypes::SharedScalarVariableType   spScalar(new GeoMHDiSCC::Datatypes::ScalarVariableType(spRes));
       spScalar->rDom(0).rPerturbation().rData().setRandom();
-      spScalar->rDom(0).rPerturbation().rData() *= 1e-9;
+      spScalar->rDom(0).rPerturbation().rData() *= 1e-5;
       state.addScalar(std::make_pair(*it, spScalar));
    }
 

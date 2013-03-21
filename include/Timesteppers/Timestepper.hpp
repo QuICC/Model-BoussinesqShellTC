@@ -53,10 +53,11 @@ namespace Timestep {
          /**
           * @brief Initialise timestepper
           *
-          * @param scalEq Shared scalar equations
-          * @param vectEq Shared vector equations
+          * @param dt      Initial timestep value
+          * @param scalEq  Shared scalar equations
+          * @param vectEq  Shared vector equations
           */
-         void init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void init(const MHDFloat dt, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Adapt the timestep used

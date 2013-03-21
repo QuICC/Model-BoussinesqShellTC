@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    Timestepper::Timestepper()
-      : mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mStep(0), mDt(1e-2), mTime(0.0)
+      : mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mStep(0), mDt(this->mcMinDt), mTime(0.0)
    {
    }
 
@@ -164,8 +164,11 @@ std::cerr << "FINISH real solver update" << std::endl;
       this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
    }
 
-   void Timestepper::init(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::init(const MHDFloat dt, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
+      // Set initial timestep
+      this->mDt = dt;
+
       //
       // Determine if solvers need to be complex or not
       //

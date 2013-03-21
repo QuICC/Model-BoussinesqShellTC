@@ -225,6 +225,15 @@ namespace GeoMHDiSCC {
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
+
+      // Compute physical space data to initialise timestepper initial step
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
+
+      // Update CFL condition
+      this->mDiagnostics.updateCfl();
+
+      // Init timestepper using clf/100 as starting timestep
+      this->mTimestepper.init(this->mDiagnostics.cfl()/100., this->mScalarEquations, this->mVectorEquations);
    }
 
    void Simulation::computeNonlinear()
@@ -496,9 +505,6 @@ namespace GeoMHDiSCC {
          (*vectEqIt)->setSpectralMatrices(bcs.bc((*vectEqIt)->name()), bcs.cbc((*vectEqIt)->name()));
          (*vectEqIt)->finalizeMatrices();
       }
-
-      // Init timestepper
-      this->mTimestepper.init(this->mScalarEquations, this->mVectorEquations);
    }
 
    void Simulation::setupOutput()

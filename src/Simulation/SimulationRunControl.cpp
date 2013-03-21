@@ -46,18 +46,33 @@ namespace GeoMHDiSCC {
       if(this->mMaxSimTime > 0 && simTime > this->mMaxSimTime)
       {
          this->mStatus = Runtime::Status::STOP;
+
+         // Produce a nice looking output to std output 
+         IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printCentered(std::cout, "Simulation time limit reached!", '#');
+         IoTools::Formatter::printLine(std::cout, '#');
       }
 
       // Check for maximum simulation steps
       if(this->mMaxSimTime < 0 && this->mSteps > std::abs(this->mMaxSimTime))
       {
          this->mStatus = Runtime::Status::STOP;
+
+         // Produce a nice looking output to std output 
+         IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printCentered(std::cout, "Simulation steps limit reached!", '#');
+         IoTools::Formatter::printLine(std::cout, '#');
       }
 
       // Check if timestepper requested abort due to too small timestep
       if(simDt < 0)
       {
          this->mStatus = Runtime::Status::STOP;
+
+         // Produce a nice looking output to std output 
+         IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printCentered(std::cout, "Adaptive timestep failed!", '#');
+         IoTools::Formatter::printLine(std::cout, '#');
       }
    }
 
