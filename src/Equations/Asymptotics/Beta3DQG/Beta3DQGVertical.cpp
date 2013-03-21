@@ -124,7 +124,7 @@ namespace Equations {
       int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
 
       /// 
-      /// The timestepper will buid the full implici timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
+      /// The timestepper will buid the full implicit timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
       /// The  left-hand side following equation is setup here: 
       ///
       ///    \f$ \nabla_{\perp}^2 w - \partial_t w + \frac{1}{\Gamma}\partial_Z \psi = \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
@@ -153,11 +153,17 @@ namespace Equations {
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
-         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
+//         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
+         Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
 
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
-         Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), tmpA);
+//         Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), tmpA);
+         Eigen::kroneckerProduct(tau3D.first, spec1D.qDiff(2,0), tmpA);
          it->second.back().first += tmpA;
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise coupled boundary condition matrices
@@ -168,7 +174,12 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::STREAMFUNCTION)->second.find(bc3D)->second);
          tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
-         Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
+//         Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
+         Eigen::kroneckerProduct(tau3D.second, spec1D.qDiff(2,0), it->second.back().second);
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise nonlinear multiplication matrix
@@ -177,6 +188,10 @@ namespace Equations {
 
          // Set nonlinear multiplication matrix (kronecker(A,B,out) => out = A(i,j)*A)
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(2,0), itNL->second.back());
+
+         // Prune matrices for safety
+         itNL->second.back().prune(1e-32);
+         itNL->second.back().prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise time matrices
@@ -187,6 +202,10 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(2,0), it->second.back().first);
 
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
+
          //////////////////////////////////////////////
          // Initialise linear matrices
          pos = this->mLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
@@ -195,6 +214,10 @@ namespace Equations {
          // Set linear matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2), it->second.back().first);
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise coupling matrices
@@ -205,6 +228,10 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          tmpA = (1.0/this->eqParams().nd(NonDimensional::GAMMA))*spec3D.id(1);
          Eigen::kroneckerProduct(tmpA, spec1D.qDiff(2,0), it->second.back().first);
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
       }
    }
 }

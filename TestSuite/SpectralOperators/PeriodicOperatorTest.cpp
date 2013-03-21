@@ -78,6 +78,19 @@ namespace TestSuite {
    /**
     * @brief Test default constructor
     */
+   TEST_F(PeriodicOperatorTest, BasicM0)
+   {
+      // Set spectral and physical sizes
+      int maxN = 12;
+      int nN = maxN + 1;
+
+      // Create Chebyshev spectral operator
+      Spectral::ChebyshevOperator   op(nN);
+   }
+
+   /**
+    * @brief Test default constructor
+    */
    TEST_F(PeriodicOperatorTest, Laplacian2D)
    {
       // Set spectral and physical sizes

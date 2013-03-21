@@ -32,9 +32,6 @@ namespace Equations {
    FPlane3DQGStreamfunction::FPlane3DQGStreamfunction(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
-      // Equation is always complex due to the sloping boundary condition
-      this->setComplex(true);
-
       // Set the variable requirements
       this->setRequirements();
    }
@@ -49,39 +46,40 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      //Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
-      //
-      rNLComp.rData().setConstant(0.0);
+      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
    void FPlane3DQGStreamfunction::computeLinear(Datatypes::SpectralScalarType& rRHS) const
    {  
       ///
-      /// Compute \f$-\frac{1}{16}\frac{Ra}{Pr}\partial_y\overline{T} = -\frac{1}{16}\frac{Ra}{Pr} i m/2 \overline{T}\f$
+      /// Compute \f$-\frac{Ra}{Pr}\partial_x T' = -\frac{1}{16}\frac{Ra}{Pr} i k T'\f$
       ///
 
       // Get the box scale
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
-      // Compute Ra/(16 Pr As)
-      MHDComplex c = -this->eqParams().nd(NonDimensional::RAYLEIGH)/(32.*this->eqParams().nd(NonDimensional::PRANDTL))*boxScale*MathConstants::cI;
+      // Compute Ra/Pr
+      MHDComplex c = -this->eqParams().nd(NonDimensional::RAYLEIGH)/(this->eqParams().nd(NonDimensional::PRANDTL))*boxScale*MathConstants::cI;
 
       // Get size of dealiased output (at this stage data has still dealiasing rows)
       int dealiasedRows = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Loop over m
-      MHDFloat m_;
+      MHDFloat k_;
       int nSlice = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      for(int m = 0; m < nSlice; m++)
+      for(int k = 0; k < nSlice; k++)
       {
-         m_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
+         k_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
 
-         rRHS.setSlice((m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
+         rRHS.setSlice((k_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(k), k, dealiasedRows);
       }
    }
 
    void FPlane3DQGStreamfunction::setRequirements()
    {
+      // Equation is always complex due to the sloping boundary condition
+      this->setComplex(true);
+
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
 

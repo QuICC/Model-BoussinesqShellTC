@@ -135,7 +135,7 @@ namespace Equations {
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       /// 
-      /// The timestepper will buid the full implici timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
+      /// The timestepper will buid the full implicit timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
       /// The left-hand side of the following equation is setup here: 
       ///
       ///    \f$ \frac{1}{Pr}\nabla_{\perp}^2\overline{T} - \partial_t\overline{T} = \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
@@ -164,6 +164,10 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
 
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
+
          //////////////////////////////////////////////
          // Initialise coupled boundary condition matrices
          // NONE
@@ -176,6 +180,10 @@ namespace Equations {
          // Set nonlinear multiplication matrix (kronecker(A,B,out) => out = A(i,j)*A)
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), itNL->second.back());
 
+         // Prune matrices for safety
+         itNL->second.back().prune(1e-32);
+         itNL->second.back().prune(1e-32);
+
          //////////////////////////////////////////////
          // Initialise time matrices
          pos = this->mTMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
@@ -184,6 +192,10 @@ namespace Equations {
          // Set time matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), it->second.back().first);
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise linear matrices
@@ -194,6 +206,10 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          tmpA = (1.0/this->eqParams().nd(NonDimensional::PRANDTL))*Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2);
          Eigen::kroneckerProduct(spec3D.id(0),tmpA, it->second.back().first);
+
+         // Prune matrices for safety
+         it->second.back().first.prune(1e-32);
+         it->second.back().second.prune(1e-32);
 
          //////////////////////////////////////////////
          // Initialise coupling matrices
