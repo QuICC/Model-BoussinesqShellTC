@@ -1,7 +1,5 @@
 /** \file StaticAssert.hpp
  *  \brief Simple static assert implementation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STATICASSERT_HPP

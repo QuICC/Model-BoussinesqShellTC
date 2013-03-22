@@ -1,7 +1,5 @@
 /** \file FftwTransform.hpp
  *  \brief Implementation of the FFTW transform
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FFTWTRANSFORM_HPP

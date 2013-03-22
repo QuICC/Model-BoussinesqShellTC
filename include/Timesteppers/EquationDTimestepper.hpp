@@ -1,7 +1,5 @@
 /** \file EquationDTimestepper.hpp
  *  \brief Implementation of a real valued (coupled) equation timestepper
- *
- *  \mhdBug Needs test
  */
 
 #ifndef EQUATIONDTIMESTEPPER_HPP

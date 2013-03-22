@@ -1,7 +1,5 @@
 /** \file EndDispatcher.hpp
  *  \brief Simple converter dispatcher for the communicators
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ENDDISPATCHER_HPP

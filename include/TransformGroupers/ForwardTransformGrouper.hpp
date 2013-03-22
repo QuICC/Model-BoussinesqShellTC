@@ -1,7 +1,5 @@
 /** \file ForwardTransformGrouper.hpp
  *  \brief This class defines the forward transform grouping algorithm
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_TRANSFORM
 

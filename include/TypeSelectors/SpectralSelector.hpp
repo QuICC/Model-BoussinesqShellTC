@@ -1,7 +1,5 @@
 /** \file SpectralSelector.hpp
  *  \brief Small template to select the right spectral operator types
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SPECTRALSELECTOR_HPP

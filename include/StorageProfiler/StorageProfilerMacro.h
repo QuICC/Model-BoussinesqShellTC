@@ -1,7 +1,5 @@
 /** \file StorageProfilerMacro.h
  *  \brief Preprocessor macros to setup storage profiling if requested in configuration
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STORAGEPROFILERMACRO_H

@@ -1,7 +1,5 @@
 /** \file Exception.hpp
  *  \brief Simple exception class.
- *
- *  \mhdBug Needs test
  */
 
 #ifndef EXCEPTION_HPP

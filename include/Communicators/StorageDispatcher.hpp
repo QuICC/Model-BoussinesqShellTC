@@ -1,7 +1,5 @@
 /** \file StorageDispatcher.hpp
  *  \brief Simple storage dispatcher for the communicator storage
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STORAGEDISPATCHER_HPP

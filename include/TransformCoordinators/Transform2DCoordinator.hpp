@@ -1,7 +1,5 @@
 /** \file Transform2DCoordinator.hpp
  *  \brief Implementation of a transform coordinator in 2D
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TRANSFORM2DCOORDINATOR_HPP

@@ -1,7 +1,5 @@
 /** \file StdOutPipe.hpp
  *  \brief Implementation of standard output pipe file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STDOUTPIPE_HPP

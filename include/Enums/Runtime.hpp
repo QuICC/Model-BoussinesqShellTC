@@ -1,7 +1,5 @@
 /** \file Runtime.hpp
  *  \brief Definition of some useful enums for runtime information
- *
- *  \mhdBug Needs test
  */
 
 #ifndef RUNTIME_HPP

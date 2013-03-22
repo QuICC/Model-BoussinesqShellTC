@@ -1,7 +1,5 @@
 /** \file IOperator.hpp
  *  \brief Interface for a general spectral operator implementation (direct and quasi inverses)
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IOPERATOR_HPP

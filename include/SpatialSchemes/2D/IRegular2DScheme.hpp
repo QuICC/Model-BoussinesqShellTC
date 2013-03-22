@@ -1,7 +1,5 @@
 /** \file IRegular2DScheme.hpp
  *  \brief Implementation of a generic regular 2D scheme
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IREGULAR2DSCHEME_HPP

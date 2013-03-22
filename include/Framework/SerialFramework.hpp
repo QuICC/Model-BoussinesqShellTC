@@ -1,7 +1,5 @@
 /** \file SerialFramework.hpp
  *  \brief Implementation of the serial framework
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SERIALFRAMEWORK_HPP

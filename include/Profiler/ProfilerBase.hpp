@@ -1,7 +1,5 @@
 /** \file ProfilerBase.hpp
  *  \brief Implementation of the base of a profiling timer
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PROFILERBASE_HPP

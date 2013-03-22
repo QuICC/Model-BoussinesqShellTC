@@ -1,7 +1,5 @@
 /** \file ForwardSingle1DConfigurator.hpp
  *  \brief This class defines the forward transform single first exchange splitting operations
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
 

@@ -1,7 +1,5 @@
 /** \file IConfigurationPart.hpp 
  *  \brief Implementation of the truncation part of the configuration file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ICONFIGURATIONPART_HPP

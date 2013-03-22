@@ -1,7 +1,5 @@
 /** \file TFFScheme.hpp
  *  \brief Implementation of the Chebyshev(FFT) + Fourier + Fourier scheme
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TFFSCHEME_HPP

@@ -1,7 +1,5 @@
 /** \file XmlFile.hpp
  *  \brief Implementation of a general XML file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef XMLFILE_HPP

@@ -50,6 +50,8 @@ namespace IoVariable {
 
          /**
           * @brief Add name of expected variable to be added
+          *
+          * @param id ID of field
           */
          void expect(const PhysicalNames::Id id);
 
@@ -75,8 +77,8 @@ namespace IoVariable {
          /**
           * @brief Set the simulation time parameters
           *
-          * @param time    Reached simulation time
-          * @param time    Last timestep size
+          * @param time       Reached simulation time
+          * @param timestep   Last timestep size
           */
          void setSimTime(const MHDFloat time, const MHDFloat timestep);
 
@@ -192,8 +194,6 @@ namespace IoVariable {
 
          /**
           * @brief Set the maximum number of IO operations
-          *
-          * @param id ID of the dimension space (spectral or physical)
           */
          void setCollIo();
 

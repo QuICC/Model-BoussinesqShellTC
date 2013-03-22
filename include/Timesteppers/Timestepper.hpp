@@ -1,7 +1,5 @@
 /** \file Timestepper.hpp
  *  \brief Implementation of a general timestepper structure
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TIMESTEPPER_HPP

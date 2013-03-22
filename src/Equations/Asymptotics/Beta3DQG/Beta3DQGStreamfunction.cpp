@@ -100,7 +100,7 @@ namespace Equations {
       // Set the timestep starting index (exclude m = 0) mode
       if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
       {
-         this->setStartIndex(1);
+      //   this->setStartIndex(1);
       }
 
       // Set field coupling to vertical velocity

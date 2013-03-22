@@ -1,7 +1,5 @@
 /** \file FlatScalarField.hpp
  *  \brief Base for a  scalar field with flat data layout
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FLATSCALARFIELD_HPP

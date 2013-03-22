@@ -1,7 +1,5 @@
 /** \file TTScheme.hpp
  *  \brief Implementation of the Chebyshev(FFT) + Chebyshev(FFT) scheme
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TTSCHEME_HPP

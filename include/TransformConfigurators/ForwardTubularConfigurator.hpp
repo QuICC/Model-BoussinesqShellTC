@@ -1,7 +1,5 @@
 /** \file ForwardTubularConfigurator.hpp
  *  \brief This class defines the forward transform tubular splitting operations
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_MPIALGO_TUBULAR
 

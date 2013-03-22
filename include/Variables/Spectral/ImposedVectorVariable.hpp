@@ -1,7 +1,5 @@
 /** \file ImposedVectorVariable.hpp
  *  \brief Implementation of vector variable with an imposed component
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IMPOSEDVECTORVARIABLE_HPP

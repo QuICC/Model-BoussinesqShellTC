@@ -1,7 +1,5 @@
 /** \file IConfigurationFile.hpp 
  *  \brief Implementation of the base for a configuration file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ICONFIGURATIONFILE_HPP
@@ -24,6 +22,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "Base/Typedefs.hpp"
+#include "Base/MpiTypes.hpp"
 #include "IoTools/Formatter.hpp"
 #include "IoConfig/ConfigParts/IConfigurationPart.hpp"
 #include "IoConfig/ConfigParts/TruncationPart.hpp"
@@ -156,8 +155,6 @@ namespace IoConfig {
 
          /**
           * @brief Spread parameters over parallel simulation
-          *
-          * \mhdBug MPI code does not handle different MHDFloat types, only double
           */
          void spreadParameters();
 
@@ -416,7 +413,7 @@ namespace IoConfig {
       MPI_Get_address(&fData[0], &element);
       displ[1] = element;
       blocks[1] = fData.size();
-      types[1] = MPI_DOUBLE;
+      types[1] = MpiTypes::type<MHDFloat>();
 
       // MPI data type for the combined integer and float data
       MPI_Datatype   cfgType;

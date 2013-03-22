@@ -1,7 +1,5 @@
 /** \file PhysicalPart.hpp 
  *  \brief Implementation of the physical part of the configuration file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PHYSICALPART_HPP

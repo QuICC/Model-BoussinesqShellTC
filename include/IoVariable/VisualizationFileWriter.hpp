@@ -35,7 +35,6 @@ namespace IoVariable {
          /**
           * @brief Constructor
           *
-          * @param spRes   Resolution information
           * @param type    Type of the file (typically scheme name)
           */
          VisualizationFileWriter(std::string type);

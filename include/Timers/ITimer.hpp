@@ -1,7 +1,5 @@
 /** \file ITimer.hpp
  *  \brief Implementation of a timer interface
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ITIMER_HPP

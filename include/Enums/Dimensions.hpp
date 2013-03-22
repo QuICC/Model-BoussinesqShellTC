@@ -1,7 +1,5 @@
 /** \file Dimensions.hpp
  *  \brief Definition of some useful enums of the dimensions of the model
- *
- *  \mhdBug Needs test
  */
 
 #ifndef DIMENSIONS_HPP

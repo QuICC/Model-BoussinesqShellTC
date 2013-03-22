@@ -1,7 +1,5 @@
 /** \file SimulationResolution.hpp
  *  \brief Definition of a simulation resolution object
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SIMULATIONRESOLUTION_HPP

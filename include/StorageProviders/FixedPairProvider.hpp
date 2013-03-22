@@ -1,7 +1,5 @@
 /** \file FixedPairProvider.hpp
  *  \brief Templated implementation of a data pair storage provider with fixed size.
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FIXEDPAIRPROVIDER_HPP

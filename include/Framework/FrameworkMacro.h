@@ -1,7 +1,5 @@
 /** \file FrameworkMacro.h
  *  \brief Preprocessor macros to setup the framework depending on parallelisation options
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FRAMEWORKMACRO_H

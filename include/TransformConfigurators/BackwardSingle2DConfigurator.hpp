@@ -1,7 +1,5 @@
 /** \file BackwardSingle2DConfigurator.hpp
  *  \brief This defines the backward transform second exchange single splitting operations
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
 

@@ -1,7 +1,5 @@
 /** \file IEvolutionEquation.hpp
  *  \brief Base building block for the implementation of a time dependend evolution equation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IEVOLUTIONEQUATION_HPP

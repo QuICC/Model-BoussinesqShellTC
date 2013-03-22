@@ -1,7 +1,5 @@
 /** \file SplittingDescription.hpp
  *  \brief Implementation basic description of the obtained splitting (for any algorithm)
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SPLITTINGDESCRIPTION_HPP

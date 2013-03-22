@@ -1,7 +1,5 @@
 /** \file Simulation.hpp
  *  \brief High level implementation of a simulation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SIMULATION_HPP

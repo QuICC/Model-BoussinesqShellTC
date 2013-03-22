@@ -1,7 +1,5 @@
 /** \file ParallelPart.hpp 
  *  \brief Implementation of the parallel part of the configuration file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PARALLELPART_HPP

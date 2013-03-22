@@ -1,7 +1,5 @@
 /** \file IVectorEquation.hpp
  *  \brief Base for the implementation of a vector equation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IVECTOREQUATION_HPP

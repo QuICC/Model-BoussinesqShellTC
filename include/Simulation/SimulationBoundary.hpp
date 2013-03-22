@@ -1,7 +1,5 @@
 /** \file SimulationBoundary.hpp
  *  \brief Implementation of a simple simulation wide boundary condition interface
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SIMULATIONBOUNDARY_HPP

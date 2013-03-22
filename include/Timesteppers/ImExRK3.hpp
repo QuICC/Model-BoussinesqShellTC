@@ -1,7 +1,5 @@
 /** \file ImExRK3.hpp
  *  \brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IMEXRK3_HPP

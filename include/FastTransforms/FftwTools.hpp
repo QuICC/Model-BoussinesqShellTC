@@ -1,7 +1,5 @@
 /** \file FftwTools.hpp
  *  \brief Definition of some useful constants and tools for FFTW
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FFTWTOOLS_HPP

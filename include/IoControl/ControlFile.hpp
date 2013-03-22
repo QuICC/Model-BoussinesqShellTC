@@ -1,7 +1,5 @@
 /** \file ControlFile.hpp
  *  \brief Implementation of a control file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef CONTROLFILE_HPP

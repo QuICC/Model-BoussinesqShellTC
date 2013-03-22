@@ -1,7 +1,5 @@
 /** \file BackwardEquationGrouper.hpp
  *  \brief This class defines a simple equation wise backward transform grouping algorithm (serial algorithm)
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
 

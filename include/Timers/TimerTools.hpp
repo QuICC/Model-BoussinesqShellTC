@@ -1,7 +1,5 @@
 /** \file TimerTools.hpp
  *  \brief Implementation of timer tools
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TIMERTOOLS_HPP

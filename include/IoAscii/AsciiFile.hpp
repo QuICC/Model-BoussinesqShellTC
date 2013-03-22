@@ -1,7 +1,5 @@
 /** \file AsciiFile.hpp
  *  \brief Implementation of a general ASCII file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ASCIIFILE_HPP

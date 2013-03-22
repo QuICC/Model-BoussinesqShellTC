@@ -1,7 +1,5 @@
 /** \file IBinaryWriter.hpp
  *  \brief Interface to a general binary writer
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IBINARYWRITER_HPP

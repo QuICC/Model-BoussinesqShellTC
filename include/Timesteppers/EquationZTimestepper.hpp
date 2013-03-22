@@ -1,7 +1,5 @@
 /** \file EquationZTimestepper.hpp
  *  \brief Implementation of a complex valued (coupled) equation timestepper
- *
- *  \mhdBug Needs test
  */
 
 #ifndef EQUATIONZTIMESTEPPER_HPP

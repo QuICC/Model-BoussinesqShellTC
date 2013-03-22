@@ -1,7 +1,5 @@
 /** \file MpiTimer.hpp
  *  \brief Implementation of a MPI timer
- *
- *  \mhdBug Needs test
  */
 
 #ifndef MPITIMER_HPP

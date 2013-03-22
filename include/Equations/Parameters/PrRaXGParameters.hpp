@@ -1,7 +1,5 @@
 /** \file PrRaXGParameters.hpp
  *  \brief Definition of the \f$Pr\f$, \f$Ra\f$, \f$\chi\f$, \f$\Gamma\f$ based parameters
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PRRAXGPARAMETERS_HPP

@@ -1,7 +1,5 @@
 /** \file VariableRequirement.hpp
  *  \brief Implementation of a class to store requirements for the variables
- *
- *  \mhdBug Needs test
  */
 
 #ifndef VARIABLEREQUIREMENT_HPP

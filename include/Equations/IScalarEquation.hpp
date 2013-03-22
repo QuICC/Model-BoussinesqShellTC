@@ -1,7 +1,5 @@
 /** \file IScalarEquation.hpp
  *  \brief Base for the implementation of a scalar equation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ISCALAREQUATION_HPP

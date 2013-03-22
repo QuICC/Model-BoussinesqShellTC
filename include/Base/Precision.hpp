@@ -1,7 +1,5 @@
 /** \file Precision.hpp
  *  \brief Definition of small class containing normal or MP typedefs for internal computations
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PRECISION_HPP

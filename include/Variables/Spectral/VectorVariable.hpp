@@ -1,7 +1,5 @@
 /** \file VectorVariable.hpp
  *  \brief Implementation of vector variable
- *
- *  \mhdBug Needs test
  */
 
 #ifndef VECTORVARIABLE_HPP

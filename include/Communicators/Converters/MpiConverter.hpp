@@ -1,7 +1,5 @@
 /** \file MpiConverter.hpp
  *  \brief Implementation of the FDSH MPI data converter.
- *
- *  \mhdBug Needs test
  */
 
 #ifndef MPICONVERTER_HPP

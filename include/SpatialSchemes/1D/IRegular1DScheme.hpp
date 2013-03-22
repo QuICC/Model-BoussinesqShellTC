@@ -1,7 +1,5 @@
 /** \file IRegular1DScheme.hpp
  *  \brief Implementation of a generic regular 1D scheme
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IREGULAR1DSCHEME_HPP

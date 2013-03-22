@@ -1,7 +1,5 @@
 /** \file Formatter.hpp
  *  \brief Implementation of a few useful output formating static functions
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FORMATTER_HPP

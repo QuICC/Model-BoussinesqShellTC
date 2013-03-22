@@ -1,7 +1,5 @@
 /** \file FFScheme.hpp
  *  \brief Implementation of the Fourier + Fourier scheme
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FFSCHEME_HPP

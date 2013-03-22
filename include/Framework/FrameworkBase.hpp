@@ -1,7 +1,5 @@
 /** \file FrameworkBase.hpp
  *  \brief Base of the implementation of the framework
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FRAMEWORKBASE_HPP

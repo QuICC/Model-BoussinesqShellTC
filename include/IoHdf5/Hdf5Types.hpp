@@ -1,7 +1,5 @@
 /** \file Hdf5Types.hpp
  *  \brief Implementation of a simple HDF5 datatype converter
- *
- *  \mhdBug Needs test
  */
 
 #ifndef HDF5TYPES_HPP

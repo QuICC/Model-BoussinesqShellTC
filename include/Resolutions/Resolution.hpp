@@ -1,7 +1,5 @@
 /** \file Resolution.hpp
  *  \brief Definition of a resolution object
- *
- *  \mhdBug Needs test
  */
 
 #ifndef RESOLUTION_HPP

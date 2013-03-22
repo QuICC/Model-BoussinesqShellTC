@@ -1,7 +1,5 @@
 /** \file ForwardSingle2DGrouper.hpp
  *  \brief This class defines the forward single grouping exchange grouping algorithm for the second exchange
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
 

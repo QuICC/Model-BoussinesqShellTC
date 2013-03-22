@@ -1,7 +1,5 @@
 /** \file IHdf5Writer.hpp
  *  \brief Interface to a general HDF5 writer
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IHDF5WRITER_HPP

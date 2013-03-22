@@ -1,7 +1,5 @@
 /** \file MathConstants.hpp
  *  \brief Definition of some useful math constants
- *
- *  \mhdBug Needs test
  */
 
 #ifndef MATHCONSTANTS_HPP

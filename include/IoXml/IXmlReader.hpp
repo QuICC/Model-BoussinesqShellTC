@@ -1,7 +1,5 @@
 /** \file IXmlReader.hpp
  *  \brief Interface to an XML reader
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IXMLREADER_HPP

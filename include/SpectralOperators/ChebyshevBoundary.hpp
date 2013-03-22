@@ -1,7 +1,5 @@
 /** \file ChebyshevBoundary.hpp
  *  \brief Implementation of the spectral boundary operator for the chebyshev basis
- *
- *  \mhdBug Needs test
  */
 
 #ifndef CHEBYSHEVBOUNDARY_HPP

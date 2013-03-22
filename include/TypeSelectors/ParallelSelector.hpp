@@ -1,7 +1,5 @@
 /** \file ParallelSelector.hpp
  *  \brief Definition of some useful typedefs for the parallelisation algorithms
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PARALLELSELECTOR_HPP

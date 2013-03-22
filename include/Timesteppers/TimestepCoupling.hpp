@@ -1,7 +1,5 @@
 /** \file TimestepCoupling.hpp
  *  \brief Implementation of equation coupling information at the timestep level
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TIMESTEPCOUPLING_HPP

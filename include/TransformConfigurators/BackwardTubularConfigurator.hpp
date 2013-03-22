@@ -1,7 +1,5 @@
 /** \file BackwardTubularConfigurator.hpp
  *  \brief This defines the backward transform tubular splitting operations
- *
- *  \mhdBug Needs test
  */
 #ifdef GEOMHDISCC_MPIALGO_TUBULAR
 

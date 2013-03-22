@@ -1,7 +1,5 @@
 /** \file ChebyshevOperator.hpp
  *  \brief Implementation of the spectral operators for the chebyshev basis
- *
- *  \mhdBug Needs test
  */
 
 #ifndef CHEBYSHEVOPERATOR_HPP

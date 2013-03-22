@@ -1,7 +1,5 @@
 /** \file Arithmetics.hpp
  *  \brief Definition of some useful enums for basis arithmetics
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ARITHMETICS_HPP

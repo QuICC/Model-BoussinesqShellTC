@@ -1,7 +1,5 @@
 /** \file ISchemeCosts.hpp
  *  \brief Base implementation of a cost based spatial schemes
- *
- *  \mhdBug Needs test
  */
 
 #ifndef ISCHEMECOSTS_HPP

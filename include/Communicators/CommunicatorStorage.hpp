@@ -1,7 +1,5 @@
 /** \file CommunicatorStorage.hpp
  *  \brief Simple implementation of the storage providers for the communicators
- *
- *  \mhdBug Needs test
  */
 
 #ifndef COMMUNICATORSTORAGE_HPP

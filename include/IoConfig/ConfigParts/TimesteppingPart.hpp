@@ -1,7 +1,5 @@
 /** \file TimesteppingPart.hpp 
  *  \brief Implementation of the timestepping part of the configuration file
- *
- *  \mhdBug Needs test
  */
 
 #ifndef TIMESTEPPINGPART_HPP

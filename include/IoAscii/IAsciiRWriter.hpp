@@ -1,7 +1,5 @@
 /** \file IAsciiRWriter.hpp
  *  \brief Interface to an overwriting ASCII writer
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IASCIIRWRITER_HPP

@@ -1,7 +1,5 @@
 /** \file SerialSplitting.hpp
  *  \brief Implementation of a serial "load splitting" algorithm
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SERIALSPLITTING_HPP

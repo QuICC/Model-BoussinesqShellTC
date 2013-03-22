@@ -1,7 +1,5 @@
 /** \file SimulationIoControl.hpp
  *  \brief Implementation of the control instance for the simulation IO related operations
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SIMULATIONIOCONTROL_HPP

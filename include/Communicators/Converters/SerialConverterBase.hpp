@@ -1,7 +1,5 @@
 /** \file SerialConverterBase.hpp
  *  \brief Implementation of the serial data converter base
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SERIALCONVERTERBASE_HPP

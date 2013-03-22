@@ -1,7 +1,5 @@
 /** \file StreamAdvection.hpp
  *  \brief Implementation of a generic streamfunction advection
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STREAMADVECTION_HPP

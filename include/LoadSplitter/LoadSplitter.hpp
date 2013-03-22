@@ -1,7 +1,5 @@
 /** \file LoadSplitter.hpp
  *  \brief Implementation of the workload splitter over the available CPUs
- *
- *  \mhdBug Needs test
  */
 
 #ifndef LOADSPLITTER_HPP

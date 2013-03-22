@@ -1,7 +1,5 @@
 /** \file PhysicalNames.hpp
  *  \brief Definition of some useful enums mapping physical names to ID
- *
- *  \mhdBug Needs test
  */
 
 #ifndef PHYSICALNAMES_HPP

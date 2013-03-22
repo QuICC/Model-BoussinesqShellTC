@@ -1,7 +1,5 @@
 /** \file ForwardConfigurator.hpp
  *  \brief This class defines the base operations for a forward transform
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FORWARDCONFIGURATOR_HPP

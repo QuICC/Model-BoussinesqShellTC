@@ -1,7 +1,5 @@
 /** \file Cross.hpp
  *  \brief Implementation of a generic vector cross product
- *
- *  \mhdBug Needs test
  */
 
 #ifndef CROSS_HPP

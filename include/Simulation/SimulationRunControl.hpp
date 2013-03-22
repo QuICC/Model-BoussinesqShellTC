@@ -1,7 +1,5 @@
 /** \file SimulationRunControl.hpp
  *  \brief Implementation of a general simulation control structure
- *
- *  \mhdBug Needs test
  */
 
 #ifndef SIMULATIONRUNCONTROL_HPP

@@ -1,7 +1,5 @@
 /** \file DynamicPairProvider.hpp
  *  \brief Templated implementation of a data pair storage provider adapting its size dynamically.
- *
- *  \mhdBug Needs test
  */
 
 #ifndef DYNAMICPAIRPROVIDER_HPP

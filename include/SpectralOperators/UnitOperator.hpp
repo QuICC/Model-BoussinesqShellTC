@@ -1,7 +1,5 @@
 /** \file UnitOperator.hpp
  *  \brief Implementation of the unit spectral operator with quasi inverses
- *
- *  \mhdBug Needs test
  */
 
 #ifndef UNITOPERATOR_HPP

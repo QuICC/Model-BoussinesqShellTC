@@ -54,7 +54,6 @@ namespace Parallel {
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
           * @param data    Input data
-          * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
          template <typename TData> static MPI_Datatype buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
@@ -65,7 +64,6 @@ namespace Parallel {
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
           * @param data    Input data
-          * @param type    Created MPI data type
           * @param cpuId   ID of the CPU
           */
          template <typename TData> static MPI_Datatype buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);

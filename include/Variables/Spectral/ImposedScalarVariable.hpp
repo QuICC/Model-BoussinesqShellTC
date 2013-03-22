@@ -1,7 +1,5 @@
 /** \file ImposedScalarVariable.hpp
  *  \brief Implementation of scalar field variable with imposed component
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IMPOSEDSCALARVARIABLE_HPP

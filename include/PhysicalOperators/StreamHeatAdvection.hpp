@@ -1,7 +1,5 @@
 /** \file StreamHeatAdvection.hpp
  *  \brief Implementation of a generic streamfunction advection including conducting state
- *
- *  \mhdBug Needs test
  */
 
 #ifndef STREAMHEATADVECTION_HPP

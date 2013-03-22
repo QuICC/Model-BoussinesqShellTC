@@ -1,7 +1,5 @@
 /** \file MemorySize.hpp
  *  \brief Simple template for the memory usage of the different types
- *
- *  \mhdBug Needs test
  */
 
 #ifndef MEMORYSIZE_HPP

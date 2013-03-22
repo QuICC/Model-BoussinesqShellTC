@@ -1,7 +1,5 @@
 /** \file IBoundary.hpp
  *  \brief Interface for a general spectral boundary operator implementation
- *
- *  \mhdBug Needs test
  */
 
 #ifndef IBOUNDARY_HPP

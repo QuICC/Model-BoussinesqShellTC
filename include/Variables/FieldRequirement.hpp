@@ -1,7 +1,5 @@
 /** \file FieldRequirement.hpp
  *  \brief Implementation of a class to store requirements for a field
- *
- *  \mhdBug Needs test
  */
 
 #ifndef FIELDREQUIREMENT_HPP
