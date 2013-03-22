@@ -1,5 +1,5 @@
-/** \file LargeBeta3DQGTransport.cpp
- *  \brief Source of the implementation of the transport equation in the large 3DQG beta model
+/** \file AnelasticFPlane3DQGTransport.cpp
+ *  \brief Source of the implementation of the transport equation in the anelastic 3DQG f-plane model
  */
 
 // Configuration includes
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/LargeBeta3DQG/LargeBeta3DQGTransport.hpp"
+#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGTransport.hpp"
 
 // Project includes
 //
@@ -29,18 +29,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   LargeBeta3DQGTransport::LargeBeta3DQGTransport(SharedIEquationParameters spEqParams)
+   AnelasticFPlane3DQGTransport::AnelasticFPlane3DQGTransport(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   LargeBeta3DQGTransport::~LargeBeta3DQGTransport()
+   AnelasticFPlane3DQGTransport::~AnelasticFPlane3DQGTransport()
    {
    }
 
-   void LargeBeta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void AnelasticFPlane3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -48,7 +48,7 @@ namespace Equations {
       ///
    }
 
-   void LargeBeta3DQGTransport::setRequirements()
+   void AnelasticFPlane3DQGTransport::setRequirements()
    {
       // Set temperature as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -57,11 +57,11 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
    }
 
-   void LargeBeta3DQGTransport::setCoupling()
+   void AnelasticFPlane3DQGTransport::setCoupling()
    {
    }
 
-   void LargeBeta3DQGTransport::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void AnelasticFPlane3DQGTransport::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
    {
    }
 }

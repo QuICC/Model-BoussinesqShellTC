@@ -46,9 +46,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
-      //Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
-      //
-      rNLComp.rData().setConstant(0.0);
+      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void Beta3DQGVertical::setRequirements()
@@ -59,15 +57,16 @@ namespace Equations {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
 
-      // Add vertical velocity requirements
+      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
 
-      // Add streamfunction requirements
+      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
    void Beta3DQGVertical::setCoupling()
    {
+      /// \mhdBug m=0 mode should be extracted an written as a separate real equation
       // Set the timestep starting index (exclude m = 0) mode
       if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
       {

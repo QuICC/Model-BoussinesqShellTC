@@ -1,5 +1,5 @@
-/** \file RayleighBenardVertical.cpp
- *  \brief Source of the implementation of the vertical velocity equation in the Rayleigh-Benard model
+/** \file AnelasticBeta3DQGVertical.cpp
+ *  \brief Source of the implementation of the vertical velocity equation in the anelastic 3DQG beta model
  */
 
 // Configuration includes
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/RayleighBenard/RayleighBenardVertical.hpp"
+#include "Equations/Asymptotics/AnelasticBeta3DQG/AnelasticBeta3DQGVertical.hpp"
 
 // Project includes
 //
@@ -29,18 +29,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   RayleighBenardVertical::RayleighBenardVertical(SharedIEquationParameters spEqParams)
+   AnelasticBeta3DQGVertical::AnelasticBeta3DQGVertical(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   RayleighBenardVertical::~RayleighBenardVertical()
+   AnelasticBeta3DQGVertical::~AnelasticBeta3DQGVertical()
    {
    }
 
-   void RayleighBenardVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void AnelasticBeta3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -48,7 +48,7 @@ namespace Equations {
       ///
    }
 
-   void RayleighBenardVertical::setRequirements()
+   void AnelasticBeta3DQGVertical::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
@@ -57,11 +57,11 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
    }
 
-   void RayleighBenardVertical::setCoupling()
+   void AnelasticBeta3DQGVertical::setCoupling()
    {
    }
  
-   void RayleighBenardVertical::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void AnelasticBeta3DQGVertical::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
    {
    }
 }

@@ -2,6 +2,10 @@
  *  \brief Implementation of a general timestepper structure
  */
 
+// Debug includes
+//
+#include "Debug/DebugIncludes.hpp"
+
 // System includes
 //
 
@@ -18,8 +22,6 @@
 // Project includes
 //
 #include "Timesteppers/ImExRK3.hpp"
-
-#include <iostream>
 
 namespace GeoMHDiSCC {
 

@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "PhysicalOperators/StreamHeatAdvection.hpp"
+#include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
 
@@ -46,9 +46,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      //Physical::StreamHeatAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
-      //
-      rNLComp.rData().setConstant(0.0);
+      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void Beta3DQGTransport::computeLinear(Datatypes::SpectralScalarType& rRHS) const
@@ -70,7 +68,7 @@ namespace Equations {
       {
          m_ = 0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
 
-         rRHS.setSlice((m_*c)*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).perturbation().slice(m), m, dealiasedRows);
+         rRHS.addSlice((m_*c)*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).perturbation().slice(m), m, dealiasedRows);
       }
    }
 
@@ -79,10 +77,10 @@ namespace Equations {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
 
-      // Add temperature to requirements
+      // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
 
-      // Add streamfunction to requirements
+      // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 

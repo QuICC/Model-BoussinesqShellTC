@@ -46,9 +46,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      //Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
-      //
-      rNLComp.rData().setConstant(0.0);
+      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
    void Beta3DQGStreamfunction::computeLinear(Datatypes::SpectralScalarType& rRHS) const
@@ -73,7 +71,7 @@ namespace Equations {
       {
          m_ = static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m));
 
-         rRHS.setSlice((m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
+         rRHS.addSlice((m_*c)*this->scalar(PhysicalNames::TEMPERATURE).dom(0).perturbation().slice(m), m, dealiasedRows);
       }
    }
 
@@ -85,18 +83,19 @@ namespace Equations {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
 
-      // Set streamfunction requirements
+      // Set streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
 
-      // Add vertical velocity requirements
+      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, true));
 
-      // Add temperature requirements
+      // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
    }
 
    void Beta3DQGStreamfunction::setCoupling()
    {
+      /// \mhdBug m=0 mode should be extracted an written as a separate real equation
       // Set the timestep starting index (exclude m = 0) mode
       if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
       {
