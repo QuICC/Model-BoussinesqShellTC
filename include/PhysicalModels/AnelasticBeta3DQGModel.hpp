@@ -1,9 +1,9 @@
-/** \file LargeBeta3DQGModel.hpp
- *  \brief Implementation of the large beta 3DQG physical model
+/** \file AnelasticBeta3DQGModel.hpp
+ *  \brief Implementation of the anelastic beta 3DQG physical model
  */
 
-#ifndef LARGEBETA3DQGMODEL_HPP
-#define LARGEBETA3DQGMODEL_HPP
+#ifndef ANELASTICBETA3DQGMODEL_HPP
+#define ANELASTICBETA3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -18,22 +18,22 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
-#include "SpatialSchemes/3D/TFFScheme.hpp"
+#include "SpatialSchemes/3D/TFTScheme.hpp"
 #include "Equations/Parameters/PrRaXGParameters.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the large beta 3DQG physical model
+    * @brief Implementation of the anelastic beta 3DQG physical model
     */
-   class LargeBeta3DQGModel
+   class AnelasticBeta3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
          static const int DIMENSION = 3;
 
          /// Typedef for the spatial scheme used
-         typedef TFFScheme SchemeType;
+         typedef TFTScheme SchemeType;
 
          /// Typedef for the equation parameters used
          typedef Equations::PrRaXGParameters  ParametersType;
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         LargeBeta3DQGModel();
+         AnelasticBeta3DQGModel();
 
          /**
           * @brief Destructor
           */
-         ~LargeBeta3DQGModel();
+         ~AnelasticBeta3DQGModel();
    };
 
 }
 
-#endif // LARGEBETA3DQGMODEL_HPP
+#endif // ANELASTICBETA3DQGMODEL_HPP

@@ -1,9 +1,9 @@
-/** \file LargeBeta3DQGModel.hpp
- *  \brief Implementation of the large beta 3DQG physical model
+/** \file AnelasticFPlane3DQGModel.hpp
+ *  \brief Implementation of the anelastic f-plane 3DQG physical model
  */
 
-#ifndef LARGEBETA3DQGMODEL_HPP
-#define LARGEBETA3DQGMODEL_HPP
+#ifndef ANELASTICFPLANE3DQGMODEL_HPP
+#define ANELASTICFPLANE3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -24,9 +24,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the large beta 3DQG physical model
+    * @brief Implementation of the anelastic f-plane 3DQG physical model
     */
-   class LargeBeta3DQGModel
+   class AnelasticFPlane3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         LargeBeta3DQGModel();
+         AnelasticFPlane3DQGModel();
 
          /**
           * @brief Destructor
           */
-         ~LargeBeta3DQGModel();
+         ~AnelasticFPlane3DQGModel();
    };
 
 }
 
-#endif // LARGEBETA3DQGMODEL_HPP
+#endif // ANELASTICFPLANE3DQGMODEL_HPP

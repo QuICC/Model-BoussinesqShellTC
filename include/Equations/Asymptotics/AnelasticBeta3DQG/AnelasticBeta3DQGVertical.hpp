@@ -1,9 +1,9 @@
-/** \file RayleighBenardTransport.hpp
- *  \brief Implementation of the transport equation for the Rayleigh-Benard model
+/** \file AnelasticBeta3DQGVertical.hpp
+ *  \brief Implementation of the vertical velocity equation for the anelastic 3DQG beta model
  */
 
-#ifndef RAYLEIGHBENARDTRANSPORT_HPP
-#define RAYLEIGHBENARDTRANSPORT_HPP
+#ifndef ANELASTICBETA3DQGVERTICAL_HPP
+#define ANELASTICBETA3DQGVERTICAL_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Rayleigh-Benard model
+    * \brief Implementation of the vertical velocity equation for the anelastic 3DQG beta model
     */
-   class RayleighBenardTransport: public IScalarEquation
+   class AnelasticBeta3DQGVertical: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         RayleighBenardTransport(SharedIEquationParameters spEqParams);
+         AnelasticBeta3DQGVertical(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~RayleighBenardTransport();
+         virtual ~AnelasticBeta3DQGVertical();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -75,4 +75,4 @@ namespace Equations {
 }
 }
 
-#endif // RAYLEIGHBENARDTRANSPORT_HPP
+#endif // ANELASTICBETA3DQGVERTICAL_HPP

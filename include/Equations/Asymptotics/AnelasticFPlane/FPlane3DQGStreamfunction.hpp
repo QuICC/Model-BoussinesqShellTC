@@ -1,9 +1,9 @@
-/** \file LargeBeta3DQGStreamfunction.hpp
- *  \brief Implementation of the streamfunction equation for the 3DQG large beta model
+/** \file AnelasticFPlane3DQGStreamfunction.hpp
+ *  \brief Implementation of the streamfunction equation for the anelastic 3DQG f-plane model
  */
 
-#ifndef LARGEBETA3DQGSTREAMFUNCTION_HPP
-#define LARGEBETA3DQGSTREAMFUNCTION_HPP
+#ifndef ANELASTICFPLANE3DQGSTREAMFUNCTION_HPP
+#define ANELASTICFPLANE3DQGSTREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the large 3DQG beta model
+    * \brief Implementation of the streamfunction equation for the anelastic 3DQG f-plane model
     */
-   class LargeBeta3DQGStreamfunction: public IScalarEquation
+   class AnelasticFPlane3DQGStreamfunction: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         LargeBeta3DQGStreamfunction(SharedIEquationParameters spEqParams);
+         AnelasticFPlane3DQGStreamfunction(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~LargeBeta3DQGStreamfunction();
+         virtual ~AnelasticFPlane3DQGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -95,4 +95,4 @@ namespace Equations {
 }
 }
 
-#endif // LARGEBETA3DQGSTREAMFUNCTION_HPP
+#endif // ANELASTICFPLANE3DQGSTREAMFUNCTION_HPP

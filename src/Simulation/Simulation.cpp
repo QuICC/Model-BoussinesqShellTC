@@ -2,6 +2,10 @@
  *  \brief Source of the high level simulation
  */
 
+// Debug includes
+//
+#include "Debug/DebugIncludes.hpp"
+
 // Configuration includes
 //
 #include "Profiler/ProfilerMacro.h"

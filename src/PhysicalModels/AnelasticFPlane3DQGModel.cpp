@@ -1,5 +1,5 @@
-/** \file FPlane3DQGModel.cpp
- *  \brief Source of the f-plane 3DQG physical model
+/** \file AnelasticFPlane3DQGModel.cpp
+ *  \brief Source of the anelastic f-plane 3DQG physical model
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/FPlane3DQGModel.hpp"
+#include "PhysicalModels/AnelasticFPlane3DQGModel.hpp"
 
 // Project includes
 //
@@ -22,13 +22,13 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGVertical.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGVertical.hpp"
+#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> FPlane3DQGModel::fieldIds()
+   std::vector<PhysicalNames::Id> AnelasticFPlane3DQGModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -48,14 +48,14 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> FPlane3DQGModel::boundaryNames()
+   std::vector<std::string> AnelasticFPlane3DQGModel::boundaryNames()
    {
       // Create storage
       std::vector<std::string>   names;
 
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
 
       for(it = ids.begin(); it != ids.end(); ++it)
       {
@@ -65,7 +65,7 @@ namespace GeoMHDiSCC {
       return names;
    }
 
-   std::vector<bool> FPlane3DQGModel::isPeriodicBox()
+   std::vector<bool> AnelasticFPlane3DQGModel::isPeriodicBox()
    {
       std::vector<bool> box;
 
@@ -81,22 +81,22 @@ namespace GeoMHDiSCC {
       return box;
    }
 
-   void FPlane3DQGModel::addEquations(SharedSimulation spSim)
+   void AnelasticFPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add mean temperature equation
-      spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGTransport>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::FPlane3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::FPlane3DQGVertical>();
+      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGVertical>();
    }
 
-   void FPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void AnelasticFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -105,11 +105,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void FPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void AnelasticFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -128,7 +128,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedPtrMacro<SimulationBoundary> FPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedPtrMacro<SimulationBoundary> AnelasticFPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedPtrMacro<SimulationBoundary>  spBcs(new SimulationBoundary());
@@ -209,11 +209,11 @@ namespace GeoMHDiSCC {
       return spBcs;
    }
 
-   void FPlane3DQGModel::setInitialState(SharedSimulation spSim)
+   void AnelasticFPlane3DQGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

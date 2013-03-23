@@ -413,7 +413,7 @@ namespace IoConfig {
       MPI_Get_address(&fData[0], &element);
       displ[1] = element;
       blocks[1] = fData.size();
-      types[1] = MpiTypes::type<MHDFloat>();
+      types[1] = Parallel::MpiTypes::type<MHDFloat>();
 
       // MPI data type for the combined integer and float data
       MPI_Datatype   cfgType;

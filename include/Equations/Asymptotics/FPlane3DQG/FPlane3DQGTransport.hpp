@@ -51,13 +51,6 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
 
          /**
-          * @brief Compute the linear term
-          *
-          * @param rRHS    RHS of timestepping equation
-          */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
-
-         /**
           * @brief Set the equation matrices
           *
           * @param bcIds   List of boundary condition IDs

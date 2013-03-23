@@ -86,7 +86,7 @@ namespace Timestep {
          hasNewDt = true;
 
          // Set new timestep
-         this->mDt = cfl;
+         this->mDt = cfl/this->mcUpWindow;
 
       // No need to change timestep
       } else

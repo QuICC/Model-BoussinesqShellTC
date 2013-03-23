@@ -51,13 +51,6 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
 
          /**
-          * @brief Compute the linear term
-          *
-          * @param rRHS    RHS of timestepping equation
-          */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
-
-         /**
           * @brief Transfer timestepper output to unknown and update vorticity
           *
           * @param id      Component ID
