@@ -157,9 +157,14 @@ namespace Equations {
          const FieldRequirement& requirements(PhysicalNames::Id id) const;
 
          /**
-          * @brief Finalize the initialise equation matrices
+          * @brief Finalize the initialised equation matrices
           */
          void finalizeMatrices();
+
+         /**
+          * @brief Clear spectral equation matrices
+          */
+         void clearSpectralMatrices();
 
          /**
           * @brief Get the equation parameters

@@ -104,6 +104,7 @@ namespace Timestep {
       //
       if(hasNewDt)
       {
+std::cerr << "START update matrices" << std::endl;
          // Loop over all substeps of timestepper
          for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
          {
@@ -126,6 +127,7 @@ namespace Timestep {
                this->updateMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
             }
          }
+std::cerr << "FINISH update matrices" << std::endl;
 
 std::cerr << "START complex solver update" << std::endl;
          // Update solvers from complex equation steppers
@@ -873,67 +875,89 @@ std::cerr << "FINISH real solver update" << std::endl;
       MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
       MHDFloat linearCoeff = ImExRK3::lhsL(this->mStep);
 
-      DecoupledZSparse   lhs;
+      // Set block size
+      int blockRows = spEq->linearMatrix(comp,idx).first.rows();
+      int blockCols = spEq->linearMatrix(comp,idx).first.cols();
 
-      // Addition storage for coupled case
-      SparseMatrix   coupledT;
-      SparseMatrix   coupledC;
+      // Block shifts
+      int rowShift = 0;
+      int colShift = 0;
 
-      // Create real LHS matrix
-      lhs.first =  linearCoeff*spEq->linearMatrix(comp,idx).first - timeCoeff*spEq->timeMatrix(comp,idx).first;
-      // Create imaginary LHS matrix
-      lhs.second = linearCoeff*spEq->linearMatrix(comp,idx).second - timeCoeff*spEq->timeMatrix(comp,idx).second;
-
-      // Create coupled matrix
+      // Set block shift for main LHS matrix
       if(nC > 0)
       {
-         // Block selection matrix for coupled system
-         SparseMatrix  blockT(nC+1,nC+1);
-         SparseMatrix  blockC(nC+1,nC+1);
+         rowShift = cRow*blockRows;
+         colShift = cRow*blockCols;
+      }
 
-         // Single element is required
-         blockT.reserve(1);
-         blockC.reserve(1);
+      // Create real main LHS matrix
+      SparseMatrix work =  linearCoeff*spEq->linearMatrix(comp,idx).first - timeCoeff*spEq->timeMatrix(comp,idx).first;
 
-         // Create matrix blocks
-         blockT.insert(cRow,cRow) = 1.0;
-         blockC.insert(cRow,1-cRow) = linearCoeff;
-         
-         // Create real coupled LHS matrix
-         Eigen::kroneckerProduct(blockT,lhs.first, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->couplingMatrix(comp,idx).first, coupledC);
-         lhs.first = coupledT + coupledC;
-
-         // Create imaginary coupled LHS matrix
-         Eigen::kroneckerProduct(blockT,lhs.second, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->couplingMatrix(comp,idx).second, coupledC);
-         lhs.second = coupledT + coupledC;
-
-         // Add boundary conditions
-         //
-         // Make unit blocks (don't want rescaled boundary conditions)
-         blockT.coeffRef(cRow,cRow) = 1.0;
-         blockC.coeffRef(cRow,1-cRow) = 1.0;
-
-         // Real coupled boundary conditions
-         Eigen::kroneckerProduct(blockT,spEq->bcMatrix(comp,idx).first, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->cbcMatrix(comp,idx).first, coupledC);
-         lhs.first += coupledT + coupledC;
-
-         // Imaginary coupled boundary conditions
-         Eigen::kroneckerProduct(blockT,spEq->bcMatrix(comp,idx).second, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->cbcMatrix(comp,idx).second, coupledC);
-         lhs.second += coupledT + coupledC;
-
-      // Add boundary conditions for uncoupled system
+      // reserve storage for the triplets
+      std::vector<Eigen::Triplet<MHDFloat> > realTriplets;
+      if(nC > 0)
+      {
+         realTriplets.reserve(work.nonZeros() + spEq->bcMatrix(comp,idx).first.nonZeros() + spEq->couplingMatrix(comp,idx).first.nonZeros() + spEq->cbcMatrix(comp,idx).first.nonZeros());
       } else
       {
-         // Real boundary conditions
-         lhs.first += spEq->bcMatrix(comp,idx).first;
-
-         // Imaginary boundary conditions
-         lhs.second += spEq->bcMatrix(comp,idx).second;
+         realTriplets.reserve(work.nonZeros() + spEq->bcMatrix(comp,idx).first.nonZeros());
       }
+
+      // Add triplets for the main LHS Matrix
+      this->addTriplets(realTriplets, work, rowShift, colShift, 1.0);
+
+      // Create imaginary main LHS matrix
+      work =  linearCoeff*spEq->linearMatrix(comp,idx).second - timeCoeff*spEq->timeMatrix(comp,idx).second;
+
+      // reserve storage for the triplets
+      std::vector<Eigen::Triplet<MHDFloat> > imagTriplets;
+      if(nC > 0)
+      {
+         imagTriplets.reserve(work.nonZeros() + spEq->bcMatrix(comp,idx).second.nonZeros() + spEq->couplingMatrix(comp,idx).second.nonZeros() + spEq->cbcMatrix(comp,idx).second.nonZeros());
+      } else
+      {
+         imagTriplets.reserve(work.nonZeros() + spEq->bcMatrix(comp,idx).second.nonZeros());
+      }
+
+      // Add triplets for the main LHS Matrix
+      this->addTriplets(imagTriplets, work, rowShift, colShift, 1.0);
+
+      // Add triplets for the real boundary conditions
+      this->addTriplets(realTriplets, spEq->bcMatrix(comp,idx).first, rowShift, colShift, 1.0);
+
+      // Add triplets for the imaginary boundary conditions
+      this->addTriplets(imagTriplets, spEq->bcMatrix(comp,idx).second, rowShift, colShift, 1.0);
+
+      // Add coupling if required
+      if(nC > 0)
+      {
+         // Set block shift for coupling LHS matrix
+         rowShift = cRow*blockRows;
+         colShift = (1-cRow)*blockCols;
+
+         // Add triplets for the real coupling matrix
+         this->addTriplets(realTriplets, spEq->couplingMatrix(comp,idx).first, rowShift, colShift, linearCoeff);
+
+         // Add triplets for the imaginary coupling matrix
+         this->addTriplets(imagTriplets, spEq->couplingMatrix(comp,idx).second, rowShift, colShift, linearCoeff);
+
+         // Add triplets for the real coupled boundary conditions
+         this->addTriplets(realTriplets, spEq->cbcMatrix(comp,idx).first, rowShift, colShift, 1.0);
+
+         // Add triplets for the imaginary coupled boundary conditions
+         this->addTriplets(imagTriplets, spEq->cbcMatrix(comp,idx).second, rowShift, colShift, 1.0);
+      }
+
+      // Create storage for the matrix
+      DecoupledZSparse  lhs;
+
+      // Resize and set real component
+      lhs.first.resize(blockRows*(nC+1), blockCols*(nC+1));
+      lhs.first.setFromTriplets(realTriplets.begin(), realTriplets.end());
+
+      // Resize and set imaginary component
+      lhs.second.resize(blockRows*(nC+1), blockCols*(nC+1));
+      lhs.second.setFromTriplets(imagTriplets.begin(), imagTriplets.end());
 
       return lhs;
    }
@@ -944,42 +968,91 @@ std::cerr << "FINISH real solver update" << std::endl;
       MHDFloat timeCoeff = -ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
       MHDFloat linearCoeff = -ImExRK3::rhsL(this->mStep);
 
-      DecoupledZSparse   rhs;
+      // Set block size
+      int blockRows = spEq->linearMatrix(comp,idx).first.rows();
+      int blockCols = spEq->linearMatrix(comp,idx).first.cols();
 
-      // Addition storage for coupled case
-      SparseMatrix   coupledT;
-      SparseMatrix   coupledC;
+      // Block shifts
+      int rowShift = 0;
+      int colShift = 0;
 
-      // Create real LHS matrix
-      rhs.first = linearCoeff*spEq->linearMatrix(comp,idx).first + timeCoeff*spEq->timeMatrix(comp,idx).first;
-      // Create imaginary LHS matrix
-      rhs.second = linearCoeff*spEq->linearMatrix(comp,idx).second + timeCoeff*spEq->timeMatrix(comp,idx).second;
-
-      // Create coupled matrix
+      // Set block shift for main LHS matrix
       if(nC > 0)
       {
-         // Block selection matrix for coupled system
-         SparseMatrix  blockT(nC+1,nC+1);
-         SparseMatrix  blockC(nC+1,nC+1);
-
-         // Single element is required
-         blockT.reserve(1);
-         blockC.reserve(1);
-
-         // Create correct equation timestepper
-         blockT.insert(cRow,cRow) = 1.0;
-         blockC.insert(cRow,1-cRow) = linearCoeff;
-
-         Eigen::kroneckerProduct(blockT,rhs.first, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->couplingMatrix(comp,idx).first, coupledC);
-         rhs.first = coupledT + coupledC;
-
-         Eigen::kroneckerProduct(blockT,rhs.second, coupledT);
-         Eigen::kroneckerProduct(blockC,spEq->couplingMatrix(comp,idx).second, coupledC);
-         rhs.second = coupledT + coupledC;
+         rowShift = cRow*blockRows;
+         colShift = cRow*blockCols;
       }
 
+      // Create real main RHS matrix
+      SparseMatrix work =  linearCoeff*spEq->linearMatrix(comp,idx).first + timeCoeff*spEq->timeMatrix(comp,idx).first;
+
+      // reserve storage for the triplets
+      std::vector<Eigen::Triplet<MHDFloat> > realTriplets;
+      if(nC > 0)
+      {
+         realTriplets.reserve(work.nonZeros() + spEq->couplingMatrix(comp,idx).first.nonZeros());
+      } else
+      {
+         realTriplets.reserve(work.nonZeros());
+      }
+
+      // Add triplets for the main RHS Matrix
+      this->addTriplets(realTriplets, work, rowShift, colShift, 1.0);
+
+      // Create imaginary main RHS matrix
+      work =  linearCoeff*spEq->linearMatrix(comp,idx).second + timeCoeff*spEq->timeMatrix(comp,idx).second;
+
+      // reserve storage for the triplets
+      std::vector<Eigen::Triplet<MHDFloat> > imagTriplets;
+      if(nC > 0)
+      {
+         imagTriplets.reserve(work.nonZeros() + spEq->couplingMatrix(comp,idx).second.nonZeros());
+      } else
+      {
+         imagTriplets.reserve(work.nonZeros());
+      }
+
+      // Add triplets for the main RHS Matrix
+      this->addTriplets(imagTriplets, work, rowShift, colShift, 1.0);
+
+      // Add coupling if required
+      if(nC > 0)
+      {
+         // Set block shift for coupling RHS matrix
+         rowShift = cRow*blockRows;
+         colShift = (1-cRow)*blockCols;
+
+         // Add triplets for the real coupling matrix
+         this->addTriplets(realTriplets, spEq->couplingMatrix(comp,idx).first, rowShift, colShift, linearCoeff);
+
+         // Add triplets for the imaginary coupling matrix
+         this->addTriplets(imagTriplets, spEq->couplingMatrix(comp,idx).second, rowShift, colShift, linearCoeff);
+      }
+
+      // Create storage for the matrix
+      DecoupledZSparse  rhs;
+
+      // Resize and set real component
+      rhs.first.resize(blockRows*(nC+1), blockCols*(nC+1));
+      rhs.first.setFromTriplets(realTriplets.begin(), realTriplets.end());
+
+      // Resize and set imaginary component
+      rhs.second.resize(blockRows*(nC+1), blockCols*(nC+1));
+      rhs.second.setFromTriplets(imagTriplets.begin(), imagTriplets.end());
+
       return rhs;
+   }
+
+   void Timestepper::addTriplets(std::vector<Eigen::Triplet<MHDFloat> >& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c)
+   {
+      // Add triplet for matrix
+      for (int k=0; k<mat.outerSize(); ++k)
+      {
+         for (SparseMatrix::InnerIterator it(mat,k); it; ++it)
+         {
+            triplets.push_back(Eigen::Triplet<MHDFloat>(it.row()+rowShift, it.col()+colShift, c*it.value()));
+         }
+      }
    }
 }
 }

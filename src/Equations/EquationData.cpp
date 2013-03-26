@@ -175,6 +175,24 @@ namespace Equations {
       }
    }
 
+   void EquationData::clearSpectralMatrices()
+   {
+      // Clear time matrices
+      this->mTMatrices.clear();
+
+      // Clear linear matrices
+      this->mLMatrices.clear();
+
+      // Clear linear coupling matrices
+      this->mCMatrices.clear();
+
+      // Clear boundary condition matrices
+      this->mBCMatrices.clear();
+
+      // Clear coupled boundary condition matrices
+      this->mCBCMatrices.clear();
+   }
+
    void EquationData::setField(PhysicalNames::Id name, Datatypes::SharedScalarVariableType spField)
    {
       this->mScalars.insert(std::make_pair(name, spField));

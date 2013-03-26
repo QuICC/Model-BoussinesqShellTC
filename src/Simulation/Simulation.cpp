@@ -28,6 +28,7 @@
 #include "IoTools/Formatter.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 
+#include "valgrind/callgrind.h"
 namespace GeoMHDiSCC {
 
    Simulation::Simulation()

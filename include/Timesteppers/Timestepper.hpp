@@ -169,6 +169,11 @@ namespace Timestep {
          DecoupledZSparse buildRHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
 
          /**
+          * @brief Add triplets corresponding to matrix
+          */
+         void addTriplets(std::vector<Eigen::Triplet<MHDFloat> >& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c);
+
+         /**
           * @brief Maximum timestep jump per step (See Soederlind)
           */
          const MHDFloat mcMaxJump;
