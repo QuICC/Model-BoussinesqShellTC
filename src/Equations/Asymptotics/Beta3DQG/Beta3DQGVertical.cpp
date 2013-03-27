@@ -66,7 +66,7 @@ namespace Equations {
 
    void Beta3DQGVertical::setCoupling()
    {
-      /// \mhdBug m=0 mode should be extracted an written as a separate real equation
+      /// \mhdBug m=0 mode should be extracted and written as a separate real equation
       // Set the timestep starting index (exclude m = 0) mode
       if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
       {
@@ -124,7 +124,7 @@ namespace Equations {
 
       /// 
       /// The timestepper will buid the full implicit timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
-      /// The  left-hand side following equation is setup here: 
+      /// The  left-hand side of the following equation is setup here: 
       ///
       ///    \f$ \nabla_{\perp}^2 w - \partial_t w + \frac{1}{\Gamma}\partial_Z \psi = \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
@@ -152,11 +152,9 @@ namespace Equations {
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
-//         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
 
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
-//         Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), tmpA);
          Eigen::kroneckerProduct(tau3D.first, spec1D.qDiff(2,0), tmpA);
          it->second.back().first += tmpA;
 
@@ -173,7 +171,6 @@ namespace Equations {
          it->second.push_back(DecoupledZSparse());
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::STREAMFUNCTION)->second.find(bc3D)->second);
          tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
-//         Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
          Eigen::kroneckerProduct(tau3D.second, spec1D.qDiff(2,0), it->second.back().second);
 
          // Prune matrices for safety

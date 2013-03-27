@@ -14,7 +14,7 @@
    // Include the right header
    #include <StorageProviders/DynamicPairProvider.hpp>
 
-   // Dynamic size storage pair provider
+   /// Macro to select the type of storage pair provider
    #define StoragePairProviderMacro GeoMHDiSCC::DynamicPairProvider
 
 #endif // STORAGEPAIRPROVIDERMACRO_H

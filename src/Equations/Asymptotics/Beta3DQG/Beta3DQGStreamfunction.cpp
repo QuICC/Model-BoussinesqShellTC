@@ -95,7 +95,7 @@ namespace Equations {
 
    void Beta3DQGStreamfunction::setCoupling()
    {
-      /// \mhdBug m=0 mode should be extracted an written as a separate real equation
+      /// \mhdBug m=0 mode should be extracted and written as a separate real equation
       // Set the timestep starting index (exclude m = 0) mode
       if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
       {
@@ -221,11 +221,9 @@ namespace Equations {
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
-//         Eigen::kroneckerProduct(spec3D.qDiff(1,0), tau1D.first, it->second.back().first);
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
          tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
-//         Eigen::kroneckerProduct(tau3D.second, spec1D.id(0), it->second.back().second);
          Eigen::kroneckerProduct(tau3D.second, spec1D.qDiff(4,0), it->second.back().second);
 
          // Prune matrices for safety
@@ -240,7 +238,6 @@ namespace Equations {
          // Set coupled boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
          tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::VELOCITYZ)->second.find(bc3D)->second);
-//         Eigen::kroneckerProduct(tau3D.first, spec1D.id(0), it->second.back().first);
          Eigen::kroneckerProduct(tau3D.first, spec1D.qDiff(4,0), it->second.back().first);
 
          // Prune matrices for safety

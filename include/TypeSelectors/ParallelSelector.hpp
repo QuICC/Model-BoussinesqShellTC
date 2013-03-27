@@ -146,8 +146,14 @@ namespace GeoMHDiSCC {
        */
       void setGrouper(const SplittingDescription& descr, Transform::SharedIForwardGrouper& spFwdGrouper, Transform::SharedIBackwardGrouper& spBwdGrouper);
 
+      /**
+       * @brief Templated grouper selector 
+       */
       template <Splitting::Groupers::Id TGroup, Splitting::Algorithms::Id TAlgo> void setGrouper(Transform::SharedIForwardGrouper& spFwdGrouper, Transform::SharedIBackwardGrouper& spBwdGrouper);
 
+      /**
+       * @brief Templated grouper selector 
+       */
       template <Splitting::Groupers::Id TGroup> void setGrouper(const Splitting::Algorithms::Id algo, Transform::SharedIForwardGrouper& spFwdGrouper, Transform::SharedIBackwardGrouper& spBwdGrouper);
 
       template <Splitting::Groupers::Id TGroup, Splitting::Algorithms::Id TAlgo> void setGrouper(Transform::SharedIForwardGrouper& spFwdGrouper, Transform::SharedIBackwardGrouper& spBwdGrouper)
