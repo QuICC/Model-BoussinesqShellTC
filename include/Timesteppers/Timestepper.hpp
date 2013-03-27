@@ -147,31 +147,110 @@ namespace Timestep {
          void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
-          * @brief Build the LHS matrix
+          * @brief Build the LHS matrix triplets
           *
-          * @param spEq Shared pointer to equation
-          * @param comp Field component
-          * @param idx  Matrix index
-          * @param nC   Number of coupled fields
-          * @param cRow Row index of coupled field
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
           */
-         DecoupledZSparse buildLHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         int buildLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
 
          /**
-          * @brief Build the RHS matrix
+          * @brief Build the LHS matrix triplets
           *
-          * @param spEq Shared pointer to equation
-          * @param comp Field component
-          * @param idx  Matrix index
-          * @param nC   Number of coupled fields
-          * @param cRow Row index of coupled field
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
           */
-         DecoupledZSparse buildRHSMatrix(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         int buildLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
 
          /**
-          * @brief Add triplets corresponding to matrix
+          * @brief Build the RHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
           */
-         void addTriplets(std::vector<Eigen::Triplet<MHDFloat> >& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c);
+         void buildRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Build the RHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
+          */
+         void buildRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Update the LHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
+          */
+         void updateLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Update the LHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
+          */
+         void updateLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Update the RHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
+          */
+         void updateRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Update the RHS matrix triplets
+          *
+          * @param triplets   Storage for the triplets
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param nC         Number of coupled fields
+          * @param cRow       Row index of coupled field
+          */
+         void updateRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+
+         /**
+          * @brief Add real triplets corresponding to sparse real matrix
+          */
+         void addTriplets(std::vector<Triplet>& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c);
+
+         /**
+          * @brief Add complex triplets corresponding to sparse complex matrix
+          */
+         void addTriplets(std::vector<TripletZ>& triplets, const SparseMatrixZ& mat, const int rowShift, const int colShift, const MHDComplex c);
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
@@ -192,6 +271,11 @@ namespace Timestep {
           * @brief Current timestepper step (local)
           */
          int   mStep;
+
+         /**
+          * @brief Previous timestep length
+          */
+         MHDFloat mOldDt;
 
          /**
           * @brief Timestep length

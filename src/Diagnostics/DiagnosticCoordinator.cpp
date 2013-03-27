@@ -5,7 +5,6 @@
 // Debug includes
 //
 #include <cassert>
-#include "Debug/DebugIncludes.hpp"
 
 // System includes
 //
@@ -22,6 +21,8 @@
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Diagnostics/StreamVerticalWrapper.hpp"
+
+#include <iostream>
 
 namespace GeoMHDiSCC {
 

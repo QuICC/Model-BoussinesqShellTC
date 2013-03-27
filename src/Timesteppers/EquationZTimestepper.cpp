@@ -76,8 +76,24 @@ namespace Timestep {
 
    void EquationZTimestepper::initSolver()
    {
-      this->mSolver.reserve(this->mLHSMatrix.size());
-      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
+      // Initialise the RHS matrices
+      this->mRHSMatrix.reserve(this->mRHSTriplets.size());
+      for(size_t i = 0; i < this->mRHSTriplets.size(); i++)
+      {
+         // Get matrix size
+         int rows = this->mSize.at(i % this->nSystem()); 
+
+         // Create RHS matrix from triplets
+         SparseMatrixZ tmp(rows, rows);
+         tmp.setFromTriplets(this->mRHSTriplets.at(i).begin(), this->mRHSTriplets.at(i).end());
+         
+         // Add RHS matrix to storage
+         this->mRHSMatrix.push_back(tmp);
+      }
+
+      // Initialise solver
+      this->mSolver.reserve(this->mLHSTriplets.size());
+      for(size_t i = 0; i < this->mLHSTriplets.size(); i++)
       {
          SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> >  solver(new SparseSolverMacro<SparseMatrixZ>());
 
@@ -85,14 +101,21 @@ namespace Timestep {
       }
 
       // Compute pattern and factorisation
-      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSTriplets.size(); i++)
       {
          if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
-            // Safety assert to make sur matrix is compressed
-            assert(this->mLHSMatrix.at(i).isCompressed());
+            // Get matrix size
+            int rows = this->mSize.at(i % this->nSystem()); 
 
-            this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
+            // Create matrix from stored triplets
+            SparseMatrixZ tmp(rows, rows);
+            tmp.setFromTriplets(this->mLHSTriplets.at(i).begin(), this->mLHSTriplets.at(i).end());
+
+            // Safety assert to make sur matrix is compressed
+            assert(tmp.isCompressed());
+
+            this->mSolver.at(i)->compute(tmp);
 
             // Safety assert for successful factorisation
             assert(this->mSolver.at(i)->info() == Eigen::Success);
@@ -102,15 +125,28 @@ namespace Timestep {
 
    void EquationZTimestepper::updateSolver()
    {
+      // Update the RHS matrices
+      for(size_t i = 0; i < this->mRHSTriplets.size(); i++)
+      {
+         this->mRHSMatrix.at(i).setFromTriplets(this->mRHSTriplets.at(i).begin(), this->mRHSTriplets.at(i).end());
+      }
+
       // Compute factorisation
-      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
+      for(size_t i = 0; i < this->mLHSTriplets.size(); i++)
       {
          if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
-            // Safety assert to make sur matrix is compressed
-            assert(this->mLHSMatrix.at(i).isCompressed());
+            // Get matrix size
+            int rows = this->mSize.at(i % this->nSystem()); 
 
-            this->mSolver.at(i)->factorize(this->mLHSMatrix.at(i));
+            // Create matrix from stored triplets
+            SparseMatrixZ tmp(rows, rows);
+            tmp.setFromTriplets(this->mLHSTriplets.at(i).begin(), this->mLHSTriplets.at(i).end());
+
+            // Safety assert to make sur matrix is compressed
+            assert(tmp.isCompressed());
+
+            this->mSolver.at(i)->factorize(tmp);
 
             // Safety assert for successful factorisation
             assert(this->mSolver.at(i)->info() == Eigen::Success);
@@ -120,47 +156,41 @@ namespace Timestep {
 
    void EquationZTimestepper::reserveMatrices(const int n)
    {
-      // Reserve space for the LHS matrices
-      this->mLHSMatrix.reserve(n);
-
       // Reserve space for the RHS matrices
       this->mRHSMatrix.reserve(n);
+
+      // Reserve space for the LHS triplets
+      this->mLHSTriplets.reserve(n);
+
+      // Reserve space for the RHS triplets
+      this->mRHSTriplets.reserve(n);
+
+      // Initialise storage
+      for(int i = 0; i < n; ++i)
+      {
+         this->mLHSTriplets.push_back(std::vector<TripletZ>());
+         this->mRHSTriplets.push_back(std::vector<TripletZ>());
+      }
    }
 
-   void EquationZTimestepper::addLHSMatrix(const DecoupledZSparse& lhs)
+   std::vector<TripletZ>& EquationZTimestepper::rLHSTriplets(const int idx)
    {
-      this->mLHSMatrix.push_back(lhs.first.cast<MHDComplex>() + MathConstants::cI*lhs.second);
+      return this->mLHSTriplets.at(idx);
    }
 
-   void EquationZTimestepper::addRHSMatrix(const DecoupledZSparse& rhs)
+   std::vector<TripletZ>& EquationZTimestepper::rRHSTriplets(const int idx)
    {
-      this->mRHSMatrix.push_back(rhs.first.cast<MHDComplex>() + MathConstants::cI*rhs.second);
+      return this->mRHSTriplets.at(idx);
    }
 
-   void EquationZTimestepper::setLHSMatrix(const int idx, const DecoupledZSparse& lhs)
+   void EquationZTimestepper::addStorage(const int rows, const int cols)
    {
-      this->mLHSMatrix.at(idx) = lhs.first.cast<MHDComplex>() + MathConstants::cI*lhs.second;
-   }
+      // Assert for non zero rows and columns
+      assert(rows > 0);
+      assert(cols > 0);
 
-   void EquationZTimestepper::setRHSMatrix(const int idx, const DecoupledZSparse& rhs)
-   {
-      this->mRHSMatrix.at(idx) = rhs.first.cast<MHDComplex>() + MathConstants::cI*rhs.second;
-   }
-
-   void EquationZTimestepper::completeLHSMatrix(const int idx, const DecoupledZSparse& lhs)
-   {
-      this->mLHSMatrix.at(idx) += lhs.first.cast<MHDComplex>() + MathConstants::cI*lhs.second;
-   }
-
-   void EquationZTimestepper::completeRHSMatrix(const int idx, const DecoupledZSparse& rhs)
-   {
-      this->mRHSMatrix.at(idx) += rhs.first.cast<MHDComplex>() + MathConstants::cI*rhs.second;
-   }
-
-   void EquationZTimestepper::addStorage(const int cols)
-   {
-      // get the required number of rows
-      int rows = this->mLHSMatrix.back().cols();
+      // Set the matrix size
+      this->mSize.push_back(rows);
 
       // Add storage for RHS data
       this->mRHSData.push_back(MatrixZ(rows,cols));

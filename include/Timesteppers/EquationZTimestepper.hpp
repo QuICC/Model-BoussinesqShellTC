@@ -78,57 +78,26 @@ namespace Timestep {
          int nSystem() const;
 
          /**
-          * @brief Add LHS Matrix
+          * @brief Set LHS triplets
           *
-          * @param lhs LHS matrix to add
+          * @param idx Index of the triplets
           */
-         void addLHSMatrix(const DecoupledZSparse& lhs);
+         std::vector<TripletZ>& rLHSTriplets(const int idx);
 
          /**
-          * @brief Add RHS Matrix
+          * @brief Set RHS triplets
           *
-          * @param rhs RHS matrix to add
+          * @param idx Index of the triplets
           */
-         void addRHSMatrix(const DecoupledZSparse& rhs);
-
-         /**
-          * @brief Set existing LHS Matrix with new values
-          *
-          * @param idx  Index of the matrix
-          * @param lhs LHS matrix to add
-          */
-         void setLHSMatrix(const int idx, const DecoupledZSparse& lhs);
-
-         /**
-          * @brief Se existing RHS Matrix with new values
-          *
-          * @param idx  Index of the matrix
-          * @param rhs RHS matrix to add
-          */
-         void setRHSMatrix(const int idx, const DecoupledZSparse& rhs);
-
-         /**
-          * @brief Complete LHS Matrix with additional values
-          *
-          * @param idx  Index of the matrix
-          * @param lhs  LHS matrix to add
-          */
-         void completeLHSMatrix(const int idx, const DecoupledZSparse& lhs);
-
-         /**
-          * @brief Complete RHS Matrix with additional values
-          *
-          * @param idx  Index of the matrix
-          * @param rhs RHS matrix to add
-          */
-         void completeRHSMatrix(const int idx, const DecoupledZSparse& rhs);
+         std::vector<TripletZ>& rRHSTriplets(const int idx);
 
          /**
           * @brief Add RHS and solution data storage
           * 
+          * @param rows Number of rows of matrix
           * @param cols Number of columns required
           */
-         void addStorage(const int cols);
+         void addStorage(const int rows, const int cols);
 
          /**
           * @brief Set RHS data
@@ -153,14 +122,24 @@ namespace Timestep {
          
       protected:
          /**
-          * @brief Complex LHS operators of the timestepped equations
+          * @brief Storage for the matrix sizes
           */
-         std::vector<SparseMatrixZ>   mLHSMatrix;
+         std::vector<int>  mSize;
 
          /**
           * @brief Complex RHS operators of the timestepped equations
           */
          std::vector<SparseMatrixZ>   mRHSMatrix;
+
+         /**
+          * @brief Complex LHS operators triplets of the timestepped equations
+          */
+         std::vector<std::vector<TripletZ> >   mLHSTriplets;
+
+         /**
+          * @brief Complex RHS operators triplets of the timestepped equations
+          */
+         std::vector<std::vector<TripletZ> >   mRHSTriplets;
 
          /**
           * @brief Storage for linear solve's RHS

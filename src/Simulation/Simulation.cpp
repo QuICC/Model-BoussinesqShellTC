@@ -4,7 +4,6 @@
 
 // Debug includes
 //
-#include "Debug/DebugIncludes.hpp"
 
 // Configuration includes
 //
@@ -28,7 +27,6 @@
 #include "IoTools/Formatter.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 
-#include "valgrind/callgrind.h"
 namespace GeoMHDiSCC {
 
    Simulation::Simulation()
@@ -257,9 +255,13 @@ namespace GeoMHDiSCC {
 
    void Simulation::timestepEquations()
    {
+TimerMacro  timer;
+timer.start();
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
       this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+timer.stop();
+std::cerr << "TIMESTEP : " << timer.time() << std::endl;
 
       ProfilerMacro_start(ProfilerMacro::CONTROL);
       if(this->mTimestepper.finishedStep())
