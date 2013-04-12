@@ -6,7 +6,7 @@ project(GeoMHDiSCC CXX)
 #
 # Check for minimal version for CMake
 #
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8.2)
 
 #
 # Include function library
@@ -35,7 +35,7 @@ geomhdiscc_provide_choice(GEOMHDISCC_PLATFORMS "Platform" GEOMHDISCC_PLATFORM pl
 
 if(platformTest)
    # Load platform
-   geomhdiscc_load_platform(GEOMHDISCC_PLATFORMS GEOMHDISCC_PLATFORM)
+   geomhdiscc_load_platform(GEOMHDISCC_PLATFORM)
 
    # Create global configurator
    include(cmake.d/setup/global.cmake)
