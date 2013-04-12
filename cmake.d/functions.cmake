@@ -85,6 +85,10 @@ function (geomhdiscc_link_external varName)
          endif(${GEOMHDISCC_LIBRARIES_${libName}} STREQUAL "auto") 
       endif(${len} EQUAL 1)
    endif(DEFINED GEOMHDISCC_LIBRARIES_${libName})
+   # Loop over all library directories to add 
+   foreach(inc ${GEOMHDISCC_LIBDIR_${libName}})
+      link_directories(${inc})
+   endforeach(inc)
    # Loop over all libraries to link to
    foreach(lib ${GEOMHDISCC_LIBRARIES_${libName}})
       link_libraries(${lib})

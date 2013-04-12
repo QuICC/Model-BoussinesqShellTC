@@ -2,4 +2,4 @@
 #-------------- AVAILABLE PLATFORMS --------------#
 ###################################################
 
-set(GEOMHDISCC_PLATFORMS "Desktop")
+set(GEOMHDISCC_PLATFORMS "Desktop" "Janus")
