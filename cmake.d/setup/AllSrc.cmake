@@ -32,6 +32,7 @@ message(STATUS "!!!WARNING!!! AllSrc.cmake OVERRIDING ACTUAL DIRECTORY LIST WITH
 #
 set(MHDAllSrcDirs
    Base
+   Debug
    Communicators
    Diagnostics
    Equations

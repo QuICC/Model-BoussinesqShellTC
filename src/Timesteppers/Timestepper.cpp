@@ -274,7 +274,7 @@ timer.stop();
 std::cerr << "FINISH complex solver init: " << timer.time() << std::endl;
 
 timer.start();
-std::cerr << "START complex solver init" << std::endl;
+std::cerr << "START real solver init" << std::endl;
       // Initialise solvers from real equation steppers
       for(size_t i = 0; i < this->mEqDStepper.size(); i++)
       {
