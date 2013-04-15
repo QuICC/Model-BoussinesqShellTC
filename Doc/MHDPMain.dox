@@ -1,6 +1,8 @@
 /** \mainpage Geophysical (M)HD in Spheres, Cylinders and Cartesian boxes
  *
  * <center>
- * | \subpage mhdPDevelopment |
+ * | \subpage mhdPModels |
+ *   \subpage mhdPExternal |
+ *   \subpage mhdPDevelopment |
  * </center>
  */

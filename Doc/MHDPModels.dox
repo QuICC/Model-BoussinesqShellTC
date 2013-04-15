@@ -1,0 +1,38 @@
+/** \page mhdPModels Physical models
+ *
+ *    - <em>Reduced Boussinesq Rayleigh-Bénard</em>
+ *
+ *    - <em>Reduced Boussinesq rotating Rayleigh-Bénard</em>
+ *
+ *    - \ref mhdPReducedBoussinesqBPlane <em>(Work in progress)</em>
+ *
+ *    - <em>Reduced Boussinesq f-plane</em>
+ *
+ *    - <em>Reduced Boussinesq equatorial region</em>
+ *          
+ *    - <em>Reduced anelastic Rayleigh-Bénard</em>
+ *          
+ *    - <em>Reduced anelastic rotating Rayleigh-Bénard</em>
+ *          
+ *    - <em>Reduced anelastic \f$\beta\f$-plane</em>
+ *
+ *    - <em>Reduced anelastic f-plane</em>
+ *          
+ *    - <em>Reduced anelastic equatorial region</em>
+ *          
+ *    - <em>Boussinesq full cylinder</em>
+ *          
+ *    - <em>Boussinesq cylindrical annulus</em>
+ *
+ *    - <em>Boussinesq full sphere</em>
+ *          
+ *    - <em>Boussinesq spherical shell</em>
+ *          
+ *    - <em>Anelastic full cylinder</em>
+ *          
+ *    - <em>Anelastic cylindrical annulus</em>
+ *
+ *    - <em>Anelastic full sphere</em>
+ *          
+ *    - <em>Anelastic spherical shell</em>
+ */
