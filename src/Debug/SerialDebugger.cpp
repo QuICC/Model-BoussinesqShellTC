@@ -20,13 +20,21 @@ namespace GeoMHDiSCC {
 
 namespace Debug {
 
-   void SerialDebugger::enter(const std::string& msg)
+   void SerialDebugger::enter(const std::string& msg, const int tabs)
    {
+      for(int i = 0; i < tabs; i++)
+      {
+         std::cerr << "\t";
+      }
       std::cerr << "ENTERING: " << msg << std::endl;
    }
 
-   void SerialDebugger::leave(const std::string& msg)
+   void SerialDebugger::leave(const std::string& msg, const int tabs)
    {
+      for(int i = 0; i < tabs; i++)
+      {
+         std::cerr << "\t";
+      }
       std::cerr << "LEAVING: " << msg << std::endl;
    }
 

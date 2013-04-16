@@ -64,6 +64,13 @@ namespace Timestep {
    {
       int start = step*this->nSystem();
 
+      // Set unused modes to zero
+      for(int i = 0; i < this->mZeroIdx; ++i)
+      {
+         this->mSolution.at(i).first.setZero();
+         this->mSolution.at(i).second.setZero();
+      }
+
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          // Solve for the real component

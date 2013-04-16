@@ -92,6 +92,7 @@ namespace Diagnostics {
 
       std::cerr << "Raw CFL: " << this->mCfl << std::endl;
       /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
+      /// \mhdBug This is not a clean CFL but min(0.1,cfl)
       //this->mCfl = std::min(this->mcCourant, this->mCfl);
       this->mCfl = std::min(0.1, this->mCfl);
    }

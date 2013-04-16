@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
    void Simulation::initBase()
    {
       // Debug statement
-      DebuggerMacro::enter("initBase");
+      DebuggerMacro::enter("initBase",0);
 
       // Make sure to catch raised exception in initialisation steps
       try{
@@ -79,13 +79,13 @@ namespace GeoMHDiSCC {
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("initBase");
+      DebuggerMacro::leave("initBase",0);
    }
 
    void Simulation::init(const SimulationBoundary& bcs)
    {
       // Debug statement
-      DebuggerMacro::enter("init");
+      DebuggerMacro::enter("init",0);
 
       // Initialise the variables
       this->initVariables();
@@ -115,13 +115,13 @@ namespace GeoMHDiSCC {
       }
 
       // Debug statement
-      DebuggerMacro::leave("init");
+      DebuggerMacro::leave("init",0);
    }
 
    void Simulation::run()
    {
       // Debug statement
-      DebuggerMacro::enter("run");
+      DebuggerMacro::enter("run",0);
 
       // Stop timer and update initialisation time
       this->mExecutionTimer.stop();
@@ -141,7 +141,7 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.start();
 
       // Debug statement
-      DebuggerMacro::enter("main loop");
+      DebuggerMacro::enter("main loop",0);
 
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == Runtime::Status::GOON)
@@ -160,7 +160,7 @@ namespace GeoMHDiSCC {
       }
 
       // Debug statement
-      DebuggerMacro::leave("main loop");
+      DebuggerMacro::leave("main loop",0);
 
       // Stop main loop timing
       this->mExecutionTimer.stop();
@@ -183,13 +183,13 @@ namespace GeoMHDiSCC {
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("run");
+      DebuggerMacro::leave("run",0);
    }
 
    void Simulation::finalize()
    {
       // Debug statement
-      DebuggerMacro::enter("finalize");
+      DebuggerMacro::enter("finalize",0);
 
       // Print execution timer infos
       this->mExecutionTimer.printInfo(std::cout);
@@ -201,7 +201,7 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo();
 
       // Debug statement
-      DebuggerMacro::leave("finalize");
+      DebuggerMacro::leave("finalize",0);
    }
 
    void Simulation::setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile)
@@ -243,7 +243,7 @@ namespace GeoMHDiSCC {
    void Simulation::preRun()
    {
       // Debug statement
-      DebuggerMacro::enter("preRun");
+      DebuggerMacro::enter("preRun",1);
 
       // Print message to signal successful completion of initialisation step
       if(FrameworkMacro::allowsIO())
@@ -275,13 +275,13 @@ namespace GeoMHDiSCC {
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepper.init(this->mDiagnostics.cfl()/100., this->mScalarEquations, this->mVectorEquations);
       // Debug statement
-      DebuggerMacro::leave("preRun");
+      DebuggerMacro::leave("preRun",1);
    }
 
    void Simulation::computeNonlinear()
    {
       // Debug statement
-      DebuggerMacro::enter("computeNonlinear");
+      DebuggerMacro::enter("computeNonlinear",1);
 
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
@@ -292,13 +292,13 @@ namespace GeoMHDiSCC {
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mTransformCoordinator);
 
       // Debug statement
-      DebuggerMacro::leave("computeNonlinear");
+      DebuggerMacro::leave("computeNonlinear",1);
    }
 
    void Simulation::timestepEquations()
    {
       // Debug statement
-      DebuggerMacro::enter("timestepEquations");
+      DebuggerMacro::enter("timestepEquations",1);
 
 TimerMacro  timer;
 timer.start();
@@ -335,13 +335,13 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
 
       // Debug statement
-      DebuggerMacro::leave("timestepEquations");
+      DebuggerMacro::leave("timestepEquations",1);
    }
 
    void Simulation::writeOutput()
    {
       // Debug statement
-      DebuggerMacro::enter("writeOutput");
+      DebuggerMacro::enter("writeOutput",1);
 
       ProfilerMacro_start(ProfilerMacro::IO);
       if(this->mTimestepper.finishedStep())
@@ -352,13 +352,13 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       ProfilerMacro_stop(ProfilerMacro::IO);
 
       // Debug statement
-      DebuggerMacro::leave("writeOutput");
+      DebuggerMacro::leave("writeOutput",1);
    }
 
    void Simulation::postRun()
    {
       // Debug statement
-      DebuggerMacro::enter("postRun");
+      DebuggerMacro::enter("postRun",1);
 
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
@@ -370,7 +370,7 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("postRun");
+      DebuggerMacro::leave("postRun",1);
    }
 
    void Simulation::initVariables()

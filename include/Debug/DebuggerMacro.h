@@ -14,17 +14,17 @@
    }
 
    /// Define debug enter macro function
-   #define DebuggerMacro_enter(P)  DebuggerMacro::enter(P)
+   #define DebuggerMacro_enter(M,T)  DebuggerMacro::enter(M,T)
 
    /// Define debug leave macro function
-   #define DebuggerMacro_leave(P)  DebuggerMacro::leave(P)
+   #define DebuggerMacro_leave(M,T)  DebuggerMacro::leave(M,T)
 
 #else
    /// Define empty debug enter  macro function
-   #define DebuggerMacro_enter(P)  
+   #define DebuggerMacro_enter(M,T)  
 
    /// Define empty debug leave macro function
-   #define DebuggerMacro_leave(P)  
+   #define DebuggerMacro_leave(M,T)  
 #endif // GEOMHDISCC_DEBUG
 
 #endif // DEBUGGERMACRO_H

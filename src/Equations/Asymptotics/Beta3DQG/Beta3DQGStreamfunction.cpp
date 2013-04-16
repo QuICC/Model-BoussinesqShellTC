@@ -218,7 +218,7 @@ namespace Equations {
          pos = this->mBCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
          it = pos.first;
 
-         // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
+         // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*B)
          it->second.push_back(DecoupledZSparse());
          tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);

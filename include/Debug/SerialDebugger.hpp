@@ -28,16 +28,18 @@ namespace Debug {
          /**
           * @brief Debug message when entering function
           *
-          * @param masg Message to print
+          * @param msg Message to print
+          * @param tabs Number of tab characters
           */
-         static void enter(const std::string& msg);
+         static void enter(const std::string& msg, const int tabs);
 
          /**
           * @brief Debug message when leaving function
           *
-          * @param masg Message to print
+          * @param msg Message to print
+          * @param tabs Number of tab characters
           */
-         static void leave(const std::string& msg);
+         static void leave(const std::string& msg, const int tabs);
          
       protected:
 

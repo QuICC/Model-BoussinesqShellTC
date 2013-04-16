@@ -10,6 +10,25 @@ include(cmake.d/functions.cmake)
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
 ###################################################
+#-------------------- DEBUGGER -------------------#
+###################################################
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set(GEOMHDISCC_DEBUG ON)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+if(GEOMHDISCC_DEBUG)
+   message(STATUS "***********************************************")
+   message(STATUS "**************** Debug setup ******************")
+   message(STATUS "***********************************************")
+   message(STATUS " --> Debug: Active")
+endif(GEOMHDISCC_DEBUG)
+
+if(GEOMHDISCC_DEBUG)
+   add_definitions("-DGEOMHDISCC_DEBUG")
+endif(GEOMHDISCC_DEBUG)
+
+###################################################
 #------------------- PROFILING -------------------#
 ###################################################
 
@@ -18,11 +37,11 @@ include(cmake.d/functions.cmake)
 #
 option(GEOMHDISCC_PROFILE "Activate internal profiler?" OFF)
 
-if(GEOMHDISCC_PROFILE)
+if(NOT GEOMHDISCC_DEBUG AND GEOMHDISCC_PROFILE)
    message(STATUS "***********************************************")
    message(STATUS "**************** Debug setup ******************")
    message(STATUS "***********************************************")
-endif(GEOMHDISCC_PROFILE)
+endif(NOT GEOMHDISCC_DEBUG AND GEOMHDISCC_PROFILE)
 
 if(GEOMHDISCC_PROFILE)
    add_definitions("-DGEOMHDISCC_PROFILE")
@@ -45,11 +64,11 @@ endif(GEOMHDISCC_PROFILE)
 #
 option(GEOMHDISCC_STORAGEPROFILE "Activate internal storage profiler?" OFF)
 
-if(NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
+if(NOT GEOMHDISCC_DEBUG AND NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
    message(STATUS "***********************************************")
    message(STATUS "**************** Debug setup ******************")
    message(STATUS "***********************************************")
-endif(NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
+endif(NOT GEOMHDISCC_DEBUG AND NOT GEOMHDISCC_PROFILE AND GEOMHDISCC_STORAGEPROFILE)
 
 if(GEOMHDISCC_STORAGEPROFILE)
    add_definitions("-DGEOMHDISCC_STORAGEPROFILE")
@@ -78,6 +97,10 @@ endif(GEOMHDISCC_STORAGEPROFILE)
 #
 # List of source subdirectories for the Base subframework
 #
+
+if(GEOMHDISCC_DEBUG)
+   set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Debug)
+endif(GEOMHDISCC_DEBUG)
 
 if(GEOMHDISCC_PROFILE)
    set(MHDDebugSrcDirs ${MHDDebugSrcDirs} Profiler)

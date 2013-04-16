@@ -62,9 +62,13 @@ namespace Timestep {
    {  
       int start = step*this->nSystem();
 
-      // Set m = 0 mode to zero
-      this->mSolution.at(0).setZero();
+      // Set unused modes to zero
+      for(int i = 0; i < this->mZeroIdx; ++i)
+      {
+         this->mSolution.at(i).setZero();
+      }
 
+      // Solve other modes
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
@@ -86,6 +90,7 @@ namespace Timestep {
          // Create RHS matrix from triplets
          SparseMatrixZ tmp(rows, rows);
          tmp.setFromTriplets(this->mRHSTriplets.at(i).begin(), this->mRHSTriplets.at(i).end());
+         tmp.makeCompressed();
          
          // Add RHS matrix to storage
          this->mRHSMatrix.push_back(tmp);
@@ -111,6 +116,7 @@ namespace Timestep {
             // Create matrix from stored triplets
             SparseMatrixZ tmp(rows, rows);
             tmp.setFromTriplets(this->mLHSTriplets.at(i).begin(), this->mLHSTriplets.at(i).end());
+            tmp.makeCompressed();
 
             // Safety assert to make sur matrix is compressed
             assert(tmp.isCompressed());
