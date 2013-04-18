@@ -19,7 +19,6 @@
 //
 #include "Timesteppers/EquationDTimestepper.hpp"
 #include "Timesteppers/EquationZTimestepper.hpp"
-#include "Timesteppers/TimestepCoupling.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -93,11 +92,6 @@ namespace Timestep {
 
       private:
          /**
-          * @brief Compute the type of the equation stepper (real or complex)
-          */
-         void getEqStepperType(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
-
-         /**
           * @brief Create the correct equation steppers
           */
          void createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
@@ -153,10 +147,9 @@ namespace Timestep {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         int buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
+         void buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Build the solver matrix
@@ -165,10 +158,9 @@ namespace Timestep {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         int buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
+         void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Update the LHS matrix triplets
@@ -177,11 +169,9 @@ namespace Timestep {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
           * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
+         void updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Update the LHS matrix triplets
@@ -190,21 +180,19 @@ namespace Timestep {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
           * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
+         void updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
-          * @brief Add real triplets corresponding to sparse real matrix
+          * @brief Add real triplets
           */
-         void addTriplets(std::vector<Triplet>& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c);
+         void addTriplets(std::vector<Triplet>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDFloat c);
 
          /**
-          * @brief Add complex triplets corresponding to sparse complex matrix
+          * @brief Add complex triplets stored in decoupled storage
           */
-         void addTriplets(std::vector<TripletZ>& triplets, const SparseMatrixZ& mat, const int rowShift, const int colShift, const MHDComplex c);
+         void addTriplets(std::vector<TripletZ>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDComplex c);
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
@@ -240,11 +228,6 @@ namespace Timestep {
           * @brief Current time
           */
          MHDFloat mTime;
-
-         /**
-          * @brief Timestep equation coupling
-          */
-         TimestepCoupling mTimeCoupling;
 
          /**
           * @brief Vector of (coupled) real equation timesteppers

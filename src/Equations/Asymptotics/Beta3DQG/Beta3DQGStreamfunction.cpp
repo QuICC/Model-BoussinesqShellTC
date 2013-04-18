@@ -77,9 +77,6 @@ namespace Equations {
 
    void Beta3DQGStreamfunction::setRequirements()
    {
-      // Equation is always complex due to the sloping boundary condition
-      this->setComplex(true);
-
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
 

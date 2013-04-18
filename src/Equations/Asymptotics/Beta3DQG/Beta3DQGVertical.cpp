@@ -51,9 +51,6 @@ namespace Equations {
 
    void Beta3DQGVertical::setRequirements()
    {
-      // Equation is always complex due to the sloping boundary condition
-      this->setComplex(true);
-
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
 

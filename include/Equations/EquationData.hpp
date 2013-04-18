@@ -102,16 +102,6 @@ namespace Equations {
          int nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
 
          /**
-          * @brief Are equation timestepping matrices complex?
-          */
-         virtual bool isComplex(FieldComponents::Spectral::Id id) const;
-
-         /**
-          * @brief Get starting index for equation (useful to exclude m=0 for example)
-          */
-         virtual int startIndex(FieldComponents::Spectral::Id id) const;
-
-         /**
           * @brief Get the Time derivative matrices (sparse matrices)
           */
          const DecoupledZSparse& timeMatrix(FieldComponents::Spectral::Id id, const int j) const;
@@ -140,11 +130,6 @@ namespace Equations {
           * @brief Get the coupling information
           */
          const CouplingInformation&  couplingInfo() const;
-
-         /**
-          * @brief Get the row shift due to coupling matrices
-          */
-         int rowShift(FieldComponents::Spectral::Id id, const int j) const;
 
          /**
           * @brief Get map of field storage requirements information
@@ -176,16 +161,6 @@ namespace Equations {
           * @brief Set the unknown name of equation
           */
          void setName(PhysicalNames::Id name);
-
-         /**
-          * @brief Set complex flag
-          */
-         void setComplex(bool isComplex);
-
-         /**
-          * @brief Set starting index
-          */
-         void setStartIndex(int start);
 
          /**
           * @brief Storage for the variable requirements
@@ -247,16 +222,6 @@ namespace Equations {
           * @brief Name ID of the unknown
           */
          PhysicalNames::Id mName;
-
-         /**
-          * @brief Are timestepping matrices for this equation complex?
-          */
-         bool mEqIsComplex;
-
-         /**
-          * @brief Starting index for timestepping matrices
-          */
-         int mZeroIdx;
    };
 
    /// Typedef for a smart EquationData
