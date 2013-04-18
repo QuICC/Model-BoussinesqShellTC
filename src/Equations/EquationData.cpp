@@ -31,147 +31,6 @@ namespace Equations {
    {
    }
 
-   void EquationData::finalizeMatrices()
-   {
-      // Matrix vector iterator for operators
-      std::vector<DecoupledZSparse>::iterator opIt;
-      // Matrix vector iterator for boundary conditions
-      std::vector<DecoupledZSparse>::iterator bcIt;
-
-      // Matrix map iterator
-      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::iterator mapIt;
-
-      // Loop over all components in time matrices map
-      for(mapIt = this->mTMatrices.begin(); mapIt != this->mTMatrices.end(); ++mapIt)
-      {
-         // Make sure there are the right number of operators vs boundary matrices
-         if(mapIt->second.size() != this->mBCMatrices.find(mapIt->first)->second.size())
-         {
-            throw Exception("Can't finalize matrices, incompatible operator and boundary matrices");
-         }
-
-         // Find the corresponding boundary condition matrix set
-         bcIt = this->mBCMatrices.find(mapIt->first)->second.begin();
-   
-         // Loop over matrices components in map
-         for(opIt = mapIt->second.begin(); opIt != mapIt->second.end(); ++opIt,++bcIt)
-         {
-            // If real matrix is empty resize it to right size
-            if(opIt->first.size() == 0)
-            {
-               opIt->first.resize(opIt->second.rows(), opIt->second.cols());
-            }
-            opIt->first.makeCompressed();
-
-            // If imaginary matrix is empty resize it to right size
-            if(opIt->second.size() == 0)
-            {
-               opIt->second.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            opIt->second.makeCompressed();
-
-            // If real boundary matrix is empty resize it to right size
-            if(bcIt->first.size() == 0)
-            {
-               bcIt->first.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            bcIt->first.makeCompressed();
-
-            // If imaginary boundary matrix is empty resize it to right size
-            if(bcIt->second.size() == 0)
-            {
-               bcIt->second.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            bcIt->second.makeCompressed();
-         }
-      }
-
-      // Loop over all components in linear matrices map
-      for(mapIt = this->mLMatrices.begin(); mapIt != this->mLMatrices.end(); ++mapIt)
-      {
-         // Loop over matrices components in map
-         for(opIt = mapIt->second.begin(); opIt != mapIt->second.end(); ++opIt)
-         {
-            // If real matrix is empty resize it to right size
-            if(opIt->first.size() == 0)
-            {
-               opIt->first.resize(opIt->second.rows(), opIt->second.cols());
-            }
-            opIt->first.makeCompressed();
-
-            // If imaginary matrix is empty resize it to right size
-            if(opIt->second.size() == 0)
-            {
-               opIt->second.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            opIt->second.makeCompressed();
-         }
-      }
-
-      // Loop over all components in coupling matrices map
-      for(mapIt = this->mCMatrices.begin(); mapIt != this->mCMatrices.end(); ++mapIt)
-      {
-         // Make sure there are the right number of operators vs boundary matrices
-         if(mapIt->second.size() != this->mCBCMatrices.find(mapIt->first)->second.size())
-         {
-            throw Exception("Can't finalize matrices, incompatible operator and boundary matrices");
-         }
-
-         // Find the corresponding boundary condition matrix set
-         bcIt = this->mCBCMatrices.find(mapIt->first)->second.begin();
-   
-         // Loop over matrices components in map
-         for(opIt = mapIt->second.begin(); opIt != mapIt->second.end(); ++opIt,++bcIt)
-         {
-            // If real matrix is empty resize it to right size
-            if(opIt->first.size() == 0)
-            {
-               opIt->first.resize(opIt->second.rows(), opIt->second.cols());
-            }
-            opIt->first.makeCompressed();
-
-            // If imaginary matrix is empty resize it to right size
-            if(opIt->second.size() == 0)
-            {
-               opIt->second.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            opIt->second.makeCompressed();
-
-            // If real boundary matrix is empty resize it to right size
-            if(bcIt->first.size() == 0)
-            {
-               bcIt->first.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            bcIt->first.makeCompressed();
-
-            // If imaginary boundary matrix is empty resize it to right size
-            if(bcIt->second.size() == 0)
-            {
-               bcIt->second.resize(opIt->first.rows(), opIt->first.cols());
-            }
-            bcIt->second.makeCompressed();
-         }
-      }
-   }
-
-   void EquationData::clearSpectralMatrices()
-   {
-      // Clear time matrices
-      this->mTMatrices.clear();
-
-      // Clear linear matrices
-      this->mLMatrices.clear();
-
-      // Clear linear coupling matrices
-      this->mCMatrices.clear();
-
-      // Clear boundary condition matrices
-      this->mBCMatrices.clear();
-
-      // Clear coupled boundary condition matrices
-      this->mCBCMatrices.clear();
-   }
-
    void EquationData::setField(PhysicalNames::Id name, Datatypes::SharedScalarVariableType spField)
    {
       this->mScalars.insert(std::make_pair(name, spField));
@@ -227,41 +86,12 @@ namespace Equations {
       return this->mTMatrices.find(id)->second.at(j);
    }
 
-   const DecoupledZSparse& EquationData::linearMatrix(FieldComponents::Spectral::Id id, const int j) const
+   const CouplingInformation& EquationData::couplingInfo(FieldComponents::Spectral::Id comp) const
    {
       // Safety assert
-      assert(this->mLMatrices.count(id) > 0);
+      assert(this->mCouplingInfos.count(comp) > 0);
       
-      return this->mLMatrices.find(id)->second.at(j);
-   }
-
-   const DecoupledZSparse& EquationData::couplingMatrix(FieldComponents::Spectral::Id id, const int j) const
-   {
-      // Safety assert
-      assert(this->mCMatrices.count(id) > 0);
-      
-      return this->mCMatrices.find(id)->second.at(j);
-   }
-
-   const DecoupledZSparse& EquationData::bcMatrix(FieldComponents::Spectral::Id id, const int j) const
-   {
-      // Safety assert
-      assert(this->mBCMatrices.count(id) > 0);
-      
-      return this->mBCMatrices.find(id)->second.at(j);
-   }
-
-   const DecoupledZSparse& EquationData::cbcMatrix(FieldComponents::Spectral::Id id, const int j) const
-   {
-      // Safety assert
-      assert(this->mCBCMatrices.count(id) > 0);
-      
-      return this->mCBCMatrices.find(id)->second.at(j);
-   }
-
-   const CouplingInformation& EquationData::couplingInfo() const
-   {
-      return this->mCouplingInfo;
+      return this->mCouplingInfos.find(comp)->second;
    }
 
    void EquationData::setName(PhysicalNames::Id name)

@@ -69,10 +69,10 @@ namespace GeoMHDiSCC {
       TModel::addHdf5OutputFiles(spSim);
 
       // Set the boundary conditions
-      SharedPtrMacro<SimulationBoundary> spBcs = spSim->createBoundary<TModel>();
+      SharedSimulationBoundary spBcs = spSim->createBoundary<TModel>();
 
       // Initialise the simulation
-      spSim->init(*spBcs);
+      spSim->init(spBcs);
 
       // Set initial state
       TModel::setInitialState(spSim);

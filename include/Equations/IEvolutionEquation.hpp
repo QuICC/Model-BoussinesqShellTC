@@ -99,7 +99,7 @@ namespace Equations {
           *
           * @param bcIds   List of boundary condition IDs
           */
-         virtual void setSpectralMatrices(const SimulationBoundary& bcIds) = 0;
+         virtual void setSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
 
          /**
           * @brief Transfer equation input to timestepper
@@ -173,26 +173,6 @@ namespace Equations {
          virtual void setCoupling() = 0;
 
          /**
-          * @brief Is coupled system of equation complex?
-          */
-         virtual bool isSystemComplex(FieldComponents::Spectral::Id id) const = 0;
-
-         /**
-          * @brief Get starting index for equation (useful to exclude m=0 for example)
-          */
-         virtual int startIndex(FieldComponents::Spectral::Id id) const = 0;
-
-         /**
-          * @brief Get index of the system of equations
-          */
-         virtual int systemIndex(FieldComponents::Spectral::Id id) const = 0;
-
-         /**
-          * @brief Get size of the system of equations
-          */
-         virtual int systemSize(FieldComponents::Spectral::Id id) const = 0;
-
-         /**
           * @brief Get linear operator row of coupled matrix
           */
          virtual linearRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
@@ -206,7 +186,6 @@ namespace Equations {
           * @brief Get boundary operator row of coupled matrix
           */
          virtual boundaryRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
-
 
       private:
    };

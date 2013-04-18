@@ -78,11 +78,19 @@ namespace Equations {
          virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
 
          /**
-          * @brief Set equation matrices
-          *
-          * @param bcs   List of boundary condition IDs
+          * @brief Build Full block row for linear operators
           */
-         virtual void setSpectralMatrices(const SimulationBoundary& bcs);
+         virtual void linearRow(FieldComponents::Spectral::Id id, const int matIdx);
+
+         /**
+          * @brief Build Full block row for time operators
+          */
+         virtual void timeRow(FieldComponents::Spectral::Id id, const int matIdx);
+
+         /**
+          * @brief Build Full block row for time operators
+          */
+         virtual void boundaryRow(FieldComponents::Spectral::Id id, const int matIdx);
          
       protected:
          /**

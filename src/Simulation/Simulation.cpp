@@ -82,7 +82,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("initBase",0);
    }
 
-   void Simulation::init(const SimulationBoundary& bcs)
+   void Simulation::init(const SharedSimulationBoundary spBcs)
    {
       // Debug statement
       DebuggerMacro_enter("init",0);
@@ -94,7 +94,7 @@ namespace GeoMHDiSCC {
       this->setupEquations();
 
       // Initialise the timestepper
-      this->initTimestepper(bcs);
+      this->initTimestepper(spBcs);
 
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
@@ -557,7 +557,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Simulation::initTimestepper(const SimulationBoundary& bcs)
+   void Simulation::initTimestepper(const SharedSimulationBoundary spBcs)
    {
       // Create iterators over scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
@@ -567,15 +567,13 @@ namespace GeoMHDiSCC {
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
-         (*scalEqIt)->setSpectralMatrices(bcs);
-         (*scalEqIt)->finalizeMatrices();
+         (*scalEqIt)->setSpectralMatrices(spBcs);
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
-         (*vectEqIt)->setSpectralMatrices(bcs);
-         (*vectEqIt)->finalizeMatrices();
+         (*vectEqIt)->setSpectralMatrices(spBcs);
       }
    }
 

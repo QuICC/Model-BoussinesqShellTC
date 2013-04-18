@@ -49,13 +49,6 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
-
-         /**
-          * @brief Set the equation matrices
-          *
-          * @param bcIds   List of boundary condition IDs
-          */
-         virtual void setSpectralMatrices(const SimulationBoundary& bcIds);
          
       protected:
          /**

@@ -1,5 +1,5 @@
 /** \file CouplingInformation.hpp
- *  \brief Implemenation of container the coupling information of the equations
+ *  \brief Implemenation of the coupling information of an equation
  */
 
 #ifndef COUPLINGINFORMATION_HPP
@@ -26,16 +26,16 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implemenation of container the coupling information of the equations
+    * \brief Implemenation of the coupling information of the equation
     */
    class CouplingInformation
    {
       public:
-         /// Typedef to simplify notation for the field coupling data
-         typedef std::multimap<FieldComponents::Spectral::Id, std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> > FieldCouplingType;
+         /// Typedef to simplify notation for the field data
+         typedef std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> > FieldType;
 
-         /// Typedef for an iterator for the field coupling data
-         typedef FieldCouplingType::const_iterator  field_iterator;
+         /// Typedef for an iterator for the field data
+         typedef FieldType::const_iterator  field_iterator;
 
          /// Typedef for a range iterator for the field coupling data
          typedef std::pair<field_iterator,field_iterator>  field_iterator_range;
@@ -51,85 +51,120 @@ namespace Equations {
          virtual ~CouplingInformation();
 
          /**
+          * @brief Is the system complex?
+          */
+         bool isComplex() const;
+
+         /**
+          * @brief Number of blocks in row of the system
+          */
+         int nBlocks() const;
+
+         /**
+          * @brief Number of systems
+          */
+         int nSystems() const;
+
+         /**
+          * @brief Size of block
+          *
+          * @param idx System index
+          */
+         int blockN(const int idx) const;
+
+         /**
+          * @brief Size of system
+          *
+          * @param idx System index
+          */
+         int systemN(const int idx) const;
+
+         /**
+          * @brief Index of solver
+          */
+         int solverIndex() const;
+
+         /**
+          * @brief Start index in field values
+          */
+         int fieldStart() const;
+
+         /**
+          * @brief Number of RHS columns in solve
+          *
+          * @param idx System index
+          */
+         int rhsCols(const int idx) const;
+
+         /**
           * @brief Set a field coupling
           *
-          * @param comp    Field component
-          * @param field   External coupling information
+          * @param fieldId Physical ID of the field
+          * @param compId  Physical ID of the component
           */
-         void addField(const FieldComponents::Spectral::Id& comp, const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& field);
+         void addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
 
          /**
-          * @brief Set an internal coupling (matrix dimensions)
+          * @brief Set settings for all systems
           *
-          * @param comp Component ID
-          * @param nMat Number of matrices
-          * @param dim  Number of columns on RHS
+          * @param solverIndex   Index of the solver
+          * @param isComplex     Complex flag of solver
+          * @param fieldStart    Start index of the filed
           */
-         void addInternal(const FieldComponents::Spectral::Id& comp, const int nMat, const ArrayI& dim);
+         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart);
 
          /**
-          * @brief Get internal coupling information (matrix dimensions)
+          * @brief Set system sizes
+          *
+          * @param nSystems   Number of systems
+          * @param blockNs    Block size for each system
+          * @param rhsCols    Number of columns in RHS for each system
           */
-         const std::pair<int,ArrayI>&  internal(const FieldComponents::Spectral::Id& comp) const;
-
-         /**
-          * @brief Equation has external coupling (i.e. with other fields)?
-          */
-         bool hasFieldCoupling() const;
-
-         /**
-          * @brief Get the number of field couplings
-          */
-         int nFields(const FieldComponents::Spectral::Id& comp) const;
+         void setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols);
 
          /**
           * @brief Get iterator to field couplings
           */
-         field_iterator_range fieldRange(const FieldComponents::Spectral::Id& comp) const;
+         field_iterator_range fieldRange() const;
 
       protected:
 
       private:
          /**
-          * @brief Other field coupling flag
-          */
-         bool mHasField;
-
-         /**
-          * @brief Internal coupling flag
-          */
-         bool mHasInternal;
-
-         /**
           * @brief Storage for the field coupling information
           */
-         std::multimap<FieldComponents::Spectral::Id, std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mField;
+         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mFields;
 
          /**
-          * @brief Storage for the internal coupling information
+          * @brief Storage for the complex flag
           */
-         std::map<FieldComponents::Spectral::Id, std::pair<int, ArrayI> >   mInternal;
+         bool mIsComplex;
+
+         /**
+          * @brief Storage for the number of systems
+          */
+         int mNSystems;
+
+         /**
+          * @brief Storage for the solver index
+          */
+         int mSolverIndex;
+
+         /**
+          * @brief Storage for the field start index
+          */
+         int mFieldStart;
+
+         /**
+          * @brief Storage for the block sizes
+          */
+         ArrayI mBlockNs;
+
+         /**
+          * @brief Storage for the number of RHS in solver
+          */
+         ArrayI mRhsCols;
    };
-
-   inline bool CouplingInformation::hasFieldCoupling() const
-   {
-      return this->mHasField;
-   }
-
-   inline const std::pair<int,ArrayI>& CouplingInformation::internal(const FieldComponents::Spectral::Id& comp) const
-   {
-      return this->mInternal.find(comp)->second;
-   }
-
-   inline int CouplingInformation::nFields(const FieldComponents::Spectral::Id& comp) const
-   {
-      return this->mField.count(comp);
-   }
-
-   inline CouplingInformation::field_iterator_range CouplingInformation::fieldRange(const FieldComponents::Spectral::Id& comp) const
-   {
-      return this->mField.equal_range(comp);
-   }
 }
 }
 

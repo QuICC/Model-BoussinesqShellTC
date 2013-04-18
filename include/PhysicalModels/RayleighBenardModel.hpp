@@ -79,7 +79,7 @@ namespace GeoMHDiSCC {
           *
           * @param bcIds Boundary condition IDs
           */
-         static SharedPtrMacro<SimulationBoundary> createBoundary(const std::map<std::string, int>& bcIds);
+         static SharedSimulationBoundary createBoundary(const std::map<std::string, int>& bcIds);
 
          /**
           * @brief Set the initial state

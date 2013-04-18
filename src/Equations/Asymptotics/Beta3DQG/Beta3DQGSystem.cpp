@@ -29,6 +29,67 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
+   void Beta3DQGSystem::setCouplingInfo(CouplingInformation& rInfo, const PhysicalNames::Id eqId, const int nx, const int nz, const int ny)
+   {
+      /// - Streamfunction equation
+      if(eqId == PhysicalNames::STREAMFUNCTION)
+      {
+         // Set solver index
+         rInfo.setGeneral(0, true, 0);
+
+         // Equation is coupled to streamfunction equation (self)
+         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+         // Equation is coupled to vertical velocity equation
+         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR);
+
+         // Set sizes of blocks and matrices
+         ArrayI blocksN(ny);
+         blockNs.setConstant(nx*nz);
+         ArrayI rhsCols(ny);
+         rhsCols.setConstant(1);
+         rInfo.setSizes(ny, blockNs, rhsCols); 
+
+      /// - Vertical velocity equation
+      } else if(eqId == PhysicalNames::VELOCITYZ)
+      {
+         // Set solver index
+         rInfo.setGeneral(0, true, 0);
+
+         // Equation is coupled to streamfunction equation
+         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+         // Equation is coupled to vertical velocity equation (self)
+         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR);
+
+         // Set sizes of blocks and matrices
+         ArrayI blocksN(ny);
+         blockNs.setConstant(nx*nz);
+         ArrayI rhsCols(ny);
+         rhsCols.setConstant(1);
+         rInfo.setSizes(ny, blockNs, rhsCols); 
+
+      /// - Transport equation
+      } else if(eqId == PhysicalNames::TEMPERATURE)
+      {
+         // Set solver index
+         rInfo.setGeneral(1, false, 0);
+
+         // Equation is coupled to temperature equation
+         rInfo.addField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
+
+         // Set sizes of blocks and matrices
+         ArrayI blocksN(ny);
+         blockNs.setConstant(nx*nz);
+         ArrayI rhsCols(ny);
+         rhsCols.setConstant(1);
+         rInfo.setSizes(ny, blockNs, rhsCols); 
+
+      // Unknown equation
+      } else
+      {
+         throw Exception("Unknown equation ID for quasi-inverse operator!");
+      }
+   }
+
    void Beta3DQGSystem::quasiInverse(SparseMatrix& mat, const PhysicalNames::Id eqId, const int nx, const int nz)
    {
       // Create spectral operators
@@ -52,6 +113,8 @@ namespace Equations {
       {
          // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), mat);
+
+      // Unknown equation
       } else
       {
          throw Exception("Unknown equation ID for quasi-inverse operator!");
@@ -91,6 +154,8 @@ namespace Equations {
       {
          // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
          Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), mat.first);
+
+      // Unknown equation
       } else
       {
          throw Exception("Unknown equation ID for time operator!");
@@ -213,7 +278,7 @@ namespace Equations {
 
    }
 
-   void boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SimulationBoundary& bcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
@@ -239,7 +304,7 @@ namespace Equations {
       SparseMatrix q3D;
 
       /// <b>Boundary operators for the streamfunction equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$ and \f$\left(D_x^{-4} \otimes BC_Z\right)\f$
-      if(eqId == PhysicalNames::STREAMFUNCTION && bcIds.hasEquation(eqId))
+      if(eqId == PhysicalNames::STREAMFUNCTION && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
          q1D = spec1D.qDiff(4,0);
@@ -247,7 +312,7 @@ namespace Equations {
          q3D = spec3D.id(0);
 
       /// <b>Boundary operators for the vertical velocity equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$ and \f$\left(D_x^{-2} \otimes BC_Z\right)\f$
-      } else if(eqId == PhysicalNames::VELOCITYZ && bcIds.hasEquation(eqId))
+      } else if(eqId == PhysicalNames::VELOCITYZ && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
          q1D = spec1D.qDiff(2,0);
@@ -255,7 +320,7 @@ namespace Equations {
          q3D = spec3D.id(0);
 
       /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
-      } else if(eqId == PhysicalNames::TEMPERATURE && bcIds.hasEquation(eqId))
+      } else if(eqId == PhysicalNames::TEMPERATURE && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
          q1D = spec1D.qDiff(2,0);
@@ -272,12 +337,12 @@ namespace Equations {
       DecoupledZSparse tau;
 
       // Set boundary conditions on fieldId
-      if(bcIds.hasField(eqId,fieldId))
+      if(spBcIds->hasField(eqId,fieldId))
       {
          // Set X boundary conditions
-         if(bcIds.bcs(eqId,fieldId).count(bc1D) > 0)
+         if(spBcIds->bcs(eqId,fieldId).count(bc1D) > 0)
          {
-            tau = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.bcs(eqId,fieldId).find(bc1D)->second);
+            tau = Spectral::BoundaryConditions::tauMatrix(bound1D, spBcIds->bcs(eqId,fieldId).find(bc1D)->second);
             if(tau.first.nonZeros() > 0)
             {
                Eigen::kroneckerProduct(q3D, tau.first, mat.first);
@@ -290,9 +355,9 @@ namespace Equations {
          }
 
          // Set Z boundary conditions
-         if(bcIds.bcs(eqId,fieldId).count(bc3D) > 0)
+         if(spBcIds->bcs(eqId,fieldId).count(bc3D) > 0)
          {
-            tau = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.bcs(eqId,fieldId).find(bc3D)->second);
+            tau = Spectral::BoundaryConditions::tauMatrix(bound3D, spBcIds->bcs(eqId,fieldId).find(bc3D)->second);
             if(tau.first.nonZeros() > 0)
             {
                SparseMatrix tmp;

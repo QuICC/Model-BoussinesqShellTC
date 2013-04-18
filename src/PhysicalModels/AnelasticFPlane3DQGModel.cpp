@@ -128,10 +128,10 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedPtrMacro<SimulationBoundary> AnelasticFPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedSimulationBoundary AnelasticFPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
-      SharedPtrMacro<SimulationBoundary>  spBcs(new SimulationBoundary());
+      SharedSimulationBoundary  spBcs(new SimulationBoundary());
 
       // Create boundary condition key
       Equations::IEvolutionEquation::BcKeyType  key;

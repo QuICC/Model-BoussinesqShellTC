@@ -56,13 +56,6 @@ namespace Equations {
           * @param rRHS    RHS of timestepping equation
           */
          virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
-
-         /**
-          * @brief Set the equation matrices
-          *
-          * @param bcIds   List of boundary condition IDs
-          */
-         virtual void setSpectralMatrices(const SimulationBoundary& bcIds);
          
       protected:
          /**

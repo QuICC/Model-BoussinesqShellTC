@@ -64,7 +64,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the different components of the simulation
           */
-         void init(const SimulationBoundary& bcs);
+         void init(const SharedSimulationBoundary spBcs);
 
          /**
           * @brief Run the simulation
@@ -84,7 +84,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Create the simulation wide boundary conditions
           */
-         template <typename TModel> SharedPtrMacro<SimulationBoundary> createBoundary();
+         template <typename TModel> SharedSimulationBoundary createBoundary();
 
          /**
           * @brief Add scalar equation to solver
@@ -167,7 +167,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the timestepper
           */
-         void initTimestepper(const SimulationBoundary& bcs);
+         void initTimestepper(const SharedSimulationBoundary spBcs);
 
          /**
           * @brief Setup the output files adde by the model
@@ -272,7 +272,7 @@ namespace GeoMHDiSCC {
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
    }
 
-   template <typename TModel> SharedPtrMacro<SimulationBoundary> Simulation::createBoundary()
+   template <typename TModel> SharedSimulationBoundary Simulation::createBoundary()
    {
       return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
    }

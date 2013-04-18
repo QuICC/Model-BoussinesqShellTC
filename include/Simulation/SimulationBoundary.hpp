@@ -102,6 +102,9 @@ namespace GeoMHDiSCC {
           */
          std::map<PhysicalNames::Id, std::map<PhysicalNames::Id, SimulationBoundary::BcEqMapType> > mBcs;
    };
+
+   /// Typedef for a shared pointer to a SimulationBoundary object
+   typedef SharedPtrMacro<SimulationBoundary>   SharedSimulationBoundary;
 }
 
 #endif // SIMULATIONBOUNDARY_HPP

@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mHasField(false)
+      : mIsComplex(true), mNSystems(0), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -31,19 +31,67 @@ namespace Equations {
    {
    }
 
-   void CouplingInformation::addField(const FieldComponents::Spectral::Id& component, const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& field)
+   bool CouplingInformation::isComplex() const
    {
-      // Set the coupling flag
-      this->mHasField = true;
-
-      // Store field coupling information
-      this->mField.insert(std::make_pair(component,field));
+      return this->mIsComplex;
    }
 
-   void CouplingInformation::addInternal(const FieldComponents::Spectral::Id& component, const int nMat, const ArrayI& dim)
+   int CouplingInformation::nBlocks() const
    {
-      // Store internal coupling information
-      this->mInternal.insert(std::make_pair(component,std::make_pair(nMat,dim)));
+      return this->mFields.size();
+   }
+
+   int CouplingInformation::nSystems() const
+   {
+      return this->mNSystems;
+   }
+
+   int CouplingInformation::blockN(const int idx) const
+   {
+      return this->mBlockNs(idx);
+   }
+
+   int CouplingInformation::systemN(const int idx) const
+   {
+      return this->blockN(idx)*this->mFields.size();
+   }
+
+   int CouplingInformation::solverIndex() const
+   {
+      return this->mSolverIndex;
+   }
+
+   int CouplingInformation::fieldStart() const
+   {
+      return this->mFieldStart;
+   }
+
+   int CouplingInformation::rhsCols(const int idx) const
+   {
+      return this->mRhsCols(idx);
+   }
+
+   void CouplingInformation::addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id field compId)
+   {
+      this->mFields.push_back(std::make_pair(fieldId,compId));
+   }
+
+   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
+   {
+      this->mSolverIndex = solverIndex;
+
+      this->mIsComplex = isComplex;
+
+      this->mFieldStart = fieldStart;
+   }
+
+   void CouplingInformation::setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols)
+   {
+      this->mNSystems = nSystems;
+
+      this->mBlockNs = blockNs;
+
+      this->mRhsCols = rhsCols;
    }
 }
 }

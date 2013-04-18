@@ -107,49 +107,21 @@ namespace Equations {
          const DecoupledZSparse& timeMatrix(FieldComponents::Spectral::Id id, const int j) const;
 
          /**
-          * @brief Get the linear operator matrices (sparse matrices) 
-          */
-         const DecoupledZSparse& linearMatrix(FieldComponents::Spectral::Id id, const int j) const;
-
-         /**
-          * @brief Get the coupling matrices (sparse matrices) 
-          */
-         const DecoupledZSparse& couplingMatrix(FieldComponents::Spectral::Id id, const int j) const;
-
-         /**
-          * @brief Get the boundary condition matrices (sparse matrices) 
-          */
-         const DecoupledZSparse& bcMatrix(FieldComponents::Spectral::Id id, const int j) const;
-
-         /**
-          * @brief Get the coupling boundary condition matrices (sparse matrices) 
-          */
-         const DecoupledZSparse& cbcMatrix(FieldComponents::Spectral::Id id, const int j) const;
-
-         /**
           * @brief Get the coupling information
           */
-         const CouplingInformation&  couplingInfo() const;
+         const CouplingInformation&  couplingInfo(FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Get map of field storage requirements information
+          *
+          * \mhdBug Ultimatively this should depend on component
           */
          const VariableRequirement& requirements() const;
 
          /**
           * @brief Get map of field storage requirements information
           */
-         const FieldRequirement& requirements(PhysicalNames::Id id) const;
-
-         /**
-          * @brief Finalize the initialised equation matrices
-          */
-         void finalizeMatrices();
-
-         /**
-          * @brief Clear spectral equation matrices
-          */
-         void clearSpectralMatrices();
+         const FieldRequirement& requirements(FieldComponents::Spectral::Id id, PhysicalNames::Id id) const;
 
          /**
           * @brief Get the equation parameters
@@ -164,43 +136,20 @@ namespace Equations {
 
          /**
           * @brief Storage for the variable requirements
+          *
+          * \mhdBug Ultimatively this should depend on component
           */
          VariableRequirement mRequirements;
 
          /**
           * @brief Coupling information of the equation
           */
-         CouplingInformation  mCouplingInfo;
+         std::map<FieldComponents::Spectral::Id, CouplingInformation>  mCouplingInfos;
 
          /**
           * @brief Map of component and time matrices 
           */
          std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mTMatrices;
-
-         /**
-          * @brief Map of component and linear matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mLMatrices;
-
-         /**
-          * @brief Map of component and coupling matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mCMatrices;
-
-         /**
-          * @brief Map of component and boundary condition matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mBCMatrices;
-
-         /**
-          * @brief Map of component and coupled boundary condition matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mCBCMatrices;
-
-         /**
-          * @brief Map of component and nonlinear term multiplication matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
 
       private:
          /**

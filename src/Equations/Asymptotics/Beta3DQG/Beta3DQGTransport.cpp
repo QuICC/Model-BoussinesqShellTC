@@ -86,134 +86,16 @@ namespace Equations {
 
    void Beta3DQGTransport::setCoupling()
    {
-      // Set field coupling
-      // NONE 
+      // Get X dimension
+      int nX = this->unknown().dom(0).spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      // Get Y dimension
+      int nY = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      // Get Z dimension
+      int nZ = this->unknown().dom(0).spRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
-      // Set internal coupling (X and Z are coupled)
-      int nMat = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      ArrayI dim(nMat);
-      dim.setConstant(1);
-      this->mCouplingInfo.addInternal(FieldComponents::Spectral::SCALAR, nMat, dim);
-   }
-
-   void Beta3DQGTransport::setSpectralMatrices(const SimulationBoundary& bcIds)
-   {
-      // Get local copy of a shared resolution
-      SharedResolution  spRes = this->unknown().dom(0).spRes();
-
-      // Simplify notation
-      typedef std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::iterator spectral_iterator;
-      typedef std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator nonlin_iterator;
-
-      // Create map position object
-      std::pair<spectral_iterator,bool> pos;
-      // Create spectral map iterator
-      spectral_iterator it;
-      // Create nonlinear map iterator
-      nonlin_iterator itNL;
-
-      // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(1);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(1);
-
-      // Create spectral boundary operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(1);
-
-      // Create boundary conditions ID
-      SimulationBoundary::BcKeyType bc1D = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
-
-      // Temporary storage
-      SparseMatrix   tmpA;
-      DecoupledZSparse   tau1D;
-
-      // Get third dimension size
-      int dim3D = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
-
-      /// 
-      /// The timestepper will buid the full implicit timestepping matrices as L - T, where L is the linear operator and T is the time derivative matrix.
-      /// The left-hand side of the following equation is setup here: 
-      ///
-      ///    \f$ \frac{1}{Pr}\nabla_{\perp}^2\overline{T} - \partial_t\overline{T} = \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
-      ///
-
-      // Loop over third dimension
-      for(int k = 0; k < dim3D; k++)
-      {
-         // Get global index in third data dimension (second physical dimension)
-         MHDFloat k_ = boxScale*0.5*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)); 
-
-         // Reset spectral operator 1D
-         spec1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
-         // Reset spectral operator 3D
-         spec3D.reset(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
-         // Reset spectral boundary operator 1D
-         bound1D.reset(spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
-
-         //////////////////////////////////////////////
-         // Initialise boundary condition matrices
-         pos = this->mBCMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
-         it = pos.first;
-
-         // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
-         tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.bcs(PhysicalNames::TEMPERATURE, PhysicalNames::TEMPERATURE).find(bc1D)->second);
-         it->second.push_back(DecoupledZSparse());
-         Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
-
-         // Prune matrices for safety
-         it->second.back().first.prune(1e-32);
-         it->second.back().second.prune(1e-32);
-
-         //////////////////////////////////////////////
-         // Initialise coupled boundary condition matrices
-         // NONE
-
-         //////////////////////////////////////////////
-         // Initialise nonlinear multiplication matrix
-         itNL = this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>())).first;
-         itNL->second.push_back(SparseMatrix());
-
-         // Set nonlinear multiplication matrix (kronecker(A,B,out) => out = A(i,j)*A)
-         Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), itNL->second.back());
-
-         // Prune matrices for safety
-         itNL->second.back().prune(1e-32);
-         itNL->second.back().prune(1e-32);
-
-         //////////////////////////////////////////////
-         // Initialise time matrices
-         pos = this->mTMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
-         it = pos.first;
-
-         // Set time matrices (kronecker(A,B,out) => out = A(i,j)*A)
-         it->second.push_back(DecoupledZSparse());
-         Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), it->second.back().first);
-
-         // Prune matrices for safety
-         it->second.back().first.prune(1e-32);
-         it->second.back().second.prune(1e-32);
-
-         //////////////////////////////////////////////
-         // Initialise linear matrices
-         pos = this->mLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<DecoupledZSparse>()));
-         it = pos.first;
-
-         // Set linear matrices (kronecker(A,B,out) => out = A(i,j)*A)
-         it->second.push_back(DecoupledZSparse());
-         tmpA = (1.0/this->eqParams().nd(NonDimensional::PRANDTL))*Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2);
-         Eigen::kroneckerProduct(spec3D.id(0),tmpA, it->second.back().first);
-
-         // Prune matrices for safety
-         it->second.back().first.prune(1e-32);
-         it->second.back().second.prune(1e-32);
-
-         //////////////////////////////////////////////
-         // Initialise coupling matrices
-         // Set coupling matrices
-         // NONE
-      }
+      // Set coupling information
+      this->mCouplingInfos.insert(make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
+      Beta3DQGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, this->name(), nX, nZ, nY);
    }
 }
 }

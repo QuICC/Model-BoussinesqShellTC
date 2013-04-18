@@ -257,10 +257,10 @@ namespace Timestep {
    void Timestepper::createEqStepper(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // Equation is part of a complex system
-      if(spEq->isSystemComplex(comp))
+      if(spEq->couplingInfo(comp).isComplex())
       {
          // Add equation stepper if system index does not yet exist
-         if(spEq->systemIndex(comp) > this->mEqZStepper.size() - 1)
+         if(spEq->couplingInfo(comp).solverIndex() > this->mEqZStepper.size() - 1)
          {
             this->mEqZStepper.push_back(EquationZTimestepper(spEq->systemFields(comp), spEq->startIndex(comp)));
          }
@@ -269,7 +269,7 @@ namespace Timestep {
       } else
       {
          // Add equation stepper if system index does not yet exist
-         if(spEq->systemIndex(comp) > this->mEqDStepper.size() - 1)
+         if(spEq->couplingInfo(comp).solverIndex() > this->mEqDStepper.size() - 1)
          {
             this->mEqDStepper.push_back(EquationZTimestepper(spEq->systemFields(comp), spEq->startIndex(comp)));
          }
@@ -282,28 +282,28 @@ namespace Timestep {
       std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId = std::make_pair(spEq->name(),comp);
 
       // Index of the current field
-      int myIdx = spEq->systemIndex(comp);
+      int myIdx = spEq->couplingInfo(comp).solverIndex();
 
-      // Get internal information
-      std::pair<int,ArrayI>  interInfo = spEq->couplingInfo().internal(comp);
+      // Number of linear systems
+      int nSystems = spEq->couplingInfo(comp).nSystems();
 
       // start index for matrices
-      int start = this->mStep*interInfo.first;
+      int start = this->mStep*nSystems;
 
       // Start row for storage information
-      ArrayI startRow(interInfo.first);
+      ArrayI startRow(nSystems);
 
       // Complex matrices in linear solve
-      if(spEq->isSystemComplex(comp))
+      if(spEq->couplingInfo(comp).isComplex())
       {
         // Reserve space for the matrices to avoid large number of expensive reallocations
-        if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
+        if(spEq->couplingInfo(comp).solverIndex() == 0 && this->mStep == 0)
         {
-           this->mEqZStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*interInfo.first);
+           this->mEqZStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*nSystems);
         }
 
         int size = 0;
-        for(int i = 0; i < interInfo.first; i++)
+        for(int i = 0; i < nSystems; i++)
         {
            // Add LHS triplets
            this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
@@ -314,7 +314,7 @@ namespace Timestep {
            if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
            {
               // Create RHS and solution data storage
-              this->mEqZStepper.at(myIdx).addStorage(size, interInfo.second(i));
+              this->mEqZStepper.at(myIdx).addStorage(size, spEq->couplingInfo(comp).rhsCols(i));
            }
 
            // Set the start row
@@ -333,11 +333,11 @@ namespace Timestep {
          // Reserve space for the matrices to avoid large number of expensive reallocations
          if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
          {
-            this->mEqDStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*interInfo.first);
+            this->mEqDStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*nSystems);
          }
 
          int size = 0;
-         for(int i = 0; i < interInfo.first; i++)
+         for(int i = 0; i < nSystems.first; i++)
          {
             // Add LHS triplets
             this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
@@ -348,7 +348,7 @@ namespace Timestep {
             if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
             {
                // Create RHS and solution data storage
-               this->mEqDStepper.at(myIdx).addStorage(size, interInfo.second(i));
+               this->mEqDStepper.at(myIdx).addStorage(size, spEq->couplingInfo(comp).rhsCols(i));
             }
 
             // Set the start row
@@ -369,16 +369,13 @@ namespace Timestep {
       std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId = std::make_pair(spEq->name(),comp);
 
       // Index of the current field
-      int myIdx = spEq->systemIndex(comp);
-
-      // Get internal information
-      std::pair<int,ArrayI>  interInfo = spEq->couplingInfo().internal(comp);
+      int myIdx = spEq->couplingInfo(comp).solverIndex();
 
       // start index for matrices
       int start = this->mStep*interInfo.first;
 
       // Complex matrices in linear solve
-      if(spEq->isSystemComplex(comp))
+      if(spEq->couplingInfo(comp).isComplex())
       {
          for(int i = 0; i < interInfo.first; i++)
          {
@@ -420,10 +417,10 @@ namespace Timestep {
          myId = std::make_pair((*scalEqIt)->name(), comp);
 
          // Get index of current field
-         int myIdx = (*scalEqIt)->systemIndex(comp);
+         int myIdx = (*scalEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*scalEqIt)->isSystemComplex(comp))
+         if((*scalEqIt)->couplingInfo(comp).isComplex())
          {
             // Get timestep input
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
@@ -453,10 +450,10 @@ namespace Timestep {
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
          // Get index of current field
-         int myIdx = (*vectEqIt)->systemIndex(comp);
+         int myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
             // Get timestep input for toroidal component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
@@ -481,10 +478,10 @@ namespace Timestep {
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
          // Get index of current field
-         myIdx = (*vectEqIt)->systemIndex(comp);
+         myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
             // Get timestep input for poloidal component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
