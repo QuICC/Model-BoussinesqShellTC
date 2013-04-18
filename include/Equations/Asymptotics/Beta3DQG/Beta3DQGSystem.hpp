@@ -1,5 +1,5 @@
 /** \file Beta3DQGSystem.hpp
- *  \brief Implementation of the system of equations equation for the 3DQG beta model
+ *  \brief Implementation of the matrix blocks for the 3DQG beta model
  */
 
 #ifndef BETA3DQGSYSTEM_HPP
@@ -7,7 +7,6 @@
 
 // Configuration includes
 //
-#include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
 //
@@ -18,45 +17,91 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "TypeSelectors/ScalarSelector.hpp"
+#include "Enums/PhysicalNames.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    *  @brief Implementation of the system of equations equation for the 3DQG beta model
+    * \brief Implementation of the matrix blocks for the 3DQG beta model
+    *
+    * The implementation of all operators assume that all equations are written in the form
+    * \f$ L - T = NL \f$
+    * where L are the linear operators, T the time derivatives and NL the nonlinear terms
     */
    class Beta3DQGSystem
    {
       public:
          /**
-          * @brief Simple constructor
+          * @brief Get the quasi-inverse matrix operator for an equation
           *
-          * @param spEqParams  Shared equation parameters
+          * @param mat     Storage for output matrix
+          * @param eqId    Physical ID of the equation
+          * @param nx      Matrix size in X
+          * @param nz      Matrix size in Z
           */
-         Beta3DQGSystem(SharedIEquationParameters spEqParams);
+         static void quasiInverse(SparseMatrix& mat, const PhysicalNames::Id eqId, const int nx, const int nz);
+
+         /**
+          * @brief Get the time matrix block for an equation
+          *
+          * @param mat     Storage for output matrix
+          * @param eqId    Physical ID of the equation
+          * @param nx      Matrix size in X
+          * @param nz      Matrix size in Z
+          * @param k       Wave number k
+          * @param Ra      Rayleigh number
+          * @param Pr      Prandtl number
+          * @param Gamma   Gamma number
+          * @param chi     Angle Chi
+          */
+         static void timeBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+
+         /**
+          * @brief Get the linear matrix block for an equation on given field
+          *
+          * @param mat     Storage for output matrix
+          * @param eqId    Physical ID of the equation
+          * @param fieldId Physical ID of the field
+          * @param nx      Matrix size in X
+          * @param nz      Matrix size in Z
+          * @param k       Wave number k
+          * @param Ra      Rayleigh number
+          * @param Pr      Prandtl number
+          * @param Gamma   Gamma number
+          * @param chi     Angle Chi
+          */
+         static void linearBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+
+         /**
+          * @brief Get the boundary condition matrix block for an equation on given field
+          *
+          * @param mat     Storage for output matrix
+          * @param eqId    Physical ID of the equation
+          * @param fieldId Physical ID of the field
+          * @param nx      Matrix size in X
+          * @param nz      Matrix size in Z
+          * @param k       Wave number k
+          * @param Ra      Rayleigh number
+          * @param Pr      Prandtl number
+          * @param Gamma   Gamma number
+          * @param chi     Angle Chi
+          */
+         static void boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+         
+      protected:
+
+      private:
+         /**
+          * @brief Simple constructor
+          */
+         Beta3DQGSystem();
 
          /**
           * @brief Simple empty destructor
           */
          virtual ~Beta3DQGSystem();
-
-         const std::vector<PhysicalNames::Id> fields(const PhysicalNames::Id eqId);
-         void linear(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId);
-         void time(DecoupledZSparse& op, const PhysicalNames::Id eqId);
-         void boundary(DecoupledZSparse& op, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId);
-         void quasiInverse(DecoupledZSparse& op, const PhysicalNames::Id eqId);
-         
-      protected:
-
-      private:
-         void linearStreamfunction(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
-         void linearVelocityZ(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
-         void linearTemperature(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
-         void boundaryStreamfunction(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
-         void boundaryVelocityZ(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
-         void boundaryTemperature(DecoupledZSparse& op, const MHDFloat k, const PhysicalNames::Id fieldId);
    };
 
 }

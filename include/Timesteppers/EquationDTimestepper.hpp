@@ -78,18 +78,18 @@ namespace Timestep {
          int nSystem() const;
 
          /**
-          * @brief Set LHS triplets
+          * @brief Set LHS matrix
           *
-          * @param idx Index of the triplets
+          * @param idx Index of the matrix
           */
-         std::vector<Triplet>& rLHSTriplets(const int idx);
+         SparseMatrix& rLHSMatrix(const int idx);
 
          /**
-          * @brief Set RHS triplets
+          * @brief Set RHS matrix
           *
-          * @param idx Index of the triplets
+          * @param idx Index of the matrix
           */
-         std::vector<Triplet>& rRHSTriplets(const int idx);
+         SparseMatrix& rRHSMatrix(const int idx);
 
          /**
           * @brief Add RHS and solution data storage
@@ -122,24 +122,14 @@ namespace Timestep {
          
       protected:
          /**
-          * @brief Storage for the matrix sizes
+          * @brief Real LHS operators of the timestepped equations
           */
-         std::vector<int>  mSize;
+         std::vector<SparseMatrix>   mLHSMatrix;
 
          /**
           * @brief Real RHS operators of the timestepped equations
           */
          std::vector<SparseMatrix>   mRHSMatrix;
-
-         /**
-          * @brief Complex LHS operators triplets of the timestepped equations
-          */
-         std::vector<std::vector<Triplet> >   mLHSTriplets;
-
-         /**
-          * @brief Complex RHS operators triplets of the timestepped equations
-          */
-         std::vector<std::vector<Triplet> >   mRHSTriplets;
 
          /**
           * @brief Storage for linear solve's RHS

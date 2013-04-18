@@ -14,6 +14,8 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
+#include "Timers/TimerMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -25,6 +27,14 @@ namespace Debug {
    class SerialDebugger
    {
       public:
+         /**
+          * @brief Debug message
+          *
+          * @param msg Message to print
+          * @param tabs Number of tab characters
+          */
+         static void msg(const std::string& msg, const int tabs);
+
          /**
           * @brief Debug message when entering function
           *
@@ -40,6 +50,20 @@ namespace Debug {
           * @param tabs Number of tab characters
           */
          static void leave(const std::string& msg, const int tabs);
+
+         /**
+          * @brief Debug message with numerical value
+          *
+          * @param msg Message to print
+          * @param tabs Number of tab characters
+          * @param value Value to add at end of message
+          */
+         static void showValue(const std::string& msg, const int tabs, const MHDFloat value);
+
+         /**
+          * @brief Timer to use for debugging
+          */
+         static TimerMacro timer;
          
       protected:
 

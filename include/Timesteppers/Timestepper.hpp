@@ -147,100 +147,54 @@ namespace Timestep {
          void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
-          * @brief Build the LHS matrix triplets
+          * @brief Build the solver matrix
           *
-          * @param triplets   Storage for the triplets
+          * @param solverMatrix  Storage for solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           * @param nC         Number of coupled fields
           * @param cRow       Row index of coupled field
           */
-         int buildLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         int buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
 
          /**
-          * @brief Build the LHS matrix triplets
+          * @brief Build the solver matrix
           *
-          * @param triplets   Storage for the triplets
+          * @param solverMatrix   Storage for the solver matrix
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           * @param nC         Number of coupled fields
           * @param cRow       Row index of coupled field
           */
-         int buildLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
-
-         /**
-          * @brief Build the RHS matrix triplets
-          *
-          * @param triplets   Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
-          */
-         void buildRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
-
-         /**
-          * @brief Build the RHS matrix triplets
-          *
-          * @param triplets   Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
-          */
-         void buildRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         int buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
 
          /**
           * @brief Update the LHS matrix triplets
           *
-          * @param triplets   Storage for the triplets
+          * @param oldTime    Storage for the triplets
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           * @param nC         Number of coupled fields
           * @param cRow       Row index of coupled field
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void updateLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         void updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
 
          /**
           * @brief Update the LHS matrix triplets
           *
-          * @param triplets   Storage for the triplets
+          * @param oldTime    Storage for the triplets
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
           * @param nC         Number of coupled fields
           * @param cRow       Row index of coupled field
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void updateLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
-
-         /**
-          * @brief Update the RHS matrix triplets
-          *
-          * @param triplets   Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
-          */
-         void updateRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
-
-         /**
-          * @brief Update the RHS matrix triplets
-          *
-          * @param triplets   Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param nC         Number of coupled fields
-          * @param cRow       Row index of coupled field
-          */
-         void updateRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC = 0, const int cRow = 0);
+         void updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs);
 
          /**
           * @brief Add real triplets corresponding to sparse real matrix

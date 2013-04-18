@@ -128,17 +128,17 @@ namespace GeoMHDiSCC {
       SharedPtrMacro<SimulationBoundary>  spBcs(new SimulationBoundary());
 
       // Create boundary condition key
-      Equations::IEvolutionEquation::BcKeyType  key;
+      SimulationBoundary::BcKeyType  key;
 
       // Temperature equation
       //    ... boundary conditions
       spBcs->initStorage(PhysicalNames::TEMPERATURE);
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
-      spBcs->initBcStorage(PhysicalNames::TEMPERATURE, key);
+      spBcs->initBcStorage(PhysicalNames::TEMPERATURE, PhysicalNames::TEMPERATURE, key);
       if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::TEMPERATURE))->second == 0)
       {
-         spBcs->addBc(PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(PhysicalNames::TEMPERATURE, PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+         spBcs->addBc(PhysicalNames::TEMPERATURE, PhysicalNames::TEMPERATURE, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
       } else
       {
          throw Exception("Unknown temperature boundary conditions in configuration file");
@@ -148,57 +148,57 @@ namespace GeoMHDiSCC {
       //    ... boundary conditions
       spBcs->initStorage(PhysicalNames::STREAMFUNCTION);
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
-      spBcs->initBcStorage(PhysicalNames::STREAMFUNCTION, key);
-      spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-      spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->initBcStorage(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key);
+      spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+      spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       // No-slip boundary conditions
       if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))->second == 0)
       {
-         spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
+         spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
       } else if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))->second == 1)
       {
-         spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
+         spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
       } else
       {
          throw Exception("Unknown streamfunction boundary conditions in configuration file");
       }
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
-      spBcs->initBcStorage(PhysicalNames::STREAMFUNCTION, key);
-      spBcs->addBc(PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
+      spBcs->initBcStorage(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key);
+      spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
       //    ... coupled boundary conditions
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
-      spBcs->initCBcStorage(PhysicalNames::STREAMFUNCTION, PhysicalNames::VELOCITYZ, key); 
-      spBcs->addCBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+      spBcs->initBcStorage(PhysicalNames::STREAMFUNCTION, PhysicalNames::VELOCITYZ, key); 
+      spBcs->addBc(PhysicalNames::STREAMFUNCTION, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
 
       // Axial velocity equation
       //    ... boundary conditions
       spBcs->initStorage(PhysicalNames::VELOCITYZ);
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
-      spBcs->initBcStorage(PhysicalNames::VELOCITYZ, key);
+      spBcs->initBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key);
       // No-slip boundary conditions
       if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::VELOCITYZ))->second == 0)
       {
-         spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+         spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
       } else if(bcIds.find(IoTools::IdToHuman::toTag(PhysicalNames::VELOCITYZ))->second == 1)
       {
-         spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
+         spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
       } else
       {
          throw Exception("Unknown velocityz boundary conditions in configuration file");
       }
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
-      spBcs->initBcStorage(PhysicalNames::VELOCITYZ, key);
-      spBcs->addBc(PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->initBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key);
+      spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ, key, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       //    ... coupled boundary conditions
       key = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
-      spBcs->initCBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key); 
-      spBcs->addCBc(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
+      spBcs->initBcStorage(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key); 
+      spBcs->addBc(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION, key, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
 
       return spBcs;
    }

@@ -4,6 +4,7 @@
 
 // Debug includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // System includes
 //
@@ -22,8 +23,6 @@
 #include "Base/MathConstants.hpp"
 #include "Timesteppers/ImExRK3.hpp"
 
-#include "Timers/TimerMacro.h"
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Timestep {
@@ -100,7 +99,7 @@ namespace Timestep {
 
       if(hasNewDt)
       {
-         std::cerr << "Updating timestep and matrices with new Dt = " << this->mDt << std::endl;
+         DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
       }
 
       //
@@ -108,9 +107,7 @@ namespace Timestep {
       //
       if(hasNewDt)
       {
-TimerMacro  timer;
-timer.start();
-std::cerr << "START update matrices" << std::endl;
+         DebuggerMacro_start("Update matrices", 0);
          // Loop over all substeps of timestepper
          for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
          {
@@ -133,28 +130,23 @@ std::cerr << "START update matrices" << std::endl;
                this->updateMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
             }
          }
-timer.stop();
-std::cerr << "FINISH update matrices: " << timer.time() << std::endl;
+         DebuggerMacro_stop("Update matrices t = ", 0);
 
-timer.start();
-std::cerr << "START complex solver update" << std::endl;
+         DebuggerMacro_start("Complex solver update", 0);
          // Update solvers from complex equation steppers
          for(size_t i = 0; i < this->mEqZStepper.size(); i++)
          {
             this->mEqZStepper.at(i).updateSolver();
          }
-timer.stop();
-std::cerr << "FINISH complex solver update: " << timer.time() << std::endl;
+         DebuggerMacro_stop("Complex solver update t = ", 0);
 
-timer.start();
-std::cerr << "START real solver update" << std::endl;
+         DebuggerMacro_start("Real solver update", 0);
          // Update solvers from real equation steppers
          for(size_t i = 0; i < this->mEqDStepper.size(); i++)
          {
             this->mEqDStepper.at(i).updateSolver();
          }
-timer.stop();
-std::cerr << "FINISH real solver update: " << timer.time() << std::endl;
+         DebuggerMacro_stop("Real solver update t = ", 0);
 
          // Reset the step index
          this->mStep = 0;
@@ -233,9 +225,7 @@ std::cerr << "FINISH real solver update: " << timer.time() << std::endl;
       // Create the timestep matrices
       //
 
-TimerMacro  timer;
-timer.start();
-std::cerr << "START create matrices" << std::endl;
+      DebuggerMacro_start("Create matrices", 0);
       // Loop over all substeps of timestepper
       for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
       {
@@ -256,32 +246,27 @@ std::cerr << "START create matrices" << std::endl;
             this->createMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
          }
       }
-timer.stop();
-std::cerr << "FINISH create matrices: " << timer.time() << std::endl;
+      DebuggerMacro_stop("Create matrices t = ", 0);
 
       //
       // Initialise the solvers and the initial state
       //
 
-timer.start();
-std::cerr << "START complex solver init" << std::endl;
+      DebuggerMacro_start("Complex solver init", 0);
       // Initialise solvers from complex equation steppers
       for(size_t i = 0; i < this->mEqZStepper.size(); i++)
       {
          this->mEqZStepper.at(i).initSolver();
       }
-timer.stop();
-std::cerr << "FINISH complex solver init: " << timer.time() << std::endl;
+      DebuggerMacro_stop("Complex solver init t = ", 0);
 
-timer.start();
-std::cerr << "START real solver init" << std::endl;
+      DebuggerMacro_start("Real solver init", 0);
       // Initialise solvers from real equation steppers
       for(size_t i = 0; i < this->mEqDStepper.size(); i++)
       {
          this->mEqDStepper.at(i).initSolver();
       }
-timer.stop();
-std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
+      DebuggerMacro_stop("Real solver init t = ", 0);
 
       // Reset the step index
       this->mStep = 0;
@@ -393,15 +378,11 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             int size = 0;
             for(int i = 0; i < interInfo.first; i++)
             {
-               // Clear LHS triplets
-               this->mEqZStepper.at(myIdx).rLHSTriplets(start+i).clear();
                // Add LHS triplets
-               size = this->buildLHSMatrix(this->mEqZStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               size = this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
-               // Clear RHS triplets
-               this->mEqZStepper.at(myIdx).rRHSTriplets(start+i).clear();
                // Add RHS triplets
-               this->buildRHSMatrix(this->mEqZStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                if(this->mStep == 0)
                {
@@ -417,10 +398,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Add LHS triplets
-               this->buildLHSMatrix(this->mEqZStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Add RHS triplets
-               this->buildRHSMatrix(this->mEqZStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -452,15 +433,11 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             int size = 0;
             for(int i = 0; i < interInfo.first; i++)
             {
-               // Clear LHS triplets
-               this->mEqDStepper.at(myIdx).rLHSTriplets(start+i).clear();
                // Add LHS triplets
-               size = this->buildLHSMatrix(this->mEqDStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               size = this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
-               // Clear RHS triplets
-               this->mEqDStepper.at(myIdx).rRHSTriplets(start+i).clear();
                // Add RHS triplets
-               this->buildRHSMatrix(this->mEqDStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                if(this->mStep == 0)
                {
@@ -476,10 +453,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Add LHS triplets
-               this->buildLHSMatrix(this->mEqDStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Add RHS triplets
-               this->buildRHSMatrix(this->mEqDStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -530,10 +507,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Update LHS triplets
-               this->updateLHSMatrix(this->mEqZStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Update RHS triplets
-               this->updateRHSMatrix(this->mEqZStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = 0;
@@ -543,10 +520,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Update LHS triplets
-               this->updateLHSMatrix(this->mEqZStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Update RHS triplets
-               this->updateRHSMatrix(this->mEqZStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -566,10 +543,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Update LHS triplets
-               this->updateLHSMatrix(this->mEqDStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Update RHS triplets
-               this->updateRHSMatrix(this->mEqDStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = 0;
@@ -579,10 +556,10 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
             for(int i = 0; i < interInfo.first; i++)
             {
                // Update LHS triplets
-               this->updateLHSMatrix(this->mEqDStepper.at(myIdx).rLHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, true);
 
                // Update RHS triplets
-               this->updateRHSMatrix(this->mEqDStepper.at(myIdx).rRHSTriplets(start+i), spEq, comp, i, nC, fieldIdx);
+               this->updateTimeMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, nC, fieldIdx, false);
 
                // Set the start row
                startRow(i) = spEq->rowShift(comp, i);
@@ -904,11 +881,27 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
       }
    }
 
-   int Timestepper::buildLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   int Timestepper::buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs)
    {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
-      MHDFloat linearCoeff = ImExRK3::lhsL(this->mStep);
+      // Operator coefficients
+      MHDFloat timeCoeff;
+      MHDFloat linearCoeff;
+
+      if(isLhs)
+      {
+         // Set time coefficients for LHS Matrix
+         timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+
+         // Set linear coefficients for LHS Matrix
+         linearCoeff = ImExRK3::lhsL(this->mStep);
+      } else
+      {
+         // Set time coefficients for RHS Matrix
+         timeCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+
+         // Set linear coefficients for RHS Matrix
+         linearCoeff = -ImExRK3::rhsL(this->mStep);
+      }
 
       // Set block size
       int blockRows = spEq->linearMatrix(comp,idx).first.rows();
@@ -925,47 +918,96 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
          colShift = cRow*blockCols;
       }
 
-      // Create real main LHS matrix
+      // Create internal part of solver matrix (i.e without boundary conditions)
       SparseMatrix work =  linearCoeff*spEq->linearMatrix(comp,idx).first - timeCoeff*spEq->timeMatrix(comp,idx).first;
 
-      // reserve storage for the triplets
+      // Count the number of nonzero values for internal part of solver matrix
       int nz = work.nonZeros();
-      nz += spEq->bcMatrix(comp,idx).first.nonZeros();
       if(nC > 0)
       {
          nz += spEq->couplingMatrix(comp,idx).first.nonZeros();
-         nz += spEq->cbcMatrix(comp,idx).first.nonZeros();
       }
-      triplets.reserve(nz);
 
-      // Add triplets for the main LHS Matrix
+      // Count the number of nonzero values for boundary conditions
+      if(isLhs)
+      {
+         nz += spEq->bcMatrix(comp,idx).first.nonZeros();
+         if(nC > 0)
+         {
+            nz += spEq->cbcMatrix(comp,idx).first.nonZeros();
+         }
+      }
+      
+      // Storage for the triplets
+      std::vector<Triplet> triplets;
+      // Reserve space to avoid reallocations
+      triplets.reserve(nz + solverMatrix.nonZeros());
+      // Add nonzero elements from solver matrix to triplets
+      this->addTriplets(triplets, solverMatrix, 0, 0, 1.0);
+
+      // Add triplets for the internal part of solver Matrix
       this->addTriplets(triplets, work, rowShift, colShift, 1.0);
-
-      // Add triplets for the real boundary conditions
-      this->addTriplets(triplets, spEq->bcMatrix(comp,idx).first, rowShift, colShift, 1.0);
 
       // Add coupling if required
       if(nC > 0)
       {
-         // Set block shift for coupling LHS matrix
+         // Set block shift for coupling matrix
          rowShift = cRow*blockRows;
          colShift = (1-cRow)*blockCols;
 
-         // Add triplets for the real coupling matrix
+         // Add triplets for the coupling matrix
          this->addTriplets(triplets, spEq->couplingMatrix(comp,idx).first, rowShift, colShift, linearCoeff);
-
-         // Add triplets for the real coupled boundary conditions
-         this->addTriplets(triplets, spEq->cbcMatrix(comp,idx).first, rowShift, colShift, 1.0);
       }
 
-      return  (nC+1)*blockRows;
+      if(isLhs)
+      {
+         // Set block shift
+         rowShift = cRow*blockRows;
+         colShift = cRow*blockCols;
+
+         // Add triplets for the boundary conditions
+         this->addTriplets(triplets, spEq->bcMatrix(comp,idx).first, rowShift, colShift, 1.0);
+
+         // Add coupling if required
+         if(nC > 0)
+         {
+            // Set block shift for coupling matrix
+            rowShift = cRow*blockRows;
+            colShift = (1-cRow)*blockCols;
+
+            // Add triplets for the coupled boundary conditions
+            this->addTriplets(triplets, spEq->cbcMatrix(comp,idx).first, rowShift, colShift, 1.0);
+         }
+      }
+
+      // Set matrix from triplets
+      solverMatrix.resize((nC+1)*blockRows,(nC+1)*blockRows);
+      solverMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+      return  solverMatrix.rows();
    }
 
-   int  Timestepper::buildLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   int  Timestepper::buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, const bool isLhs)
    {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
-      MHDFloat linearCoeff = ImExRK3::lhsL(this->mStep);
+      // Operator coefficients
+      MHDFloat timeCoeff;
+      MHDFloat linearCoeff;
+
+      if(isLhs)
+      {
+         // Set time coefficients for LHS Matrix
+         timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+
+         // Set linear coefficients for LHS Matrix
+         linearCoeff = ImExRK3::lhsL(this->mStep);
+      } else
+      {
+         // Set time coefficients for RHS Matrix
+         timeCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+
+         // Set linear coefficients for RHS Matrix
+         linearCoeff = -ImExRK3::rhsL(this->mStep);
+      }
 
       // Set block size
       int blockRows = std::max(spEq->linearMatrix(comp,idx).first.rows(),spEq->linearMatrix(comp,idx).second.rows());
@@ -985,23 +1027,31 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
       // Create main LHS matrix
       SparseMatrixZ work =  (linearCoeff*spEq->linearMatrix(comp,idx).first - timeCoeff*spEq->timeMatrix(comp,idx).first).cast<MHDComplex>() + MathConstants::cI*(linearCoeff*spEq->linearMatrix(comp,idx).second - timeCoeff*spEq->timeMatrix(comp,idx).second);
 
-      // reserve storage for the triplets
+      // Count the number of nonzero values for internal part of solver matrix
       int nz = work.nonZeros();
-      nz += spEq->bcMatrix(comp,idx).first.nonZeros() + spEq->bcMatrix(comp,idx).second.nonZeros();
       if(nC > 0)
       {
          nz += spEq->couplingMatrix(comp,idx).first.nonZeros() + spEq->couplingMatrix(comp,idx).second.nonZeros();
-         nz += spEq->cbcMatrix(comp,idx).first.nonZeros() + spEq->cbcMatrix(comp,idx).second.nonZeros();
       }
-      triplets.reserve(nz);
+
+      // Count the number of nonzero values for boundary conditions
+      if(isLhs)
+      {
+         nz += spEq->bcMatrix(comp,idx).first.nonZeros() + spEq->bcMatrix(comp,idx).second.nonZeros();
+         if(nC > 0)
+         {
+            nz += spEq->cbcMatrix(comp,idx).first.nonZeros() + spEq->cbcMatrix(comp,idx).second.nonZeros();
+         }
+      }
+      
+      // Storage for the triplets
+      std::vector<TripletZ> triplets;
+      // Reserve space to avoid reallocations
+      triplets.reserve(nz + solverMatrix.nonZeros());
+      // Add nonzero elements from solver matrix to triplets
+      this->addTriplets(triplets, solverMatrix, 0, 0, 1.0);
 
       // Add triplets for the main LHS Matrix
-      this->addTriplets(triplets, work, rowShift, colShift, 1.0);
-
-      // Create complex boundary condition matrix
-      work = spEq->bcMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->bcMatrix(comp,idx).second;
-
-      // Add triplets for the boundary conditions
       this->addTriplets(triplets, work, rowShift, colShift, 1.0);
 
       // Add coupling if required
@@ -1016,112 +1066,40 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
 
          // Add triplets for the real coupling matrix
          this->addTriplets(triplets, work, rowShift, colShift, linearCoeff);
+      }
 
-         // Create complex coupled boundary condition matrix
-         work = spEq->cbcMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->cbcMatrix(comp,idx).second;
+      if(isLhs)
+      {
+         // Set block shift
+         rowShift = cRow*blockRows;
+         colShift = cRow*blockCols;
 
-         // Add triplets for the real coupled boundary conditions
+         // Create complex boundary condition matrix
+         work = spEq->bcMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->bcMatrix(comp,idx).second;
+
+         // Add triplets for the boundary conditions
          this->addTriplets(triplets, work, rowShift, colShift, 1.0);
+
+         // Add coupling if required
+         if(nC > 0)
+         {
+            // Set block shift for coupling LHS matrix
+            rowShift = cRow*blockRows;
+            colShift = (1-cRow)*blockCols;
+
+            // Create complex coupled boundary condition matrix
+            work = spEq->cbcMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->cbcMatrix(comp,idx).second;
+
+            // Add triplets for the real coupled boundary conditions
+            this->addTriplets(triplets, work, rowShift, colShift, 1.0);
+         }
       }
 
-      return  (nC+1)*blockRows;
-   }
+      // Set matrix from triplets
+      solverMatrix.resize((nC+1)*blockRows,(nC+1)*blockRows);
+      solverMatrix.setFromTriplets(triplets.begin(), triplets.end());
 
-   void  Timestepper::buildRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
-   {
-      // Matrix coefficients
-      MHDFloat timeCoeff = -ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
-      MHDFloat linearCoeff = -ImExRK3::rhsL(this->mStep);
-
-      // Set block size
-      int blockRows = spEq->linearMatrix(comp,idx).first.rows();
-      int blockCols = spEq->linearMatrix(comp,idx).first.cols();
-
-      // Block shifts
-      int rowShift = 0;
-      int colShift = 0;
-
-      // Set block shift for main RHS matrix
-      if(nC > 0)
-      {
-         rowShift = cRow*blockRows;
-         colShift = cRow*blockCols;
-      }
-
-      // Create real main RHS matrix
-      SparseMatrix work =  linearCoeff*spEq->linearMatrix(comp,idx).first + timeCoeff*spEq->timeMatrix(comp,idx).first;
-
-      // reserve storage for the triplets
-      int nz = work.nonZeros();
-      if(nC > 0)
-      {
-         nz += spEq->couplingMatrix(comp,idx).first.nonZeros();
-      }
-      triplets.reserve(nz);
-
-      // Add triplets for the main RHS Matrix
-      this->addTriplets(triplets, work, rowShift, colShift, 1.0);
-
-      // Add coupling if required
-      if(nC > 0)
-      {
-         // Set block shift for coupling RHS matrix
-         rowShift = cRow*blockRows;
-         colShift = (1-cRow)*blockCols;
-
-         // Add triplets for the real coupling matrix
-         this->addTriplets(triplets, spEq->couplingMatrix(comp,idx).first, rowShift, colShift, linearCoeff);
-      }
-   }
-
-   void  Timestepper::buildRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
-   {
-      // Matrix coefficients
-      MHDFloat timeCoeff = -ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
-      MHDFloat linearCoeff = -ImExRK3::rhsL(this->mStep);
-
-      // Set block size
-      int blockRows = std::max(spEq->linearMatrix(comp,idx).first.rows(),spEq->linearMatrix(comp,idx).second.rows());
-      int blockCols = std::max(spEq->linearMatrix(comp,idx).first.cols(),spEq->linearMatrix(comp,idx).second.cols());
-
-      // Block shifts
-      int rowShift = 0;
-      int colShift = 0;
-
-      // Set block shift for main RHS matrix
-      if(nC > 0)
-      {
-         rowShift = cRow*blockRows;
-         colShift = cRow*blockCols;
-      }
-
-      // Create main RHS matrix
-      SparseMatrixZ work =  (linearCoeff*spEq->linearMatrix(comp,idx).first + timeCoeff*spEq->timeMatrix(comp,idx).first).cast<MHDComplex>() + MathConstants::cI*(linearCoeff*spEq->linearMatrix(comp,idx).second + timeCoeff*spEq->timeMatrix(comp,idx).second);
-
-      // reserve storage for the triplets
-      int nz = work.nonZeros();
-      if(nC > 0)
-      {
-         nz += spEq->couplingMatrix(comp,idx).first.nonZeros() + spEq->couplingMatrix(comp,idx).second.nonZeros();
-      }
-      triplets.reserve(nz);
-
-      // Add triplets for the main RHS Matrix
-      this->addTriplets(triplets, work, rowShift, colShift, 1.0);
-
-      // Add coupling if required
-      if(nC > 0)
-      {
-         // Set block shift for coupling RHS matrix
-         rowShift = cRow*blockRows;
-         colShift = (1-cRow)*blockCols;
-
-         // Create complex coupling matrix
-         work = spEq->couplingMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->couplingMatrix(comp,idx).second;
-
-         // Add triplets for the coupling matrix
-         this->addTriplets(triplets, work, rowShift, colShift, linearCoeff);
-      }
+      return  solverMatrix.rows();
    }
 
    void Timestepper::addTriplets(std::vector<Triplet>& triplets, const SparseMatrix& mat, const int rowShift, const int colShift, const MHDFloat c)
@@ -1148,10 +1126,19 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
       }
    }
 
-   void  Timestepper::updateLHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   void  Timestepper::updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, bool isLhs)
    {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      // Set time coefficient
+      MHDFloat timeCoeff;
+      if(isLhs)
+      {
+         // Compute timestep correction coefficient for LHS matrix
+         timeCoeff = ImExRK3::lhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      } else
+      {
+         // Compute timestep correction coefficient for RHS matrix
+         timeCoeff = ImExRK3::rhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      }
 
       // Set block size
       int blockRows = spEq->timeMatrix(comp,idx).first.rows();
@@ -1171,36 +1158,45 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
       // Create main LHS matrix
       SparseMatrix work =  timeCoeff*spEq->timeMatrix(comp,idx).first;
 
+      // Convert time matrix to triplets
       std::vector<Triplet> timeTriplets;
       timeTriplets.reserve(work.nonZeros());
-
-      // Add triplets for the main LHS Matrix
       this->addTriplets(timeTriplets, work, rowShift, colShift, 1.0);
 
-      std::vector<Triplet>::iterator it;
-      size_t j = 0;
-      for(it = triplets.begin(); it != triplets.end(); ++it)
+      // Update old matrix with new time dependence
+      int j = 0;
+      for (int k=0; k<oldTime.outerSize(); ++k)
       {
-         if(it->col() == timeTriplets.at(j).col() && it->row() == timeTriplets.at(j).row())
+         for (SparseMatrix::InnerIterator it(oldTime,k); it; ++it)
          {
-            *it = Triplet(it->row(), it->col(), it->value() + timeTriplets.at(j).value());
-            j++;
-
-            if(j == timeTriplets.size())
+            if(static_cast<size_t>(j) < timeTriplets.size() && static_cast<size_t>(k) == timeTriplets.at(j).col())
             {
-               break;
+               if(static_cast<size_t>(it.row()) == timeTriplets.at(j).row())
+               {
+                  it.valueRef() += timeTriplets.at(j).value();
+                  j++;
+               }
             }
          }
       }
 
-      // Safety assert that all values have been updated
-      assert(j == timeTriplets.size());
+      // Safety assert to make sure all values have been updated
+      assert(static_cast<size_t>(j) == timeTriplets.size());
    }
 
-   void  Timestepper::updateLHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
+   void  Timestepper::updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow, bool isLhs)
    {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      // Set time coefficient
+      MHDFloat timeCoeff;
+      if(isLhs)
+      {
+         // Compute timestep correction coefficient for LHS matrix
+         timeCoeff = ImExRK3::lhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      } else
+      {
+         // Compute timestep correction coefficient for RHS matrix
+         timeCoeff = ImExRK3::rhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
+      }
 
       // Set block size
       int blockRows = std::max(spEq->timeMatrix(comp,idx).first.rows(),spEq->timeMatrix(comp,idx).second.rows());
@@ -1217,131 +1213,33 @@ std::cerr << "FINISH real solver init: " << timer.time() << std::endl;
          colShift = cRow*blockCols;
       }
 
-      // Create main LHS matrix
+      // Create time matrix
       SparseMatrixZ work =  timeCoeff*spEq->timeMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*timeCoeff*spEq->timeMatrix(comp,idx).second;
 
+      // Convert time matrix to triplets
       std::vector<TripletZ> timeTriplets;
       timeTriplets.reserve(work.nonZeros());
-
-      // Add triplets for the main LHS Matrix
       this->addTriplets(timeTriplets, work, rowShift, colShift, 1.0);
 
-      std::vector<TripletZ>::iterator it;
-      size_t j = 0;
-      for(it = triplets.begin(); it != triplets.end(); ++it)
+      // Update old matrix with new time dependence
+      int j = 0;
+      for (int k=0; k<oldTime.outerSize(); ++k)
       {
-         if(it->col() == timeTriplets.at(j).col() && it->row() == timeTriplets.at(j).row())
+         for (SparseMatrixZ::InnerIterator it(oldTime,k); it; ++it)
          {
-            *it = TripletZ(it->row(), it->col(), it->value() + timeTriplets.at(j).value());
-            j++;
-
-            if(j == timeTriplets.size())
+            if(static_cast<size_t>(j) < timeTriplets.size() && static_cast<size_t>(k) == timeTriplets.at(j).col())
             {
-               break;
+               if(static_cast<size_t>(it.row()) == timeTriplets.at(j).row())
+               {
+                  it.valueRef() += timeTriplets.at(j).value();
+                  j++;
+               }
             }
          }
       }
 
-      // Safety assert that all values have been updated
-      assert(j == timeTriplets.size());
-   }
-
-   void  Timestepper::updateRHSMatrix(std::vector<Triplet>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
-   {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::lhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
-
-      // Set block size
-      int blockRows = spEq->timeMatrix(comp,idx).first.rows();
-      int blockCols = spEq->timeMatrix(comp,idx).first.cols();
-
-      // Block shifts
-      int rowShift = 0;
-      int colShift = 0;
-
-      // Set block shift for time matrix
-      if(nC > 0)
-      {
-         rowShift = cRow*blockRows;
-         colShift = cRow*blockCols;
-      }
-
-      // Create main LHS matrix
-      SparseMatrix work =  timeCoeff*spEq->timeMatrix(comp,idx).first;
-
-      std::vector<Triplet> timeTriplets;
-      timeTriplets.reserve(work.nonZeros());
-
-      // Add triplets for the main LHS Matrix
-      this->addTriplets(timeTriplets, work, rowShift, colShift, 1.0);
-
-      std::vector<Triplet>::iterator it;
-      size_t j = 0;
-      for(it = triplets.begin(); it != triplets.end(); ++it)
-      {
-         if(it->col() == timeTriplets.at(j).col() && it->row() == timeTriplets.at(j).row())
-         {
-            *it = Triplet(it->row(), it->col(), it->value() + timeTriplets.at(j).value());
-            j++;
-
-            if(j == timeTriplets.size())
-            {
-               break;
-            }
-         }
-      }
-
-      // Safety assert that all values have been updated
-      assert(j == timeTriplets.size());
-   }
-
-   void  Timestepper::updateRHSMatrix(std::vector<TripletZ>& triplets, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const int nC, const int cRow)
-   {
-      // Matrix coefficients
-      MHDFloat timeCoeff = ImExRK3::rhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
-
-      // Set block size
-      int blockRows = std::max(spEq->timeMatrix(comp,idx).first.rows(),spEq->timeMatrix(comp,idx).second.rows());
-      int blockCols = std::max(spEq->timeMatrix(comp,idx).first.cols(),spEq->timeMatrix(comp,idx).second.cols());
-
-      // Block shifts
-      int rowShift = 0;
-      int colShift = 0;
-
-      // Set block shift for time matrix
-      if(nC > 0)
-      {
-         rowShift = cRow*blockRows;
-         colShift = cRow*blockCols;
-      }
-
-      // Create main LHS matrix
-      SparseMatrixZ work =  timeCoeff*spEq->timeMatrix(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*timeCoeff*spEq->timeMatrix(comp,idx).second;
-
-      std::vector<TripletZ> timeTriplets;
-      timeTriplets.reserve(work.nonZeros());
-
-      // Add triplets for the main LHS Matrix
-      this->addTriplets(timeTriplets, work, rowShift, colShift, 1.0);
-
-      std::vector<TripletZ>::iterator it;
-      size_t j = 0;
-      for(it = triplets.begin(); it != triplets.end(); ++it)
-      {
-         if(it->col() == timeTriplets.at(j).col() && it->row() == timeTriplets.at(j).row())
-         {
-            *it = TripletZ(it->row(), it->col(), it->value() + timeTriplets.at(j).value());
-            j++;
-
-            if(j == timeTriplets.size())
-            {
-               break;
-            }
-         }
-      }
-
-      // Safety assert that all values have been updated
-      assert(j == timeTriplets.size());
+      // Safety assert to make sure all values have been updated
+      assert(static_cast<size_t>(j) == timeTriplets.size());
    }
 }
 }

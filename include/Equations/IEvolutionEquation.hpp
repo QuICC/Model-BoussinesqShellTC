@@ -27,6 +27,7 @@
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
+#include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -38,15 +39,6 @@ namespace Equations {
    class IEvolutionEquation : public EquationData
    {
       public:
-         /// Typedef for the boundary conditions map key type
-         typedef std::pair<FieldComponents::Spectral::Id, Dimensions::Simulation::Id> BcKeyType;
-
-         /// Typedef for the boundary conditions map storage type
-         typedef std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > BcMapType;
-
-         /// Typedef for the boundary conditions map storage type
-         typedef std::map<BcKeyType, BcMapType> BcEqMapType;
-
          /**
           * @brief Simple constructor
           */
@@ -106,9 +98,8 @@ namespace Equations {
           * @brief Set the equation matrices
           *
           * @param bcIds   List of boundary condition IDs
-          * @param cbcIds  List of coupled boundary condition IDs
           */
-         virtual void setSpectralMatrices(const BcEqMapType& bcIds, const std::map<PhysicalNames::Id, BcEqMapType>& cbcIds) = 0;
+         virtual void setSpectralMatrices(const SimulationBoundary& bcIds) = 0;
 
          /**
           * @brief Transfer equation input to timestepper

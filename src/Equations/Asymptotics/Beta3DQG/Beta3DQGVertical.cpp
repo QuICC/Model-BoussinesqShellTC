@@ -83,7 +83,7 @@ namespace Equations {
       this->mCouplingInfo.addInternal(FieldComponents::Spectral::SCALAR, nMat, dim);
    }
  
-   void Beta3DQGVertical::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)
+   void Beta3DQGVertical::setSpectralMatrices(const SimulationBoundary& bcIds)
    {
       // Get local copy of a shared resolution
       SharedResolution  spRes = this->unknown().dom(0).spRes();
@@ -108,8 +108,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(1);
 
       // Create boundary conditions ID
-      IEvolutionEquation::BcKeyType bc1D = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
-      IEvolutionEquation::BcKeyType bc3D = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
+      SimulationBoundary::BcKeyType bc1D = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM1D);
+      SimulationBoundary::BcKeyType bc3D = std::make_pair(FieldComponents::Spectral::SCALAR, Dimensions::Simulation::SIM3D);
 
       // Temporary storage
       SparseMatrix   tmpA;
@@ -151,10 +151,10 @@ namespace Equations {
 
          // Set boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
-         tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.find(bc1D)->second);
+         tau1D = Spectral::BoundaryConditions::tauMatrix(bound1D, bcIds.bcs(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ).find(bc1D)->second);
          Eigen::kroneckerProduct(spec3D.id(0), tau1D.first, it->second.back().first);
 
-         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.find(bc3D)->second);
+         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.bcs(PhysicalNames::VELOCITYZ, PhysicalNames::VELOCITYZ).find(bc3D)->second);
          Eigen::kroneckerProduct(tau3D.first, spec1D.qDiff(2,0), tmpA);
          it->second.back().first += tmpA;
 
@@ -169,7 +169,7 @@ namespace Equations {
 
          // Set coupled boundary condition matrices (kronecker(A,B,out) => out = A(i,j)*A)
          it->second.push_back(DecoupledZSparse());
-         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, cbcIds.find(PhysicalNames::STREAMFUNCTION)->second.find(bc3D)->second);
+         tau3D = Spectral::BoundaryConditions::tauMatrix(bound3D, bcIds.bcs(PhysicalNames::VELOCITYZ, PhysicalNames::STREAMFUNCTION).find(bc3D)->second);
          tau3D.second *= k_*std::tan((MathConstants::PI/180.)*this->eqParams().nd(NonDimensional::CHI));
          Eigen::kroneckerProduct(tau3D.second, spec1D.qDiff(2,0), it->second.back().second);
 

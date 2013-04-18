@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
    void Simulation::initBase()
    {
       // Debug statement
-      DebuggerMacro::enter("initBase",0);
+      DebuggerMacro_enter("initBase",0);
 
       // Make sure to catch raised exception in initialisation steps
       try{
@@ -79,13 +79,13 @@ namespace GeoMHDiSCC {
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("initBase",0);
+      DebuggerMacro_leave("initBase",0);
    }
 
    void Simulation::init(const SimulationBoundary& bcs)
    {
       // Debug statement
-      DebuggerMacro::enter("init",0);
+      DebuggerMacro_enter("init",0);
 
       // Initialise the variables
       this->initVariables();
@@ -115,13 +115,13 @@ namespace GeoMHDiSCC {
       }
 
       // Debug statement
-      DebuggerMacro::leave("init",0);
+      DebuggerMacro_leave("init",0);
    }
 
    void Simulation::run()
    {
       // Debug statement
-      DebuggerMacro::enter("run",0);
+      DebuggerMacro_enter("run",0);
 
       // Stop timer and update initialisation time
       this->mExecutionTimer.stop();
@@ -141,7 +141,7 @@ namespace GeoMHDiSCC {
       this->mExecutionTimer.start();
 
       // Debug statement
-      DebuggerMacro::enter("main loop",0);
+      DebuggerMacro_enter("main loop",0);
 
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == Runtime::Status::GOON)
@@ -160,7 +160,7 @@ namespace GeoMHDiSCC {
       }
 
       // Debug statement
-      DebuggerMacro::leave("main loop",0);
+      DebuggerMacro_leave("main loop",0);
 
       // Stop main loop timing
       this->mExecutionTimer.stop();
@@ -183,13 +183,13 @@ namespace GeoMHDiSCC {
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("run",0);
+      DebuggerMacro_leave("run",0);
    }
 
    void Simulation::finalize()
    {
       // Debug statement
-      DebuggerMacro::enter("finalize",0);
+      DebuggerMacro_enter("finalize",0);
 
       // Print execution timer infos
       this->mExecutionTimer.printInfo(std::cout);
@@ -201,7 +201,7 @@ namespace GeoMHDiSCC {
       StorageProfilerMacro_printInfo();
 
       // Debug statement
-      DebuggerMacro::leave("finalize",0);
+      DebuggerMacro_leave("finalize",0);
    }
 
    void Simulation::setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile)
@@ -243,7 +243,7 @@ namespace GeoMHDiSCC {
    void Simulation::preRun()
    {
       // Debug statement
-      DebuggerMacro::enter("preRun",1);
+      DebuggerMacro_enter("preRun",1);
 
       // Print message to signal successful completion of initialisation step
       if(FrameworkMacro::allowsIO())
@@ -274,14 +274,15 @@ namespace GeoMHDiSCC {
 
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepper.init(this->mDiagnostics.cfl()/100., this->mScalarEquations, this->mVectorEquations);
+
       // Debug statement
-      DebuggerMacro::leave("preRun",1);
+      DebuggerMacro_leave("preRun",1);
    }
 
    void Simulation::computeNonlinear()
    {
       // Debug statement
-      DebuggerMacro::enter("computeNonlinear",1);
+      DebuggerMacro_enter("computeNonlinear",1);
 
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
@@ -292,21 +293,19 @@ namespace GeoMHDiSCC {
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mTransformCoordinator);
 
       // Debug statement
-      DebuggerMacro::leave("computeNonlinear",1);
+      DebuggerMacro_leave("computeNonlinear",1);
    }
 
    void Simulation::timestepEquations()
    {
       // Debug statement
-      DebuggerMacro::enter("timestepEquations",1);
+      DebuggerMacro_enter("timestepEquations",1);
 
-TimerMacro  timer;
-timer.start();
+      DebuggerMacro_start("Full timestep",2);
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
       this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
-timer.stop();
-std::cerr << "TIMESTEP : " << timer.time() << std::endl;
+      DebuggerMacro_stop("Full timestep t = ",2);
 
       ProfilerMacro_start(ProfilerMacro::CONTROL);
       if(this->mTimestepper.finishedStep())
@@ -335,13 +334,13 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
 
       // Debug statement
-      DebuggerMacro::leave("timestepEquations",1);
+      DebuggerMacro_leave("timestepEquations",1);
    }
 
    void Simulation::writeOutput()
    {
       // Debug statement
-      DebuggerMacro::enter("writeOutput",1);
+      DebuggerMacro_enter("writeOutput",1);
 
       ProfilerMacro_start(ProfilerMacro::IO);
       if(this->mTimestepper.finishedStep())
@@ -352,13 +351,13 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       ProfilerMacro_stop(ProfilerMacro::IO);
 
       // Debug statement
-      DebuggerMacro::leave("writeOutput",1);
+      DebuggerMacro_leave("writeOutput",1);
    }
 
    void Simulation::postRun()
    {
       // Debug statement
-      DebuggerMacro::enter("postRun",1);
+      DebuggerMacro_enter("postRun",1);
 
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
@@ -370,7 +369,7 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       FrameworkMacro::synchronize();
 
       // Debug statement
-      DebuggerMacro::leave("postRun",1);
+      DebuggerMacro_leave("postRun",1);
    }
 
    void Simulation::initVariables()
@@ -568,14 +567,14 @@ std::cerr << "TIMESTEP : " << timer.time() << std::endl;
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
-         (*scalEqIt)->setSpectralMatrices(bcs.bc((*scalEqIt)->name()), bcs.cbc((*scalEqIt)->name()));
+         (*scalEqIt)->setSpectralMatrices(bcs);
          (*scalEqIt)->finalizeMatrices();
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
-         (*vectEqIt)->setSpectralMatrices(bcs.bc((*vectEqIt)->name()), bcs.cbc((*vectEqIt)->name()));
+         (*vectEqIt)->setSpectralMatrices(bcs);
          (*vectEqIt)->finalizeMatrices();
       }
    }
