@@ -130,6 +130,14 @@ namespace Datatypes {
          template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
 
          /**
+          * @brief Multiply a 2D slice of the field by a matrix
+          *
+          * @param mat  Left matrix multiplication
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k);
+
+         /**
           * @brief Add to 2D slice of the field
           *
           * @param sl   Slice values
@@ -154,6 +162,16 @@ namespace Datatypes {
           * @param k    Index of the slice
           */
          template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
+
+         /**
+          * @brief Multiply the top rows of a 2D slice of the field by a matrix
+          *
+          * Use this to adapt to differentenlty dealiased data
+          *
+          * @param mat  Slice values
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows);
 
          /**
           * @brief Add to the top rows of a 2D slice of the field
@@ -328,6 +346,22 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
    }
 
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Assert for compatible matrix
+      assert(mat.rows() == mat.cols());
+      assert(mat.cols() == this->mspSetup->blockRows(k));
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) *= mat;
+   }
+
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
       // Slices only make sense in 3D
@@ -365,6 +399,25 @@ namespace Datatypes {
       assert(rows < this->mspSetup->blockRows(k));
 
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) = sl;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
+   {
+      // Slices only make sense in 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      // Assert for compatible matrix
+      assert(mat.rows() == mat.cols());
+      assert(mat.cols() == rows);
+
+      // Should not be called as a replacement of the shorter version
+      assert(rows < this->mspSetup->blockRows(k));
+
+      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) *= mat;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)

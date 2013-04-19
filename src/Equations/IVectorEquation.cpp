@@ -52,11 +52,6 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   void IVectorEquation::computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id) const
-   {
-      // Empty default implementation
-   }
-
    void IVectorEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id)
    {
       // Assert dealiasing has taken place!

@@ -22,36 +22,6 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardConfigurator::linearStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::LINEAR);
-
-      // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Compute linear term component
-      spEquation->computeLinear(rScalar);
-
-      // Hold temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rScalar);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::LINEAR);
-   }
-
-   void ForwardConfigurator::linearStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
-
-      // Add the toroidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
-      // Add the poloidal linear term
-      ForwardConfigurator::linearTerm<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
-   }
-
    void ForwardConfigurator::prepareTimestep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
@@ -80,10 +50,6 @@ namespace Transform {
 
       // Prepare the poloidal timestep RHS
       ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
-   }
-
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
    }
 
    template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)

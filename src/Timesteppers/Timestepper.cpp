@@ -23,6 +23,8 @@
 #include "Base/MathConstants.hpp"
 #include "Timesteppers/ImExRK3.hpp"
 
+#include <iostream>
+
 namespace GeoMHDiSCC {
 
 namespace Timestep {
@@ -309,13 +311,7 @@ namespace Timestep {
             {
                // Create RHS and solution data storage
                this->mEqZStepper.at(myIdx).addStorage(spEq->couplingInfo(comp).systemN(i), spEq->couplingInfo(comp).rhsCols(i));
-
-               // Store the start row
-               startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).systemN(i);
             }
-
-            // Store storage information
-            this->mEqZStepper.at(myIdx).addInformation(myId,startRow);
          }
 
          // Build the solver matrices
@@ -326,7 +322,13 @@ namespace Timestep {
 
             // Add RHS triplets
             this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, false);
+
+            // Store the start row
+            startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).blockN(i);
          }
+
+         // Store storage information
+         this->mEqZStepper.at(myIdx).addInformation(myId,startRow);
 
       // Real matrices in linear solve
       } else
@@ -342,13 +344,7 @@ namespace Timestep {
             {
                // Create RHS and solution data storage
                this->mEqDStepper.at(myIdx).addStorage(spEq->couplingInfo(comp).systemN(i), spEq->couplingInfo(comp).rhsCols(i));
-
-               // Store the start row
-               startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).systemN(i);
             }
-
-            // Store storage information
-            this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
          }
 
          // Build the solver matrices
@@ -359,7 +355,13 @@ namespace Timestep {
 
             // Add RHS triplets
             this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, false);
+
+            // Store the start row
+            startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).blockN(i);
          }
+
+         // Store storage information
+         this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
       }
    }
 
@@ -854,7 +856,6 @@ namespace Timestep {
       }
 
       // Safety assert to make sure all values have been updated
-      assert(j == static_cast<size_t>(newTime.outerSize()));
       assert(nnz == 0);
    }
 
@@ -899,8 +900,9 @@ namespace Timestep {
          }
       }
 
+      std::cerr << nnz << std::endl;
+
       // Safety assert to make sure all values have been updated
-      assert(j == static_cast<size_t>(newTime.outerSize()));
       assert(nnz == 0);
    }
 }

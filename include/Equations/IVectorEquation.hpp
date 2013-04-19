@@ -74,14 +74,6 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
 
          /**
-          * @brief Compute the linear term
-          *
-          * @param rRHS RHS of timestepping equation
-          * @param id   ID of the spectral vector component
-          */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS, FieldComponents::Spectral::Id id) const;
-
-         /**
           * @brief Prepare the RHS for the timestep computation
           *
           * @param rhs    RHS of timestepping equation

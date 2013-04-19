@@ -5,6 +5,7 @@
 // Debug includes
 //
 #include <cassert>
+#include "Debug/DebuggerMacro.h"
 
 // System includes
 //
@@ -21,8 +22,6 @@
 #include "Base/MpiTypes.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Diagnostics/StreamVerticalWrapper.hpp"
-
-#include <iostream>
 
 namespace GeoMHDiSCC {
 
@@ -90,7 +89,7 @@ namespace Diagnostics {
       this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
       this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
 
-      std::cerr << "Raw CFL: " << this->mCfl << std::endl;
+      DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
       /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
       /// \mhdBug This is not a clean CFL but min(0.1,cfl)
       //this->mCfl = std::min(this->mcCourant, this->mCfl);

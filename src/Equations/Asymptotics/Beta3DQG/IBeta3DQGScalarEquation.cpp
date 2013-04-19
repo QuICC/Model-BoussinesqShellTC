@@ -26,8 +26,6 @@
 #include "TypeSelectors/SpectralSelector.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
 
-#include <iostream>
-
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -78,7 +76,7 @@ namespace Equations {
       // Loop over all coupled fields
       int colIdx = 0;
       CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).fieldRange();
+      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
          SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
@@ -159,9 +157,19 @@ namespace Equations {
       // Loop over all coupled fields
       int colIdx = 0;
       CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).fieldRange();
+      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
+         SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
+         blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
+
+         Beta3DQGSystem::boundaryBlock(block, this->name(), fIt->first, this->mspBcIds, nx, nz, k, Ra, Pr, Gamma, chi);
+         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         matrixRow.first += tmp;
+         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         matrixRow.second += tmp;
+
+         colIdx++;
       }
 
       // Make sure matrices are in compressed format
@@ -173,6 +181,25 @@ namespace Equations {
 
    void IBeta3DQGScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      // Get X and Z dimensions
+      int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nz = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      // Initialise the quasi-inverse operators for the nonlinear terms
+      int nSystems = this->couplingInfo(FieldComponents::Spectral::SCALAR).nSystems();
+      this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
+      std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
+      qIt->second.reserve(nSystems);
+      for(int i = 0; i < nSystems; ++i)
+      {
+         qIt->second.push_back(SparseMatrix());
+
+         Beta3DQGSystem::quasiInverse(qIt->second.back(), this->name(), nx, nz);
+      }
+
    }
 }
 }

@@ -102,13 +102,26 @@ namespace Equations {
          int rhsCols(const int idx) const;
 
          /**
-          * @brief Set a field coupling
+          * @brief Number of explicit linear fields
+          */
+         int nExplicit() const;
+
+         /**
+          * @brief Add field to list of implicit timestep fields (coupled solve)
           *
           * @param fieldId Physical ID of the field
           * @param compId  Physical ID of the component
           * @param isSelf  Is field equation field?
           */
-         void addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf);
+         void addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf);
+
+         /**
+          * @brief Add field to list of explicit timestep fields
+          *
+          * @param fieldId Physical ID of the field
+          * @param compId  Physical ID of the component
+          */
+         void addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
 
          /**
           * @brief Set settings for all systems
@@ -129,17 +142,27 @@ namespace Equations {
          void setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols);
 
          /**
-          * @brief Get iterator to field couplings
+          * @brief Get iterator to implicit fields
           */
-         field_iterator_range fieldRange() const;
+         field_iterator_range implicitRange() const;
+
+         /**
+          * @brief Get iterator to explicit fields
+          */
+         field_iterator_range explicitRange() const;
 
       protected:
 
       private:
          /**
-          * @brief Storage for the field coupling information
+          * @brief Storage for the implicit fields information
           */
-         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mFields;
+         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mImplicitFields;
+
+         /**
+          * @brief Storage for the explicit fields information
+          */
+         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mExplicitFields;
 
          /**
           * @brief Storage for the complex flag

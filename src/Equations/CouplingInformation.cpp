@@ -38,7 +38,7 @@ namespace Equations {
 
    int CouplingInformation::nBlocks() const
    {
-      return this->mFields.size();
+      return this->mImplicitFields.size();
    }
 
    int CouplingInformation::nSystems() const
@@ -53,7 +53,7 @@ namespace Equations {
 
    int CouplingInformation::systemN(const int idx) const
    {
-      return this->blockN(idx)*this->mFields.size();
+      return this->blockN(idx)*this->nBlocks();
    }
 
    int CouplingInformation::fieldIndex() const
@@ -71,20 +71,30 @@ namespace Equations {
       return this->mFieldStart;
    }
 
+   int CouplingInformation::nExplicit() const
+   {
+      return this->mExplicitFields.size();
+   }
+
    int CouplingInformation::rhsCols(const int idx) const
    {
       return this->mRhsCols(idx);
    }
 
-   void CouplingInformation::addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf)
+   void CouplingInformation::addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf)
    {
       // If field is itself, set the field index
       if(isSelf)
       {
-         this->mFieldIndex = this->mFields.size();
+         this->mFieldIndex = this->mImplicitFields.size();
       }
 
-      this->mFields.push_back(std::make_pair(fieldId,compId));
+      this->mImplicitFields.push_back(std::make_pair(fieldId,compId));
+   }
+
+   void CouplingInformation::addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId)
+   {
+      this->mExplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 
    void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
@@ -105,9 +115,14 @@ namespace Equations {
       this->mRhsCols = rhsCols;
    }
 
-   CouplingInformation::field_iterator_range CouplingInformation::fieldRange() const
+   CouplingInformation::field_iterator_range CouplingInformation::implicitRange() const
    {
-      return std::make_pair(this->mFields.begin(), this->mFields.end());
+      return std::make_pair(this->mImplicitFields.begin(), this->mImplicitFields.end());
+   }
+
+   CouplingInformation::field_iterator_range CouplingInformation::explicitRange() const
+   {
+      return std::make_pair(this->mExplicitFields.begin(), this->mExplicitFields.end());
    }
 }
 }

@@ -19,6 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Equations/IScalarEquation.hpp"
+#include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -69,6 +70,11 @@ namespace Equations {
           * @brief Set coupling information
           */
          virtual void setCoupling();
+
+         /**
+          * @brief Storage for the shared boundary condition list
+          */
+         SharedSimulationBoundary mspBcIds;
 
       private:
    };

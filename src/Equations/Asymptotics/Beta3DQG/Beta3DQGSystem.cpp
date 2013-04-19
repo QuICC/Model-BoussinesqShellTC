@@ -42,9 +42,12 @@ namespace Equations {
          //
 
          // Equation is coupled to streamfunction equation (self)
-         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
          // Equation is coupled to vertical velocity equation
-         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
+         rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
+
+         // Equation has explicit temperature
+         rInfo.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(ny);
@@ -64,9 +67,9 @@ namespace Equations {
          //
 
          // Equation is coupled to streamfunction equation
-         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, false);
+         rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, false);
          // Equation is coupled to vertical velocity equation (self)
-         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(ny);
@@ -86,7 +89,10 @@ namespace Equations {
          //
 
          // Equation is coupled to temperature equation
-         rInfo.addField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
+
+         // Equation has explicit temperature
+         rInfo.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(ny);
@@ -251,12 +257,12 @@ namespace Equations {
       /// <b>Linear operators for the transport equation</b>
       } else if(eqId == PhysicalNames::TEMPERATURE)
       {
-         /// - Streamfunction : \f$ \left(0_x \otimes 0_Z\right) \f$
+         /// - Streamfunction : \f$ i \frac{k}{2} \left(D_x^{-2} \otimes I_Z\right) \f$
          if(fieldId == PhysicalNames::STREAMFUNCTION)
          {
-            //
-            // Nothing to do for an empty sparse matrix
-            //
+            // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
+            SparseMatrix tmp = k_*spec3D.id(0);
+            Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
 
          /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
          } else if(fieldId == PhysicalNames::VELOCITYZ)
@@ -290,7 +296,7 @@ namespace Equations {
 
    }
 
-   void boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void Beta3DQGSystem::boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);

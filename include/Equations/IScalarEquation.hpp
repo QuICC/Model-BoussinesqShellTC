@@ -72,13 +72,6 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const = 0;
 
          /**
-          * @brief Compute the linear term
-          *
-          * @param rRHS    RHS of timestepping equation
-          */
-         virtual void computeLinear(Datatypes::SpectralScalarType& rRHS) const;
-
-         /**
           * @brief Prepare the RHS for the timestep computation
           *
           * @param rhs    RHS of timestepping equation
@@ -88,20 +81,20 @@ namespace Equations {
          /**
           * @brief Basic implementatin of the method to transfer equation input to timestepper
           *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param id         Component ID
+          * @param storage    Storage for the equation values
+          * @param matIdx     Index of the given data
+          * @param start      Start index for the storage
           */
          virtual void timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
 
          /**
           * @brief Basic implementation of the method to transfer equation input to timestepper
           *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param id         Component ID
+          * @param storage    Storage for the equation values
+          * @param matIdx     Index of the given data
+          * @param start      Start index for the storage
           */
          virtual void timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
@@ -111,7 +104,7 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
 
@@ -121,7 +114,7 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
 
@@ -131,7 +124,7 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
 
@@ -141,7 +134,7 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
@@ -151,7 +144,7 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
 
@@ -161,30 +154,11 @@ namespace Equations {
           * @param id      Component ID
           * @param storage Storage for the equation values
           * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
+          * @param start   Start index for the storage
           */
          virtual void copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
          
       protected:
-         /**
-          * @brief Apply quasi-inverse to nonlinear values
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
-
-         /**
-          * @brief Apply quasi-inverse to nonlinear values
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void applyQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
 
       private:
          /**

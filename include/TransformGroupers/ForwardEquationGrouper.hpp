@@ -133,24 +133,6 @@ namespace Transform {
       }
 
       //
-      // Compute linear step after transforms
-      //
-
-      // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
-      {
-         // Compute linear step after transforms for scalar equation
-         TConfigurator::linearStep(*scalEqIt, coord);
-      }
-
-      // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
-      {
-         // Compute linear step after transforms for vector equation
-         TConfigurator::linearStep(*vectEqIt, coord);
-      }
-
-      //
       // Prepare timestep after transforms
       //
 

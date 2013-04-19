@@ -102,9 +102,9 @@ namespace Equations {
          int nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
 
          /**
-          * @brief Get the Time derivative matrices (sparse matrices)
+          * @brief Get the explicit linear matrices (sparse matrices)
           */
-         const DecoupledZSparse& timeMatrix(FieldComponents::Spectral::Id id, const int j) const;
+         const DecoupledZSparse& explicitLinear(FieldComponents::Spectral::Id id, const int j) const;
 
          /**
           * @brief Get the coupling information
@@ -147,9 +147,9 @@ namespace Equations {
          std::map<FieldComponents::Spectral::Id, CouplingInformation>  mCouplingInfos;
 
          /**
-          * @brief Map of component and time matrices 
+          * @brief Map of component and explicit linear matrices 
           */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mTMatrices;
+         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mLMatrices;
 
          /**
           * @brief Map of component and nonlinear term multiplication matrices

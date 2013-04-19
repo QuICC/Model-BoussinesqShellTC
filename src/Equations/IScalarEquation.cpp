@@ -52,11 +52,6 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   void IScalarEquation::computeLinear(Datatypes::SpectralScalarType& rRHS) const
-   {
-      // Empty default implementation
-   }
-
    void IScalarEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs)
    {
       // Assert dealiasing has taken place!
@@ -70,19 +65,25 @@ namespace Equations {
    void IScalarEquation::timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Copy field values into timestep input
-      this->copyTInput(id,storage,matIdx,start);
+      this->copyTInput(id, storage, matIdx, start);
 
-      // Apply quasi-inverse
-      this->applyQuasiInverse(id,storage,matIdx,start);
+      // Apply quasi-inverse to nonlinear terms
+      this->applyNLQuasiInverse(id, storage, matIdx, start);
+
+      // Add linear terms
+//      this->computeLinear(id, storage, oldField, matIdx, start);
    }
 
    void IScalarEquation::timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       // Copy field values into timestep input
-      this->copyTInput(id,storage,matIdx,start);
+      this->copyTInput(id, storage, matIdx, start);
 
-      // Apply quasi-inverse
-      this->applyQuasiInverse(id,storage,matIdx,start);
+      // Apply quasi-inverse to nonlinear terms
+      this->applyNLQuasiInverse(id, storage, matIdx, start);
+
+      // Add linear terms
+//      this->computeLinear(id, storage, oldField, matIdx, start);
    }
 
    void IScalarEquation::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
@@ -97,31 +98,15 @@ namespace Equations {
       this->copyTOutput(id, storage, matIdx, start);
    }
 
-   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
-   {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-      int inCols = storage.first.cols();
-
-      storage.first.block(start,0,rows*cols,inCols) = this->mNLMatrices.find(id)->second.at(matIdx)*storage.first.block(start,0,rows*cols,inCols);
-      storage.second.block(start,0,rows*cols,inCols) = this->mNLMatrices.find(id)->second.at(matIdx)*storage.second.block(start,0,rows*cols,inCols);
-   }
-
-   void IScalarEquation::applyQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
-   {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-      int inCols = storage.cols();
-
-      storage.block(start,0,rows*cols,inCols) = this->mNLMatrices.find(id)->second.at(matIdx)*storage.block(start,0,rows*cols,inCols);
-   }
-
    void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
       //Safety assertion
+      assert(start >= 0);
+      assert(start < storage.first.size());
+      assert(start < storage.second.size());
       assert(rows*cols+start <= storage.first.rows());
       assert(rows*cols+start <= storage.second.rows());
 
@@ -149,6 +134,8 @@ namespace Equations {
       int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
       //Safety assertion
+      assert(start >= 0);
+      assert(start < storage.size());
       assert(rows*cols+start <= storage.rows());
 
       // Copy data

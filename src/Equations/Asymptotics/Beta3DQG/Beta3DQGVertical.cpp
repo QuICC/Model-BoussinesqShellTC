@@ -24,8 +24,6 @@
 #include "TypeSelectors/SpectralSelector.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
 
-#include <iostream>
-
 namespace GeoMHDiSCC {
 
 namespace Equations {

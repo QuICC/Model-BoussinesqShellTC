@@ -34,22 +34,6 @@ namespace Transform {
    {
       public:
          /**
-          * @brief Compute linear interaction on a scalar
-          *
-          * @param spEquation Equation providing the linear computation
-          * @param coord      Transform coordinator
-          */
-         static void linearStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the linear interaction on a vector
-          *
-          * @param spEquation Vector equation
-          * @param coord      Transform coordinator
-          */
-         static void linearStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
           * @brief Prepare the timestep RHS for a scalar
           *
           * @param spEquation Equation providing the timestep structure
@@ -106,16 +90,6 @@ namespace Transform {
          template <TransformSteps::ForwardBase::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute linear interaction on a vector field
-          *
-          * @param spEquation Equation providing the linear computation
-          * @param coord      Transform coordinator
-          *
-          * \tparam TComponent Spectral vector field component
-          */
-         template <FieldComponents::Spectral::Id TComponent> static void linearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
           * @brief Prepare the timestep RHS for a vector field
           *
           * @param spEquation Equation providing the timestep structure
@@ -156,24 +130,6 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::linearTerm(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::LINEAR);
-
-      // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Compute linear term component
-      spEquation->computeLinear(rComp, TComponent);
-
-      // Hold the temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rComp);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::LINEAR);
-   }
-
    template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::prepareTimestep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
@@ -212,9 +168,6 @@ namespace Transform {
    /// Specialised 3D integration to compute scalar
    template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
 
-
-   /// Specialised linear term to do nothing
-   template <> void ForwardConfigurator::linearTerm<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
    /// Specialised timestep preparation to do nothing
    template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
