@@ -140,6 +140,11 @@ namespace Timestep {
       return this->mRHSMatrix.at(idx);
    }
 
+   SparseMatrixZ& EquationZTimestepper::rTMatrix(const int idx)
+   {
+      return this->mTMatrix.at(idx);
+   }
+
    void EquationZTimestepper::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns

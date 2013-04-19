@@ -93,6 +93,13 @@ namespace Timestep {
          SparseMatrix& rRHSMatrix(const int idx);
 
          /**
+          * @brief Set time dependent part of LHS matrix
+          *
+          * @param idx Index of the matrix
+          */
+         SparseMatrix& rTMatrix(const int idx);
+
+         /**
           * @brief Add RHS and solution data storage
           * 
           * @param rows Number of rows of matrix
@@ -131,6 +138,11 @@ namespace Timestep {
           * @brief Real RHS operators of the timestepped equations
           */
          std::vector<SparseMatrix>   mRHSMatrix;
+
+         /**
+          * @brief Time dependent part of LHS matrix
+          */
+         std::vector<SparseMatrix>   mTMatrix;
 
          /**
           * @brief Storage for linear solve's RHS

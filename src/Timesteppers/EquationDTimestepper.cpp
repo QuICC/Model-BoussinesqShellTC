@@ -149,6 +149,11 @@ namespace Timestep {
       return this->mRHSMatrix.at(idx);
    }
 
+   SparseMatrix& EquationDTimestepper::rTMatrix(const int idx)
+   {
+      return this->mTMatrix.at(idx);
+   }
+
    void EquationDTimestepper::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
