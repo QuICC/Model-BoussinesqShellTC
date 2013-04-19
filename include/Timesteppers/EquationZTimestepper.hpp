@@ -33,10 +33,9 @@ namespace Timestep {
          /**
           * @brief Constructor
           *
-          * @param nField  Number of fields
           * @param start   Starting index (for example without m=0)
           */
-         EquationZTimestepper(const int nField, const int start);
+         EquationZTimestepper(const int start);
 
          /**
           * @brief Destructor
@@ -44,9 +43,11 @@ namespace Timestep {
          virtual ~EquationZTimestepper();
 
          /**
-          * @brief Reserve storage for the matrices
+          * @brief Initialise the solver matrices storage
+          *
+          * @param n Size of matrices
           */
-         void reserveMatrices(const int n);
+         void initMatrices(const int n);
 
          /**
           * @brief Initialise solver

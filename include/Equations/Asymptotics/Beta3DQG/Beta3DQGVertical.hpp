@@ -49,6 +49,29 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
+
+         /**
+          * @brief Build Full block row for linear operators
+          */
+         virtual DecoupledZSparse linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Build Full block row for time operators
+          */
+         virtual DecoupledZSparse timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Build Full block row for time operators
+          */
+         virtual DecoupledZSparse boundaryRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Initialise spectral equation matrices
+          *
+          * @param spBcs   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary bcs);
+
          
       protected:
          /**

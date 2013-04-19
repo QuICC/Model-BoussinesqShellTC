@@ -80,17 +80,24 @@ namespace Equations {
          /**
           * @brief Build Full block row for linear operators
           */
-         virtual void linearRow(FieldComponents::Spectral::Id id, const int matIdx);
+         virtual DecoupledZSparse linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
 
          /**
           * @brief Build Full block row for time operators
           */
-         virtual void timeRow(FieldComponents::Spectral::Id id, const int matIdx);
+         virtual DecoupledZSparse timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
 
          /**
           * @brief Build Full block row for time operators
           */
-         virtual void boundaryRow(FieldComponents::Spectral::Id id, const int matIdx);
+         virtual DecoupledZSparse boundaryRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Initialise spectral equation matrices
+          *
+          * @param spBcs   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary bcs);
          
       protected:
          /**

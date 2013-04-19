@@ -121,7 +121,7 @@ namespace Equations {
          /**
           * @brief Get map of field storage requirements information
           */
-         const FieldRequirement& requirements(FieldComponents::Spectral::Id id, PhysicalNames::Id id) const;
+         const FieldRequirement& requirements(PhysicalNames::Id id) const;
 
          /**
           * @brief Get the equation parameters
@@ -150,6 +150,11 @@ namespace Equations {
           * @brief Map of component and time matrices 
           */
          std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mTMatrices;
+
+         /**
+          * @brief Map of component and nonlinear term multiplication matrices
+          */
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
 
       private:
          /**

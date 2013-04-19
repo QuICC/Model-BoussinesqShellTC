@@ -34,16 +34,20 @@ namespace Equations {
       /// - Streamfunction equation
       if(eqId == PhysicalNames::STREAMFUNCTION)
       {
-         // Set solver index
+         // Generat setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 0);
 
+         // 
+         //  WARNING: the order is important as it determines the field index!
+         //
+
          // Equation is coupled to streamfunction equation (self)
-         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
          // Equation is coupled to vertical velocity equation
-         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR);
+         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
          // Set sizes of blocks and matrices
-         ArrayI blocksN(ny);
+         ArrayI blockNs(ny);
          blockNs.setConstant(nx*nz);
          ArrayI rhsCols(ny);
          rhsCols.setConstant(1);
@@ -52,16 +56,20 @@ namespace Equations {
       /// - Vertical velocity equation
       } else if(eqId == PhysicalNames::VELOCITYZ)
       {
-         // Set solver index
+         // Generat setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 0);
 
+         // 
+         //  WARNING: the order is important as it determines the field index!
+         //
+
          // Equation is coupled to streamfunction equation
-         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+         rInfo.addField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, false);
          // Equation is coupled to vertical velocity equation (self)
-         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR);
+         rInfo.addField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
-         ArrayI blocksN(ny);
+         ArrayI blockNs(ny);
          blockNs.setConstant(nx*nz);
          ArrayI rhsCols(ny);
          rhsCols.setConstant(1);
@@ -70,14 +78,18 @@ namespace Equations {
       /// - Transport equation
       } else if(eqId == PhysicalNames::TEMPERATURE)
       {
-         // Set solver index
-         rInfo.setGeneral(1, false, 0);
+         // Generat setup: first real solver, real solver, start from m = 0
+         rInfo.setGeneral(0, false, 0);
+
+         // 
+         //  WARNING: the order is important
+         //
 
          // Equation is coupled to temperature equation
-         rInfo.addField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
+         rInfo.addField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
-         ArrayI blocksN(ny);
+         ArrayI blockNs(ny);
          blockNs.setConstant(nx*nz);
          ArrayI rhsCols(ny);
          rhsCols.setConstant(1);

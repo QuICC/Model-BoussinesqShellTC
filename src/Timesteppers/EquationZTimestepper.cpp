@@ -25,8 +25,8 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationZTimestepper::EquationZTimestepper(const int nField, const int start)
-      : EquationTimestepperBase(nField, start)
+   EquationZTimestepper::EquationZTimestepper(const int start)
+      : EquationTimestepperBase(start)
    {
    }
 
@@ -111,7 +111,7 @@ namespace Timestep {
       }
    }
 
-   void EquationZTimestepper::reserveMatrices(const int n)
+   void EquationZTimestepper::initMatrices(const int n)
    {
       // Reserve space for the LHS matrices
       this->mLHSMatrix.reserve(n);

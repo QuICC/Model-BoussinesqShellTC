@@ -34,25 +34,14 @@ namespace Timestep {
          /**
           * @brief Constructor
           *
-          * @param nField  Number of fields
           * @param start   Starting index (for example without m=0)
           */
-         EquationTimestepperBase(const int nField, const int start);
+         EquationTimestepperBase(const int start);
 
          /**
           * @brief Destructor
           */
          virtual ~EquationTimestepperBase();
-
-         /**
-          * @brief Get index of current field
-          */
-         int current() const;
-
-         /**
-          * @brief Move counter to next field (loops around)
-          */
-         void next();
 
          /**
           * @brief Add storage information 
@@ -66,19 +55,9 @@ namespace Timestep {
          
       protected:
          /**
-          * @brief Storage for the number of fields
-          */
-         int mNField;
-         
-         /**
           * @brief Starting index
           */
          int mZeroIdx;
-
-         /**
-          * @brief Storage for the current field index
-          */
-         int mCurrent;
 
          /**
           * @brief Storage for the storage information
@@ -87,16 +66,6 @@ namespace Timestep {
 
       private:
    };
-
-   inline int EquationTimestepperBase::current() const
-   {
-      return this->mCurrent;
-   }
-
-   inline void EquationTimestepperBase::next()
-   {
-      this->mCurrent = (this->mCurrent+1) % this->mNField;
-   }
 
    /// Typedef for a shared pointer of a EquationTimestepperBase
    typedef SharedPtrMacro<EquationTimestepperBase>  SharedEquationTimestepperBase;

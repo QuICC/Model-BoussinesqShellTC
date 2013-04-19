@@ -181,6 +181,7 @@ namespace Timestep {
       // Create real/complex timesteppers
       //
 
+      DebuggerMacro_start("Create timesteppers", 0);
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
@@ -199,6 +200,7 @@ namespace Timestep {
          // Get type information for the equation steppers for the poloidal component
          this->createEqStepper((*vectEqIt), FieldComponents::Spectral::TWO);
       }
+      DebuggerMacro_stop("Create timesteppers t = ", 0);
 
       //
       // Create the timestep matrices
@@ -260,18 +262,18 @@ namespace Timestep {
       if(spEq->couplingInfo(comp).isComplex())
       {
          // Add equation stepper if system index does not yet exist
-         if(spEq->couplingInfo(comp).solverIndex() > this->mEqZStepper.size() - 1)
+         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mEqZStepper.size()) - 1)
          {
-            this->mEqZStepper.push_back(EquationZTimestepper(spEq->systemFields(comp), spEq->startIndex(comp)));
+            this->mEqZStepper.push_back(EquationZTimestepper(spEq->couplingInfo(comp).fieldStart()));
          }
 
       // Equation is part of a real system
       } else
       {
          // Add equation stepper if system index does not yet exist
-         if(spEq->couplingInfo(comp).solverIndex() > this->mEqDStepper.size() - 1)
+         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mEqDStepper.size()) - 1)
          {
-            this->mEqDStepper.push_back(EquationZTimestepper(spEq->systemFields(comp), spEq->startIndex(comp)));
+            this->mEqDStepper.push_back(EquationDTimestepper(spEq->couplingInfo(comp).fieldStart()));
          }
       }
    }
@@ -296,88 +298,86 @@ namespace Timestep {
       // Complex matrices in linear solve
       if(spEq->couplingInfo(comp).isComplex())
       {
-        // Reserve space for the matrices to avoid large number of expensive reallocations
-        if(spEq->couplingInfo(comp).solverIndex() == 0 && this->mStep == 0)
-        {
-           this->mEqZStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*nSystems);
-        }
-
-        int size = 0;
-        for(int i = 0; i < nSystems; i++)
-        {
-           // Add LHS triplets
-           this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
-
-           // Add RHS triplets
-           this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, false);
-
-           if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
-           {
-              // Create RHS and solution data storage
-              this->mEqZStepper.at(myIdx).addStorage(size, spEq->couplingInfo(comp).rhsCols(i));
-           }
-
-           // Set the start row
-           startRow(i) = spEq->systemIndex(comp)*size;
-        }
-
-         if(this->mStep == 0)
+         // Initialise the equation stepper
+         if(this->mEqZStepper.at(myIdx).nSystem() == 0)
          {
+            // Reserve storage for matrice and initialise vectors
+            this->mEqZStepper.at(myIdx).initMatrices(ImExRK3::STEPS*nSystems);
+
+            // Initialise field storage and information
+            for(int i = 0; i < nSystems; i++)
+            {
+               // Create RHS and solution data storage
+               this->mEqZStepper.at(myIdx).addStorage(spEq->couplingInfo(comp).systemN(i), spEq->couplingInfo(comp).rhsCols(i));
+
+               // Store the start row
+               startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).systemN(i);
+            }
+
             // Store storage information
             this->mEqZStepper.at(myIdx).addInformation(myId,startRow);
+         }
+
+         // Build the solver matrices
+         for(int i = 0; i < nSystems; i++)
+         {
+            // Add LHS triplets
+            this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
+
+            // Add RHS triplets
+            this->buildSolverMatrix(this->mEqZStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, false);
          }
 
       // Real matrices in linear solve
       } else
       {
-         // Reserve space for the matrices to avoid large number of expensive reallocations
-         if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
+         // Initialise the equation stepper
+         if(this->mEqDStepper.at(myIdx).nSystem() == 0)
          {
-            this->mEqDStepper.at(myIdx).reserveMatrices(ImExRK3::STEPS*nSystems);
+            // Reserve storage for matrice and initialise vectors
+            this->mEqDStepper.at(myIdx).initMatrices(ImExRK3::STEPS*nSystems);
+
+            // Initialise field storage and information
+            for(int i = 0; i < nSystems; i++)
+            {
+               // Create RHS and solution data storage
+               this->mEqDStepper.at(myIdx).addStorage(spEq->couplingInfo(comp).systemN(i), spEq->couplingInfo(comp).rhsCols(i));
+
+               // Store the start row
+               startRow(i) = spEq->couplingInfo(comp).fieldIndex()*spEq->couplingInfo(comp).systemN(i);
+            }
+
+            // Store storage information
+            this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
          }
 
-         int size = 0;
-         for(int i = 0; i < nSystems.first; i++)
+         // Build the solver matrices
+         for(int i = 0; i < nSystems; i++)
          {
             // Add LHS triplets
             this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
 
             // Add RHS triplets
             this->buildSolverMatrix(this->mEqDStepper.at(myIdx).rRHSMatrix(start+i), spEq, comp, i, false);
-
-            if(spEq->systemIndex(comp) == 0 && this->mStep == 0)
-            {
-               // Create RHS and solution data storage
-               this->mEqDStepper.at(myIdx).addStorage(size, spEq->couplingInfo(comp).rhsCols(i));
-            }
-
-            // Set the start row
-            startRow(i) = spEq->systemIndex(comp)*size;
-         }
-
-         if(this->mStep == 0)
-         {
-            // Store storage information
-            this->mEqDStepper.at(myIdx).addInformation(myId,startRow);
          }
       }
    }
 
    void Timestepper::updateMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
-      // ID of the current field
-      std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId = std::make_pair(spEq->name(),comp);
-
       // Index of the current field
       int myIdx = spEq->couplingInfo(comp).solverIndex();
 
+      // Number of linear systems
+      int nSystems = spEq->couplingInfo(comp).nSystems();
+
       // start index for matrices
-      int start = this->mStep*interInfo.first;
+      int start = this->mStep*nSystems;
 
       // Complex matrices in linear solve
       if(spEq->couplingInfo(comp).isComplex())
       {
-         for(int i = 0; i < interInfo.first; i++)
+         for(int i = 0; i < nSystems; i++)
          {
             // Update LHS triplets
             this->updateTimeMatrix(this->mEqZStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
@@ -389,7 +389,7 @@ namespace Timestep {
       // Real matrices in linear solve
       } else
       {
-         for(int i = 0; i < interInfo.first; i++)
+         for(int i = 0; i < nSystems; i++)
          {
             // Update LHS triplets
             this->updateTimeMatrix(this->mEqDStepper.at(myIdx).rLHSMatrix(start+i), spEq, comp, i, true);
@@ -413,10 +413,10 @@ namespace Timestep {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
-         // Get identity and corresponding equation information
+         // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), comp);
 
-         // Get index of current field
+         // Get index of timesteppper
          int myIdx = (*scalEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
@@ -446,10 +446,10 @@ namespace Timestep {
          // Work on first component
          comp = FieldComponents::Spectral::ONE;
 
-         // Get identity and corresponding equation information for toroidal component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
+         // Get index of timestespper
          int myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
@@ -474,10 +474,10 @@ namespace Timestep {
          // Work on second component
          comp = FieldComponents::Spectral::TWO;
 
-         // Get identity and corresponding equation information for second component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
+         // Get index of timestepper
          myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
@@ -514,14 +514,14 @@ namespace Timestep {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
-         // Get identity and corresponding equation information
+         // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), comp);
 
-         // Get index of current field
-         int myIdx = (*scalEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         int myIdx = (*scalEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*scalEqIt)->isSystemComplex(comp))
+         if((*scalEqIt)->couplingInfo(comp).isComplex())
          {
             // Get timestep input
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
@@ -544,18 +544,19 @@ namespace Timestep {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
+         // Work on first component
          comp = FieldComponents::Spectral::ONE;
 
-         // Get identity and corresponding equation information for toroidal component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
-         int myIdx = (*vectEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         int myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
-            // Get timestep input for toroidal component
+            // Get timestep input for first component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepInput(comp, this->mEqZStepper.at(myIdx).rRHSData(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
@@ -564,25 +565,26 @@ namespace Timestep {
          // Linear solve matrices are real
          } else
          {
-            // Get timestep input for toroidal component
+            // Get timestep input for first component
             for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepInput(comp, this->mEqDStepper.at(myIdx).rRHSData(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
 
+         // Work on second component
          comp = FieldComponents::Spectral::TWO;
 
-         // Get identity and corresponding equation information for poloidal component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
-         myIdx = (*vectEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if(this->(*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
-            // Get timestep input for poloidal component
+            // Get timestep input for second component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepInput(comp, this->mEqZStepper.at(myIdx).rRHSData(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
@@ -591,7 +593,7 @@ namespace Timestep {
          // Linear solve matrices are real
          } else
          {
-            // Get timestep input for poloidal component
+            // Get timestep input for second component
             for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepInput(comp, this->mEqDStepper.at(myIdx).rRHSData(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
@@ -639,9 +641,10 @@ namespace Timestep {
 
    void Timestepper::transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
-      // Storage for information and identity
+      // Storage for identity
       std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId;
 
+      // Storage for component
       FieldComponents::Spectral::Id comp;
 
       // Loop over all scalar equations
@@ -649,14 +652,14 @@ namespace Timestep {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
       {
-         // Get identity and corresponding equation information
+         // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), comp);
 
-         // Get index of current field
-         int myIdx = (*scalEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         int myIdx = (*scalEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if(this->(*scalEqIt)->isSystemComplex(comp))
+         if((*scalEqIt)->couplingInfo(comp).isComplex())
          {
             // Get timestep output
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
@@ -679,18 +682,19 @@ namespace Timestep {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
       {
+         // Work on first component
          comp = FieldComponents::Spectral::ONE;
 
-         // Get identity and corresponding equation information for toroidal component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
-         int myIdx = (*vectEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         int myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
-            // Get timestep output for toroidal component
+            // Get timestep output for first component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepOutput(comp, this->mEqZStepper.at(myIdx).solution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
@@ -699,25 +703,26 @@ namespace Timestep {
          // Linear solve matrices are real
          } else
          {
-            // Get timestep output for toroidal component
+            // Get timestep output for first component
             for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepOutput(comp, this->mEqDStepper.at(myIdx).solution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
             }
          }
 
+         // Work on second component
          comp = FieldComponents::Spectral::TWO;
 
-         // Get identity and corresponding equation information for poloidal component
+         // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), comp);
 
-         // Get index of current field
-         myIdx = (*vectEqIt)->systemIndex(comp);
+         // Get index of timestepper
+         myIdx = (*vectEqIt)->couplingInfo(comp).solverIndex();
 
          // Linear solve matrices are complex
-         if((*vectEqIt)->isSystemComplex(comp))
+         if((*vectEqIt)->couplingInfo(comp).isComplex())
          {
-            // Get timestep input for poloidal component
+            // Get timestep input for second component
             for(int i = 0; i < this->mEqZStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepOutput(comp, this->mEqZStepper.at(myIdx).solution(i), i, this->mEqZStepper.at(myIdx).startRow(myId,i));
@@ -726,7 +731,7 @@ namespace Timestep {
          // Linear solve matrices are real
          } else
          {
-            // Get timestep output for poloidal component
+            // Get timestep output for second component
             for(int i = 0; i < this->mEqDStepper.at(myIdx).nSystem(); i++)
             {
                (*vectEqIt)->timestepOutput(comp, this->mEqDStepper.at(myIdx).solution(i), i, this->mEqDStepper.at(myIdx).startRow(myId,i));
@@ -757,40 +762,18 @@ namespace Timestep {
          linearCoeff = -ImExRK3::rhsL(this->mStep);
       }
 
-      // Count the number of nonzero values for linear row block
-      int nz = spEq->linearRow(comp,idx).first.size();
-      nz += spEq->timeRow(comp,idx).first.size();
-
-      // Count the number of nonzero values for boundary row block
-      if(isLhs)
+      if(solverMatrix.size() == 0)
       {
-         nz += spEq->boundaryRow(comp,idx).first.size();
+         solverMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
-
-      // Storage for the triplets
-      std::vector<Triplet> solverTriplets;
-
-      // Reserve space to avoid reallocations
-      solverTriplets.reserve(nz + solverMatrix.nonZeros());
-
-      // Add nonzero elements from solver matrix to triplets
-      this->addTriplets(solverTriplets, solverMatrix, 1.0);
-
-      // Add nonzero elements from equation linear row to triplets
-      this->addTriplets(solverTriplets, spEq->linearRow(comp,idx), linearCoeff);
-
-      // Add nonzero elements from equation linear row to triplets
-      this->addTriplets(solverTriplets, spEq->timeRow(comp,idx), -timeCoeff);
 
       // Add boundary row for LHS operator
       if(isLhs)
       {
-         this->addTriplets(solverTriplets, spEq->boundarRow(comp,idx), 1.0);
+         solverMatrix += spEq->boundaryRow(comp, idx).first;
       }
 
-      // Set matrix from triplets
-      solverMatrix.resize(spEq->systemSize(comp,i),spEq->systemSize(comp,i));
-      solverMatrix.setFromTriplets(solverTriplets.begin(), solverTriplets.end());
+      solverMatrix += linearCoeff*spEq->linearRow(comp, idx).first - timeCoeff*spEq->timeRow(comp, idx).first;
    }
 
    void  Timestepper::buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs)
@@ -815,64 +798,18 @@ namespace Timestep {
          linearCoeff = -ImExRK3::rhsL(this->mStep);
       }
 
-      // Count the number of nonzero values for linear row block
-      int nz = spEq->linearRow(comp,idx).first.size() + spEq->linearRow(comp,idx).second.size();
-      nz += spEq->timeRow(comp,idx).first.size() + spEq->timeRow(comp,idx).second.size();
-
-      // Count the number of nonzero values for boundary row block
-      if(isLhs)
+      if(solverMatrix.size() == 0)
       {
-         nz += spEq->boundaryRow(comp,idx).first.size() + spEq->boundaryRow(comp,idx).second.size();
+         solverMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
-
-      // Storage for the triplets
-      std::vector<TripletZ> solverTriplets;
-
-      // Reserve space to avoid reallocations
-      solverTriplets.reserve(nz + solverMatrix.nonZeros());
-
-      // Add nonzero elements from solver matrix to triplets
-      this->addTriplets(solverTriplets, solverMatrix, 1.0);
-
-      // Add nonzero elements from equation linear row to triplets
-      this->addTriplets(solverTriplets, spEq->linearRow(comp,idx), linearCoeff);
-
-      // Add nonzero elements from equation linear row to triplets
-      this->addTriplets(solverTriplets, spEq->timeRow(comp,idx), -timeCoeff);
 
       // Add boundary row for LHS operator
       if(isLhs)
       {
-         this->addTriplets(solverTriplets, spEq->boundarRow(comp,idx), 1.0);
+         solverMatrix += spEq->boundaryRow(comp, idx).first.cast<MHDComplex>() + MathConstants::cI*spEq->boundaryRow(comp, idx).second;
       }
 
-      // Set matrix from triplets
-      solverMatrix.resize(spEq->systemSize(comp,i),spEq->systemSize(comp,i));
-      solverMatrix.setFromTriplets(solverTriplets.begin(), solverTriplets.end());
-   }
-
-   void Timestepper::addTriplets(std::vector<Triplet>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDFloat c)
-   {
-      // Add real triplets to outTriplets
-      for(std::vector<Triplet>::const_iterator it = inTriplets.first.begin(); it != inTriplets.first.end(); ++it)
-      {
-         outTriplets.push_back(Triplet(it->row(), it->col(), c*it->value()));
-      }
-   }
-
-   void Timestepper::addTriplets(std::vector<TripletZ>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDFloat c)
-   {
-      // Add real triplets to outTriplets
-      for(std::vector<Triplet>::const_iterator it = inTriplets.first.begin(); it != inTriplets.first.end(); ++it)
-      {
-         outTriplets.push_back(TripletZ(it->row(), it->col(), static_cast<MHDComplex>(c*it->value())));
-      }
-
-      // Add imaginary triplets to outTriplets
-      for(std::vector<Triplet>::const_iterator it = inTriplets.second.begin(); it != inTriplets.second.end(); ++it)
-      {
-         outTriplets.push_back(TripletZ(it->row(), it->col(), c*it->value()*MathConstants::cI));
-      }
+      solverMatrix += linearCoeff*spEq->linearRow(comp, idx).first.cast<MHDComplex>() + MathConstants::cI*linearCoeff*spEq->linearRow(comp, idx).second - timeCoeff*spEq->timeRow(comp, idx).first.cast<MHDComplex>() - MathConstants::cI*timeCoeff*spEq->timeRow(comp, idx).second;
    }
 
    void  Timestepper::updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, bool isLhs)
@@ -889,25 +826,36 @@ namespace Timestep {
          timeCoeff = ImExRK3::rhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
       }
 
+      // Get new time matrix
+      SparseMatrix newTime = timeCoeff*spEq->timeRow(comp,idx).first;
+
       // Update old matrix with new time dependence
-      int j = 0;
-      for (int k=0; k<oldTime.outerSize(); ++k)
+      size_t nnz = newTime.nonZeros();
+      size_t j = 0;
+      for (size_t k=0; k< static_cast<size_t>(oldTime.outerSize()); ++k)
       {
-         for (SparseMatrix::InnerIterator it(oldTime,k); it; ++it)
+         SparseMatrix::InnerIterator newIt(newTime,j);
+         for (SparseMatrix::InnerIterator oldIt(oldTime,k); oldIt; ++oldIt)
          {
-            if(static_cast<size_t>(j) < spEq->timeRow(comp,idx).first.size() && static_cast<size_t>(k) == spEq->timeRow(comp,idx).first.at(j).col())
+            if(nnz > 0 && oldIt.col() == newIt.col())
             {
-               if(static_cast<size_t>(it.row()) == spEq->timeRow(comp,idx).first.at(j).row())
+               if(oldIt.row() == newIt.row())
                {
-                  it.valueRef() += timeCoeff*spEq->timeRow(comp,idx).first.at(j).value();
-                  j++;
+                  oldIt.valueRef() += newIt.value();
+                  ++newIt;
+                  if(!newIt)
+                  {
+                     j++;
+                  }
+                  nnz--;
                }
             }
          }
       }
 
       // Safety assert to make sure all values have been updated
-      assert(static_cast<size_t>(j) == spEq->timeRow(comp,idx).first.size());
+      assert(j == static_cast<size_t>(newTime.outerSize()));
+      assert(nnz == 0);
    }
 
    void  Timestepper::updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, bool isLhs)
@@ -924,36 +872,36 @@ namespace Timestep {
          timeCoeff = ImExRK3::rhsT(this->mStep)*(1.0/this->mOldDt - 1.0/this->mDt);
       }
 
-      // Update old matrix with new time dependence
-      int j = 0;
-      int jj = 0;
-      for (int k=0; k<oldTime.outerSize(); ++k)
-      {
-         for (SparseMatrixZ::InnerIterator it(oldTime,k); it; ++it)
-         {
-            if(static_cast<size_t>(j) < spEq->timeRow(comp,idx).first.size() && static_cast<size_t>(k) == spEq->timeRow(comp,idx).first.at(j).col())
-            {
-               if(static_cast<size_t>(it.row()) == spEq->timeRow(comp,idx).first.at(j).row())
-               {
-                  it.valueRef().real() += spEq->timeRow(comp,idx).first.at(j).value();
-                  j++;
-               }
-            }
+      // Get new time matrix
+      SparseMatrixZ newTime = timeCoeff*spEq->timeRow(comp,idx).first.cast<MHDComplex>() + MathConstants::cI*timeCoeff*spEq->timeRow(comp,idx).second;
 
-            if(static_cast<size_t>(jj) < spEq->timeRow(comp,idx).second.size() && static_cast<size_t>(k) == spEq->timeRow(comp,idx).second.at(jj).col())
+      // Update old matrix with new time dependence
+      size_t nnz = newTime.nonZeros();
+      size_t j = 0;
+      for (size_t k=0; k< static_cast<size_t>(oldTime.outerSize()); ++k)
+      {
+         SparseMatrixZ::InnerIterator newIt(newTime,j);
+         for (SparseMatrixZ::InnerIterator oldIt(oldTime,k); oldIt; ++oldIt)
+         {
+            if(nnz > 0 && oldIt.col() == newIt.col())
             {
-               if(static_cast<size_t>(it.row()) == spEq->timeRow(comp,idx).second.at(jj).row())
+               if(oldIt.row() == newIt.row())
                {
-                  it.valueRef().imag() += spEq->timeRow(comp,idx).second.at(jj).value();
-                  jj++;
+                  oldIt.valueRef() += newIt.value();
+                  ++newIt;
+                  if(!newIt)
+                  {
+                     j++;
+                  }
+                  nnz--;
                }
             }
          }
       }
 
       // Safety assert to make sure all values have been updated
-      assert(static_cast<size_t>(j) == spEq->timeRow(comp,idx).first.size());
-      assert(static_cast<size_t>(jj) == spEq->timeRow(comp,idx).second.size());
+      assert(j == static_cast<size_t>(newTime.outerSize()));
+      assert(nnz == 0);
    }
 }
 }

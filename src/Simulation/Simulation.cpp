@@ -567,13 +567,13 @@ namespace GeoMHDiSCC {
       // Loop over all scalar equations
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
-         (*scalEqIt)->setSpectralMatrices(spBcs);
+         (*scalEqIt)->initSpectralMatrices(spBcs);
       }
 
       // Loop over all vector equations
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
-         (*vectEqIt)->setSpectralMatrices(spBcs);
+         (*vectEqIt)->initSpectralMatrices(spBcs);
       }
    }
 

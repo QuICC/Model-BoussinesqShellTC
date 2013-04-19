@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mIsComplex(true), mNSystems(0), mSolverIndex(-1), mFieldStart(-1)
+      : mIsComplex(true), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -56,6 +56,11 @@ namespace Equations {
       return this->blockN(idx)*this->mFields.size();
    }
 
+   int CouplingInformation::fieldIndex() const
+   {
+      return this->mFieldIndex;
+   }
+
    int CouplingInformation::solverIndex() const
    {
       return this->mSolverIndex;
@@ -71,8 +76,14 @@ namespace Equations {
       return this->mRhsCols(idx);
    }
 
-   void CouplingInformation::addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id field compId)
+   void CouplingInformation::addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf)
    {
+      // If field is itself, set the field index
+      if(isSelf)
+      {
+         this->mFieldIndex = this->mFields.size();
+      }
+
       this->mFields.push_back(std::make_pair(fieldId,compId));
    }
 
@@ -92,6 +103,11 @@ namespace Equations {
       this->mBlockNs = blockNs;
 
       this->mRhsCols = rhsCols;
+   }
+
+   CouplingInformation::field_iterator_range CouplingInformation::fieldRange() const
+   {
+      return std::make_pair(this->mFields.begin(), this->mFields.end());
    }
 }
 }

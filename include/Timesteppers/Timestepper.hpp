@@ -185,16 +185,6 @@ namespace Timestep {
          void updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
-          * @brief Add real triplets
-          */
-         void addTriplets(std::vector<Triplet>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDFloat c);
-
-         /**
-          * @brief Add complex triplets stored in decoupled storage
-          */
-         void addTriplets(std::vector<TripletZ>& outTriplets, const std::pair<std::vector<Triplet>,std::vector<Triplet> >& inTriplets, const MHDComplex c);
-
-         /**
           * @brief Maximum timestep jump per step (See Soederlind)
           */
          const MHDFloat mcMaxJump;

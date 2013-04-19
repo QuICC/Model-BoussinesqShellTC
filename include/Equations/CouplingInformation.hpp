@@ -80,6 +80,11 @@ namespace Equations {
          int systemN(const int idx) const;
 
          /**
+          * @brief Index of the field within the system
+          */
+         int fieldIndex() const;
+
+         /**
           * @brief Index of solver
           */
          int solverIndex() const;
@@ -101,8 +106,9 @@ namespace Equations {
           *
           * @param fieldId Physical ID of the field
           * @param compId  Physical ID of the component
+          * @param isSelf  Is field equation field?
           */
-         void addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
+         void addField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf);
 
          /**
           * @brief Set settings for all systems
@@ -144,6 +150,11 @@ namespace Equations {
           * @brief Storage for the number of systems
           */
          int mNSystems;
+
+         /**
+          * @brief Storage for the field index
+          */
+         int mFieldIndex;
 
          /**
           * @brief Storage for the solver index

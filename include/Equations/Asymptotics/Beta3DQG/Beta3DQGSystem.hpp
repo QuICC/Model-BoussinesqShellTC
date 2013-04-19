@@ -18,6 +18,8 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/PhysicalNames.hpp"
+#include "Equations/CouplingInformation.hpp"
+#include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
 

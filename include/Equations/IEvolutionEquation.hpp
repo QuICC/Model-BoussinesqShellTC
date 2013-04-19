@@ -95,13 +95,6 @@ namespace Equations {
          virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start) = 0;
 
          /**
-          * @brief Set the equation matrices
-          *
-          * @param bcIds   List of boundary condition IDs
-          */
-         virtual void setSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
-
-         /**
           * @brief Transfer equation input to timestepper
           *
           * @param id      Component ID
@@ -140,6 +133,28 @@ namespace Equations {
           * @param start   Start indx for the storage
           */
          virtual void copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start) = 0;
+
+         /**
+          * @brief Get linear operator row of coupled matrix
+          */
+         virtual DecoupledZSparse linearRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
+
+         /**
+          * @brief Get time operator row of coupled matrix
+          */
+         virtual DecoupledZSparse timeRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
+
+         /**
+          * @brief Get boundary operator row of coupled matrix
+          */
+         virtual DecoupledZSparse boundaryRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
          
       protected:
          /**
@@ -171,21 +186,6 @@ namespace Equations {
           * @brief Set the equation coupling information
           */
          virtual void setCoupling() = 0;
-
-         /**
-          * @brief Get linear operator row of coupled matrix
-          */
-         virtual linearRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
-
-         /**
-          * @brief Get time operator row of coupled matrix
-          */
-         virtual timeRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
-
-         /**
-          * @brief Get boundary operator row of coupled matrix
-          */
-         virtual boundaryRow(FieldComponents::Spectral::Id id, const int matIdx) const = 0;
 
       private:
    };
