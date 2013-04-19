@@ -18,8 +18,8 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBeta3DQGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the vertical velocity equation for the 3DQG beta model
     */
-   class Beta3DQGVertical: public IScalarEquation
+   class Beta3DQGVertical: public IBeta3DQGScalarEquation
    {
       public:
          /**
@@ -49,40 +49,12 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
-
-         /**
-          * @brief Build Full block row for linear operators
-          */
-         virtual DecoupledZSparse linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
-
-         /**
-          * @brief Build Full block row for time operators
-          */
-         virtual DecoupledZSparse timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
-
-         /**
-          * @brief Build Full block row for time operators
-          */
-         virtual DecoupledZSparse boundaryRow(FieldComponents::Spectral::Id comp, const int matIdx) const;
-
-         /**
-          * @brief Initialise spectral equation matrices
-          *
-          * @param spBcs   List of boundary condition IDs
-          */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary bcs);
-
          
       protected:
          /**
           * @brief Set variable requirements
           */
          virtual void setRequirements();
-
-         /**
-          * @brief Set coupling information
-          */
-         virtual void setCoupling();
 
       private:
    };
