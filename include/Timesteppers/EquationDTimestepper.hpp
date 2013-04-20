@@ -74,6 +74,15 @@ namespace Timestep {
          void solve(const int step);
 
          /**
+          * @brief Update the LHS matrix triplets
+          *
+          * @param lhsCoeff   New coefficient for LHS time dependent part
+          * @param rhsCoeff   New coefficient for RHS time dependent part
+          * @param step       Timestep scheme substep
+          */
+         void updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step);
+
+         /**
           * @brief Get the number of linear systems in solver
           */
          int nSystem() const;

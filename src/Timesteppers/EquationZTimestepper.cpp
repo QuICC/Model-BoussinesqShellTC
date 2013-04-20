@@ -78,6 +78,77 @@ namespace Timestep {
       }
    }
 
+   void  EquationZTimestepper::updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
+   {
+      // Set start offset
+      int start = step*this->nSystem();
+
+      // Loop over matrices within same step
+      for(int i = 0; i < this->nSystem(); ++i)
+      {
+         // Get the number of nonzero elements in time dependence
+         size_t nnz = this->mTMatrix.at(i).nonZeros();
+
+         // Update LHS and RHS matrices
+         size_t lhsJ = 0;
+         size_t rhsJ = 0;
+         for (size_t k=0; k< static_cast<size_t>(this->mTMatrix.at(i).outerSize()); ++k)
+         {
+            SparseMatrixZ::InnerIterator lhsIt(this->mLHSMatrix.at(start+i),lhsJ);
+            SparseMatrixZ::InnerIterator rhsIt(this->mRHSMatrix.at(start+i),rhsJ);
+            for (SparseMatrixZ::InnerIterator timeIt(this->mTMatrix.at(i),k); timeIt; ++timeIt)
+            {
+               // Only keep going if nonzero elements are left
+               if(nnz > 0)
+               {
+                  // Update LHS matrix
+                  if(timeIt.col() == lhsIt.col())
+                  {
+                     if(timeIt.row() == lhsIt.row())
+                     {
+                        // Update values
+                        lhsIt.valueRef() += lhsCoeff*timeIt.value();
+
+                        // Update LHS iterators and counters
+                        ++lhsIt;
+                        if(!lhsIt)
+                        {
+                           lhsJ++;
+                        }
+                     }
+                  }
+
+                  // Update LHS matrix
+                  if(timeIt.col() == rhsIt.col())
+                  {
+                     if(timeIt.row() == rhsIt.row())
+                     {
+                        // Update values
+                        rhsIt.valueRef() += rhsCoeff*timeIt.value();
+
+                        // Update RHS iterators and counters
+                        ++rhsIt;
+                        if(!rhsIt)
+                        {
+                           rhsJ++;
+                        }
+                     }
+                  }
+
+                  // Update nonzero counter
+                  nnz--;
+               } else
+               {
+                  break;
+               }
+            }
+         }
+
+         // Safety assert to make sure all values have been updated
+         assert(nnz == 0);
+      }
+   }
+
    void EquationZTimestepper::initSolver()
    {
       // Initialise solver
@@ -162,6 +233,9 @@ namespace Timestep {
       // Add storage for solution
       this->mSolution.push_back(MatrixZ(rows,cols));
       this->mSolution.back().setZero();
+
+      // Add storage for the time matrix
+      this->mTMatrix.push_back(SparseMatrixZ());
    }
 }
 }

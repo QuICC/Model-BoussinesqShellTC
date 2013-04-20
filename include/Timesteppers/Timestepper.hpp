@@ -102,9 +102,9 @@ namespace Timestep {
          void createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
-          * @brief Update (coupled) matrices
+          * @brief Update time dependence
           */
-         void updateMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp);
+         void updateMatrices();
 
          /**
           * @brief Initialise the solution
@@ -141,6 +141,26 @@ namespace Timestep {
          void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
+          * @brief Build the time matrix
+          *
+          * @param timeMatrix Storage for time matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         void buildTimeMatrix(SparseMatrix& timeMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+         /**
+          * @brief Build the time matrix
+          *
+          * @param timeMatrix Storage for the time matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         void buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+         /**
           * @brief Build the solver matrix
           *
           * @param solverMatrix  Storage for solver matrix
@@ -161,28 +181,6 @@ namespace Timestep {
           * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
          void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
-
-         /**
-          * @brief Update the LHS matrix triplets
-          *
-          * @param oldTime    Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void updateTimeMatrix(SparseMatrix& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
-
-         /**
-          * @brief Update the LHS matrix triplets
-          *
-          * @param oldTime    Storage for the triplets
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void updateTimeMatrix(SparseMatrixZ& oldTime, Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
