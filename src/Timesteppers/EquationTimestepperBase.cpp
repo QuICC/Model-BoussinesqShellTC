@@ -31,12 +31,12 @@ namespace Timestep {
    {
    }
 
-   void EquationTimestepperBase::addInformation(const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& id, const ArrayI& startRow)
+   void EquationTimestepperBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow)
    {
       this->mInformation.insert(std::make_pair(id, startRow));
    }
 
-   int EquationTimestepperBase::startRow(const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& id, const int i) const
+   int EquationTimestepperBase::startRow(const SpectralFieldId& id, const int i) const
    {
       return this->mInformation.find(id)->second(i);
    }

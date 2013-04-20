@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 #include "Diagnostics/IVelocityWrapper.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 

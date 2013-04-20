@@ -19,8 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/PhysicalNames.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 #include "Equations/IEquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"

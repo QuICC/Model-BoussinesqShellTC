@@ -18,8 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/FieldComponents.hpp"
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -46,12 +45,12 @@ namespace Timestep {
          /**
           * @brief Add storage information 
           */
-         void addInformation(const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& id, const ArrayI& startRow);
+         void addInformation(const SpectralFieldId& id, const ArrayI& startRow);
 
          /**
           * @brief Get start row 
           */
-         int startRow(const std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>& id, const int i) const;
+         int startRow(const SpectralFieldId& id, const int i) const;
          
       protected:
          /**
@@ -62,7 +61,7 @@ namespace Timestep {
          /**
           * @brief Storage for the storage information
           */
-         std::map<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id>, ArrayI> mInformation;
+         std::map<SpectralFieldId, ArrayI> mInformation;
 
       private:
    };

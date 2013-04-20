@@ -19,8 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
-#include "Enums/PhysicalNames.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 #include "Equations/IEquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
@@ -102,9 +101,14 @@ namespace Equations {
          int nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
 
          /**
-          * @brief Get the explicit linear matrices (sparse matrices)
+          * @brief Get the explicit linear matrices (real sparse operators)
           */
-         const DecoupledZSparse& explicitLinear(FieldComponents::Spectral::Id id, const int j) const;
+         const SparseMatrix& explicitDLinear(FieldComponents::Spectral::Id id, const int j) const;
+
+         /**
+          * @brief Get the explicit linear matrices (complex sparse operators)
+          */
+         const SparseMatrixZ& explicitZLinear(FieldComponents::Spectral::Id id, const int j) const;
 
          /**
           * @brief Get the coupling information
@@ -147,9 +151,14 @@ namespace Equations {
          std::map<FieldComponents::Spectral::Id, CouplingInformation>  mCouplingInfos;
 
          /**
-          * @brief Map of component and explicit linear matrices 
+          * @brief Map of component and explicit linear matrices (real operators)
           */
-         std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> > mLMatrices;
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mLDMatrices;
+
+         /**
+          * @brief Map of component and explicit linear matrices (complex operators)
+          */
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrixZ> > mLZMatrices;
 
          /**
           * @brief Map of component and nonlinear term multiplication matrices

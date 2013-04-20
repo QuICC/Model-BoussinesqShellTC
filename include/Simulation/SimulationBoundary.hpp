@@ -17,8 +17,7 @@
 // Project includes
 //
 #include "Enums/Dimensions.hpp"
-#include "Enums/FieldComponents.hpp"
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {

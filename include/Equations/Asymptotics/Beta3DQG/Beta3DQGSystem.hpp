@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 

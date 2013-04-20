@@ -78,12 +78,20 @@ namespace Equations {
       return *this->mspEqParams;
    }
 
-   const DecoupledZSparse& EquationData::explicitLinear(FieldComponents::Spectral::Id id, const int j) const
+   const SparseMatrix& EquationData::explicitDLinear(FieldComponents::Spectral::Id id, const int j) const
    {
       // Safety assert
-      assert(this->mLMatrices.count(id) > 0);
+      assert(this->mLDMatrices.count(id) > 0);
       
-      return this->mLMatrices.find(id)->second.at(j);
+      return this->mLDMatrices.find(id)->second.at(j);
+   }
+
+   const SparseMatrixZ& EquationData::explicitZLinear(FieldComponents::Spectral::Id id, const int j) const
+   {
+      // Safety assert
+      assert(this->mLZMatrices.count(id) > 0);
+      
+      return this->mLZMatrices.find(id)->second.at(j);
    }
 
    const CouplingInformation& EquationData::couplingInfo(FieldComponents::Spectral::Id comp) const

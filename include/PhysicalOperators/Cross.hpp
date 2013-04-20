@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 #include "VectorFields/VectorField.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 

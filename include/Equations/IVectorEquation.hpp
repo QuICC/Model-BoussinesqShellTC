@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 #include "Equations/IEquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"

@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Enums/Dimensions.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 #include "ScalarFields/FieldTools.hpp"
 #include "IoVariable/VisualizationFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"

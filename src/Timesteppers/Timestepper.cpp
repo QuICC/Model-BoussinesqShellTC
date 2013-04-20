@@ -265,7 +265,7 @@ namespace Timestep {
    void Timestepper::createMatrices(Equations::SharedIEvolutionEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
-      std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId = std::make_pair(spEq->name(),comp);
+      SpectralFieldId myId = std::make_pair(spEq->name(),comp);
 
       // Index of the current field
       int myIdx = spEq->couplingInfo(comp).solverIndex();
@@ -383,7 +383,7 @@ namespace Timestep {
    void Timestepper::initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
-      std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId;
+      SpectralFieldId myId;
 
       // Storage for the selected field component
       FieldComponents::Spectral::Id comp;
@@ -484,7 +484,7 @@ namespace Timestep {
    void Timestepper::getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for information and identity
-      std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId;
+      SpectralFieldId myId;
 
       // Storage for the selected field component
       FieldComponents::Spectral::Id comp;
@@ -622,7 +622,7 @@ namespace Timestep {
    void Timestepper::transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
    {
       // Storage for identity
-      std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> myId;
+      SpectralFieldId myId;
 
       // Storage for component
       FieldComponents::Spectral::Id comp;

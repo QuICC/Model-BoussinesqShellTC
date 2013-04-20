@@ -15,7 +15,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "IoHdf5/IHdf5NWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"

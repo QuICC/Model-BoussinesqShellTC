@@ -1,9 +1,9 @@
-/** \file FieldComponents.hpp
- *  \brief Definition of some useful enums used to access scalar fields and vector field components
+/** \file FieldIds.hpp
+ *  \brief Definition of some useful enums used to access fields by ID
  */
 
-#ifndef FIELDCOMPONENTS_HPP
-#define FIELDCOMPONENTS_HPP
+#ifndef FIELDIDS_HPP
+#define FIELDIDS_HPP
 
 // Configuration includes
 //
@@ -19,6 +19,38 @@
 //
 
 namespace GeoMHDiSCC {
+
+   /**
+    * @brief Simple struct to hold the physical names IDs
+    */
+   struct PhysicalNames
+   {
+      /**
+       * @name Enum for physical name to ID mapping
+       */
+      enum Id {
+         /// Codensity field
+         CODENSITY,
+         /// Pressure field
+         PRESSURE,
+         /// Temperature field
+         TEMPERATURE,
+         /// Mean temperature field
+         MEANTEMPERATURE,
+         /// Streamfunction field
+         STREAMFUNCTION,
+         /// Axial velocity field
+         VELOCITYZ,
+         /// Axial vorticity field
+         VORTICITYZ,
+         /// Magnetic field
+         MAGNETIC,
+         /// Velocity field
+         VELOCITY, 
+         /// Vorticity field
+         VORTICITY
+      };
+   };
 
    /**
     * @brief Simple struct to hold the field components
@@ -69,6 +101,12 @@ namespace GeoMHDiSCC {
          };
       };
    };
+
+   /// Typedef for a full ID for a spectral field component
+   typedef std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id>   SpectralFieldId;
+
+   /// Typedef for a full ID for a physical field component
+   typedef std::pair<PhysicalNames::Id,FieldComponents::Physical::Id>   PhysicalFieldId;
 }
 
-#endif // FIELDCOMPONENTS_HPP
+#endif // FIELDIDS_HPP

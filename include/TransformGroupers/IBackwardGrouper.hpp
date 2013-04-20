@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "Enums/PhysicalNames.hpp"
+#include "Enums/FieldIds.hpp"
 #include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {

@@ -18,8 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/PhysicalNames.hpp"
-#include "Enums/FieldComponents.hpp"
+#include "Enums/FieldIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,7 +31,7 @@ namespace Equations {
    {
       public:
          /// Typedef to simplify notation for the field data
-         typedef std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> > FieldType;
+         typedef std::vector<SpectralFieldId> FieldType;
 
          /// Typedef for an iterator for the field data
          typedef FieldType::const_iterator  field_iterator;
@@ -157,12 +156,12 @@ namespace Equations {
          /**
           * @brief Storage for the implicit fields information
           */
-         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mImplicitFields;
+         std::vector<SpectralFieldId>   mImplicitFields;
 
          /**
           * @brief Storage for the explicit fields information
           */
-         std::vector<std::pair<PhysicalNames::Id, FieldComponents::Spectral::Id> >   mExplicitFields;
+         std::vector<SpectralFieldId>   mExplicitFields;
 
          /**
           * @brief Storage for the complex flag

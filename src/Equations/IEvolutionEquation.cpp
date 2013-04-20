@@ -38,47 +38,47 @@ namespace Equations {
 
    void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const DecoupledZMatrix& linearField, const int matIdx, const int start) const
    {
-      // Get iterator to set of linear matrices
-      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::const_iterator lIt = this->mLMatrices.find(id);
-
-      // Get number of rows
-      int rows = this->couplingInfo(id).blockN(matIdx);
-
-      // Safety asserts
-      assert(lIt->second.at(matIdx).first.rows() == lIt->second.at(matIdx).first.cols());
-      assert(lIt->second.at(matIdx).second.rows() == lIt->second.at(matIdx).second.cols());
-      assert(lIt->second.at(matIdx).first.cols() == rows);
-      assert(lIt->second.at(matIdx).second.cols() == rows);
-
-      // Loop over all explicit linear terms
-      for(int k = 0; k < this->couplingInfo(FieldComponents::Spectral::SCALAR).nExplicit(); ++k)
-      {
+//      // Get iterator to set of linear matrices
+//      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::const_iterator lIt = this->mLMatrices.find(id);
+//
+//      // Get number of rows
+//      int rows = this->couplingInfo(id).blockN(matIdx);
+//
+//      // Safety asserts
+//      assert(lIt->second.at(matIdx).first.rows() == lIt->second.at(matIdx).first.cols());
+//      assert(lIt->second.at(matIdx).second.rows() == lIt->second.at(matIdx).second.cols());
+//      assert(lIt->second.at(matIdx).first.cols() == rows);
+//      assert(lIt->second.at(matIdx).second.cols() == rows);
+//
+//      // Loop over all explicit linear terms
+//      for(int k = 0; k < this->couplingInfo(FieldComponents::Spectral::SCALAR).nExplicit(); ++k)
+//      {
 //         storage.first.block(start, 0, rows, storage.first.cols()) += lIt->second.at(matIdx)*linearField.first.block(start, 0, rows, storage.first.cols());
 //         storage.second.block(start, 0, rows, storage.second.cols()) += lIt->second.at(matIdx)*linearField.second.block(start, 0, rows, storage.second.cols());
-      }
+//      }
    }
 
    void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id id, MatrixZ& storage, const MatrixZ& linearField, const int matIdx, const int start) const
    {
-      // Get iterator to set of linear matrices
-      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::const_iterator lIt = this->mLMatrices.find(id);
-
-      // Get number of rows
-      int rows = this->couplingInfo(id).blockN(matIdx);
-
-      // Safety asserts
-      assert(lIt->second.at(matIdx).first.rows() == lIt->second.at(matIdx).first.cols());
-      assert(lIt->second.at(matIdx).second.rows() == lIt->second.at(matIdx).second.cols());
-      assert(lIt->second.at(matIdx).first.cols() == rows);
-      assert(lIt->second.at(matIdx).second.cols() == rows);
-
-      // Loop over all explicit linear terms
-      CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
-      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-      {
+//      // Get iterator to set of linear matrices
+//      std::map<FieldComponents::Spectral::Id, std::vector<DecoupledZSparse> >::const_iterator lIt = this->mLMatrices.find(id);
+//
+//      // Get number of rows
+//      int rows = this->couplingInfo(id).blockN(matIdx);
+//
+//      // Safety asserts
+//      assert(lIt->second.at(matIdx).first.rows() == lIt->second.at(matIdx).first.cols());
+//      assert(lIt->second.at(matIdx).second.rows() == lIt->second.at(matIdx).second.cols());
+//      assert(lIt->second.at(matIdx).first.cols() == rows);
+//      assert(lIt->second.at(matIdx).second.cols() == rows);
+//
+//      // Loop over all explicit linear terms
+//      CouplingInformation::field_iterator fIt;
+//      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+//      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+//      {
 //         storage.block(start, 0, rows, storage.cols()) += lIt->second.at(matIdx)*linearField.block(start, 0, rows, storage.cols());
-      }
+//      }
    }
 
    void IEvolutionEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
