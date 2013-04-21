@@ -103,17 +103,17 @@ namespace Equations {
          /**
           * @brief Get the explicit linear matrices (real sparse operators)
           */
-         const SparseMatrix& explicitDLinear(FieldComponents::Spectral::Id id, const int j) const;
+         const SparseMatrix& explicitDLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the explicit linear matrices (complex sparse operators)
           */
-         const SparseMatrixZ& explicitZLinear(FieldComponents::Spectral::Id id, const int j) const;
+         const SparseMatrixZ& explicitZLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the coupling information
           */
-         const CouplingInformation&  couplingInfo(FieldComponents::Spectral::Id id) const;
+         const CouplingInformation&  couplingInfo(const FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Get map of field storage requirements information
@@ -153,12 +153,12 @@ namespace Equations {
          /**
           * @brief Map of component and explicit linear matrices (real operators)
           */
-         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mLDMatrices;
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> > mLDMatrices;
 
          /**
           * @brief Map of component and explicit linear matrices (complex operators)
           */
-         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrixZ> > mLZMatrices;
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> > mLZMatrices;
 
          /**
           * @brief Map of component and nonlinear term multiplication matrices

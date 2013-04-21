@@ -30,6 +30,15 @@ namespace Timestep {
    class EquationTimestepperBase
    {
       public:
+         /// Typedef to simplify notation for the field data
+         typedef std::vector<SpectralFieldId> FieldIdVector;
+
+         /// Typedef for an iterator for the field data
+         typedef FieldIdVector::const_iterator  field_iterator;
+
+         /// Typedef for a range iterator for the field coupling data
+         typedef std::pair<field_iterator,field_iterator>  field_iterator_range;
+
          /**
           * @brief Constructor
           *
@@ -51,12 +60,22 @@ namespace Timestep {
           * @brief Get start row 
           */
          int startRow(const SpectralFieldId& id, const int i) const;
+
+         /**
+          * @brief Range of stored fields
+          */
+         field_iterator_range fieldRange() const;
          
       protected:
          /**
           * @brief Starting index
           */
          int mZeroIdx;
+
+         /**
+          * @brief Storage for the field Ids
+          */
+         std::vector<SpectralFieldId>   mFieldIds;
 
          /**
           * @brief Storage for the storage information

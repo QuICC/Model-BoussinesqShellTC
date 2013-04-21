@@ -78,23 +78,29 @@ namespace Equations {
       return *this->mspEqParams;
    }
 
-   const SparseMatrix& EquationData::explicitDLinear(FieldComponents::Spectral::Id id, const int j) const
+   const SparseMatrix& EquationData::explicitDLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const
    {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(comp, fieldId);
+
       // Safety assert
-      assert(this->mLDMatrices.count(id) > 0);
+      assert(this->mLDMatrices.count(key) > 0);
       
-      return this->mLDMatrices.find(id)->second.at(j);
+      return this->mLDMatrices.find(key)->second.at(j);
    }
 
-   const SparseMatrixZ& EquationData::explicitZLinear(FieldComponents::Spectral::Id id, const int j) const
+   const SparseMatrixZ& EquationData::explicitZLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const
    {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(comp, fieldId);
+
       // Safety assert
-      assert(this->mLZMatrices.count(id) > 0);
+      assert(this->mLZMatrices.count(key) > 0);
       
-      return this->mLZMatrices.find(id)->second.at(j);
+      return this->mLZMatrices.find(key)->second.at(j);
    }
 
-   const CouplingInformation& EquationData::couplingInfo(FieldComponents::Spectral::Id comp) const
+   const CouplingInformation& EquationData::couplingInfo(const FieldComponents::Spectral::Id comp) const
    {
       // Safety assert
       assert(this->mCouplingInfos.count(comp) > 0);

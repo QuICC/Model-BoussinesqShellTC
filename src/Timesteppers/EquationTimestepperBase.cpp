@@ -33,12 +33,19 @@ namespace Timestep {
 
    void EquationTimestepperBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow)
    {
+      this->mFieldIds.push_back(id);
+
       this->mInformation.insert(std::make_pair(id, startRow));
    }
 
    int EquationTimestepperBase::startRow(const SpectralFieldId& id, const int i) const
    {
       return this->mInformation.find(id)->second(i);
+   }
+
+   EquationTimestepperBase::field_iterator_range EquationTimestepperBase::fieldRange() const
+   {
+      return std::make_pair(this->mFieldIds.begin(), this->mFieldIds.end());
    }
 }
 }

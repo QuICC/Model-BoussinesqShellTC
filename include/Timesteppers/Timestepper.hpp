@@ -21,6 +21,7 @@
 #include "Timesteppers/EquationZTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "Timesteppers/ImExRK3.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,6 +33,12 @@ namespace Timestep {
    class Timestepper
    {
       public:
+         /// Typedef for an iterator to a complex equation timstepper
+         typedef std::vector<EquationZTimestepper>::iterator   eqz_iterator;
+
+         /// Typedef for an iterator to a real equation timstepper
+         typedef std::vector<EquationDTimestepper>::iterator   eqd_iterator;
+
          /**
           * @brief Constructor
           */
@@ -91,6 +98,16 @@ namespace Timestep {
       protected:
 
       private:
+         /**
+          * @brief Get the solver input independenlty of solver type
+          */
+         template <typename TEquationIt, typename TSolverIt> void getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt);
+
+         /**
+          * @brief Build the solver matrices independenlty of solver type
+          */
+         template <typename TSolverIt> void buildSolverMatrix(Equations::SharedIEvolutionEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
+
          /**
           * @brief Create the correct equation steppers
           */
@@ -227,6 +244,83 @@ namespace Timestep {
           */
          std::vector<EquationZTimestepper> mEqZStepper;
    };
+
+   template <typename TSolverIt> void Timestepper::buildSolverMatrix(Equations::SharedIEvolutionEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
+   {
+      // Number of linear systems
+      int nSystems = spEq->couplingInfo(id.second).nSystems();
+
+      // start index for matrices
+      int start = this->mStep*nSystems;
+
+      // Start row for storage information
+      ArrayI startRow(nSystems);
+
+      // Initialise the equation stepper
+      if(solveIt->nSystem() == 0)
+      {
+         // Reserve storage for matrice and initialise vectors
+         solveIt->initMatrices(ImExRK3::STEPS*nSystems);
+
+         // Initialise field storage and information
+         for(int i = 0; i < nSystems; i++)
+         {
+            // Create RHS and solution data storage
+            solveIt->addStorage(spEq->couplingInfo(id.second).systemN(i), spEq->couplingInfo(id.second).rhsCols(i));
+
+            // Build time matrix
+            this->buildTimeMatrix(solveIt->rTMatrix(i), spEq, id.second, i);
+         }
+      }
+
+      // Build the solver matrices
+      for(int i = 0; i < nSystems; i++)
+      {
+         // Build LHS solver matrix
+         this->buildSolverMatrix(solveIt->rLHSMatrix(start+i), spEq, id.second, i, true);
+
+         // Build RHS solver matrix
+         this->buildSolverMatrix(solveIt->rRHSMatrix(start+i), spEq, id.second, i, false);
+
+         // Store the start row
+         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).blockN(i);
+      }
+
+      // Store storage information
+      solveIt->addInformation(id,startRow);
+   }
+
+   template <typename TEquationIt, typename TSolverIt> void Timestepper::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt)
+   {
+      // Get timestep input
+      for(int i = 0; i < solveIt->nSystem(); i++)
+      {
+         // Get new timestep input
+         (*eqIt)->timestepInput(id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
+
+         // Loop over all complex solvers
+         for(std::vector<EquationZTimestepper>::iterator zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
+         {
+            // Loop over all fields
+            EquationZTimestepper::field_iterator_range   fRange = zIt->fieldRange();
+            for(EquationZTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+            {
+               (*eqIt)->computeLinear(id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, zIt->rRHSData(i), zIt->startRow(*fIt,i), i);
+            }
+         }
+
+         // Loop over all real solvers
+         for(std::vector<EquationDTimestepper>::iterator dIt = this->mEqDStepper.begin(); dIt != this->mEqDStepper.end(); ++dIt)
+         {
+            // Loop over all fields
+            EquationDTimestepper::field_iterator_range   fRange = dIt->fieldRange();
+            for(EquationDTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+            {
+               (*eqIt)->computeLinear(id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, dIt->rRHSData(i), dIt->startRow(*fIt,i), i);
+            }
+         }
+      }
+   }
 }
 }
 

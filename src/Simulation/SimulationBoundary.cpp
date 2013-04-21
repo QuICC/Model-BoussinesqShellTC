@@ -26,12 +26,12 @@ namespace GeoMHDiSCC {
    {
    }
 
-   bool SimulationBoundary::hasEquation(const PhysicalNames::Id eqId) const
+   bool SimulationBoundary::hasEquation(const SpectralFieldId eqId) const
    {
       return this->mBcs.count(eqId);
    }
 
-   bool SimulationBoundary::hasField(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId) const
+   bool SimulationBoundary::hasField(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
    {
       // Safey assert
       assert(this->mBcs.count(eqId) > 0);
@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
       return this->mBcs.find(eqId)->second.count(fieldId);
    }
 
-   const SimulationBoundary::BcEqMapType& SimulationBoundary::bcs(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId) const
+   const SimulationBoundary::BcEqMapType& SimulationBoundary::bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
    {
       // Safey asserts
       assert(this->mBcs.count(eqId) > 0);
@@ -48,13 +48,13 @@ namespace GeoMHDiSCC {
       return this->mBcs.find(eqId)->second.find(fieldId)->second;
    }
 
-   void SimulationBoundary::initStorage(const PhysicalNames::Id id)
+   void SimulationBoundary::initStorage(const SpectralFieldId id)
    {
       // Initialise boundary condition storage
-      this->mBcs.insert(std::make_pair(id, std::map<PhysicalNames::Id, SimulationBoundary::BcEqMapType>()));
+      this->mBcs.insert(std::make_pair(id, std::map<SpectralFieldId, SimulationBoundary::BcEqMapType>()));
    }
 
-   void SimulationBoundary::initBcStorage(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SimulationBoundary::BcKeyType& key)
+   void SimulationBoundary::initBcStorage(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId)
    {
       // Safey assert
       assert(this->mBcs.count(eqId) > 0);
@@ -63,17 +63,17 @@ namespace GeoMHDiSCC {
       this->mBcs.find(eqId)->second.insert(std::make_pair(fieldId, SimulationBoundary::BcEqMapType()));
 
       // Initialise boundary condition storage
-      this->mBcs.find(eqId)->second.find(fieldId)->second.insert(std::make_pair(key, SimulationBoundary::BcMapType()));
+      this->mBcs.find(eqId)->second.find(fieldId)->second.insert(std::make_pair(dimId, SimulationBoundary::BcMapType()));
    }
 
-   void SimulationBoundary::addBc(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SimulationBoundary::BcKeyType& key, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
+   void SimulationBoundary::addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
    {
       // Safey assert
       assert(this->mBcs.count(eqId) > 0);
       assert(this->mBcs.find(eqId)->second.count(fieldId) > 0);
-      assert(this->mBcs.find(eqId)->second.find(fieldId)->second.count(key) > 0);
+      assert(this->mBcs.find(eqId)->second.find(fieldId)->second.count(dimId) > 0);
 
-      this->mBcs.find(eqId)->second.find(fieldId)->second.find(key)->second.push_back(std::make_pair(bcId,pos));
+      this->mBcs.find(eqId)->second.find(fieldId)->second.find(dimId)->second.push_back(std::make_pair(bcId,pos));
    }
 
 }

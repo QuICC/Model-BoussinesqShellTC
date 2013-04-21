@@ -28,14 +28,11 @@ namespace GeoMHDiSCC {
    class SimulationBoundary
    {
       public:
-         /// Typedef for the boundary conditions map key type
-         typedef std::pair<FieldComponents::Spectral::Id, Dimensions::Simulation::Id> BcKeyType;
-
          /// Typedef for the boundary conditions map storage type
          typedef std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > BcMapType;
 
          /// Typedef for the boundary conditions map storage type
-         typedef std::map<BcKeyType, BcMapType> BcEqMapType;
+         typedef std::map<Dimensions::Simulation::Id, BcMapType> BcEqMapType;
 
          /**
           * @brief Constructor
@@ -52,7 +49,7 @@ namespace GeoMHDiSCC {
           *
           * @param eqId    Physical ID for equation
           */
-         bool hasEquation(const PhysicalNames::Id eqId) const;
+         bool hasEquation(const SpectralFieldId eqId) const;
 
          /**
           * @brief Check if boundary condition for field in given equation exist
@@ -60,7 +57,7 @@ namespace GeoMHDiSCC {
           * @param eqId       Physical ID for equation
           * @param fieldId    Physical ID for field
           */
-         bool hasField(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId) const;
+         bool hasField(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
 
          /**
           * @brief Get boundary conditions for specific equation
@@ -68,30 +65,32 @@ namespace GeoMHDiSCC {
           * @param eqId       Physical ID for equation
           * @param fieldId    Physical ID for field
           */
-         const SimulationBoundary::BcEqMapType& bcs(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId) const;
+         const SimulationBoundary::BcEqMapType& bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
 
          /**
           * @brief Initialise storage for a new equation
           *
           * @param id ID of the equation
           */
-         void initStorage(const PhysicalNames::Id id);
+         void initStorage(const SpectralFieldId id);
 
          /**
           * @brief Initialise storage for a new boundary condition component
           *
           * @param eqId    ID of the equation
           * @param fieldId ID of the variable
+          * @param dimId   ID of the dimension
           */
-         void initBcStorage(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SimulationBoundary::BcKeyType& key);
+         void initBcStorage(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId);
 
          /**
           * @brief Add boundary condition
           *
           * @param eqId    ID of the equation
           * @param fieldId ID of the variable
+          * @param dimId   ID of the dimension
           */
-         void addBc(const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SimulationBoundary::BcKeyType& key, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos);
+         void addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos);
          
       protected:
 
@@ -99,7 +98,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the coupled boundary conditions
           */
-         std::map<PhysicalNames::Id, std::map<PhysicalNames::Id, SimulationBoundary::BcEqMapType> > mBcs;
+         std::map<SpectralFieldId, std::map<SpectralFieldId, SimulationBoundary::BcEqMapType> > mBcs;
    };
 
    /// Typedef for a shared pointer to a SimulationBoundary object

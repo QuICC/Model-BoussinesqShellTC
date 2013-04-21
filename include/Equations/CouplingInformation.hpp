@@ -31,10 +31,10 @@ namespace Equations {
    {
       public:
          /// Typedef to simplify notation for the field data
-         typedef std::vector<SpectralFieldId> FieldType;
+         typedef std::vector<SpectralFieldId> FieldIdVector;
 
          /// Typedef for an iterator for the field data
-         typedef FieldType::const_iterator  field_iterator;
+         typedef FieldIdVector::const_iterator  field_iterator;
 
          /// Typedef for a range iterator for the field coupling data
          typedef std::pair<field_iterator,field_iterator>  field_iterator_range;

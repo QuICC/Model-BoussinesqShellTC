@@ -44,7 +44,7 @@ namespace Equations {
           * @param nz      Matrix size in Z
           * @param ny      Number of azimuthal wave numbers
           */
-         static void setCouplingInfo(CouplingInformation& rInfo, const PhysicalNames::Id eqId, const int nx, const int nz, const int ny);
+         static void setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nx, const int nz, const int ny);
 
          /**
           * @brief Get the quasi-inverse matrix operator for an equation
@@ -54,7 +54,7 @@ namespace Equations {
           * @param nx      Matrix size in X
           * @param nz      Matrix size in Z
           */
-         static void quasiInverse(SparseMatrix& mat, const PhysicalNames::Id eqId, const int nx, const int nz);
+         static void quasiInverse(SparseMatrix& mat, const SpectralFieldId eqId, const int nx, const int nz);
 
          /**
           * @brief Get the time matrix block for an equation
@@ -69,7 +69,7 @@ namespace Equations {
           * @param Gamma   Gamma number
           * @param chi     Angle Chi
           */
-         static void timeBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+         static void timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
 
          /**
           * @brief Get the linear matrix block for an equation on given field
@@ -85,7 +85,7 @@ namespace Equations {
           * @param Gamma   Gamma number
           * @param chi     Angle Chi
           */
-         static void linearBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+         static void linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
 
          /**
           * @brief Get the boundary condition matrix block for an equation on given field
@@ -102,7 +102,7 @@ namespace Equations {
           * @param Gamma   Gamma number
           * @param chi     Angle Chi
           */
-         static void boundaryBlock(DecoupledZSparse& mat, const PhysicalNames::Id eqId, const PhysicalNames::Id fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
+         static void boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi);
          
       protected:
 

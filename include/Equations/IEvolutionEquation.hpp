@@ -56,24 +56,29 @@ namespace Equations {
          /**
           * @brief Compute the explicit linear terms
           *
-          * @param id            Component ID
-          * @param storage       Storage for the equation values
-          * @param linearField   Field with explicit linear dependence 
-          * @param matIdx        Index of the given data
-          * @param start         Start index for the storage
+          * @param compId     Equation field component ID
+          * @param eqField    Equation field values
+          * @param eqStart    Start index for the equation field
+          * @param fieldId    Physical field ID
+          * @param linField   Explicit linear field values
+          * @param linStart   Start index for the linear field
+          * @param matIdx     System index
           */
-         virtual void computeLinear(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const DecoupledZMatrix& linearField, const int matIdx, const int start) const;
+         virtual void computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const;
+         virtual void computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const;
 
          /**
           * @brief Compute the explicit linear terms
           *
-          * @param id            Component ID
-          * @param storage       Storage for the equation values
-          * @param linearField   Field with explicit linear dependence 
-          * @param matIdx        Index of the given data
-          * @param start         Start index for the storage
+          * @param compId     Equation field component ID
+          * @param eqField    Equation field values
+          * @param eqStart    Start index for the equation field
+          * @param linField   Explicit linear field values
+          * @param linStart   Start index for the linear field
+          * @param matIdx     System index
           */
-         virtual void computeLinear(FieldComponents::Spectral::Id id, MatrixZ& storage, const MatrixZ& linearField, const int matIdx, const int start) const;
+         virtual void computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const;
+         virtual void computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const;
 
          /**
           * @brief Pure virtual method to transfer equation input to timestepper

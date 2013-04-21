@@ -50,7 +50,8 @@ namespace Equations {
 
       // Set coupling information
       this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
-      Beta3DQGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, this->name(), nX, nZ, nY);
+      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
+      Beta3DQGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, eqId, nX, nZ, nY);
    }
 
    DecoupledZSparse IBeta3DQGScalarEquation::linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const
@@ -60,7 +61,7 @@ namespace Equations {
       int nz = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Get wave number rescale to box size
-      MHDFloat k = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Get Physical parameters Ra, Pr, Gamma, chi
       MHDFloat Ra = this->eqParams().nd(NonDimensional::RAYLEIGH);
@@ -82,7 +83,8 @@ namespace Equations {
          SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
          blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
 
-         Beta3DQGSystem::linearBlock(block, this->name(), fIt->first, nx, nz, k, Ra, Pr, Gamma, chi);
+         SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
+         Beta3DQGSystem::linearBlock(block, eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -105,7 +107,7 @@ namespace Equations {
       int nz = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Get wave number rescale to box size
-      MHDFloat k = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Get Physical parameters Ra, Pr, Gamma, chi
       MHDFloat Ra = this->eqParams().nd(NonDimensional::RAYLEIGH);
@@ -121,7 +123,8 @@ namespace Equations {
       // Create time row
       SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
       blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), this->couplingInfo(comp).fieldIndex()) = 1;
-      Beta3DQGSystem::timeBlock(block, this->name(), nx, nz, k, Ra, Pr, Gamma, chi);
+      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
+      Beta3DQGSystem::timeBlock(block, eqId, nx, nz, k_, Ra, Pr, Gamma, chi);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
       matrixRow.first += tmp;
       Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -141,7 +144,7 @@ namespace Equations {
       int nz = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Get wave number rescale to box size
-      MHDFloat k = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Get Physical parameters Ra, Pr, Gamma, chi
       MHDFloat Ra = this->eqParams().nd(NonDimensional::RAYLEIGH);
@@ -163,7 +166,8 @@ namespace Equations {
          SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
          blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
 
-         Beta3DQGSystem::boundaryBlock(block, this->name(), fIt->first, this->mspBcIds, nx, nz, k, Ra, Pr, Gamma, chi);
+         SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
+         Beta3DQGSystem::boundaryBlock(block, eqId, *fIt, this->mspBcIds, nx, nz, k_, Ra, Pr, Gamma, chi);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -181,6 +185,9 @@ namespace Equations {
 
    void IBeta3DQGScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
+      // Equation key
+      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
+
       // Store the boundary condition list
       this->mspBcIds = spBcIds;
 
@@ -188,8 +195,21 @@ namespace Equations {
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nz = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
-      // Initialise the quasi-inverse operators for the nonlinear terms
+      // Get the number of systems
       int nSystems = this->couplingInfo(FieldComponents::Spectral::SCALAR).nSystems();
+
+      // Get Physical parameters Ra, Pr, Gamma, chi
+      MHDFloat Ra = this->eqParams().nd(NonDimensional::RAYLEIGH);
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
+      MHDFloat Gamma = this->eqParams().nd(NonDimensional::GAMMA);
+      MHDFloat chi = this->eqParams().nd(NonDimensional::CHI);
+
+      // Boxscale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
+      //
+      // Initialise the quasi-inverse operators for the nonlinear terms
+      //
       this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
       std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
       qIt->second.reserve(nSystems);
@@ -197,7 +217,63 @@ namespace Equations {
       {
          qIt->second.push_back(SparseMatrix());
 
-         Beta3DQGSystem::quasiInverse(qIt->second.back(), this->name(), nx, nz);
+         Beta3DQGSystem::quasiInverse(qIt->second.back(), eqId, nx, nz);
+      }
+
+      //
+      // Initialise the explicit linear operators
+      //
+      CouplingInformation::field_iterator fIt;
+      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+      {
+         std::vector<DecoupledZSparse> tmpMat;
+         tmpMat.reserve(nSystems);
+
+         bool isComplex = false;
+
+         // Create matrices
+         for(int i = 0; i < nSystems; ++i)
+         {
+            MHDFloat k_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
+
+            // Get linear block
+            tmpMat.push_back(DecoupledZSparse());
+            Beta3DQGSystem::linearBlock(tmpMat.at(i), eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
+
+            // Explicit operator requires an additional minus sign
+            tmpMat.at(i).first = -tmpMat.at(i).first;
+            tmpMat.at(i).second = -tmpMat.at(i).second;
+
+            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+         }
+
+         // Create key
+         std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(FieldComponents::Spectral::SCALAR, *fIt);
+
+         // Select real or complex operator
+         if(isComplex)
+         {
+            this->mLZMatrices.insert(std::make_pair(key, std::vector<SparseMatrixZ>()));
+            this->mLZMatrices.find(key)->second.reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               this->mLZMatrices.find(key)->second.push_back(tmp);
+            }
+         } else
+         {
+            this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
+            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
+
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+            }
+         }
       }
 
    }
