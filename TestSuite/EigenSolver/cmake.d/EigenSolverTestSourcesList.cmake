@@ -11,6 +11,7 @@ set(MHDTestSources
    Simulation/SimulationBoundary.cpp
    Equations/CouplingInformation.cpp
    Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.cpp
+   EigenSolver/ArpackEigenSolver.cpp
 )
 
 # Include all files for the framework

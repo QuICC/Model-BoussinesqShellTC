@@ -35,6 +35,7 @@ set(MHDAllSrcDirs
    Debug
    Communicators
    Diagnostics
+   EigenSolver
    Equations
    Enums
    Exceptions
