@@ -101,8 +101,8 @@ namespace TestSuite {
          spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
          spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
-      // spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
-      // spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+         // spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
+         // spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
@@ -120,11 +120,11 @@ namespace TestSuite {
       fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
       // No-slip boundary conditions
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
       // Stress-free boundary conditions
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
+         //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
+         //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
@@ -139,13 +139,13 @@ namespace TestSuite {
       int nz = 7;
 
       // Physical parameters Ra, Pr, Gamma, chi
-      MHDFloat Ra = 800.0;
+      MHDFloat Ra = 1800.0;
       MHDFloat Pr = 1.0;
-      MHDFloat Gamma = .1;
+      MHDFloat Gamma = 1.;
       MHDFloat chi = 45;
 
       // Wave number
-      MHDFloat k_ = 2.75;
+      MHDFloat k_ = 3.0;
 
       // Create vector of fields
       std::vector<SpectralFieldId>  fieldIds;
@@ -177,8 +177,6 @@ namespace TestSuite {
             sparseLhs += tmp.cast<MHDComplex>();
             Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
             sparseLhs += MathConstants::cI*tmp;
-
-            std::cerr << sparseLhs << std::endl;
 
             Equations::Beta3DQGSystem::boundaryBlock(block, *rowIt, *colIt, spBcs, nx, nz, k_, Ra, Pr, Gamma, chi);
             Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
@@ -225,9 +223,9 @@ namespace TestSuite {
       solver.compute(solveOp);
 
       int n = rhs.rows();
-      int nev = 4;
+      int nev = 6;
       int ncv = 20;
-      std::string bmat = "G";
+      std::string bmat = "I";
       std::string which = "LM";
 
       int lworkl = std::pow(3*ncv,2) + 5*ncv;
@@ -239,7 +237,7 @@ namespace TestSuite {
       iparam.setZero(); // ishfts
       iparam(0) = 1; // ishfts
       iparam(2) = 300; // maxitr
-      iparam(6) = 3; // mode
+      iparam(6) = 1; // mode
 
 
       int ldv = n;
@@ -268,8 +266,8 @@ namespace TestSuite {
          } else if(ido == 1)
          {
             std::cerr << "IDO == 1" << std::endl;
-            workd.segment(ipntr(1),n) = workd.segment(ipntr(2), n);
-            workd.segment(ipntr(1),n) = solver.solve(workd.segment(ipntr(1),n));
+            workd.segment(ipntr(2),n) = workd.segment(ipntr(1), n);
+            workd.segment(ipntr(2),n) = solver.solve(workd.segment(ipntr(2),n));
          } else if(ido == 2)
          {
             std::cerr << "IDO == 2" << std::endl;

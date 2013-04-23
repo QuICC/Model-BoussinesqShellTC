@@ -181,7 +181,8 @@ namespace Spectral {
          // Create sub diagonal entry for j+1
          if(j < mat.rows()-1)
          {
-            mat.insertBack(j+1,j) = (1.0/static_cast<MHDFloat>(2*(j+1)));
+            //mat.insertBack(j+1,j) = (1.0/static_cast<MHDFloat>(2*(j+1)));
+            mat.insertBack(j+1,j) = (1.0/static_cast<MHDFloat>(2*(j+1)))*this->c(j);
          }
       }
       mat.finalize(); 
