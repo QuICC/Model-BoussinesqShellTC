@@ -14,6 +14,7 @@
 #include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
 #include "../External/Interfaces/ARPACK_Interface.h"
 #include "EigenSolver/ArpackEigenSolver.hpp"
+#include <cmath>
 
 namespace GeoMHDiSCC {
 
@@ -225,26 +226,34 @@ namespace TestSuite {
          eigenSolver.compute(sparseLhs, sparseRhs);
 
          // Compute eigenvalues
-         ArrayZ eigenValues(8);
+         ArrayZ eigenValues(30);
          MatrixZ eigenVectors;
          eigenSolver.solve(eigenValues, eigenVectors);
 
-         // Show eigenValues
-         std::cerr << std::setprecision(16) << "Ra = " << Ra << " EVs = " << eigenValues.transpose() << std::endl;
-
-         if(eigenValues(0).real() > 0)
+         if(eigenSolver.info() == 0)
          {
-            MHDFloat tmp = 2*Ra-highRa;
-            highRa = Ra;
-            Ra = tmp;
-            //Ra = (highRa+tmp)/2;
-            //Ra = 1.001*tmp;
+            // Show eigenValues
+            std::cerr << std::setprecision(16) << "Ra = " << Ra << " EVs = " << eigenValues.transpose() << std::endl;
+
+            if(eigenValues(0).real() > 0)
+            {
+               MHDFloat tmp = 2*Ra-highRa;
+               highRa = Ra;
+               Ra = tmp;
+               //Ra = (highRa+tmp)/2;
+               //Ra = 1.001*tmp;
+            } else
+            {
+               lowRa = Ra;
+               Ra = (highRa+Ra)/2;
+               eigenSolver.setSigma(MHDComplex(1.1*eigenValues(0).real(), 0.0));
+               eigenSolver.setWhich("LR");
+            }
          } else
          {
-            lowRa = Ra;
-            Ra = (highRa+Ra)/2;
-            eigenSolver.setSigma(MHDComplex(1.1*eigenValues(0).real(), 0.0));
-            eigenSolver.setWhich("LR");
+            std::cerr << "ARPACK failed!" << std::endl;
+            //throw Exception("ARPACK failed with -14");
+            eigenValues.resize(eigenValues.size()*2);
          }
       }
    }

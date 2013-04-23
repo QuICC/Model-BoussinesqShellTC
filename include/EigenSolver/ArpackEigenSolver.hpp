@@ -7,6 +7,7 @@
 
 // System includes
 //
+#include <cmath>
 
 // External includes
 //
@@ -45,6 +46,11 @@ namespace GeoMHDiSCC {
          void solve(ArrayZ& eigenValues, MatrixZ& eigenVectors);
 
          /**
+          * @brief Get the status from ARPACK
+          */
+         int info() const;
+
+         /**
           * @brief Set the shift eigenvalue
           */
          void setSigma(const MHDComplex sigma);
@@ -76,6 +82,11 @@ namespace GeoMHDiSCC {
           * @brief Allocate work memory
           */
          void allocateMemory();
+
+         /**
+          * @brief Storage for the status output from ARPACK
+          */
+         int mInfo;
 
          /**
           * @brief Shift eigenvalue \f$\sigma\f$
@@ -138,7 +149,17 @@ namespace GeoMHDiSCC {
 
    inline bool sortEigenValues(const MHDComplex& x, const MHDComplex& y)
    {
-      return x.real() > y.real();
+      if(std::isinf(x.real()) || std::abs(x.real()) > 1e20)
+      {
+         return false;
+      }
+      else if(std::isinf(y.real()) || std::abs(x.real()) > 1e20)
+      {
+         return true;
+      } else
+      {
+         return x.real() > y.real();
+      }
    }
 }
 

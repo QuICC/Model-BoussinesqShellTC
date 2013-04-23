@@ -33,8 +33,8 @@ namespace Spectral {
    {
       if(n == 0)
       {
-         //return 2.0;
-         return 1.0;
+         return 2.0;
+         //return 1.0;
 
       } else if(n < 0)
       {

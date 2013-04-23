@@ -23,7 +23,7 @@
 namespace GeoMHDiSCC {
 
    ArpackEigenSolver::ArpackEigenSolver()
-      : mSigma(0.0,0.0), mTol(0.0), mMaxIter(300), mNcv(20), mWhich("LM"), mIpntr(14), mIparam(11)
+      : mInfo(0), mSigma(0.0,0.0), mTol(0.0), mMaxIter(300), mNcv(50), mWhich("LM"), mIpntr(14), mIparam(11)
    {
    }
 
@@ -85,8 +85,16 @@ namespace GeoMHDiSCC {
       std::string bmat = "I";
       int lworkl = this->mWorkl.size();
       int ido = 0; 
-      int info = 0;
       int ldv = n;
+
+      // Make sure NCV has possible value
+      if(this->mNcv-nev < 2 || this->mNcv > n)
+      {
+         this->mNcv = 2+nev;
+      }
+
+      // Prepare status ouput
+      this-> mInfo = 0;
 
       // Set this->mIparam
       this->mIparam(0) = 1; // ishfts
@@ -97,7 +105,7 @@ namespace GeoMHDiSCC {
       while(ido != 99)
       {
          // ARPACK's ZNAUPD
-         znaupd_(&ido, bmat.c_str(), &n, this->mWhich.c_str(), &nev, &this->mTol, this->mResid.data(), &this->mNcv, this->mV.data(), &ldv, this->mIparam.data(), this->mIpntr.data(), this->mWorkd.data(), this->mWorkl.data(), &lworkl, this->mRwork.data(), &info);
+         znaupd_(&ido, bmat.c_str(), &n, this->mWhich.c_str(), &nev, &this->mTol, this->mResid.data(), &this->mNcv, this->mV.data(), &ldv, this->mIparam.data(), this->mIpntr.data(), this->mWorkd.data(), this->mWorkl.data(), &lworkl, this->mRwork.data(), &this->mInfo);
 
          // ZNAUPD's IDO == 1
          if(ido == 1)
@@ -116,7 +124,7 @@ namespace GeoMHDiSCC {
          }
       }
 
-      if(info < 0)
+      if(this->mInfo < 0)
       {
          throw Exception("ARPACK's ZNAUPD failed!");
       } else
@@ -132,11 +140,13 @@ namespace GeoMHDiSCC {
          }
 
          // ARPACK's ZNEUPD
-         zneupd_(&rvec, howmny.c_str(), this->mSelect.data(), this->mD.data(), this->mZ.data(), &ldz, &this->mSigma, this->mWorkev.data(), bmat.c_str(), &n, this->mWhich.c_str(), &nev, &this->mTol, this->mResid.data(), &this->mNcv, this->mV.data(), &ldv, this->mIparam.data(), this->mIpntr.data(), this->mWorkd.data(), this->mWorkl.data(), &lworkl, this->mRwork.data(), &info);
+         zneupd_(&rvec, howmny.c_str(), this->mSelect.data(), this->mD.data(), this->mZ.data(), &ldz, &this->mSigma, this->mWorkev.data(), bmat.c_str(), &n, this->mWhich.c_str(), &nev, &this->mTol, this->mResid.data(), &this->mNcv, this->mV.data(), &ldv, this->mIparam.data(), this->mIpntr.data(), this->mWorkd.data(), this->mWorkl.data(), &lworkl, this->mRwork.data(), &this->mInfo);
 
-         if(info < 0)
+         if(this->mInfo == -14)
          {
-            std::cerr << info << std::endl;
+            eigenValues.setConstant(-42);
+         } else if(this->mInfo < 0)
+         {
             throw Exception("ARPACK's ZNEUPD failed!");
          } else
          {
@@ -144,6 +154,11 @@ namespace GeoMHDiSCC {
             std::sort(eigenValues.data(), eigenValues.data()+eigenValues.size(), &sortEigenValues);
          }
       }
+   }
+
+   int ArpackEigenSolver::info() const
+   {
+      return this->mInfo;
    }
 
    void ArpackEigenSolver::setSigma(const MHDComplex sigma)
