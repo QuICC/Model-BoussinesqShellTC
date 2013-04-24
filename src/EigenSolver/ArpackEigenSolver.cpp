@@ -19,11 +19,10 @@
 #include "Exceptions/Exception.hpp"
 #include "../External/Interfaces/ARPACK_Interface.h"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
    ArpackEigenSolver::ArpackEigenSolver()
-      : mInfo(0), mSigma(0.0,0.0), mTol(0.0), mMaxIter(300), mNcv(50), mWhich("LM"), mIpntr(14), mIparam(11)
+      : mInfo(0), mSigma(0.0,0.0), mTol(0.0), mMaxIter(300), mNcv(-1), mWhich("LM"), mIpntr(14), mIparam(11)
    {
    }
 
@@ -52,20 +51,24 @@ namespace GeoMHDiSCC {
       }
 
       // Allocate work memory
-      this->allocateMemory();
+      this->allocateMemory(10);
    }
 
-   void ArpackEigenSolver::allocateMemory()
+   void ArpackEigenSolver::allocateMemory(const int nev)
    {
       this->mResid.resize(this->mLhs.rows());
-      this->mV.resize(this->mLhs.rows(), this->mNcv);
       this->mWorkd.resize(3*this->mLhs.rows());
+      this->mD.resize(nev+1);
+      this->mZ.resize(this->mLhs.rows(),nev);
+
+      // Set NCV to some value
+      this->mNcv = std::min(6+nev, this->mLhs.rows());
+
+      this->mV.resize(this->mLhs.rows(), this->mNcv);
       this->mWorkl.resize(std::pow(3*this->mNcv,2) + 5*this->mNcv);
       this->mRwork.resize(this->mNcv);
 
       this->mSelect.resize(this->mNcv);
-      this->mD.resize(11);
-      this->mZ.resize(this->mLhs.rows(),11);
       this->mWorkev.resize(2*this->mNcv);
    }
 
@@ -81,17 +84,12 @@ namespace GeoMHDiSCC {
 
       // Extract the requested number of eigenvalues
       int nev = eigenValues.size();
+      this->allocateMemory(nev);
 
       std::string bmat = "I";
       int lworkl = this->mWorkl.size();
       int ido = 0; 
       int ldv = n;
-
-      // Make sure NCV has possible value
-      if(this->mNcv-nev < 2 || this->mNcv > n)
-      {
-         this->mNcv = 2+nev;
-      }
 
       // Prepare status ouput
       this-> mInfo = 0;
@@ -132,12 +130,6 @@ namespace GeoMHDiSCC {
          int rvec = (eigenVectors.size() > 0);
          std::string howmny = "A";
          int ldz = n;
-
-         if(nev > 10)
-         {
-            this->mD.resize(nev+1);
-            this->mZ.resize(n, nev);
-         }
 
          // ARPACK's ZNEUPD
          zneupd_(&rvec, howmny.c_str(), this->mSelect.data(), this->mD.data(), this->mZ.data(), &ldz, &this->mSigma, this->mWorkev.data(), bmat.c_str(), &n, this->mWhich.c_str(), &nev, &this->mTol, this->mResid.data(), &this->mNcv, this->mV.data(), &ldv, this->mIparam.data(), this->mIpntr.data(), this->mWorkd.data(), this->mWorkl.data(), &lworkl, this->mRwork.data(), &this->mInfo);

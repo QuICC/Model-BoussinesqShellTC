@@ -321,17 +321,17 @@ namespace Equations {
       if(eqId.first == PhysicalNames::STREAMFUNCTION && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
-         q1D = spec1D.id(0);
+         q1D = spec1D.id(4);
          // Set Z boundary quasi-inverse
-         q3D = spec3D.qDiff(1,0);
+         q3D = spec3D.id(0);
 
       /// <b>Boundary operators for the vertical velocity equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$ and \f$\left(D_x^{-2} \otimes BC_Z\right)\f$
       } else if(eqId.first == PhysicalNames::VELOCITYZ && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
-         q1D = spec1D.id(0);
+         q1D = spec1D.id(2);
          // Set Z boundary quasi-inverse
-         q3D = spec3D.qDiff(1,0);
+         q3D = spec3D.id(0);
 
       /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
       } else if(eqId.first == PhysicalNames::TEMPERATURE && spBcIds->hasEquation(eqId))

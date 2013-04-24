@@ -159,7 +159,7 @@ namespace TestSuite {
       // Physical parameters Ra, Pr, Gamma, chi
       MHDFloat Ra = 1800.0;
       MHDFloat Pr = 1.0;
-      MHDFloat Gamma = 1.;
+      MHDFloat Gamma = .1;
       MHDFloat chi = 45;
       // Wave number
       MHDFloat k_ = 3.0;
@@ -169,9 +169,9 @@ namespace TestSuite {
       Ra = (lowRa+highRa)/2;
 
       eigenSolver.setWhich("LM");
-      eigenSolver.setSigma(MHDComplex(0.0,0.0));
+      eigenSolver.setSigma(MHDComplex(1.0,0.0));
 
-      for(int i = 0; i < 50; ++i)
+      for(int i = 0; i < 20; ++i)
       {
          std::cerr << "Ra = " << Ra << std::endl;
          SparseMatrix  tmp;
@@ -226,7 +226,8 @@ namespace TestSuite {
          eigenSolver.compute(sparseLhs, sparseRhs);
 
          // Compute eigenvalues
-         ArrayZ eigenValues(30);
+         ArrayZ eigenValues(5*nx+5*nz);
+         //MatrixZ eigenVectors(sparseLhs.rows(), eigenValues.size());
          MatrixZ eigenVectors;
          eigenSolver.solve(eigenValues, eigenVectors);
 
@@ -237,17 +238,16 @@ namespace TestSuite {
 
             if(eigenValues(0).real() > 0)
             {
-               MHDFloat tmp = 2*Ra-highRa;
+               if(eigenValues(0).real() < 1e-2)
+               {
+                  break;
+               }
                highRa = Ra;
-               Ra = tmp;
-               //Ra = (highRa+tmp)/2;
-               //Ra = 1.001*tmp;
+               Ra = (lowRa+Ra)/2;
             } else
             {
                lowRa = Ra;
                Ra = (highRa+Ra)/2;
-               eigenSolver.setSigma(MHDComplex(1.1*eigenValues(0).real(), 0.0));
-               eigenSolver.setWhich("LR");
             }
          } else
          {
@@ -256,6 +256,8 @@ namespace TestSuite {
             eigenValues.resize(eigenValues.size()*2);
          }
       }
+
+      std::cerr << "Critical Ra = " << Ra << std::endl;
    }
 
 }

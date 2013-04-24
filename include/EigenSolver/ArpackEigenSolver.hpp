@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Allocate work memory
           */
-         void allocateMemory();
+         void allocateMemory(const int nev);
 
          /**
           * @brief Storage for the status output from ARPACK
