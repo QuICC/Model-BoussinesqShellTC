@@ -15,7 +15,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Timesteppers/SparseSolverMacro.h"
+#include "SparseSolvers/SparseSolverMacro.h"
 
 namespace GeoMHDiSCC {
 

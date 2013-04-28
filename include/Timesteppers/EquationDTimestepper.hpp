@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "Timesteppers/SparseSolverMacro.h"
+#include "SparseSolvers/SparseSolverMacro.h"
 #include "Timesteppers/EquationTimestepperBase.hpp"
 
 namespace GeoMHDiSCC {
