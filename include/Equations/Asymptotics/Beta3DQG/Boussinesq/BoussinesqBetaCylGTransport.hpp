@@ -1,9 +1,9 @@
-/** \file Beta3DQGVertical.hpp
- *  \brief Implementation of the vertical velocity equation for the 3DQG beta model
+/** \file BoussinesqBetaCylGTransport.hpp
+ *  \brief Implementation of the transport equation for the 3DQG beta model
  */
 
-#ifndef BETA3DQGVERTICAL_HPP
-#define BETA3DQGVERTICAL_HPP
+#ifndef BETA3DQGTRANSPORT_HPP
+#define BETA3DQGTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/IBeta3DQGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * \brief Implementation of the vertical velocity equation for the 3DQG beta model
+    * \brief Implementation of the transport equation for the 3DQG beta model
     */
-   class Beta3DQGVertical: public IBeta3DQGScalarEquation
+   class BoussinesqBetaCylGTransport: public IBoussinesqBetaCylGScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Beta3DQGVertical(SharedIEquationParameters spEqParams);
+         BoussinesqBetaCylGTransport(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGVertical();
+         virtual ~BoussinesqBetaCylGTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -49,7 +49,7 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const;
-         
+
       protected:
          /**
           * @brief Set variable requirements
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BETA3DQGVERTICAL_HPP
+#endif // BETA3DQGTRANSPORT_HPP

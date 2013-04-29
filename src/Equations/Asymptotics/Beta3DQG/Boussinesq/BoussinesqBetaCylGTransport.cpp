@@ -1,4 +1,4 @@
-/** \file Beta3DQGTransport.cpp
+/** \file BoussinesqBetaCylGTransport.cpp
  *  \brief Source of the implementation of the transport equation in the 3DQG beta model
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGTransport.hpp"
 
 // Project includes
 //
@@ -22,24 +22,24 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   Beta3DQGTransport::Beta3DQGTransport(SharedIEquationParameters spEqParams)
-      : IBeta3DQGScalarEquation(spEqParams)
+   BoussinesqBetaCylGTransport::BoussinesqBetaCylGTransport(SharedIEquationParameters spEqParams)
+      : IBoussinesqBetaCylGScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   Beta3DQGTransport::~Beta3DQGTransport()
+   BoussinesqBetaCylGTransport::~BoussinesqBetaCylGTransport()
    {
    }
 
-   void Beta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void BoussinesqBetaCylGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -48,7 +48,7 @@ namespace Equations {
       Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void Beta3DQGTransport::setRequirements()
+   void BoussinesqBetaCylGTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);

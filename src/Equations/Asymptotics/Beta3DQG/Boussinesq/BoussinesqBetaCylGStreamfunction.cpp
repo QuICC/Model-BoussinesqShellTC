@@ -1,4 +1,4 @@
-/** \file Beta3DQGStreamfunction.cpp
+/** \file BoussinesqBetaCylGStreamfunction.cpp
  *  \brief Source of the implementation of the streamfunction equation in the 3DQG beta model
  */
 
@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGStreamfunction.hpp"
 
 // Project includes
 //
@@ -22,24 +22,24 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   Beta3DQGStreamfunction::Beta3DQGStreamfunction(SharedIEquationParameters spEqParams)
-      : IBeta3DQGScalarEquation(spEqParams)
+   BoussinesqBetaCylGStreamfunction::BoussinesqBetaCylGStreamfunction(SharedIEquationParameters spEqParams)
+      : IBoussinesqBetaCylGScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   Beta3DQGStreamfunction::~Beta3DQGStreamfunction()
+   BoussinesqBetaCylGStreamfunction::~BoussinesqBetaCylGStreamfunction()
    {
    }
 
-   void Beta3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void BoussinesqBetaCylGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -48,7 +48,7 @@ namespace Equations {
       Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
-   void Beta3DQGStreamfunction::setRequirements()
+   void BoussinesqBetaCylGStreamfunction::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
@@ -63,7 +63,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
    }
 
-   void Beta3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
+   void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
@@ -83,7 +83,7 @@ namespace Equations {
       this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
    }
 
-   void Beta3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
+   void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);

@@ -1,4 +1,4 @@
-/** \file Beta3DQGModel.hpp
+/** \file BoussinesqBetaCylGModel.hpp
  *  \brief Implementation of the beta 3DQG physical model
  */
 
@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
    /**
     * @brief Implementation of the beta 3DQG physical model
     */
-   class Beta3DQGModel
+   class BoussinesqBetaCylGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -94,12 +94,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         Beta3DQGModel();
+         BoussinesqBetaCylGModel();
 
          /**
           * @brief Destructor
           */
-         ~Beta3DQGModel();
+         ~BoussinesqBetaCylGModel();
    };
 
 }

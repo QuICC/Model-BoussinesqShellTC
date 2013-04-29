@@ -1,4 +1,4 @@
-/** \file Beta3DQGSystem.cpp
+/** \file BoussinesqBetaCylGSystem.cpp
  *  \brief Source of the implementation of the system of equations for the 3DQG beta model
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
 
 // Project includes
 //
@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   void Beta3DQGSystem::setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nx, const int nz, const int ny)
+   void BoussinesqBetaCylGSystem::setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nx, const int nz, const int ny)
    {
       /// - Streamfunction equation
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
@@ -108,7 +108,7 @@ namespace Equations {
       }
    }
 
-   void Beta3DQGSystem::quasiInverse(SparseMatrix& mat, const SpectralFieldId eqId, const int nx, const int nz)
+   void BoussinesqBetaCylGSystem::quasiInverse(SparseMatrix& mat, const SpectralFieldId eqId, const int nx, const int nz)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
@@ -142,7 +142,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void Beta3DQGSystem::timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
@@ -184,7 +184,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void Beta3DQGSystem::linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
@@ -296,7 +296,7 @@ namespace Equations {
 
    }
 
-   void Beta3DQGSystem::boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
@@ -394,11 +394,11 @@ namespace Equations {
 
    }
 
-   Beta3DQGSystem::Beta3DQGSystem()
+   BoussinesqBetaCylGSystem::BoussinesqBetaCylGSystem()
    {
    }
 
-   Beta3DQGSystem::~Beta3DQGSystem()
+   BoussinesqBetaCylGSystem::~BoussinesqBetaCylGSystem()
    {
    }
 }

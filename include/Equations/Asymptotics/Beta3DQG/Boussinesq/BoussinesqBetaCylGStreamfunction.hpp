@@ -1,4 +1,4 @@
-/** \file Beta3DQGStreamfunction.hpp
+/** \file BoussinesqBetaCylGStreamfunction.hpp
  *  \brief Implementation of the streamfunction equation for the 3DQG beta model
  */
 
@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/IBeta3DQGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the streamfunction equation for the 3DQG beta model
     */
-   class Beta3DQGStreamfunction: public IBeta3DQGScalarEquation
+   class BoussinesqBetaCylGStreamfunction: public IBoussinesqBetaCylGScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         Beta3DQGStreamfunction(SharedIEquationParameters spEqParams);
+         BoussinesqBetaCylGStreamfunction(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGStreamfunction();
+         virtual ~BoussinesqBetaCylGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term

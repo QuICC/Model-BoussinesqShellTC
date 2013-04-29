@@ -1,4 +1,4 @@
-/** \file IBeta3DQGScalarEquation.hpp
+/** \file IBoussinesqBetaCylGScalarEquation.hpp
  *  \brief Implementation of the general scalar equation for the 3DQG beta model
  */
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * @brief Implementation of the general scalar equation for the 3DQG beta model
     */
-   class IBeta3DQGScalarEquation: public IScalarEquation
+   class IBoussinesqBetaCylGScalarEquation: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         IBeta3DQGScalarEquation(SharedIEquationParameters spEqParams);
+         IBoussinesqBetaCylGScalarEquation(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IBeta3DQGScalarEquation();
+         virtual ~IBoussinesqBetaCylGScalarEquation();
 
          /**
           * @brief Build Full block row for linear operators

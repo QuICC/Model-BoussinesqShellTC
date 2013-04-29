@@ -1,4 +1,4 @@
-/** \file IBeta3DQGScalarEquation.cpp
+/** \file IBoussinesqBetaCylGScalarEquation.cpp
  *  \brief Source of the implementation of the streamfunction equation in the 3DQG beta model
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/IBeta3DQGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
 
 // Project includes
 //
@@ -24,22 +24,22 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IBeta3DQGScalarEquation::IBeta3DQGScalarEquation(SharedIEquationParameters spEqParams)
+   IBoussinesqBetaCylGScalarEquation::IBoussinesqBetaCylGScalarEquation(SharedIEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
    }
 
-   IBeta3DQGScalarEquation::~IBeta3DQGScalarEquation()
+   IBoussinesqBetaCylGScalarEquation::~IBoussinesqBetaCylGScalarEquation()
    {
    }
 
-   void IBeta3DQGScalarEquation::setCoupling()
+   void IBoussinesqBetaCylGScalarEquation::setCoupling()
    {
       // Get X dimension
       int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -51,10 +51,10 @@ namespace Equations {
       // Set coupling information
       this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-      Beta3DQGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, eqId, nX, nZ, nY);
+      BoussinesqBetaCylGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, eqId, nX, nZ, nY);
    }
 
-   DecoupledZSparse IBeta3DQGScalarEquation::linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const
    {
       // Get X and Z dimensions
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -84,7 +84,7 @@ namespace Equations {
          blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
 
          SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-         Beta3DQGSystem::linearBlock(block, eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
+         BoussinesqBetaCylGSystem::linearBlock(block, eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -100,7 +100,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   DecoupledZSparse IBeta3DQGScalarEquation::timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const
    {
       // Get X and Z dimensions
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -124,7 +124,7 @@ namespace Equations {
       SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
       blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), this->couplingInfo(comp).fieldIndex()) = 1;
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-      Beta3DQGSystem::timeBlock(block, eqId, nx, nz, k_, Ra, Pr, Gamma, chi);
+      BoussinesqBetaCylGSystem::timeBlock(block, eqId, nx, nz, k_, Ra, Pr, Gamma, chi);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
       matrixRow.first += tmp;
       Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -137,7 +137,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   DecoupledZSparse IBeta3DQGScalarEquation::boundaryRow(FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::boundaryRow(FieldComponents::Spectral::Id comp, const int matIdx) const
    {
       // Get X and Z dimensions
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -167,7 +167,7 @@ namespace Equations {
          blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
 
          SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-         Beta3DQGSystem::boundaryBlock(block, eqId, *fIt, this->mspBcIds, nx, nz, k_, Ra, Pr, Gamma, chi);
+         BoussinesqBetaCylGSystem::boundaryBlock(block, eqId, *fIt, this->mspBcIds, nx, nz, k_, Ra, Pr, Gamma, chi);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -183,7 +183,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   void IBeta3DQGScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void IBoussinesqBetaCylGScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
       // Equation key
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
@@ -217,7 +217,7 @@ namespace Equations {
       {
          qIt->second.push_back(SparseMatrix());
 
-         Beta3DQGSystem::quasiInverse(qIt->second.back(), eqId, nx, nz);
+         BoussinesqBetaCylGSystem::quasiInverse(qIt->second.back(), eqId, nx, nz);
       }
 
       //
@@ -239,7 +239,7 @@ namespace Equations {
 
             // Get linear block
             tmpMat.push_back(DecoupledZSparse());
-            Beta3DQGSystem::linearBlock(tmpMat.at(i), eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
+            BoussinesqBetaCylGSystem::linearBlock(tmpMat.at(i), eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
 
             // Explicit operator requires an additional minus sign
             tmpMat.at(i).first = -tmpMat.at(i).first;

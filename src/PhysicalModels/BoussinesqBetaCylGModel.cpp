@@ -1,4 +1,4 @@
-/** \file Beta3DQGModel.cpp
+/** \file BoussinesqBetaCylGModel.cpp
  *  \brief Source of the beta 3DQG physical model
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/Beta3DQGModel.hpp"
+#include "PhysicalModels/BoussinesqBetaCylGModel.hpp"
 
 // Project includes
 //
@@ -22,13 +22,13 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGVertical.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> Beta3DQGModel::fieldIds()
+   std::vector<PhysicalNames::Id> BoussinesqBetaCylGModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -45,14 +45,14 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> Beta3DQGModel::boundaryNames()
+   std::vector<std::string> BoussinesqBetaCylGModel::boundaryNames()
    {
       // Create storage
       std::vector<std::string>   names;
 
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqBetaCylGModel::fieldIds();
 
       for(it = ids.begin(); it != ids.end(); ++it)
       {
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
       return names;
    }
 
-   std::vector<bool> Beta3DQGModel::isPeriodicBox()
+   std::vector<bool> BoussinesqBetaCylGModel::isPeriodicBox()
    {
       std::vector<bool> box;
 
@@ -78,19 +78,19 @@ namespace GeoMHDiSCC {
       return box;
    }
 
-   void Beta3DQGModel::addEquations(SharedSimulation spSim)
+   void BoussinesqBetaCylGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::Beta3DQGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqBetaCylGTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::Beta3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::BoussinesqBetaCylGStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::Beta3DQGVertical>();
+      spSim->addScalarEquation<Equations::BoussinesqBetaCylGVertical>();
    }
 
-   void Beta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqBetaCylGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -99,11 +99,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void Beta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqBetaCylGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqBetaCylGModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -122,7 +122,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedSimulationBoundary Beta3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedSimulationBoundary BoussinesqBetaCylGModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedSimulationBoundary  spBcs(new SimulationBoundary());
@@ -215,11 +215,11 @@ namespace GeoMHDiSCC {
       return spBcs;
    }
 
-   void Beta3DQGModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqBetaCylGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = Beta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqBetaCylGModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

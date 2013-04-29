@@ -1,4 +1,4 @@
-/** \file Beta3DQGVertical.cpp
+/** \file BoussinesqBetaCylGVertical.cpp
  *  \brief Source of the implementation of the vertical velocity equation in the 3DQG beta model
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGVertical.hpp"
 
 // Project includes
 //
@@ -22,24 +22,24 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   Beta3DQGVertical::Beta3DQGVertical(SharedIEquationParameters spEqParams)
-      : IBeta3DQGScalarEquation(spEqParams)
+   BoussinesqBetaCylGVertical::BoussinesqBetaCylGVertical(SharedIEquationParameters spEqParams)
+      : IBoussinesqBetaCylGScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   Beta3DQGVertical::~Beta3DQGVertical()
+   BoussinesqBetaCylGVertical::~BoussinesqBetaCylGVertical()
    {
    }
 
-   void Beta3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void BoussinesqBetaCylGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
       /// 
       /// Computation of the jacobian:
@@ -48,7 +48,7 @@ namespace Equations {
       Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void Beta3DQGVertical::setRequirements()
+   void BoussinesqBetaCylGVertical::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);

@@ -1,4 +1,4 @@
-/** \file Beta3DQGSystem.hpp
+/** \file BoussinesqBetaCylGSystem.hpp
  *  \brief Implementation of the matrix blocks for the 3DQG beta model
  */
 
@@ -32,7 +32,7 @@ namespace Equations {
     * \f$ L - T = NL \f$
     * where L are the linear operators, T the time derivatives and NL the nonlinear terms
     */
-   class Beta3DQGSystem
+   class BoussinesqBetaCylGSystem
    {
       public:
          /**
@@ -110,12 +110,12 @@ namespace Equations {
          /**
           * @brief Simple constructor
           */
-         Beta3DQGSystem();
+         BoussinesqBetaCylGSystem();
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~Beta3DQGSystem();
+         virtual ~BoussinesqBetaCylGSystem();
    };
 
 }
