@@ -1,9 +1,9 @@
-/** \file FPlane3DQGModel.hpp
- *  \brief Implementation of the f-plane 3DQG physical model
+/** \file BoussinesqBetaSphGModel.hpp
+ *  \brief Implementation of the Boussinesq beta 3DQG model with spherical gravity
  */
 
-#ifndef FPLANE3DQGMODEL_HPP
-#define FPLANE3DQGMODEL_HPP
+#ifndef BOUSSINESQBETASPHGMODEL_HPP
+#define BOUSSINESQBETASPHGMODEL_HPP
 
 // Configuration includes
 //
@@ -18,22 +18,22 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
-#include "SpatialSchemes/3D/TFFScheme.hpp"
+#include "SpatialSchemes/3D/TFTScheme.hpp"
 #include "Equations/Parameters/PrRaXGParameters.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the f-plane 3DQG physical model
+    * @brief Implementation of the Boussinesq beta 3DQG model with spherical gravity
     */
-   class FPlane3DQGModel
+   class BoussinesqBetaSphGModel
    {
       public:
          /// Typedef for the spatial scheme used
          static const int DIMENSION = 3;
 
          /// Typedef for the spatial scheme used
-         typedef TFFScheme SchemeType;
+         typedef TFTScheme SchemeType;
 
          /// Typedef for the equation parameters used
          typedef Equations::PrRaXGParameters  ParametersType;
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         FPlane3DQGModel();
+         BoussinesqBetaSphGModel();
 
          /**
           * @brief Destructor
           */
-         ~FPlane3DQGModel();
+         ~BoussinesqBetaSphGModel();
    };
 
 }
 
-#endif // FPLANE3DQGMODEL_HPP
+#endif // BOUSSINESQBETASPHGMODEL_HPP

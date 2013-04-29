@@ -1,9 +1,9 @@
-/** \file BoussinesqBetaCylGTransport.hpp
- *  \brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity
+/** \file BoussinesqBetaSphGTransport.hpp
+ *  \brief Implementation of the transport equation for the Boussinesq beta model with spherical gravity
  */
 
-#ifndef BOUSSINESQBETACYLGTRANSPORT_HPP
-#define BOUSSINESQBETACYLGTRANSPORT_HPP
+#ifndef BOUSSINESQBETASPHGTRANSPORT_HPP
+#define BOUSSINESQBETASPHGTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaSphGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity
+    * \brief Implementation of the transport equation for the Boussinesq beta model with spherical gravity
     */
-   class BoussinesqBetaCylGTransport: public IBoussinesqBetaCylGScalarEquation
+   class BoussinesqBetaSphGTransport: public IBoussinesqBetaSphGScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqBetaCylGTransport(SharedIEquationParameters spEqParams);
+         BoussinesqBetaSphGTransport(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGTransport();
+         virtual ~BoussinesqBetaSphGTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETACYLGTRANSPORT_HPP
+#endif // BOUSSINESQBETASPHGTRANSPORT_HPP

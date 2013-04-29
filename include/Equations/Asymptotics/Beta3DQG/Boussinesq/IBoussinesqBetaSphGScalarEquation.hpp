@@ -1,9 +1,9 @@
-/** \file IBoussinesqBetaCylGScalarEquation.hpp
- *  \brief Implementation of the general scalar equation for the Boussinesq beta model with cylindrical gravity
+/** \file IBoussinesqBetaSphGScalarEquation.hpp
+ *  \brief Implementation of the general scalar equation for the Boussinesq beta model with spherical gravity
  */
 
-#ifndef IBOUSSINESQBETACYLGSCALAREQUATION_HPP
-#define IBOUSSINESQBETACYLGSCALAREQUATION_HPP
+#ifndef IBOUSSINESQBETASPHGSCALAREQUATION_HPP
+#define IBOUSSINESQBETASPHGSCALAREQUATION_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the general scalar equation for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the general scalar equation for the Boussinesq beta model with spherical gravity
     */
-   class IBoussinesqBetaCylGScalarEquation: public IScalarEquation
+   class IBoussinesqBetaSphGScalarEquation: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         IBoussinesqBetaCylGScalarEquation(SharedIEquationParameters spEqParams);
+         IBoussinesqBetaSphGScalarEquation(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IBoussinesqBetaCylGScalarEquation();
+         virtual ~IBoussinesqBetaSphGScalarEquation();
 
          /**
           * @brief Build Full block row for linear operators
@@ -82,4 +82,4 @@ namespace Equations {
 }
 }
 
-#endif // IBOUSSINESQBETACYLGSCALAREQUATION_HPP
+#endif // IBOUSSINESQBETASPHGSCALAREQUATION_HPP

@@ -1,9 +1,9 @@
 /** \file BoussinesqBetaCylGModel.hpp
- *  \brief Implementation of the beta 3DQG physical model
+ *  \brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity
  */
 
-#ifndef BETA3DQGMODEL_HPP
-#define BETA3DQGMODEL_HPP
+#ifndef BOUSSINESQBETACYLGMODEL_HPP
+#define BOUSSINESQBETACYLGMODEL_HPP
 
 // Configuration includes
 //
@@ -24,7 +24,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the beta 3DQG physical model
+    * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity
     */
    class BoussinesqBetaCylGModel
    {
@@ -104,4 +104,4 @@ namespace GeoMHDiSCC {
 
 }
 
-#endif // BETA3DQGMODEL_HPP
+#endif // BOUSSINESQBETACYLGMODEL_HPP

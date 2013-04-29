@@ -1,9 +1,9 @@
-/** \file BoussinesqBetaCylGSystem.hpp
- *  \brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity
+/** \file BoussinesqBetaSphGSystem.hpp
+ *  \brief Implementation of the matrix blocks for the Boussinesq beta model with spherical gravity
  */
 
-#ifndef BOUSSINESQBETACYLGSYSTEM_HPP
-#define BOUSSINESQBETACYLGSYSTEM_HPP
+#ifndef BOUSSINESQBETASPHGSYSTEM_HPP
+#define BOUSSINESQBETASPHGSYSTEM_HPP
 
 // Configuration includes
 //
@@ -26,13 +26,13 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity
+    * \brief Implementation of the matrix blocks for the Boussinesq beta model with spherical gravity
     *
     * The implementation of all operators assume that all equations are written in the form
     * \f$ L - T = NL \f$
     * where L are the linear operators, T the time derivatives and NL the nonlinear terms
     */
-   class BoussinesqBetaCylGSystem
+   class BoussinesqBetaSphGSystem
    {
       public:
          /**
@@ -110,15 +110,15 @@ namespace Equations {
          /**
           * @brief Simple constructor
           */
-         BoussinesqBetaCylGSystem();
+         BoussinesqBetaSphGSystem();
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGSystem();
+         virtual ~BoussinesqBetaSphGSystem();
    };
 
 }
 }
 
-#endif // BOUSSINESQBETACYLGSYSTEM_HPP
+#endif // BOUSSINESQBETASPHGSYSTEM_HPP

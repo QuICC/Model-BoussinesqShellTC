@@ -1,9 +1,9 @@
 /** \file BoussinesqBetaCylGVertical.hpp
- *  \brief Implementation of the vertical velocity equation for the 3DQG beta model
+ *  \brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity
  */
 
-#ifndef BETA3DQGVERTICAL_HPP
-#define BETA3DQGVERTICAL_HPP
+#ifndef BOUSSINESQBETACYLGVERTICAL_HPP
+#define BOUSSINESQBETACYLGVERTICAL_HPP
 
 // Configuration includes
 //
@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the vertical velocity equation for the 3DQG beta model
+    * \brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity
     */
    class BoussinesqBetaCylGVertical: public IBoussinesqBetaCylGScalarEquation
    {
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BETA3DQGVERTICAL_HPP
+#endif // BOUSSINESQBETACYLGVERTICAL_HPP

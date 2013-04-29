@@ -1,9 +1,9 @@
-/** \file AnelasticBeta3DQGModel.hpp
- *  \brief Implementation of the anelastic beta 3DQG physical model
+/** \file AnelasticBetaSphGModel.hpp
+ *  \brief Implementation of the anelastic beta 3DQG model with spherical gravity
  */
 
-#ifndef ANELASTICBETA3DQGMODEL_HPP
-#define ANELASTICBETA3DQGMODEL_HPP
+#ifndef ANELASTICBETASPHGMODEL_HPP
+#define ANELASTICBETASPHGMODEL_HPP
 
 // Configuration includes
 //
@@ -24,9 +24,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the anelastic beta 3DQG physical model
+    * @brief Implementation of the anelastic beta 3DQG model with spherical gravity
     */
-   class AnelasticBeta3DQGModel
+   class AnelasticBetaSphGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         AnelasticBeta3DQGModel();
+         AnelasticBetaSphGModel();
 
          /**
           * @brief Destructor
           */
-         ~AnelasticBeta3DQGModel();
+         ~AnelasticBetaSphGModel();
    };
 
 }
 
-#endif // ANELASTICBETA3DQGMODEL_HPP
+#endif // ANELASTICBETASPHGMODEL_HPP

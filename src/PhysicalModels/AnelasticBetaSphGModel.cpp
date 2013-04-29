@@ -1,5 +1,5 @@
-/** \file AnelasticBeta3DQGModel.cpp
- *  \brief Source of the anelastic beta 3DQG physical model
+/** \file AnelasticBetaSphGModel.cpp
+ *  \brief Source of the anelastic beta 3DQG model with spherical gravity
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/AnelasticBeta3DQGModel.hpp"
+#include "PhysicalModels/AnelasticBetaSphGModel.hpp"
 
 // Project includes
 //
@@ -28,7 +28,7 @@
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> AnelasticBeta3DQGModel::fieldIds()
+   std::vector<PhysicalNames::Id> AnelasticBetaSphGModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -45,14 +45,14 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> AnelasticBeta3DQGModel::boundaryNames()
+   std::vector<std::string> AnelasticBetaSphGModel::boundaryNames()
    {
       // Create storage
       std::vector<std::string>   names;
 
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBeta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
 
       for(it = ids.begin(); it != ids.end(); ++it)
       {
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
       return names;
    }
 
-   std::vector<bool> AnelasticBeta3DQGModel::isPeriodicBox()
+   std::vector<bool> AnelasticBetaSphGModel::isPeriodicBox()
    {
       std::vector<bool> box;
 
@@ -78,7 +78,7 @@ namespace GeoMHDiSCC {
       return box;
    }
 
-   void AnelasticBeta3DQGModel::addEquations(SharedSimulation spSim)
+   void AnelasticBetaSphGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
       spSim->addScalarEquation<Equations::AnelasticBeta3DQGTransport>();
@@ -90,7 +90,7 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::AnelasticBeta3DQGVertical>();
    }
 
-   void AnelasticBeta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void AnelasticBetaSphGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -99,11 +99,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void AnelasticBeta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void AnelasticBetaSphGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBeta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -122,7 +122,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedSimulationBoundary AnelasticBeta3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedSimulationBoundary AnelasticBetaSphGModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedSimulationBoundary  spBcs(new SimulationBoundary());
@@ -203,11 +203,11 @@ namespace GeoMHDiSCC {
       return spBcs;
    }
 
-   void AnelasticBeta3DQGModel::setInitialState(SharedSimulation spSim)
+   void AnelasticBetaSphGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBeta3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

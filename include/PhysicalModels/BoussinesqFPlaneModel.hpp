@@ -1,9 +1,9 @@
-/** \file AnelasticFPlane3DQGModel.hpp
- *  \brief Implementation of the anelastic f-plane 3DQG physical model
+/** \file BoussinesqFPlaneModel.hpp
+ *  \brief Implementation of the Boussinesq f-plane 3DQG model
  */
 
-#ifndef ANELASTICFPLANE3DQGMODEL_HPP
-#define ANELASTICFPLANE3DQGMODEL_HPP
+#ifndef BOUSSINESQFPLANEMODEL_HPP
+#define BOUSSINESQFPLANEMODEL_HPP
 
 // Configuration includes
 //
@@ -24,9 +24,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the anelastic f-plane 3DQG physical model
+    * @brief Implementation of the Boussinesq f-plane 3DQG model
     */
-   class AnelasticFPlane3DQGModel
+   class BoussinesqFPlaneModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -94,14 +94,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         AnelasticFPlane3DQGModel();
+         BoussinesqFPlaneModel();
 
          /**
           * @brief Destructor
           */
-         ~AnelasticFPlane3DQGModel();
+         ~BoussinesqFPlaneModel();
    };
 
 }
 
-#endif // ANELASTICFPLANE3DQGMODEL_HPP
+#endif // BOUSSINESQFPLANEMODEL_HPP

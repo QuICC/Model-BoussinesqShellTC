@@ -1,9 +1,9 @@
-/** \file BoussinesqBetaCylGStreamfunction.hpp
- *  \brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity
+/** \file BoussinesqBetaSphGStreamfunction.hpp
+ *  \brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
  */
 
-#ifndef BOUSSINESQBETACYLGSTREAMFUNCTION_HPP
-#define BOUSSINESQBETACYLGSTREAMFUNCTION_HPP
+#ifndef BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
+#define BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaSphGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity
+    * \brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
     */
-   class BoussinesqBetaCylGStreamfunction: public IBoussinesqBetaCylGScalarEquation
+   class BoussinesqBetaSphGStreamfunction: public IBoussinesqBetaSphGScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqBetaCylGStreamfunction(SharedIEquationParameters spEqParams);
+         BoussinesqBetaSphGStreamfunction(SharedIEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGStreamfunction();
+         virtual ~BoussinesqBetaSphGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -82,4 +82,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETACYLGSTREAMFUNCTION_HPP
+#endif // BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
