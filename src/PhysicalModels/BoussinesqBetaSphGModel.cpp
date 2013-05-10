@@ -22,9 +22,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaSphGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaSphGVertical.hpp"
-#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaSphGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaSphGStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaSphGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaSphGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,21 +45,24 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> BoussinesqBetaSphGModel::boundaryNames()
+   std::vector<NonDimensional::Id> BoussinesqBetaSphGModel::paramIds()
    {
       // Create storage
-      std::vector<std::string>   names;
+      std::vector<NonDimensional::Id> ids;
 
-      // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqBetaSphGModel::fieldIds();
+      // Add Prandtl number
+      ids.push_back(NonDimensional::PRANDTL);
 
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         names.push_back(IoTools::IdToHuman::toTag(*it));
-      }
+      // Add Rayleigh number
+      ids.push_back(NonDimensional::RAYLEIGH);
 
-      return names;
+      // Add gamma
+      ids.push_back(NonDimensional::GAMMA);
+
+      // Add chi
+      ids.push_back(NonDimensional::CHI);
+
+      return ids;
    }
 
    std::vector<bool> BoussinesqBetaSphGModel::isPeriodicBox()

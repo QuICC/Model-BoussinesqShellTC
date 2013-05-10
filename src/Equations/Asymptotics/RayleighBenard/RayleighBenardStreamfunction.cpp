@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   RayleighBenardStreamfunction::RayleighBenardStreamfunction(SharedIEquationParameters spEqParams)
+   RayleighBenardStreamfunction::RayleighBenardStreamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements

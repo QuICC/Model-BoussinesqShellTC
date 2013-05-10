@@ -1,4 +1,4 @@
-/** \file AnelasticFPlane3DQGModel.cpp
+/** \file AnelasticFPlaneModel.cpp
  *  \brief Source of the anelastic f-plane 3DQG physical model
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/AnelasticFPlane3DQGModel.hpp"
+#include "PhysicalModels/AnelasticFPlaneModel.hpp"
 
 // Project includes
 //
@@ -22,13 +22,13 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGVertical.hpp"
-#include "Equations/Asymptotics/AnelasticFPlane3DQG/AnelasticFPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneVertical.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneTransport.hpp"
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> AnelasticFPlane3DQGModel::fieldIds()
+   std::vector<PhysicalNames::Id> AnelasticFPlaneModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -48,24 +48,27 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> AnelasticFPlane3DQGModel::boundaryNames()
+   std::vector<NonDimensional::Id> AnelasticFPlaneModel::paramIds()
    {
       // Create storage
-      std::vector<std::string>   names;
+      std::vector<NonDimensional::Id> ids;
 
-      // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
+      // Add Prandtl number
+      ids.push_back(NonDimensional::PRANDTL);
 
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         names.push_back(IoTools::IdToHuman::toTag(*it));
-      }
+      // Add Rayleigh number
+      ids.push_back(NonDimensional::RAYLEIGH);
 
-      return names;
+      // Add gamma
+      ids.push_back(NonDimensional::GAMMA);
+
+      // Add chi
+      ids.push_back(NonDimensional::CHI);
+
+      return ids;
    }
 
-   std::vector<bool> AnelasticFPlane3DQGModel::isPeriodicBox()
+   std::vector<bool> AnelasticFPlaneModel::isPeriodicBox()
    {
       std::vector<bool> box;
 
@@ -81,22 +84,22 @@ namespace GeoMHDiSCC {
       return box;
    }
 
-   void AnelasticFPlane3DQGModel::addEquations(SharedSimulation spSim)
+   void AnelasticFPlaneModel::addEquations(SharedSimulation spSim)
    {
       // Add mean temperature equation
-      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::AnelasticFPlaneTransport>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::AnelasticFPlaneTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::AnelasticFPlaneStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::AnelasticFPlane3DQGVertical>();
+      spSim->addScalarEquation<Equations::AnelasticFPlaneVertical>();
    }
 
-   void AnelasticFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void AnelasticFPlaneModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -105,11 +108,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void AnelasticFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void AnelasticFPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlaneModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -128,7 +131,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedSimulationBoundary AnelasticFPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedSimulationBoundary AnelasticFPlaneModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedSimulationBoundary  spBcs(new SimulationBoundary());
@@ -209,11 +212,11 @@ namespace GeoMHDiSCC {
       return spBcs;
    }
 
-   void AnelasticFPlane3DQGModel::setInitialState(SharedSimulation spSim)
+   void AnelasticFPlaneModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlaneModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

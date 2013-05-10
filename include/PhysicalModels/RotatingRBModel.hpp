@@ -19,7 +19,6 @@
 //
 #include "Simulation/Simulation.hpp"
 #include "SpatialSchemes/3D/TFFScheme.hpp"
-#include "Equations/Parameters/PrRaXGParameters.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,18 +34,15 @@ namespace GeoMHDiSCC {
          /// Typedef for the spatial scheme used
          typedef TFFScheme SchemeType;
 
-         /// Typedef for the equation parameters used
-         typedef Equations::PrRaXGParameters  ParametersType;
-
          /**
           * @brief Get vector of names for the boundary conditions
           */
          static std::vector<PhysicalNames::Id> fieldIds();
 
          /**
-          * @brief Get vector of names for the boundary conditions
+          * @brief Get vector of names for the nondimensional parameters
           */
-         static std::vector<std::string> boundaryNames();
+         static std::vector<NonDimensional::Id> paramIds();
 
          /**
           * @brief Get vector of bools about periodic box

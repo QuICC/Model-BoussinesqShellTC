@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "Enums/NonDimensional.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -57,6 +58,11 @@ namespace IoTools {
        * @brief Convert ID to string tag
        */
       static std::string toTag(const FieldComponents::Spectral::Id id);
+
+      /**
+       * @brief Convert ID to tag
+       */
+      static std::string toTag(const NonDimensional::Id id);
 
       private:
          /**

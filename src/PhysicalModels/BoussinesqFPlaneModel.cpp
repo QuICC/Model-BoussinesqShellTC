@@ -1,5 +1,5 @@
-/** \file FPlane3DQGModel.cpp
- *  \brief Source of the f-plane 3DQG physical model
+/** \file BoussinesqFPlaneModel.cpp
+ *  \brief Source of the Boussinesq f-plane 3DQG physical model
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "PhysicalModels/FPlane3DQGModel.hpp"
+#include "PhysicalModels/BoussinesqFPlaneModel.hpp"
 
 // Project includes
 //
@@ -22,13 +22,13 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGVertical.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/FPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlaneStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlaneVertical.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlaneTransport.hpp"
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> FPlane3DQGModel::fieldIds()
+   std::vector<PhysicalNames::Id> BoussinesqFPlaneModel::fieldIds()
    {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
@@ -48,24 +48,27 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> FPlane3DQGModel::boundaryNames()
+   std::vector<NonDimensional::Id> BoussinesqFPlaneModel::paramIds()
    {
       // Create storage
-      std::vector<std::string>   names;
+      std::vector<NonDimensional::Id> ids;
 
-      // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      // Add Prandtl number
+      ids.push_back(NonDimensional::PRANDTL);
 
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         names.push_back(IoTools::IdToHuman::toTag(*it));
-      }
+      // Add Rayleigh number
+      ids.push_back(NonDimensional::RAYLEIGH);
 
-      return names;
+      // Add gamma
+      ids.push_back(NonDimensional::GAMMA);
+
+      // Add chi
+      ids.push_back(NonDimensional::CHI);
+
+      return ids;
    }
 
-   std::vector<bool> FPlane3DQGModel::isPeriodicBox()
+   std::vector<bool> BoussinesqFPlaneModel::isPeriodicBox()
    {
       std::vector<bool> box;
 
@@ -81,22 +84,22 @@ namespace GeoMHDiSCC {
       return box;
    }
 
-   void FPlane3DQGModel::addEquations(SharedSimulation spSim)
+   void BoussinesqFPlaneModel::addEquations(SharedSimulation spSim)
    {
       // Add mean temperature equation
-      spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqFPlaneTransport>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::FPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqFPlaneTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::FPlane3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::BoussinesqFPlaneStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::FPlane3DQGVertical>();
+      spSim->addScalarEquation<Equations::BoussinesqFPlaneVertical>();
    }
 
-   void FPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqFPlaneModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -105,11 +108,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void FPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqFPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqFPlaneModel::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -128,7 +131,7 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spViz);
    }
 
-   SharedSimulationBoundary FPlane3DQGModel::createBoundary(const std::map<std::string,int>& bcIds)
+   SharedSimulationBoundary BoussinesqFPlaneModel::createBoundary(const std::map<std::string,int>& bcIds)
    {
       // Create shared simulation boundary
       SharedSimulationBoundary  spBcs(new SimulationBoundary());
@@ -209,11 +212,11 @@ namespace GeoMHDiSCC {
       return spBcs;
    }
 
-   void FPlane3DQGModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqFPlaneModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = FPlane3DQGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqFPlaneModel::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

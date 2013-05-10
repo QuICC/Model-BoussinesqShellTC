@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         RotatingRBTransport(SharedIEquationParameters spEqParams);
+         RotatingRBTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

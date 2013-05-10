@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         IBoussinesqBetaSphGScalarEquation(SharedIEquationParameters spEqParams);
+         IBoussinesqBetaSphGScalarEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

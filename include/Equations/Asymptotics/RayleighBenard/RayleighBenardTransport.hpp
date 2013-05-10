@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         RayleighBenardTransport(SharedIEquationParameters spEqParams);
+         RayleighBenardTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

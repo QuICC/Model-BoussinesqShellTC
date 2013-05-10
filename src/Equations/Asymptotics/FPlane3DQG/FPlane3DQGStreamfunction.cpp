@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   FPlane3DQGStreamfunction::FPlane3DQGStreamfunction(SharedIEquationParameters spEqParams)
+   FPlane3DQGStreamfunction::FPlane3DQGStreamfunction(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements

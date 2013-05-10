@@ -10,7 +10,7 @@ set(MHDTestSources
    SpectralOperators/PeriodicOperator.cpp
    Simulation/SimulationBoundary.cpp
    Equations/CouplingInformation.cpp
-   Equations/Asymptotics/Beta3DQG/Beta3DQGSystem.cpp
+   Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGSystem.cpp
    EigenSolver/ArpackEigenSolver.cpp
 )
 

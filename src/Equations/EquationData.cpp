@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   EquationData::EquationData(SharedIEquationParameters spEqParams)
+   EquationData::EquationData(SharedEquationParameters spEqParams)
       : mspEqParams(spEqParams)
    {
    }
@@ -73,7 +73,7 @@ namespace Equations {
       return *(this->mVectors.find(name)->second);
    }
 
-   const IEquationParameters& EquationData::eqParams() const
+   const EquationParameters& EquationData::eqParams() const
    {
       return *this->mspEqParams;
    }

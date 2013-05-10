@@ -21,7 +21,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
-#include "Equations/IEquationParameters.hpp"
+#include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
@@ -39,7 +39,7 @@ namespace Equations {
          /**
           * \brief Simple constructor
           */
-         explicit EquationData(SharedIEquationParameters spEqParams);
+         explicit EquationData(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -130,7 +130,7 @@ namespace Equations {
          /**
           * @brief Get the equation parameters
           */
-         const IEquationParameters& eqParams() const;
+         const EquationParameters& eqParams() const;
 
       protected:
          /**
@@ -169,7 +169,7 @@ namespace Equations {
          /**
           * @brief Storage for smart equation parameters
           */
-         SharedIEquationParameters   mspEqParams;
+         SharedEquationParameters   mspEqParams;
 
          /**
           * @brief Map of name and pointer for the scalar variables

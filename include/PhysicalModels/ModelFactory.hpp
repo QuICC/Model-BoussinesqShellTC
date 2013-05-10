@@ -17,6 +17,7 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
+#include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -50,8 +51,26 @@ namespace GeoMHDiSCC {
       // Create simulation
       SharedSimulation  spSim(new Simulation);
 
+      // Create list of field ID strings for boundary conditions
+      std::vector<PhysicalNames::Id> fields = TModel::fieldIds();
+      std::vector<PhysicalNames::Id>::iterator fIt;
+      std::vector<std::string>   bcNames;
+      for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
+      {
+         bcNames.push_back(IoTools::IdToHuman::toTag(*fIt));
+      }
+
+      // Create list of nondimensional ID strings for physical parameters
+      std::vector<NonDimensional::Id> params = TModel::paramIds();
+      std::vector<NonDimensional::Id>::iterator pIt;
+      std::vector<std::string>   ndNames;
+      for(pIt = params.begin(); pIt != params.end(); ++pIt)
+      {
+         ndNames.push_back(IoTools::IdToHuman::toTag(*pIt));
+      }
+
       // Add configuration file and parameters
-      spSim->setConfiguration<TModel::DIMENSION, typename TModel::ParametersType>(TModel::SchemeType::type(), TModel::isPeriodicBox(), TModel::boundaryNames());
+      spSim->setConfiguration<TModel::DIMENSION>(TModel::SchemeType::type(), TModel::isPeriodicBox(), bcNames, ndNames);
 
       // Initialise simulation
       spSim->initBase();

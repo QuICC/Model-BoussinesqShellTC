@@ -5,10 +5,9 @@ set(MHDSources
    IScalarEquation.cpp
    IVectorEquation.cpp
    EquationData.cpp
-   IEquationParameters.cpp
+   EquationParameters.cpp
 )
 
 set(MHDSrcSubDirs
    Asymptotics
-   Parameters
 )

@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaCylGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/IBoussinesqBetaCylGScalarEquation.hpp"
 
 // Project includes
 //
@@ -24,13 +24,13 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/BoussinesqBetaCylGSystem.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IBoussinesqBetaCylGScalarEquation::IBoussinesqBetaCylGScalarEquation(SharedIEquationParameters spEqParams)
+   IBoussinesqBetaCylGScalarEquation::IBoussinesqBetaCylGScalarEquation(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
    }

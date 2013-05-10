@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         FPlane3DQGVertical(SharedIEquationParameters spEqParams);
+         FPlane3DQGVertical(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

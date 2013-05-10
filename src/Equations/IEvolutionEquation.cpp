@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IEvolutionEquation::IEvolutionEquation(SharedIEquationParameters spEqParams)
+   IEvolutionEquation::IEvolutionEquation(SharedEquationParameters spEqParams)
       : EquationData(spEqParams)
    {
    }

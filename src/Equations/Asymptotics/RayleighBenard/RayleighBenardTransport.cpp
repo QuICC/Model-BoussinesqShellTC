@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   RayleighBenardTransport::RayleighBenardTransport(SharedIEquationParameters spEqParams)
+   RayleighBenardTransport::RayleighBenardTransport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements

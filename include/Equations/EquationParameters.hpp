@@ -1,9 +1,9 @@
-/** \file IEquationParameters.hpp
+/** \file EquationParameters.hpp
  *  \brief Definition of the non-dimensional parameters
  */
 
-#ifndef IEQUATIONPARAMETERS_HPP
-#define IEQUATIONPARAMETERS_HPP
+#ifndef EQUATIONPARAMETERS_HPP
+#define EQUATIONPARAMETERS_HPP
 
 // Configuration includes
 //
@@ -28,25 +28,30 @@ namespace Equations {
    /**
     * @brief This class provides the constant coefficients apparearing in the equations
     */
-   class IEquationParameters
+   class EquationParameters
    {
       public:
          /**
           * @brief Constructor
           */
-         IEquationParameters();
+         EquationParameters();
 
          /**
           * @brief Destructor
           */
-         virtual ~IEquationParameters();
+         virtual ~EquationParameters();
+
+         /**
+          * @brief Get the names of the equation parameters
+          */
+         std::vector<std::string>  names();
 
          /**
           * @brief Initialise the values from given parameters
           *
           * @param parameters Parameter values read from configuration
           */
-         virtual void init(const std::map<std::string, MHDFloat>& parameters) = 0;
+         void init(const std::map<std::string, MHDFloat>& parameters);
 
          /**
           * @brief Get a nondimensional parameter
@@ -64,9 +69,9 @@ namespace Equations {
       private:
    };
 
-   /// Typedef for a shared pointer to an IEquationParameters object
-   typedef SharedPtrMacro<IEquationParameters>   SharedIEquationParameters;
+   /// Typedef for a shared pointer to an EquationParameters object
+   typedef SharedPtrMacro<EquationParameters>   SharedEquationParameters;
 }
 }
 
-#endif // IEQUATIONPARAMETERS_HPP
+#endif // EQUATIONPARAMETERS_HPP

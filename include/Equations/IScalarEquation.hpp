@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IEquationParameters.hpp"
+#include "Equations/EquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -38,7 +38,7 @@ namespace Equations {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IScalarEquation(SharedIEquationParameters spEqParams);
+         explicit IScalarEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

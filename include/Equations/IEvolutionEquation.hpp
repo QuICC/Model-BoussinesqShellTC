@@ -21,7 +21,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
-#include "Equations/IEquationParameters.hpp"
+#include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -41,7 +41,7 @@ namespace Equations {
          /**
           * @brief Simple constructor
           */
-         explicit IEvolutionEquation(SharedIEquationParameters spEqParams);
+         explicit IEvolutionEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

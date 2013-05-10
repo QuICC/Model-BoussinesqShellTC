@@ -45,21 +45,24 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> RayleighBenardModel::boundaryNames()
+   std::vector<NonDimensional::Id> RayleighBenardModel::paramIds()
    {
       // Create storage
-      std::vector<std::string>   names;
+      std::vector<NonDimensional::Id> ids;
 
-      // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = RayleighBenardModel::fieldIds();
+      // Add Prandtl number
+      ids.push_back(NonDimensional::PRANDTL);
 
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         names.push_back(IoTools::IdToHuman::toTag(*it));
-      }
+      // Add Rayleigh number
+      ids.push_back(NonDimensional::RAYLEIGH);
 
-      return names;
+      // Add gamma
+      ids.push_back(NonDimensional::GAMMA);
+
+      // Add chi
+      ids.push_back(NonDimensional::CHI);
+
+      return ids;
    }
 
    std::vector<bool> RayleighBenardModel::isPeriodicBox()

@@ -1,6 +1,9 @@
 /** \file IdToHuman.cpp
  *  \brief Source of enum id to human strings converters
  */
+// Configuration includes
+//
+#include "Exceptions/Exception.hpp"
 
 // Configuration includes
 //
@@ -47,7 +50,7 @@ namespace IoTools {
          case PhysicalNames::VORTICITY:
             return "Vorticity";
          default:
-            return "UNKNOWN";
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 
@@ -76,7 +79,7 @@ namespace IoTools {
          case PhysicalNames::VORTICITY:
             return "vorticity";
          default:
-            return "unknown";
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 
@@ -93,7 +96,7 @@ namespace IoTools {
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
-            return "UNKNOWN";
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 
@@ -110,7 +113,7 @@ namespace IoTools {
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
-            return "UNKNOWN";
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 
@@ -127,7 +130,7 @@ namespace IoTools {
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
-            return "UNKNOWN";
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 
@@ -144,7 +147,32 @@ namespace IoTools {
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
-            return "UNKNOWN";
+            throw Exception("Unknown ID to string conversion requested");
+      }
+   }
+
+   std::string IdToHuman::toTag(const NonDimensional::Id id)
+   {
+      switch(id)
+      {
+         case NonDimensional::EKMAN:
+            return "ekman";
+         case NonDimensional::ROBERTS:
+            return "roberts";
+         case NonDimensional::RAYLEIGH:
+            return "rayleigh";
+         case NonDimensional::MAGEKMAN:
+            return "magnetic_ekman";
+         case NonDimensional::PRANDTL:
+            return "prandtl";
+         case NonDimensional::MAGPRANDTL:
+            return "magnetic_prandtl";
+         case NonDimensional::CHI:
+            return "chi";
+         case NonDimensional::GAMMA:
+            return "gamma";
+         default:
+            throw Exception("Unknown ID to string conversion requested");
       }
    }
 

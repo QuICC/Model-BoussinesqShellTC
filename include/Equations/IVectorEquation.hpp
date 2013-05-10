@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
-#include "Equations/IEquationParameters.hpp"
+#include "Equations/EquationParameters.hpp"
 #include "Equations/IEvolutionEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -39,7 +39,7 @@ namespace Equations {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IVectorEquation(SharedIEquationParameters spEqParams);
+         explicit IVectorEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

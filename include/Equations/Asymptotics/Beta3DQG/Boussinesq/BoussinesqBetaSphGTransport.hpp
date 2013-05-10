@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/IBoussinesqBetaSphGScalarEquation.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/IBoussinesqBetaSphGScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqBetaSphGTransport(SharedIEquationParameters spEqParams);
+         BoussinesqBetaSphGTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

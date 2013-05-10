@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         RayleighBenardVertical(SharedIEquationParameters spEqParams);
+         RayleighBenardVertical(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

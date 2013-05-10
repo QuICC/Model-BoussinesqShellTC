@@ -36,7 +36,7 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         FPlane3DQGStreamfunction(SharedIEquationParameters spEqParams);
+         FPlane3DQGStreamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

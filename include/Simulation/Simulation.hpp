@@ -21,6 +21,7 @@
 #include "Simulation/SimulationRunControl.hpp"
 #include "Simulation/SimulationIoControl.hpp"
 #include "Simulation/SimulationBoundary.hpp"
+#include "Equations/EquationParameters.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "Timesteppers/Timestepper.hpp"
@@ -101,7 +102,7 @@ namespace GeoMHDiSCC {
           *
           * @param bcNames Vector of names for the boundary conditions
           */
-         template <int DIMENSION, typename TParam> void setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames);
+         template <int DIMENSION> void setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames, const std::vector<std::string>& ndNames);
 
          /**
           * @brief Set initial state through input file
@@ -187,7 +188,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Shared resolution
           */
-         Equations::SharedIEquationParameters mspEqParams;
+         Equations::SharedEquationParameters mspEqParams;
 
          /**
           * @brief Simulation run control
@@ -277,17 +278,17 @@ namespace GeoMHDiSCC {
       return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
    }
 
-   template <int DIMENSION, typename TParam> void Simulation::setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames)
+   template <int DIMENSION> void Simulation::setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames, const std::vector<std::string>& ndNames)
    {
       // Create shared configuration file
       IoConfig::SharedConfigurationReader spCfgFile(new IoConfig::ConfigurationReader(DIMENSION, isPeriodicBox, type));
 
       // Create the equation parameter shared pointer
-      SharedPtrMacro<TParam> spEqParams(new TParam);
+      Equations::SharedEquationParameters spEqParams(new Equations::EquationParameters);
       this->mspEqParams = spEqParams;
 
       // Create the equation parameter dependent configuration part
-      IoConfig::SharedPhysicalPart   spPhys(new IoConfig::PhysicalPart(TParam::names()));
+      IoConfig::SharedPhysicalPart   spPhys(new IoConfig::PhysicalPart(ndNames));
 
       // Add physical part to configuration file
       spCfgFile->addPart(IoConfig::SimulationBlocks::PHYSICAL, spPhys);

@@ -22,9 +22,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/AnelasticBeta3DQG/AnelasticBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/AnelasticBeta3DQG/AnelasticBeta3DQGVertical.hpp"
-#include "Equations/Asymptotics/AnelasticBeta3DQG/AnelasticBeta3DQGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGTransport.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,21 +45,24 @@ namespace GeoMHDiSCC {
       return ids;
    }
 
-   std::vector<std::string> AnelasticBetaSphGModel::boundaryNames()
+   std::vector<NonDimensional::Id> AnelasticBetaSphGModel::paramIds()
    {
       // Create storage
-      std::vector<std::string>   names;
+      std::vector<NonDimensional::Id> ids;
 
-      // Field IDs iterator
-      std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
+      // Add Prandtl number
+      ids.push_back(NonDimensional::PRANDTL);
 
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         names.push_back(IoTools::IdToHuman::toTag(*it));
-      }
+      // Add Rayleigh number
+      ids.push_back(NonDimensional::RAYLEIGH);
 
-      return names;
+      // Add gamma
+      ids.push_back(NonDimensional::GAMMA);
+
+      // Add chi
+      ids.push_back(NonDimensional::CHI);
+
+      return ids;
    }
 
    std::vector<bool> AnelasticBetaSphGModel::isPeriodicBox()
@@ -81,13 +84,13 @@ namespace GeoMHDiSCC {
    void AnelasticBetaSphGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::AnelasticBeta3DQGTransport>();
+      spSim->addScalarEquation<Equations::AnelasticBetaSphGTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::AnelasticBeta3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::AnelasticBetaSphGStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::AnelasticBeta3DQGVertical>();
+      spSim->addScalarEquation<Equations::AnelasticBetaSphGVertical>();
    }
 
    void AnelasticBetaSphGModel::addAsciiOutputFiles(SharedSimulation spSim)
