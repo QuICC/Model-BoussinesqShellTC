@@ -137,4 +137,28 @@ namespace GeoMHDiSCC {
       return this->mIdx3D(i);
    }
 
+   ArrayI TransformResolution::mode(const int i) const
+   {
+      ArrayI mode(2);
+
+      int current = 0;
+      for(mode(0) = 0; mode(0) < this->mIdx3D.size(); ++mode(0))
+      {
+         if(i - current < this->mIdx2D.at(mode(0)).size())
+         {
+            mode(1) = this->mIdx2D.at(mode(0))(i-current);
+            current = i;
+            break;
+         } else
+         {
+            current += this->mIdx2D.at(mode(0)).size();
+         }
+      }
+
+      // Safety assert
+      assert(current == i);
+
+      return mode;
+   }
+
 }

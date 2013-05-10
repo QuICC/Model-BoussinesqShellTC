@@ -20,6 +20,22 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
+   MHDFloat PeriodicOperator::laplacian2D(const MHDFloat k, const MHDFloat m)
+   {
+      // Compute periodic laplacian
+      MHDFloat lapl = (std::pow(k,2) + std::pow(m,2));
+
+      return lapl;
+   }
+
+   MHDFloat PeriodicOperator::bilaplacian2D(const MHDFloat k, const MHDFloat m)
+   {
+      // Compute periodic bilaplacian
+      MHDFloat lapl = (std::pow(k,4) + 2*std::pow(k,2)*std::pow(m,2) + std::pow(m,4));
+
+      return lapl;
+   }
+
    SparseMatrix PeriodicOperator::laplacian2D(const IOperator& op, const MHDFloat k, const int nBC)
    {
       // Compute sparse laplacian

@@ -28,26 +28,53 @@ namespace GeoMHDiSCC {
 
       template<Dimensions::Transform::Id TId> struct ScalarSelector;
 
-      template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
-      {
-         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+      // Configure code to use TFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
-         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-      };
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
 
-      template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
-      {
-         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
 
-         typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-      };
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
 
-      template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
-      {
-         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+         template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+   
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFT
 
-         typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
-      };
+      // Configure code to use TFF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+   
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
 
       /// Typedef for the physical space scalar
       typedef ScalarSelector<Dimensions::Transform::TRA3D>::FwdType PhysicalScalarType;

@@ -28,23 +28,47 @@ namespace GeoMHDiSCC {
 
       template<Dimensions::Transform::Id TId> struct TransformSelector;
 
-      template<> struct TransformSelector<Dimensions::Transform::TRA1D>
-      {
-         /// Typedef for the first transform
-         typedef ChebyshevFftwTransform Type;
-      };
+      // Configure code to use TFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef ChebyshevFftwTransform Type;
+         };
 
-      template<> struct TransformSelector<Dimensions::Transform::TRA2D>
-      {
-         /// Typedef for the second transform
-         typedef FftwTransform Type;
-      };
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef FftwTransform Type;
+         };
 
-      template<> struct TransformSelector<Dimensions::Transform::TRA3D>
-      {
-         /// Typedef for the third transform
-         typedef ChebyshevFftwTransform Type;
-      };
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef ChebyshevFftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFT
+
+      // Configure code to use TFF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef ChebyshevFftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef FftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef FftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
    }
 
    namespace Parallel {

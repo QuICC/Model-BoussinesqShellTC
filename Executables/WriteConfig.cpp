@@ -21,9 +21,12 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
+#include "Enums/FieldIds.hpp"
+#include "Enums/NonDimensional.hpp"
 #include "IoConfig/ConfigurationWriter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
+#include "IoTools/IdToHuman.hpp"
 #include MODELHEADER
 
 typedef GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL PModel;
@@ -45,15 +48,30 @@ int run()
    // Create configuration writer
    GeoMHDiSCC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
 
+   // Create list of field ID strings for boundary conditions
+   std::vector<GeoMHDiSCC::PhysicalNames::Id> fields = PModel::fieldIds();
+   std::vector<GeoMHDiSCC::PhysicalNames::Id>::iterator fIt;
+   std::vector<std::string>   bcNames;
+   for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
+   {
+      bcNames.push_back(GeoMHDiSCC::IoTools::IdToHuman::toTag(*fIt));
+   }
+
+   // Create list of nondimensional ID strings for physical parameters
+   std::vector<GeoMHDiSCC::NonDimensional::Id> params = PModel::paramIds();
+   std::vector<GeoMHDiSCC::NonDimensional::Id>::iterator pIt;
+   std::vector<std::string>   ndNames;
+   for(pIt = params.begin(); pIt != params.end(); ++pIt)
+   {
+      ndNames.push_back(GeoMHDiSCC::IoTools::IdToHuman::toTag(*pIt));
+   }
+
    // Add the physical part
-   std::vector<std::string>   names = PModel::ParametersType::names();
-   GeoMHDiSCC::IoConfig::SharedPhysicalPart   spPhys(new GeoMHDiSCC::IoConfig::PhysicalPart(names));
+   GeoMHDiSCC::IoConfig::SharedPhysicalPart   spPhys(new GeoMHDiSCC::IoConfig::PhysicalPart(ndNames));
    writer.addPart(GeoMHDiSCC::IoConfig::SimulationBlocks::PHYSICAL, spPhys);
 
    // Add the boundary part
-   names.clear();
-   names = PModel::boundaryNames();
-   GeoMHDiSCC::IoConfig::SharedBoundaryPart   spBound(new GeoMHDiSCC::IoConfig::BoundaryPart(names));
+   GeoMHDiSCC::IoConfig::SharedBoundaryPart   spBound(new GeoMHDiSCC::IoConfig::BoundaryPart(bcNames));
    writer.addPart(GeoMHDiSCC::IoConfig::SimulationBlocks::BOUNDARY, spBound);
 
    // Initialise writer

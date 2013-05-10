@@ -72,9 +72,15 @@ namespace GeoMHDiSCC {
           * @brief Get index mapping to full resolution
           *
           * @param i Index of dimension
-          * @param k Index of the last dimension
           */
          template <Dimensions::Data::Id TDim> int idx(const int i) const;
+
+         /**
+          * @brief Get mode index mapping to full resolution indexes
+          *
+          * @param i Mode index
+          */
+         ArrayI mode(const int i) const;
 
       protected:
 

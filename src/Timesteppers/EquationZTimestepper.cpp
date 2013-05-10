@@ -21,6 +21,7 @@
 #include "Base/MathConstants.hpp"
 #include "Timesteppers/ImExRK3.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Timestep {
@@ -173,6 +174,8 @@ namespace Timestep {
          {
             // Safety assert to make sur matrix is compressed
             assert(this->mLHSMatrix.at(i).isCompressed());
+
+            std::cerr << this->mLHSMatrix.at(i) << std::endl;
 
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
 

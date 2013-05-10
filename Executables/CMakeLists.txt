@@ -12,6 +12,11 @@ foreach(ModelFile ${PhysicalModels})
    # Extract filename from full path
    get_filename_component(ModelName ${ModelFile} NAME_WE)
 
+   # Extract the spatial scheme from model file
+   file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
+   STRING(REGEX REPLACE "typedef ([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
+   STRING(REGEX REPLACE " " "" Scheme ${Scheme})
+
    # Create list of source files
    set(SrcsList RunSimulation.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
 
@@ -20,7 +25,7 @@ foreach(ModelFile ${PhysicalModels})
 
    # Set special properties of target
    set_target_properties(${ModelName} PROPERTIES OUTPUT_NAME ${ModelName}
-      COMPILE_FLAGS "-D GEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+      COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Create list of source files
    set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
@@ -30,7 +35,7 @@ foreach(ModelFile ${PhysicalModels})
 
    # Set special properties of target
    set_target_properties(${ModelName}Config PROPERTIES OUTPUT_NAME
-      ${ModelName}Config COMPILE_FLAGS "-D GEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+      ${ModelName}Config COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Create list of source files
    set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
@@ -40,7 +45,7 @@ foreach(ModelFile ${PhysicalModels})
 
    # Set special properties of target
    set_target_properties(${ModelName}State PROPERTIES OUTPUT_NAME
-      ${ModelName}State COMPILE_FLAGS "-D GEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+      ${ModelName}State COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Show message
    message(STATUS " --> Added ${ModelName}Config executable")

@@ -27,6 +27,22 @@ namespace Spectral {
    {
       public:
          /**
+          * @brief Compute the 2D Laplacian operator for a periodic 2D box
+          *
+          * @param k    First wave number
+          * @param m    Second wave number
+          */
+         static MHDFloat laplacian2D(const MHDFloat k, const MHDFloat m);
+
+         /**
+          * @brief Compute the 2D bi-Laplacian operator for a periodic 2D box
+          *
+          * @param k    First wave number
+          * @param m    Second wave number
+          */
+         static MHDFloat bilaplacian2D(const MHDFloat k, const MHDFloat m);
+
+         /**
           * @brief Compute the 2D Laplacian operator
           *
           * @param op   Spectral operator
