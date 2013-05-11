@@ -17,8 +17,11 @@ foreach(ModelFile ${PhysicalModels})
    STRING(REGEX REPLACE "typedef ([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
    STRING(REGEX REPLACE " " "" Scheme ${Scheme})
 
+   # Get model specific sources
+   include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
+
    # Create list of source files
-   set(SrcsList RunSimulation.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
+   set(SrcsList RunSimulation.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
    add_executable(${ModelName} ${SrcsList})
@@ -28,7 +31,7 @@ foreach(ModelFile ${PhysicalModels})
       COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Create list of source files
-   set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
+   set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
    add_executable(${ModelName}Config ${SrcsList})
@@ -38,7 +41,7 @@ foreach(ModelFile ${PhysicalModels})
       ${ModelName}Config COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Create list of source files
-   set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs})
+   set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
    add_executable(${ModelName}State ${SrcsList})

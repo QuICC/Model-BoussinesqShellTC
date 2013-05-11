@@ -7,7 +7,3 @@ set(MHDSources
    EquationData.cpp
    EquationParameters.cpp
 )
-
-set(MHDSrcSubDirs
-   Asymptotics
-)

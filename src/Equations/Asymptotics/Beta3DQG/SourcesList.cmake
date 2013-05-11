@@ -1,3 +1,0 @@
-set(MHDSrcSubDirs
-   Boussinesq
-)
