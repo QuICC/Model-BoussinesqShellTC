@@ -69,9 +69,6 @@ namespace Equations {
 
       // Apply quasi-inverse to nonlinear terms
       this->applyNLQuasiInverse(id, storage, matIdx, start);
-
-      // Add linear terms
-//      this->computeLinear(id, storage, oldField, matIdx, start);
    }
 
    void IScalarEquation::timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
@@ -81,9 +78,6 @@ namespace Equations {
 
       // Apply quasi-inverse to nonlinear terms
       this->applyNLQuasiInverse(id, storage, matIdx, start);
-
-      // Add linear terms
-//      this->computeLinear(id, storage, oldField, matIdx, start);
    }
 
    void IScalarEquation::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)

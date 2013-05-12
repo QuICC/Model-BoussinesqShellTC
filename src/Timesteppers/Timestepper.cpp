@@ -96,16 +96,16 @@ namespace Timestep {
          hasNewDt = false;
       }
 
-      if(hasNewDt)
-      {
-         DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
-      }
+      this->mDt = this->mOldDt;
+      hasNewDt = false;
 
       //
       // Update the timestep matrices if necessary
       //
       if(hasNewDt)
       {
+         DebuggerMacro_showValue("Updating timestep and matrices with new Dt = ", 0, this->mDt);
+
          DebuggerMacro_start("Update matrices", 0);
          // Update the time dependence in matrices
          this->updateMatrices();
@@ -157,6 +157,7 @@ namespace Timestep {
       // Set initial timestep
       this->mOldDt = dt;
       this->mDt = dt;
+      DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->mDt);
 
       //
       // Create real/complex timesteppers

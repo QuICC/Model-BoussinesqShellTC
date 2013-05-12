@@ -267,13 +267,13 @@ namespace GeoMHDiSCC {
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
 
       // Update CFL condition
-      this->mDiagnostics.updateCfl();
+      this->mDiagnostics.initialCfl();
 
       // Synchronise diagnostics
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepper.init(this->mDiagnostics.cfl()/100., this->mScalarEquations, this->mVectorEquations);
+      this->mTimestepper.init(this->mDiagnostics.cfl(), this->mScalarEquations, this->mVectorEquations);
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);

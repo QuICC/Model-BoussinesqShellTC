@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   void BoussinesqBetaCylGSystem::setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nx, const int nz, const int ny)
+   void BoussinesqBetaCylGSystem::setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nX, const int nZ, const int nY)
    {
       /// - Streamfunction equation
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
@@ -50,11 +50,11 @@ namespace Equations {
          rInfo.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
-         ArrayI blockNs(ny);
-         blockNs.setConstant(nx*nz);
-         ArrayI rhsCols(ny);
+         ArrayI blockNs(nY);
+         blockNs.setConstant(nX*nZ);
+         ArrayI rhsCols(nY);
          rhsCols.setConstant(1);
-         rInfo.setSizes(ny, blockNs, rhsCols); 
+         rInfo.setSizes(nY, blockNs, rhsCols); 
 
       /// - Vertical velocity equation
       } else if(eqId.first == PhysicalNames::VELOCITYZ)
@@ -72,11 +72,11 @@ namespace Equations {
          rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
-         ArrayI blockNs(ny);
-         blockNs.setConstant(nx*nz);
-         ArrayI rhsCols(ny);
+         ArrayI blockNs(nY);
+         blockNs.setConstant(nX*nZ);
+         ArrayI rhsCols(nY);
          rhsCols.setConstant(1);
-         rInfo.setSizes(ny, blockNs, rhsCols); 
+         rInfo.setSizes(nY, blockNs, rhsCols); 
 
       /// - Transport equation
       } else if(eqId.first == PhysicalNames::TEMPERATURE)
@@ -95,24 +95,24 @@ namespace Equations {
          rInfo.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
-         ArrayI blockNs(ny);
-         blockNs.setConstant(nx*nz);
-         ArrayI rhsCols(ny);
+         ArrayI blockNs(nY);
+         blockNs.setConstant(nX*nZ);
+         ArrayI rhsCols(nY);
          rhsCols.setConstant(1);
-         rInfo.setSizes(ny, blockNs, rhsCols); 
+         rInfo.setSizes(nY, blockNs, rhsCols); 
 
       // Unknown equation
       } else
       {
-         throw Exception("Unknown equation ID for quasi-inverse operator!");
+         throw Exception("Unknown equation ID to set coupling information!");
       }
    }
 
-   void BoussinesqBetaCylGSystem::quasiInverse(SparseMatrix& mat, const SpectralFieldId eqId, const int nx, const int nz)
+   void BoussinesqBetaCylGSystem::quasiInverse(SparseMatrix& mat, const SpectralFieldId eqId, const int nX, const int nZ)
    {
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nz);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       /// - Streamfunction equation: \f$ \left(D_x^{-4} \otimes D_Z^{-1}\right) \f$
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
@@ -142,15 +142,15 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void BoussinesqBetaCylGSystem::timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nX, const int nZ, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nz);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nx*nz,nx*nz);
-      mat.second.resize(nx*nz,nx*nz);
+      mat.first.resize(nX*nZ,nX*nZ);
+      mat.second.resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -184,15 +184,15 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void BoussinesqBetaCylGSystem::linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nz);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nx*nz,nx*nz);
-      mat.second.resize(nx*nz,nx*nz);
+      mat.first.resize(nX*nZ,nX*nZ);
+      mat.second.resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -296,19 +296,19 @@ namespace Equations {
 
    }
 
-   void BoussinesqBetaCylGSystem::boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nx, const int nz, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqBetaCylGSystem::boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nX, const int nZ, const MHDFloat k, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nx);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nz);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Create spectral boundary operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(nx);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(nz);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nx*nz,nx*nz);
-      mat.second.resize(nx*nz,nx*nz);
+      mat.first.resize(nX*nZ,nX*nZ);
+      mat.second.resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -321,7 +321,8 @@ namespace Equations {
       if(eqId.first == PhysicalNames::STREAMFUNCTION && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
-         q1D = spec1D.id(4);
+         q1D = spec1D.shiftId(4);
+
          // Set Z boundary quasi-inverse
          q3D = spec3D.id(0);
 
@@ -329,7 +330,7 @@ namespace Equations {
       } else if(eqId.first == PhysicalNames::VELOCITYZ && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
-         q1D = spec1D.id(2);
+         q1D = spec1D.shiftId(2);
          // Set Z boundary quasi-inverse
          q3D = spec3D.id(0);
 

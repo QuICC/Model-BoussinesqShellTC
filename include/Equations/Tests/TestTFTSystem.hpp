@@ -1,9 +1,9 @@
-/** \file BoussinesqBetaCylGSystem.hpp
- *  \brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity
+/** \file TestTFTSystem.hpp
+ *  \brief Implementation of the matrix blocks for the test equations for the TFT scheme
  */
 
-#ifndef BOUSSINESQBETACYLGSYSTEM_HPP
-#define BOUSSINESQBETACYLGSYSTEM_HPP
+#ifndef TESTTFTSYSTEM_HPP
+#define TESTTFTSYSTEM_HPP
 
 // Configuration includes
 //
@@ -26,13 +26,13 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the matrix blocks for the test equations for the TFT scheme
     *
     * The implementation of all operators assume that all equations are written in the form
     * \f$ L - T = NL \f$
     * where L are the linear operators, T the time derivatives and NL the nonlinear terms
     */
-   class BoussinesqBetaCylGSystem
+   class TestTFTSystem
    {
       public:
          /**
@@ -110,15 +110,15 @@ namespace Equations {
          /**
           * @brief Simple constructor
           */
-         BoussinesqBetaCylGSystem();
+         TestTFTSystem();
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGSystem();
+         virtual ~TestTFTSystem();
    };
 
 }
 }
 
-#endif // BOUSSINESQBETACYLGSYSTEM_HPP
+#endif // TESTTFTSYSTEM_HPP

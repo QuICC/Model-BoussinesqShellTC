@@ -35,7 +35,7 @@ namespace Equations {
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Generat setup: first complex solver, complex solver, start from m = 0
-         rInfo.setGeneral(0, true, 0);
+         rInfo.setGeneral(0, true, 1);
 
          // 
          //  WARNING: the order is important as it determines the field index!
@@ -60,7 +60,7 @@ namespace Equations {
       } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
          // Generat setup: first complex solver, complex solver, start from m = 0
-         rInfo.setGeneral(0, true, 0);
+         rInfo.setGeneral(0, true, 1);
 
          // 
          //  WARNING: the order is important as it determines the field index!
@@ -82,7 +82,7 @@ namespace Equations {
       } else if(eqId.first == PhysicalNames::TEMPERATURE)
       {
          // Generat setup: first real solver, real solver, start from m = 0
-         rInfo.setGeneral(0, false, 0);
+         rInfo.setGeneral(0, false, 1);
 
          // 
          //  WARNING: the order is important
@@ -104,7 +104,7 @@ namespace Equations {
       // Unknown equation
       } else
       {
-         throw Exception("Unknown equation ID for quasi-inverse operator!");
+         throw Exception("Unknown equation ID to set coupling information!");
       }
    }
 

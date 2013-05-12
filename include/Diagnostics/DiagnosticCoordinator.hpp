@@ -52,6 +52,11 @@ namespace Diagnostics {
          void init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors); 
 
          /**
+          * @brief Compute the initial CFL condition
+          */
+         void initialCfl();
+
+         /**
           * @brief Compute the current CFL condition
           */
          void updateCfl();

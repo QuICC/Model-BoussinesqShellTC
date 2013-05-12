@@ -45,7 +45,7 @@ namespace Spectral {
          void reset(const int basisN);
 
          /**
-          * @brief Get the (qasi) identity matrix of order p
+          * @brief Get the (quasi) identity matrix of order p
           *
           * The 0th order quasi identity is the standard identity matrix. For positiv p the top rows are removed
           * and for negative p the bottom rows are removed
@@ -53,6 +53,17 @@ namespace Spectral {
           * @param p Order of the quasi identity
           */
          virtual SparseMatrix id(const int p) const;
+
+         /**
+          * @brief Get the shifted (quasi) identity matrix of order p
+          *
+          * The 0th order shifted quasi identity is the standard identity matrix. For positiv p the top rows are removed
+          * and the lower identity matrix is shifted to the left. For negative p the bottom rows are removed and the
+          * upper identity is shifted the right
+          *
+          * @param p Order of the shifted quasi identity
+          */
+         virtual SparseMatrix shiftId(const int p) const;
 
          /**
           * @brief Get the derivative of order p

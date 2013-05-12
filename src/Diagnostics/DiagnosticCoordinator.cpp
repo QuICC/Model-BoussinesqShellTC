@@ -79,6 +79,20 @@ namespace Diagnostics {
       }
    }
 
+   void DiagnosticCoordinator::initialCfl()
+   {
+      // Safety assert
+      assert(this->mspVelocityWrapper);
+
+      // Compute CFL for initial state
+      this->updateCfl();
+
+      // Assume a velocity of 100 to avoid problems with "zero" starting values 
+      this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/100.);
+      this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/100.);
+      this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/100.);
+   }
+
    void DiagnosticCoordinator::updateCfl()
    {
       // Safety assert
@@ -86,8 +100,14 @@ namespace Diagnostics {
 
       // Compute most stringent CFL condition
       this->mCfl = this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/this->mspVelocityWrapper->one().data().array().abs().maxCoeff();
+      DebuggerMacro_showValue("Raw CFL Dx = ", 2, this->mMeshSpacings.at(0).minCoeff());
+      DebuggerMacro_showValue("Raw CFL Vx = ", 2, this->mspVelocityWrapper->one().data().array().abs().maxCoeff());
       this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
+      DebuggerMacro_showValue("Raw CFL Dy = ", 2, this->mMeshSpacings.at(1).minCoeff());
+      DebuggerMacro_showValue("Raw CFL Vy = ", 2, this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
       this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
+      DebuggerMacro_showValue("Raw CFL Dz = ", 2, this->mMeshSpacings.at(2).minCoeff());
+      DebuggerMacro_showValue("Raw CFL Vz = ", 2, this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
 
       DebuggerMacro_showValue("Raw CFL cfl = ", 2, this->mCfl);
       /// Compute CFL condition : \f$\alpha\frac{\Delta x}{|v_{max}|}\f$
