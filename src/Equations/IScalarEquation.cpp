@@ -121,8 +121,6 @@ namespace Equations {
 //         }
 //      }
 
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
       //Safety assertion
       assert(start >= 0);
@@ -131,6 +129,7 @@ namespace Equations {
 
       // Get mode indexes
       ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
 
       // Copy data
       int k = start;
@@ -170,8 +169,6 @@ namespace Equations {
 //            k++;
 //         }
 //      }
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
       //Safety assertion
       assert(start >= 0);
@@ -179,6 +176,8 @@ namespace Equations {
 
       // Get mode indexes
       ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
 
       // Copy data
       int k = start;
@@ -214,15 +213,10 @@ namespace Equations {
 //            k++;
 //         }
 //      }
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(rows*cols+start <= storage.first.rows());
-      assert(rows*cols+start <= storage.second.rows());
 
       // Get mode indexes
       ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
 
       // Copy data
       int k = start;
@@ -257,15 +251,10 @@ namespace Equations {
 //            k++;
 //         }
 //      }
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(rows*cols+start <= storage.first.rows());
-      assert(rows*cols+start <= storage.second.rows());
 
       // Get mode indexes
       ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
 
       // Copy data
       int k = start;
