@@ -68,11 +68,12 @@ namespace Equations {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
 
-      // Get right wave number
-      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      // Get radial wave number rescaled to box size
+      MHDFloat kX_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*0.5*static_cast<MHDFloat>(mode(1));
+      // Get azimuthal wave number rescaled to box size
+      MHDFloat kY_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*0.5*static_cast<MHDFloat>(mode(0));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -80,7 +81,7 @@ namespace Equations {
       ///
       /// Compute the vertical vorticity: \f$\zeta = \nabla^2\psi\f$
       ///
-      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
+      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setProfile(Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.id(0)*this->unknown().dom(0).perturbation().profile(mode(1),mode(0)), mode(1), mode(0));
    }
 
    void BoussinesqPerBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
@@ -88,11 +89,12 @@ namespace Equations {
       // Call basic implementation
       IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
 
-      // Get right wave number
-      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      // Get radial wave number rescaled to box size
+      MHDFloat kX_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*0.5*static_cast<MHDFloat>(mode(1));
+      // Get azimuthal wave number rescaled to box size
+      MHDFloat kY_ = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*0.5*static_cast<MHDFloat>(mode(0));
 
       // Create spectral operator
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
@@ -100,7 +102,7 @@ namespace Equations {
       ///
       /// Compute the vertical vorticity: \f$\zeta = \nabla^2\psi\f$
       ///
-      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
+      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setProfile(Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.id(0)*this->unknown().dom(0).perturbation().profile(mode(1),mode(0)), mode(1), mode(0));
    }
 
 }
