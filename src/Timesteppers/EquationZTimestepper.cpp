@@ -59,7 +59,7 @@ namespace Timestep {
    }
 
    void EquationZTimestepper::solve(const int step)
-   {  
+   {
       int start = step*this->nSystem();
 
       // Set unused modes to zero

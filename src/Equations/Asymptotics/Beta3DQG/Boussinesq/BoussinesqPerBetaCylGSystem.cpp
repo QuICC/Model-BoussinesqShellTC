@@ -47,7 +47,7 @@ namespace Equations {
          rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
          // Equation has explicit temperature
-         rInfo.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
+         //rInfo.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(modes);
@@ -92,7 +92,7 @@ namespace Equations {
          rInfo.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
 
          // Equation has explicit temperature
-         rInfo.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+         //rInfo.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(modes);
