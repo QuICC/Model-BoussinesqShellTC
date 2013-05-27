@@ -41,14 +41,19 @@ namespace IoHdf5 {
          // Create file access property list
          hid_t fPList = H5Pcreate(H5P_FILE_ACCESS);
 
-MPI_Info info;
-MPI_Info_create(&info);
-MPI_Info_set(info, "romio_ds_write", "disable");
-MPI_Info_set(info, "romio_ds_read", "disable");
+         #ifdef GEOMHDISCC_ON_JANUS
+            // Deactivate incompatible ROMIO features
+            MPI_Info info;
+            MPI_Info_create(&info);
+            MPI_Info_set(info, "romio_ds_write", "disable");
+            MPI_Info_set(info, "romio_ds_read", "disable");
 
-         // Create the MPI IO access property
-//         H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
-H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, info);
+            // Create the MPI IO access property
+            H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, info);
+         #else
+            // Create the MPI IO access property
+            H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
+         #endif // GEOMHDISCC_ON_JANUS
       #else
          hid_t fPList(H5P_DEFAULT);
       #endif // GEOMHDISCC_MPI

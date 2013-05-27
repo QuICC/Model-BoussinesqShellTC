@@ -53,6 +53,8 @@ endfunction(geomhdiscc_provide_choice)
 #
 function (geomhdiscc_load_platform platform)
    include("cmake.d/platforms/${${platform}}.cmake")
+   string(TOUPPER "${${platform}}" plat)
+   add_definitions("-DGEOMHDISCC_ON_${plat}")
 endfunction (geomhdiscc_load_platform)
 
 #
