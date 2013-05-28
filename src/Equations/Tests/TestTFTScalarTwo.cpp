@@ -1,5 +1,5 @@
-/** \file TestTFTTransport.cpp
- *  \brief Source of the implementation of the test equation for the TFT scheme
+/** \file TestTFTScalarTwo.cpp
+ *  \brief Source of the implementation of the second scalar test equation for the TFT scheme
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/Tests/TestTFTTransport.hpp"
+#include "Equations/Tests/TestTFTScalarTwo.hpp"
 
 // Project includes
 //
@@ -28,28 +28,28 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestTFTTransport::TestTFTTransport(SharedEquationParameters spEqParams)
+   TestTFTScalarTwo::TestTFTScalarTwo(SharedEquationParameters spEqParams)
       : ITestTFTScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   TestTFTTransport::~TestTFTTransport()
+   TestTFTScalarTwo::~TestTFTScalarTwo()
    {
    }
 
-   void TestTFTTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void TestTFTScalarTwo::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
    }
 
-   void TestTFTTransport::setRequirements()
+   void TestTFTScalarTwo::setRequirements()
    {
       // Set temperature as equation unknown
-      this->setName(PhysicalNames::TEMPERATURE);
+      this->setName(PhysicalNames::STREAMFUNCTION);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
 }

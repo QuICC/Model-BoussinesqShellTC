@@ -1,9 +1,9 @@
-/** \file TestTFTTransport.hpp
- *  \brief Implementation of the transport equation to test TFT scheme
+/** \file TestTFTScalarThree.hpp
+ *  \brief Implementation of the third scalar equation to test TFT scheme
  */
 
-#ifndef TESTTFTTRANSPORT_HPP
-#define TESTTFTTRANSPORT_HPP
+#ifndef TESTTFTSCALARTHREE_HPP
+#define TESTTFTSCALARTHREE_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    *  @brief Implementation of the transport equation to test TFT scheme
+    *  @brief Implementation of the third scalar equation to test TFT scheme
     */
-   class TestTFTTransport: public ITestTFTScalarEquation
+   class TestTFTScalarThree: public ITestTFTScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         TestTFTTransport(SharedEquationParameters spEqParams);
+         TestTFTScalarThree(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~TestTFTTransport();
+         virtual ~TestTFTScalarThree();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // TESTTFTTRANSPORT_HPP
+#endif // TESTTFTSCALARTHREE_HPP

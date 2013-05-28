@@ -22,7 +22,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Tests/TestTFTTransport.hpp"
+#include "Equations/Tests/TestTFTScalarOne.hpp"
+#include "Equations/Tests/TestTFTScalarTwo.hpp"
+#include "Equations/Tests/TestTFTScalarThree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -75,8 +77,14 @@ namespace GeoMHDiSCC {
 
    void TestTFTModel::addEquations(SharedSimulation spSim)
    {
-      // Add transport equation
-      spSim->addScalarEquation<Equations::TestTFTTransport>();
+      // Add first scalar test equation
+      spSim->addScalarEquation<Equations::TestTFTScalarOne>();
+
+      // Add second scalar test equation
+      spSim->addScalarEquation<Equations::TestTFTScalarTwo>();
+
+      // Add third scalar test equation
+      spSim->addScalarEquation<Equations::TestTFTScalarThree>();
    }
 
    void TestTFTModel::addAsciiOutputFiles(SharedSimulation spSim)
