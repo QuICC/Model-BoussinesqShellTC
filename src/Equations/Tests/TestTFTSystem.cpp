@@ -31,7 +31,7 @@ namespace Equations {
 
    void TestTFTSystem::setCouplingInfo(CouplingInformation& rInfo, const SpectralFieldId eqId, const int nX, const int nZ, const int nY)
    {
-      /// - Transport equation
+      /// - First scalar equation
       if(eqId.first == PhysicalNames::TEMPERATURE)
       {
          // Generat setup: first real solver, real solver, start from m = 0
@@ -41,8 +41,48 @@ namespace Equations {
          //  WARNING: the order is important
          //
 
-         // Equation is coupled to temperature equation
+         // Add self coupling
          rInfo.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
+
+         // Set sizes of blocks and matrices
+         ArrayI blockNs(nY);
+         blockNs.setConstant(nX*nZ);
+         ArrayI rhsCols(nY);
+         rhsCols.setConstant(1);
+         rInfo.setSizes(nY, blockNs, rhsCols); 
+
+      /// - Second scalar equation
+      if(eqId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         // Generat setup: first real solver, real solver, start from m = 0
+         rInfo.setGeneral(0, false, 0);
+
+         // 
+         //  WARNING: the order is important
+         //
+
+         // Add self coupling
+         rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
+
+         // Set sizes of blocks and matrices
+         ArrayI blockNs(nY);
+         blockNs.setConstant(nX*nZ);
+         ArrayI rhsCols(nY);
+         rhsCols.setConstant(1);
+         rInfo.setSizes(nY, blockNs, rhsCols); 
+
+      /// - Third scalar equation
+      if(eqId.first == PhysicalNames::VELOCITYZ)
+      {
+         // Generat setup: first real solver, real solver, start from m = 0
+         rInfo.setGeneral(0, false, 0);
+
+         // 
+         //  WARNING: the order is important
+         //
+
+         // Add self coupling
+         rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(nY);
