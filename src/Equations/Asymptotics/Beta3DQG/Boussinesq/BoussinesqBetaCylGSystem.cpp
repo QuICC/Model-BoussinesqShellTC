@@ -34,7 +34,7 @@ namespace Equations {
       /// - Streamfunction equation
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Generat setup: first complex solver, complex solver, start from m = 0
+         // General setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 0);
 
          // 
@@ -42,7 +42,7 @@ namespace Equations {
          //
 
          // Equation is coupled to streamfunction equation (self)
-         rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
          // Equation is coupled to vertical velocity equation
          rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
@@ -59,7 +59,7 @@ namespace Equations {
       /// - Vertical velocity equation
       } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
-         // Generat setup: first complex solver, complex solver, start from m = 0
+         // General setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 0);
 
          // 
@@ -69,7 +69,7 @@ namespace Equations {
          // Equation is coupled to streamfunction equation
          rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, false);
          // Equation is coupled to vertical velocity equation (self)
-         rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(nY);
@@ -81,15 +81,15 @@ namespace Equations {
       /// - Transport equation
       } else if(eqId.first == PhysicalNames::TEMPERATURE)
       {
-         // Generat setup: first real solver, real solver, start from m = 0
+         // General setup: first real solver, real solver, start from m = 0
          rInfo.setGeneral(0, false, 0);
 
          // 
          //  WARNING: the order is important
          //
 
-         // Equation is coupled to temperature equation
-         rInfo.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
+         // Equation is coupled to temperature equation (self)
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
 
          // Equation has explicit temperature
          rInfo.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);

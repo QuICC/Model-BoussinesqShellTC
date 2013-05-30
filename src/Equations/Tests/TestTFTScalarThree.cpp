@@ -41,6 +41,7 @@ namespace Equations {
 
    void TestTFTScalarThree::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
    {
+      rNLComp.rData().setConstant(0.0);
    }
 
    void TestTFTScalarThree::setRequirements()
@@ -49,7 +50,7 @@ namespace Equations {
       this->setName(PhysicalNames::VELOCITYZ);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
    }
 
 }

@@ -33,8 +33,14 @@ namespace GeoMHDiSCC {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
 
-      // Add temperature
+      // Add first scalar
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add second scalar
+      ids.push_back(PhysicalNames::STREAMFUNCTION);
+
+      // Add third scalar
+      ids.push_back(PhysicalNames::VELOCITYZ);
 
       return ids;
    }
@@ -131,11 +137,37 @@ namespace GeoMHDiSCC {
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
 
-      // Temperature equation Dirichlet boundary conditions
+      // First scalar equation Dirichlet boundary conditions
       eqId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      dimId = Dimensions::Simulation::SIM3D;
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+
+      // Second scalar equation Dirichlet boundary conditions
+      eqId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      dimId = Dimensions::Simulation::SIM3D;
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+
+      // Third scalar equation Dirichlet boundary conditions
+      eqId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);

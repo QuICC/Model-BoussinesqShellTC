@@ -63,6 +63,17 @@ namespace Spectral {
          /**
           * @brief Compute the 3D Laplacian operator
           *
+          * @param opA  First spectral operator
+          * @param opB  Second spectral operator
+          * @param k    First wave number
+          * @param nBCA  Number of boundary rows for first operator
+          * @param nBCB  Number of boundary rows for second operator
+          */
+         static SparseMatrix laplacian3D(const IOperator& opA, const IOperator& opB, const MHDFloat k, const int nBCA, const int nBCB);
+
+         /**
+          * @brief Compute the 3D Laplacian operator
+          *
           * @param op   Spectral operator
           * @param k    First wave number
           * @param m    Second wave number
@@ -97,6 +108,17 @@ namespace Spectral {
           * @param p    Order of the quasi inverse
           */
          static SparseMatrix qBilaplacian2D(const IOperator& op, const MHDFloat k, const int p);
+
+         /**
+          * @brief Compute the 3D quasi inverse Laplacian operator 
+          *
+          * @param opA  First spectral operator
+          * @param opB  Second spectral operator
+          * @param k    First wave number
+          * @param pA    Order of the quasi inverse for first operator
+          * @param pB    Order of the quasi inverse for second operator
+          */
+         static SparseMatrix qLaplacian3D(const IOperator& opA, const IOperator& opB, const MHDFloat k, const int pA, const int pB);
 
          /**
           * @brief Compute the 3D quasi inverse Laplacian operator 

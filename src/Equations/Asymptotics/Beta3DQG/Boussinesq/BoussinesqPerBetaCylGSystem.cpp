@@ -34,7 +34,7 @@ namespace Equations {
       /// - Streamfunction equation
       if(eqId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Generat setup: first complex solver, complex solver, start from m = 0
+         // General setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 1);
 
          // 
@@ -59,7 +59,7 @@ namespace Equations {
       /// - Vertical velocity equation
       } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
-         // Generat setup: first complex solver, complex solver, start from m = 0
+         // General setup: first complex solver, complex solver, start from m = 0
          rInfo.setGeneral(0, true, 1);
 
          // 
@@ -81,7 +81,7 @@ namespace Equations {
       /// - Transport equation
       } else if(eqId.first == PhysicalNames::TEMPERATURE)
       {
-         // Generat setup: first real solver, real solver, start from m = 0
+         // General setup: first real solver, real solver, start from m = 0
          rInfo.setGeneral(0, false, 1);
 
          // 

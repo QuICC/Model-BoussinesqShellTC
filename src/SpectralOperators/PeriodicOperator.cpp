@@ -8,6 +8,8 @@
 
 // External includes
 //
+#include <Eigen/Sparse>
+#include <Eigen/KroneckerProduct>
 
 // Class include
 //
@@ -72,6 +74,23 @@ namespace Spectral {
       return lapl;
    }
 
+   SparseMatrix PeriodicOperator::laplacian3D(const IOperator& opA, const IOperator& opB, const MHDFloat k, const int nBCA, const int nBCB)
+   {
+      // Compute sparse laplacian
+      SparseMatrix lapl;
+      Eigen::kroneckerProduct(opB.diff(nBCB, 2), opA.id(nBCB), lapl);
+      SparseMatrix tmp;
+      Eigen::kroneckerProduct(opB.id(nBCB), opA.diff(nBCB,2), tmp);
+      lapl = lapl + tmp;
+      Eigen::kroneckerProduct(opB.id(nBCB), opA.id(nBCA), tmp);
+      lapl = lapl - std::pow(k,2)*tmp;
+
+      // Prune sparse laplacian
+      lapl.prune(1e-32);
+
+      return lapl;
+   }
+
    SparseMatrix PeriodicOperator::bilaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int nBC)
    {
       // Compute sparse laplacian
@@ -88,7 +107,7 @@ namespace Spectral {
 
    SparseMatrix PeriodicOperator::qLaplacian2D(const IOperator& op, const MHDFloat k, const int p)
    {
-      // Ccompute quasi inverse of laplacian
+      // Compute quasi inverse of laplacian
       SparseMatrix qLapl = (op.qDiff(p,2) - std::pow(k,2)*op.qDiff(p,0));
 
       // Prune sparse matrix
@@ -108,9 +127,26 @@ namespace Spectral {
       return qLapl;
    }
 
+   SparseMatrix PeriodicOperator::qLaplacian3D(const IOperator& opA, const IOperator& opB, const MHDFloat k, const int pA, const int pB)
+   {
+      // Compute quasi inverse of laplacian
+      SparseMatrix qLapl;
+      Eigen::kroneckerProduct(opB.qDiff(pB, 2), opA.qDiff(pA,0), qLapl);
+      SparseMatrix tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,2), tmp);
+      qLapl = qLapl + tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,0), tmp);
+      qLapl = qLapl - std::pow(k,2)*tmp;
+
+      // Prune sparse matrix
+      qLapl.prune(1e-32);
+
+      return qLapl;
+   }
+
    SparseMatrix PeriodicOperator::qLaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int p)
    {
-      // Ccompute quasi inverse of laplacian
+      // Compute quasi inverse of laplacian
       SparseMatrix qLapl = (op.qDiff(p,2) - (std::pow(k,2) - std::pow(m,2))*op.qDiff(p,0));
 
       // Prune sparse matrix

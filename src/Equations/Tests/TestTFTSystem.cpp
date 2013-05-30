@@ -34,7 +34,7 @@ namespace Equations {
       /// - First scalar equation
       if(eqId.first == PhysicalNames::TEMPERATURE)
       {
-         // Generat setup: first real solver, real solver, start from m = 0
+         // General setup: first real solver, real solver, start from m = 0
          rInfo.setGeneral(0, false, 0);
 
          // 
@@ -42,7 +42,7 @@ namespace Equations {
          //
 
          // Add self coupling
-         rInfo.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(nY);
@@ -52,17 +52,17 @@ namespace Equations {
          rInfo.setSizes(nY, blockNs, rhsCols); 
 
       /// - Second scalar equation
-      if(eqId.first == PhysicalNames::STREAMFUNCTION)
+      } else if(eqId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Generat setup: first real solver, real solver, start from m = 0
-         rInfo.setGeneral(0, false, 0);
+         // General setup: second real solver, real solver, start from m = 0
+         rInfo.setGeneral(1, false, 0);
 
          // 
          //  WARNING: the order is important
          //
 
          // Add self coupling
-         rInfo.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(nY);
@@ -72,17 +72,17 @@ namespace Equations {
          rInfo.setSizes(nY, blockNs, rhsCols); 
 
       /// - Third scalar equation
-      if(eqId.first == PhysicalNames::VELOCITYZ)
+      } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
-         // Generat setup: first real solver, real solver, start from m = 0
-         rInfo.setGeneral(0, false, 0);
+         // General setup: third real solver, real solver, start from m = 0
+         rInfo.setGeneral(2, false, 0);
 
          // 
          //  WARNING: the order is important
          //
 
          // Add self coupling
-         rInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, true);
+         rInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
 
          // Set sizes of blocks and matrices
          ArrayI blockNs(nY);
@@ -104,8 +104,20 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
-      /// - Transport equation: \f$ \left( D_x^{-2} \otimes D_Z^{-2}\right) \f$
+      /// - First scalar equation: \f$ \left( D_x^{-2} \otimes D_Z^{-2}\right) \f$
       if(eqId.first == PhysicalNames::TEMPERATURE)
+      {
+         // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
+         Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat);
+
+      /// - Second scalar equation: \f$ \left( D_x^{-2} \otimes D_Z^{-2}\right) \f$
+      } else if(eqId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
+         Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat);
+
+      /// - Third scalar equation: \f$ \left( D_x^{-2} \otimes D_Z^{-2}\right) \f$
+      } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
          // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
          Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat);
@@ -133,8 +145,20 @@ namespace Equations {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      /// - Transport equation: \f$\left(D_x^{-2} \otimes D_Z^{-2}\right)\f$
+      /// - First scalar equation: \f$\left(D_x^{-2} \otimes D_Z^{-2}\right)\f$
       if(eqId.first == PhysicalNames::TEMPERATURE)
+      {
+         // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
+         Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat.first);
+
+      /// - Second scalar equation: \f$\left(D_x^{-2} \otimes D_Z^{-2}\right)\f$
+      } else if(eqId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
+         Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat.first);
+
+      /// - Third scalar equation: \f$\left(D_x^{-2} \otimes D_Z^{-2}\right)\f$
+      } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
          // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
          Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat.first);
@@ -163,7 +187,7 @@ namespace Equations {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      /// <b>Linear operators for the transport equation</b>
+      /// <b>Linear operators for the first scalar equation</b>
       if(eqId.first == PhysicalNames::TEMPERATURE)
       {
          /// - Streamfunction : \f$ \left(0_x \otimes 0_Z\right) \f$
@@ -184,12 +208,65 @@ namespace Equations {
          } else if(fieldId.first == PhysicalNames::TEMPERATURE)
          {
             // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-            Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.id(2), mat.first);
-            SparseMatrix tmp;
-            Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), tmp);
-            mat.first = mat.first - (k_*k_)*tmp;
-            Eigen::kroneckerProduct(spec3D.id(2), spec1D.qDiff(2,0), tmp);
-            mat.first = mat.first + tmp;
+            mat.first = Spectral::PeriodicOperator::qLaplacian3D(spec1D, spec3D, k_, 2, 2);
+
+         // Unknown field
+         } else
+         {
+            throw Exception("Unknown field ID for linear operator!");
+         }
+
+      /// <b>Linear operators for the second scalar equation</b>
+      } else if(eqId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         /// - Streamfunction : \f$ \left(0_x \otimes 0_Z\right) \f$
+         if(fieldId.first == PhysicalNames::STREAMFUNCTION)
+         {
+            // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
+            mat.first = Spectral::PeriodicOperator::qLaplacian3D(spec1D, spec3D, k_, 2, 2);
+
+         /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
+         } else if(fieldId.first == PhysicalNames::VELOCITYZ)
+         {
+            //
+            // Nothing to do for an empty sparse matrix
+            //
+
+         /// - Temperature : \f$ \left(D_x^{-2} \otimes D_Z^{-2}\right)\nabla^{2} \f$
+         } else if(fieldId.first == PhysicalNames::TEMPERATURE)
+         {
+            //
+            // Nothing to do for an empty sparse matrix
+            //
+
+         // Unknown field
+         } else
+         {
+            throw Exception("Unknown field ID for linear operator!");
+         }
+
+      /// <b>Linear operators for the first scalar equation</b>
+      } else if(eqId.first == PhysicalNames::VELOCITYZ)
+      {
+         /// - Streamfunction : \f$ \left(0_x \otimes 0_Z\right) \f$
+         if(fieldId.first == PhysicalNames::STREAMFUNCTION)
+         {
+            //
+            // Nothing to do for an empty sparse matrix
+            //
+
+         /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
+         } else if(fieldId.first == PhysicalNames::VELOCITYZ)
+         {
+            // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
+            mat.first = Spectral::PeriodicOperator::qLaplacian3D(spec1D, spec3D, k_, 2, 2);
+
+         /// - Temperature : \f$ \left(D_x^{-2} \otimes D_Z^{-2}\right)\nabla^{2} \f$
+         } else if(fieldId.first == PhysicalNames::TEMPERATURE)
+         {
+            //
+            // Nothing to do for an empty sparse matrix
+            //
 
          // Unknown field
          } else
@@ -230,8 +307,24 @@ namespace Equations {
       SparseMatrix q1D;
       SparseMatrix q3D;
 
-      /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
+      /// <b>Boundary operators for the first scalar equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
       if(eqId.first == PhysicalNames::TEMPERATURE && spBcIds->hasEquation(eqId))
+      {
+         // Set X boundary quasi-inverse
+         q1D = spec1D.id(0);
+         // Set Z boundary quasi-inverse
+         q3D = spec3D.shiftId(2);
+
+      /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
+      } else if(eqId.first == PhysicalNames::STREAMFUNCTION && spBcIds->hasEquation(eqId))
+      {
+         // Set X boundary quasi-inverse
+         q1D = spec1D.id(0);
+         // Set Z boundary quasi-inverse
+         q3D = spec3D.shiftId(2);
+
+      /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
+      } else if(eqId.first == PhysicalNames::VELOCITYZ && spBcIds->hasEquation(eqId))
       {
          // Set X boundary quasi-inverse
          q1D = spec1D.id(0);
@@ -250,7 +343,7 @@ namespace Equations {
       // Set boundary conditions on fieldId
       if(spBcIds->hasField(eqId,fieldId))
       {
-         // Set X boundary conditions
+         // Set first dimension boundary conditions
          if(spBcIds->bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
          {
             tau = Spectral::BoundaryConditions::tauMatrix(bound1D, spBcIds->bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
@@ -265,7 +358,7 @@ namespace Equations {
             }
          }
 
-         // Set Z boundary conditions
+         // Set third dimension boundary conditions
          if(spBcIds->bcs(eqId,fieldId).count(Dimensions::Simulation::SIM3D) > 0)
          {
             tau = Spectral::BoundaryConditions::tauMatrix(bound3D, spBcIds->bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second);
@@ -277,7 +370,6 @@ namespace Equations {
             }
             if(tau.second.nonZeros() > 0)
             {
-               tau.second *= k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
                SparseMatrix tmp;
                Eigen::kroneckerProduct(tau.second, q1D, tmp);
                mat.second += tmp;
