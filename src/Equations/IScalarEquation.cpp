@@ -94,177 +94,193 @@ namespace Equations {
 
    void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(start >= 0);
-      assert(start < storage.first.size());
-      assert(start < storage.second.size());
-      assert(rows*cols+start <= storage.first.rows());
-      assert(rows*cols+start <= storage.second.rows());
-
-      // Copy data
-      int k = start;
-      for(int j = 0; j < cols; j++)
+      if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
+         int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         //Safety assertion
+         assert(start >= 0);
+         assert(start < storage.first.size());
+         assert(start < storage.second.size());
+         assert(rows*cols+start <= storage.first.rows());
+         assert(rows*cols+start <= storage.second.rows());
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field real value into storage
+               storage.first(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx).real();
+
+               // Copy field imaginary value into storage
+               storage.second(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx).imag();
+
+               // increase storage counter
+               k++;
+            }
+         }
+      } else if(this->couplingInfo(id).indexType() == CouplingInformation::MODE)
+      {
+         //Safety assertion
+         assert(start >= 0);
+         assert(start < storage.first.size());
+         assert(start < storage.second.size());
+
+         // Get mode indexes
+         ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
          for(int i = 0; i < rows; i++)
          {
             // Copy field real value into storage
-            storage.first(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx).real();
+            storage.first(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0)).real();
 
             // Copy field imaginary value into storage
-            storage.second(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx).imag();
+            storage.second(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0)).imag();
 
             // increase storage counter
             k++;
          }
       }
-
-//      //Safety assertion
-//      assert(start >= 0);
-//      assert(start < storage.first.size());
-//      assert(start < storage.second.size());
-//
-//      // Get mode indexes
-//      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-//      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
-//
-//      // Copy data
-//      int k = start;
-//      for(int i = 0; i < rows; i++)
-//      {
-//         // Copy field real value into storage
-//         storage.first(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0)).real();
-//
-//         // Copy field imaginary value into storage
-//         storage.second(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0)).imag();
-//
-//         // increase storage counter
-//         k++;
-//      }
    }
 
    void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(start >= 0);
-      assert(start < storage.size());
-      assert(rows*cols+start <= storage.rows());
-
-      // Copy data
-      int k = start;
-      for(int j = 0; j < cols; j++)
+      if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
+         int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         //Safety assertion
+         assert(start >= 0);
+         assert(start < storage.size());
+         assert(rows*cols+start <= storage.rows());
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field into storage
+               storage(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx);
+
+               // increase storage counter
+               k++;
+            }
+         }
+      } else if(this->couplingInfo(id).indexType() == CouplingInformation::MODE)
+      {
+         //Safety assertion
+         assert(start >= 0);
+         assert(start < storage.size());
+
+         // Get mode indexes
+         ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+         int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
          for(int i = 0; i < rows; i++)
          {
-            // Copy field into storage
-            storage(k) = this->unknown().dom(0).perturbation().point(i,j,matIdx);
+            // Copy field value into storage
+            storage(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0));
 
             // increase storage counter
             k++;
          }
       }
-
-//      //Safety assertion
-//      assert(start >= 0);
-//      assert(start < storage.size());
-//
-//      // Get mode indexes
-//      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-//
-//      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
-//
-//      // Copy data
-//      int k = start;
-//      for(int i = 0; i < rows; i++)
-//      {
-//         // Copy field value into storage
-//         storage(k) = this->unknown().dom(0).perturbation().point(i,mode(1),mode(0));
-//
-//         // increase storage counter
-//         k++;
-//      }
    }
 
    void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(rows*cols+start <= storage.first.rows());
-      assert(rows*cols+start <= storage.second.rows());
-
-      // Copy data
-      int k = start;
-      for(int j = 0; j < cols; j++)
+      if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
+         int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         //Safety assertion
+         assert(rows*cols+start <= storage.first.rows());
+         assert(rows*cols+start <= storage.second.rows());
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy timestep output into field
+               this->rUnknown().rDom(0).rPerturbation().setPoint(MHDComplex(storage.first(k),storage.second(k)),i,j,matIdx);
+
+               // increase storage counter
+               k++;
+            }
+         }
+      } else if(this->couplingInfo(id).indexType() == CouplingInformation::MODE)
+      {
+         // Get mode indexes
+         ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            this->rUnknown().rDom(0).rPerturbation().setPoint(MHDComplex(storage.first(k),storage.second(k)),i,j,matIdx);
+            this->rUnknown().rDom(0).rPerturbation().setPoint(MHDComplex(storage.first(k),storage.second(k)),i,mode(1),mode(0));
 
             // increase storage counter
             k++;
          }
       }
-
-//      // Get mode indexes
-//      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-//      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
-//
-//      // Copy data
-//      int k = start;
-//      for(int i = 0; i < rows; i++)
-//      {
-//         // Copy timestep output into field
-//         this->rUnknown().rDom(0).rPerturbation().setPoint(MHDComplex(storage.first(k),storage.second(k)),i,mode(1),mode(0));
-//
-//         // increase storage counter
-//         k++;
-//      }
    }
 
    void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
-      int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
-      int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
-
-      //Safety assertion
-      assert(rows*cols+start <= storage.rows());
-
-      // Copy data
-      int k = start;
-      for(int j = 0; j < cols; j++)
+      if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
+         int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         //Safety assertion
+         assert(rows*cols+start <= storage.rows());
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy timestep output into field
+               this->rUnknown().rDom(0).rPerturbation().setPoint(storage(k),i,j,matIdx);
+
+               // increase storage counter
+               k++;
+            }
+         }
+      } else if(this->couplingInfo(id).indexType() == CouplingInformation::MODE)
+      {
+         // Get mode indexes
+         ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            this->rUnknown().rDom(0).rPerturbation().setPoint(storage(k),i,j,matIdx);
+            this->rUnknown().rDom(0).rPerturbation().setPoint(storage(k),i,mode(1),mode(0));
 
             // increase storage counter
             k++;
          }
       }
-
-//      // Get mode indexes
-//      ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-//      int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
-//
-//      // Copy data
-//      int k = start;
-//      for(int i = 0; i < rows; i++)
-//      {
-//         // Copy timestep output into field
-//         this->rUnknown().rDom(0).rPerturbation().setPoint(storage(k),i,mode(1),mode(0));
-//
-//         // increase storage counter
-//         k++;
-//      }
    }
 }
 }

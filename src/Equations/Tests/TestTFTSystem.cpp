@@ -49,7 +49,10 @@ namespace Equations {
          blockNs.setConstant(nX*nZ);
          ArrayI rhsCols(nY);
          rhsCols.setConstant(1);
-         rInfo.setSizes(nY, blockNs, rhsCols); 
+         rInfo.setSizes(nY, blockNs, rhsCols);
+
+         // Set solver data index "dimensionality"
+         rInfo.setIndexType(CouplingInformation::SLOWEST);
 
       /// - Second scalar equation
       } else if(eqId.first == PhysicalNames::STREAMFUNCTION)
@@ -71,6 +74,9 @@ namespace Equations {
          rhsCols.setConstant(1);
          rInfo.setSizes(nY, blockNs, rhsCols); 
 
+         // Set solver data index "dimensionality"
+         rInfo.setIndexType(CouplingInformation::SLOWEST);
+
       /// - Third scalar equation
       } else if(eqId.first == PhysicalNames::VELOCITYZ)
       {
@@ -90,6 +96,9 @@ namespace Equations {
          ArrayI rhsCols(nY);
          rhsCols.setConstant(1);
          rInfo.setSizes(nY, blockNs, rhsCols); 
+
+         // Set solver data index "dimensionality"
+         rInfo.setIndexType(CouplingInformation::SLOWEST);
 
       // Unknown equation
       } else

@@ -40,6 +40,16 @@ namespace Equations {
          typedef std::pair<field_iterator,field_iterator>  field_iterator_range;
 
          /**
+          * @brief Enum to specify the type of indexes
+          */
+         enum IndexType {
+            /// Matrix index is slowest index of field
+            SLOWEST = 0,
+            /// Matrix index is a mode index
+            MODE
+         };
+
+         /**
           * @brief Simple constructor
           */
          CouplingInformation();
@@ -53,6 +63,11 @@ namespace Equations {
           * @brief Is the system complex?
           */
          bool isComplex() const;
+
+         /**
+          * @brief Get index type
+          */
+         IndexType indexType() const;
 
          /**
           * @brief Number of blocks in row of the system
@@ -141,6 +156,13 @@ namespace Equations {
          void setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols);
 
          /**
+          * @brief Set the index type
+          *
+          * @param id   Dimension type id of index
+          */
+         void setIndexType(const IndexType id);
+
+         /**
           * @brief Get iterator to implicit fields
           */
          field_iterator_range implicitRange() const;
@@ -167,6 +189,11 @@ namespace Equations {
           * @brief Storage for the complex flag
           */
          bool mIsComplex;
+
+         /**
+          * @brief Storage for the index type
+          */
+         IndexType mIndexType;
 
          /**
           * @brief Storage for the number of systems

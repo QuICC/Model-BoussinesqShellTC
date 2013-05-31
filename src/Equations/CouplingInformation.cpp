@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mIsComplex(true), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -34,6 +34,11 @@ namespace Equations {
    bool CouplingInformation::isComplex() const
    {
       return this->mIsComplex;
+   }
+
+   CouplingInformation::IndexType CouplingInformation::indexType() const
+   {
+      return this->mIndexType;
    }
 
    int CouplingInformation::nBlocks() const
@@ -113,6 +118,11 @@ namespace Equations {
       this->mBlockNs = blockNs;
 
       this->mRhsCols = rhsCols;
+   }
+
+   void CouplingInformation::setIndexType(const CouplingInformation::IndexType id)
+   {
+      this->mIndexType = id;
    }
 
    CouplingInformation::field_iterator_range CouplingInformation::implicitRange() const
