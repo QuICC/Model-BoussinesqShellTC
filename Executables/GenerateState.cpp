@@ -81,8 +81,20 @@ int run()
    for(it = ids.begin(); it != ids.end(); ++it)
    {
       GeoMHDiSCC::Datatypes::SharedScalarVariableType   spScalar(new GeoMHDiSCC::Datatypes::ScalarVariableType(spRes));
-      spScalar->rDom(0).rPerturbation().rData().setRandom();
-      spScalar->rDom(0).rPerturbation().rData() *= 1e1;
+      spScalar->rDom(0).rPerturbation().rData().setZero();
+
+      spScalar->rDom(0).rPerturbation().setPoint(1,0,0,1);
+      spScalar->rDom(0).rPerturbation().setPoint(1,0,2,1);
+      spScalar->rDom(0).rPerturbation().setPoint(1,0,4,1);
+      spScalar->rDom(0).rPerturbation().setPoint(1,0,6,1);
+      spScalar->rDom(0).rPerturbation().setPoint(1,0,0,1);
+
+      //spScalar->rDom(0).rPerturbation().rData().topRows(spScalar->rDom(0).rPerturbation().rData().rows()/2).setRandom();
+      //spScalar->rDom(0).rPerturbation().rData() *= 1e-4;
+
+      GeoMHDiSCC::MatrixZ noIm = spScalar->dom(0).perturbation().slice(0);
+      noIm.imag().setZero();
+      spScalar->rDom(0).rPerturbation().setSlice(noIm, 0);
       state.addScalar(std::make_pair(*it, spScalar));
    }
 
