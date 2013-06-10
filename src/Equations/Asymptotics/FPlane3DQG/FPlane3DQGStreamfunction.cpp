@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    FPlane3DQGStreamfunction::FPlane3DQGStreamfunction(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+      : IScalarPEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
@@ -64,13 +64,13 @@ namespace Equations {
    void FPlane3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
    }
 
    void FPlane3DQGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
    }
  
    void FPlane3DQGStreamfunction::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)

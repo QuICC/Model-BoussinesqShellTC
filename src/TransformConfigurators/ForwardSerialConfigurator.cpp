@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardSerialConfigurator::firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::firstStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(spEquation, coord);
@@ -43,7 +43,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSerialConfigurator::firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::firstStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_ONE>(spEquation, coord);
@@ -102,22 +102,22 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSerialConfigurator::secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::secondStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
 
-   void ForwardSerialConfigurator::secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::secondStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
    
-   void ForwardSerialConfigurator::lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::lastStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }
 
-   void ForwardSerialConfigurator::lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSerialConfigurator::lastStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }

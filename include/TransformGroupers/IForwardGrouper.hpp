@@ -17,8 +17,10 @@
 
 // Project includes
 //
-#include "Equations/IScalarEquation.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
+#include "Equations/IVectorPEquation.hpp"
+#include "Equations/IScalarDEquation.hpp"
+#include "Equations/IVectorDEquation.hpp"
 #include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
@@ -32,13 +34,22 @@ namespace Transform {
    {
       public:
          /**
-          * @brief Setup the full forward transform structure
+          * @brief Setup the full forward transform structure for prognostic equations
           *
-          * @param scalEqs  Vector of scalar equations
-          * @param vectEqs  Vector of vector equations
+          * @param scalEqs  Vector of prognostic scalar equations
+          * @param vectEqs  Vector of prognostic vector equations
           * @param coord    Transform coord
           */
-         virtual void transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord) = 0;
+         virtual void transform(std::vector<Equations::SharedIScalarPEquation>& scalEqs, std::vector<Equations::SharedIVectorPEquation>& vectEqs, TransformCoordinatorType& coord) = 0;
+
+         /**
+          * @brief Setup the full forward transform structure for diagnostic equations
+          *
+          * @param scalEqs  Vector of diagnostic scalar equations
+          * @param vectEqs  Vector of diagnostic vector equations
+          * @param coord    Transform coord
+          */
+         virtual void transform(std::vector<Equations::SharedIScalarDEquation>& scalEqs, std::vector<Equations::SharedIVectorDEquation>& vectEqs, TransformCoordinatorType& coord) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the first exchange

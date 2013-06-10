@@ -1,9 +1,9 @@
-/** \file IScalarEquation.hpp
- *  \brief Base for the implementation of a scalar equation
+/** \file IScalarPEquation.hpp
+ *  \brief Base for the implementation of a scalar prognostic equation
  */
 
-#ifndef ISCALAREQUATION_HPP
-#define ISCALAREQUATION_HPP
+#ifndef ISCALARPEQUATION_HPP
+#define ISCALARPEQUATION_HPP
 
 // Configuration includes
 //
@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Equations/EquationParameters.hpp"
-#include "Equations/IEvolutionEquation.hpp"
+#include "Equations/IPrognosticEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base for the implementation of a scalar equation
+    * \brief Base for the implementation of a scalar prognostic equation
     */
-   class IScalarEquation: public IEvolutionEquation
+   class IScalarPEquation: public IPrognosticEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IScalarEquation(SharedEquationParameters spEqParams);
+         explicit IScalarPEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IScalarEquation();
+         virtual ~IScalarPEquation();
 
          /**
           * @brief Set the shared pointer to the unknown field
@@ -167,10 +167,10 @@ namespace Equations {
          Datatypes::SharedScalarVariableType mspUnknown;
    };
 
-   /// Typedef for a shared IScalarEquation
-   typedef SharedPtrMacro<IScalarEquation> SharedIScalarEquation;
+   /// Typedef for a shared IScalarPEquation
+   typedef SharedPtrMacro<IScalarPEquation> SharedIScalarPEquation;
 
 }
 }
 
-#endif // ISCALAREQUATION_HPP
+#endif // ISCALARPEQUATION_HPP

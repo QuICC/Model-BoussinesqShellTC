@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardSingle2DConfigurator::firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::firstStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(spEquation, coord);
@@ -37,7 +37,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle2DConfigurator::firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::firstStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm<TransformSteps::Physical::NONLINEAR_ONE>(spEquation, coord);
@@ -78,7 +78,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle2DConfigurator::lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::lastStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -93,7 +93,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle2DConfigurator::lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::lastStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
@@ -134,12 +134,12 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
-   void ForwardSingle2DConfigurator::secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::secondStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }
 
-   void ForwardSingle2DConfigurator::secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardSingle2DConfigurator::secondStep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
       // No need for second step
    }

@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the transport equation for the Rayleigh-Benard model
     */
-   class RayleighBenardTransport: public IScalarEquation
+   class RayleighBenardTransport: public IScalarPEquation
    {
       public:
          /**

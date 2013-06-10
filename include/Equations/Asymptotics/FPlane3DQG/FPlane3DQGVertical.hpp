@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the vertical velocity equation for the 3DQG f-plane model
     */
-   class FPlane3DQGVertical: public IScalarEquation
+   class FPlane3DQGVertical: public IScalarPEquation
    {
       public:
          /**

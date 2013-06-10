@@ -41,6 +41,7 @@ set(MHDAllSrcDirs
    Exceptions
    FastTransforms
    Framework
+   Generator
    IoAscii
    IoBinary
    IoConfig

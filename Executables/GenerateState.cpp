@@ -1,5 +1,5 @@
 /** \file GenerateState.cpp
- *  \brief Simple executable to generate a state file for a model
+ *  \brief Simple general executable to generate a state file for a model
  */
 /// Set the path to the simulation implementation
 #define MODELPATH PhysicalModels/GEOMHDISCC_RUNSIM_MODEL.hpp
@@ -21,100 +21,43 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
-#include "IoVariable/StateFileWriter.hpp"
+#include "Generator/StateGenerator.hpp"
+#include "PhysicalModels/StateGeneratorFactory.hpp"
 #include MODELHEADER
-
-typedef GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL PModel;
 
 /**
  * @brief Setup and run the simulation
  */
 int run()
 {
-   // Set nCpu for serial run
-   int nCpu = 1;
-
-   // Set ID and nCpu in MPI case
-   #ifdef GEOMHDISCC_MPI
-      // Get MPI size
-      int size;
-      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-   #endif //GEOMHDISCC_MPI
-
-   // Setup framework
-   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
-
-   // Set type string
-   std::string type = PModel::SchemeType::type();
-
-   // Set data regularity
-   bool isRegular = PModel::SchemeType::isRegular();
-
-   // Create configuration writer
-   GeoMHDiSCC::IoVariable::StateFileWriter state(type, isRegular);
-
-   // Add expected fields
-   std::vector<GeoMHDiSCC::PhysicalNames::Id>  ids = PModel::fieldIds();
-   std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-   for(it = ids.begin(); it != ids.end(); ++it)
-   {
-      state.expect(*it);
-   }
-
-   // Set spectral
-   GeoMHDiSCC::ArrayI dims(PModel::DIMENSION);
-   dims.setConstant(15);
-   
-   // Create the load splitter
-   GeoMHDiSCC::Parallel::LoadSplitter splitter(GeoMHDiSCC::FrameworkMacro::id(), GeoMHDiSCC::FrameworkMacro::nCpu());
-
-   // Initialise the load splitter
-   splitter.init<PModel::SchemeType>(dims);
-
-   // Get best splitting resolution object
-   std::pair<GeoMHDiSCC::SharedResolution, GeoMHDiSCC::Parallel::SplittingDescription>  best = splitter.bestSplitting();
-
-   // Store the shared resolution object
-   GeoMHDiSCC::SharedResolution spRes = best.first;
-
-   // Create scalar variable
-   for(it = ids.begin(); it != ids.end(); ++it)
-   {
-      GeoMHDiSCC::Datatypes::SharedScalarVariableType   spScalar(new GeoMHDiSCC::Datatypes::ScalarVariableType(spRes));
-      spScalar->rDom(0).rPerturbation().rData().setZero();
-
-      spScalar->rDom(0).rPerturbation().setPoint(1,0,0,1);
-      spScalar->rDom(0).rPerturbation().setPoint(1,0,2,1);
-      spScalar->rDom(0).rPerturbation().setPoint(1,0,4,1);
-      spScalar->rDom(0).rPerturbation().setPoint(1,0,6,1);
-      spScalar->rDom(0).rPerturbation().setPoint(1,0,0,1);
-
-      //spScalar->rDom(0).rPerturbation().rData().topRows(spScalar->rDom(0).rPerturbation().rData().rows()/2).setRandom();
-      //spScalar->rDom(0).rPerturbation().rData() *= 1e-4;
-
-      GeoMHDiSCC::MatrixZ noIm = spScalar->dom(0).perturbation().slice(0);
-      noIm.imag().setZero();
-      spScalar->rDom(0).rPerturbation().setSlice(noIm, 0);
-      state.addScalar(std::make_pair(*it, spScalar));
-   }
-
    int status = 0;
 
-   // Make sure all information was provided
-   if(state.isFull())
-   {
-      // Initialise state file
-      state.init();
+   // Create simulation
+   GeoMHDiSCC::SharedStateGenerator   spGen;
 
-      // Write state file
-      state.write();
-
-      // Finalize state file
-      state.finalize();
-   } else
+   // Exception handling during the initialisation part
+   try
    {
+      // Create state generator
+      spGen = GeoMHDiSCC::StateGeneratorFactory<GeoMHDiSCC::GEOMHDISCC_RUNSIM_MODEL>::createGenerator();
+   }
+
+   // If exception is thrown, finalise (close files) and return
+   catch(GeoMHDiSCC::Exception& e)
+   {
+      std::cerr << e.what() << std::endl;
+
       status = -1;
    }
+
+   if(status == 0)
+   {
+      // Run the simulation
+      spGen->run();
+   }
+
+   // Cleanup and close file handles
+   spGen->finalize();
 
    return status;
 }

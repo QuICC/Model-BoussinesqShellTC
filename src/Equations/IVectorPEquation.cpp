@@ -1,5 +1,5 @@
-/** \file IVectorEquation.cpp
- *  \brief Source of the base implementation of a vector equation
+/** \file IVectorPEquation.cpp
+ *  \brief Source of the base implementation of a vector prognostic equation
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IVectorPEquation.hpp"
 
 // Project includes
 //
@@ -22,21 +22,21 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams)
-      : IEvolutionEquation(spEqParams)
+   IVectorPEquation::IVectorPEquation(SharedEquationParameters spEqParams)
+      : IPrognosticEquation(spEqParams)
    {
    }
 
-   IVectorEquation::~IVectorEquation()
+   IVectorPEquation::~IVectorPEquation()
    {
    }
 
-   void IVectorEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
+   void IVectorPEquation::setUnknown(Datatypes::SharedVectorVariableType spUnknown)
    {
       this->mspUnknown = spUnknown;
    }
 
-   const Datatypes::VectorVariableType& IVectorEquation::unknown() const
+   const Datatypes::VectorVariableType& IVectorPEquation::unknown() const
    {
       // Safety assert
       assert(this->mspUnknown);
@@ -44,7 +44,7 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   Datatypes::VectorVariableType& IVectorEquation::rUnknown()
+   Datatypes::VectorVariableType& IVectorPEquation::rUnknown()
    {
       // Safety assert
       assert(this->mspUnknown);
@@ -52,7 +52,7 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   void IVectorEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id)
+   void IVectorPEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id)
    {
       // Assert dealiasing has taken place!
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(id).data().rows() < rhs.data().rows());

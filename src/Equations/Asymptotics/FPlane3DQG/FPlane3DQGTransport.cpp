@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    FPlane3DQGTransport::FPlane3DQGTransport(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+      : IScalarPEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

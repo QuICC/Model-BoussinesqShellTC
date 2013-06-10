@@ -22,8 +22,8 @@
 #include "Simulation/SimulationIoControl.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 #include "Equations/EquationParameters.hpp"
-#include "Equations/IScalarEquation.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
+#include "Equations/IVectorPEquation.hpp"
 #include "Timesteppers/Timestepper.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
@@ -47,8 +47,6 @@ namespace GeoMHDiSCC {
       public:
          /**
           * @brief Constructor
-          *
-          * The constructor simply calls the constructor of TSimImpl.
           */
          Simulation();
 
@@ -213,12 +211,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for scalar equations
           */
-         std::vector<Equations::SharedIScalarEquation> mScalarEquations;
+         std::vector<Equations::SharedIScalarPEquation> mScalarEquations;
 
          /**
           * @brief Storage for vector equations
           */
-         std::vector<Equations::SharedIVectorEquation> mVectorEquations;
+         std::vector<Equations::SharedIVectorPEquation> mVectorEquations;
 
          /**
           * @brief Map between name and pointer for the scalar variables

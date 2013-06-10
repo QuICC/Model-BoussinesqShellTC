@@ -1,9 +1,9 @@
-/** \file IVectorEquation.hpp
- *  \brief Base for the implementation of a vector equation
+/** \file IVectorDEquation.hpp
+ *  \brief Base for the implementation of a vector diagnostic equation
  */
 
-#ifndef IVECTOREQUATION_HPP
-#define IVECTOREQUATION_HPP
+#ifndef IVECTORDEQUATION_HPP
+#define IVECTORDEQUATION_HPP
 
 // Configuration includes
 //
@@ -20,7 +20,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Equations/EquationParameters.hpp"
-#include "Equations/IEvolutionEquation.hpp"
+#include "Equations/IDiagnosticEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base for the implementation of a vector equation
+    * \brief Base for the implementation of a vector diagnostic equation
     */
-   class IVectorEquation: public IEvolutionEquation
+   class IVectorDEquation: public IDiagnosticEquation
    {
       public:
          /**
@@ -39,12 +39,12 @@ namespace Equations {
           *
           * \param spEqParams Shared equation parameters
           */
-         explicit IVectorEquation(SharedEquationParameters spEqParams);
+         explicit IVectorDEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IVectorEquation();
+         virtual ~IVectorDEquation();
 
          /**
           * @brief Set the smart pointer to the unknown field
@@ -73,14 +73,6 @@ namespace Equations {
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
 
-         /**
-          * @brief Prepare the RHS for the timestep computation
-          *
-          * @param rhs    RHS of timestepping equation
-          * @param compID  ID of the vector component
-          */
-         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id);
-
       protected:
 
       private:
@@ -90,10 +82,10 @@ namespace Equations {
          Datatypes::SharedVectorVariableType mspUnknown;
    };
 
-   /// Typedef for a shared IVectorEquation
-   typedef SharedPtrMacro<IVectorEquation> SharedIVectorEquation;
+   /// Typedef for a shared IVectorDEquation
+   typedef SharedPtrMacro<IVectorDEquation> SharedIVectorDEquation;
 
 }
 }
 
-#endif // IVECTOREQUATION_HPP
+#endif // IVECTORDEQUATION_HPP

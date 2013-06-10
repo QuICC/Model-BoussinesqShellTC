@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Simulation/Simulation.hpp"
+#include "Generator/StateGenerator.hpp"
 #include "SpatialSchemes/3D/TFTScheme.hpp"
 
 namespace GeoMHDiSCC {
@@ -55,6 +56,13 @@ namespace GeoMHDiSCC {
           * @param spSim   Shared simulation object
           */
          static void addEquations(SharedSimulation spSim);
+
+         /**
+          * @brief Add the initial state generation equations
+          *
+          * @param spGen   Shared generator object
+          */
+         static void addStates(SharedStateGenerator spGen);
 
          /**
           * @brief Add the required ASCII output files

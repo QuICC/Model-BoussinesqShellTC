@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * @brief Implementation of the general scalar equation for the test equations for the TFT scheme
     */
-   class ITestTFTScalarEquation: public IScalarEquation
+   class ITestTFTScalarEquation: public IScalarPEquation
    {
       public:
          /**

@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * @brief Implementation of the general scalar equation for the Boussinesq beta model with cylindrical gravity
     */
-   class IBoussinesqBetaCylGScalarEquation: public IScalarEquation
+   class IBoussinesqBetaCylGScalarEquation: public IScalarPEquation
    {
       public:
          /**

@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ITestTFTScalarEquation::ITestTFTScalarEquation(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+      : IScalarPEquation(spEqParams)
    {
    }
 

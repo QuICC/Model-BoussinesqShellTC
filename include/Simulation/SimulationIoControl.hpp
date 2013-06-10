@@ -114,6 +114,11 @@ namespace GeoMHDiSCC {
          Array configRun() const;
 
          /**
+          * @brief Get the timestepping options read from the configuration file
+          */
+         Array configTimestepping() const;
+
+         /**
           * @brief Get begin iterator to HDF5 files
           */
          hdf5_iterator beginHdf5();

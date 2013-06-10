@@ -75,7 +75,7 @@ namespace GeoMHDiSCC {
       // Initialise simulation
       spSim->initBase();
 
-      // Add equations
+      // Initialise resolution
       spSim->initResolution<typename TModel::SchemeType>();
 
       // Add equations

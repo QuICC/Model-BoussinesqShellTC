@@ -1,4 +1,4 @@
-/** \file IEvolutionEquation.cpp
+/** \file IPrognosticEquation.cpp
  *  \brief Source of building block for the implementation of a time dependend evolution equation
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/IEvolutionEquation.hpp"
+#include "Equations/IPrognosticEquation.hpp"
 
 // Project includes
 //
@@ -22,21 +22,21 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IEvolutionEquation::IEvolutionEquation(SharedEquationParameters spEqParams)
+   IPrognosticEquation::IPrognosticEquation(SharedEquationParameters spEqParams)
       : EquationData(spEqParams)
    {
    }
 
-   IEvolutionEquation::~IEvolutionEquation()
+   IPrognosticEquation::~IPrognosticEquation()
    {
    }
 
-   void IEvolutionEquation::init()
+   void IPrognosticEquation::init()
    {
       this->setCoupling();
    }
 
-   void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
+   void IPrognosticEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
    {
       // Safety asserts
       assert(eqField.first.cols() == linField.first.cols());
@@ -76,7 +76,7 @@ namespace Equations {
       }
    }
 
-   void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
+   void IPrognosticEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
    {
       // Safety asserts
       assert(eqField.first.cols() == linField.cols());
@@ -116,7 +116,7 @@ namespace Equations {
       }
    }
 
-   void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
+   void IPrognosticEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
    {
       // Safety asserts
       assert(eqField.cols() == linField.first.cols());
@@ -156,7 +156,7 @@ namespace Equations {
       }
    }
 
-   void IEvolutionEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
+   void IPrognosticEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
    {
       // Safety asserts
       assert(eqField.cols() == linField.cols());
@@ -191,7 +191,7 @@ namespace Equations {
       }
    }
 
-   void IEvolutionEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IPrognosticEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Get iterator to set of quasi-inverse matrices
       std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::const_iterator qIt = this->mNLMatrices.find(id);
@@ -208,7 +208,7 @@ namespace Equations {
       storage.second.block(start, 0, rows, storage.second.cols()) = qIt->second.at(matIdx)*storage.second.block(start, 0, rows, storage.second.cols());
    }
 
-   void IEvolutionEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
+   void IPrognosticEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       // Get iterator to set of quasi-inverse matrices
       std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::const_iterator qIt = this->mNLMatrices.find(id);

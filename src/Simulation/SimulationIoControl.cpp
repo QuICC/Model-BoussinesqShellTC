@@ -275,4 +275,17 @@ namespace GeoMHDiSCC {
 
       return run;
    }
+
+   Array SimulationIoControl::configTimestepping() const
+   {
+      Array tstep(2);
+
+      // Get timestepping time configuration
+      tstep(0) = this->mspCfgFile->spTimestepping()->fValue("time");
+
+      // Get timestepping timestep configuration
+      tstep(1) = this->mspCfgFile->spTimestepping()->fValue("timestep");
+
+      return tstep;
+   }
 }

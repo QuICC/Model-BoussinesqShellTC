@@ -18,8 +18,10 @@
 
 // Project includes
 //
-#include "Equations/IScalarEquation.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
+#include "Equations/IVectorPEquation.hpp"
+#include "Equations/IScalarDEquation.hpp"
+#include "Equations/IVectorDEquation.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 
 namespace GeoMHDiSCC {
@@ -43,13 +45,22 @@ namespace Transform {
          ~ForwardEquationGrouper();
 
          /**
-          * @brief Setup the full forward transform structure
+          * @brief Setup the full forward transform structure for the prognostic equations
           *
-          * @param scalEqs  Vector of scalar equations
-          * @param vectEqs  Vector of vector equations
+          * @param scalEqs  Vector of scalar prognostic equations
+          * @param vectEqs  Vector of vector prognostic equations
           * @param coord    Transform coord
           */
-         virtual void transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord);
+         virtual void transform(std::vector<Equations::SharedIScalarPEquation>& scalEqs, std::vector<Equations::SharedIVectorPEquation>& vectEqs, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup the full forward transform structure for the diagnostic equations
+          *
+          * @param scalEqs  Vector of scalar diagnostic equations
+          * @param vectEqs  Vector of vector diagnostic equations
+          * @param coord    Transform coord
+          */
+         virtual void transform(std::vector<Equations::SharedIScalarDEquation>& scalEqs, std::vector<Equations::SharedIVectorDEquation>& vectEqs, TransformCoordinatorType& coord);
 
          /**
           * @brief Get the number of required buffer packs for the first exchange
@@ -79,7 +90,7 @@ namespace Transform {
    {
    }
 
-   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
+   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarPEquation>& scalEqs, std::vector<Equations::SharedIVectorPEquation>& vectEqs, TransformCoordinatorType& coord)
    {
       //
       // Compute nonlinear interaction 
@@ -87,7 +98,7 @@ namespace Transform {
       //
 
       // First treat the scalar equations
-      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
+      std::vector<Equations::SharedIScalarPEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
          // Setup the second exchange communication step for scalar equation
@@ -110,7 +121,7 @@ namespace Transform {
       }
 
       // ... then the vector equations
-      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
+      std::vector<Equations::SharedIVectorPEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
          // Setup the second exchange communication step for vector equation

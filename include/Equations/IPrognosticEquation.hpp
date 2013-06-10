@@ -1,9 +1,9 @@
-/** \file IEvolutionEquation.hpp
- *  \brief Base building block for the implementation of a time dependend evolution equation
+/** \file IPrognosticEquation.hpp
+ *  \brief Base building block for the implementation of a time dependend/prognostic equation
  */
 
-#ifndef IEVOLUTIONEQUATION_HPP
-#define IEVOLUTIONEQUATION_HPP
+#ifndef IPROGNOSTICEQUATION_HPP
+#define IPROGNOSTICEQUATION_HPP
 
 // Configuration includes
 //
@@ -33,20 +33,20 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Base building block for the implementation of a time dependend evolution equation
+    * @brief Base building block for the implementation of a time dependend/prognostic equation
     */
-   class IEvolutionEquation : public EquationData
+   class IPrognosticEquation : public EquationData
    {
       public:
          /**
           * @brief Simple constructor
           */
-         explicit IEvolutionEquation(SharedEquationParameters spEqParams);
+         explicit IPrognosticEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~IEvolutionEquation();
+         virtual ~IPrognosticEquation();
 
          /**
           * @brief Initialise the equation
@@ -216,9 +216,9 @@ namespace Equations {
       private:
    };
 
-   /// Typedef for a smart IEvolutionEquation
-   typedef SharedPtrMacro<IEvolutionEquation> SharedIEvolutionEquation;
+   /// Typedef for a smart IPrognosticEquation
+   typedef SharedPtrMacro<IPrognosticEquation> SharedIPrognosticEquation;
 }
 }
 
-#endif // IEVOLUTIONEQUATION_HPP
+#endif // IPROGNOSTICEQUATION_HPP

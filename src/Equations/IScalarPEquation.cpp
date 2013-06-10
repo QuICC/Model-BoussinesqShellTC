@@ -1,5 +1,5 @@
-/** \file IScalarEquation.cpp
- *  \brief Source of the base implementation of a scalar equation
+/** \file IScalarPEquation.cpp
+ *  \brief Source of the base implementation of a scalar prognostic equation
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IScalarPEquation.hpp"
 
 // Project includes
 //
@@ -22,21 +22,21 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IScalarEquation::IScalarEquation(SharedEquationParameters spEqParams)
-      : IEvolutionEquation(spEqParams)
+   IScalarPEquation::IScalarPEquation(SharedEquationParameters spEqParams)
+      : IPrognosticEquation(spEqParams)
    {
    }
 
-   IScalarEquation::~IScalarEquation()
+   IScalarPEquation::~IScalarPEquation()
    {
    }
 
-   void IScalarEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
+   void IScalarPEquation::setUnknown(Datatypes::SharedScalarVariableType spUnknown)
    {
       this->mspUnknown = spUnknown;
    }
 
-   const Datatypes::ScalarVariableType& IScalarEquation::unknown() const
+   const Datatypes::ScalarVariableType& IScalarPEquation::unknown() const
    {
       // Safety assert
       assert(this->mspUnknown);
@@ -44,7 +44,7 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   Datatypes::ScalarVariableType& IScalarEquation::rUnknown()
+   Datatypes::ScalarVariableType& IScalarPEquation::rUnknown()
    {
       // Safety assert
       assert(this->mspUnknown);
@@ -52,7 +52,7 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   void IScalarEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs)
+   void IScalarPEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs)
    {
       // Assert dealiasing has taken place!
       assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
@@ -62,7 +62,7 @@ namespace Equations {
       this->rUnknown().rDom(0).rPerturbation().setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));
    }
 
-   void IScalarEquation::timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarPEquation::timestepInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Copy field values into timestep input
       this->copyTInput(id, storage, matIdx, start);
@@ -71,7 +71,7 @@ namespace Equations {
       this->applyNLQuasiInverse(id, storage, matIdx, start);
    }
 
-   void IScalarEquation::timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
+   void IScalarPEquation::timestepInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       // Copy field values into timestep input
       this->copyTInput(id, storage, matIdx, start);
@@ -80,19 +80,19 @@ namespace Equations {
       this->applyNLQuasiInverse(id, storage, matIdx, start);
    }
 
-   void IScalarEquation::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarPEquation::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Copy timestep output into field value
       this->copyTOutput(id, storage, matIdx, start);
    }
 
-   void IScalarEquation::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
+   void IScalarPEquation::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Copy timestep output into field value
       this->copyTOutput(id, storage, matIdx, start);
    }
 
-   void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarPEquation::copyTInput(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
@@ -149,7 +149,7 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
+   void IScalarPEquation::copyTInput(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
    {
       if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
@@ -198,7 +198,7 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
+   void IScalarPEquation::copyTOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
@@ -241,7 +241,7 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
+   void IScalarPEquation::copyTOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       if(this->couplingInfo(id).indexType() == CouplingInformation::SLOWEST)
       {
