@@ -52,9 +52,10 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
-   void IScalarPEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs)
+   void IScalarPEquation::prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id)
    {
       // Assert dealiasing has taken place!
+      assert(id == FieldComponents::Spectral::SCALAR);
       assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().data().cols() == rhs.data().cols());
 

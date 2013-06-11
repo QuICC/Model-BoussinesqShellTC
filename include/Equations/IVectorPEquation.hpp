@@ -66,18 +66,10 @@ namespace Equations {
          Datatypes::VectorVariableType& rUnknown();
 
          /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          * @param name    ID of the physical vector component
-          */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
-
-         /**
           * @brief Prepare the RHS for the timestep computation
           *
-          * @param rhs    RHS of timestepping equation
-          * @param compID  ID of the vector component
+          * @param rhs  RHS of timestepping equation
+          * @param id   ID of the vector component
           */
          virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id);
 

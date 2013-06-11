@@ -162,6 +162,60 @@ namespace Transform {
       }
    }
 
+   template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarDEquation>& scalEqs, std::vector<Equations::SharedIVectorDEquation>& vectEqs, TransformCoordinatorType& coord)
+   {
+      //
+      // Compute nonlinear interaction 
+      // ... and forward transform
+      //
+
+      // First treat the scalar equations
+      std::vector<Equations::SharedIScalarDEquation>::iterator scalEqIt;
+      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      {
+         // Setup the second exchange communication step for scalar equation
+         TConfigurator::setup2DCommunication(this->mScalarPacks2D, coord);
+         // Setup the first exchange communication step for scalar equation
+         TConfigurator::setup1DCommunication(this->mScalarPacks1D, coord);
+
+         // Compute first step of transform for scalar equation
+         TConfigurator::firstStep(*scalEqIt, coord);
+         // Initiate the second exchange communication step for scalar equation
+         TConfigurator::initiate2DCommunication(coord);
+
+         // Compute second step of transform for scalar equation
+         TConfigurator::secondStep(*scalEqIt, coord);
+         // Initiate the first exchange communication step for scalar equation
+         TConfigurator::initiate1DCommunication(coord);
+
+         // Compute last step of transform for scalar equation
+         TConfigurator::lastStep(*scalEqIt, coord);
+      }
+
+      // ... then the vector equations
+      std::vector<Equations::SharedIVectorDEquation>::iterator vectEqIt;
+      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      {
+         // Setup the second exchange communication step for vector equation
+         TConfigurator::setup2DCommunication(this->mVectorPacks2D, coord);
+         // Setup the first exchange communication step for vector equation
+         TConfigurator::setup1DCommunication(this->mVectorPacks1D, coord);
+
+         // Compute first step of transform for vector equation
+         TConfigurator::firstStep(*vectEqIt, coord);
+         // Initiate the second exchange communication step for the vector equation
+         TConfigurator::initiate2DCommunication(coord);
+
+         // Compute second step of transform for vector equation
+         TConfigurator::secondStep(*vectEqIt, coord);
+         // Initiate the first exchange communication step for the vector equation
+         TConfigurator::initiate1DCommunication(coord);
+
+         // Compute last step of transform for vector equation
+         TConfigurator::lastStep(*vectEqIt, coord);
+      }
+   }
+
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
    {
       return this->listPacks1D(varInfo);

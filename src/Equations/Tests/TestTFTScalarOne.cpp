@@ -39,8 +39,11 @@ namespace Equations {
    {
    }
 
-   void TestTFTScalarOne::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void TestTFTScalarOne::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
       rNLComp.rData().setConstant(0.0);
    }
 

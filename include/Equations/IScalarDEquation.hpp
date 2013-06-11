@@ -63,13 +63,6 @@ namespace Equations {
           * @brief Set the unknown variable
           */
          Datatypes::ScalarVariableType& rUnknown();
-
-         /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const = 0;
          
       protected:
 

@@ -51,22 +51,14 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Compute nonlinear interaction on a scalar
-          *
-          * @param spEquation Equation providing the nonlinear computation
-          * @param coord      Transform coordinator
-          */
-         static void nonlinearTerm(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute nonlinear interaction on a vector field
+          * @brief Compute nonlinear interaction on a scalar or vector field
           *
           * @param spEquation Equation providing the nonlinear computation
           * @param coord      Transform coordinator
           *
           * \tparam TComponent Physical vector field component
           */
-         template <FieldComponents::Physical::Id TComponent> static void nonlinearTerm(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord);
+         template <FieldComponents::Physical::Id TComponent> static void nonlinearTerm(Equations::SharedIEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the first dimension
@@ -112,7 +104,7 @@ namespace Transform {
       private: 
    };
 
-   template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
+   template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(Equations::SharedIEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::NONLINEAR);

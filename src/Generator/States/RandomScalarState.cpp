@@ -39,8 +39,11 @@ namespace Equations {
    {
    }
 
-   void RandomScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void RandomScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
    }
 
    void RandomScalarState::setRequirements()

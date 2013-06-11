@@ -25,7 +25,7 @@ namespace Transform {
    void ForwardSingle2DConfigurator::firstStep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
    {
       // Compute the nonlinear interaction
-      ForwardConfigurator::nonlinearTerm(spEquation, coord);
+      ForwardConfigurator::nonlinearTerm<FieldComponents::Physical::SCALAR>(spEquation, coord);
 
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);

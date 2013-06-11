@@ -39,8 +39,11 @@ namespace Equations {
    {
    }
 
-   void BoussinesqBetaCylGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void BoussinesqBetaCylGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
       /// 
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$

@@ -94,11 +94,6 @@ namespace Equations {
           * \param spField Shared pointer to the vector field
           */
          void setField(PhysicalNames::Id name, Datatypes::SharedVectorVariableType spField);
-   
-         /**
-          * @brief Get the number of implemented boundary conditions
-          */
-         int nBC(FieldComponents::Spectral::Id id, Dimensions::Transform::Id dim) const;
 
          /**
           * @brief Get the explicit linear matrices (real sparse operators)

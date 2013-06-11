@@ -40,8 +40,11 @@ namespace Equations {
    {
    }
 
-   void FPlane3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void FPlane3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
       /// 
       /// Computation of the jacobian:
       ///   \f$ ??? \f$

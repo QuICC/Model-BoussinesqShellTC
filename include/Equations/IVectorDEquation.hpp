@@ -65,14 +65,6 @@ namespace Equations {
           */
          Datatypes::VectorVariableType& rUnknown();
 
-         /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          * @param name    ID of the physical vector component
-          */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
-
       protected:
 
       private:

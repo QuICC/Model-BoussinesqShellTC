@@ -31,7 +31,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->prepareTimestep(rScalar);
+      spEquation->prepareTimestep(rScalar, FieldComponents::Spectral::SCALAR);
 
       // Free the temporary storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
@@ -54,24 +54,6 @@ namespace Transform {
 
    template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
    {
-   }
-
-   void ForwardConfigurator::nonlinearTerm(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::NONLINEAR);
-
-      // Get physical storage
-      TransformCoordinatorType::CommunicatorType::Fwd3DType &rNLComp = coord.communicator().providePhysical();
-
-      // Compute nonlinear term component
-      spEquation->computeNonlinear(rNLComp);
-
-      // Transfer physical storage to next step
-      coord.communicator().holdPhysical(rNLComp);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
    template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)

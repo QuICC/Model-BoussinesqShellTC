@@ -40,8 +40,11 @@ namespace Equations {
    {
    }
 
-   void RotatingRBStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const
+   void RotatingRBStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
       /// 
       /// Computation of the jacobian:
       ///   \f$ ??? \f$

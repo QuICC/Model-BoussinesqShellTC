@@ -1,6 +1,7 @@
 # Create list of sources
 set(MHDSources
    CouplingInformation.cpp
+   IEquation.cpp
    IDiagnosticEquation.cpp
    IPrognosticEquation.cpp
    IScalarDEquation.cpp

@@ -65,21 +65,15 @@ namespace Equations {
          Datatypes::ScalarVariableType& rUnknown();
 
          /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp) const = 0;
-
-         /**
           * @brief Prepare the RHS for the timestep computation
           *
-          * @param rhs    RHS of timestepping equation
+          * @param rhs  RHS of timestepping equation
+          * @param id   ID of the component (allows for a more general implementation)
           */
-         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs);
+         virtual void prepareTimestep(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id id);
 
          /**
-          * @brief Basic implementatin of the method to transfer equation input to timestepper
+          * @brief Basic implementation of the method to transfer equation input to timestepper
           *
           * @param id         Component ID
           * @param storage    Storage for the equation values
