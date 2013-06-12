@@ -62,51 +62,11 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
 
          /**
-          * @brief Compute the explicit linear terms
+          * @brief Initialise the spectral equation matrices
           *
-          * @param compId     Equation field component ID
-          * @param eqField    Equation field values
-          * @param eqStart    Start index for the equation field
-          * @param fieldId    Physical field ID
-          * @param linField   Explicit linear field values
-          * @param linStart   Start index for the linear field
-          * @param matIdx     System index
+          * @param spBcIds   List of boundary condition IDs
           */
-         virtual void computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const;
-         virtual void computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const;
-
-         /**
-          * @brief Compute the explicit linear terms
-          *
-          * @param compId     Equation field component ID
-          * @param eqField    Equation field values
-          * @param eqStart    Start index for the equation field
-          * @param linField   Explicit linear field values
-          * @param linStart   Start index for the linear field
-          * @param matIdx     System index
-          */
-         virtual void computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const;
-         virtual void computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const;
-
-         /**
-          * @brief Apply quasi-inverse to the nonlinear term
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start index for the storage
-          */
-         virtual void applyNLQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start);
-
-         /**
-          * @brief Apply quasi-inverse to the nonlinear term
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start index for the storage
-          */
-         virtual void applyNLQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start);
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
          
       protected:
          /**
@@ -124,6 +84,33 @@ namespace Equations {
 
    /// Typedef for a smart IEquation
    typedef SharedPtrMacro<IEquation> SharedIEquation;
+
+   /**
+    * @brief Apply quasi-inverse to the nonlinear term
+    *
+    * @param compId  Component ID
+    * @param storage Storage for the equation values
+    * @param matIdx  Index of the given data
+    * @param start   Start index for the storage
+    */
+   void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
+   void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+
+   /**
+    * @brief Compute and add the explicit linear terms
+    *
+    * @param compId     Equation field component ID
+    * @param eqField    Equation field values
+    * @param eqStart    Start index for the equation field
+    * @param fieldId    Physical field ID
+    * @param linField   Explicit linear field values
+    * @param linStart   Start index for the linear field
+    * @param matIdx     System index
+    */
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx);
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx);
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx);
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx);
 }
 }
 

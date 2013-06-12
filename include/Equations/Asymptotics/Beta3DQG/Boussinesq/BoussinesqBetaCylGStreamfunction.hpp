@@ -50,26 +50,6 @@ namespace Equations {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-
-         /**
-          * @brief Transfer timestepper output to unknown and update vorticity
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start);
-
-         /**
-          * @brief Transfer timestepper output to unknown and update vorticity
-          *
-          * @param id      Component ID
-          * @param storage Storage for the equation values
-          * @param matIdx  Index of the given data
-          * @param start   Start indx for the storage
-          */
-         virtual void timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start);
          
       protected:
          /**

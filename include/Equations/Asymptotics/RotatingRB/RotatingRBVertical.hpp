@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarPEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the vertical velocity equation for the rotating Rayleigh-Benard model
     */
-   class RotatingRBVertical: public IScalarPEquation
+   class RotatingRBVertical: public IScalarEquation
    {
       public:
          /**

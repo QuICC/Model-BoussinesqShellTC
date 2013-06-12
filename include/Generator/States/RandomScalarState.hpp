@@ -1,5 +1,5 @@
 /** \file RandomScalarState.hpp
- *  \brief Implementation of the diagnostic equation to generate a random scalar state
+ *  \brief Implementation of the equation to generate a random scalar state
  */
 
 #ifndef RANDOMSCALARSTATE_HPP
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarDEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the diagnostic equation to generate a random scalar state
+    * @brief Implementation of the equation to generate a random scalar state
     */
-   class RandomScalarState: public IScalarDEquation
+   class RandomScalarState: public IScalarEquation
    {
       public:
          /**
@@ -51,6 +51,13 @@ namespace Equations {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
+
+         /**
+          * @brief Initialise spectral equation matrices
+          *
+          * @param spBcs   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary bcs);
 
       protected:
          /**

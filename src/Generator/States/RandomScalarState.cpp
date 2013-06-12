@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RandomScalarState::RandomScalarState(SharedEquationParameters spEqParams, const PhysicalNames::Id name)
-      : IScalarDEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set name of unknown
       this->setName(name);

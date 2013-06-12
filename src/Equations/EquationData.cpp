@@ -33,11 +33,17 @@ namespace Equations {
 
    void EquationData::setField(PhysicalNames::Id name, Datatypes::SharedScalarVariableType spField)
    {
+      // Safety assertion
+      assert(this->mScalars.count(name) == 0);
+
       this->mScalars.insert(std::make_pair(name, spField));
    }
 
    void EquationData::setField(PhysicalNames::Id name, Datatypes::SharedVectorVariableType spField)
    {
+      // Safety assertion
+      assert(this->mVectors.count(name) == 0);
+
       this->mVectors.insert(std::make_pair(name, spField));
    }
 
@@ -78,10 +84,34 @@ namespace Equations {
       return *this->mspEqParams;
    }
 
-   const SparseMatrix& EquationData::explicitDLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const
+   const SparseMatrix& EquationData::quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const
+   {
+      // Safety assert
+      assert(this->mNLMatrices.count(compId) > 0);
+      
+      return this->mNLMatrices.find(compId)->second.at(j);
+   }
+
+   bool EquationData::hasExplicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
    {
       // Make key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(comp, fieldId);
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
+
+      return (this->mLDMatrices.count(key) > 0);
+   }
+
+   bool EquationData::hasExplicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
+   {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
+
+      return (this->mLZMatrices.count(key) > 0);
+   }
+
+   const SparseMatrix& EquationData::explicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
 
       // Safety assert
       assert(this->mLDMatrices.count(key) > 0);
@@ -89,10 +119,10 @@ namespace Equations {
       return this->mLDMatrices.find(key)->second.at(j);
    }
 
-   const SparseMatrixZ& EquationData::explicitZLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const
+   const SparseMatrixZ& EquationData::explicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
    {
       // Make key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(comp, fieldId);
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
 
       // Safety assert
       assert(this->mLZMatrices.count(key) > 0);
@@ -100,12 +130,12 @@ namespace Equations {
       return this->mLZMatrices.find(key)->second.at(j);
    }
 
-   const CouplingInformation& EquationData::couplingInfo(const FieldComponents::Spectral::Id comp) const
+   const CouplingInformation& EquationData::couplingInfo(const FieldComponents::Spectral::Id compId) const
    {
       // Safety assert
-      assert(this->mCouplingInfos.count(comp) > 0);
+      assert(this->mCouplingInfos.count(compId) > 0);
       
-      return this->mCouplingInfos.find(comp)->second;
+      return this->mCouplingInfos.find(compId)->second;
    }
 
    void EquationData::setName(PhysicalNames::Id name)

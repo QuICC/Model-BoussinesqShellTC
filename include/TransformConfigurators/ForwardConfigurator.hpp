@@ -17,8 +17,8 @@
 
 // Project includes
 //
-#include "Equations/IScalarPEquation.hpp"
-#include "Equations/IVectorPEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/TransformSteps.hpp"
@@ -34,20 +34,20 @@ namespace Transform {
    {
       public:
          /**
-          * @brief Prepare the timestep RHS for a scalar
+          * @brief Update variable values from dealiased data
           *
-          * @param spEquation Equation providing the timestep structure
+          * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         static void prepareTimestep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord);
+         static void updateEquation(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Prepare the timestep RHS for a vector
           *
-          * @param spEquation Equation providing the timestep structure
+          * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         static void prepareTimestep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord);
+         static void updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -82,14 +82,14 @@ namespace Transform {
          template <TransformSteps::ForwardBase::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
 
          /**
-          * @brief Prepare the timestep RHS for a vector field
+          * @brief Update equation variable from dealiased data for a vector field
           *
-          * @param spEquation Equation providing the timestep structure
+          * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           *
           * \tparam TComponent Spectral vector field component
           */
-         template <FieldComponents::Spectral::Id TComponent> static void prepareTimestep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord);
+         template <FieldComponents::Spectral::Id TComponent> static void updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -122,7 +122,7 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::prepareTimestep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
+   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
@@ -131,7 +131,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->prepareTimestep(rComp, TComponent);
+      spEquation->updateDealiasedUnknown(rComp, TComponent);
 
       // Free the temporary storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rComp);
@@ -162,7 +162,7 @@ namespace Transform {
 
 
    /// Specialised timestep preparation to do nothing
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord);
+   template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
 }
 }

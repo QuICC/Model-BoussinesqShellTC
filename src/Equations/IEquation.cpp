@@ -36,23 +36,54 @@ namespace Equations {
       this->setCoupling();
    }
 
-   void IEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
+   void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
+   {
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+
+      // Get number of rows
+      int rows = eq.couplingInfo(compId).blockN(matIdx);
+
+      // Safety asserts
+      assert(op->rows() == op->cols());
+      assert(op->cols() == rows);
+
+      // Multiply nonlinear term by quasi-inverse
+      storage.first.block(start, 0, rows, storage.first.cols()) = (*op)*storage.first.block(start, 0, rows, storage.first.cols());
+      storage.second.block(start, 0, rows, storage.second.cols()) = (*op)*storage.second.block(start, 0, rows, storage.second.cols());
+   }
+
+   void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
+   {
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+
+      // Get number of rows
+      int rows = eq.couplingInfo(compId).blockN(matIdx);
+
+      // Safety asserts
+      assert(op->rows() == op->cols());
+      assert(op->cols() == rows);
+
+      // Multiply nonlinear term by quasi-inverse
+      storage.block(start, 0, rows, storage.cols()) = (*op)*storage.block(start, 0, rows, storage.cols());
+   }
+
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx)
    {
       // Safety asserts
       assert(eqField.first.cols() == linField.first.cols());
       assert(eqField.second.cols() == linField.second.cols());
 
-      // Create key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, fieldId);
-
-      if(this->mLZMatrices.count(key) > 0)
+      // Compute with complex linear operator
+      if(eq.hasExplicitZLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLZMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.first.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrixZ * op = &this->mLZMatrices.find(key)->second.at(matIdx);
+         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.first.cols();
 
          // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
          eqField.first.block(eqStart, 0, rows, cols) += op->real()*linField.first.block(linStart, 0, rows, cols);
@@ -61,14 +92,15 @@ namespace Equations {
          eqField.second.block(eqStart, 0, rows, cols) += op->imag()*linField.first.block(linStart, 0, rows, cols);
       }
 
-      if(this->mLDMatrices.count(key) > 0)
+      // Compute with real linear operator
+      if(eq.hasExplicitDLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLDMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.first.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrix * op = &this->mLDMatrices.find(key)->second.at(matIdx);
+         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.first.cols();
 
          // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
          eqField.first.block(eqStart, 0, rows, cols) += (*op)*linField.first.block(linStart, 0, rows, cols);
@@ -76,23 +108,20 @@ namespace Equations {
       }
    }
 
-   void IEquation::computeLinear(FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx)
    {
       // Safety asserts
       assert(eqField.first.cols() == linField.cols());
       assert(eqField.second.cols() == linField.cols());
 
-      // Create key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, fieldId);
-
-      if(this->mLZMatrices.count(key) > 0)
+      if(eq.hasExplicitZLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLZMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.first.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrixZ * op = &this->mLZMatrices.find(key)->second.at(matIdx);
+         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.first.cols();
 
          // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
          eqField.first.block(eqStart, 0, rows, cols) += op->real()*linField.block(linStart, 0, rows,cols).real();
@@ -101,14 +130,14 @@ namespace Equations {
          eqField.second.block(eqStart, 0, rows, cols) += op->imag()*linField.block(linStart, 0, rows, cols).real();
       }
 
-      if(this->mLDMatrices.count(key) > 0)
+      if(eq.hasExplicitDLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLDMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.first.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrix * op = &this->mLDMatrices.find(key)->second.at(matIdx);
+         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.first.cols();
 
          // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
          eqField.first.block(eqStart, 0, rows, cols) += (*op)*linField.block(linStart, 0, rows, cols).real();
@@ -116,23 +145,20 @@ namespace Equations {
       }
    }
 
-   void IEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx) const
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx)
    {
       // Safety asserts
       assert(eqField.cols() == linField.first.cols());
       assert(eqField.cols() == linField.second.cols());
 
-      // Create key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, fieldId);
-
-      if(this->mLZMatrices.count(key) > 0)
+      if(eq.hasExplicitZLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLZMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrixZ * op = &this->mLZMatrices.find(key)->second.at(matIdx);
+         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.cols();
 
          // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
          eqField.block(eqStart, 0, rows, cols).real() += op->real()*linField.first.block(linStart, 0, rows, cols);
@@ -141,14 +167,14 @@ namespace Equations {
          eqField.block(eqStart, 0, rows, cols).imag() += op->imag()*linField.first.block(linStart, 0, rows, cols);
       }
 
-      if(this->mLDMatrices.count(key) > 0)
+      if(eq.hasExplicitDLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLDMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrix * op = &this->mLDMatrices.find(key)->second.at(matIdx);
+         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.cols();
 
          // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
          eqField.block(eqStart, 0, rows, cols).real() += (*op)*linField.first.block(linStart, 0, rows, cols);
@@ -156,72 +182,36 @@ namespace Equations {
       }
    }
 
-   void IEquation::computeLinear(FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx) const
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx)
    {
       // Safety asserts
       assert(eqField.cols() == linField.cols());
 
-      // Create key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, fieldId);
-
-      if(this->mLZMatrices.count(key) > 0)
+      if(eq.hasExplicitZLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLZMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrixZ * op = &this->mLZMatrices.find(key)->second.at(matIdx);
+         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.cols();
 
          // Apply operator to field: eq += op*lin
          eqField.block(eqStart, 0, rows, cols) += (*op)*linField.block(linStart, 0, rows, cols);
       }
 
-      if(this->mLDMatrices.count(key) > 0)
+      if(eq.hasExplicitDLinear(compId, fieldId))
       {
-         // Get number of rows and columns of block
-         int rows = this->mLDMatrices.find(key)->second.at(matIdx).rows();
-         int cols = eqField.cols();
-
          // Create pointer to sparse operator
-         const SparseMatrix * op = &this->mLDMatrices.find(key)->second.at(matIdx);
+         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
+
+         // Get number of rows and columns of block
+         int rows = op->rows();
+         int cols = eqField.cols();
 
          eqField.block(eqStart, 0, rows, cols).real() += (*op)*linField.block(linStart, 0, rows, cols).real();
          eqField.block(eqStart, 0, rows, cols).imag() += (*op)*linField.block(linStart, 0, rows, cols).imag();
       }
-   }
-
-   void IEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, DecoupledZMatrix& storage, const int matIdx, const int start)
-   {
-      // Get iterator to set of quasi-inverse matrices
-      std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::const_iterator qIt = this->mNLMatrices.find(id);
-
-      // Get number of rows
-      int rows = this->couplingInfo(id).blockN(matIdx);
-
-      // Safety asserts
-      assert(qIt->second.at(matIdx).rows() == qIt->second.at(matIdx).cols());
-      assert(qIt->second.at(matIdx).cols() == rows);
-
-      // Multiply nonlinear term by quasi-inverse
-      storage.first.block(start, 0, rows, storage.first.cols()) = qIt->second.at(matIdx)*storage.first.block(start, 0, rows, storage.first.cols());
-      storage.second.block(start, 0, rows, storage.second.cols()) = qIt->second.at(matIdx)*storage.second.block(start, 0, rows, storage.second.cols());
-   }
-
-   void IEquation::applyNLQuasiInverse(FieldComponents::Spectral::Id id, MatrixZ& storage, const int matIdx, const int start)
-   {
-      // Get iterator to set of quasi-inverse matrices
-      std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::const_iterator qIt = this->mNLMatrices.find(id);
-
-      // Get number of rows
-      int rows = this->couplingInfo(id).blockN(matIdx);
-
-      // Safety asserts
-      assert(qIt->second.at(matIdx).rows() == qIt->second.at(matIdx).cols());
-      assert(qIt->second.at(matIdx).cols() == rows);
-
-      // Multiply nonlinear term by quasi-inverse
-      storage.block(start, 0, rows, storage.cols()) = qIt->second.at(matIdx)*storage.block(start, 0, rows, storage.cols());
    }
 }
 }

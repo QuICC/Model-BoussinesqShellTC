@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RotatingRBTransport::RotatingRBTransport(SharedEquationParameters spEqParams)
-      : IScalarPEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    IBoussinesqPerBetaCylGScalarEquation::IBoussinesqPerBetaCylGScalarEquation(SharedEquationParameters spEqParams)
-      : IScalarPEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
    }
 

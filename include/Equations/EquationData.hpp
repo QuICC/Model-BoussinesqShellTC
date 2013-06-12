@@ -1,5 +1,5 @@
 /** \file EquationData.hpp
- *  \brief Base building block for the implementation of a time dependend evolution equation
+ *  \brief Lowest building block for the implementation of an equation
  */
 
 #ifndef EQUATIONDATA_HPP
@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Base building block for the implementation of a time dependend evolution equation
+    * @brief Lowest building block for the implementation of an equation
     */
    class EquationData
    {
@@ -59,25 +59,11 @@ namespace Equations {
          const Datatypes::ScalarVariableType& scalar(PhysicalNames::Id name) const;
 
          /**
-          * @brief Set scalar variable
-          *
-          * @param name Physical name of the field
-          */
-         Datatypes::ScalarVariableType& rScalar(PhysicalNames::Id name);
-
-         /**
           * @brief Get vector variable
           *
           * @param name Physical name of the field
           */
          const Datatypes::VectorVariableType& vector(PhysicalNames::Id name) const;
-
-         /**
-          * @brief Set vector variable
-          *
-          * @param name Physical name of the field
-          */
-         Datatypes::VectorVariableType& rVector(PhysicalNames::Id name);
 
          /**
           * @brief Set the smart pointer to the scalar field
@@ -96,19 +82,53 @@ namespace Equations {
          void setField(PhysicalNames::Id name, Datatypes::SharedVectorVariableType spField);
 
          /**
-          * @brief Get the explicit linear matrices (real sparse operators)
+          * @brief Get the quasi-inverse matrix for the nonlinear terms
+          *
+          * @param compId  Field component ID
+          * @param j       Matrix index
           */
-         const SparseMatrix& explicitDLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const;
+         const SparseMatrix& quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const;
+
+         /**
+          * @brief Check if real explicit linear matrices exist
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          */
+         bool hasExplicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
+
+         /**
+          * @brief Check if complex explicit linear matrices exist
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          */
+         bool hasExplicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
+
+         /**
+          * @brief Get the explicit linear matrices (real sparse operators)
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          * @param j       Matrix index
+          */
+         const SparseMatrix& explicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the explicit linear matrices (complex sparse operators)
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          * @param j       Matrix index
           */
-         const SparseMatrixZ& explicitZLinear(const FieldComponents::Spectral::Id comp, const SpectralFieldId fieldId, const int j) const;
+         const SparseMatrixZ& explicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the coupling information
+          *
+          * @param compId  Field component ID
           */
-         const CouplingInformation&  couplingInfo(const FieldComponents::Spectral::Id id) const;
+         const CouplingInformation&  couplingInfo(const FieldComponents::Spectral::Id compId) const;
 
          /**
           * @brief Get map of field storage requirements information
@@ -132,6 +152,20 @@ namespace Equations {
           * @brief Set the unknown name of equation
           */
          void setName(PhysicalNames::Id name);
+
+         /**
+          * @brief Set scalar variable
+          *
+          * @param name Physical name of the field
+          */
+         Datatypes::ScalarVariableType& rScalar(PhysicalNames::Id name);
+
+         /**
+          * @brief Set vector variable
+          *
+          * @param name Physical name of the field
+          */
+         Datatypes::VectorVariableType& rVector(PhysicalNames::Id name);
 
          /**
           * @brief Storage for the variable requirements

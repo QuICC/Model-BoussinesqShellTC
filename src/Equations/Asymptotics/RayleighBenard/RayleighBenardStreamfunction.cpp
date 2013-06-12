@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RayleighBenardStreamfunction::RayleighBenardStreamfunction(SharedEquationParameters spEqParams)
-      : IScalarPEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
@@ -67,13 +67,13 @@ namespace Equations {
    void RayleighBenardStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarEquation::timestepOutput(id, storage, matIdx, start);
    }
 
    void RayleighBenardStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarEquation::timestepOutput(id, storage, matIdx, start);
    }
  
    void RayleighBenardStreamfunction::setSpectralMatrices(const IEvolutionEquation::BcEqMapType& bcIds, const std::map<PhysicalNames::Id, IEvolutionEquation::BcEqMapType>& cbcIds)

@@ -19,8 +19,8 @@
 //
 #include "Timesteppers/EquationDTimestepper.hpp"
 #include "Timesteppers/EquationZTimestepper.hpp"
-#include "Equations/IScalarPEquation.hpp"
-#include "Equations/IVectorPEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 #include "Timesteppers/ImExRK3.hpp"
 
 namespace GeoMHDiSCC {
@@ -61,7 +61,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat dt, const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void init(const MHDFloat dt, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Adapt the timestep used
@@ -70,7 +70,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Update control status
@@ -83,7 +83,7 @@ namespace Timestep {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void stepForward(const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Get current simulation time
@@ -106,17 +106,17 @@ namespace Timestep {
          /**
           * @brief Build the solver matrices independenlty of solver type
           */
-         template <typename TSolverIt> void buildSolverMatrix(Equations::SharedIPrognosticEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
+         template <typename TSolverIt> void buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
 
          /**
           * @brief Create the correct equation steppers
           */
-         void createEqStepper(Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp);
+         void createEqStepper(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Compute (coupled) matrices
           */
-         void createMatrices(Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp);
+         void createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Update time dependence
@@ -129,7 +129,7 @@ namespace Timestep {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void initSolution(const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Update equation input to timestepper
@@ -137,7 +137,7 @@ namespace Timestep {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void getInput(const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Compute the RHS of all linear systems
@@ -155,7 +155,7 @@ namespace Timestep {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void transferOutput(const std::vector<Equations::SharedIScalarPEquation>& scalEq, const std::vector<Equations::SharedIVectorPEquation>& vectEq);
+         void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
 
          /**
           * @brief Build the time matrix
@@ -165,7 +165,7 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         void buildTimeMatrix(SparseMatrix& timeMatrix, Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         void buildTimeMatrix(SparseMatrix& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the time matrix
@@ -175,7 +175,7 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         void buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         void buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the solver matrix
@@ -186,7 +186,7 @@ namespace Timestep {
           * @param idx        Matrix index
           * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+         void buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Build the solver matrix
@@ -197,7 +197,7 @@ namespace Timestep {
           * @param idx        Matrix index
           * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIPrognosticEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+         void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
@@ -245,7 +245,7 @@ namespace Timestep {
          std::vector<EquationZTimestepper> mEqZStepper;
    };
 
-   template <typename TSolverIt> void Timestepper::buildSolverMatrix(Equations::SharedIPrognosticEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
+   template <typename TSolverIt> void Timestepper::buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
    {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
@@ -295,8 +295,11 @@ namespace Timestep {
       // Get timestep input
       for(int i = 0; i < solveIt->nSystem(); i++)
       {
-         // Get new timestep input
-         (*eqIt)->timestepInput(id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
+         // Copy field values into timestep input
+         Equations::copyUnknown(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
+
+         // Apply quasi-inverse to nonlinear terms
+         Equations::applyQuasiInverse(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
 
          // Loop over all complex solvers
          for(std::vector<EquationZTimestepper>::iterator zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
@@ -305,7 +308,7 @@ namespace Timestep {
             EquationZTimestepper::field_iterator_range   fRange = zIt->fieldRange();
             for(EquationZTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               (*eqIt)->computeLinear(id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, zIt->rRHSData(i), zIt->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, zIt->rRHSData(i), zIt->startRow(*fIt,i), i);
             }
          }
 
@@ -316,7 +319,7 @@ namespace Timestep {
             EquationDTimestepper::field_iterator_range   fRange = dIt->fieldRange();
             for(EquationDTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               (*eqIt)->computeLinear(id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, dIt->rRHSData(i), dIt->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, dIt->rRHSData(i), dIt->startRow(*fIt,i), i);
             }
          }
       }

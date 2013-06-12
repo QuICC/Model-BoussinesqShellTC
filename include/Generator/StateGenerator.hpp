@@ -19,8 +19,8 @@
 //
 #include "Simulation/SimulationIoControl.hpp"
 #include "Equations/EquationParameters.hpp"
-#include "Equations/IScalarDEquation.hpp"
-#include "Equations/IVectorDEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -150,12 +150,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for scalar equations
           */
-         std::vector<Equations::SharedIScalarDEquation> mScalarEquations;
+         std::vector<Equations::SharedIScalarEquation> mScalarEquations;
 
          /**
           * @brief Storage for vector equations
           */
-         std::vector<Equations::SharedIVectorDEquation> mVectorEquations;
+         std::vector<Equations::SharedIVectorEquation> mVectorEquations;
 
          /**
           * @brief Map between name and pointer for the scalar variables

@@ -2,12 +2,8 @@
 set(MHDSources
    CouplingInformation.cpp
    IEquation.cpp
-   IDiagnosticEquation.cpp
-   IPrognosticEquation.cpp
-   IScalarDEquation.cpp
-   IVectorDEquation.cpp
-   IScalarPEquation.cpp
-   IVectorPEquation.cpp
+   IScalarEquation.cpp
+   IVectorEquation.cpp
    EquationData.cpp
    EquationParameters.cpp
 )

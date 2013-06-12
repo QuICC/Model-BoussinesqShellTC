@@ -69,7 +69,7 @@ namespace Equations {
    void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
       // Get the box scale
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
@@ -89,7 +89,7 @@ namespace Equations {
    void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
    {
       // Call basic implementation
-      IScalarPEquation::timestepOutput(id, storage, matIdx, start);
+      IScalarEquation::timestepOutput(id, storage, matIdx, start);
 
       // Get the box scale
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);

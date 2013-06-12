@@ -206,14 +206,14 @@ namespace GeoMHDiSCC {
       //
 
       // Loop over all scalar equations
-      std::vector<Equations::SharedIScalarDEquation>::iterator scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
       {
          varInfo.merge((*scalEqIt)->requirements());
       }
 
       // Loop over all vector equations
-      std::vector<Equations::SharedIVectorDEquation>::iterator vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
       {
          varInfo.merge((*vectEqIt)->requirements());
@@ -310,7 +310,7 @@ namespace GeoMHDiSCC {
       for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
       {
          // Loop over scalar equations
-         std::vector<Equations::SharedIScalarDEquation>::iterator scalEqIt;
+         std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
          for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
          {
             // Set scalar variable as unknown scalar field
@@ -330,7 +330,7 @@ namespace GeoMHDiSCC {
          }
 
          // Loop over vector equations
-         std::vector<Equations::SharedIVectorDEquation>::iterator vectEqIt;
+         std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
          for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
          {
             // Set scalar variable as additional scalar field
@@ -346,7 +346,7 @@ namespace GeoMHDiSCC {
       for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
       {
          // Loop over scalar equations
-         std::vector<Equations::SharedIScalarDEquation>::iterator scalEqIt;
+         std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
          for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
          {
             // Set vector variable as additional vector field
@@ -357,7 +357,7 @@ namespace GeoMHDiSCC {
          }
 
          // Loop over vector equations
-         std::vector<Equations::SharedIVectorDEquation>::iterator vectEqIt;
+         std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
          for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
          {
             // Set vector variable as unknown vector field

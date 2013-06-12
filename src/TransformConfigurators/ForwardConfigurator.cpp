@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardConfigurator::prepareTimestep(Equations::SharedIScalarPEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::updateEquation(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
@@ -31,7 +31,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->prepareTimestep(rScalar, FieldComponents::Spectral::SCALAR);
+      spEquation->updateDealiasedUnknown(rScalar, FieldComponents::Spectral::SCALAR);
 
       // Free the temporary storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
@@ -40,19 +40,19 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
    }
 
-   void ForwardConfigurator::prepareTimestep(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
+      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
 
       // Prepare the poloidal timestep RHS
-      ForwardConfigurator::prepareTimestep<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
    }
 
-   template <> void ForwardConfigurator::prepareTimestep<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorPEquation spEquation, TransformCoordinatorType& coord)
+   template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
    }
 

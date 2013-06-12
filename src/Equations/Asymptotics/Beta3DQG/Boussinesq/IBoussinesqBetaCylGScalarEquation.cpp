@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    IBoussinesqBetaCylGScalarEquation::IBoussinesqBetaCylGScalarEquation(SharedEquationParameters spEqParams)
-      : IScalarPEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
    }
 
@@ -54,7 +54,7 @@ namespace Equations {
       BoussinesqBetaCylGSystem::setCouplingInfo(this->mCouplingInfos.find(FieldComponents::Spectral::SCALAR)->second, eqId, nX, nZ, nY);
    }
 
-   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::linearRow(FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::linearRow(FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       // Get X and Z dimensions
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -70,9 +70,9 @@ namespace Equations {
       MHDFloat chi = this->eqParams().nd(NonDimensional::CHI);
 
       // Storage for the matrix row
-      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx)), SparseMatrix(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx)));
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(this->couplingInfo(comp).blockN(matIdx), this->couplingInfo(comp).blockN(matIdx)),SparseMatrix(this->couplingInfo(comp).blockN(matIdx), this->couplingInfo(comp).blockN(matIdx)));
-      SparseMatrix  tmp(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx));
+      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx)), SparseMatrix(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx)));
+      DecoupledZSparse  block = std::make_pair(SparseMatrix(this->couplingInfo(compId).blockN(matIdx), this->couplingInfo(compId).blockN(matIdx)),SparseMatrix(this->couplingInfo(compId).blockN(matIdx), this->couplingInfo(compId).blockN(matIdx)));
+      SparseMatrix  tmp(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx));
 
       // Loop over all coupled fields
       int colIdx = 0;
@@ -80,11 +80,12 @@ namespace Equations {
       CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
-         SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
-         blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), colIdx) = 1;
+         SparseMatrix   blockMatrix(this->couplingInfo(compId).nBlocks(),this->couplingInfo(compId).nBlocks());
+         blockMatrix.insert(this->couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
          SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
          BoussinesqBetaCylGSystem::linearBlock(block, eqId, *fIt, nx, nz, k_, Ra, Pr, Gamma, chi);
+         Equations::linearBlock(eq, block, *fIt, nx, nz, k_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -100,7 +101,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::timeRow(FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse IBoussinesqBetaCylGScalarEquation::timeRow(FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       // Get X and Z dimensions
       int nx = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -116,13 +117,13 @@ namespace Equations {
       MHDFloat chi = this->eqParams().nd(NonDimensional::CHI);
 
       // Storage for the matrix row
-      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx)), SparseMatrix(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx)));
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(this->couplingInfo(comp).blockN(matIdx), this->couplingInfo(comp).blockN(matIdx)),SparseMatrix(this->couplingInfo(comp).blockN(matIdx), this->couplingInfo(comp).blockN(matIdx)));
-      SparseMatrix  tmp(this->couplingInfo(comp).systemN(matIdx), this->couplingInfo(comp).systemN(matIdx));
+      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx)), SparseMatrix(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx)));
+      DecoupledZSparse  block = std::make_pair(SparseMatrix(this->couplingInfo(compId).blockN(matIdx), this->couplingInfo(compId).blockN(matIdx)),SparseMatrix(this->couplingInfo(compId).blockN(matIdx), this->couplingInfo(compId).blockN(matIdx)));
+      SparseMatrix  tmp(this->couplingInfo(compId).systemN(matIdx), this->couplingInfo(compId).systemN(matIdx));
 
       // Create time row
-      SparseMatrix   blockMatrix(this->couplingInfo(comp).nBlocks(),this->couplingInfo(comp).nBlocks());
-      blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), this->couplingInfo(comp).fieldIndex()) = 1;
+      SparseMatrix   blockMatrix(this->couplingInfo(compId).nBlocks(),this->couplingInfo(compId).nBlocks());
+      blockMatrix.insert(this->couplingInfo(compId).fieldIndex(), this->couplingInfo(compId).fieldIndex()) = 1;
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
       BoussinesqBetaCylGSystem::timeBlock(block, eqId, nx, nz, k_, Ra, Pr, Gamma, chi);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
@@ -276,6 +277,52 @@ namespace Equations {
          }
       }
 
+   }
+
+   DecoupledZSparse boundaryRow(const IScalarEquation& eq, FieldComponents::Spectral::Id comp, const int matIdx) const
+   {
+      // Get X and Z dimensions
+      int nx = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nz = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      // Get wave number rescale to box size
+      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+
+      // Get Physical parameters Ra, Pr, Gamma, chi
+      MHDFloat Ra = this->eqParams().nd(NonDimensional::RAYLEIGH);
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
+      MHDFloat Gamma = this->eqParams().nd(NonDimensional::GAMMA);
+      MHDFloat chi = this->eqParams().nd(NonDimensional::CHI);
+
+      // Storage for the matrix row
+      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(eq.couplingInfo(comp).systemN(matIdx), eq.couplingInfo(comp).systemN(matIdx)), SparseMatrix(eq.couplingInfo(comp).systemN(matIdx), eq.couplingInfo(comp).systemN(matIdx)));
+      DecoupledZSparse  block = std::make_pair(SparseMatrix(eq.couplingInfo(comp).blockN(matIdx), eq.couplingInfo(comp).blockN(matIdx)),SparseMatrix(eq.couplingInfo(comp).blockN(matIdx), eq.couplingInfo(comp).blockN(matIdx)));
+      SparseMatrix  tmp(eq.couplingInfo(comp).systemN(matIdx), eq.couplingInfo(comp).systemN(matIdx));
+
+      // Loop over all coupled fields
+      int colIdx = 0;
+      CouplingInformation::field_iterator fIt;
+      CouplingInformation::field_iterator_range fRange = eq.couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
+      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+      {
+         SparseMatrix   blockMatrix(eq.couplingInfo(comp).nBlocks(),eq.couplingInfo(comp).nBlocks());
+         blockMatrix.insert(eq.couplingInfo(comp).fieldIndex(), colIdx) = 1;
+
+         SpectralFieldId eqId = std::make_pair(eq.name(), FieldComponents::Spectral::SCALAR);
+         BoussinesqBetaCylGSystem::boundaryBlock(block, eqId, *fIt, this->mspBcIds, nx, nz, k_, Ra, Pr, Gamma, chi);
+         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         matrixRow.first += tmp;
+         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         matrixRow.second += tmp;
+
+         colIdx++;
+      }
+
+      // Make sure matrices are in compressed format
+      matrixRow.first.makeCompressed();
+      matrixRow.second.makeCompressed();
+
+      return matrixRow;
    }
 }
 }
