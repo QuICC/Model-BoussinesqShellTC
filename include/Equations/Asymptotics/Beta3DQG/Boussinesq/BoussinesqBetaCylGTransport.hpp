@@ -57,8 +57,60 @@ namespace Equations {
           */
          virtual void setRequirements();
 
+         /**
+          * @brief Set the equation coupling information
+          */
+         virtual void setCoupling();
+
       private:
    };
+
+   /**
+    * @brief Build Full block row for linear operators
+    */
+   DecoupledZSparse linearRow(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+
+   /**
+    * @brief Build Full block row for time operators
+    */
+   DecoupledZSparse timeRow(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+
+   /**
+    * @brief Build Full block row for time operators
+    */
+   DecoupledZSparse boundaryRow(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+
+   /**
+    * @brief Get the time matrix block for an equation
+    *
+    * @param mat     Storage for output matrix
+    * @param nX      Matrix size in X
+    * @param nZ      Matrix size in Z
+    * @param k       Wave number k
+    */
+   void timeBlock(const BoussinesqBetaCylGTransport& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
+
+   /**
+    * @brief Get the linear matrix block for an equation on given field
+    *
+    * @param mat     Storage for output matrix
+    * @param fieldId Physical ID of the field
+    * @param nX      Matrix size in X
+    * @param nZ      Matrix size in Z
+    * @param k       Wave number k
+    */
+   void linearBlock(const BoussinesqBetaCylGTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+
+   /**
+    * @brief Get the boundary condition matrix block for an equation on given field
+    *
+    * @param mat     Storage for output matrix
+    * @param fieldId Physical ID of the field
+    * @param nX      Matrix size in X
+    * @param nZ      Matrix size in Z
+    * @param k       Wave number k
+    */
+   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
 }
 }

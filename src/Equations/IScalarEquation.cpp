@@ -10,6 +10,8 @@
 
 // External includes
 //
+#include <Eigen/Sparse>
+#include <Eigen/KroneckerProduct>
 
 // Class include
 //
