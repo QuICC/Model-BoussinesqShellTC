@@ -39,6 +39,14 @@ namespace Equations {
    {
       public:
          /**
+          * @brief Enum for the different types of operator rows
+          */
+         enum OperatorRowId {
+            TIMEROW = 0,
+            LINEARROW,
+            BOUNDARYROW};
+
+         /**
           * @brief Simple constructor
           */
          explicit IEquation(SharedEquationParameters spEqParams);
@@ -52,6 +60,11 @@ namespace Equations {
           * @brief Initialise the equation
           */
          virtual void init();
+
+         /**
+          * @brief Generic operator row dispatcher
+          */
+         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const = 0;
 
          /**
           * @brief Compute the nonlinear interaction term

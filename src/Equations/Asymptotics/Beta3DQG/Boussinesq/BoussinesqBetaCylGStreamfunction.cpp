@@ -22,14 +22,13 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGSystem.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    BoussinesqBetaCylGStreamfunction::BoussinesqBetaCylGStreamfunction(SharedEquationParameters spEqParams)
-      : IBoussinesqBetaCylGScalarEquation(spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
@@ -49,30 +48,31 @@ namespace Equations {
       int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Initialise coupling information
-      this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
+      std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator infoIt;
+      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
       // General setup: first complex solver, complex solver, start from m = 0
-      this->mCouplingInfo.setGeneral(0, true, 0);
+      infoIt->second.setGeneral(0, true, 0);
 
       // 
       //  WARNING: the order is important as it determines the field index!
       //
 
       // Equation is coupled to streamfunction equation (self)
-      this->mCouplingInfo.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
       // Equation is coupled to vertical velocity equation
-      this->mCouplingInfo.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
+      infoIt->second.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
       // Equation has explicit temperature
-      this->mCouplingInfo.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
+      infoIt->second.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
       blockNs.setConstant(nX*nZ);
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
-      this->mCouplingInfo.setSizes(nY, blockNs, rhsCols); 
+      infoIt->second.setSizes(nY, blockNs, rhsCols); 
    }
 
    void BoussinesqBetaCylGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -142,23 +142,57 @@ namespace Equations {
       this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
    }
 
-   DecoupledZSparse linearRow(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   DecoupledZSparse BoussinesqBetaCylGStreamfunction::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
-      return linearRow1DPeriodic(eq, compId, matIdx);
+      if(opId == IEquation::TIMEROW)
+      { 
+         return timeRow1DPeriodic(*this, compId, matIdx);
+      } else if(opId == IEquation::LINEARROW)
+      {
+         return linearRow1DPeriodic(*this, compId, matIdx);
+      } else if(opId == IEquation::BOUNDARYROW)
+      {
+         return boundaryRow1DPeriodic(*this, compId, matIdx);
+      } else
+      {
+         throw Exception("Unknown operator row ID");
+      }
    }
 
-   DecoupledZSparse timeRow(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   void BoussinesqBetaCylGStreamfunction::setQuasiInverse(SparseMatrix& mat) const
    {
-      return timeRow1DPeriodic(eq, compId, matIdx);
+      quasiInverse(*this, mat);
    }
 
-   DecoupledZSparse boundaryRow(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   void BoussinesqBetaCylGStreamfunction::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
-      return boundaryRow1DPeriodic(eq, compId, matIdx);
+      linearBlock(*this, mat, fieldId, k);
    }
 
-   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k)
+   void quasiInverse(const BoussinesqBetaCylGStreamfunction& eq, SparseMatrix& mat)
    {
+      // Get X and Z dimensions
+      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      // Create spectral operators
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+
+      /// - Streamfunction equation: \f$ \left(D_x^{-4} \otimes D_Z^{-1}\right) \f$
+      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
+      Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(4,0), mat);
+
+      // Prune matrices for safety
+      mat.prune(1e-32);
+   }
+
+   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   {
+      // Get X and Z dimensions
+      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
@@ -206,8 +240,12 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k)
+   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const MHDFloat k)
    {
+      // Get X and Z dimensions
+      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
@@ -227,31 +265,27 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nX, const int nZ, const MHDFloat k)
+   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
-      // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
-
-      // Create spectral boundary operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(nZ);
-
-      // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
-
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      // Storage for the boundary quasi-inverses
-      SparseMatrix q1D;
-      SparseMatrix q3D;
+      // Get Physical parameters Ra, Pr, Gamma, chi
+      MHDFloat Ra = eq.eqParams().nd(NonDimensional::RAYLEIGH);
+      MHDFloat Pr = eq.eqParams().nd(NonDimensional::PRANDTL);
+      MHDFloat Gamma = eq.eqParams().nd(NonDimensional::GAMMA);
+      MHDFloat chi = eq.eqParams().nd(NonDimensional::CHI);
 
+      /// <b>Boundary operators for the streamfunction equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$ and \f$\left(D_x^{-4} \otimes BC_Z\right)\f$
+      int pX = 4;
+      int pZ = 0;
 
-      // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      // Set boundary condition prefactors
+      MHDFloat cX = 1.0;
+      MHDFloat cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
+
+      // Compute boundary block operator
+      boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/IBoussinesqBetaCylGScalarEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity
     */
-   class BoussinesqBetaCylGVertical: public IBoussinesqBetaCylGScalarEquation
+   class BoussinesqBetaCylGVertical: public IScalarEquation
    {
       public:
          /**
@@ -50,6 +50,18 @@ namespace Equations {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
+
+         /**
+          * @brief Generic operator row dispatcher
+          */
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
          
       protected:
          /**
@@ -62,55 +74,55 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(SparseMatrix &mat) const;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+
       private:
    };
 
    /**
-    * @brief Build Full block row for linear operators
-    */
-   DecoupledZSparse linearRow(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, const int matIdx);
-
-   /**
-    * @brief Build Full block row for time operators
-    */
-   DecoupledZSparse timeRow(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, const int matIdx);
-
-   /**
-    * @brief Build Full block row for time operators
-    */
-   DecoupledZSparse boundaryRow(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, const int matIdx);
-
-   /**
-    * @brief Get the time matrix block for an equation
+    * @brief Get the quasi-inverse matrix operator
     *
+    * @param eq      Equation to work on
     * @param mat     Storage for output matrix
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
+    */
+   void quasiInverse(const BoussinesqBetaCylGVertical& eq, SparseMatrix& mat, const SpectralFieldId eqId);
+
+   /**
+    * @brief Get the time matrix block
+    *
+    * @param eq      Equation to work on
+    * @param mat     Storage for output matrix
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
+   void timeBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const MHDFloat k);
 
    /**
-    * @brief Get the linear matrix block for an equation on given field
+    * @brief Get the linear matrix block on given field
     *
+    * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void linearBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
    /**
-    * @brief Get the boundary condition matrix block for an equation on given field
+    * @brief Get the boundary condition matrix block on given field
     *
+    * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void boundaryBlock(const BoussinesqBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }

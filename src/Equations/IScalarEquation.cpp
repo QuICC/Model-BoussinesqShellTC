@@ -19,6 +19,8 @@
 
 // Project includes
 //
+#include "Base/MathConstants.hpp"
+#include "TypeSelectors/SpectralSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -151,6 +153,88 @@ namespace Equations {
       }
    }
 
+   void IScalarEquation::initSpectralMatrices1DPeriodic(const SharedSimulationBoundary spBcIds)
+   {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      // Get the number of systems
+      int nSystems = this->couplingInfo(FieldComponents::Spectral::SCALAR).nSystems();
+
+      // Boxscale
+      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
+      //
+      // Initialise the quasi-inverse operators for the nonlinear terms
+      //
+      this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
+      std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
+      qIt->second.reserve(nSystems);
+      for(int i = 0; i < nSystems; ++i)
+      {
+         qIt->second.push_back(SparseMatrix());
+
+         this->setQuasiInverse(qIt->second.back());
+      }
+
+      //
+      // Initialise the explicit linear operators
+      //
+      CouplingInformation::field_iterator fIt;
+      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+      {
+         std::vector<DecoupledZSparse> tmpMat;
+         tmpMat.reserve(nSystems);
+
+         bool isComplex = false;
+
+         // Create matrices
+         for(int i = 0; i < nSystems; ++i)
+         {
+            MHDFloat k_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
+
+            // Get linear block
+            tmpMat.push_back(DecoupledZSparse());
+            this->setExplicitLinearBlock(tmpMat.at(i), *fIt, k_);
+
+            // Explicit operator requires an additional minus sign
+            tmpMat.at(i).first = -tmpMat.at(i).first;
+            tmpMat.at(i).second = -tmpMat.at(i).second;
+
+            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+         }
+
+         // Create key
+         std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(FieldComponents::Spectral::SCALAR, *fIt);
+
+         // Select real or complex operator
+         if(isComplex)
+         {
+            this->mLZMatrices.insert(std::make_pair(key, std::vector<SparseMatrixZ>()));
+            this->mLZMatrices.find(key)->second.reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               this->mLZMatrices.find(key)->second.push_back(tmp);
+            }
+         } else
+         {
+            this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
+            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
+
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+            }
+         }
+      }
+
+   }
+
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
@@ -255,6 +339,106 @@ namespace Equations {
             k++;
          }
       }
+   }
+
+   void boundaryBlock1DPeriodic(const IScalarEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int pX, const int pZ, const MHDFloat cX, const MHDFloat cZ)
+   {
+      // Get X and Z dimensions
+      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      // Create equation ID
+      SpectralFieldId eqId = std::make_pair(eq.name(), FieldComponents::Spectral::SCALAR);
+
+      // Create spectral operators
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+
+      // Create spectral boundary operators
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(nX);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(nZ);
+
+      // Initialise output matrices
+      mat.first.resize(nX*nZ,nX*nZ);
+      mat.second.resize(nX*nZ,nX*nZ);
+
+      // Storage for the boundary quasi-inverses
+      SparseMatrix q1D;
+      SparseMatrix q3D;
+
+      // Set boundary "operators"
+      if(eq.bcIds().hasEquation(eqId))
+      {
+         // Set X boundary quasi-inverse
+         q1D = spec1D.shiftId(pX);
+
+         // Set Z boundary quasi-inverse
+         q3D = spec3D.id(pZ);
+      // Unknown equation
+      } else
+      {
+         throw Exception("Missing condition(s) for boundary operator!");
+      }
+
+      // Temporary storage for the boundary operators
+      DecoupledZSparse tau;
+
+      // Set boundary conditions on fieldId
+      if(eq.bcIds().hasField(eqId,fieldId))
+      {
+         // Set X boundary conditions
+         if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
+         {
+            tau = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
+            if(tau.first.nonZeros() > 0)
+            {
+               if(cX != 1.0)
+               {
+                  tau.first *= cX*tau.first;
+               }
+               Eigen::kroneckerProduct(q3D, tau.first, mat.first);
+            }
+
+            if(tau.second.nonZeros() > 0)
+            {
+               if(cX != 1.0)
+               {
+                  tau.second *= cX*tau.second;
+               }
+               Eigen::kroneckerProduct(q3D, tau.second, mat.second);
+            }
+         }
+
+         // Set Z boundary conditions
+         if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM3D) > 0)
+         {
+            tau = Spectral::BoundaryConditions::tauMatrix(bound3D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second);
+            if(tau.first.nonZeros() > 0)
+            {
+               if(cZ != 1.0)
+               {
+                  tau.first *= cZ*tau.first;
+               }
+               SparseMatrix tmp;
+               Eigen::kroneckerProduct(tau.first, q1D, tmp);
+               mat.first += tmp;
+            }
+            if(tau.second.nonZeros() > 0)
+            {
+               if(cZ != 1.0)
+               {
+                  tau.second *= cZ*tau.second;
+               }
+               SparseMatrix tmp;
+               Eigen::kroneckerProduct(tau.second, q1D, tmp);
+               mat.second += tmp;
+            }
+         }
+      }
+
+      // Prune matrices for safety
+      mat.first.prune(1e-32);
+      mat.second.prune(1e-32);
    }
 }
 }

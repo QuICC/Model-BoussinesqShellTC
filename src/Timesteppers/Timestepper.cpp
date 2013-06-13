@@ -690,7 +690,7 @@ namespace Timestep {
          timeMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
-      timeMatrix += Equations::timeRow(*spEq, comp, idx).first;
+      timeMatrix += spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx).first;
    }
 
    void Timestepper::buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
@@ -700,7 +700,9 @@ namespace Timestep {
          timeMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
-      timeMatrix += Equations::timeRow(*spEq, comp, idx).first.cast<MHDComplex>() + MathConstants::cI*Equations::timeRow(*spEq, comp, idx).second;
+      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
+
+      timeMatrix += tRow.first.cast<MHDComplex>() + MathConstants::cI*tRow.second;
    }
 
    void Timestepper::buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs)
@@ -733,10 +735,10 @@ namespace Timestep {
       // Add boundary row for LHS operator
       if(isLhs)
       {
-         solverMatrix += Equations::boundaryRow(*spEq, comp, idx).first;
+         solverMatrix += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first;
       }
 
-      solverMatrix += linearCoeff*Equations::linearRow(*spEq, comp, idx).first - timeCoeff*Equations::timeRow(*spEq, comp, idx).first;
+      solverMatrix += linearCoeff*spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first - timeCoeff*spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx).first;
    }
 
    void Timestepper::buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs)
@@ -769,10 +771,13 @@ namespace Timestep {
       // Add boundary row for LHS operator
       if(isLhs)
       {
-         solverMatrix += Equations::boundaryRow(*spEq, comp, idx).first.cast<MHDComplex>() + MathConstants::cI*Equations::boundaryRow(*spEq, comp, idx).second;
+         DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
+         solverMatrix += bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
       }
 
-      solverMatrix += linearCoeff*Equations::linearRow(*spEq, comp, idx).first.cast<MHDComplex>() + MathConstants::cI*linearCoeff*Equations::linearRow(*spEq, comp, idx).second - timeCoeff*Equations::timeRow(*spEq, comp, idx).first.cast<MHDComplex>() - MathConstants::cI*timeCoeff*Equations::timeRow(*spEq, comp, idx).second;
+      DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
+      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
+      solverMatrix += linearCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*linearCoeff*linRow.second - timeCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*timeCoeff*tRow.second;
    }
 
 }

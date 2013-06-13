@@ -53,6 +53,11 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
          /**
+          * @brief Generic operator row dispatcher
+          */
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
           * @brief Initialise spectral equation matrices
           *
           * @param spBcs   List of boundary condition IDs
@@ -70,8 +75,44 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(SparseMatrix &mat) const;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+
       private:
    };
+
+   /**
+    * @brief Get the quasi-inverse matrix operator
+    *
+    * @param eq      Equation to work on
+    * @param mat     Storage for output matrix
+    */
+   void quasiInverse(const RandomScalarState& eq, SparseMatrix& mat);
+
+   /**
+    * @brief Get the linear matrix block for an equation on given field
+    *
+    * @param mat     Storage for output matrix
+    * @param fieldId Physical ID of the field
+    * @param k       Wave number k
+    */
+   void linearBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+
+   /**
+    * @brief Get the boundary condition matrix block for an equation on given field
+    *
+    * @param mat     Storage for output matrix
+    * @param fieldId Physical ID of the field
+    * @param k       Wave number k
+    */
+   void boundaryBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }

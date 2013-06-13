@@ -46,6 +46,20 @@ namespace Equations {
 
    }
 
+   DecoupledZSparse RandomScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   {
+      if(opId == IEquation::LINEARROW)
+      {
+         return linearRow1DPeriodic(*this, compId, matIdx);
+      } else if(opId == IEquation::BOUNDARYROW)
+      {
+         return boundaryRow1DPeriodic(*this, compId, matIdx);
+      } else
+      {
+         throw Exception("Unknown operator row ID");
+      }
+   }
+
    void RandomScalarState::setRequirements()
    {
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
@@ -54,6 +68,16 @@ namespace Equations {
 
    void RandomScalarState::setCoupling()
    {
+   }
+
+   void RandomScalarState::setQuasiInverse(SparseMatrix& mat) const
+   {
+      Equations::quasiInverse(*this, mat);
+   }
+
+   void RandomScalarState::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   {
+      Equations::linearBlock(*this, mat, fieldId, k);
    }
 
 }

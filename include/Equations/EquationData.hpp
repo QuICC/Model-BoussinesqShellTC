@@ -25,6 +25,7 @@
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
+#include "Simulation/SimulationBoundary.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -147,6 +148,11 @@ namespace Equations {
           */
          const EquationParameters& eqParams() const;
 
+         /**
+          * @brief Get the list of boundary conditions
+          */
+         const SimulationBoundary& bcIds() const;
+
       protected:
          /**
           * @brief Set the unknown name of equation
@@ -193,6 +199,11 @@ namespace Equations {
           * @brief Map of component and nonlinear term multiplication matrices
           */
          std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
+
+         /**
+          * @brief Storage for the shared boundary condition list
+          */
+         SharedSimulationBoundary mspBcIds;
 
       private:
          /**

@@ -84,6 +84,11 @@ namespace Equations {
       return *this->mspEqParams;
    }
 
+   const SimulationBoundary& EquationData::bcIds() const
+   {
+      return *this->mspBcIds;
+   }
+
    const SparseMatrix& EquationData::quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const
    {
       // Safety assert

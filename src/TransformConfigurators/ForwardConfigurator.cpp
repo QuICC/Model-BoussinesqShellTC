@@ -43,13 +43,13 @@ namespace Transform {
    void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
       // Prepare the toroidal timestep RHS
-      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
+      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
 
       // Prepare the poloidal timestep RHS
-      ForwardConfigurator::updateDealiasedUnknown<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
    }
 
    template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)

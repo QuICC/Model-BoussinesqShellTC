@@ -88,6 +88,23 @@ namespace Equations {
 
       private:
          /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(SparseMatrix &mat) const = 0;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const = 0;
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         void initSpectralMatrices1DPeriodic(const SharedSimulationBoundary spBcIds);
+
+         /**
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedScalarVariableType mspUnknown;
@@ -122,14 +139,15 @@ namespace Equations {
     */
    template <typename TEquation> DecoupledZSparse boundaryRow1DPeriodic(const TEquation& eq, FieldComponents::Spectral::Id comp, const int matIdx);
 
+   /**
+    * @brief General implementation of the boundary block for equations with a single periodic dimensions
+    */
+   void boundaryBlock1DPeriodic(const IScalarEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const int pX, const int pZ, const MHDFloat cX, const MHDFloat cZ);
+
    template <typename TEquation> DecoupledZSparse linearRow1DPeriodic(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get X and Z dimensions
-      int nx = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nz = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
       // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Storage for the matrix row
       DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(eq.couplingInfo(compId).systemN(matIdx), eq.couplingInfo(compId).systemN(matIdx)), SparseMatrix(eq.couplingInfo(compId).systemN(matIdx), eq.couplingInfo(compId).systemN(matIdx)));
@@ -145,7 +163,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         linearBlock(eq, block, *fIt, nx, nz, k_);
+         linearBlock(eq, block, *fIt, k_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -163,10 +181,6 @@ namespace Equations {
 
    template <typename TEquation> DecoupledZSparse timeRow1DPeriodic(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get X and Z dimensions
-      int nx = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nz = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
       // Get wave number rescale to box size
       MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
 
@@ -178,7 +192,7 @@ namespace Equations {
       // Create time row
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
-      timeBlock(eq, block, nx, nz, k_);
+      timeBlock(eq, block, k_);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
       matrixRow.first += tmp;
       Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -193,12 +207,8 @@ namespace Equations {
 
    template <typename TEquation> DecoupledZSparse boundaryRow1DPeriodic(const TEquation& eq, FieldComponents::Spectral::Id comp, const int matIdx)
    {
-      // Get X and Z dimensions
-      int nx = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nz = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
       // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Storage for the matrix row
       DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(eq.couplingInfo(comp).systemN(matIdx), eq.couplingInfo(comp).systemN(matIdx)), SparseMatrix(eq.couplingInfo(comp).systemN(matIdx), eq.couplingInfo(comp).systemN(matIdx)));
@@ -214,7 +224,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(comp).nBlocks(),eq.couplingInfo(comp).nBlocks());
          blockMatrix.insert(eq.couplingInfo(comp).fieldIndex(), colIdx) = 1;
 
-         boundaryBlock(eq, block, *fIt, nx, nz, k_);
+         boundaryBlock(eq, block, *fIt, k_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
