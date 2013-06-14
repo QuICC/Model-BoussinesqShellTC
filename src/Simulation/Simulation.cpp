@@ -14,6 +14,7 @@
 
 // System includes
 //
+#include <algorithm>
 
 // External includes
 //
@@ -90,11 +91,14 @@ namespace GeoMHDiSCC {
       // Initialise the variables
       this->initVariables();
 
-      // Setup the equations
-      this->setupEquations();
+      // Map variables to the equations
+      this->mapEquationVariables();
 
-      // Initialise the timestepper
-      this->initTimestepper(spBcs);
+      // Initialise the equations (generate operators, etc)
+      this->setupEquations(spBcs);
+
+      // Sort the equations by type: time/solver/direct
+      this->sortEquations();
 
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
@@ -273,7 +277,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepper.init(this->mDiagnostics.cfl(), this->mScalarEquations, this->mVectorEquations);
+      this->mTimestepper.init(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);
@@ -303,7 +307,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Full timestep",2);
       ProfilerMacro_start(ProfilerMacro::TIMESTEP);
-      this->mTimestepper.stepForward(this->mScalarEquations, this->mVectorEquations);
+      this->mTimestepper.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
       DebuggerMacro_stop("Full timestep t = ",2);
 
@@ -323,7 +327,7 @@ namespace GeoMHDiSCC {
          this->mDiagnostics.synchronize();
 
          // Adapt timestepper time step
-         this->mTimestepper.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarEquations, this->mVectorEquations);
+         this->mTimestepper.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       
          // Update simulation run control
          this->mSimRunCtrl.update(this->mTimestepper.time(), this->mTimestepper.timestep());
@@ -482,7 +486,7 @@ namespace GeoMHDiSCC {
       this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
    }
 
-   void Simulation::setupEquations()
+   void Simulation::mapEquationVariables()
    {
       // Loop over all scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
@@ -557,7 +561,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void Simulation::initTimestepper(const SharedSimulationBoundary spBcs)
+   void Simulation::setupEquations(const SharedSimulationBoundary spBcs)
    {
       // Create iterators over scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
@@ -574,6 +578,65 @@ namespace GeoMHDiSCC {
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
          (*vectEqIt)->initSpectralMatrices(spBcs);
+      }
+   }
+
+   void Simulation::sortEquations()
+   {
+      // Sort scalar equations
+      std::stable_sort(this->mScalarEquations.begin(), this->mScalarEquations.end(), sortScalarEquationType);
+
+      // Set the ranges for the different types
+      int group = 1;
+      std::vector<Equations::SharedIScalarEquation>::iterator  scalEqIt;
+      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt != this->mScalarEquations.end(); ++scalEqIt)
+      {
+         // Set time equation range
+         if(group == 1 && computeScalarEquationType(*scalEqIt) == 2)
+         {
+            this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), scalEqIt);
+            group++;
+         }
+         // Set solver and direct equation ranges
+         if(group == 2 && computeScalarEquationType(*scalEqIt) == 3)
+         {
+            // Set solver equation range
+            this->mScalarDiagnosticRange = std::make_pair(this->mScalarPrognosticRange.second, scalEqIt);
+
+            // Set direct equation range
+            this->mScalarDirectRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
+
+            // Exit loop
+            break;
+         }
+      }
+
+      // Sort vector equations
+      std::stable_sort(this->mVectorEquations.begin(), this->mVectorEquations.end(), sortVectorEquationType);
+
+      // Set the ranges for the different types
+      group = 1;
+      std::vector<Equations::SharedIVectorEquation>::iterator  vectEqIt;
+      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt != this->mVectorEquations.end(); ++vectEqIt)
+      {
+         // Set time equation range
+         if(group == 1 && computeVectorEquationType(*vectEqIt) == 2)
+         {
+            this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), vectEqIt);
+            group++;
+         }
+         // Set solver and direct equation ranges
+         if(group == 2 && computeVectorEquationType(*vectEqIt) == 3)
+         {
+            // Set solver equation range
+            this->mVectorDiagnosticRange = std::make_pair(this->mVectorPrognosticRange.second, vectEqIt);
+
+            // Set direct equation range
+            this->mVectorDirectRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
+
+            // Exit loop
+            break;
+         }
       }
    }
 
@@ -605,6 +668,26 @@ namespace GeoMHDiSCC {
 
       // init the output writers
       this->mSimIoCtrl.initWriters();
+   }
+
+   int computeScalarEquationType(Equations::SharedIScalarEquation eqA)
+   {
+      return static_cast<int>(eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType());
+   }
+
+   bool sortScalarEquationType(Equations::SharedIScalarEquation eqA, Equations::SharedIScalarEquation eqB)
+   {
+      return computeScalarEquationType(eqA) < computeScalarEquationType(eqB);
+   }
+
+   int computeVectorEquationType(Equations::SharedIVectorEquation eqA)
+   { 
+      return static_cast<int>(eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType());
+   }
+
+   bool sortVectorEquationType(Equations::SharedIVectorEquation eqA, Equations::SharedIVectorEquation eqB)
+   {
+      return computeVectorEquationType(eqA) < computeVectorEquationType(eqB);
    }
 
 }

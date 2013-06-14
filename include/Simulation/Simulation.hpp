@@ -45,6 +45,18 @@ namespace GeoMHDiSCC {
    class Simulation
    {
       public:
+         /// Typedef for a shared scalar equation iterator
+         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquationIteratorType;
+
+         /// Typedef for a shared vector equation iterator
+         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquationIteratorType;
+
+         /// Typedef for a shared scalar equation range
+         typedef std::pair<ScalarEquationIteratorType, ScalarEquationIteratorType>  ScalarEquationRangeType;
+
+         /// Typedef for a shared vector equation range
+         typedef std::pair<VectorEquationIteratorType, VectorEquationIteratorType>  VectorEquationRangeType;
+
          /**
           * @brief Constructor
           */
@@ -159,14 +171,19 @@ namespace GeoMHDiSCC {
          void initVariables();
 
          /**
-          * @brief Initialise and setup the equations added by the model
+          * @brief Map the variables to the equations
           */
-         void setupEquations();
+         void mapEquationVariables();
 
          /**
-          * @brief Initialise the timestepper
+          * @brief Initialise the equations (generate operators, etc)
           */
-         void initTimestepper(const SharedSimulationBoundary spBcs);
+         void setupEquations(const SharedSimulationBoundary spBcs);
+
+         /**
+          * @brief Sort equations and store information for timestep/solver/nothing ranges
+          */
+         void sortEquations();
 
          /**
           * @brief Setup the output files adde by the model
@@ -219,6 +236,36 @@ namespace GeoMHDiSCC {
          std::vector<Equations::SharedIVectorEquation> mVectorEquations;
 
          /**
+          * @brief Storage for the range of scalar timestepping equations
+          */
+         ScalarEquationRangeType mScalarPrognosticRange;
+
+         /**
+          * @brief Storage for the range of vector timestepping equations
+          */
+         VectorEquationRangeType mVectorPrognosticRange;
+
+         /**
+          * @brief Storage for the range of scalar solver equations
+          */
+         ScalarEquationRangeType mScalarDiagnosticRange;
+
+         /**
+          * @brief Storage for the range of vector solver equations
+          */
+         VectorEquationRangeType mVectorDiagnosticRange;
+
+         /**
+          * @brief Storage for the range of scalar "direct" equations
+          */
+         ScalarEquationRangeType mScalarDirectRange;
+
+         /**
+          * @brief Storage for the range of vector "direct" equations
+          */
+         VectorEquationRangeType mVectorDirectRange;
+
+         /**
           * @brief Map between name and pointer for the scalar variables
           */
          std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  mScalarVariables;
@@ -243,6 +290,26 @@ namespace GeoMHDiSCC {
           */
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
    };
+
+   /**
+    * @brief Compute the scalar equation type flag for time/solver/directo ordering
+    */
+   int computeScalarEquationType(Equations::SharedIScalarEquation eqA);
+
+   /**
+    * @brief Compute the vector equation type flag for time/solver/directo ordering
+    */
+   int computeVectorEquationType(Equations::SharedIVectorEquation eqA);
+
+   /**
+    * @brief Sorting function for the scalar equations to obtain time/solver/directo ordering
+    */
+   bool sortScalarEquationType(Equations::SharedIScalarEquation eqA, Equations::SharedIScalarEquation eqB);
+
+   /**
+    * @brief Sorting function for the vector equations to obtain time/solver/directo ordering
+    */
+   bool sortVectorEquationType(Equations::SharedIVectorEquation eqA, Equations::SharedIVectorEquation eqB);
 
    template <typename TScheme> void Simulation::initResolution()
    {

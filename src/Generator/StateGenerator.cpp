@@ -80,7 +80,10 @@ namespace GeoMHDiSCC {
       this->initVariables();
 
       // Setup the equations
-      this->setupEquations();
+      this->mapEquationVariables();
+
+      // Initialise the equations (generate operators, etc)
+      this->setupEquations(spBcs);
 
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
@@ -303,7 +306,7 @@ namespace GeoMHDiSCC {
       this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
    }
 
-   void StateGenerator::setupEquations()
+   void StateGenerator::mapEquationVariables()
    {
       // Loop over all scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
@@ -375,6 +378,26 @@ namespace GeoMHDiSCC {
                (*vectEqIt)->setField(vectIt->first, this->mVectorVariables.at(vectIt->first));
             }
          }
+      }
+   }
+
+   void StateGenerator::setupEquations(const SharedSimulationBoundary spBcs)
+   {
+      // Create iterators over scalar equations
+      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
+      // Create iterators over vector equations
+      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
+
+      // Loop over all scalar equations
+      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
+      {
+         (*scalEqIt)->initSpectralMatrices(spBcs);
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
+      {
+         (*vectEqIt)->initSpectralMatrices(spBcs);
       }
    }
 

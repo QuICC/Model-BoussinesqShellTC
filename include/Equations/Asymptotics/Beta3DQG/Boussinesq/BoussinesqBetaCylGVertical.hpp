@@ -93,7 +93,7 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     */
-   void quasiInverse(const BoussinesqBetaCylGVertical& eq, SparseMatrix& mat, const SpectralFieldId eqId);
+   void quasiInverseBlock(const BoussinesqBetaCylGVertical& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block

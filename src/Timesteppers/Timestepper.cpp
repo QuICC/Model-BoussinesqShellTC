@@ -55,7 +55,7 @@ namespace Timestep {
       this->mTime += this->mDt;
    }
 
-   void Timestepper::adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::adaptTimestep(const MHDFloat cfl, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Flag to update timestep
       bool hasNewDt = false;
@@ -134,7 +134,7 @@ namespace Timestep {
       }
    }
 
-   void Timestepper::stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::stepForward(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq);
@@ -152,7 +152,7 @@ namespace Timestep {
       this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
    }
 
-   void Timestepper::init(const MHDFloat dt, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::init(const MHDFloat dt, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Set initial timestep
       this->mOldDt = dt;
@@ -166,7 +166,7 @@ namespace Timestep {
       DebuggerMacro_start("Create timesteppers", 0);
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
-      for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
          // Get type information for the equation steppers
          this->createEqStepper((*scalEqIt), FieldComponents::Spectral::SCALAR);
@@ -174,7 +174,7 @@ namespace Timestep {
 
       // Loop over all vector equations
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
-      for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
          // Get type information for the equation steppers for the toroidal component
          this->createEqStepper((*vectEqIt), FieldComponents::Spectral::ONE);
@@ -193,14 +193,14 @@ namespace Timestep {
       for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
       {
          // Loop over all scalar equations
-         for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+         for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
          {
             // Create (coupled) matrices
             this->createMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
 
          // Loop over all vector equations
-         for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+         for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
          {
             // Create (coupled) matrices
             this->createMatrices((*vectEqIt), FieldComponents::Spectral::ONE);
@@ -319,14 +319,14 @@ namespace Timestep {
       }
    }
 
-   void Timestepper::initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::initSolution(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Storage for information and identity
       SpectralFieldId myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
-      for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
          // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
@@ -364,7 +364,7 @@ namespace Timestep {
 
       // Loop over all vector equations
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
-      for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
          // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
@@ -434,14 +434,14 @@ namespace Timestep {
       }
    }
 
-   void Timestepper::getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::getInput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Storage for information and identity
       SpectralFieldId myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
-      for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
          // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
@@ -473,7 +473,7 @@ namespace Timestep {
 
       // Loop over all vector equations
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
-      for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
          // Get field identity for first component
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
@@ -568,14 +568,14 @@ namespace Timestep {
       }
    }
 
-   void Timestepper::transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq)
+   void Timestepper::transferOutput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
    {
       // Storage for identity
       SpectralFieldId myId;
 
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
-      for(scalEqIt = scalEq.begin(); scalEqIt < scalEq.end(); scalEqIt++)
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
          // Get field identity
          myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
@@ -613,7 +613,7 @@ namespace Timestep {
 
       // Loop over all vector equations
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
-      for(vectEqIt = vectEq.begin(); vectEqIt < vectEq.end(); vectEqIt++)
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
          // Get field identity
          myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);

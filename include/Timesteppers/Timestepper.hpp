@@ -39,6 +39,18 @@ namespace Timestep {
          /// Typedef for an iterator to a real equation timstepper
          typedef std::vector<EquationDTimestepper>::iterator   eqd_iterator;
 
+         /// Typedef for a shared scalar equation iterator
+         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquationIteratorType;
+
+         /// Typedef for a shared vector equation iterator
+         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquationIteratorType;
+
+         /// Typedef for a shared scalar equation range
+         typedef std::pair<ScalarEquationIteratorType, ScalarEquationIteratorType>  ScalarEquationRangeType;
+
+         /// Typedef for a shared vector equation range
+         typedef std::pair<VectorEquationIteratorType, VectorEquationIteratorType>  VectorEquationRangeType;
+
          /**
           * @brief Constructor
           */
@@ -61,7 +73,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat dt, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void init(const MHDFloat dt, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Adapt the timestep used
@@ -70,7 +82,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const MHDFloat cfl, const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void adaptTimestep(const MHDFloat cfl, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Update control status
@@ -83,7 +95,7 @@ namespace Timestep {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void stepForward(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void stepForward(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Get current simulation time
@@ -129,7 +141,7 @@ namespace Timestep {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void initSolution(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void initSolution(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Update equation input to timestepper
@@ -137,7 +149,7 @@ namespace Timestep {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void getInput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void getInput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Compute the RHS of all linear systems
@@ -155,7 +167,7 @@ namespace Timestep {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void transferOutput(const std::vector<Equations::SharedIScalarEquation>& scalEq, const std::vector<Equations::SharedIVectorEquation>& vectEq);
+         void transferOutput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Build the time matrix

@@ -118,9 +118,14 @@ namespace GeoMHDiSCC {
          void initVariables();
 
          /**
-          * @brief Initialise and setup the equations added by the model
+          * @brief Map variables to the equations added by the model
           */
-         void setupEquations();
+         void mapEquationVariables();
+
+         /**
+          * @brief Initialise the equations (generate operators, etc)
+          */
+         void setupEquations(const SharedSimulationBoundary spBcs);
 
          /**
           * @brief Setup the output files adde by the model

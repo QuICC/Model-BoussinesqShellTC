@@ -60,9 +60,9 @@ namespace Equations {
          /**
           * @brief Initialise spectral equation matrices
           *
-          * @param spBcs   List of boundary condition IDs
+          * @param spBcIds   List of boundary condition IDs
           */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary bcs);
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
 
       protected:
          /**
@@ -94,7 +94,7 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     */
-   void quasiInverse(const RandomScalarState& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const RandomScalarState& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the linear matrix block for an equation on given field

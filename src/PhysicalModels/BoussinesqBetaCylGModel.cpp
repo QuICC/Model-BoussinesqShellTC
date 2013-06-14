@@ -25,6 +25,7 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGStreamfunction.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGVertical.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGVorticity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 
 namespace GeoMHDiSCC {
@@ -92,6 +93,9 @@ namespace GeoMHDiSCC {
       
       // Add vertical velocity equation
       spSim->addScalarEquation<Equations::BoussinesqBetaCylGVertical>();
+      
+      // Add vorticity computation
+      spSim->addScalarEquation<Equations::BoussinesqBetaCylGVorticity>();
    }
 
    void BoussinesqBetaCylGModel::addStates(SharedStateGenerator spGen)

@@ -38,6 +38,11 @@ namespace Equations {
    {
    }
 
+   void BoussinesqBetaCylGStreamfunction::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   {
+      this->initSpectralMatrices1DPeriodic(spBcIds);
+   }
+
    void BoussinesqBetaCylGStreamfunction::setCoupling()
    {
       // Get X dimension
@@ -48,31 +53,31 @@ namespace Equations {
       int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Initialise coupling information
-      std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator infoIt;
+      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
       // General setup: first complex solver, complex solver, start from m = 0
-      infoIt->second.setGeneral(0, true, 0);
+      infoIt.first->second.setGeneral(1, true, 0);
 
       // 
       //  WARNING: the order is important as it determines the field index!
       //
 
       // Equation is coupled to streamfunction equation (self)
-      infoIt->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
       // Equation is coupled to vertical velocity equation
-      infoIt->second.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
+      infoIt.first->second.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
       // Equation has explicit temperature
-      infoIt->second.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
+      infoIt.first->second.addExplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
       blockNs.setConstant(nX*nZ);
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
-      infoIt->second.setSizes(nY, blockNs, rhsCols); 
+      infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
    }
 
    void BoussinesqBetaCylGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -102,46 +107,6 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
    }
 
-   void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const DecoupledZMatrix& storage, const int matIdx, const int start)
-   {
-      // Call basic implementation
-      IScalarEquation::timestepOutput(id, storage, matIdx, start);
-
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
-
-      // Get right wave number
-      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
-
-      // Create spectral operator
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
-
-      ///
-      /// Compute the vertical vorticity: \f$\zeta = \nabla^2\psi\f$
-      ///
-      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
-   }
-
-   void BoussinesqBetaCylGStreamfunction::timestepOutput(FieldComponents::Spectral::Id id, const MatrixZ& storage, const int matIdx, const int start)
-   {
-      // Call basic implementation
-      IScalarEquation::timestepOutput(id, storage, matIdx, start);
-
-      // Get the box scale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
-
-      // Get right wave number
-      MHDFloat m_ = boxScale*0.5*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
-
-      // Create spectral operator
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL));
-
-      ///
-      /// Compute the vertical vorticity: \f$\zeta = \nabla^2\psi\f$
-      ///
-      this->rScalar(PhysicalNames::VORTICITYZ).rDom(0).rPerturbation().setSlice(Spectral::PeriodicOperator::laplacian2D(spec1D, m_, 0)*this->unknown().dom(0).perturbation().slice(matIdx), matIdx);
-   }
-
    DecoupledZSparse BoussinesqBetaCylGStreamfunction::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::TIMEROW)
@@ -161,7 +126,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGStreamfunction::setQuasiInverse(SparseMatrix& mat) const
    {
-      quasiInverse(*this, mat);
+      quasiInverseBlock(*this, mat);
    }
 
    void BoussinesqBetaCylGStreamfunction::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
@@ -169,11 +134,11 @@ namespace Equations {
       linearBlock(*this, mat, fieldId, k);
    }
 
-   void quasiInverse(const BoussinesqBetaCylGStreamfunction& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const BoussinesqBetaCylGStreamfunction& eq, SparseMatrix& mat)
    {
       // Get X and Z dimensions
-      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
@@ -190,8 +155,8 @@ namespace Equations {
    void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
-      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
@@ -207,8 +172,6 @@ namespace Equations {
       // Get Physical parameters Ra, Pr, Gamma, chi
       MHDFloat Ra = eq.eqParams().nd(NonDimensional::RAYLEIGH);
       MHDFloat Pr = eq.eqParams().nd(NonDimensional::PRANDTL);
-      MHDFloat Gamma = eq.eqParams().nd(NonDimensional::GAMMA);
-      MHDFloat chi = eq.eqParams().nd(NonDimensional::CHI);
 
       /// - Streamfunction : \f$ \left(D_x^{-4}\nabla_\perp^{4} \otimes D_Z^{-1}\right) \f$
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
@@ -243,8 +206,8 @@ namespace Equations {
    void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const MHDFloat k)
    {
       // Get X and Z dimensions
-      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
@@ -271,8 +234,6 @@ namespace Equations {
       MHDFloat k_ = k/2.;
 
       // Get Physical parameters Ra, Pr, Gamma, chi
-      MHDFloat Ra = eq.eqParams().nd(NonDimensional::RAYLEIGH);
-      MHDFloat Pr = eq.eqParams().nd(NonDimensional::PRANDTL);
       MHDFloat Gamma = eq.eqParams().nd(NonDimensional::GAMMA);
       MHDFloat chi = eq.eqParams().nd(NonDimensional::CHI);
 

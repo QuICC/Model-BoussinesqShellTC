@@ -94,7 +94,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eqId    Physical ID of the equation
     */
-   void quasiInverse(const BoussinesqBetaCylGTransport& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqBetaCylGTransport& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block

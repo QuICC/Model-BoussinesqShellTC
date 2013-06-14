@@ -23,12 +23,17 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(DIRECT), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
    CouplingInformation::~CouplingInformation()
    {
+   }
+
+   CouplingInformation::EquationTypeId CouplingInformation::equationType() const
+   {
+      return this->mEquationType;
    }
 
    bool CouplingInformation::isComplex() const
@@ -104,7 +109,24 @@ namespace Equations {
 
    void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
    {
-      this->mSolverIndex = solverIndex;
+      // Timestepping is required
+      if(solverIndex > 0)
+      {
+         this->mEquationType = PROGNOSTIC;
+         this->mSolverIndex = solverIndex - 1;
+
+      // Solver is required (but no time marching)
+      } else if(solverIndex < 0)
+      {
+         this->mEquationType = DIAGNOSTIC;
+         this->mSolverIndex = std::abs(solverIndex) - 1;
+
+      // No solver and no timestepping
+      } else
+      {
+         this->mEquationType = DIRECT;
+         this->mSolverIndex = -42;
+      }
 
       this->mIsComplex = isComplex;
 

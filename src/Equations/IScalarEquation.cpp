@@ -394,7 +394,7 @@ namespace Equations {
             {
                if(cX != 1.0)
                {
-                  tau.first *= cX*tau.first;
+                  tau.first *= cX;
                }
                Eigen::kroneckerProduct(q3D, tau.first, mat.first);
             }
@@ -403,7 +403,7 @@ namespace Equations {
             {
                if(cX != 1.0)
                {
-                  tau.second *= cX*tau.second;
+                  tau.second *= cX;
                }
                Eigen::kroneckerProduct(q3D, tau.second, mat.second);
             }
@@ -417,7 +417,7 @@ namespace Equations {
             {
                if(cZ != 1.0)
                {
-                  tau.first *= cZ*tau.first;
+                  tau.first *= cZ;
                }
                SparseMatrix tmp;
                Eigen::kroneckerProduct(tau.first, q1D, tmp);
@@ -427,7 +427,7 @@ namespace Equations {
             {
                if(cZ != 1.0)
                {
-                  tau.second *= cZ*tau.second;
+                  tau.second *= cZ;
                }
                SparseMatrix tmp;
                Eigen::kroneckerProduct(tau.second, q1D, tmp);

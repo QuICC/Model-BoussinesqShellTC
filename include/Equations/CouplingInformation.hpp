@@ -50,6 +50,18 @@ namespace Equations {
          };
 
          /**
+          * @brief Enum for the equation type
+          */
+         enum EquationTypeId {
+            /// Equation needs time marching
+            PROGNOSTIC = 1,
+            /// Equation needs a solver
+            DIAGNOSTIC = 2,
+            /// Equation is direct
+            DIRECT = 3
+         };
+
+         /**
           * @brief Simple constructor
           */
          CouplingInformation();
@@ -58,6 +70,11 @@ namespace Equations {
           * @brief Simple empty destructor
           */
          virtual ~CouplingInformation();
+
+         /**
+          * @brief Get equation type
+          */
+         EquationTypeId equationType() const;
 
          /**
           * @brief Is the system complex?
@@ -184,6 +201,11 @@ namespace Equations {
           * @brief Storage for the explicit fields information
           */
          std::vector<SpectralFieldId>   mExplicitFields;
+
+         /**
+          * @brief Storage for the equation type
+          */
+         EquationTypeId mEquationType;
 
          /**
           * @brief Storage for the complex flag
