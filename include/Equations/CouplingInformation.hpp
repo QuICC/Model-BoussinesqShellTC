@@ -77,6 +77,16 @@ namespace Equations {
          EquationTypeId equationType() const;
 
          /**
+          * @brief Has a nonlinear term?
+          */
+         bool hasNonlinear() const;
+
+         /**
+          * @brief Has a quasi-inverse operator for nonlinear terms?
+          */
+         bool hasQuasiInverse() const;
+
+         /**
           * @brief Is the system complex?
           */
          bool isComplex() const;
@@ -157,11 +167,13 @@ namespace Equations {
          /**
           * @brief Set settings for all systems
           *
-          * @param solverIndex   Index of the solver
-          * @param isComplex     Complex flag of solver
-          * @param fieldStart    Start index of the filed
+          * @param solverIndex      Index of the solver
+          * @param isComplex        Complex flag of solver
+          * @param fieldStart       Start index of the filed
+          * @param hasNonlinear     Equation requires nonlinear computation?
+          * @param hasQuasiInverse  Equation requires quasi-inverse on nonlinear terms?
           */
-         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart);
+         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart, const bool hasNonlinear, const bool hasQuasiInverse);
 
          /**
           * @brief Set system sizes
@@ -206,6 +218,16 @@ namespace Equations {
           * @brief Storage for the equation type
           */
          EquationTypeId mEquationType;
+
+         /**
+          * @brief Storage for the nonlinear flag
+          */
+         bool mHasNonlinear;
+
+         /**
+          * @brief Storage for the quasi-inverse flag
+          */
+         bool mHasQuasiInverse;
 
          /**
           * @brief Storage for the complex flag

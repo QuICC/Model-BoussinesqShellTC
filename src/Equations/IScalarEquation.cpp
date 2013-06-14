@@ -165,16 +165,19 @@ namespace Equations {
       MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       //
-      // Initialise the quasi-inverse operators for the nonlinear terms
+      // Initialise the quasi-inverse operators for the nonlinear terms (if required)
       //
-      this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
-      std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
-      qIt->second.reserve(nSystems);
-      for(int i = 0; i < nSystems; ++i)
+      if(this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse())
       {
-         qIt->second.push_back(SparseMatrix());
+         this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
+         qIt->second.reserve(nSystems);
+         for(int i = 0; i < nSystems; ++i)
+         {
+            qIt->second.push_back(SparseMatrix());
 
-         this->setQuasiInverse(qIt->second.back());
+            this->setQuasiInverse(qIt->second.back());
+         }
       }
 
       //
@@ -237,6 +240,7 @@ namespace Equations {
 
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
@@ -249,22 +253,48 @@ namespace Equations {
          assert(rows*cols+start <= storage.first.rows());
          assert(rows*cols+start <= storage.second.rows());
 
-         // Copy data
-         int k = start;
-         for(int j = 0; j < cols; j++)
+         // Check if a nonlinear computation took place
+         if(eq.couplingInfo(compId).hasNonlinear())
          {
-            for(int i = 0; i < rows; i++)
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
             {
-               // Copy field real value into storage
-               storage.first(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx).real();
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field real value into storage
+                  storage.first(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx).real();
 
-               // Copy field imaginary value into storage
-               storage.second(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx).imag();
+                  // Copy field imaginary value into storage
+                  storage.second(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx).imag();
 
-               // increase storage counter
-               k++;
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+         // There was non nonlinear computation, field need to be initialised (i.e. set to zero)
+         } else
+         {
+            // Set data to zero
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field real value into storage
+                  storage.first(k) = 0.0;
+
+                  // Copy field imaginary value into storage
+                  storage.second(k) = 0.0;
+
+                  // increase storage counter
+                  k++;
+               }
             }
          }
+      
+      // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
          //Safety assertion
@@ -276,24 +306,46 @@ namespace Equations {
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
          int rows = eq.unknown().dom(0).perturbation().slice(mode(0)).rows();
 
-         // Copy data
-         int k = start;
-         for(int i = 0; i < rows; i++)
+         // Check if a nonlinear computation took place
+         if(eq.couplingInfo(compId).hasNonlinear())
          {
-            // Copy field real value into storage
-            storage.first(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0)).real();
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field real value into storage
+               storage.first(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0)).real();
 
-            // Copy field imaginary value into storage
-            storage.second(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0)).imag();
+               // Copy field imaginary value into storage
+               storage.second(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0)).imag();
 
-            // increase storage counter
-            k++;
+               // increase storage counter
+               k++;
+            }
+
+         // There was non nonlinear computation, field need to be initialised (i.e. set to zero)
+         } else
+         {
+            // Set data to zero
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field real value into storage
+               storage.first(k) = 0.0;
+
+               // Copy field imaginary value into storage
+               storage.second(k) = 0.0;
+
+               // increase storage counter
+               k++;
+            }
          }
       }
    }
 
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
+      // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
@@ -304,19 +356,42 @@ namespace Equations {
          assert(start < storage.size());
          assert(rows*cols+start <= storage.rows());
 
-         // Copy data
-         int k = start;
-         for(int j = 0; j < cols; j++)
+         // Check if a nonlinear computation took place
+         if(eq.couplingInfo(compId).hasNonlinear())
          {
-            for(int i = 0; i < rows; i++)
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
             {
-               // Copy field into storage
-               storage(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx);
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field into storage
+                  storage(k) = eq.unknown().dom(0).perturbation().point(i,j,matIdx);
 
-               // increase storage counter
-               k++;
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+         // There was non nonlinear computation, field need to be initialised (i.e. set to zero)
+         } else
+         {
+            // Set data to zero
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field into storage
+                  storage(k) = 0.0;
+
+                  // increase storage counter
+                  k++;
+               }
             }
          }
+
+      // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
          //Safety assertion
@@ -328,15 +403,33 @@ namespace Equations {
 
          int rows = eq.unknown().dom(0).perturbation().slice(mode(0)).rows();
 
-         // Copy data
-         int k = start;
-         for(int i = 0; i < rows; i++)
+         // Check if a nonlinear computation took place
+         if(eq.couplingInfo(compId).hasNonlinear())
          {
-            // Copy field value into storage
-            storage(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0));
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field value into storage
+               storage(k) = eq.unknown().dom(0).perturbation().point(i,mode(1),mode(0));
 
-            // increase storage counter
-            k++;
+               // increase storage counter
+               k++;
+            }
+
+            // There was non nonlinear computation, field need to be initialised (i.e. set to zero)
+         } else
+         {
+            // Set data to zero
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field value into storage
+               storage(k) = 0.0;
+
+               // increase storage counter
+               k++;
+            }
          }
       }
    }

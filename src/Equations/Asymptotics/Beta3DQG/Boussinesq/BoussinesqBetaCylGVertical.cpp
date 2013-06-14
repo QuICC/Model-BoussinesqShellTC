@@ -57,8 +57,8 @@ namespace Equations {
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
-      // General setup: first complex solver, complex solver, start from m = 0
-      infoIt.first->second.setGeneral(1, true, 0);
+      // General setup: first complex solver, complex solver, start from m = 0, has nonlinear term, has quasi-inverse
+      infoIt.first->second.setGeneral(1, true, 0, true, true);
 
       // 
       //  WARNING: the order is important as it determines the field index!

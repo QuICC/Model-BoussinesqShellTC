@@ -38,35 +38,43 @@ namespace Equations {
 
    void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
-      // Create pointer to sparse operator
-      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+      // Apply quasi inverse
+      if(eq.couplingInfo(compId).hasQuasiInverse())
+      {
+         // Create pointer to sparse operator
+         const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
 
-      // Get number of rows
-      int rows = eq.couplingInfo(compId).blockN(matIdx);
+         // Get number of rows
+         int rows = eq.couplingInfo(compId).blockN(matIdx);
 
-      // Safety asserts
-      assert(op->rows() == op->cols());
-      assert(op->cols() == rows);
+         // Safety asserts
+         assert(op->rows() == op->cols());
+         assert(op->cols() == rows);
 
-      // Multiply nonlinear term by quasi-inverse
-      storage.first.block(start, 0, rows, storage.first.cols()) = (*op)*storage.first.block(start, 0, rows, storage.first.cols());
-      storage.second.block(start, 0, rows, storage.second.cols()) = (*op)*storage.second.block(start, 0, rows, storage.second.cols());
+         // Multiply nonlinear term by quasi-inverse
+         storage.first.block(start, 0, rows, storage.first.cols()) = (*op)*storage.first.block(start, 0, rows, storage.first.cols());
+         storage.second.block(start, 0, rows, storage.second.cols()) = (*op)*storage.second.block(start, 0, rows, storage.second.cols());
+      }
    }
 
    void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
-      // Create pointer to sparse operator
-      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+      // Apply quasi inverse
+      if(eq.couplingInfo(compId).hasQuasiInverse())
+      {
+         // Create pointer to sparse operator
+         const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
 
-      // Get number of rows
-      int rows = eq.couplingInfo(compId).blockN(matIdx);
+         // Get number of rows
+         int rows = eq.couplingInfo(compId).blockN(matIdx);
 
-      // Safety asserts
-      assert(op->rows() == op->cols());
-      assert(op->cols() == rows);
+         // Safety asserts
+         assert(op->rows() == op->cols());
+         assert(op->cols() == rows);
 
-      // Multiply nonlinear term by quasi-inverse
-      storage.block(start, 0, rows, storage.cols()) = (*op)*storage.block(start, 0, rows, storage.cols());
+         // Multiply nonlinear term by quasi-inverse
+         storage.block(start, 0, rows, storage.cols()) = (*op)*storage.block(start, 0, rows, storage.cols());
+      }
    }
 
    void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx)

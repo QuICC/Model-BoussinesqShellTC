@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(DIRECT), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(DIRECT), mHasNonlinear(false), mHasQuasiInverse(false), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -34,6 +34,16 @@ namespace Equations {
    CouplingInformation::EquationTypeId CouplingInformation::equationType() const
    {
       return this->mEquationType;
+   }
+
+   bool CouplingInformation::hasNonlinear() const
+   {
+      return this->mHasNonlinear;
+   }
+
+   bool CouplingInformation::hasQuasiInverse() const
+   {
+      return this->mHasQuasiInverse;
    }
 
    bool CouplingInformation::isComplex() const
@@ -107,7 +117,7 @@ namespace Equations {
       this->mExplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 
-   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
+   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart, const bool hasNonlinear, const bool hasQuasiInverse)
    {
       // Timestepping is required
       if(solverIndex > 0)
@@ -127,6 +137,10 @@ namespace Equations {
          this->mEquationType = DIRECT;
          this->mSolverIndex = -42;
       }
+
+      this->mHasNonlinear = hasNonlinear;
+
+      this->mHasQuasiInverse = hasQuasiInverse;
 
       this->mIsComplex = isComplex;
 

@@ -77,7 +77,7 @@ namespace Transform {
       VariableRequirement::const_iterator infoIt;
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
-         // add physica field packs for second exchange
+         // add physical field packs for second exchange
          if(infoIt->second.needSpectral())
          {
             if(infoIt->second.isScalar())

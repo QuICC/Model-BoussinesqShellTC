@@ -24,32 +24,40 @@ namespace Transform {
 
    void ForwardConfigurator::updateEquation(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
    {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::TIMESTEP);
+      // Only compute for equations requiring nonlinear terms
+      if(spEquation->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
+      {
+         // Start profiler
+         ProfilerMacro_start(ProfilerMacro::TIMESTEP);
 
-      // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+         // Recover temporary storage
+         TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-      // Compute linear term component
-      spEquation->updateDealiasedUnknown(rScalar, FieldComponents::Spectral::SCALAR);
+         // Compute linear term component
+         spEquation->updateDealiasedUnknown(rScalar, FieldComponents::Spectral::SCALAR);
 
-      // Free the temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
+         // Free the temporary storage
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
 
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+         // Stop profiler
+         ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+      }
    }
 
    void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+      // Only compute for equations requiring nonlinear terms
+      if(spEquation->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
+      {
+         // Prepare the toroidal timestep RHS
+         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
 
-      // Prepare the toroidal timestep RHS
-      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
+         // Prepare the toroidal timestep RHS
+         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
 
-      // Prepare the poloidal timestep RHS
-      ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+         // Prepare the poloidal timestep RHS
+         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
+      }
    }
 
    template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
