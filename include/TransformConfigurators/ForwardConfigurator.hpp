@@ -125,7 +125,7 @@ namespace Transform {
    template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
    {
       // Start profiler
-      ProfilerMacro_start(ProfilerMacro::TIMESTEP);
+      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
 
       // Recover temporary storage
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -137,7 +137,7 @@ namespace Transform {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rComp);
 
       // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
 
    /// Specialised integration to do nothing

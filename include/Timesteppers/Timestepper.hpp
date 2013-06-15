@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "Timesteppers/EquationDTimestepper.hpp"
 #include "Timesteppers/EquationZTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -30,27 +31,9 @@ namespace Timestep {
    /**
     * @brief Implementation of general timestepper structure
     */
-   class Timestepper
+   class Timestepper: public SparseLinearCoordinatorBase
    {
       public:
-         /// Typedef for an iterator to a complex equation timstepper
-         typedef std::vector<EquationZTimestepper>::iterator   eqz_iterator;
-
-         /// Typedef for an iterator to a real equation timstepper
-         typedef std::vector<EquationDTimestepper>::iterator   eqd_iterator;
-
-         /// Typedef for a shared scalar equation iterator
-         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquationIteratorType;
-
-         /// Typedef for a shared vector equation iterator
-         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquationIteratorType;
-
-         /// Typedef for a shared scalar equation range
-         typedef std::pair<ScalarEquationIteratorType, ScalarEquationIteratorType>  ScalarEquationRangeType;
-
-         /// Typedef for a shared vector equation range
-         typedef std::pair<VectorEquationIteratorType, VectorEquationIteratorType>  VectorEquationRangeType;
-
          /**
           * @brief Constructor
           */
@@ -60,11 +43,6 @@ namespace Timestep {
           * @brief Destructor
           */
          ~Timestepper();
-
-         /**
-          * @brief Finished computation of full timestep?
-          */
-         bool finishedStep() const;
 
          /**
           * @brief Initialise timestepper
@@ -108,27 +86,21 @@ namespace Timestep {
          MHDFloat timestep() const;
          
       protected:
+         /**
+          * @brief Create a real linear solver
+          */
+         virtual void addSolverD(const int start);
+
+         /**
+          * @brief Create a complex linear solver
+          */
+         virtual void addSolverZ(const int start);
 
       private:
-         /**
-          * @brief Get the solver input independenlty of solver type
-          */
-         template <typename TEquationIt, typename TSolverIt> void getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt);
-
          /**
           * @brief Build the solver matrices independenlty of solver type
           */
          template <typename TSolverIt> void buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
-
-         /**
-          * @brief Create the correct equation steppers
-          */
-         void createEqStepper(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp);
-
-         /**
-          * @brief Compute (coupled) matrices
-          */
-         void createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp);
 
          /**
           * @brief Update time dependence
@@ -136,38 +108,9 @@ namespace Timestep {
          void updateMatrices();
 
          /**
-          * @brief Initialise the solution
-          *
-          * @param scalEq Scalar equations
-          * @param vectEq Vector equations
-          */
-         void initSolution(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
-
-         /**
-          * @brief Update equation input to timestepper
-          *
-          * @param scalEq Scalar equations
-          * @param vectEq Vector equations
-          */
-         void getInput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
-
-         /**
           * @brief Compute the RHS of all linear systems
           */
          void computeRHS();
-
-         /**
-          * @brief Solve all the linear systems
-          */
-         void solve();
-
-         /**
-          * @brief Update equation unkowns with timestepper output 
-          *
-          * @param scalEq Shared scalar equations
-          * @param vectEq Shared vector equations
-          */
-         void transferOutput(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
 
          /**
           * @brief Build the time matrix
@@ -227,11 +170,6 @@ namespace Timestep {
          const MHDFloat mcMinDt;
 
          /**
-          * @brief Current timestepper step (local)
-          */
-         int   mStep;
-
-         /**
           * @brief Previous timestep length
           */
          MHDFloat mOldDt;
@@ -245,16 +183,6 @@ namespace Timestep {
           * @brief Current time
           */
          MHDFloat mTime;
-
-         /**
-          * @brief Vector of (coupled) real equation timesteppers
-          */
-         std::vector<EquationDTimestepper> mEqDStepper;
-
-         /**
-          * @brief Vector of (coupled) complex equation timesteppers
-          */
-         std::vector<EquationZTimestepper> mEqZStepper;
    };
 
    template <typename TSolverIt> void Timestepper::buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
@@ -300,41 +228,6 @@ namespace Timestep {
 
       // Store storage information
       solveIt->addInformation(id,startRow);
-   }
-
-   template <typename TEquationIt, typename TSolverIt> void Timestepper::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt)
-   {
-      // Get timestep input
-      for(int i = 0; i < solveIt->nSystem(); i++)
-      {
-         // Copy field values into timestep input
-         Equations::copyUnknown(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
-
-         // Apply quasi-inverse to nonlinear terms
-         Equations::applyQuasiInverse(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
-
-         // Loop over all complex solvers
-         for(std::vector<EquationZTimestepper>::iterator zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
-         {
-            // Loop over all fields
-            EquationZTimestepper::field_iterator_range   fRange = zIt->fieldRange();
-            for(EquationZTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
-            {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, zIt->rRHSData(i), zIt->startRow(*fIt,i), i);
-            }
-         }
-
-         // Loop over all real solvers
-         for(std::vector<EquationDTimestepper>::iterator dIt = this->mEqDStepper.begin(); dIt != this->mEqDStepper.end(); ++dIt)
-         {
-            // Loop over all fields
-            EquationDTimestepper::field_iterator_range   fRange = dIt->fieldRange();
-            for(EquationDTimestepper::field_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
-            {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, dIt->rRHSData(i), dIt->startRow(*fIt,i), i);
-            }
-         }
-      }
    }
 }
 }

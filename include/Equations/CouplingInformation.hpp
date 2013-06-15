@@ -34,10 +34,10 @@ namespace Equations {
          typedef std::vector<SpectralFieldId> FieldIdVector;
 
          /// Typedef for an iterator for the field data
-         typedef FieldIdVector::const_iterator  field_iterator;
+         typedef FieldIdVector::const_iterator  FieldId_iterator;
 
          /// Typedef for a range iterator for the field coupling data
-         typedef std::pair<field_iterator,field_iterator>  field_iterator_range;
+         typedef std::pair<FieldId_iterator,FieldId_iterator>  FieldId_range;
 
          /**
           * @brief Enum to specify the type of indexes
@@ -194,12 +194,12 @@ namespace Equations {
          /**
           * @brief Get iterator to implicit fields
           */
-         field_iterator_range implicitRange() const;
+         FieldId_range implicitRange() const;
 
          /**
           * @brief Get iterator to explicit fields
           */
-         field_iterator_range explicitRange() const;
+         FieldId_range explicitRange() const;
 
       protected:
 

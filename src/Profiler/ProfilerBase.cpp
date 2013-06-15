@@ -53,8 +53,10 @@ namespace Debug {
             return "Forward";
          case LINEAR:
             return "Linear";
-         case TIMESTEP:
-            return "Timestep";
+         case PROGNOSTICEQUATION:
+            return "Prognostic";
+         case DIAGNOSTICEQUATION:
+            return "Diagnostic";
          case CONTROL:
             return "Control";
          case IO:

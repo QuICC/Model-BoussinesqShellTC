@@ -161,12 +161,12 @@ namespace Equations {
       this->mIndexType = id;
    }
 
-   CouplingInformation::field_iterator_range CouplingInformation::implicitRange() const
+   CouplingInformation::FieldId_range CouplingInformation::implicitRange() const
    {
       return std::make_pair(this->mImplicitFields.begin(), this->mImplicitFields.end());
    }
 
-   CouplingInformation::field_iterator_range CouplingInformation::explicitRange() const
+   CouplingInformation::FieldId_range CouplingInformation::explicitRange() const
    {
       return std::make_pair(this->mExplicitFields.begin(), this->mExplicitFields.end());
    }

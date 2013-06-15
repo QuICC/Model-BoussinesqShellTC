@@ -83,7 +83,9 @@ namespace Debug {
 
       map.insert(std::make_pair(TEMPORARIES, "Temporaries"));
 
-      map.insert(std::make_pair(TIMESTEP, "Timestep"));
+      map.insert(std::make_pair(DIAGNOSTICEQUATION, "Diagnostic"));
+
+      map.insert(std::make_pair(PROGNOSTICEQUATION, "Prognostic"));
 
       map.insert(std::make_pair(MPI, "MPI"));
 

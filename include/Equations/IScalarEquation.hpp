@@ -156,8 +156,8 @@ namespace Equations {
 
       // Loop over all coupled fields
       int colIdx = 0;
-      CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = eq.couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
+      CouplingInformation::FieldId_iterator fIt;
+      CouplingInformation::FieldId_range fRange = eq.couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
@@ -217,8 +217,8 @@ namespace Equations {
 
       // Loop over all coupled fields
       int colIdx = 0;
-      CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = eq.couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
+      CouplingInformation::FieldId_iterator fIt;
+      CouplingInformation::FieldId_range fRange = eq.couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
          SparseMatrix   blockMatrix(eq.couplingInfo(comp).nBlocks(),eq.couplingInfo(comp).nBlocks());

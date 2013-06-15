@@ -5,5 +5,4 @@ set(MHDSources
    EquationZTimestepper.cpp
    ImExRK3.cpp
    Timestepper.cpp
-   Timestepper.cpp
 )

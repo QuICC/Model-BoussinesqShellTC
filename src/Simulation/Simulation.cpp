@@ -163,7 +163,7 @@ namespace GeoMHDiSCC {
          this->computeNonlinear();
 
          // Timestep the equations
-         this->timestepEquations();
+         this->solveEquations();
 
          // Write the output
          this->writeOutput();
@@ -309,17 +309,18 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("computeNonlinear",1);
    }
 
-   void Simulation::timestepEquations()
+   void Simulation::solveEquations()
    {
       // Debug statement
-      DebuggerMacro_enter("timestepEquations",1);
+      DebuggerMacro_enter("solveEquations",1);
 
-      DebuggerMacro_start("Full timestep",2);
-      ProfilerMacro_start(ProfilerMacro::TIMESTEP);
-      this->mTimestepper.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
-      ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
-      DebuggerMacro_stop("Full timestep t = ",2);
+      // Solve prognostic equations (timestep)
+      this->solvePrognosticEquations();
 
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations();
+
+      // Update conditions at the end of timestep
       ProfilerMacro_start(ProfilerMacro::CONTROL);
       if(this->mTimestepper.finishedStep())
       {
@@ -347,7 +348,37 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
 
       // Debug statement
-      DebuggerMacro_leave("timestepEquations",1);
+      DebuggerMacro_leave("solveEquations",1);
+   }
+
+   void Simulation::solvePrognosticEquations()
+   {
+      // Debug statement
+      DebuggerMacro_enter("solvePrognostic",2);
+
+      DebuggerMacro_start("Solve prognostic(timestep)",3);
+      ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
+      this->mTimestepper.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
+      DebuggerMacro_stop("Solve prognostic(timestep) t = ",3);
+
+      // Debug statement
+      DebuggerMacro_leave("solvePrognostic",2);
+   }
+
+   void Simulation::solveDiagnosticEquations()
+   {
+      // Debug statement
+      DebuggerMacro_enter("solveDiagnosticEquations",2);
+
+      DebuggerMacro_start("Solve diagnotic",3);
+      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
+      this->mLinearSolver.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
+      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
+      DebuggerMacro_stop("Solve diagnostic t = ",3);
+
+      // Debug statement
+      DebuggerMacro_leave("solveDiagnosticEquations",2);
    }
 
    void Simulation::writeOutput()

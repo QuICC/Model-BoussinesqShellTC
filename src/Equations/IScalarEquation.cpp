@@ -183,8 +183,8 @@ namespace Equations {
       //
       // Initialise the explicit linear operators
       //
-      CouplingInformation::field_iterator fIt;
-      CouplingInformation::field_iterator_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+      CouplingInformation::FieldI_iterator fIt;
+      CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
          std::vector<DecoupledZSparse> tmpMat;

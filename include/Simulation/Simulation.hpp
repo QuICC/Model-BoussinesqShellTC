@@ -46,16 +46,16 @@ namespace GeoMHDiSCC {
    {
       public:
          /// Typedef for a shared scalar equation iterator
-         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquationIteratorType;
+         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquation_iterator;
 
          /// Typedef for a shared vector equation iterator
-         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquationIteratorType;
+         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquation_iterator;
 
          /// Typedef for a shared scalar equation range
-         typedef std::pair<ScalarEquationIteratorType, ScalarEquationIteratorType>  ScalarEquationRangeType;
+         typedef std::pair<ScalarEquation_iterator, ScalarEquation_iterator>  ScalarEquation_range;
 
          /// Typedef for a shared vector equation range
-         typedef std::pair<VectorEquationIteratorType, VectorEquationIteratorType>  VectorEquationRangeType;
+         typedef std::pair<VectorEquation_iterator, VectorEquation_iterator>  VectorEquation_range;
 
          /**
           * @brief Constructor
@@ -151,9 +151,19 @@ namespace GeoMHDiSCC {
          void computeNonlinear();
 
          /**
-          * @brief Timestep the equations
+          * @brief Solve all equations
           */
-         void timestepEquations();
+         void solveEquations();
+
+         /**
+          * @brief Timestep the prognostic equations
+          */
+         void solvePrognosticEquations();
+
+         /**
+          * @brief Solve the diagnostic equations
+          */
+         void solveDiagnosticEquations();
 
          /**
           * @brief Write the output if required
@@ -250,32 +260,32 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the range of scalar timestepping equations
           */
-         ScalarEquationRangeType mScalarPrognosticRange;
+         ScalarEquation_range mScalarPrognosticRange;
 
          /**
           * @brief Storage for the range of vector timestepping equations
           */
-         VectorEquationRangeType mVectorPrognosticRange;
+         VectorEquation_range mVectorPrognosticRange;
 
          /**
           * @brief Storage for the range of scalar solver equations
           */
-         ScalarEquationRangeType mScalarDiagnosticRange;
+         ScalarEquation_range mScalarDiagnosticRange;
 
          /**
           * @brief Storage for the range of vector solver equations
           */
-         VectorEquationRangeType mVectorDiagnosticRange;
+         VectorEquation_range mVectorDiagnosticRange;
 
          /**
           * @brief Storage for the range of scalar "direct" equations
           */
-         ScalarEquationRangeType mScalarDirectRange;
+         ScalarEquation_range mScalarDirectRange;
 
          /**
           * @brief Storage for the range of vector "direct" equations
           */
-         VectorEquationRangeType mVectorDirectRange;
+         VectorEquation_range mVectorDirectRange;
 
          /**
           * @brief Map between name and pointer for the scalar variables

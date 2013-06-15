@@ -28,7 +28,7 @@ namespace Transform {
       if(spEquation->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
       {
          // Start profiler
-         ProfilerMacro_start(ProfilerMacro::TIMESTEP);
+         ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
 
          // Recover temporary storage
          TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -40,7 +40,7 @@ namespace Transform {
          coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
 
          // Stop profiler
-         ProfilerMacro_stop(ProfilerMacro::TIMESTEP);
+         ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
       }
    }
 
