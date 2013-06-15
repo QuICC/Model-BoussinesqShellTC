@@ -55,15 +55,17 @@ namespace Transform {
           * @brief Get the number of required buffer packs for the first exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo);
+         virtual ArrayI packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo);
+         virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
       protected:
 
@@ -151,14 +153,14 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
-      return this->listPacks1D(varInfo);
+      return this->listPacks1D(varInfo, nonInfo);
    }
 
-   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
-      return this->listPacks2D(varInfo);
+      return this->listPacks2D(varInfo, nonInfo);
    }
 
 }

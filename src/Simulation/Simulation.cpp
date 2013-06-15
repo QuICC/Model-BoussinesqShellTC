@@ -88,11 +88,20 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("init",0);
 
-      // Initialise the variables
-      this->initVariables();
+      // Storage for the variable info
+      VariableRequirement varInfo;
 
-      // Map variables to the equations
-      this->mapEquationVariables();
+      // Initialise the variables and set general variable requirements
+      this->initVariables(varInfo);
+
+      // Storage for the nonlinear requirement info
+      std::set<PhysicalNames::Id>   nonInfo;
+
+      // Map variables to the equations and set nonlinear requirements
+      this->mapEquationVariables(nonInfo);
+
+      // Initialise the transform coordinator
+      this->initTransformCoordinator(varInfo, nonInfo);
 
       // Initialise the equations (generate operators, etc)
       this->setupEquations(spBcs);
@@ -376,13 +385,10 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("postRun",1);
    }
 
-   void Simulation::initVariables()
+   void Simulation::initVariables(VariableRequirement& varInfo)
    {
       // Iterator over info
       VariableRequirement::const_iterator infoIt;
-
-      // Storage for the variable info
-      VariableRequirement varInfo;
 
       //
       // Identify the required variables
@@ -469,24 +475,9 @@ namespace GeoMHDiSCC {
             }
          }
       }
-      
-      // Initialise the transform coordinator
-      this->mTransformCoordinator.initTransforms(this->mspRes, varInfo);
-
-      // Initialise the communicator
-      this->mTransformCoordinator.initCommunicator(this->mspRes);
-
-      // Get the buffer pack sizes
-      ArrayI packs1DFwd = this->mspFwdGrouper->packs1D(varInfo);
-      ArrayI packs2DFwd = this->mspFwdGrouper->packs2D(varInfo);
-      ArrayI packs1DBwd = this->mspBwdGrouper->packs1D(varInfo);
-      ArrayI packs2DBwd = this->mspBwdGrouper->packs2D(varInfo);
-
-      // Initialise the converters
-      this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
    }
 
-   void Simulation::mapEquationVariables()
+   void Simulation::mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo)
    {
       // Loop over all scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
@@ -503,6 +494,12 @@ namespace GeoMHDiSCC {
 
                // Finish initialisation of equation
                (*scalEqIt)->init();
+
+               // Check for nonlinear requirements
+               if((*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
+               {
+                  nonInfo.insert((*scalEqIt)->name());
+               }
             }
 
             // Set scalar variable as additional scalar field
@@ -550,6 +547,12 @@ namespace GeoMHDiSCC {
 
                // Finish initialisation of equation
                (*vectEqIt)->init();
+
+               // Check for nonlinear requirements
+               if((*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
+               {
+                  nonInfo.insert((*vectEqIt)->name());
+               }
             }
 
             // Set vector variable as additional vector field
@@ -559,6 +562,24 @@ namespace GeoMHDiSCC {
             }
          }
       }
+   }
+      
+   void Simulation::initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   {
+      // Initialise the transform coordinator
+      this->mTransformCoordinator.initTransforms(this->mspRes, varInfo);
+
+      // Initialise the communicator
+      this->mTransformCoordinator.initCommunicator(this->mspRes);
+
+      // Get the buffer pack sizes
+      ArrayI packs1DFwd = this->mspFwdGrouper->packs1D(varInfo, nonInfo);
+      ArrayI packs2DFwd = this->mspFwdGrouper->packs2D(varInfo, nonInfo);
+      ArrayI packs1DBwd = this->mspBwdGrouper->packs1D(varInfo);
+      ArrayI packs2DBwd = this->mspBwdGrouper->packs2D(varInfo);
+
+      // Initialise the converters
+      this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
    }
 
    void Simulation::setupEquations(const SharedSimulationBoundary spBcs)

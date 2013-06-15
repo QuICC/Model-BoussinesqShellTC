@@ -114,13 +114,25 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Initialise the variables required by the simulation
+          *
+          * @param varInfo Global variable requirements
           */
-         void initVariables();
+         void initVariables(VariableRequirement& varInfo);
 
          /**
-          * @brief Map variables to the equations added by the model
+          * @brief Map the variables to the equations
+          *
+          * @param nonInfo Global nonlinear requirements
           */
-         void mapEquationVariables();
+         void mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo);
+
+         /**
+          * @brief Initialise the transform coordinator
+          *
+          * @param varInfo Global variable requirements
+          * @param nonInfo Global nonlinear requirements
+          */
+         void initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Initialise the equations (generate operators, etc)

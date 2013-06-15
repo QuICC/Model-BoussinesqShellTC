@@ -44,15 +44,17 @@ namespace Transform {
           * @brief Get the number of required buffer packs for the first exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo) = 0;
+         virtual ArrayI packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo) = 0;
+         virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo) = 0;
 
          /**
           * @brief Location of the split in the configurator
@@ -84,29 +86,33 @@ namespace Transform {
           * @brief Get the list of pack numbers for the first exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         ArrayI listPacks1D(const VariableRequirement& varInfo);
+         ArrayI listPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the list of pack numbers for the second exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         ArrayI listPacks2D(const VariableRequirement& varInfo);
+         ArrayI listPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         ArrayI groupPacks1D(const VariableRequirement& varInfo);
+         ArrayI groupPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         ArrayI groupPacks2D(const VariableRequirement& varInfo);
+         ArrayI groupPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Empty constructor

@@ -32,7 +32,7 @@ namespace Transform {
    {
    }
 
-   ArrayI IForwardGrouper::listPacks1D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::listPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
       // Create list of packet sizes
       std::set<int>  list;
@@ -42,7 +42,7 @@ namespace Transform {
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for first exchange
-         if(infoIt->second.needSpectral())
+         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
          {
             if(infoIt->second.isScalar())
             {
@@ -68,7 +68,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::listPacks2D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::listPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
       // Create list of packet sizes
       std::set<int>  list;
@@ -78,7 +78,7 @@ namespace Transform {
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical field packs for second exchange
-         if(infoIt->second.needSpectral())
+         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
          {
             if(infoIt->second.isScalar())
             {
@@ -104,7 +104,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::groupPacks1D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::groupPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
       // Initialise the number of packs
       ArrayI packs(1);
@@ -115,7 +115,7 @@ namespace Transform {
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical -> spectral field packs for first exchange
-         if(infoIt->second.needSpectral())
+         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
          {
             if(infoIt->second.isScalar())
             {
@@ -130,7 +130,7 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::groupPacks2D(const VariableRequirement& varInfo)
+   ArrayI IForwardGrouper::groupPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
       // Initialise the number of packs
       ArrayI packs(1);
@@ -141,7 +141,7 @@ namespace Transform {
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
       {
          // add physical -> spectral field packs for second exchange
-         if(infoIt->second.needSpectral())
+         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
          {
             if(infoIt->second.isScalar())
             {

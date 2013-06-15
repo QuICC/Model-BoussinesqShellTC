@@ -55,15 +55,17 @@ namespace Transform {
           * @brief Get the number of required buffer packs for the first exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo);
+         virtual ArrayI packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
           * @param varInfo Variable information
+          * @param nonInfo Nonlinear requirements
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo);
+         virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
       protected:
          /**
@@ -168,10 +170,10 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle1DGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI ForwardSingle1DGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
       // Get size of grouped communication
-      ArrayI packs = this->groupPacks1D(varInfo);
+      ArrayI packs = this->groupPacks1D(varInfo, nonInfo);
 
       // Store the number of grouped packs
       this->mGroupedPacks1D = packs(0);
@@ -179,9 +181,9 @@ namespace Transform {
       return packs;
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle1DGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI ForwardSingle1DGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
-      return this->listPacks2D(varInfo);
+      return this->listPacks2D(varInfo, nonInfo);
    }
 
 }
