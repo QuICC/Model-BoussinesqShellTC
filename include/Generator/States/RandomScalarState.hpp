@@ -37,7 +37,7 @@ namespace Equations {
           * @param spEqParams Shared equation parameters
           * @paarm name       Name of the field
           */
-         RandomScalarState(SharedEquationParameters spEqParams, const PhysicalNames::Id name);
+         RandomScalarState(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -64,6 +64,11 @@ namespace Equations {
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
 
+         /**
+          * @brief Set the unknown name and requirements
+          */
+         void setIdentity(const PhysicalNames::Id name);
+
       protected:
          /**
           * @brief Set variable requirements
@@ -87,6 +92,9 @@ namespace Equations {
 
       private:
    };
+
+   /// Typedef for a shared RandomScalarState
+   typedef SharedPtrMacro<RandomScalarState> SharedRandomScalarState;
 
    /**
     * @brief Get the quasi-inverse matrix operator

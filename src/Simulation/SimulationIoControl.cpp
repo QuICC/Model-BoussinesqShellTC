@@ -155,7 +155,10 @@ namespace GeoMHDiSCC {
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
          // Set simulation time
-         (*itHdf5)->setSimTime(time,timestep);
+         if(time > 0 && timestep >= 0)
+         {
+            (*itHdf5)->setSimTime(time,timestep);
+         }
 
          (*itHdf5)->write();
       }
@@ -163,6 +166,9 @@ namespace GeoMHDiSCC {
 
    void SimulationIoControl::initCfg()
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       // Initialise config file
       this->mspCfgFile->init();
 
@@ -193,6 +199,9 @@ namespace GeoMHDiSCC {
 
    ArrayI SimulationIoControl::configDimension() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       // Get truncation map
       std::map<std::string,int>  trunc = this->mspCfgFile->spTruncation()->iMap();
 
@@ -213,6 +222,9 @@ namespace GeoMHDiSCC {
 
    Array SimulationIoControl::configBoxScale() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       // Create storage for box scales
       Array box = Array::Ones(this->mspCfgFile->spTruncation()->iMap().size()); 
 
@@ -240,16 +252,25 @@ namespace GeoMHDiSCC {
 
    int SimulationIoControl::configNCpu() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       return this->mspCfgFile->spParallel()->iValue("cpus");
    }
 
    const std::map<std::string, MHDFloat>& SimulationIoControl::configPhysical() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       return this->mspCfgFile->spPhysical()->fMap();
    }
 
    const std::map<std::string, int>& SimulationIoControl::configBoundary() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       return this->mspCfgFile->spBoundary()->iMap();
    }
 
@@ -265,6 +286,9 @@ namespace GeoMHDiSCC {
 
    Array SimulationIoControl::configRun() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       Array run(2);
 
       // Get simulation time configuration
@@ -278,6 +302,9 @@ namespace GeoMHDiSCC {
 
    Array SimulationIoControl::configTimestepping() const
    {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
       Array tstep(2);
 
       // Get timestepping time configuration
