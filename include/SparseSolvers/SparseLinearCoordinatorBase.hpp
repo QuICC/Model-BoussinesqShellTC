@@ -141,7 +141,6 @@ namespace Solver {
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
-          * @param isLhs   Flag to update LHS and RHS time dependent matrix
           */
          virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
@@ -153,7 +152,6 @@ namespace Solver {
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
-          * @param isLhs   Flag to update LHS and RHS time dependent matrix
           */
          virtual void buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
@@ -192,16 +190,16 @@ namespace Solver {
       ArrayI startRow(nSystems);
 
       // Initialise the linear solver
-      if(solveIt->nSystem() == 0)
+      if((*solveIt)->nSystem() == 0)
       {
          // Reserve storage for matrice and initialise vectors
-         solveIt->initMatrices(this->mNStep*nSystems);
+         (*solveIt)->initMatrices(this->mNStep*nSystems);
 
          // Initialise field storage and information
          for(int i = 0; i < nSystems; i++)
          {
             // Create data storage
-            solveIt->addStorage(spEq->couplingInfo(id.second).systemN(i), spEq->couplingInfo(id.second).rhsCols(i));
+            (*solveIt)->addStorage(spEq->couplingInfo(id.second).systemN(i), spEq->couplingInfo(id.second).rhsCols(i));
          }
       }
 
@@ -216,19 +214,19 @@ namespace Solver {
       }
 
       // Store storage information
-      solveIt->addInformation(id,startRow);
+      (*solveIt)->addInformation(id,startRow);
    }
 
    template <typename TEquationIt, typename TSolverIt> void SparseLinearCoordinatorBase::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt)
    {
       // Get timestep input
-      for(int i = 0; i < solveIt->nSystem(); i++)
+      for(int i = 0; i < (*solveIt)->nSystem(); i++)
       {
          // Copy field values into solver input
-         Equations::copyUnknown(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
+         Equations::copyUnknown(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
          // Apply quasi-inverse to nonlinear terms
-         Equations::applyQuasiInverse(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
+         Equations::applyQuasiInverse(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
          // Loop over all complex solvers
          for(SolverZ_iterator solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
@@ -237,7 +235,7 @@ namespace Solver {
             Equations::CouplingInformation::FieldId_range   fRange = (*solZIt)->fieldRange();
             for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, (*solZIt)->rRHSData(i), (*solZIt)->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, (*solZIt)->rRHSData(i), (*solZIt)->startRow(*fIt,i), i);
             }
          }
 
@@ -248,7 +246,7 @@ namespace Solver {
             Equations::CouplingInformation::FieldId_range   fRange = (*solDIt)->fieldRange();
             for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, (*solDIt)->rRHSData(i), (*solDIt)->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, (*solDIt)->rRHSData(i), (*solDIt)->startRow(*fIt,i), i);
             }
          }
       }

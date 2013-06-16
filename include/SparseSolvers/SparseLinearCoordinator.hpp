@@ -69,9 +69,8 @@ namespace Solver {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex solver matrix
@@ -81,9 +80,8 @@ namespace Solver {
           * @param spEq       Shared pointer to equation
           * @param comp       Field component
           * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
           */
-         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+         virtual void buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
    };

@@ -24,7 +24,8 @@
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "Timesteppers/Timestepper.hpp"
+#include "SparseSolvers/SparseLinearCoordinator.hpp"
+#include "Timesteppers/TimestepCoordinator.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -233,9 +234,14 @@ namespace GeoMHDiSCC {
          SimulationRunControl mSimRunCtrl;
 
          /**
-          * @brief Timestepper
+          * @brief Linear solver coordinator
           */
-         Timestep::Timestepper mTimestepper;
+         Solver::SparseLinearCoordinator mLinearCoordinator;
+
+         /**
+          * @brief Timestep coordinator
+          */
+         Timestep::TimestepCoordinator mTimestepCoordinator;
 
          /**
           * @brief Simulation IO control

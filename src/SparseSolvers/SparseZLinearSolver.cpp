@@ -21,7 +21,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseZLinearSolver::SparseZLinearSolver(const int start)
-      : SparesLinearSolverBase(start)
+      : SparseLinearSolverBase(start)
    {
    }
 
@@ -104,10 +104,6 @@ namespace Solver {
       // Add storage for RHS data
       this->mRHSData.push_back(MatrixZ(rows,cols));
       this->mRHSData.back().setZero();
-
-      // Add storage for old RHS
-      this->mRHSOld.push_back(MatrixZ(rows,cols));
-      this->mRHSOld.back().setZero();
 
       // Add storage for solution
       this->mSolution.push_back(MatrixZ(rows,cols));

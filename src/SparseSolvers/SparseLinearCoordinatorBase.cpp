@@ -52,7 +52,7 @@ namespace Solver {
       for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
          // Get type information for the linear solvers
-         this->createsolver((*scalEqIt), FieldComponents::Spectral::SCALAR);
+         this->createSolver((*scalEqIt), FieldComponents::Spectral::SCALAR);
       }
 
       // Loop over all vector equations
@@ -161,7 +161,7 @@ namespace Solver {
          std::advance(solZIt, myIdx);
 
          // Build solver matrices
-         this->buildSolverMatrix(spEq, myId, solZIt);
+         this->buildSolverMatrices(spEq, myId, solZIt);
 
       // Real matrices in linear solve
       } else
@@ -171,7 +171,7 @@ namespace Solver {
          std::advance(solDIt, myIdx);
 
          // Build solver matrices
-         this->buildSolverMatrix(spEq, myId, solDIt);
+         this->buildSolverMatrices(spEq, myId, solDIt);
       }
    }
 
@@ -391,7 +391,7 @@ namespace Solver {
    {
       // Solve complex linear systems
       SolverZ_iterator   solZIt;
-      for(soZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
+      for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
       {
          // Compute linear solve RHS
          (*solZIt)->solve(this->mStep);

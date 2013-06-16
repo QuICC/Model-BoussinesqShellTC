@@ -268,10 +268,10 @@ namespace GeoMHDiSCC {
       }
 
       // Write initial ASCII output
-      this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
+      this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Write initial state file
-      this->mSimIoCtrl.writeHdf5(this->mTimestepper.time(), this->mTimestepper.timestep());
+      this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
@@ -286,7 +286,7 @@ namespace GeoMHDiSCC {
       this->mDiagnostics.synchronize();
 
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepper.init(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.init(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);
@@ -322,10 +322,10 @@ namespace GeoMHDiSCC {
 
       // Update conditions at the end of timestep
       ProfilerMacro_start(ProfilerMacro::CONTROL);
-      if(this->mTimestepper.finishedStep())
+      if(this->mTimestepCoordinator.finishedStep())
       {
          // Update timestepper
-         this->mTimestepper.update();
+         this->mTimestepCoordinator.update();
 
          // Update CFL condition
          this->mDiagnostics.updateCfl();
@@ -337,10 +337,10 @@ namespace GeoMHDiSCC {
          this->mDiagnostics.synchronize();
 
          // Adapt timestepper time step
-         this->mTimestepper.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+         this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       
          // Update simulation run control
-         this->mSimRunCtrl.update(this->mTimestepper.time(), this->mTimestepper.timestep());
+         this->mSimRunCtrl.update(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       
          // Update simulation IO control
          this->mSimIoCtrl.update();
@@ -358,7 +358,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve prognostic(timestep)",3);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
-      this->mTimestepper.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
       DebuggerMacro_stop("Solve prognostic(timestep) t = ",3);
 
@@ -373,7 +373,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve diagnotic",3);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-      this->mLinearSolver.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
+      this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
       DebuggerMacro_stop("Solve diagnostic t = ",3);
 
@@ -387,10 +387,10 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("writeOutput",1);
 
       ProfilerMacro_start(ProfilerMacro::IO);
-      if(this->mTimestepper.finishedStep())
+      if(this->mTimestepCoordinator.finishedStep())
       {
          // Write initial ASCII and HDF5 output files if applicable
-         this->mSimIoCtrl.writeFiles(this->mTimestepper.time(), this->mTimestepper.timestep());
+         this->mSimIoCtrl.writeFiles(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
 
@@ -404,10 +404,10 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("postRun",1);
 
       // Write final ASCII output
-      this->mSimIoCtrl.writeAscii(this->mTimestepper.time(), this->mTimestepper.timestep());
+      this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Write final state file
-      this->mSimIoCtrl.writeHdf5(this->mTimestepper.time(), this->mTimestepper.timestep());
+      this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();

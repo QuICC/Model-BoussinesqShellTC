@@ -3,5 +3,5 @@ set(MHDSources
    SparseDTimestepper.cpp
    SparseZTimestepper.cpp
    ImExRK3.cpp
-   Timestepper.cpp
+   TimestepCoordinator.cpp
 )

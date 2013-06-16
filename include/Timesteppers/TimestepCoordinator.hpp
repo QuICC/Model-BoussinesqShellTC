@@ -1,9 +1,9 @@
-/** \file Timestepper.hpp
- *  \brief Implementation of a general timestepper structure
+/** \file TimestepCoordinator.hpp
+ *  \brief Implementation of a general timestep coordinator structure
  */
 
-#ifndef TIMESTEPPER_HPP
-#define TIMESTEPPER_HPP
+#ifndef TIMESTEPCOORDINATOR_HPP
+#define TIMESTEPCOORDINATOR_HPP
 
 // Configuration includes
 //
@@ -20,9 +20,9 @@
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "Timesteppers/SparseDTimestepper.hpp"
 #include "Timesteppers/SparseZTimestepper.hpp"
+#include "Timesteppers/ImExRK3.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "Timesteppers/ImExRK3.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -31,7 +31,7 @@ namespace Timestep {
    /**
     * @brief Implementation of general timestepper structure
     */
-   class Timestepper: public Solver::SparseLinearCoordinatorBase
+   class TimestepCoordinator: public Solver::SparseLinearCoordinatorBase
    {
       public:
          /// Typedef for a shared scalar equation iterator
@@ -49,12 +49,12 @@ namespace Timestep {
          /**
           * @brief Constructor
           */
-         Timestepper();
+         TimestepCoordinator();
 
          /**
           * @brief Destructor
           */
-         ~Timestepper();
+         ~TimestepCoordinator();
 
          /**
           * @brief Initialise timestepper
@@ -174,4 +174,4 @@ namespace Timestep {
 }
 }
 
-#endif // TIMESTEPPER_HPP
+#endif // TIMESTEPCOORDINATOR_HPP

@@ -3,6 +3,6 @@ set(MHDSources
    SparseLinearSolverBase.cpp
    SparseDLinearSolver.cpp
    SparseZLinearSolver.cpp
+   SparseLinearCoordinatorBase.cpp
    SparseLinearCoordinator.cpp
-   ImExRK3.cpp
 )

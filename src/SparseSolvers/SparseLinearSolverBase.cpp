@@ -1,4 +1,4 @@
-/** \file SparseLinearSolverBaseBase.cpp
+/** \file SparseLinearSolverBase.cpp
  *  \brief Implementation of the base for linear solver structures
  */
 
@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "SparseSolvers/SparseLinearSolverBaseBase.hpp"
+#include "SparseSolvers/SparseLinearSolverBase.hpp"
 
 // Project includes
 //
@@ -20,30 +20,30 @@ namespace GeoMHDiSCC {
 
 namespace Solver {
 
-   SparseLinearSolverBaseBase::SparseLinearSolverBaseBase(const int start)
+   SparseLinearSolverBase::SparseLinearSolverBase(const int start)
       : mZeroIdx(start)
    {
       // Safety assert
       assert(start >= 0);
    }
 
-   SparseLinearSolverBaseBase::~SparseLinearSolverBaseBase()
+   SparseLinearSolverBase::~SparseLinearSolverBase()
    {
    }
 
-   void SparseLinearSolverBaseBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow)
+   void SparseLinearSolverBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow)
    {
       this->mFieldIds.push_back(id);
 
       this->mInformation.insert(std::make_pair(id, startRow));
    }
 
-   int SparseLinearSolverBaseBase::startRow(const SpectralFieldId& id, const int i) const
+   int SparseLinearSolverBase::startRow(const SpectralFieldId& id, const int i) const
    {
       return this->mInformation.find(id)->second(i);
    }
 
-   SparseLinearSolverBaseBase::FieldId_range SparseLinearSolverBaseBase::fieldRange() const
+   SparseLinearSolverBase::FieldId_range SparseLinearSolverBase::fieldRange() const
    {
       return std::make_pair(this->mFieldIds.begin(), this->mFieldIds.end());
    }

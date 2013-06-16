@@ -54,6 +54,7 @@ set(MHDAllSrcDirs
    Profiler
    Resolutions
    Simulation
+   SparseSolvers
    SpatialSchemes
    SpectralOperators
    StorageProfiler

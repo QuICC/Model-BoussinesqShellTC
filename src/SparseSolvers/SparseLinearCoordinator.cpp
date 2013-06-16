@@ -47,7 +47,7 @@ namespace Solver {
       this->transferOutput(scalEq, vectEq);
 
       // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % this->mNSteps;
+      this->mStep = (this->mStep + 1) % this->mNStep;
    }
 
    void SparseLinearCoordinator::addSolverD(const int start)
@@ -67,28 +67,28 @@ namespace Solver {
    void SparseLinearCoordinator::buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Resize LHS matrix if necessary
-      if(spSolver->mLHSMatrix.at(matIdx).size() == 0)
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
       {
-         spSolver->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
       // Set LHS matrix
-      spSolver->mLHSMatrix.at(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first;
+      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first;
    }
 
    void SparseLinearCoordinator::buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Resize LHS matrix if necessary
-      if(spSolver->mLHSMatrix.at(matIdx).size() == 0)
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
       {
-         spSolver->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
       DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
 
       // Set LHS matrix
-      spSolver->mLHSMatrix.at(matIdx) += linRow.first.cast<MHDComplex>() + MathConstants::cI*linRow.second + bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+      spSolver->rLHSMatrix(matIdx) += linRow.first.cast<MHDComplex>() + MathConstants::cI*linRow.second + bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
    }
 
 }
