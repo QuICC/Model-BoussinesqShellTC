@@ -29,30 +29,6 @@ namespace Solver {
    {
    }
 
-   void SparseZLinearSolver::computeRHS(const int step)
-   {
-      int start = step*this->nSystem();
-
-      MatrixZ   tmp;
-
-      if(ImExRK3::rhsNN(step) == 0.0)
-      {
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
-         {
-            this->mRHSOld.at(i) = this->mRHSData.at(i);
-            this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i);
-         }
-      } else
-      {
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
-         {
-            tmp = this->mRHSData.at(i);
-            this->mRHSData.at(i) = this->mRHSMatrix.at(i+start)*this->mSolution.at(i) + ImExRK3::rhsN(step)*this->mRHSData.at(i) + ImExRK3::rhsNN(step)*this->mRHSOld.at(i);
-            this->mRHSOld.at(i) = tmp;
-         }
-      }
-   }
-
    void SparseZLinearSolver::solve(const int step)
    {
       int start = step*this->nSystem();
@@ -119,11 +95,6 @@ namespace Solver {
       }
    }
 
-   SparseMatrixZ& SparseZLinearSolver::rLHSMatrix(const int idx)
-   {
-      return this->mLHSMatrix.at(idx);
-   }
-
    void SparseZLinearSolver::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
@@ -141,6 +112,31 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(MatrixZ(rows,cols));
       this->mSolution.back().setZero();
+   }
+
+   int SparseZLinearSolver::nSystem() const
+   {
+      return this->mRHSData.size();
+   }
+
+   SparseMatrixZ& SparseZLinearSolver::rLHSMatrix(const int idx)
+   {
+      return this->mLHSMatrix.at(idx);
+   }
+
+   MatrixZ& SparseZLinearSolver::rRHSData(const int idx)
+   {
+      return this->mRHSData.at(idx);
+   }
+
+   const MatrixZ& SparseZLinearSolver::solution(const int idx) const
+   {
+      return this->mSolution.at(idx);
+   }
+
+   MatrixZ& SparseZLinearSolver::rSolution(const int idx)
+   {
+      return this->mSolution.at(idx);
    }
 }
 }

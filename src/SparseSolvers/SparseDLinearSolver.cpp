@@ -101,11 +101,6 @@ namespace Solver {
       }
    }
 
-   SparseMatrix& SparseDLinearSolver::rLHSMatrix(const int idx)
-   {
-      return this->mLHSMatrix.at(idx);
-   }
-
    void SparseDLinearSolver::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
@@ -121,6 +116,31 @@ namespace Solver {
       this->mSolution.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
       this->mSolution.back().first.setZero();
       this->mSolution.back().second.setZero();
+   }
+
+   int SparseDLinearSolver::nSystem() const
+   {
+      return this->mRHSData.size();
+   }
+
+   SparseMatrix& SparseDLinearSolver::rLHSMatrix(const int idx)
+   {
+      return this->mLHSMatrix.at(idx);
+   }
+
+   DecoupledZMatrix& SparseDLinearSolver::rRHSData(const int idx)
+   {
+      return this->mRHSData.at(idx);
+   }
+
+   const DecoupledZMatrix& SparseDLinearSolver::solution(const int idx) const
+   {
+      return this->mSolution.at(idx);
+   }
+
+   DecoupledZMatrix& SparseDLinearSolver::rSolution(const int idx)
+   {
+      return this->mSolution.at(idx);
    }
 }
 }

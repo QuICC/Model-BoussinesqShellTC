@@ -18,8 +18,8 @@
 // Project includes
 //
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
-#include "Timesteppers/EquationDTimestepper.hpp"
-#include "Timesteppers/EquationZTimestepper.hpp"
+#include "Timesteppers/SparseDTimestepper.hpp"
+#include "Timesteppers/SparseZTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "Timesteppers/ImExRK3.hpp"
@@ -31,9 +31,21 @@ namespace Timestep {
    /**
     * @brief Implementation of general timestepper structure
     */
-   class Timestepper: public SparseLinearCoordinatorBase
+   class Timestepper: public Solver::SparseLinearCoordinatorBase
    {
       public:
+         /// Typedef for a shared scalar equation iterator
+         typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquation_iterator;
+
+         /// Typedef for a shared vector equation iterator
+         typedef std::vector<Equations::SharedIVectorEquation>::iterator   VectorEquation_iterator;
+
+         /// Typedef for a shared scalar equation range
+         typedef std::pair<ScalarEquation_iterator, ScalarEquation_iterator>  ScalarEquation_range;
+
+         /// Typedef for a shared vector equation range
+         typedef std::pair<VectorEquation_iterator, VectorEquation_iterator>  VectorEquation_range;
+
          /**
           * @brief Constructor
           */
@@ -51,7 +63,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat dt, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
+         void init(const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Adapt the timestep used
@@ -60,7 +72,7 @@ namespace Timestep {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void adaptTimestep(const MHDFloat cfl, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
+         void adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Update control status
@@ -73,7 +85,7 @@ namespace Timestep {
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
           */
-         void stepForward(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq);
+         void stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Get current simulation time
@@ -96,12 +108,29 @@ namespace Timestep {
           */
          virtual void addSolverZ(const int start);
 
-      private:
          /**
-          * @brief Build the solver matrices independenlty of solver type
+          * @brief Build the real solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
           */
-         template <typename TSolverIt> void buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
+         virtual void buildSolverMatrix(Solver::SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
+         /**
+          * @brief Build the complex solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         virtual void buildSolverMatrix(Solver::SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+      private:
          /**
           * @brief Update time dependence
           */
@@ -111,48 +140,6 @@ namespace Timestep {
           * @brief Compute the RHS of all linear systems
           */
          void computeRHS();
-
-         /**
-          * @brief Build the time matrix
-          *
-          * @param timeMatrix Storage for time matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          */
-         void buildTimeMatrix(SparseMatrix& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
-
-         /**
-          * @brief Build the time matrix
-          *
-          * @param timeMatrix Storage for the time matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          */
-         void buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
-
-         /**
-          * @brief Build the solver matrix
-          *
-          * @param solverMatrix  Storage for solver matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
-
-         /**
-          * @brief Build the solver matrix
-          *
-          * @param solverMatrix   Storage for the solver matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)
@@ -184,51 +171,6 @@ namespace Timestep {
           */
          MHDFloat mTime;
    };
-
-   template <typename TSolverIt> void Timestepper::buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
-   {
-      // Number of linear systems
-      int nSystems = spEq->couplingInfo(id.second).nSystems();
-
-      // start index for matrices
-      int start = this->mStep*nSystems;
-
-      // Start row for storage information
-      ArrayI startRow(nSystems);
-
-      // Initialise the equation stepper
-      if(solveIt->nSystem() == 0)
-      {
-         // Reserve storage for matrice and initialise vectors
-         solveIt->initMatrices(ImExRK3::STEPS*nSystems);
-
-         // Initialise field storage and information
-         for(int i = 0; i < nSystems; i++)
-         {
-            // Create RHS and solution data storage
-            solveIt->addStorage(spEq->couplingInfo(id.second).systemN(i), spEq->couplingInfo(id.second).rhsCols(i));
-
-            // Build time matrix
-            this->buildTimeMatrix(solveIt->rTMatrix(i), spEq, id.second, i);
-         }
-      }
-
-      // Build the solver matrices
-      for(int i = 0; i < nSystems; i++)
-      {
-         // Build LHS solver matrix
-         this->buildSolverMatrix(solveIt->rLHSMatrix(start+i), spEq, id.second, i, true);
-
-         // Build RHS solver matrix
-         this->buildSolverMatrix(solveIt->rRHSMatrix(start+i), spEq, id.second, i, false);
-
-         // Store the start row
-         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).blockN(i);
-      }
-
-      // Store storage information
-      solveIt->addInformation(id,startRow);
-   }
 }
 }
 

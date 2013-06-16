@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseLinearCoordinatorBase::SparseLinearCoordinatorBase()
-      : mStep(0)
+      : mNStep(1), mStep(0)
    {
    }
 
@@ -73,8 +73,7 @@ namespace Solver {
 
       DebuggerMacro_start("Create linear operators", 0);
       // Loop over all substeps of timestepper
-AARRRRRGHHHHHH
-      for(this->mStep = 0; this->mStep < ImExRK3::STEPS; this->mStep++)
+      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
       {
          // Loop over all scalar equations
          for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
@@ -104,7 +103,7 @@ AARRRRRGHHHHHH
       SolverZ_iterator   solZIt;
       for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
       {
-         solZIt->initSolver();
+         (*solZIt)->initSolver();
       }
       DebuggerMacro_stop("Complex solver init t = ", 0);
 
@@ -113,7 +112,7 @@ AARRRRRGHHHHHH
       SolverD_iterator   solDIt;
       for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
       {
-         solDIt->initSolver();
+         (*solDIt)->initSolver();
       }
       DebuggerMacro_stop("Real solver init t = ", 0);
 
@@ -199,9 +198,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver input
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*scalEqIt), myId.second, solZIt->rSolution(i), i, solZIt->startRow(myId,i));
+               Equations::copyUnknown(*(*scalEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -212,9 +211,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver input
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*scalEqIt), myId.second, solDIt->rSolution(i), i, solDIt->startRow(myId,i));
+               Equations::copyUnknown(*(*scalEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
       }
@@ -237,9 +236,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver input for toroidal component
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, solZIt->rSolution(i), i, solZIt->startRow(myId,i));
+               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -250,9 +249,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver input for toroidal component
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, solDIt->rSolution(i), i, solDIt->startRow(myId,i));
+               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
 
@@ -270,9 +269,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver input for poloidal component
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, solZIt->rSolution(i), i, solZIt->startRow(myId,i));
+               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -283,9 +282,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver input for poloidal component
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, solDIt->rSolution(i), i, solDIt->startRow(myId,i));
+               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
       }
@@ -395,7 +394,7 @@ AARRRRRGHHHHHH
       for(soZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
       {
          // Compute linear solve RHS
-         solZIt->solve(this->mStep);
+         (*solZIt)->solve(this->mStep);
       }
 
       // Solve real linear systems
@@ -403,7 +402,7 @@ AARRRRRGHHHHHH
       for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
       {
          // Compute linear solve RHS
-         solDIt->solve(this->mStep);
+         (*solDIt)->solve(this->mStep);
       }
    }
 
@@ -430,9 +429,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver output
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               (*scalEqIt)->storeSolution(myId.second, solZIt->solution(i), i, solZIt->startRow(myId,i));
+               (*scalEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -443,9 +442,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver output
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               (*scalEqIt)->storeSolution(myId.second, solDIt->solution(i), i, solDIt->startRow(myId,i));
+               (*scalEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
       }
@@ -468,9 +467,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver output for first component
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               (*vectEqIt)->storeSolution(myId.second, solZIt->solution(i), i, solZIt->startRow(myId,i));
+               (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -481,9 +480,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver output for first component
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               (*vectEqIt)->storeSolution(myId.second, solDIt->solution(i), i, solDIt->startRow(myId,i));
+               (*vectEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
 
@@ -501,9 +500,9 @@ AARRRRRGHHHHHH
             std::advance(solZIt, myIdx);
 
             // Get solver input for second component
-            for(int i = 0; i < solZIt->nSystem(); i++)
+            for(int i = 0; i < (*solZIt)->nSystem(); i++)
             {
-               (*vectEqIt)->storeSolution(myId.second, solZIt->solution(i), i, solZIt->startRow(myId,i));
+               (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
             }
 
          // Linear solve matrices are real
@@ -514,9 +513,9 @@ AARRRRRGHHHHHH
             std::advance(solDIt, myIdx);
 
             // Get solver output for second component
-            for(int i = 0; i < solDIt->nSystem(); i++)
+            for(int i = 0; i < (*solDIt)->nSystem(); i++)
             {
-               (*vectEqIt)->storeSolution(myId.second, solDIt->solution(i), i, solDIt->startRow(myId,i));
+               (*vectEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
             }
          }
       }

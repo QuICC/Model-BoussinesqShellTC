@@ -18,8 +18,8 @@
 // Project includes
 //
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
-#include "SparseLinearSolver/SparseDLinearSolver.hpp"
-#include "SparseLinearSolver/SparseZLinearSolver.hpp"
+#include "SparseSolvers/SparseDLinearSolver.hpp"
+#include "SparseSolvers/SparseZLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -61,68 +61,32 @@ namespace Solver {
           */
          virtual void addSolverZ(const int start);
 
+         /**
+          * @brief Build the real solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
+          */
+         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+
+         /**
+          * @brief Build the complex solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          * @param isLhs      Flag to update LHS and RHS time dependent matrix
+          */
+         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
+
       private:
-         /**
-          * @brief Build the solver matrix
-          *
-          * @param solverMatrix  Storage for solver matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void buildSolverMatrix(SparseMatrix& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
-
-         /**
-          * @brief Build the solver matrix
-          *
-          * @param solverMatrix   Storage for the solver matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          * @param isLhs      Flag to update LHS and RHS time dependent matrix
-          */
-         void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs);
    };
-
-   template <typename TSolverIt> void SparseLinearCoordinator::buildSolverMatrix(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
-   {
-      // Number of linear systems
-      int nSystems = spEq->couplingInfo(id.second).nSystems();
-
-      // start index for matrices
-      int start = this->mStep*nSystems;
-
-      // Start row for storage information
-      ArrayI startRow(nSystems);
-
-      // Initialise the linear solver
-      if(solveIt->nSystem() == 0)
-      {
-         // Reserve storage for matrice and initialise vectors
-         solveIt->initMatrices(ImExRK3::STEPS*nSystems);
-
-         // Initialise field storage and information
-         for(int i = 0; i < nSystems; i++)
-         {
-            // Create data storage
-            solveIt->addStorage(spEq->couplingInfo(id.second).systemN(i), spEq->couplingInfo(id.second).rhsCols(i));
-         }
-      }
-
-      // Build the solver matrices
-      for(int i = 0; i < nSystems; i++)
-      {
-         // Build LHS solver matrix
-         this->buildSolverMatrix(solveIt->rLHSMatrix(start+i), spEq, id.second, i);
-
-         // Store the start row
-         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).blockN(i);
-      }
-
-      // Store storage information
-      solveIt->addInformation(id,startRow);
-   }
 }
 }
 

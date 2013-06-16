@@ -1,5 +1,5 @@
-/** \file EquationDTimestepper.cpp
- *  \brief Implementation of a general timestepper structure
+/** \file SparseDTimestepper.cpp
+ *  \brief Implementation of a general real timestepper structure
  */
 
 // System includes
@@ -10,7 +10,7 @@
 
 // Class include
 //
-#include "Timesteppers/EquationDTimestepper.hpp"
+#include "Timesteppers/SparseDTimestepper.hpp"
 
 // Project includes
 //
@@ -20,16 +20,16 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationDTimestepper::EquationDTimestepper(const int start)
-      : SparseDLinearSolver(start)
+   SparseDTimestepper::SparseDTimestepper(const int start)
+      : Solver::SparseDLinearSolver(start)
    {
    }
 
-   EquationDTimestepper::~EquationDTimestepper()
+   SparseDTimestepper::~SparseDTimestepper()
    {
    }
 
-   void EquationDTimestepper::computeRHS(const int step)
+   void SparseDTimestepper::computeRHS(const int step)
    {
       int start = step*this->nSystem();
 
@@ -60,7 +60,7 @@ namespace Timestep {
       }
    }
 
-   void  EquationDTimestepper::updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
+   void  SparseDTimestepper::updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
    {
       // Set start offset
       int start = step*this->nSystem();
@@ -131,10 +131,10 @@ namespace Timestep {
       }
    }
 
-   void EquationDTimestepper::initMatrices(const int n)
+   void SparseDTimestepper::initMatrices(const int n)
    {
-      // Reserve space for the LHS matrices
-      this->mLHSMatrix.reserve(n);
+      // Initialise base matrices
+      SparseDLinearSolver::initMatrices(n);
 
       // Reserve space for the RHS matrices
       this->mRHSMatrix.reserve(n);
@@ -143,43 +143,32 @@ namespace Timestep {
       for(int i = 0; i < n; ++i)
       {
          // Create storage for LHS matrices
-         this->mLHSMatrix.push_back(SparseMatrix());
-
-         // Create storage for LHS matrices
          this->mRHSMatrix.push_back(SparseMatrix());
       }
    }
 
-   SparseMatrix& EquationDTimestepper::rRHSMatrix(const int idx)
+   SparseMatrix& SparseDTimestepper::rRHSMatrix(const int idx)
    {
       return this->mRHSMatrix.at(idx);
    }
 
-   SparseMatrix& EquationDTimestepper::rTMatrix(const int idx)
+   SparseMatrix& SparseDTimestepper::rTMatrix(const int idx)
    {
       return this->mTMatrix.at(idx);
    }
 
-   void EquationDTimestepper::addStorage(const int rows, const int cols)
+   void SparseDTimestepper::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
       assert(rows > 0);
       assert(cols > 0);
 
-      // Add storage for RHS data
-      this->mRHSData.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mRHSData.back().first.setZero();
-      this->mRHSData.back().second.setZero();
+      SparseDLinearSolver::addStorage(rows,cols);
 
       // Add storage for old RHS data
       this->mRHSOld.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
       this->mRHSOld.back().first.setZero();
       this->mRHSOld.back().second.setZero();
-
-      // Add storage for solution
-      this->mSolution.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mSolution.back().first.setZero();
-      this->mSolution.back().second.setZero();
 
       // Add storage for the time matrix
       this->mTMatrix.push_back(SparseMatrix());

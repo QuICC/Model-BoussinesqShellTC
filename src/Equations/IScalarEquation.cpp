@@ -183,7 +183,7 @@ namespace Equations {
       //
       // Initialise the explicit linear operators
       //
-      CouplingInformation::FieldI_iterator fIt;
+      CouplingInformation::FieldId_iterator fIt;
       CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {

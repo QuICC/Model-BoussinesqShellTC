@@ -1,8 +1,7 @@
 # Create list of sources
 set(MHDSources
-   EquationTimestepperBase.cpp
-   EquationDTimestepper.cpp
-   EquationZTimestepper.cpp
+   SparseDTimestepper.cpp
+   SparseZTimestepper.cpp
    ImExRK3.cpp
    Timestepper.cpp
 )

@@ -29,6 +29,7 @@ namespace Timestep {
    Timestepper::Timestepper()
       : SparseLinearCoordinatorBase(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
    {
+      this->mNSteps = ImExRK3::STEPS;
    }
 
    Timestepper::~Timestepper()
@@ -50,7 +51,7 @@ namespace Timestep {
       this->mTime += this->mDt;
    }
 
-   void Timestepper::adaptTimestep(const MHDFloat cfl, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
+   void Timestepper::adaptTimestep(const MHDFloat cfl, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Flag to update timestep
       bool hasNewDt = false;
@@ -108,19 +109,19 @@ namespace Timestep {
 
          DebuggerMacro_start("Complex solver update", 0);
          // Update solvers from complex equation steppers
-         std::vector<EquationZTimestepper>::iterator   zIt;
-         for(zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
+         SolverZ_iterator   solZIt;
+         for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
          {
-            zIt->updateSolver();
+            (*solZIt)->updateSolver();
          }
          DebuggerMacro_stop("Complex solver update t = ", 0);
 
          DebuggerMacro_start("Real solver update", 0);
          // Update solvers from real equation steppers
-         std::vector<EquationDTimestepper>::iterator   rIt;
-         for(rIt = this->mEqDStepper.begin(); rIt != this->mEqDStepper.end(); ++rIt)
+         SolverD_iterator   solDIt;
+         for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
          {
-            rIt->updateSolver();
+            (*solDIt)->updateSolver();
          }
          DebuggerMacro_stop("Real solver update t = ", 0);
 
@@ -129,7 +130,7 @@ namespace Timestep {
       }
    }
 
-   void Timestepper::stepForward(const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
+   void Timestepper::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq);
@@ -144,10 +145,10 @@ namespace Timestep {
       this->transferOutput(scalEq, vectEq);
 
       // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % ImExRK3::STEPS;
+      this->mStep = (this->mStep + 1) % this->mNStep;
    }
 
-   void Timestepper::init(const MHDFloat dt, const ScalarEquationRangeType& scalEq, const VectorEquationRangeType& vectEq)
+   void Timestepper::init(const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Set initial timestep
       this->mOldDt = dt;
@@ -175,7 +176,7 @@ namespace Timestep {
    void Timestepper::updateMatrices()
    {
       // Loop over all substeps of timestepper
-      for(int step = 0; step < ImExRK3::STEPS; ++step)
+      for(int step = 0; step < this->mNStep; ++step)
       {
          // Compute timestep correction coefficient for LHS matrix
          MHDFloat lhsCoeff = ImExRK3::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
@@ -184,17 +185,17 @@ namespace Timestep {
          MHDFloat rhsCoeff = ImExRK3::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Loop over all complex timesteppers
-         std::vector<EquationZTimestepper>::iterator   zIt;
-         for(zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
+         SolverZ_iterator   solZIt;
+         for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
          {
-            zIt->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
+            (*solZIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
          }
 
          // Loop over all real timesteppers
-         std::vector<EquationDTimestepper>::iterator   rIt;
-         for(rIt = this->mEqDStepper.begin(); rIt != this->mEqDStepper.end(); ++rIt)
+         SolverD_iterator   solDIt;
+         for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solZIt)
          {
-            rIt->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
+            (*solDIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
          }
       }
    }
@@ -202,116 +203,136 @@ namespace Timestep {
    void Timestepper::computeRHS()
    {
       // Compute RHS component for complex linear systems
-      std::vector<EquationZTimestepper>::iterator   zIt;
-      for(zIt = this->mEqZStepper.begin(); zIt != this->mEqZStepper.end(); ++zIt)
+      SolverZ_iterator   solZIt;
+      for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
       {
          // Compute linear solve RHS
-         zIt->computeRHS(this->mStep);
+         (*solZIt)->computeRHS(this->mStep);
       }
 
       std::vector<EquationDTimestepper>::iterator   dIt;
-      for(dIt = this->mEqDStepper.begin(); dIt != this->mEqDStepper.end(); ++dIt)
+      for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
       {
          // Compute linear solve RHS
-         dIt->computeRHS(this->mStep);
+         (*solDIt)->computeRHS(this->mStep);
       }
    }
 
-   void Timestepper::buildTimeMatrix(SparseMatrix& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      if(timeMatrix.size() == 0)
-      {
-         timeMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      timeMatrix += spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx).first;
-   }
-
-   void Timestepper::buildTimeMatrix(SparseMatrixZ& timeMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      if(timeMatrix.size() == 0)
-      {
-         timeMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
-
-      timeMatrix += tRow.first.cast<MHDComplex>() + MathConstants::cI*tRow.second;
-   }
-
-   void Timestepper::buildSolverMatrix(SolverD_iterator solDIt, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs)
+   void Timestepper::buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Operator coefficients
-      MHDFloat timeCoeff;
-      MHDFloat linearCoeff;
+      MHDFloat lhsTCoeff;
+      MHDFloat rhsTCoeff;
+      MHDFloat lhsLCoeff;
+      MHDFloat rhsLCoeff;
 
-      if(isLhs)
+      // Set time coefficients for LHS Matrix
+      lhsTCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for LHS Matrix
+      lhsLCoeff = ImExRK3::lhsL(this->mStep);
+
+      // Set time coefficients for RHS Matrix
+      rhsTCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for RHS Matrix
+      rhsLCoeff = -ImExRK3::rhsL(this->mStep);
+
+      // Resize LHS matrix if necessary
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
       {
-         // Set time coefficients for LHS Matrix
-         timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
-
-         // Set linear coefficients for LHS Matrix
-         linearCoeff = ImExRK3::lhsL(this->mStep);
-      } else
-      {
-         // Set time coefficients for RHS Matrix
-         timeCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
-
-         // Set linear coefficients for RHS Matrix
-         linearCoeff = -ImExRK3::rhsL(this->mStep);
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
-      if(solverMatrix.size() == 0)
+      // Resize RHS matrix if necessary
+      if(spSolver->rRHSMatrix(matIdx).size() == 0)
       {
-         solverMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      // Add boundary row for LHS operator
-      if(isLhs)
-      {
-         solverMatrix += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first;
-      }
-
-      solverMatrix += linearCoeff*spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first - timeCoeff*spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx).first;
-   }
-
-   void Timestepper::buildSolverMatrix(SolverZ_iterator solZIt, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Operator coefficients
-      MHDFloat timeCoeff;
-      MHDFloat linearCoeff;
-
-      if(isLhs)
-      {
-         // Set time coefficients for LHS Matrix
-         timeCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
-
-         // Set linear coefficients for LHS Matrix
-         linearCoeff = ImExRK3::lhsL(this->mStep);
-      } else
-      {
-         // Set time coefficients for RHS Matrix
-         timeCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
-
-         // Set linear coefficients for RHS Matrix
-         linearCoeff = -ImExRK3::rhsL(this->mStep);
-      }
-
-      if(solverMatrix.size() == 0)
-      {
-         solverMatrix.resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      // Add boundary row for LHS operator
-      if(isLhs)
-      {
-         DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
-         solverMatrix += bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+         spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
       DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
-      solverMatrix += linearCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*linearCoeff*linRow.second - timeCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*timeCoeff*tRow.second;
+
+      // Compute LHS matrix
+      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first;
+
+      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.first - lhsTCoeff*tRow.first;
+
+      // Compute RHS matrix
+      spSolver->rRHSMatrix(matIdx) += rhsLCoeff*linRow.first - rhsCoeff*tRow.first;
+
+      // Set time matrix for timestep updates
+      if(matIdx == idx)
+      {
+         // Resize time matrix if necessary
+         if(spSolver->rTMatrix(i).size() == 0)
+         {
+            spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         }
+
+         // Set time matrix
+         spSolver->rTMatrix(i) += tRow.first;
+      }
+   }
+
+   void Timestepper::buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   {
+      // Operator coefficients
+      MHDFloat lhsTCoeff;
+      MHDFloat rhsTCoeff;
+      MHDFloat lhsLCoeff;
+      MHDFloat rhsLCoeff;
+
+      // Set time coefficients for LHS Matrix
+      lhsTCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for LHS Matrix
+      lhsLCoeff = ImExRK3::lhsL(this->mStep);
+
+      // Set time coefficients for RHS Matrix
+      rhsTCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for RHS Matrix
+      rhsLCoeff = -ImExRK3::rhsL(this->mStep);
+
+      // Resize LHS matrix if necessary
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
+      {
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+      }
+
+      // Resize RHS matrix if necessary
+      if(spSolver->rRHSMatrix(matIdx).size() == 0)
+      {
+         spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+      }
+
+      // Add boundary row for LHS operator
+      DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
+      spSolver->rLHSMatrix(matIdx) += bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+
+      DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
+      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
+
+
+      // Set LHS matrix
+      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*lhsLCoeff*linRow.second - lhsTCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*lhsTCoeff*tRow.second;
+
+      // Set RHS matrix
+      spSolver->rRHSMatrix(matIdx) += rhsLCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*rhsLCoeff*linRow.second - rhsTCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*rhsTCoeff*tRow.second;
+
+      // Set time matrix for timestep updates
+      if(matIdx == idx)
+      {
+         // Resize time matrix if necessary
+         if(spSolver->rTMatrix.at(i).size() == 0)
+         {
+            spSolver->rTMatrix.at(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         }
+
+         // Set time matrix
+         spSolver->rTMatrix.at(i) += tRow.first.cast<MHDComplex>() + MathConstants::cI*tRow.second;
+      }
    }
 
 }

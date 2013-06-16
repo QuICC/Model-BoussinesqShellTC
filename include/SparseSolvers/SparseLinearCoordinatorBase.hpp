@@ -17,8 +17,8 @@
 
 // Project includes
 //
-#include "SparseLinearSolver/SparseDLinearSolver.hpp"
-#include "SparseLinearSolver/SparseZLinearSolver.hpp"
+#include "SparseSolvers/SparseDLinearSolver.hpp"
+#include "SparseSolvers/SparseZLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -58,7 +58,7 @@ namespace Solver {
          /**
           * @brief Destructor
           */
-         ~SparseLinearCoordinatorBase();
+         virtual ~SparseLinearCoordinatorBase();
 
          /**
           * @brief Finished computation of solver step?
@@ -134,26 +134,33 @@ namespace Solver {
          void transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
-          * @brief Build the solver matrix
+          * @brief Build the real solver matrix
           *
-          * @param solDIt  Real solver iterator
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           * @param isLhs   Flag to update LHS and RHS time dependent matrix
           */
-         virtual void buildSolverMatrix(const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
-          * @brief Build the solver matrix
+          * @brief Build the complex solver matrix
           *
-          * @param solZIt  Complex solver iterator
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
           * @param spEq    Shared pointer to equation
           * @param comp    Field component
           * @param idx     Matrix index
           * @param isLhs   Flag to update LHS and RHS time dependent matrix
           */
-         virtual void buildSolverMatrix(SparseMatrixZ& solverMatrix, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+
+         /**
+          * @brief Number of solver substeps
+          */
+         int   mNStep;
 
          /**
           * @brief Current solver step
@@ -188,7 +195,7 @@ namespace Solver {
       if(solveIt->nSystem() == 0)
       {
          // Reserve storage for matrice and initialise vectors
-         solveIt->initMatrices(ImExRK3::STEPS*nSystems);
+         solveIt->initMatrices(this->mNStep*nSystems);
 
          // Initialise field storage and information
          for(int i = 0; i < nSystems; i++)
@@ -202,7 +209,7 @@ namespace Solver {
       for(int i = 0; i < nSystems; i++)
       {
          // Build LHS solver matrix
-         this->buildSolverMatrix(solveIt, spEq, id.second, i);
+         this->buildSolverMatrix(*solveIt, start+i, spEq, id.second, i);
 
          // Store the start row
          startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).blockN(i);
@@ -224,24 +231,24 @@ namespace Solver {
          Equations::applyQuasiInverse(*(*eqIt), id.second, solveIt->rRHSData(i), i, solveIt->startRow(id,i));
 
          // Loop over all complex solvers
-         for(SolverZ_iterator zIt = this->mZSolvers.begin(); zIt != this->mZSolvers.end(); ++zIt)
+         for(SolverZ_iterator solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
          {
             // Loop over all fields
-            SparseZLinearSolver::FieldId_range   fRange = zIt->fieldRange();
-            for(SparseZLinearSolver::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+            Equations::CouplingInformation::FieldId_range   fRange = (*solZIt)->fieldRange();
+            for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, zIt->rRHSData(i), zIt->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, (*solZIt)->rRHSData(i), (*solZIt)->startRow(*fIt,i), i);
             }
          }
 
          // Loop over all real solvers
-         for(SolverD_iterator dIt = this->mDSolvers.begin(); dIt != this->mDSolvers.end(); ++dIt)
+         for(SolverD_iterator solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
          {
             // Loop over all fields
-            SparseDLinearSolver::FieldId_range   fRange = dIt->fieldRange();
-            for(SparseDLinearSolver::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+            Equations::CouplingInformation::FieldId_range   fRange = (*solDIt)->fieldRange();
+            for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, dIt->rRHSData(i), dIt->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, solveIt->rRHSData(i), solveIt->startRow(id,i), *fIt, (*solDIt)->rRHSData(i), (*solDIt)->startRow(*fIt,i), i);
             }
          }
       }

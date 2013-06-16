@@ -45,6 +45,9 @@ namespace Solver {
       
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
+
+      // Update the internal step counter, counting from 0 to steps - 1
+      this->mStep = (this->mStep + 1) % this->mNSteps;
    }
 
    void SparseLinearCoordinator::addSolverD(const int start)
@@ -61,28 +64,31 @@ namespace Solver {
       this->mZSolvers.push_back(spSolver);
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SolverD_iterator solDIt, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Resize matrix if necessary
-      if(solDIt->mLHSMatrix.at(matIdx).size() == 0)
+      // Resize LHS matrix if necessary
+      if(spSolver->mLHSMatrix.at(matIdx).size() == 0)
       {
-         solDIt->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         spSolver->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
-      solDIt->mLHSMatrix.at(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first;
+      // Set LHS matrix
+      spSolver->mLHSMatrix.at(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first;
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SolverZ_iterator solZIt, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const bool isLhs)
+   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Resize matrix if necessary
-      if(solZIt->mLHSMatrix.at(matIdx).size() == 0)
+      // Resize LHS matrix if necessary
+      if(spSolver->mLHSMatrix.at(matIdx).size() == 0)
       {
-         solZIt->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         spSolver->mLHSMatrix.at(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
       DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
-      solZIt->mLHSMatrix.at(matIdx) += linRow.first.cast<MHDComplex>() + MathConstants::cI*linRow.second + bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+
+      // Set LHS matrix
+      spSolver->mLHSMatrix.at(matIdx) += linRow.first.cast<MHDComplex>() + MathConstants::cI*linRow.second + bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
    }
 
 }

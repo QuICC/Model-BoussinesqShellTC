@@ -47,7 +47,7 @@ namespace Solver {
           *
           * @param n Size of matrices
           */
-         void initMatrices(const int n);
+         virtual void initMatrices(const int n);
 
          /**
           * @brief Initialise solver
@@ -58,13 +58,6 @@ namespace Solver {
           * @brief Update solver
           */
          void updateSolver();
-
-         /**
-          * @brief Compute the RHS of the linear systems
-          *
-          * @param step    Current substep
-          */
-         void computeRHS(const int step);
 
          /**
           * @brief Solve linear systems
@@ -91,7 +84,7 @@ namespace Solver {
           * @param rows Number of rows of matrix
           * @param cols Number of columns required
           */
-         void addStorage(const int rows, const int cols);
+         virtual void addStorage(const int rows, const int cols);
 
          /**
           * @brief Set RHS data
@@ -126,11 +119,6 @@ namespace Solver {
          std::vector<MatrixZ>  mRHSData;
 
          /**
-          * @brief Storage for old nonlinear RHS
-          */
-         std::vector<MatrixZ>  mRHSOld;
-
-         /**
           * @brief Storage for solution of linear solve
           */
          std::vector<MatrixZ>  mSolution;
@@ -142,26 +130,6 @@ namespace Solver {
 
       private:
    };
-
-   inline int SparseZLinearSolver::nSystem() const
-   {
-      return this->mRHSData.size();
-   }
-
-   inline MatrixZ& SparseZLinearSolver::rRHSData(const int idx)
-   {
-      return this->mRHSData.at(idx);
-   }
-
-   inline const MatrixZ& SparseZLinearSolver::solution(const int idx) const
-   {
-      return this->mSolution.at(idx);
-   }
-
-   inline MatrixZ& SparseZLinearSolver::rSolution(const int idx)
-   {
-      return this->mSolution.at(idx);
-   }
 
    /// Typedef for a shared pointer of a SparseZLinearSolver
    typedef SharedPtrMacro<SparseZLinearSolver>  SharedSparseZLinearSolver;

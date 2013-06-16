@@ -1,5 +1,5 @@
-/** \file EquationZTimestepper.cpp
- *  \brief Implementation of a general timestepper structure
+/** \file SparseZTimestepper.cpp
+ *  \brief Implementation of a general complex timestepper structure
  */
 
 // Configuration includes
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Timesteppers/EquationZTimestepper.hpp"
+#include "Timesteppers/SparseZTimestepper.hpp"
 
 // Project includes
 //
@@ -25,16 +25,16 @@ namespace GeoMHDiSCC {
 
 namespace Timestep {
 
-   EquationZTimestepper::EquationZTimestepper(const int start)
-      : EquationTimestepperBase(start)
+   SparseZTimestepper::SparseZTimestepper(const int start)
+      : Solver::SparseZLinearSolver(start)
    {
    }
 
-   EquationZTimestepper::~EquationZTimestepper()
+   SparseZTimestepper::~SparseZTimestepper()
    {
    }
 
-   void EquationZTimestepper::computeRHS(const int step)
+   void SparseZTimestepper::computeRHS(const int step)
    {
       int start = step*this->nSystem();
 
@@ -58,27 +58,7 @@ namespace Timestep {
       }
    }
 
-   void EquationZTimestepper::solve(const int step)
-   {
-      int start = step*this->nSystem();
-
-      // Set unused modes to zero
-      for(int i = 0; i < this->mZeroIdx; ++i)
-      {
-         this->mSolution.at(i).setZero();
-      }
-
-      // Solve other modes
-      for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
-      {
-         this->mSolution.at(i) = this->mSolver.at(i+start)->solve(this->mRHSData.at(i));
-
-         // Safety assert for successful solve
-         assert(this->mSolver.at(i+start)->info() == Eigen::Success);
-      }
-   }
-
-   void  EquationZTimestepper::updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
+   void  SparseZTimestepper::updateTimeMatrix(const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
    {
       // Set start offset
       int start = step*this->nSystem();
@@ -149,43 +129,10 @@ namespace Timestep {
       }
    }
 
-   void EquationZTimestepper::initSolver()
+   void SparseZTimestepper::initMatrices(const int n)
    {
-      // Initialise solver
-      this->mSolver.reserve(this->mLHSMatrix.size());
-      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
-      {
-         SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> >  solver(new SparseSolverMacro<SparseMatrixZ>());
-
-         this->mSolver.push_back(solver);
-      }
-
-      // Compute pattern and factorisation
-      this->updateSolver();
-   }
-
-   void EquationZTimestepper::updateSolver()
-   {
-      // Compute factorisation
-      for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
-      {
-         if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
-         {
-            // Safety assert to make sur matrix is compressed
-            assert(this->mLHSMatrix.at(i).isCompressed());
-
-            this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
-
-            // Safety assert for successful factorisation
-            assert(this->mSolver.at(i)->info() == Eigen::Success);
-         }
-      }
-   }
-
-   void EquationZTimestepper::initMatrices(const int n)
-   {
-      // Reserve space for the LHS matrices
-      this->mLHSMatrix.reserve(n);
+      // Initialise base matrices
+      SparseZLinearSolver::initMatrices(n);
 
       // Reserve space for the RHS matrices
       this->mRHSMatrix.reserve(n);
@@ -194,45 +141,31 @@ namespace Timestep {
       for(int i = 0; i < n; ++i)
       {
          // Create storage for LHS matrices
-         this->mLHSMatrix.push_back(SparseMatrixZ());
-
-         // Create storage for LHS matrices
          this->mRHSMatrix.push_back(SparseMatrixZ());
       }
    }
 
-   SparseMatrixZ& EquationZTimestepper::rLHSMatrix(const int idx)
-   {
-      return this->mLHSMatrix.at(idx);
-   }
-
-   SparseMatrixZ& EquationZTimestepper::rRHSMatrix(const int idx)
+   SparseMatrixZ& SparseZTimestepper::rRHSMatrix(const int idx)
    {
       return this->mRHSMatrix.at(idx);
    }
 
-   SparseMatrixZ& EquationZTimestepper::rTMatrix(const int idx)
+   SparseMatrixZ& SparseZTimestepper::rTMatrix(const int idx)
    {
       return this->mTMatrix.at(idx);
    }
 
-   void EquationZTimestepper::addStorage(const int rows, const int cols)
+   void SparseZTimestepper::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
       assert(rows > 0);
       assert(cols > 0);
 
-      // Add storage for RHS data
-      this->mRHSData.push_back(MatrixZ(rows,cols));
-      this->mRHSData.back().setZero();
+      SparseZLinearSolver::addStorage(rows,cols);
 
       // Add storage for old RHS
       this->mRHSOld.push_back(MatrixZ(rows,cols));
       this->mRHSOld.back().setZero();
-
-      // Add storage for solution
-      this->mSolution.push_back(MatrixZ(rows,cols));
-      this->mSolution.back().setZero();
 
       // Add storage for the time matrix
       this->mTMatrix.push_back(SparseMatrixZ());
