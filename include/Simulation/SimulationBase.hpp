@@ -24,6 +24,7 @@
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "SparseSolvers/SparseTrivialCoordinator.hpp"
 #include "SparseSolvers/SparseLinearCoordinator.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
@@ -151,6 +152,11 @@ namespace GeoMHDiSCC {
          void computeNonlinear();
 
          /**
+          * @brief Solve the trivial equations
+          */
+         void solveTrivialEquations();
+
+         /**
           * @brief Solve the diagnostic equations
           */
          void solveDiagnosticEquations();
@@ -191,19 +197,24 @@ namespace GeoMHDiSCC {
          VectorEquation_range mVectorDiagnosticRange;
 
          /**
-          * @brief Storage for the range of scalar "direct" equations
+          * @brief Storage for the range of scalar trivial equations
           */
-         ScalarEquation_range mScalarDirectRange;
+         ScalarEquation_range mScalarTrivialRange;
 
          /**
-          * @brief Storage for the range of vector "direct" equations
+          * @brief Storage for the range of vectort trivial equations
           */
-         VectorEquation_range mVectorDirectRange;
+         VectorEquation_range mVectorTrivialRange;
 
          /**
           * @brief Simulation run control
           */
          SimulationRunControl mSimRunCtrl;
+
+         /**
+          * @brief Trivial solver coordinator
+          */
+         Solver::SparseTrivialCoordinator mTrivialCoordinator;
 
          /**
           * @brief Linear solver coordinator
@@ -329,22 +340,22 @@ namespace GeoMHDiSCC {
    };
 
    /**
-    * @brief Compute the scalar equation type flag for time/solver/directo ordering
+    * @brief Compute the scalar equation type flag for time/solver/trivial ordering
     */
    int computeScalarEquationType(Equations::SharedIScalarEquation eqA);
 
    /**
-    * @brief Compute the vector equation type flag for time/solver/directo ordering
+    * @brief Compute the vector equation type flag for time/solver/trivial ordering
     */
    int computeVectorEquationType(Equations::SharedIVectorEquation eqA);
 
    /**
-    * @brief Sorting function for the scalar equations to obtain time/solver/directo ordering
+    * @brief Sorting function for the scalar equations to obtain time/solver/trivial ordering
     */
    bool sortScalarEquationType(Equations::SharedIScalarEquation eqA, Equations::SharedIScalarEquation eqB);
 
    /**
-    * @brief Sorting function for the vector equations to obtain time/solver/directo ordering
+    * @brief Sorting function for the vector equations to obtain time/solver/trivial ordering
     */
    bool sortVectorEquationType(Equations::SharedIVectorEquation eqA, Equations::SharedIVectorEquation eqB);
 

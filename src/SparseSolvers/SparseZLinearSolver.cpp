@@ -21,7 +21,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseZLinearSolver::SparseZLinearSolver(const int start)
-      : SparseLinearSolverBase(start)
+      : SparseSolverBase(start)
    {
    }
 

@@ -57,8 +57,8 @@ namespace Equations {
             PROGNOSTIC = 1,
             /// Equation needs a solver
             DIAGNOSTIC = 2,
-            /// Equation is direct
-            DIRECT = 3
+            /// Equation is trivial
+            TRIVIAL = 3
          };
 
          /**
@@ -85,6 +85,11 @@ namespace Equations {
           * @brief Has a quasi-inverse operator for nonlinear terms?
           */
          bool hasQuasiInverse() const;
+
+         /**
+          * @brief Has a source term?
+          */
+         bool hasSource() const;
 
          /**
           * @brief Is the system complex?
@@ -170,10 +175,23 @@ namespace Equations {
           * @param solverIndex      Index of the solver
           * @param isComplex        Complex flag of solver
           * @param fieldStart       Start index of the filed
+          */
+         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart);
+
+         /**
+          * @brief Set nonlinear flags
+          *
           * @param hasNonlinear     Equation requires nonlinear computation?
           * @param hasQuasiInverse  Equation requires quasi-inverse on nonlinear terms?
           */
-         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart, const bool hasNonlinear, const bool hasQuasiInverse);
+         void setNonlinear(const bool hasNonlinear, const bool hasQuasiInverse);
+
+         /**
+          * @brief Set source flag
+          *
+          * @param hasSource  Equation requires source term computation?
+          */
+         void setSource(const bool hasSource);
 
          /**
           * @brief Set system sizes
@@ -228,6 +246,11 @@ namespace Equations {
           * @brief Storage for the quasi-inverse flag
           */
          bool mHasQuasiInverse;
+
+         /**
+          * @brief Storage for the source flag
+          */
+         bool mHasSource;
 
          /**
           * @brief Storage for the complex flag

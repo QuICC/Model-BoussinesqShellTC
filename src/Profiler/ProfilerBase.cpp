@@ -57,6 +57,8 @@ namespace Debug {
             return "Prognostic";
          case DIAGNOSTICEQUATION:
             return "Diagnostic";
+         case TRIVIALEQUATION:
+            return "Trivial";
          case CONTROL:
             return "Control";
          case IO:

@@ -228,6 +228,9 @@ namespace Solver {
          // Apply quasi-inverse to nonlinear terms
          Equations::applyQuasiInverse(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
+         // Apply quasi-inverse to nonlinear terms
+         Equations::addSource(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+
          // Loop over all complex solvers
          for(SolverZ_iterator solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
          {

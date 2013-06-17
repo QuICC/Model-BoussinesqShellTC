@@ -99,7 +99,7 @@ namespace GeoMHDiSCC {
       // Initialise the equations (generate operators, etc)
       this->setupEquations(spBcs);
 
-      // Sort the equations by type: time/solver/direct
+      // Sort the equations by type: time/solver/trivial
       this->sortEquations();
 
       // Setup output files (ASCII diagnostics, state files, etc)
@@ -235,7 +235,10 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("initSolvers",1);
 
-      // Init linear solver for diagnostic equations
+      // Init trivial solver for trivial equations
+      this->mTrivialCoordinator.init(this->mScalarTrivialRange, this->mVectorTrivialRange);
+
+      // Init linear solver for trivial equations
       this->mLinearCoordinator.init(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
 
       // Debug statement
@@ -257,6 +260,21 @@ namespace GeoMHDiSCC {
 
       // Debug statement
       DebuggerMacro_leave("computeNonlinear",2);
+   }
+
+   void SimulationBase::solveTrivialEquations()
+   {
+      // Debug statement
+      DebuggerMacro_enter("solveTrivialEquations",2);
+
+      DebuggerMacro_start("Solve trivial",3);
+      ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
+      this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange);
+      ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
+      DebuggerMacro_stop("Solve trivial t = ",3);
+
+      // Debug statement
+      DebuggerMacro_leave("solveDiagnosticEquations",2);
    }
 
    void SimulationBase::solveDiagnosticEquations()
@@ -549,23 +567,36 @@ namespace GeoMHDiSCC {
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt != this->mScalarEquations.end(); ++scalEqIt)
       {
          // Set time equation range
-         if(group == 1 && computeScalarEquationType(*scalEqIt) == 2)
+         if(group == 1 && computeScalarEquationType(*scalEqIt) > 1)
          {
             this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), scalEqIt);
             group++;
          }
-         // Set solver and direct equation ranges
-         if(group == 2 && computeScalarEquationType(*scalEqIt) == 3)
+
+         // Set solver and trivial equation ranges
+         if(group == 2 && computeScalarEquationType(*scalEqIt) > 2)
          {
             // Set solver equation range
             this->mScalarDiagnosticRange = std::make_pair(this->mScalarPrognosticRange.second, scalEqIt);
 
-            // Set direct equation range
-            this->mScalarDirectRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
+            // Set trivial equation range
+            this->mScalarTrivialRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
 
             // Exit loop
             break;
          }
+      }
+
+      if(this->mScalarPrognosticRange.first == this->mScalarPrognosticRange.second)
+      {
+         this->mScalarPrognosticRange.first = this->mScalarEquations.end();
+         this->mScalarPrognosticRange.second = this->mScalarEquations.end();
+      }
+
+      if(this->mScalarDiagnosticRange.first == this->mScalarDiagnosticRange.second)
+      {
+         this->mScalarDiagnosticRange.first = this->mScalarEquations.end();
+         this->mScalarDiagnosticRange.second = this->mScalarEquations.end();
       }
 
       // Sort vector equations
@@ -577,23 +608,35 @@ namespace GeoMHDiSCC {
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt != this->mVectorEquations.end(); ++vectEqIt)
       {
          // Set time equation range
-         if(group == 1 && computeVectorEquationType(*vectEqIt) == 2)
+         if(group == 1 && computeVectorEquationType(*vectEqIt) > 1)
          {
             this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), vectEqIt);
             group++;
          }
-         // Set solver and direct equation ranges
-         if(group == 2 && computeVectorEquationType(*vectEqIt) == 3)
+         // Set solver and trivial equation ranges
+         if(group == 2 && computeVectorEquationType(*vectEqIt) > 2)
          {
             // Set solver equation range
             this->mVectorDiagnosticRange = std::make_pair(this->mVectorPrognosticRange.second, vectEqIt);
 
-            // Set direct equation range
-            this->mVectorDirectRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
+            // Set trivial equation range
+            this->mVectorTrivialRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
 
             // Exit loop
             break;
          }
+      }
+
+      if(this->mVectorPrognosticRange.first == this->mVectorPrognosticRange.second)
+      {
+         this->mVectorPrognosticRange.first = this->mVectorEquations.end();
+         this->mVectorPrognosticRange.second = this->mVectorEquations.end();
+      }
+
+      if(this->mVectorDiagnosticRange.first == this->mVectorDiagnosticRange.second)
+      {
+         this->mVectorDiagnosticRange.first = this->mVectorEquations.end();
+         this->mVectorDiagnosticRange.second = this->mVectorEquations.end();
       }
    }
 

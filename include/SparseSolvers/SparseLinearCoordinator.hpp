@@ -50,6 +50,7 @@ namespace Solver {
           * @param vectEq Shared vector equations
           */
          void solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+
       protected:
          /**
           * @brief Create a real linear solver

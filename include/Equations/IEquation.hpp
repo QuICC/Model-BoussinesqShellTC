@@ -72,7 +72,17 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           * @param id      ID of the component (allows for a more general implementation)
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const = 0;
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
+
+         /**
+          * @brief Compute the source term
+          *
+          * @param compId  ID of the spectral component
+          * @param i       Fastest index
+          * @param j       Second index
+          * @param k       Slowest index
+          */
+         virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
           * @brief Initialise the spectral equation matrices

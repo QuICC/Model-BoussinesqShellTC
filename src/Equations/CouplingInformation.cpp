@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(DIRECT), mHasNonlinear(false), mHasQuasiInverse(false), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -44,6 +44,11 @@ namespace Equations {
    bool CouplingInformation::hasQuasiInverse() const
    {
       return this->mHasQuasiInverse;
+   }
+
+   bool CouplingInformation::hasSource() const
+   {
+      return this->mHasSource;
    }
 
    bool CouplingInformation::isComplex() const
@@ -117,7 +122,7 @@ namespace Equations {
       this->mExplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 
-   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart, const bool hasNonlinear, const bool hasQuasiInverse)
+   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
    {
       // Timestepping is required
       if(solverIndex > 0)
@@ -134,17 +139,25 @@ namespace Equations {
       // No solver and no timestepping
       } else
       {
-         this->mEquationType = DIRECT;
-         this->mSolverIndex = -42;
+         this->mEquationType = TRIVIAL;
+         this->mSolverIndex = 0;
       }
-
-      this->mHasNonlinear = hasNonlinear;
-
-      this->mHasQuasiInverse = hasQuasiInverse;
 
       this->mIsComplex = isComplex;
 
       this->mFieldStart = fieldStart;
+   }
+
+   void CouplingInformation::setNonlinear(const bool hasNonlinear, const bool hasQuasiInverse)
+   {
+      this->mHasNonlinear = hasNonlinear;
+
+      this->mHasQuasiInverse = hasQuasiInverse;
+   }
+
+   void CouplingInformation::setSource(const bool hasSource)
+   {
+      this->mHasSource = hasSource;
    }
 
    void CouplingInformation::setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols)

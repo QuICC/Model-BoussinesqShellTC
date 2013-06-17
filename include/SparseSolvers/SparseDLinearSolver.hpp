@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "SparseSolvers/SparseSolverMacro.h"
-#include "SparseSolvers/SparseLinearSolverBase.hpp"
+#include "SparseSolvers/SparseSolverBase.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,7 +27,7 @@ namespace Solver {
    /**
     *  \brief Implementation of a real (coupled) linear solver structure
     */
-   class SparseDLinearSolver: public SparseLinearSolverBase
+   class SparseDLinearSolver: public SparseSolverBase
    {
       public:
          /**

@@ -57,6 +57,12 @@ namespace GeoMHDiSCC {
       // Compute nonlinear terms
       this->computeNonlinear();
 
+      // Solve trivial equations
+      this->solveTrivialEquations();
+
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations();
+
       // Synchronise computation nodes
       FrameworkMacro::synchronize();
 

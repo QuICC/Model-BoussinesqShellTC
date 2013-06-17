@@ -1,9 +1,9 @@
-/** \file SparseLinearSolverBase.hpp
- *  \brief Implementation of the base for the linear solver structures
+/** \file SparseSolverBase.hpp
+ *  \brief Implementation of the base for the solver structures
  */
 
-#ifndef SPARSELINEARSOLVERBASE_HPP
-#define SPARSELINEARSOLVERBASE_HPP
+#ifndef SPARSESOLVERBASE_HPP
+#define SPARSESOLVERBASE_HPP
 
 // Configuration includes
 //
@@ -25,9 +25,9 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    /**
-    * \brief Implementation of the base for the linear solver structures
+    * \brief Implementation of the base for the solver structures
     */
-   class SparseLinearSolverBase
+   class SparseSolverBase
    {
       public:
          /// Typedef to simplify notation for the field data
@@ -44,12 +44,12 @@ namespace Solver {
           *
           * @param start   Starting index (for example without m=0)
           */
-         SparseLinearSolverBase(const int start);
+         SparseSolverBase(const int start);
 
          /**
           * @brief Destructor
           */
-         virtual ~SparseLinearSolverBase();
+         virtual ~SparseSolverBase();
 
          /**
           * @brief Add storage information 
@@ -85,9 +85,9 @@ namespace Solver {
       private:
    };
 
-   /// Typedef for a shared pointer of a SparseLinearSolverBase
-   typedef SharedPtrMacro<SparseLinearSolverBase>  SharedSparseLinearSolverBase;
+   /// Typedef for a shared pointer of a SparseSolverBase
+   typedef SharedPtrMacro<SparseSolverBase>  SharedSparseSolverBase;
 }
 }
 
-#endif // SPARSELINEARSOLVERBASE_HPP
+#endif // SPARSESOLVERBASE_HPP

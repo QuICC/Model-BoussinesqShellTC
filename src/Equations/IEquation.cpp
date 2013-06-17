@@ -36,6 +36,20 @@ namespace Equations {
       this->setCoupling();
    }
 
+   void IEquation::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   {
+      // This implementation should never get called!
+      throw Exception("Activated nonlinear term without implementation!");
+   }
+
+   MHDComplex IEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+   {
+      // This implementation should never get called!
+      throw Exception("Activated source term without implementation!");
+
+      return MHDComplex();
+   }
+
    void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Apply quasi inverse
