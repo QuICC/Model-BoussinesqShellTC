@@ -75,6 +75,11 @@ namespace Transform {
          typedef ChebyshevFftIds::Integrators IntegratorType;
 
          /**
+          * @brief Generate a physical grid
+          */
+         static Array generateGrid(const int size); 
+
+         /**
           * @brief Very basic constructor
           */
          ChebyshevFftwTransform();

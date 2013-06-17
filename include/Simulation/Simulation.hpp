@@ -17,27 +17,8 @@
 
 // Project includes
 //
-#include "Timers/ExecutionTimer.hpp"
 #include "Simulation/SimulationBase.hpp"
-#include "Simulation/SimulationRunControl.hpp"
-#include "Simulation/SimulationIoControl.hpp"
-#include "Simulation/SimulationBoundary.hpp"
-#include "Equations/EquationParameters.hpp"
-#include "Equations/IScalarEquation.hpp"
-#include "Equations/IVectorEquation.hpp"
-#include "SparseSolvers/SparseLinearCoordinator.hpp"
 #include "Timesteppers/TimestepCoordinator.hpp"
-#include "IoConfig/ConfigurationReader.hpp"
-#include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/ParallelSelector.hpp"
-#include "TransformGroupers/IForwardGrouper.hpp"
-#include "TransformGroupers/IBackwardGrouper.hpp"
-#include "LoadSplitter/LoadSplitter.hpp"
-#include "IoConfig/ConfigParts/PhysicalPart.hpp"
-#include "IoConfig/ConfigParts/BoundaryPart.hpp"
-#include "IoVariable/IVariableHdf5Reader.hpp"
-#include "Diagnostics/DiagnosticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
 

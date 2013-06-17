@@ -153,6 +153,11 @@ namespace Equations {
           */
          const SimulationBoundary& bcIds() const;
 
+         /**
+          * @brief Set the solver index for the coupling information
+          */
+         void setSolverIndex(const FieldComponents::Spectral::Id, const int idx);
+
       protected:
          /**
           * @brief Set the unknown name of equation

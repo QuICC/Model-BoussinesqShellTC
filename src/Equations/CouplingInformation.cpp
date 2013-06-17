@@ -122,26 +122,9 @@ namespace Equations {
       this->mExplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 
-   void CouplingInformation::setGeneral(const int solverIndex, const bool isComplex, const int fieldStart)
+   void CouplingInformation::setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart)
    {
-      // Timestepping is required
-      if(solverIndex > 0)
-      {
-         this->mEquationType = PROGNOSTIC;
-         this->mSolverIndex = solverIndex - 1;
-
-      // Solver is required (but no time marching)
-      } else if(solverIndex < 0)
-      {
-         this->mEquationType = DIAGNOSTIC;
-         this->mSolverIndex = std::abs(solverIndex) - 1;
-
-      // No solver and no timestepping
-      } else
-      {
-         this->mEquationType = TRIVIAL;
-         this->mSolverIndex = 0;
-      }
+      this->mEquationType = typeId;
 
       this->mIsComplex = isComplex;
 
@@ -167,6 +150,11 @@ namespace Equations {
       this->mBlockNs = blockNs;
 
       this->mRhsCols = rhsCols;
+   }
+
+   void CouplingInformation::setSolverIndex(const int idx)
+   {
+      this->mSolverIndex = idx;
    }
 
    void CouplingInformation::setIndexType(const CouplingInformation::IndexType id)

@@ -45,29 +45,24 @@ namespace Equations {
          virtual ~RandomScalarState();
 
          /**
-          * @brief Compute the nonlinear interaction term
+          * @brief Compute the random state as a source term
           *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
+          * @param compId  ID of the spectral component
+          * @param iX      Index for the X direction
+          * @param iZ      Index for the Z direction
+          * @param iY      Index for the Y direction
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
-
-         /**
-          * @brief Initialise spectral equation matrices
-          *
-          * @param spBcIds   List of boundary condition IDs
-          */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
+         virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const;
 
          /**
           * @brief Set the unknown name and requirements
           */
          void setIdentity(const PhysicalNames::Id name);
+
+         /**
+          * @brief Set spectrum variables
+          */
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat xRatio, const MHDFloat yRatio, const MHDFloat zRatio);
 
       protected:
          /**
@@ -80,47 +75,35 @@ namespace Equations {
           */
          virtual void setCoupling();
 
-         /**
-          * @brief Set the quasi inverse matrix operator
-          */
-         virtual void setQuasiInverse(SparseMatrix &mat) const;
-
-         /**
-          * @brief Set the explicit linear matrix operator
-          */
-         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
-
       private:
+         /**
+          * @brief Minimum value in coefficient range
+          */
+         MHDFloat mMin;
+
+         /**
+          * @brief Maximum value in coefficient range
+          */
+         MHDFloat mMax;
+
+         /**
+          * @brief Ratio between first and last coefficient in X direction
+          */
+         MHDFloat mXRatio;
+
+         /**
+          * @brief Ratio between first and last coefficient in Y direction
+          */
+         MHDFloat mYRatio;
+
+         /**
+          * @brief Ratio between first and last coefficient in Z direction
+          */
+         MHDFloat mZRatio;
    };
 
    /// Typedef for a shared RandomScalarState
    typedef SharedPtrMacro<RandomScalarState> SharedRandomScalarState;
-
-   /**
-    * @brief Get the quasi-inverse matrix operator
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    */
-   void quasiInverseBlock(const RandomScalarState& eq, SparseMatrix& mat);
-
-   /**
-    * @brief Get the linear matrix block for an equation on given field
-    *
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param k       Wave number k
-    */
-   void linearBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
-
-   /**
-    * @brief Get the boundary condition matrix block for an equation on given field
-    *
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param k       Wave number k
-    */
-   void boundaryBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }

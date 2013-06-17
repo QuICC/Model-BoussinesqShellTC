@@ -50,6 +50,11 @@ namespace Equations {
       return MHDComplex();
    }
 
+   DecoupledZSparse  IEquation::operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const
+   {
+      throw Exception("operatorRow: dummy implementation was called!");
+   }
+
    void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
       // Apply quasi inverse
@@ -234,6 +239,26 @@ namespace Equations {
          eqField.block(eqStart, 0, rows, cols).real() += (*op)*linField.block(linStart, 0, rows, cols).real();
          eqField.block(eqStart, 0, rows, cols).imag() += (*op)*linField.block(linStart, 0, rows, cols).imag();
       }
+   }
+
+   void quasiInverseBlock(const IEquation& eq, SparseMatrix& mat)
+   {
+      throw Exception("quasiInverseBlock: dummy implementation called!");
+   }
+
+   void timeBlock(const IEquation& eq, DecoupledZSparse& mat, const MHDFloat k)
+   {
+      throw Exception("timeBlock: dummy implementation called!");
+   }
+
+   void linearBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   {
+      throw Exception("linearBlock: dummy implementation called!");
+   }
+
+   void boundaryBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   {
+      throw Exception("boundaryBlock: dummy implementation called!");
    }
 }
 }

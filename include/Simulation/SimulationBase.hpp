@@ -329,6 +329,16 @@ namespace GeoMHDiSCC {
          void sortEquations();
 
          /**
+          * @brief Identify the coupling among the equations to set solver indexes
+          *
+          * @param scalEq  Range of scalar equations
+          * @param vectEq  Range of vector equations
+          *
+          * \mhdBug This function needs to be cleaned up!
+          */
+         void identifyCoupling(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+
+         /**
           * @brief Setup the output files added by the model
           */
          void setupOutput();

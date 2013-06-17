@@ -172,11 +172,11 @@ namespace Equations {
          /**
           * @brief Set settings for all systems
           *
-          * @param solverIndex      Index of the solver
-          * @param isComplex        Complex flag of solver
-          * @param fieldStart       Start index of the filed
+          * @param typeId     Type of the solver
+          * @param isComplex  Complex flag of solver
+          * @param fieldStart Start index of the filed
           */
-         void setGeneral(const int solverIndex, const bool isComplex, const int fieldStart);
+         void setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart);
 
          /**
           * @brief Set nonlinear flags
@@ -208,6 +208,11 @@ namespace Equations {
           * @param id   Dimension type id of index
           */
          void setIndexType(const IndexType id);
+
+         /**
+          * @brief set the solver index
+          */
+         void setSolverIndex(const int idx);
 
          /**
           * @brief Get iterator to implicit fields

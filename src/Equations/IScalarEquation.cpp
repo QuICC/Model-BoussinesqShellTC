@@ -153,6 +153,23 @@ namespace Equations {
       }
    }
 
+   void IScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      // Make sure it is safe to do nothing
+      bool notsafe = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
+
+      CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+      notsafe = notsafe && (fRange.first == fRange.second);
+
+      if(notsafe)
+      {
+         throw Exception("initSpectralMatrices: dummy implementation was called!");
+      }
+   }
+
    void IScalarEquation::initSpectralMatrices1DPeriodic(const SharedSimulationBoundary spBcIds)
    {
       // Store the boundary condition list
@@ -235,7 +252,16 @@ namespace Equations {
             }
          }
       }
+   }
 
+   void IScalarEquation::setQuasiInverse(SparseMatrix &mat) const
+   {
+      throw Exception("setQuasiInverse: dummy implementation was called!");
+   }
+
+   void IScalarEquation::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   {
+      throw Exception("setExplicitLinearBlock: dummy implementation was called!");
    }
 
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)

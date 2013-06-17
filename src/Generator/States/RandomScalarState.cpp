@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RandomScalarState::RandomScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+      : IScalarEquation(spEqParams), mMin(-10), mMax(10), mXRatio(1e3), mYRatio(1e3), mZRatio(1e3)
    {
    }
 
@@ -43,9 +43,21 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void RandomScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat xRatio, const MHDFloat yRatio, const MHDFloat zRatio)
    {
-      this->initSpectralMatrices1DPeriodic(spBcIds);
+      if(max <= min || xRatio < 1 || yRatio < 1 || zRatio < 1)
+      {
+         throw Exception("Incompatible spectrum properties requested!");
+      }
+
+      // Set min and max range for values
+      this->mMin = min;
+      this->mMax = max;
+
+      // Set spectrum ratios
+      this->mXRatio = xRatio;
+      this->mYRatio = yRatio;
+      this->mZRatio = zRatio;
    }
 
    void RandomScalarState::setCoupling()
@@ -63,13 +75,13 @@ namespace Equations {
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
       // General setup: first complex solver, complex solver, start from m = 0
-      infoIt.first->second.setGeneral(0, false, 0);
+      infoIt.first->second.setGeneral(CouplingInformation::TRIVIAL, false, 0);
 
       // Set nonlinear flags: NO nonlinear term, NO quasi-inverse
       infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: has source term
-      infoIt.first->second.setSource(false);
+      infoIt.first->second.setSource(true);
 
       // 
       //  WARNING: the order is important as it determines the field index!
@@ -86,92 +98,40 @@ namespace Equations {
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
    }
 
-   void RandomScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   MHDComplex RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
-      assert(id == FieldComponents::Physical::SCALAR);
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      // Get X dimension
+      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      // Get Y dimension
+      int nY = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      // Get Z dimension
+      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      if(iX < nX-4 && iZ < nZ - 4 && iY < nY - 4)
+      {
+         // Compute scaling factors
+         MHDFloat aX = exp(-static_cast<MHDFloat>(iX)*log(this->mXRatio)/static_cast<MHDFloat>(nX));
+         MHDFloat aY = exp(-static_cast<MHDFloat>(iY)*log(this->mYRatio)/static_cast<MHDFloat>(nY));
+         MHDFloat aZ = exp(-static_cast<MHDFloat>(iZ)*log(this->mZRatio)/static_cast<MHDFloat>(nZ));
+
+         MHDComplex val;
+         val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+         val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+
+         return val*aX*aY*aZ;
+      } else
+      {
+         return MHDComplex(0,0);
+      }
    }
 
    void RandomScalarState::setRequirements()
    {
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
-   }
-
-   DecoupledZSparse RandomScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
-   {
-      if(opId == IEquation::LINEARROW)
-      {
-         return linearRow1DPeriodic(*this, compId, matIdx);
-      } else if(opId == IEquation::BOUNDARYROW)
-      {
-         return boundaryRow1DPeriodic(*this, compId, matIdx);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
-   void RandomScalarState::setQuasiInverse(SparseMatrix& mat) const
-   {
-      Equations::quasiInverseBlock(*this, mat);
-   }
-
-   void RandomScalarState::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
-   {
-      Equations::linearBlock(*this, mat, fieldId, k);
-   }
-
-   void quasiInverseBlock(const RandomScalarState& eq, SparseMatrix& mat)
-   {
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
-
-      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0), mat);
-
-      // Prune matrices for safety
-      mat.prune(1e-32);
-   }
-
-   void linearBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
-   {
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
-
-      // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
-
-      // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0), mat.first);
-
-      // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
-   }
-
-   void boundaryBlock(const RandomScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
-   {
-      int pX = 0;
-      int pZ = 0;
-
-      // Set boundary condition prefactors
-      MHDFloat cX = 1.0;
-      MHDFloat cZ = 1.0;
-
-      // Compute boundary block operator
-      boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

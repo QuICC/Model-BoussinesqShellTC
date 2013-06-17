@@ -63,8 +63,10 @@ namespace Equations {
 
          /**
           * @brief Generic operator row dispatcher
+          *
+          * It has only a dummy implementation and should never get called
           */
-         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const = 0;
+         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const; //= 0;
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -134,6 +136,27 @@ namespace Equations {
    void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx);
    void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx);
    void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx);
+
+   /**
+    * @brief Dummy implementation: This should never be called!
+    */
+   void quasiInverseBlock(const IEquation& eq, SparseMatrix& mat); //= 0;
+
+   /**
+    * @brief Dummy implementation: This should never be called!
+    */
+   void timeBlock(const IEquation& eq, DecoupledZSparse& mat, const MHDFloat k); //= 0;
+
+   /**
+    * @brief Dummy implementation: This should never be called!
+    */
+   void linearBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+
+   /**
+    * @brief Dummy implementation. This should never get called!
+    */
+   void boundaryBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+   
 }
 }
 

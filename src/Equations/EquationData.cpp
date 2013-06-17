@@ -162,5 +162,13 @@ namespace Equations {
    {
       return this->mRequirements.field(id);
    }
+
+   void EquationData::setSolverIndex(const FieldComponents::Spectral::Id compId, const int idx)
+   {
+      // Safety assert
+      assert(this->mCouplingInfos.count(compId) > 0);
+      
+      return this->mCouplingInfos.find(compId)->second.setSolverIndex(idx);
+   }
 }
 }

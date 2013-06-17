@@ -27,6 +27,8 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGTransport.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGVorticity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
+#include "Generator/States/ExactScalarState.hpp"
+#include "Generator/Visualizers/FieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -101,19 +103,24 @@ namespace GeoMHDiSCC {
    void BoussinesqBetaCylGModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
-      Equations::SharedRandomScalarState spState;
+      Equations::SharedRandomScalarState spRand;
+      // Shared pointer to equation
+      Equations::SharedExactScalarState spExact;
 
       // Add transport initial state generation equation
-      spState = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spState->setIdentity(PhysicalNames::TEMPERATURE);
+      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+      spRand->setIdentity(PhysicalNames::TEMPERATURE);
+      spRand->setSpectrum(-10,10, 1e4, 1e4, 1e4);
       
       // Add streamfunction initial state generation equation
-      spState = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spState->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spRand->setSpectrum(-10,10, 1e4, 1e4, 1e4);
       
       // Add vertical velocity initial state generation equation
-      spState = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spState->setIdentity(PhysicalNames::VELOCITYZ);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::VELOCITYZ);
+      spExact->setStateType(Equations::ExactScalarState::SINE);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -121,6 +128,48 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spGen->addOutputFile(spOut);
+   }
+
+   void BoussinesqBetaCylGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   {
+      // Shared pointer to basic field visualizer
+      Equations::SharedFieldVisualizer spField;
+
+      // Add transport field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      
+      // Add streamfunction field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VELOCITYZ);
+
+      // Add output file
+      IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spVis->addOutputFile(spOut);
+   }
+
+   void BoussinesqBetaCylGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   {
+      // Create and add initial state file to IO
+      IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
+
+      // Set expected fields
+      spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::STREAMFUNCTION);
+      spIn->expect(PhysicalNames::VELOCITYZ);
+
+      // Set simulation state
+      spVis->setInitialState(spIn);
    }
 
    void BoussinesqBetaCylGModel::addAsciiOutputFiles(SharedSimulation spSim)

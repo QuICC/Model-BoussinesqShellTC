@@ -29,6 +29,7 @@
 #include "IoTools/Formatter.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
    SimulationBase::SimulationBase()
@@ -561,23 +562,51 @@ namespace GeoMHDiSCC {
       // Sort scalar equations
       std::stable_sort(this->mScalarEquations.begin(), this->mScalarEquations.end(), sortScalarEquationType);
 
-      // Set the ranges for the different types
+      // Initialise scalar ranges: prognostic is full, the two other are empty
+      this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), this->mScalarEquations.end());
+      this->mScalarDiagnosticRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
+      this->mScalarTrivialRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
+
+      // Determine the ranges for the different types
       int group = 1;
       std::vector<Equations::SharedIScalarEquation>::iterator  scalEqIt;
       for(scalEqIt = this->mScalarEquations.begin(); scalEqIt != this->mScalarEquations.end(); ++scalEqIt)
       {
-         // Set time equation range
+         // Transition from prognostic to the two others
          if(group == 1 && computeScalarEquationType(*scalEqIt) > 1)
          {
-            this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), scalEqIt);
+            // No prognostic equation present
+            if(scalEqIt == this->mScalarEquations.begin())
+            {
+               this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
+            
+            // With prognostic equations present
+            } else
+            {
+               this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), scalEqIt);
+            }
+
+            // Transitions to diagnostic equations
+            if(computeScalarEquationType(*scalEqIt) == 2)
+            {
+               // Set diagnostic equation range
+               this->mScalarDiagnosticRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
+
+            // Transitions to trivial equations
+            } else
+            {
+               // Set trivial equation range
+               this->mScalarTrivialRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
+               break;
+            }
             group++;
          }
 
-         // Set solver and trivial equation ranges
-         if(group == 2 && computeScalarEquationType(*scalEqIt) > 2)
+         // Transition from diagnostic to trivial
+         if(group == 2 && computeScalarEquationType(*scalEqIt) == 3)
          {
-            // Set solver equation range
-            this->mScalarDiagnosticRange = std::make_pair(this->mScalarPrognosticRange.second, scalEqIt);
+            // Set diagnostic equation range
+            this->mScalarDiagnosticRange.second = scalEqIt;
 
             // Set trivial equation range
             this->mScalarTrivialRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
@@ -587,37 +616,54 @@ namespace GeoMHDiSCC {
          }
       }
 
-      if(this->mScalarPrognosticRange.first == this->mScalarPrognosticRange.second)
-      {
-         this->mScalarPrognosticRange.first = this->mScalarEquations.end();
-         this->mScalarPrognosticRange.second = this->mScalarEquations.end();
-      }
-
-      if(this->mScalarDiagnosticRange.first == this->mScalarDiagnosticRange.second)
-      {
-         this->mScalarDiagnosticRange.first = this->mScalarEquations.end();
-         this->mScalarDiagnosticRange.second = this->mScalarEquations.end();
-      }
-
       // Sort vector equations
       std::stable_sort(this->mVectorEquations.begin(), this->mVectorEquations.end(), sortVectorEquationType);
+
+      // Initialise vector ranges: prognostic is full, the two other are empty
+      this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), this->mVectorEquations.end());
+      this->mVectorDiagnosticRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
+      this->mVectorTrivialRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
 
       // Set the ranges for the different types
       group = 1;
       std::vector<Equations::SharedIVectorEquation>::iterator  vectEqIt;
       for(vectEqIt = this->mVectorEquations.begin(); vectEqIt != this->mVectorEquations.end(); ++vectEqIt)
       {
-         // Set time equation range
+         // Transition from prognostic to the two others
          if(group == 1 && computeVectorEquationType(*vectEqIt) > 1)
          {
-            this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), vectEqIt);
+            // No prognostic equation present
+            if(vectEqIt == this->mVectorEquations.begin())
+            {
+               this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
+            
+            // With prognostic equations present
+            } else
+            {
+               this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), vectEqIt);
+            }
+
+            // Transitions to diagnostic equations
+            if(computeVectorEquationType(*vectEqIt) == 2)
+            {
+               // Set diagnostic equation range
+               this->mVectorDiagnosticRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
+
+            // Transitions to trivial equations
+            } else
+            {
+               // Set trivial equation range
+               this->mVectorTrivialRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
+               break;
+            }
             group++;
          }
-         // Set solver and trivial equation ranges
-         if(group == 2 && computeVectorEquationType(*vectEqIt) > 2)
+
+         // Transition from diagnostic to trivial
+         if(group == 2 && computeVectorEquationType(*vectEqIt) == 3)
          {
-            // Set solver equation range
-            this->mVectorDiagnosticRange = std::make_pair(this->mVectorPrognosticRange.second, vectEqIt);
+            // Set diagnostic equation range
+            this->mVectorDiagnosticRange.second = vectEqIt;
 
             // Set trivial equation range
             this->mVectorTrivialRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
@@ -627,16 +673,345 @@ namespace GeoMHDiSCC {
          }
       }
 
-      if(this->mVectorPrognosticRange.first == this->mVectorPrognosticRange.second)
+      // Identifiy the solver indexes by analysing the coupling between the equations
+      DebuggerMacro_enter("identifyCoupling_Prognostic",1);
+      this->identifyCoupling(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      DebuggerMacro_leave("identifyCoupling_Prognostic",1);
+
+      DebuggerMacro_enter("identifyCoupling_Diagnostic",1);
+      this->identifyCoupling(this->mScalarDiagnosticRange, this->mVectorPrognosticRange);
+      DebuggerMacro_leave("identifyCoupling_Diagnostic",1);
+
+      DebuggerMacro_enter("identifyCoupling_Trivial",1);
+      this->identifyCoupling(this->mScalarTrivialRange, this->mVectorPrognosticRange);
+      DebuggerMacro_leave("identifyCoupling_Trivial",1);
+   }
+
+   void SimulationBase::identifyCoupling(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   {
+      // Iterators for scalar equations
+      std::vector<Equations::SharedIScalarEquation>::iterator  scalEqIt;
+      std::vector<Equations::SharedIScalarEquation>::iterator  doneSEqIt;
+
+      // Current solver indexes for real and complex solvers
+      int dIdx = 0;
+      int zIdx = 0;
+
+      // Coupling flag
+      bool coupled = false;
+
+      // Field identification
+      FieldComponents::Spectral::Id compId = FieldComponents::Spectral::SCALAR;
+      SpectralFieldId   fieldId;
+      
+      // Loop over the scalar equations
+      for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; ++scalEqIt)
       {
-         this->mVectorPrognosticRange.first = this->mVectorEquations.end();
-         this->mVectorPrognosticRange.second = this->mVectorEquations.end();
+         // Build field identity
+         fieldId = std::make_pair((*scalEqIt)->name(), compId);
+
+         // Loop over already identified equations
+         for(doneSEqIt = scalEq.first; doneSEqIt != scalEqIt; ++doneSEqIt)
+         {
+            // loop over the implicit range
+            Equations::CouplingInformation::FieldId_iterator fIt;
+            Equations::CouplingInformation::FieldId_range fRange = (*doneSEqIt)->couplingInfo(compId).implicitRange();
+            for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+            {
+               // Check if field is in implicit range
+               if(*fIt == fieldId)
+               {
+                  // Set the solver index
+                  (*scalEqIt)->setSolverIndex(compId, (*doneSEqIt)->couplingInfo(compId).solverIndex());
+                  
+                  // Debug statements
+                  DebuggerMacro_showValue("Identified coupled scalar solver: ", 2, (*scalEqIt)->name());
+                  DebuggerMacro_showValue("---> solver index: ", 2, (*scalEqIt)->couplingInfo(compId).solverIndex());
+                  DebuggerMacro_showValue("---> is complex? ", 2, (*scalEqIt)->couplingInfo(compId).isComplex());
+                  
+                  // Set coupling flag and break out
+                  coupled = true;
+                  break;
+               }
+            }
+
+            // Break out of loop if already identified
+            if(coupled)
+            {
+               break;
+            }
+         }
+
+         // All checked and equation is not coupled
+         if(!coupled)
+         {
+            // Set solver index for complex equation
+            if((*scalEqIt)->couplingInfo(compId).isComplex())
+            {
+               // Set complex solver index
+               (*scalEqIt)->setSolverIndex(compId, zIdx);
+
+               // Increment complex solver index
+               zIdx++;
+
+            // Set solver index for real equation
+            } else
+            {
+               // Set real solver index
+               (*scalEqIt)->setSolverIndex(compId, dIdx);
+               
+               // Increment real solver index
+               dIdx++;
+            }
+
+            // Debug statements
+            DebuggerMacro_showValue("Identified first scalar solver: ", 2, (*scalEqIt)->name());
+            DebuggerMacro_showValue("---> solver index: ", 2, (*scalEqIt)->couplingInfo(compId).solverIndex());
+            DebuggerMacro_showValue("---> is complex? ", 2, (*scalEqIt)->couplingInfo(compId).isComplex());
+         }
+
+         // Reset coupling flag
+         coupled = false;
       }
 
-      if(this->mVectorDiagnosticRange.first == this->mVectorDiagnosticRange.second)
+      // Iterators for vector equations
+      std::vector<Equations::SharedIVectorEquation>::iterator  vectEqIt;
+      std::vector<Equations::SharedIVectorEquation>::iterator  doneVEqIt;
+      
+      // Loop over the vector equations
+      bool coupledOne = false;
+      bool coupledTwo = false;
+      for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; ++vectEqIt)
       {
-         this->mVectorDiagnosticRange.first = this->mVectorEquations.end();
-         this->mVectorDiagnosticRange.second = this->mVectorEquations.end();
+         // Loop over the (identified) scalar equations
+         for(doneSEqIt = scalEq.first; doneSEqIt != scalEq.second; ++doneSEqIt)
+         {
+            // loop over the implicit range
+            Equations::CouplingInformation::FieldId_iterator fIt;
+            Equations::CouplingInformation::FieldId_range fRange = (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
+            for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+            {
+               // Check if field's first component is in implicit range
+               compId = FieldComponents::Spectral::ONE;
+               if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+               {
+                  // Set the solver index
+                  (*vectEqIt)->setSolverIndex(compId, (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
+                  
+                  // Debug statements
+                  DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                  DebuggerMacro_showValue("---> component: ", 2, compId);
+                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+                  
+                  // Set coupling flag and break out
+                  coupledOne = true;
+               }
+
+               // Check if field's second component is in implicit range
+               compId = FieldComponents::Spectral::TWO;
+               if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+               {
+                  // Set the solver index
+                  (*vectEqIt)->setSolverIndex(compId, (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
+                  
+                  // Debug statements
+                  DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                  DebuggerMacro_showValue("---> component: ", 2, compId);
+                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+                  
+                  // Set coupling flag and break out
+                  coupledTwo = true;
+               }
+
+               // Break out of loop if already identified
+               if(coupledOne && coupledTwo)
+               {
+                  break;
+               }
+            }
+
+            // Break out of loop if already identified
+            if(coupledOne && coupledTwo)
+            {
+               break;
+            }
+         }
+
+         if(!coupledOne || !coupledTwo)
+         {
+            // Loop over the (identified) vector equations
+            for(doneVEqIt = vectEq.first; doneVEqIt != vectEqIt; ++doneVEqIt)
+            {
+               // loop over the implicit range of first component
+               FieldComponents::Spectral::Id doneId = FieldComponents::Spectral::ONE;
+               Equations::CouplingInformation::FieldId_iterator fIt;
+               Equations::CouplingInformation::FieldId_range fRange = (*doneVEqIt)->couplingInfo(doneId).implicitRange();
+               for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+               {
+                  // Check if field's first component is in implicit range
+                  compId = FieldComponents::Spectral::ONE;
+                  if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, compId);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+
+                     // Set coupling flag and break out
+                     coupledOne = true;
+                  }
+
+                  // Check if field's first component is in implicit range
+                  compId = FieldComponents::Spectral::TWO;
+                  if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, compId);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+
+                     // Set coupling flag and break out
+                     coupledTwo = true;
+                  }
+
+                  // Break out of loop if already identified
+                  if(coupledOne && coupledTwo)
+                  {
+                     break;
+                  }
+               }
+
+               // loop over the implicit range of second component
+               doneId = FieldComponents::Spectral::TWO;
+               fRange = (*doneVEqIt)->couplingInfo(doneId).implicitRange();
+               for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+               {
+                  // Check if field's first component is in implicit range
+                  compId = FieldComponents::Spectral::ONE;
+                  if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, compId);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+
+                     // Set coupling flag and break out
+                     coupledOne = true;
+                  }
+
+                  // Check if field's first component is in implicit range
+                  compId = FieldComponents::Spectral::TWO;
+                  if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
+
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, compId);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+
+                     // Set coupling flag and break out
+                     coupledTwo = true;
+                  }
+
+                  // Break out of loop if already identified
+                  if(coupledOne && coupledTwo)
+                  {
+                     break;
+                  }
+               }
+
+               // Break out of loop if already identified
+               if(coupledOne && coupledTwo)
+               {
+                  break;
+               }
+            }
+         }
+
+         // All checked and equation is not coupled
+         if(!coupledOne || !coupledTwo)
+         {
+            if(!coupledOne)
+            {
+               compId = FieldComponents::Spectral::ONE;
+
+               // Set solver index for complex equation
+               if((*vectEqIt)->couplingInfo(compId).isComplex())
+               {
+                  // Set complex solver index
+                  (*vectEqIt)->setSolverIndex(compId, zIdx);
+
+                  // Increment complex solver index
+                  zIdx++;
+
+               // Set solver index for real equation
+               } else
+               {
+                  // Set real solver index
+                  (*vectEqIt)->setSolverIndex(compId, dIdx);
+
+                  // Increment real solver index
+                  dIdx++;
+               }
+
+               // Debug statements
+               DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
+               DebuggerMacro_showValue("---> component: ", 2, compId);
+               DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+               DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+            }
+
+            if(!coupledTwo)
+            {
+               compId = FieldComponents::Spectral::TWO;
+
+               // Set solver index for complex equation
+               if((*vectEqIt)->couplingInfo(compId).isComplex())
+               {
+                  // Set complex solver index
+                  (*vectEqIt)->setSolverIndex(compId, zIdx);
+
+                  // Increment complex solver index
+                  zIdx++;
+
+               // Set solver index for real equation
+               } else
+               {
+                  // Set real solver index
+                  (*vectEqIt)->setSolverIndex(compId, dIdx);
+
+                  // Increment real solver index
+                  dIdx++;
+               }
+
+               // Debug statements
+               DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
+               DebuggerMacro_showValue("---> component: ", 2, compId);
+               DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
+               DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+            }
+         }
+
+         // Reset coupling flag
+         coupledOne = false;
+         coupledTwo = false;
       }
    }
 

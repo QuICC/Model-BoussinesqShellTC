@@ -30,6 +30,9 @@ foreach(ModelFile ${PhysicalModels})
    set_target_properties(${ModelName} PROPERTIES OUTPUT_NAME ${ModelName}
       COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
+   # Show message
+   message(STATUS " --> Added ${ModelName} executable")
+
    # Create list of source files
    set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
@@ -39,6 +42,9 @@ foreach(ModelFile ${PhysicalModels})
    # Set special properties of target
    set_target_properties(${ModelName}Config PROPERTIES OUTPUT_NAME
       ${ModelName}Config COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+
+   # Show message
+   message(STATUS " --> Added ${ModelName}Config executable")
 
    # Create list of source files
    set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
@@ -51,5 +57,18 @@ foreach(ModelFile ${PhysicalModels})
       ${ModelName}State COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Show message
-   message(STATUS " --> Added ${ModelName}Config executable")
+   message(STATUS " --> Added ${ModelName}State executable")
+
+   # Create list of source files
+   set(SrcsList VisualizeState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
+
+   # Add executable to target list
+   add_executable(${ModelName}Visu ${SrcsList})
+
+   # Set special properties of target
+   set_target_properties(${ModelName}Visu PROPERTIES OUTPUT_NAME
+      ${ModelName}Visu COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+
+   # Show message
+   message(STATUS " --> Added ${ModelName}Visu executable")
 endforeach(ModelFile)

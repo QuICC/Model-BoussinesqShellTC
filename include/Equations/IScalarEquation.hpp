@@ -79,6 +79,15 @@ namespace Equations {
           */
          void storeSolution(FieldComponents::Spectral::Id compId, const DecoupledZMatrix& storage, const int matIdx, const int start);
          void storeSolution(FieldComponents::Spectral::Id compId, const MatrixZ& storage, const int matIdx, const int start);
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * It has only a semi-dummy implementation
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
          
       protected:
          /**
@@ -96,13 +105,15 @@ namespace Equations {
       private:
          /**
           * @brief Set the quasi inverse matrix operator
+          *
+          * It has only a dummy implementation and should never get called!
           */
-         virtual void setQuasiInverse(SparseMatrix &mat) const = 0;
+         virtual void setQuasiInverse(SparseMatrix &mat) const; //= 0;
 
          /**
           * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const = 0;
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const; //= 0;
 
          /**
           * @brief Storage for the shared scalar variable

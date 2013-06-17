@@ -22,6 +22,20 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
+   Array ChebyshevFftwTransform::generateGrid(const int size)
+   {
+      // Initialise grid storage
+      Array grid(size);
+
+      // Create Chebyshev grid
+      for(int k = 0; k < size; k++)
+      {
+         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
+      }
+
+      return grid;
+   }
+
    ChebyshevFftwTransform::ChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
@@ -50,18 +64,7 @@ namespace Transform {
 
    Array ChebyshevFftwTransform::meshGrid() const
    {
-      int gridSize = this->mspSetup->fwdSize();
-
-      // Initialise grid storage
-      Array grid(gridSize);
-
-      // Create Chebyshev grid
-      for(int k = 0; k < gridSize; k++)
-      {
-         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(gridSize));
-      }
-
-      return grid;
+      return ChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize());
    }
 
    void ChebyshevFftwTransform::initFft()

@@ -58,7 +58,7 @@ namespace Equations {
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
       // General setup: first complex solver, complex solver, start from m = 0
-      infoIt.first->second.setGeneral(1, true, 0);
+      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // set nonlinear flags: has nonlinear term, has quasi-inverse
       infoIt.first->second.setNonlinear(true, true);

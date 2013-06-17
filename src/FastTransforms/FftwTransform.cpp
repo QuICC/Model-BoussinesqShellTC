@@ -22,6 +22,20 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
+   Array FftwTransform::generateGrid(const int size)
+   {
+      // Initialise grid storage
+      Array grid(size);
+
+      // Create equispaced FFT grid
+      for(int k = 0; k < size; k++)
+      {
+         grid(k) = 2.0*MathConstants::PI*static_cast<MHDFloat>(k)/static_cast<MHDFloat>(size);
+      }
+
+      return grid;
+   }
+
    FftwTransform::FftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
@@ -50,18 +64,7 @@ namespace Transform {
 
    Array FftwTransform::meshGrid() const
    {
-      int gridSize = this->mspSetup->fwdSize();
-
-      // Initialise grid storage
-      Array grid(gridSize);
-
-      // Create equispaced FFT grid
-      for(int k = 0; k < gridSize; k++)
-      {
-         grid(k) = 2.0*MathConstants::PI*static_cast<MHDFloat>(k)/static_cast<MHDFloat>(gridSize);
-      }
-
-      return grid;
+      return FftwTransform::generateGrid(this->mspSetup->fwdSize());
    }
 
    void FftwTransform::initFft()

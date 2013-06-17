@@ -1,9 +1,9 @@
-/** \file StateGenerator.hpp
- *  \brief High level implementation of a general state generator
+/** \file VisualizationGenerator.hpp
+ *  \brief High level implementation of a general visualization file generator
  */
 
-#ifndef STATEGENERATOR_HPP
-#define STATEGENERATOR_HPP
+#ifndef VISUALIZATIONGENERATOR_HPP
+#define VISUALIZATIONGENERATOR_HPP
 
 // Configuration includes
 //
@@ -22,20 +22,20 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief High level implementation of a general state generator
+    * @brief High level implementation of a general visualization file generator
     */
-   class StateGenerator: public SimulationBase
+   class VisualizationGenerator: public SimulationBase
    {
       public:
          /**
           * @brief Constructor
           */
-         StateGenerator();
+         VisualizationGenerator();
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~StateGenerator();
+         virtual ~VisualizationGenerator();
 
       protected:
 
@@ -66,9 +66,9 @@ namespace GeoMHDiSCC {
          void writeOutput();
    };
 
-   /// Typedef for a shared pointer of a StateGenerator
-   typedef SharedPtrMacro<StateGenerator> SharedStateGenerator;
+   /// Typedef for a shared pointer of a VisualizationGenerator
+   typedef SharedPtrMacro<VisualizationGenerator> SharedVisualizationGenerator;
 
 }
 
-#endif // STATEGENERATOR_HPP
+#endif // VISUALIZATIONGENERATOR_HPP
