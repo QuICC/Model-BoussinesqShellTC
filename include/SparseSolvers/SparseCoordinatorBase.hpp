@@ -121,11 +121,6 @@ namespace Solver {
          void getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
-          * @brief Solve all the linear systems
-          */
-         void solveSystems();
-
-         /**
           * @brief Update equation unkowns with solver output 
           *
           * @param scalEq Shared scalar equations

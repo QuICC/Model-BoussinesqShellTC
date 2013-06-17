@@ -52,7 +52,7 @@ namespace Solver {
       // Create real/complex solvers
       //
 
-      DebuggerMacro_start("Create trivial solvers", 0);
+      DebuggerMacro_start("Trivial: create solvers", 2);
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
@@ -71,13 +71,13 @@ namespace Solver {
          // Get type information for the solvers for the first component
          this->createSolver((*vectEqIt), FieldComponents::Spectral::TWO);
       }
-      DebuggerMacro_stop("Create trivial solvers t = ", 0);
+      DebuggerMacro_stop("Trivial: create solvers t = ", 2);
 
       //
-      // Create the timestep matrices
+      // Initialise the solver storage
       //
 
-      DebuggerMacro_start("Create solver storage", 0);
+      DebuggerMacro_start("Trivial: create storage", 2);
       // Loop over all substeps of timestepper
       for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
       {
@@ -98,7 +98,7 @@ namespace Solver {
             this->createStorage((*vectEqIt), FieldComponents::Spectral::TWO);
          }
       }
-      DebuggerMacro_stop("Create solver storage t = ", 0);
+      DebuggerMacro_stop("Trivial: create storage t = ", 2);
 
       //
       // Initialise the solvers initial state

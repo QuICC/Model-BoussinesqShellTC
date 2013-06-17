@@ -69,7 +69,7 @@ namespace Equations {
       infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: has source term
-      infoIt.first->second.setSource(true);
+      infoIt.first->second.setSource(false);
 
       // 
       //  WARNING: the order is important as it determines the field index!
