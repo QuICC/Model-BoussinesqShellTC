@@ -1,9 +1,9 @@
-/** \file BoussinesqBetaSphGStreamfunction.hpp
- *  \brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
+/** \file AnelasticBetaCylGVorticity.hpp
+ *  \brief Implementation of the voriticity computation for the Anelastic beta model with cylindrical gravity
  */
 
-#ifndef BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
-#define BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
+#ifndef ANELASTICBETACYLGVORTICITY_HPP
+#define ANELASTICBETACYLGVORTICITY_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
+    * \brief Implementation of the voriticity computation for the Anelastic beta model with cylindrical gravity
     */
-   class BoussinesqBetaSphGStreamfunction: public IScalarEquation
+   class AnelasticBetaCylGVorticity: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqBetaSphGStreamfunction(SharedEquationParameters spEqParams);
+         AnelasticBetaCylGVorticity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaSphGStreamfunction();
+         virtual ~AnelasticBetaCylGVorticity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -88,46 +88,16 @@ namespace Equations {
    };
 
    /**
-    * @brief Get the quasi-inverse matrix operator
+    * @brief Get the linear matrix block on given field
     *
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
-    */
-   void quasiInverseBlock(const BoussinesqBetaSphGStreamfunction& eq, SparseMatrix& mat);
-
-   /**
-    * @brief Get the time matrix block for an equation
-    *
-    * @param mat     Storage for output matrix
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
-    * @param k       Wave number k
-    */
-   void timeBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
-
-   /**
-    * @brief Get the linear matrix block for an equation on given field
-    *
-    * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
-
-   /**
-    * @brief Get the boundary condition matrix block for an equation on given field
-    *
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param nX      Matrix size in X
-    * @param nZ      Matrix size in Z
-    * @param k       Wave number k
-    */
-   void boundaryBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void linearBlock(const AnelasticBetaCylGVorticity& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }
 
-#endif // BOUSSINESQBETASPHGSTREAMFUNCTION_HPP
+#endif // ANELASTICBETACYLGVORTICITY_HPP

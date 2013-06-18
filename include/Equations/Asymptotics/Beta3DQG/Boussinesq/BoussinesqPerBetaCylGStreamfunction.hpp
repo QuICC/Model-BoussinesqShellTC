@@ -1,4 +1,4 @@
-/** \file BoussinesqPerBetaCylGStreamfunction.hpp
+/** \file BoussinesqPerPerBetaCylGStreamfunction.hpp
  *  \brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity with periodic radius
  */
 
@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/IBoussinesqPerBetaCylGScalarEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity with periodic radius
     */
-   class BoussinesqPerBetaCylGStreamfunction: public IBoussinesqPerBetaCylGScalarEquation
+   class BoussinesqPerPerBetaCylGStreamfunction: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqPerBetaCylGStreamfunction(SharedEquationParameters spEqParams);
+         BoussinesqPerPerBetaCylGStreamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqPerBetaCylGStreamfunction();
+         virtual ~BoussinesqPerPerBetaCylGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -55,6 +55,13 @@ namespace Equations {
           * @brief Generic operator row dispatcher
           */
          virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
          
       protected:
          /**
@@ -67,8 +74,26 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(SparseMatrix &mat) const;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+
       private:
    };
+
+   /**
+    * @brief Get the quasi-inverse matrix operator
+    *
+    * @param eq      Equation to work on
+    * @param mat     Storage for output matrix
+    */
+   void quasiInverseBlock(const BoussinesqPerBetaCylGStreamfunction& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block for an equation
@@ -78,7 +103,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
+   void timeBlock(const BoussinesqPerBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block for an equation on given field
@@ -89,7 +114,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void linearBlock(const BoussinesqPerBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field
@@ -100,7 +125,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void boundaryBlock(const BoussinesqPerBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
 }
 }

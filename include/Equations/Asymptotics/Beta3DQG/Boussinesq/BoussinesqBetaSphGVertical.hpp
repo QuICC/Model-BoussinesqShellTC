@@ -19,7 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/IBoussinesqBetaSphGScalarEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +28,7 @@ namespace Equations {
    /**
     * \brief Implementation of the vertical velocity equation for the Boussinesq beta model with spherical gravity
     */
-   class BoussinesqBetaSphGVertical: public IBoussinesqBetaSphGScalarEquation
+   class BoussinesqBetaSphGVertical: public IScalarEquation
    {
       public:
          /**
@@ -55,6 +55,13 @@ namespace Equations {
           * @brief Generic operator row dispatcher
           */
          virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
          
       protected:
          /**
@@ -67,8 +74,27 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(SparseMatrix &mat) const;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+
       private:
    };
+
+   /**
+    * @brief Get the quasi-inverse matrix operator
+    *
+    * @param eq      Equation to work on
+    * @param mat     Storage for output matrix
+    * @param eqId    Physical ID of the equation
+    */
+   void quasiInverseBlock(const BoussinesqBetaSphGTransport& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block for an equation
@@ -78,7 +104,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
+   void timeBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block for an equation on given field
@@ -89,7 +115,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void linearBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field
@@ -100,7 +126,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void boundaryBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
 }
 }
