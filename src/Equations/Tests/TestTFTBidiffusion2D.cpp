@@ -126,7 +126,7 @@ namespace Equations {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      // Setup 3D diffusion
+      // Setup 2D bi-diffusion
       if(fieldId.first == eq.name())
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
