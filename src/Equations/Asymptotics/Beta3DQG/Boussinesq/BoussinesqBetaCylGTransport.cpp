@@ -61,7 +61,8 @@ namespace Equations {
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, false, 0);
 
       // Set nonlinear flags: has nonlinear term, has quasi-inverse
-      infoIt.first->second.setNonlinear(true, true);
+//infoIt.first->second.setNonlinear(true, true);
+infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
@@ -102,10 +103,12 @@ namespace Equations {
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
+//this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
+this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+//this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
    }
 
    DecoupledZSparse BoussinesqBetaCylGTransport::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const

@@ -97,7 +97,7 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::BoussinesqBetaCylGVertical>();
       
       // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBetaCylGVorticity>();
+//spSim->addScalarEquation<Equations::BoussinesqBetaCylGVorticity>();
    }
 
    void BoussinesqBetaCylGModel::addStates(SharedStateGenerator spGen)

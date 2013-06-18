@@ -61,7 +61,8 @@ namespace Equations {
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // set nonlinear flags: has nonlinear term, has quasi-inverse
-      infoIt.first->second.setNonlinear(true, true);
+//infoIt.first->second.setNonlinear(true, true);
+infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
@@ -72,6 +73,7 @@ namespace Equations {
 
       // Equation is coupled to streamfunction equation (self)
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+
       // Equation is coupled to vertical velocity equation
       infoIt.first->second.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR, false);
 
@@ -104,13 +106,15 @@ namespace Equations {
       this->setName(PhysicalNames::STREAMFUNCTION);
 
       // Set streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
+//this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
+this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, true));
+//this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, true));
 
       // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
+//this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, true));
+this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, false));
    }
 
    DecoupledZSparse BoussinesqBetaCylGStreamfunction::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
@@ -243,13 +247,31 @@ namespace Equations {
       MHDFloat Gamma = eq.eqParams().nd(NonDimensional::GAMMA);
       MHDFloat chi = eq.eqParams().nd(NonDimensional::CHI);
 
-      /// <b>Boundary operators for the streamfunction equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$ and \f$\left(D_x^{-4} \otimes BC_Z\right)\f$
-      int pX = 4;
+      int pX = 1;
       int pZ = 0;
 
-      // Set boundary condition prefactors
-      MHDFloat cX = 1.0;
-      MHDFloat cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
+      MHDFloat cX;
+      MHDFloat cZ;
+
+      // Boundary condition for the streamfunction equation
+      if(fieldId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         // Set boundary condition prefactors
+         cX = 1.0;
+         cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
+
+      // Boundary condition for the vertical velocity equation
+      } else if(fieldId.first == PhysicalNames::VELOCITYZ)
+      {
+         // Set boundary condition prefactors
+         cX = 1.0;
+         cZ = 1.0;
+
+      // Unknown field
+      } else
+      {
+         throw Exception("Unknown field ID for linear operator!");
+      }
 
       // Compute boundary block operator
       boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);
