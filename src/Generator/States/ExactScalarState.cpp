@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ExactScalarState::ExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT), mSineA(2), mSineN(2)
    {
    }
 
@@ -47,6 +47,15 @@ namespace Equations {
    void ExactScalarState::setStateType(const ExactScalarState::StateTypeId id)
    {
       this->mTypeId = id;
+   }
+
+   void ExactScalarState::setSineOptions(const MHDFloat aX, const MHDFloat kX, const MHDFloat aZ, const MHDFloat kZ)
+   {
+      this->mSineA(0) = aX;
+      this->mSineA(1) = aZ;
+
+      this->mSineN(0) = kX;
+      this->mSineN(1) = kZ;
    }
 
    void ExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
@@ -77,12 +86,8 @@ namespace Equations {
       // Set source flags: has source term
       infoIt.first->second.setSource(false);
 
-      // 
-      //  WARNING: the order is important as it determines the field index!
-      //
-
       // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
@@ -90,6 +95,9 @@ namespace Equations {
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+
+      // Sort implicit fields
+      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
    void ExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
@@ -114,11 +122,12 @@ namespace Equations {
          {
             for(int iY = 0; iY < nY; ++iY)
             {
-               MHDFloat n = 1;
-               Array sinZ = (n*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
-               Array sinX = (n*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
+               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
+               Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
+               //MHDFloat yVal = std::cos(yGrid(iY));
+               MHDFloat yVal = 1.0;
 
-               rNLComp.setProfile(sinZ*sinX(iX),iY,iX);
+               rNLComp.setProfile(sinZ*sinX(iX)*yVal,iY,iX);
             }
          }
       } else

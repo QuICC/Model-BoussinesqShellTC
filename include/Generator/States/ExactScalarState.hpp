@@ -92,6 +92,16 @@ namespace Equations {
           */
          void setStateType(const ExactScalarState::StateTypeId id);
 
+         /**
+          * @brief Set the options for the sine state
+          *
+          * @param aX   Amplitude of the sine in X direction
+          * @param kX   Wave number of the sine in X direction
+          * @param aZ   Amplitude of the sine in Z direction
+          * @param kZ   Wave number of the sine in Z direction
+          */
+         void setSineOptions(const MHDFloat aX, const MHDFloat kX, const MHDFloat aZ, const MHDFloat kZ);
+
       protected:
          /**
           * @brief Set variable requirements
@@ -118,6 +128,16 @@ namespace Equations {
           * @brief Type of the state to generate
           */
          StateTypeId mTypeId;
+
+         /**
+          * @brief Amplitude of the sine state
+          */
+         Array mSineA;
+
+         /**
+          * @brief Wave number of the sine state
+          */
+         Array mSineN;
    };
 
    /// Typedef for a shared ExactScalarState

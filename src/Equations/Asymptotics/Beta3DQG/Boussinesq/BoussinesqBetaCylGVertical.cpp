@@ -61,20 +61,18 @@ namespace Equations {
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // set nonlinear flags: has nonlinear term, has quasi-inverse
-//infoIt.first->second.setNonlinear(true, true);
-infoIt.first->second.setNonlinear(false, false);
+      infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
-      // 
-      //  WARNING: the order is important as it determines the field index!
-      //
+      // Equation is coupled to vertical velocity equation (self)
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Equation is coupled to streamfunction equation
-      infoIt.first->second.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR, false);
-      // Equation is coupled to vertical velocity equation (self)
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+
+      infoIt.first->second.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
@@ -82,6 +80,9 @@ infoIt.first->second.setNonlinear(false, false);
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+
+      // Sort implicit fields
+      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
    void BoussinesqBetaCylGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -102,12 +103,10 @@ infoIt.first->second.setNonlinear(false, false);
       this->setName(PhysicalNames::VELOCITYZ);
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-//this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
-this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-//this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
-this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
    }
 
    DecoupledZSparse BoussinesqBetaCylGVertical::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
@@ -239,24 +238,31 @@ this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(tru
       MHDFloat cX;
       MHDFloat cZ;
 
-      // Boundary condition for the streamfunction equation
+      // Boundary condition for the streamfunction
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
-      // Set boundary condition prefactors
-      cX = 1.0;
-      cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
+         // Set boundary condition prefactors
+         cX = 1.0;
+         cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
 
-      // Boundary condition for the vertical velocity equation
+      // Boundary condition for the vertical velocity
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
-      // Set boundary condition prefactors
-      cX = 1.0;
-      cZ = 1.0;
+         // Set boundary condition prefactors
+         cX = 1.0;
+         cZ = 1.0;
+
+      // Boundary condition for the temperature
+      } else if(fieldId.first == PhysicalNames::TEMPERATURE)
+      {
+         // Set boundary condition prefactors
+         cX = 0.0;
+         cZ = 0.0;
 
       // Unknown field
       } else
       {
-         throw Exception("Unknown field ID for linear operator!");
+         throw Exception("Unknown field ID for boundary operator!");
       }
 
       // Compute boundary block operator

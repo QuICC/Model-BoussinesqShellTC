@@ -11,6 +11,7 @@
 
 // System includes
 //
+#include <set>
 
 // External includes
 //
@@ -157,9 +158,8 @@ namespace Equations {
           *
           * @param fieldId Physical ID of the field
           * @param compId  Physical ID of the component
-          * @param isSelf  Is field equation field?
           */
-         void addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf);
+         void addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
 
          /**
           * @brief Add field to list of explicit timestep fields
@@ -168,6 +168,14 @@ namespace Equations {
           * @param compId  Physical ID of the component
           */
          void addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
+
+         /**
+          * @brief Sort the list of implicit fields and set field index accordingly
+          *
+          * @param fieldId Physical ID of the field
+          * @param compId  Physical ID of the component
+          */
+         void sortImplicitFields(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
 
          /**
           * @brief Set settings for all systems
@@ -231,6 +239,10 @@ namespace Equations {
           * @brief Storage for the implicit fields information
           */
          std::vector<SpectralFieldId>   mImplicitFields;
+         /**
+          * @brief Storage for the implicit fields information
+          */
+         std::multiset<SpectralFieldId>   mImplicitFieldsB;
 
          /**
           * @brief Storage for the explicit fields information

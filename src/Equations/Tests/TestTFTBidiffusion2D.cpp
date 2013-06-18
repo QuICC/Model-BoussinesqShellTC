@@ -1,5 +1,5 @@
-/** \file TestTFTDiffusion3D.cpp
- *  \brief Source of the implementation of the TFT test equation for 3D diffusion
+/** \file TestTFTBidiffusion2D.cpp
+ *  \brief Source of the implementation of the TFT test equation for 2D bi-diffusion (bilaplacian)
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Equations/Tests/TestTFTDiffusion3D.hpp"
+#include "Equations/Tests/TestTFTBidiffusion2D.hpp"
 
 // Project includes
 //
@@ -26,16 +26,16 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestTFTDiffusion3D::TestTFTDiffusion3D(SharedEquationParameters spEqParams)
+   TestTFTBidiffusion2D::TestTFTBidiffusion2D(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
    }
 
-   TestTFTDiffusion3D::~TestTFTDiffusion3D()
+   TestTFTBidiffusion2D::~TestTFTBidiffusion2D()
    {
    }
 
-   void TestTFTDiffusion3D::setIdentity(const PhysicalNames::Id name)
+   void TestTFTBidiffusion2D::setIdentity(const PhysicalNames::Id name)
    {
       // Set the name
       this->setName(name);
@@ -44,12 +44,12 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void TestTFTDiffusion3D::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   void TestTFTBidiffusion2D::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
       this->initSpectralMatrices1DPeriodic(spBcIds);
    }
 
-   void TestTFTDiffusion3D::setCoupling()
+   void TestTFTBidiffusion2D::setCoupling()
    {
       // Get X dimension
       int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -86,13 +86,13 @@ namespace Equations {
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
-   void TestTFTDiffusion3D::setRequirements()
+   void TestTFTBidiffusion2D::setRequirements()
    {
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
-   DecoupledZSparse TestTFTDiffusion3D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse TestTFTBidiffusion2D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::TIMEROW)
       { 
@@ -109,7 +109,7 @@ namespace Equations {
       }
    }
 
-   void linearBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const TestTFTBidiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -130,7 +130,7 @@ namespace Equations {
       if(fieldId.first == eq.name())
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.first = Spectral::PeriodicOperator::qLaplacian3D(spec1D, spec3D, k_, 2, 2);
+         Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4), mat.first);
 
       // Unknown field
       } else
@@ -143,7 +143,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void timeBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const TestTFTBidiffusion2D& eq, DecoupledZSparse& mat, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -158,21 +158,21 @@ namespace Equations {
       mat.second.resize(nX*nZ,nX*nZ);
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.qDiff(2,0), spec1D.qDiff(2,0), mat.first);
+      Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(4,0), mat.first);
 
       // Prune matrices for safety
       mat.first.prune(1e-32);
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const TestTFTBidiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       int pX = 0;
-      int pZ = 1;
+      int pZ = 0;
 
       // Set boundary condition prefactors
       MHDFloat cX = 1.0;
-      MHDFloat cZ = 1.0;
+      MHDFloat cZ = 0.0;
 
       // Compute boundary block operator
       boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);

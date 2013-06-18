@@ -53,7 +53,7 @@ namespace Diagnostics {
       // Required wrapper is not implemented
       } else
       {
-         throw Exception("Unknown velocity wrapper is required!");
+         throw Exception("Unknown velocity wrapper is required or need to switch to fixed timestep!");
       }
 
       // Prepare mesh if CFL computation is required

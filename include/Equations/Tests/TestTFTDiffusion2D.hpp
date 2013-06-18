@@ -1,9 +1,9 @@
-/** \file TestTFTDiffusion3D.hpp
- *  \brief Implementation of the TFT test equation for 3D diffusion
+/** \file TestTFTDiffusion2D.hpp
+ *  \brief Implementation of the TFT test equation for 2D diffusion (within 3D model)
  */
 
-#ifndef TESTTFTDIFFUSION3D_HPP
-#define TESTTFTDIFFUSION3D_HPP
+#ifndef TESTTFTDIFFUSION2D_HPP
+#define TESTTFTDIFFUSION2D_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the TFT test equation for 3D diffusion
+    * @brief Implementation of the TFT test equation for 2D diffusion (within 3D model)
     */
-   class TestTFTDiffusion3D: public IScalarEquation
+   class TestTFTDiffusion2D: public IScalarEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         TestTFTDiffusion3D(SharedEquationParameters spEqParams);
+         TestTFTDiffusion2D(SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor
           */
-         virtual ~TestTFTDiffusion3D();
+         virtual ~TestTFTDiffusion2D();
 
          /**
           * @brief Set the unknown name and requirements
@@ -74,8 +74,8 @@ namespace Equations {
       private:
    };
 
-   /// Typedef for a shared TestTFTDiffusion3D
-   typedef SharedPtrMacro<TestTFTDiffusion3D> SharedTestTFTDiffusion3D;
+   /// Typedef for a shared TestTFTDiffusion2D
+   typedef SharedPtrMacro<TestTFTDiffusion2D> SharedTestTFTDiffusion2D;
 
    /**
     * @brief Get the time matrix block
@@ -84,7 +84,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param k       Wave number k
     */
-   void timeBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -94,7 +94,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void linearBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -104,9 +104,9 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void boundaryBlock(const TestTFTDiffusion3D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }
 
-#endif // TESTTFTDIFFUSION3D_HPP
+#endif // TESTTFTDIFFUSION2D_HPP

@@ -2,6 +2,10 @@
  *  \brief Source of the base implementation of a scalar equation
  */
 
+// Debug includes
+//
+#include "Debug/DebuggerMacro.h"
+
 // Configuration includes
 //
 
@@ -106,14 +110,23 @@ namespace Equations {
       return this->mRhsCols(idx);
    }
 
-   void CouplingInformation::addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const bool isSelf)
+   void CouplingInformation::sortImplicitFields(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId)
    {
-      // If field is itself, set the field index
-      if(isSelf)
-      {
-         this->mFieldIndex = this->mImplicitFields.size();
-      }
+      // Sort the implicit fields
+      std::sort(this->mImplicitFields.begin(), this->mImplicitFields.end());
 
+      // Extract the position of the equation field
+      FieldId_iterator pos = std::find(this->mImplicitFields.begin(), this->mImplicitFields.end(), std::make_pair(fieldId, compId));
+
+      // Set initial field index
+      this->mFieldIndex = pos - this->mImplicitFields.begin();
+
+      // Report position of equation field
+      DebuggerMacro_showValue("Coupling information field index: ", 1, this->mFieldIndex);
+   }
+
+   void CouplingInformation::addImplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId)
+   {
       this->mImplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 

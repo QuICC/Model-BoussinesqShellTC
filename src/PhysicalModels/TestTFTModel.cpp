@@ -23,6 +23,9 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Tests/TestTFTDiffusion3D.hpp"
+#include "Equations/Tests/TestTFTDiffusion2D.hpp"
+#include "Equations/Tests/TestTFTBidiffusion2D.hpp"
+#include "Equations/Tests/TestTFTBidiffusion3D.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/FieldVisualizer.hpp"
@@ -36,6 +39,9 @@ namespace GeoMHDiSCC {
 
       // Add first scalar
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add first scalar
+      ids.push_back(PhysicalNames::STREAMFUNCTION);
 
       return ids;
    }
@@ -78,23 +84,51 @@ namespace GeoMHDiSCC {
 
    void TestTFTModel::addEquations(SharedSimulation spSim)
    {
+      Equations::SharedTestTFTDiffusion3D   spD3D;
+      Equations::SharedTestTFTDiffusion2D   spD2D;
+      Equations::SharedTestTFTBidiffusion2D   spB2D;
+      Equations::SharedTestTFTBidiffusion3D   spB3D;
+
       // Add first scalar test equation
-      spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      //spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      //spD3D->setIdentity(PhysicalNames::TEMPERATURE);
+      //spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
+      //spD2D->setIdentity(PhysicalNames::TEMPERATURE);
+      //spB2D = spSim->addScalarEquation<Equations::TestTFTBidiffusion2D>();
+      //spB2D->setIdentity(PhysicalNames::TEMPERATURE);
+      spB3D = spSim->addScalarEquation<Equations::TestTFTBidiffusion3D>();
+      spB3D->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add second scalar test equation
+      //spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      //spD3D->setIdentity(PhysicalNames::STREAMFUNCTION);
+      //spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
+      //spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spB2D = spSim->addScalarEquation<Equations::TestTFTBidiffusion2D>();
+      spB2D->setIdentity(PhysicalNames::STREAMFUNCTION);
    }
 
    void TestTFTModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
       Equations::SharedRandomScalarState spRand;
+      Equations::SharedExactScalarState spExact;
 
-      // Add transport initial state generation equation
+      // Add first scalar random initial state generator
       spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
       spRand->setIdentity(PhysicalNames::TEMPERATURE);
       spRand->setSpectrum(-10,10, 1e4, 1e4, 1e4);
 
+      // Add second scalar random initial state generator
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spExact->setStateType(Equations::ExactScalarState::SINE);
+      spExact->setSineOptions(10, 5, 5, 2);
+
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
       spGen->addOutputFile(spOut);
    }
 
@@ -103,14 +137,20 @@ namespace GeoMHDiSCC {
       // Shared pointer to basic field visualizer
       Equations::SharedFieldVisualizer spField;
 
-      // Add transport field visualization
+      // Add first field visualization
       spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
+      // Add second field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
       spVis->addOutputFile(spOut);
    }
 
@@ -121,6 +161,7 @@ namespace GeoMHDiSCC {
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::STREAMFUNCTION);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -163,17 +204,40 @@ namespace GeoMHDiSCC {
       SpectralFieldId fieldId;
 
       // First scalar equation Dirichlet boundary conditions
-      eqId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
+      PhysicalNames::Id fieldName = PhysicalNames::TEMPERATURE;
+      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
+      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT);
+
+      // Second scalar equation Dirichlet boundary conditions
+      fieldName = PhysicalNames::STREAMFUNCTION;
+      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      dimId = Dimensions::Simulation::SIM3D;
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
 
       return spBcs;
    }

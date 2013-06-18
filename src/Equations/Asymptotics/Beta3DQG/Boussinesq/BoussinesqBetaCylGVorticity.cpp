@@ -65,12 +65,8 @@ namespace Equations {
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
-      // 
-      //  WARNING: the order is important as it determines the field index!
-      //
-
       // Equation is coupled to vorticity equation (self)
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Equation has explicit temperature
       infoIt.first->second.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
@@ -81,6 +77,9 @@ namespace Equations {
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+
+      // Sort implicit fields
+      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
    void BoussinesqBetaCylGVorticity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

@@ -58,24 +58,23 @@ namespace Equations {
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
       // General setup: prognostic equation, real solver, start from m = 0
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, false, 0);
+      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // Set nonlinear flags: has nonlinear term, has quasi-inverse
-//infoIt.first->second.setNonlinear(true, true);
-infoIt.first->second.setNonlinear(false, false);
+      infoIt.first->second.setNonlinear(false, false);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
-      // 
-      //  WARNING: the order is important
-      //
-
       // Equation is coupled to temperature equation (self)
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
+
+      infoIt.first->second.addImplicitField(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
+
+      infoIt.first->second.addImplicitField(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
 
       // Equation has explicit streamfunction
-      infoIt.first->second.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
+      //infoIt.first->second.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
@@ -83,6 +82,9 @@ infoIt.first->second.setNonlinear(false, false);
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+
+      // Sort implicit fields
+      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
    void BoussinesqBetaCylGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -103,12 +105,10 @@ infoIt.first->second.setNonlinear(false, false);
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-//this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
-this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
-//this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
-this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
    }
 
    DecoupledZSparse BoussinesqBetaCylGTransport::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
@@ -180,8 +180,8 @@ this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(tru
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         SparseMatrix tmp = k_*spec3D.id(0);
-         Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
+         //SparseMatrix tmp = k_*spec3D.id(0);
+         //Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
 
          /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
@@ -236,9 +236,35 @@ this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(tru
       int pX = 0;
       int pZ = 0;
 
-      // Set boundary condition prefactors
-      MHDFloat cX = 1.0;
-      MHDFloat cZ = 1.0;
+      MHDFloat cX;
+      MHDFloat cZ;
+
+      // Boundary condition for the streamfunction
+      if(fieldId.first == PhysicalNames::STREAMFUNCTION)
+      {
+         // Set boundary condition prefactors
+         cX = 0.0;
+         cZ = 0.0;
+
+      // Boundary condition for the vertical velocity
+      } else if(fieldId.first == PhysicalNames::VELOCITYZ)
+      {
+         // Set boundary condition prefactors
+         cX = 0.0;
+         cZ = 0.0;
+
+      // Boundary condition for the temperature
+      } else if(fieldId.first == PhysicalNames::TEMPERATURE)
+      {
+         // Set boundary condition prefactors
+         cX = 1.0;
+         cZ = 1.0;
+
+      // Unknown field
+      } else
+      {
+         throw Exception("Unknown field ID for boundary operator!");
+      }
 
       // Compute boundary block operator
       boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);

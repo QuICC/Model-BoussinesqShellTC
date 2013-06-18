@@ -74,12 +74,8 @@ namespace Equations {
       // Set source flags: has source term
       infoIt.first->second.setSource(false);
 
-      // 
-      //  WARNING: the order is important as it determines the field index!
-      //
-
       // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR, true);
+      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set sizes of blocks and matrices
       ArrayI blockNs(nY);
@@ -87,6 +83,9 @@ namespace Equations {
       ArrayI rhsCols(nY);
       rhsCols.setConstant(1);
       infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+
+      // Sort implicit fields
+      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
    void FieldVisualizer::setRequirements()

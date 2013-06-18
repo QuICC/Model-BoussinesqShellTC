@@ -4,10 +4,10 @@
 
 // Debug includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // Configuration includes
 //
-#include "Debug/DebuggerMacro.h"
 #include "Profiler/ProfilerMacro.h"
 #include "StorageProfiler/StorageProfilerMacro.h"
 #include "Framework/FrameworkMacro.h"

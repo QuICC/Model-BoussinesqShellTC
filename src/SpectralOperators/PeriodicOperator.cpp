@@ -144,6 +144,29 @@ namespace Spectral {
       return qLapl;
    }
 
+   SparseMatrix PeriodicOperator::qBilaplacian3D(const IOperator& opA, const IOperator& opB, const MHDFloat k, const int pA, const int pB)
+   {
+      // Compute quasi inverse of laplacian
+      SparseMatrix qLapl;
+      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,4), qLapl);
+      SparseMatrix tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB,4), opA.qDiff(pA,0), tmp);
+      qLapl = qLapl + tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,2), tmp);
+      qLapl = qLapl + 2*std::pow(k,2)*tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,2), tmp);
+      qLapl = qLapl - 2*std::pow(k,2)*tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,0), tmp);
+      qLapl = qLapl - 2*std::pow(k,2)*tmp;
+      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,0), tmp);
+      qLapl = qLapl + std::pow(k,4)*tmp;
+
+      // Prune sparse matrix
+      qLapl.prune(1e-32);
+
+      return qLapl;
+   }
+
    SparseMatrix PeriodicOperator::qLaplacian3D(const IOperator& op, const MHDFloat k, const MHDFloat m, const int p)
    {
       // Compute quasi inverse of laplacian
