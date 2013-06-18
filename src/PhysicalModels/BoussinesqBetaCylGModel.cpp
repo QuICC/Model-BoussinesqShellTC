@@ -194,14 +194,6 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addOutputFile(spState);
-      
-      // Create and add visualization file to IO
-      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         spViz->expect(*it);
-      }
-      spSim->addOutputFile(spViz);
    }
 
    SharedSimulationBoundary BoussinesqBetaCylGModel::createBoundary(const std::map<std::string,int>& bcIds)

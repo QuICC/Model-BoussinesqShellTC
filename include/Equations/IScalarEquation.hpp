@@ -125,7 +125,7 @@ namespace Equations {
    typedef SharedPtrMacro<IScalarEquation> SharedIScalarEquation;
 
    /**
-    * @brief Transfer equation unknown to solver
+    * @brief Copy unknown spectral values to solver
     *
     * @param eq      Equation to work on
     * @param compId  Component ID
@@ -135,6 +135,18 @@ namespace Equations {
     */
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+
+   /**
+    * @brief Transfer nonlinear spectral values from unknown to solver
+    *
+    * @param eq      Equation to work on
+    * @param compId  Component ID
+    * @param storage Storage for the equation values
+    * @param matIdx  Index of the given data
+    * @param start   Start index for the storage
+    */
+   void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
+   void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
 
    /**
     * @brief Add source term

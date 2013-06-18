@@ -57,12 +57,12 @@ namespace GeoMHDiSCC {
 
    void SimulationIoControl::writeFiles(const MHDFloat time, const MHDFloat timestep)
    {
-      if(this->mSteps % this->mAsciiRate == 0)
+      if(this->mAsciiRate > 0 && this->mSteps % this->mAsciiRate == 0)
       {
          this->writeAscii(time,timestep);
       }
 
-      if(this->mSteps % this->mHdf5Rate == 0)
+      if(this->mHdf5Rate > 0 && this->mSteps % this->mHdf5Rate == 0)
       {
          this->writeHdf5(time,timestep);
       }

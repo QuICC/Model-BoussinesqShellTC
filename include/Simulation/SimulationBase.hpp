@@ -36,6 +36,7 @@
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
 #include "IoVariable/IVariableHdf5Reader.hpp"
+#include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
 
 namespace GeoMHDiSCC {
@@ -122,7 +123,7 @@ namespace GeoMHDiSCC {
           *
           * @param spInitFile Shared initial state file
           */
-         void setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile);
+         void setInitialState(IoVariable::SharedStateFileReader spInitFile);
 
          /**
           * @brief Add ASCII output file to solver
@@ -347,6 +348,13 @@ namespace GeoMHDiSCC {
           * @brief Allow for implementation specific output tuning
           */
          virtual void tuneOutput();
+
+         /**
+          * @brief Allow for additional operators on the initial state input file
+          *
+          * @param spInitFile Shared initial state file
+          */
+         virtual void tuneInitialState(IoVariable::SharedStateFileReader spInitFile);
    };
 
    /**

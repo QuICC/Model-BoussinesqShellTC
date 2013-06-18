@@ -22,7 +22,6 @@
 #include "TypeSelectors/SpectralSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {

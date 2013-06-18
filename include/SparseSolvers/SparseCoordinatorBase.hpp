@@ -580,7 +580,7 @@ namespace Solver {
       for(int i = 0; i < (*solveIt)->nSystem(); i++)
       {
          // Copy field values into solver input
-         Equations::copyUnknown(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+         Equations::copyNonlinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
          // Apply quasi-inverse to nonlinear terms
          Equations::applyQuasiInverse(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));

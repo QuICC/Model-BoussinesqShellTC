@@ -125,7 +125,7 @@ namespace GeoMHDiSCC {
    void Simulation::solveEquations()
    {
       // Debug statement
-      DebuggerMacro_enter("solveEquations",1);
+      DebuggerMacro_enter("solveEquations",2);
 
       // Solve prognostic equations (timestep)
       this->solvePrognosticEquations();
@@ -161,28 +161,28 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
 
       // Debug statement
-      DebuggerMacro_leave("solveEquations",1);
+      DebuggerMacro_leave("solveEquations",2);
    }
 
    void Simulation::solvePrognosticEquations()
    {
       // Debug statement
-      DebuggerMacro_enter("solvePrognostic",2);
+      DebuggerMacro_enter("solvePrognostic",3);
 
-      DebuggerMacro_start("Solve prognostic(timestep)",3);
+      DebuggerMacro_start("Solve prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
       this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
-      DebuggerMacro_stop("Solve prognostic(timestep) t = ",3);
+      DebuggerMacro_stop("Solve prognostic t = ",4);
 
       // Debug statement
-      DebuggerMacro_leave("solvePrognostic",2);
+      DebuggerMacro_leave("solvePrognostic",3);
    }
 
    void Simulation::writeOutput()
    {
       // Debug statement
-      DebuggerMacro_enter("writeOutput",1);
+      DebuggerMacro_enter("writeOutput",2);
 
       ProfilerMacro_start(ProfilerMacro::IO);
       if(this->mTimestepCoordinator.finishedStep())
@@ -193,7 +193,7 @@ namespace GeoMHDiSCC {
       ProfilerMacro_stop(ProfilerMacro::IO);
 
       // Debug statement
-      DebuggerMacro_leave("writeOutput",1);
+      DebuggerMacro_leave("writeOutput",2);
    }
 
    void Simulation::postRun()

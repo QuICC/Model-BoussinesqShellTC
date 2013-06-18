@@ -136,14 +136,18 @@ namespace Timestep {
       // Initialise base matrices
       SparseDLinearSolver::initMatrices(n);
 
-      // Reserve space for the RHS matrices
-      this->mRHSMatrix.reserve(n);
-
-      // Initialise storage
-      for(int i = 0; i < n; ++i)
+      // Do not reinitialise if work already done by other field
+      if(this->mRHSMatrix.size() == 0)
       {
-         // Create storage for LHS matrices
-         this->mRHSMatrix.push_back(SparseMatrix());
+         // Reserve space for the RHS matrices
+         this->mRHSMatrix.reserve(n);
+
+         // Initialise storage
+         for(int i = 0; i < n; ++i)
+         {
+            // Create storage for LHS matrices
+            this->mRHSMatrix.push_back(SparseMatrix());
+         }
       }
    }
 

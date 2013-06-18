@@ -92,9 +92,6 @@ namespace Timestep {
          hasNewDt = false;
       }
 
-//      this->mDt = this->mOldDt;
-//      hasNewDt = false;
-
       //
       // Update the timestep matrices if necessary
       //

@@ -48,8 +48,9 @@ namespace Diagnostics {
           * @param mesh    Vector of grid values
           * @param scalars Map of shared scalar variables
           * @param vectors Map of shared vector variables
+          * @param tstep   Timestep information
           */
-         void init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors); 
+         void init(const std::vector<Array>& mesh, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>&  scalars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>&  vectors, const Array& tstep); 
 
          /**
           * @brief Compute the initial CFL condition
@@ -88,6 +89,11 @@ namespace Diagnostics {
           * @brief Courant constant used for the CFL computation
           */
          const MHDFloat mcCourant;
+
+         /**
+          * @brief Fixed timestep
+          */
+         MHDFloat mFixedStep;
 
          /**
           * @brief Current CFL condition

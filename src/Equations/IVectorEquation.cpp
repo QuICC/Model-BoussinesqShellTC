@@ -149,6 +149,7 @@ namespace Equations {
 
    void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
@@ -177,6 +178,8 @@ namespace Equations {
                k++;
             }
          }
+
+      // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
          //Safety assertion
@@ -206,6 +209,7 @@ namespace Equations {
 
    void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
+      // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
@@ -229,6 +233,8 @@ namespace Equations {
                k++;
             }
          }
+
+      // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
          //Safety assertion
@@ -249,6 +255,135 @@ namespace Equations {
 
             // increase storage counter
             k++;
+         }
+      }
+   }
+
+   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
+   {
+      // Check if a nonlinear computation took place
+      if(eq.couplingInfo(compId).hasNonlinear())
+      {
+         // simply copy values from unknown
+         copyUnknown(eq, compId, storage, matIdx, start);
+
+      // Without nonlinear computation the values have to be initialised to zero   
+      } else
+      {
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+            assert(start < storage.first.size());
+            assert(start < storage.second.size());
+            assert(rows*cols+start <= storage.first.rows());
+            assert(rows*cols+start <= storage.second.rows());
+
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field real value into storage
+                  storage.first(k) = 0.0;
+
+                  // Copy field imaginary value into storage
+                  storage.second(k) = 0.0;
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            //Safety assertion
+            assert(start >= 0);
+            assert(start < storage.first.size());
+            assert(start < storage.second.size());
+
+            // Get mode indexes
+            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field real value into storage
+               storage.first(k) = 0.0;
+
+               // Copy field imaginary value into storage
+               storage.second(k) = 0.0;
+
+               // increase storage counter
+               k++;
+            }
+         }
+      }
+   }
+
+   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
+   {
+      // Check if a nonlinear computation took place
+      if(eq.couplingInfo(compId).hasNonlinear())
+      {
+         // simply copy values from unknown
+         copyUnknown(eq, compId, storage, matIdx, start);
+
+      // Without nonlinear computation the values have to be initialised to zero   
+      } else
+      {
+         // matIdx is the index of the slowest varying direction
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+            assert(start < storage.size());
+            assert(rows*cols+start <= storage.rows());
+
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy field into storage
+                  storage(k) = 0.0;
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+         // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            //Safety assertion
+            assert(start >= 0);
+            assert(start < storage.size());
+
+            // Get mode indexes
+            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field value into storage
+               storage(k) = 0.0;
+
+               // increase storage counter
+               k++;
+            }
          }
       }
    }

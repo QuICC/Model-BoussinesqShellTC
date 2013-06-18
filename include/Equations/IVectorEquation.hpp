@@ -96,7 +96,7 @@ namespace Equations {
    typedef SharedPtrMacro<IVectorEquation> SharedIVectorEquation;
 
    /**
-    * @brief Transfer equation unknown to timestepper
+    * @brief Copy unknown spectral values to solver
     *
     * @param compId  Component ID
     * @param storage Storage for the equation values
@@ -105,6 +105,17 @@ namespace Equations {
     */
    void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
    void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+
+   /**
+    * @brief Transfer nonlinear spectral values from unknown to solver
+    *
+    * @param compId  Component ID
+    * @param storage Storage for the equation values
+    * @param matIdx  Index of the given data
+    * @param start   Start index for the storage
+    */
+   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
+   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
 
    /**
     * @brief Add source term

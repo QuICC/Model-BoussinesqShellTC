@@ -22,9 +22,10 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Tests/TestTFTScalarOne.hpp"
-#include "Equations/Tests/TestTFTScalarTwo.hpp"
-#include "Equations/Tests/TestTFTScalarThree.hpp"
+#include "Equations/Tests/TestTFTDiffusion3D.hpp"
+#include "Generator/States/RandomScalarState.hpp"
+#include "Generator/States/ExactScalarState.hpp"
+#include "Generator/Visualizers/FieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,12 +36,6 @@ namespace GeoMHDiSCC {
 
       // Add first scalar
       ids.push_back(PhysicalNames::TEMPERATURE);
-
-      // Add second scalar
-      ids.push_back(PhysicalNames::STREAMFUNCTION);
-
-      // Add third scalar
-      ids.push_back(PhysicalNames::VELOCITYZ);
 
       return ids;
    }
@@ -84,13 +79,51 @@ namespace GeoMHDiSCC {
    void TestTFTModel::addEquations(SharedSimulation spSim)
    {
       // Add first scalar test equation
-      spSim->addScalarEquation<Equations::TestTFTScalarOne>();
+      spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+   }
 
-      // Add second scalar test equation
-      spSim->addScalarEquation<Equations::TestTFTScalarTwo>();
+   void TestTFTModel::addStates(SharedStateGenerator spGen)
+   {
+      // Shared pointer to equation
+      Equations::SharedRandomScalarState spRand;
 
-      // Add third scalar test equation
-      spSim->addScalarEquation<Equations::TestTFTScalarThree>();
+      // Add transport initial state generation equation
+      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+      spRand->setIdentity(PhysicalNames::TEMPERATURE);
+      spRand->setSpectrum(-10,10, 1e4, 1e4, 1e4);
+
+      // Add output file
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spGen->addOutputFile(spOut);
+   }
+
+   void TestTFTModel::addVisualizers(SharedVisualizationGenerator spVis)
+   {
+      // Shared pointer to basic field visualizer
+      Equations::SharedFieldVisualizer spField;
+
+      // Add transport field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add output file
+      IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spVis->addOutputFile(spOut);
+   }
+
+   void TestTFTModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   {
+      // Create and add initial state file to IO
+      IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
+
+      // Set expected fields
+      spIn->expect(PhysicalNames::TEMPERATURE);
+
+      // Set simulation state
+      spVis->setInitialState(spIn);
    }
 
    void TestTFTModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -115,14 +148,6 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addOutputFile(spState);
-      
-      // Create and add visualization file to IO
-      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         spViz->expect(*it);
-      }
-      spSim->addOutputFile(spViz);
    }
 
    SharedSimulationBoundary TestTFTModel::createBoundary(const std::map<std::string,int>& bcIds)
@@ -142,32 +167,6 @@ namespace GeoMHDiSCC {
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-
-      // Second scalar equation Dirichlet boundary conditions
-      eqId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-
-      // Third scalar equation Dirichlet boundary conditions
-      eqId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);

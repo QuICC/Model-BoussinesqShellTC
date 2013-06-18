@@ -100,12 +100,8 @@ namespace Solver {
       // start index for matrices
       int start = this->mStep*nSystems;
 
-      // Initialise the linear solver
-      if((*solveIt)->nSystem() == 0)
-      {
-         // Reserve storage for matrice and initialise vectors
-         (*solveIt)->initMatrices(this->mNStep*nSystems);
-      }
+      // Reserve storage for matrice and initialise vectors
+      (*solveIt)->initMatrices(this->mNStep*nSystems);
 
       // Build the solver matrices
       for(int i = 0; i < nSystems; i++)

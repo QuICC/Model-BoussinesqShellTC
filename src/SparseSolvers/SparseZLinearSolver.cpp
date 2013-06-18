@@ -84,14 +84,18 @@ namespace Solver {
 
    void SparseZLinearSolver::initMatrices(const int n)
    {
-      // Reserve space for the LHS matrices
-      this->mLHSMatrix.reserve(n);
-
-      // Initialise storage
-      for(int i = 0; i < n; ++i)
+      // Do not reinitialise if work already done by other field
+      if(this->mLHSMatrix.size() == 0)
       {
-         // Create storage for LHS matrices
-         this->mLHSMatrix.push_back(SparseMatrixZ());
+         // Reserve space for the LHS matrices
+         this->mLHSMatrix.reserve(n);
+
+         // Initialise storage
+         for(int i = 0; i < n; ++i)
+         {
+            // Create storage for LHS matrices
+            this->mLHSMatrix.push_back(SparseMatrixZ());
+         }
       }
    }
 

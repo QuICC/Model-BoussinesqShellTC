@@ -119,4 +119,20 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("writeOutput",1);
    }
 
+   void VisualizationGenerator::tuneInitialState(IoVariable::SharedStateFileReader spInitFile)
+   {
+      // Get time from initial state
+      MHDFloat time = spInitFile->time();
+
+      // Get timestep from initial state
+      MHDFloat timestep = spInitFile->timestep();
+
+      // Loop over all files added to the simulation control
+      SimulationIoControl::hdf5_iterator  fIt;
+      for(fIt = this->mSimIoCtrl.beginHdf5(); fIt != this->mSimIoCtrl.endHdf5(); ++fIt)
+      {
+         (*fIt)->setSimTime(time, timestep);
+      }
+   }
+
 }

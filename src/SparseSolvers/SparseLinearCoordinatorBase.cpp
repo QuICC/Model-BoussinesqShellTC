@@ -46,6 +46,8 @@ namespace Solver {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
+         DebuggerMacro_msg("---> scalar solver", 2);
+
          // Get type information for the linear solvers
          this->createSolver((*scalEqIt), FieldComponents::Spectral::SCALAR);
       }
@@ -54,6 +56,8 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
+         DebuggerMacro_msg("---> vector solver", 2);
+
          // Get type information for the linear solvers for the first component
          this->createSolver((*vectEqIt), FieldComponents::Spectral::ONE);
 
@@ -73,6 +77,8 @@ namespace Solver {
          // Loop over all scalar equations
          for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
          {
+            DebuggerMacro_msg("---> scalar storage", 2);
+
             // Create (coupled) matrices
             this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
@@ -80,6 +86,8 @@ namespace Solver {
          // Loop over all vector equations
          for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
          {
+            DebuggerMacro_msg("---> vector storage", 2);
+
             // Create (coupled) matrices
             this->createStorage((*vectEqIt), FieldComponents::Spectral::ONE);
 
@@ -100,6 +108,8 @@ namespace Solver {
          // Loop over all scalar equations
          for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
          {
+            DebuggerMacro_msg("---> scalar operators", 2);
+
             // Create (coupled) matrices
             this->createMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
@@ -107,6 +117,8 @@ namespace Solver {
          // Loop over all vector equations
          for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
          {
+            DebuggerMacro_msg("---> vector operators", 2);
+
             // Create (coupled) matrices
             this->createMatrices((*vectEqIt), FieldComponents::Spectral::ONE);
 
@@ -125,6 +137,8 @@ namespace Solver {
       SolverZ_iterator   solZIt;
       for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
       {
+         DebuggerMacro_msg("---> complex solver", 2);
+
          (*solZIt)->initSolver();
       }
       DebuggerMacro_stop("Linear: complex init t = ", 2);
@@ -134,6 +148,8 @@ namespace Solver {
       SolverD_iterator   solDIt;
       for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
       {
+         DebuggerMacro_msg("---> real solver", 2);
+
          (*solDIt)->initSolver();
       }
       DebuggerMacro_stop("Linear: real init t = ", 2);

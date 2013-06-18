@@ -29,7 +29,6 @@
 #include "IoTools/Formatter.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
    SimulationBase::SimulationBase()
@@ -106,8 +105,11 @@ namespace GeoMHDiSCC {
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
 
+      // Get timestep information from configuration file
+      Array tstep = this->mSimIoCtrl.configTimestepping();
+
       // Initialise the diagnostics
-      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables);
+      this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep);
 
       // Cleanup IO control
       this->mSimIoCtrl.cleanup();
@@ -195,7 +197,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("finalize",0);
    }
 
-   void SimulationBase::setInitialState(IoVariable::SharedIVariableHdf5Reader spInitFile)
+   void SimulationBase::setInitialState(IoVariable::SharedStateFileReader spInitFile)
    {
       // Loop over all scalars
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
@@ -217,8 +219,15 @@ namespace GeoMHDiSCC {
       // Read in data
       spInitFile->read();
 
+      // Addition operations on initial state file
+      this->tuneInitialState(spInitFile);
+
       // Finalise file
       spInitFile->finalize();
+   }
+
+   void SimulationBase::tuneInitialState(IoVariable::SharedStateFileReader spInitFile)
+   {
    }
 
    void SimulationBase::addOutputFile(int spOutFile)//SharedAscii spOutFile)
@@ -266,31 +275,31 @@ namespace GeoMHDiSCC {
    void SimulationBase::solveTrivialEquations()
    {
       // Debug statement
-      DebuggerMacro_enter("solveTrivialEquations",2);
+      DebuggerMacro_enter("solveTrivialEquations",3);
 
-      DebuggerMacro_start("Solve trivial",3);
+      DebuggerMacro_start("Solve trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
       this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
-      DebuggerMacro_stop("Solve trivial t = ",3);
+      DebuggerMacro_stop("Solve trivial t = ",4);
 
       // Debug statement
-      DebuggerMacro_leave("solveDiagnosticEquations",2);
+      DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
 
    void SimulationBase::solveDiagnosticEquations()
    {
       // Debug statement
-      DebuggerMacro_enter("solveDiagnosticEquations",2);
+      DebuggerMacro_enter("solveDiagnosticEquations",3);
 
-      DebuggerMacro_start("Solve diagnotic",3);
+      DebuggerMacro_start("Solve diagnotic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
       this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-      DebuggerMacro_stop("Solve diagnostic t = ",3);
+      DebuggerMacro_stop("Solve diagnostic t = ",4);
 
       // Debug statement
-      DebuggerMacro_leave("solveDiagnosticEquations",2);
+      DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
 
    void SimulationBase::initVariables(VariableRequirement& varInfo)

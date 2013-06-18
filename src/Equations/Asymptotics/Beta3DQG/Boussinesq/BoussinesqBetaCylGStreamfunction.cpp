@@ -57,7 +57,7 @@ namespace Equations {
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
 
-      // General setup: first complex solver, complex solver, start from m = 0
+      // General setup: prognostic equation, complex solver, start from m = 0
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // set nonlinear flags: has nonlinear term, has quasi-inverse

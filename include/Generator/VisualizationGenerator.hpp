@@ -56,14 +56,21 @@ namespace GeoMHDiSCC {
          virtual void postRun();
 
          /**
+          * @brief Write the output if required
+          */
+         void writeOutput();
+
+         /**
           * @brief Allow for implementation specific output tuning
           */
          virtual void tuneOutput();
 
          /**
-          * @brief Write the output if required
+          * @brief Allow for additional operators on the initial state input file
+          *
+          * @param spInitFile Shared initial state file
           */
-         void writeOutput();
+         virtual void tuneInitialState(IoVariable::SharedStateFileReader spInitFile);
    };
 
    /// Typedef for a shared pointer of a VisualizationGenerator
