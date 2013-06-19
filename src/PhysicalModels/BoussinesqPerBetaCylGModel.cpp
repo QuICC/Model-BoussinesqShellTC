@@ -93,6 +93,21 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGVertical>();
    }
 
+   void BoussinesqPerBetaPerCylGModel::addStates(SharedStateGenerator spGen)
+   {
+      throw Exception("Not implemented yet!");
+   }
+
+   void BoussinesqPerBetaCylGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   {
+      throw Exception("Not implemented yet!");
+   }
+
+   void BoussinesqPerBetaCylGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   {
+      throw Exception("Not implemented yet!");
+   }
+
    void BoussinesqPerBetaCylGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
@@ -115,14 +130,6 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addOutputFile(spState);
-      
-      // Create and add visualization file to IO
-      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         spViz->expect(*it);
-      }
-      spSim->addOutputFile(spViz);
    }
 
    SharedSimulationBoundary BoussinesqPerBetaCylGModel::createBoundary(const std::map<std::string,int>& bcIds)

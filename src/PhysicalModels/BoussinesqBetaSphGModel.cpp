@@ -33,15 +33,6 @@ namespace GeoMHDiSCC {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
 
-      // Add streamfunction
-      ids.push_back(PhysicalNames::STREAMFUNCTION);
-
-      // Add axial velocity
-      ids.push_back(PhysicalNames::VELOCITYZ);
-
-      // Add temperature
-      ids.push_back(PhysicalNames::TEMPERATURE);
-
       return ids;
    }
 
@@ -49,18 +40,6 @@ namespace GeoMHDiSCC {
    {
       // Create storage
       std::vector<NonDimensional::Id> ids;
-
-      // Add Prandtl number
-      ids.push_back(NonDimensional::PRANDTL);
-
-      // Add Rayleigh number
-      ids.push_back(NonDimensional::RAYLEIGH);
-
-      // Add gamma
-      ids.push_back(NonDimensional::GAMMA);
-
-      // Add chi
-      ids.push_back(NonDimensional::CHI);
 
       return ids;
    }
@@ -83,14 +62,22 @@ namespace GeoMHDiSCC {
 
    void BoussinesqBetaSphGModel::addEquations(SharedSimulation spSim)
    {
-      // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBetaSphGTransport>();
-      
-      // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBetaSphGStreamfunction>();
-      
-      // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqBetaSphGVertical>();
+      throw Exception("Not implemented yet!");
+   }
+
+   void BoussinesqBetaSphGModel::addStates(SharedStateGenerator spGen)
+   {
+      throw Exception("Not implemented yet!");
+   }
+
+   void BoussinesqBetaSphGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   {
+      throw Exception("Not implemented yet!");
+   }
+
+   void BoussinesqBetaSphGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   {
+      throw Exception("Not implemented yet!");
    }
 
    void BoussinesqBetaSphGModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -115,14 +102,6 @@ namespace GeoMHDiSCC {
          spState->expect(*it);
       }
       spSim->addOutputFile(spState);
-      
-      // Create and add visualization file to IO
-      IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      for(it = ids.begin(); it != ids.end(); ++it)
-      {
-         spViz->expect(*it);
-      }
-      spSim->addOutputFile(spViz);
    }
 
    SharedSimulationBoundary BoussinesqBetaSphGModel::createBoundary(const std::map<std::string,int>& bcIds)
@@ -137,83 +116,7 @@ namespace GeoMHDiSCC {
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
 
-      // Temperature equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
-      {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      } else
-      {
-         throw Exception("Unknown temperature boundary conditions in configuration file");
-      }
-
-      // Streamfunction equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
-      // No-slip boundary conditions
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
-      {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
-      // Stress-free boundary conditions
-      } else if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 1)
-      {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
-      } else
-      {
-         throw Exception("Unknown streamfunction boundary conditions in configuration file");
-      }
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
-      //    ... coupled boundary conditions
-      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-
-      // Axial velocity equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      // No-slip boundary conditions
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
-      {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
-      // Stress-free boundary conditions
-      } else if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 1)
-      {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
-      } else
-      {
-         throw Exception("Unknown velocityz boundary conditions in configuration file");
-      }
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
-      //    ... coupled boundary conditions
-      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
+      throw Exception("Not implemented yet!");
 
       return spBcs;
    }
