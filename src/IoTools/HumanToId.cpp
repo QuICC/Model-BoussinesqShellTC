@@ -52,6 +52,12 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(NonDimensional::GAMMA))
       {
          return NonDimensional::GAMMA;
+      } else if(id == IdToHuman::toTag(NonDimensional::GAPWIDTH))
+      {
+         return NonDimensional::GAPWIDTH;
+      } else if(id == IdToHuman::toTag(NonDimensional::RRATIO))
+      {
+         return NonDimensional::RRATIO;
       } else
       {
          throw Exception("Unknown string to ID conversion requested");

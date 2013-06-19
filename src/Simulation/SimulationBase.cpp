@@ -497,6 +497,35 @@ namespace GeoMHDiSCC {
 
       // Initialise the converters
       this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
+
+      // Get the list of required options
+      std::set<NonDimensional::Id>  requests;
+      this->mTransformCoordinator.requiredOptions(requests);
+
+      // Get the list of non-dimension parameters
+      std::vector<NonDimensional::Id> names = this->mspEqParams->ids();
+
+      // Storage for the options' values
+      std::map<NonDimensional::Id,MHDFloat> options;
+
+      // Extract options
+      std::vector<NonDimensional::Id>::iterator it;
+      for(it = names.begin(); it != names.end(); ++it)
+      {
+         if(requests.count(*it) > 0)
+         {
+            options.insert(std::make_pair(*it,this->mspEqParams->nd(*it)));
+         }
+      }
+
+      // Make sure everythin was present
+      if(requests.size() != options.size())
+      {
+         throw Exception("initTransformCoordinator: requested options have not been set!");
+      }
+
+      // Transfer options to transforms
+      this->mTransformCoordinator.setOptions(options);
    }
 
    void SimulationBase::setupEquations(const SharedSimulationBoundary spBcs)

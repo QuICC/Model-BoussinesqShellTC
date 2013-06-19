@@ -7,4 +7,8 @@ set(MHDSources
    IOperator.cpp
    PeriodicOperator.cpp
    UnitOperator.cpp
+   SphericalChebyshevOperator.cpp
+   SphericalChebyshevBoundary.cpp
+   CylindricalChebyshevOperator.cpp
+   CylindricalChebyshevBoundary.cpp
 )

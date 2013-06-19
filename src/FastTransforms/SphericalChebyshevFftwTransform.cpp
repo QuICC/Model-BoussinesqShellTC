@@ -1,5 +1,5 @@
-/** \file ChebyshevFftwTransform.cpp
- *  \brief Source of the implementation of the FFTW transform
+/** \file SphericalChebyshevFftwTransform.cpp
+ *  \brief Source of the implementation of the Chebyshev FFTW transform for a spherical radius
  */
 
 // System includes
@@ -11,10 +11,11 @@
 
 // Class include
 //
-#include "FastTransforms/ChebyshevFftwTransform.hpp"
+#include "FastTransforms/SphericalChebyshevFftwTransform.hpp"
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
@@ -22,32 +23,40 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   Array ChebyshevFftwTransform::generateGrid(const int size)
+   Array SphericalChebyshevFftwTransform::generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio)
    {
-      // Initialise grid storage
-      Array grid(size);
-
-      // Create Chebyshev grid
-      for(int k = 0; k < size; k++)
+      if(gapWidth > 0 && rRatio >= 0)
       {
-         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)-0.5)/static_cast<MHDFloat>(size));
-      }
+         // Initialise grid storage
+         Array grid(size);
 
-      return grid;
+         // Create Chebyshev grid
+         for(int k = 0; k < size; k++)
+         {
+            grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)-0.5)/static_cast<MHDFloat>(size));
+
+            grid(k) = 0.5*gapWidth*grid(k) + 0.5*gapWidth*(1.+rRatio)/(1-rRatio);
+         }
+
+         return grid;
+      } else
+      {
+         throw Exception("generateGrid called with incompatible gap width or radii ratio");
+      }
    }
 
-   ChebyshevFftwTransform::ChebyshevFftwTransform()
-      : mFPlan(NULL), mBPlan(NULL)
+   SphericalChebyshevFftwTransform::SphericalChebyshevFftwTransform()
+      : mFPlan(NULL), mBPlan(NULL), mGapWidth(-1), mRRatio(-1)
    {
    }
 
-   ChebyshevFftwTransform::~ChebyshevFftwTransform()
+   SphericalChebyshevFftwTransform::~SphericalChebyshevFftwTransform()
    {
       // Cleanup memory used by FFTW
       FftwLibrary::cleanupFft();
    }
 
-   void ChebyshevFftwTransform::init(ChebyshevFftwTransform::SharedSetupType spSetup)
+   void SphericalChebyshevFftwTransform::init(SphericalChebyshevFftwTransform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
@@ -62,26 +71,26 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
-   void ChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void SphericalChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
    {
-      //
-      // No possible options
-      //
+      list.insert(NonDimensional::GAPWIDTH);
+
+      list.insert(NonDimensional::RRATIO);
    }
 
-   void ChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void SphericalChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
    {
-      //
-      // No possible options
-      //
+      this->mGapWidth = options.find(NonDimensional::GAPWIDTH)->second;
+
+      this->mRRatio = options.find(NonDimensional::RRATIO)->second;
    }
 
-   Array ChebyshevFftwTransform::meshGrid() const
+   Array SphericalChebyshevFftwTransform::meshGrid() const
    {
-      return ChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize());
+      return SphericalChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize(), this->mGapWidth, this->mRRatio);
    }
 
-   void ChebyshevFftwTransform::initFft()
+   void SphericalChebyshevFftwTransform::initFft()
    {  
       /// \mhdBug implement strideed stranforms for complex <-> complex case if possible
 
@@ -111,7 +120,7 @@ namespace Transform {
       this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
    }
 
-   void ChebyshevFftwTransform::cleanupFft()
+   void SphericalChebyshevFftwTransform::cleanupFft()
    {
       // Detroy forward plan
       if(this->mFPlan)
@@ -133,7 +142,7 @@ namespace Transform {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   MHDFloat ChebyshevFftwTransform::requiredStorage() const
+   MHDFloat SphericalChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

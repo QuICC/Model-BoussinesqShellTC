@@ -15,6 +15,8 @@
 
 // System includes
 //
+#include <set>
+#include <map>
 
 // External includes
 //
@@ -24,6 +26,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
+#include "Enums/NonDimensional.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
@@ -97,6 +100,16 @@ namespace Transform {
           * @param spSetup   Shared setup object for the transform
           */
          void init(SharedSetupType spSetup);
+
+         /**
+          * @brief set list of required options
+          */
+         void requiredOptions(std::set<NonDimensional::Id>& list) const;
+
+         /**
+          * @brief Set the required options
+          */
+         void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
 
          /**
           * @brief Get the physical grid

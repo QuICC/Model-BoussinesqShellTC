@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    #ifdef GEOMHDISCC_PROFILER_DETAILED
-      const int ProfilerBase::NBREAKPOINT = ProfilerBase::BWDCONVRECV + 1;
+      const int ProfilerBase::NBREAKPOINT = ProfilerBase::TSTEPOUT + 1;
    #else
       const int ProfilerBase::NBREAKPOINT = ProfilerBase::IO + 1;
    #endif // GEOMHDISCC_PROFILER_DETAILED
@@ -51,8 +51,6 @@ namespace Debug {
             return "Nonlinear";
          case FWDTRANSFORM: 
             return "Forward";
-         case LINEAR:
-            return "Linear";
          case PROGNOSTICEQUATION:
             return "Prognostic";
          case DIAGNOSTICEQUATION:
@@ -85,6 +83,14 @@ namespace Debug {
             return "send 3D";
          case FWDCONVRECV:
             return "receive 3D";
+         case TSTEPIN:
+            return "timestep input";
+         case TSTEPRHS:
+            return "timestep rhs";
+         case TSTEPSOLVE:
+            return "timestep solve";
+         case TSTEPOUT:
+            return "timestep output";
          default:
             return "Unknown break point";
       }

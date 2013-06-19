@@ -42,6 +42,11 @@ namespace Equations {
          virtual ~EquationParameters();
 
          /**
+          * @brief Get the IDs of the equation parameters
+          */
+         std::vector<NonDimensional::Id>  ids();
+
+         /**
           * @brief Get the names of the equation parameters
           */
          std::vector<std::string>  names();

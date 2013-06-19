@@ -19,6 +19,7 @@
 #include "TransformCoordinators/Transform3DCoordinator.hpp"
 #include "FastTransforms/FftwTransform.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
+#include "FastTransforms/CylindricalChebyshevFftwTransform.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Communicators/Communicator.hpp"
 
@@ -69,6 +70,27 @@ namespace GeoMHDiSCC {
             typedef FftwTransform Type;
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+
+      // Configure code to use CFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef CylindricalChebyshevFftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef FftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef ChebyshevFftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_CFT
    }
 
    namespace Parallel {

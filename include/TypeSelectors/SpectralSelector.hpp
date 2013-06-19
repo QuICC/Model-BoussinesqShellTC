@@ -18,6 +18,8 @@
 //
 #include "SpectralOperators/ChebyshevOperator.hpp"
 #include "SpectralOperators/ChebyshevBoundary.hpp"
+#include "SpectralOperators/CylindricalChebyshevOperator.hpp"
+#include "SpectralOperators/CylindricalChebyshevBoundary.hpp"
 #include "SpectralOperators/UnitOperator.hpp"
 
 namespace GeoMHDiSCC {
@@ -70,6 +72,31 @@ namespace GeoMHDiSCC {
          {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_TFF
+
+      // Configure code to use CFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
+         {
+            /// Typedef for the spectral operator
+            typedef  CylindricalChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  CylindricalChebyshevBoundary  BcType;
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
+         {
+            /// Typedef for the spectral operator
+            typedef  ChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  ChebyshevBoundary  BcType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
    }
 }

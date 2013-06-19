@@ -62,6 +62,20 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
+   void FftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   {
+      //
+      // No possible options
+      //
+   }
+
+   void FftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   {
+      //
+      // No possible options
+      //
+   }
+
    Array FftwTransform::meshGrid() const
    {
       return FftwTransform::generateGrid(this->mspSetup->fwdSize());

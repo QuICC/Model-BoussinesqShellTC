@@ -133,6 +133,9 @@ namespace GeoMHDiSCC {
       // Solve diagnostic equations
       this->solveDiagnosticEquations();
 
+      // Solve trivial equations
+      this->solveTrivialEquations();
+
       // Update conditions at the end of timestep
       ProfilerMacro_start(ProfilerMacro::CONTROL);
       if(this->mTimestepCoordinator.finishedStep())

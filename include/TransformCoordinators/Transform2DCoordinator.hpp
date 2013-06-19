@@ -14,12 +14,15 @@
 
 // System includes
 //
+#include<set>
+#include<map>
 
 // External includes
 //
 
 // Project includes
 //
+#include "Enums/NonDimensional.hpp"
 #include "TransformCoordinators/Transform1DCoordinator.hpp"
 #include "Variables/VariableRequirement.hpp"
 
@@ -68,6 +71,16 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           */
          void initCommunicator(SharedResolution spRes);
+
+         /**
+          * @brief Get list of required options for transform
+          */
+         void requiredOptions(std::set<NonDimensional::Id>& list) const;
+
+         /**
+          * @brief Set options of transform
+          */
+         void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
 
          /**
           * @brief Get the transform for the second dimension
@@ -137,6 +150,20 @@ namespace GeoMHDiSCC {
    {
       // initialise the communicator
       this->mCommunicator.init(spRes->spFwdSetup(Dimensions::Transform::TRA1D), spRes->spBwdSetup(Dimensions::Transform::TRA1D), spRes->spFwdSetup(Dimensions::Transform::TRA2D), spRes->spBwdSetup(Dimensions::Transform::TRA2D));
+   }
+
+   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::requiredOptions(std::set<NonDimensional::Id>& list) const
+   {
+      Transform1DCoordinator<T1D, TCommunicator>::requiredOptions(list);
+
+      this->mTransform2D.requiredOptions(list);
+   }
+
+   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   {
+      Transform1DCoordinator<T1D, TCommunicator>::setOptions(options);
+
+      this->mTransform2D.setOptions(options);
    }
 
    template <typename T1D, typename T2D, typename TCommunicator> std::vector<Array> Transform2DCoordinator<T1D, T2D, TCommunicator>::mesh()

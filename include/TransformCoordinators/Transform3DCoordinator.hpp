@@ -14,12 +14,15 @@
 
 // System includes
 //
+#include<set>
+#include<map>
 
 // External includes
 //
 
 // Project includes
 //
+#include "Enums/NonDimensional.hpp"
 #include "TransformCoordinators/Transform2DCoordinator.hpp"
 #include "Variables/VariableRequirement.hpp"
 
@@ -71,6 +74,16 @@ namespace GeoMHDiSCC {
           * @param spRes   Resolution information object
           */
          void initCommunicator(SharedResolution spRes);
+
+         /**
+          * @brief Get list of required options for transform
+          */
+         void requiredOptions(std::set<NonDimensional::Id>& list) const;
+
+         /**
+          * @brief Set options of transform
+          */
+         void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
 
          /**
           * @brief Get the transform for the first dimension
@@ -140,6 +153,22 @@ namespace GeoMHDiSCC {
    {
       // initialise the communicator
       this->mCommunicator.init(spRes->spFwdSetup(Dimensions::Transform::TRA1D), spRes->spBwdSetup(Dimensions::Transform::TRA1D), spRes->spFwdSetup(Dimensions::Transform::TRA2D), spRes->spBwdSetup(Dimensions::Transform::TRA2D), spRes->spFwdSetup(Dimensions::Transform::TRA3D), spRes->spBwdSetup(Dimensions::Transform::TRA3D));
+   }
+
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::requiredOptions(std::set<NonDimensional::Id>& list) const
+   {
+      // Get list from 2 other dimensions
+      Transform2DCoordinator<T1D,T2D, TCommunicator>::requiredOptions(list);
+
+      this->mTransform3D.requiredOptions(list);
+   }
+
+   template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   {
+      // Get list from 2 other dimensions
+      Transform2DCoordinator<T1D,T2D, TCommunicator>::setOptions(options);
+
+      this->mTransform3D.setOptions(options);
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> std::vector<Array> Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::mesh()

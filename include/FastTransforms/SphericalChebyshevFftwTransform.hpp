@@ -1,9 +1,9 @@
-/** \file ChebyshevFftwTransform.hpp
- *  \brief Implementation of the FFTW transform for a Chebyshev expansion
+/** \file SphericalChebyshevFftwTransform.hpp
+ *  \brief Implementation of the FFTW transform for a Chebyshev expansion for a spherical radius 
  */
 
-#ifndef CHEBYSHEVFFTWTRANSFORM_HPP
-#define CHEBYSHEVFFTWTRANSFORM_HPP
+#ifndef SPHERICALCHEBYSHEVFFTWTRANSFORM_HPP
+#define SPHERICALCHEBYSHEVFFTWTRANSFORM_HPP
 
 // Debug includes
 //
@@ -28,16 +28,16 @@
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
-#include "SpectralOperators/ChebyshevOperator.hpp"
+#include "SpectralOperators/SphericalChebyshevOperator.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    /**
-    * @brief Simple struct holding details about ChebyshevFFT transform
+    * @brief Simple struct holding details about SphercialChebyshevFFT transform
     */
-   struct ChebyshevFftIds {
+   struct SphericalChebyshevFftIds {
 
       /**
        * @brief Simple struct holding the projector IDs
@@ -60,9 +60,9 @@ namespace Transform {
    };
 
    /**
-    * @brief Implementation of the FFTW transform for a Chebyshev expansion
+    * @brief Implementation of the FFTW transform for a Chebyshev expansion for a spherical radius
     */ 
-   class ChebyshevFftwTransform
+   class SphericalChebyshevFftwTransform
    {
       public:
          /// Typedef for the configuration class
@@ -72,25 +72,25 @@ namespace Transform {
          typedef SharedFftSetup SharedSetupType;
 
          /// Typedef for the Projector type
-         typedef ChebyshevFftIds::Projectors ProjectorType;
+         typedef SphericalChebyshevFftIds::Projectors ProjectorType;
 
          /// Typedef for the Integrator type
-         typedef ChebyshevFftIds::Integrators IntegratorType;
+         typedef SphericalChebyshevFftIds::Integrators IntegratorType;
 
          /**
           * @brief Generate a physical grid
           */
-         static Array generateGrid(const int size); 
+         static Array generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio); 
 
          /**
           * @brief Very basic constructor
           */
-         ChebyshevFftwTransform();
+         SphericalChebyshevFftwTransform();
 
          /**
           * @brief Destroy the FFTW plans
           */
-         ~ChebyshevFftwTransform();
+         ~SphericalChebyshevFftwTransform();
 
          /**
           * @brief Initialise the FFT computations (plans, etc)
@@ -212,9 +212,19 @@ namespace Transform {
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
+
+         /**
+          * @brief Storage for the gap width (R_o - R_i)
+          */
+         MHDFloat mGapWidth;
+
+         /**
+          * @brief Storage for the ratio of the radii (R_i / R_o)
+          */
+         MHDFloat mRRatio;
    };
 
-   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void SphericalChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, SphericalChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -237,7 +247,7 @@ namespace Transform {
       rChebVal *= this->mspSetup->scale();
    }
 
-   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void SphericalChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, SphericalChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -258,9 +268,9 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute first derivative
-      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == SphericalChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::SphericalChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize());
@@ -279,7 +289,7 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void SphericalChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, SphericalChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -310,7 +320,7 @@ namespace Transform {
       rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
    }
 
-   template <Arithmetics::Id TOperation> void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void SphericalChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, SphericalChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -331,9 +341,9 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute first derivative of real part
-      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == SphericalChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::SphericalChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Compute derivative
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).real();
@@ -353,9 +363,9 @@ namespace Transform {
       rPhysVal.real() = this->mTmpOut;
 
       // Compute first derivative of imaginary part
-      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == SphericalChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::SphericalChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).imag();
@@ -378,4 +388,4 @@ namespace Transform {
 }
 }
 
-#endif // CHEBYSHEVFFTWTRANSFORM_HPP
+#endif // SPHERICALCHEBYSHEVFFTWTRANSFORM_HPP

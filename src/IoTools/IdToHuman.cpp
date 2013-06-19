@@ -171,6 +171,10 @@ namespace IoTools {
             return "chi";
          case NonDimensional::GAMMA:
             return "gamma";
+         case NonDimensional::GAPWIDTH:
+            return "gapwidth";
+         case NonDimensional::RRATIO:
+            return "rratio";
          default:
             throw Exception("Unknown ID to string conversion requested");
       }

@@ -34,6 +34,20 @@ namespace Equations {
       return this->mND.at(name);
    }
 
+   std::vector<NonDimensional::Id> EquationParameters::ids()
+   {
+      // Storage for the IDs
+      std::vector<NonDimensional::Id> ids;
+
+      std::map<NonDimensional::Id,MHDFloat>::const_iterator it;
+      for(it = this->mND.begin(); it != this->mND.end(); it++)
+      {
+         ids.push_back(it->first);
+      }
+
+      return ids;
+   }
+
    std::vector<std::string> EquationParameters::names()
    {
       // Storage for the names
