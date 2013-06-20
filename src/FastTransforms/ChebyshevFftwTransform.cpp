@@ -30,7 +30,7 @@ namespace Transform {
       // Create Chebyshev grid
       for(int k = 0; k < size; k++)
       {
-         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)-0.5)/static_cast<MHDFloat>(size));
+         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
       }
 
       return grid;
