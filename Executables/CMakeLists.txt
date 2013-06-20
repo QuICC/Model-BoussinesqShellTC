@@ -14,7 +14,7 @@ foreach(ModelFile ${PhysicalModels})
 
    # Extract the spatial scheme from model file
    file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
-   STRING(REGEX REPLACE "typedef ([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
+   STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
    STRING(REGEX REPLACE " " "" Scheme ${Scheme})
 
    # Get model specific sources

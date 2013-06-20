@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * \brief Base implementation of a cost based spatial schemes
     */
@@ -141,6 +143,6 @@ namespace GeoMHDiSCC {
 
    };
 }
-
+}
 
 #endif // ISCHEMECOSTS_HPP

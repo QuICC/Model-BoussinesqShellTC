@@ -34,7 +34,7 @@ namespace GeoMHDiSCC {
          static const int DIMENSION = 3;
 
          /// Typedef for the spatial scheme used
-         typedef CFTScheme SchemeType;
+         typedef Schemes::CFTScheme SchemeType;
 
          /**
           * @brief Get vector of names for the boundary conditions

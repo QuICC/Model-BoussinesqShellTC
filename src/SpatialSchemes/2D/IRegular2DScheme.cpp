@@ -18,6 +18,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    const int IRegular2DScheme::DIMENSIONS = 2;
 
    bool IRegular2DScheme::isRegular()
@@ -117,4 +119,5 @@ namespace GeoMHDiSCC {
       return -1;
    }
 
+}
 }

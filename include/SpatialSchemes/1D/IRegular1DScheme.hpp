@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * @brief Implementation of a generic regular 1D scheme
     */
@@ -84,6 +86,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // IREGULAR1DSCHEME_HPP

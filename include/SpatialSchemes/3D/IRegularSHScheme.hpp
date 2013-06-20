@@ -1,9 +1,9 @@
-/** \file IRegular2DScheme.hpp
- *  \brief Implementation of a generic regular 2D scheme
+/** \file IRegularSHScheme.hpp
+ *  \brief Implementation of the Regular basis + Spherical Harmonics scheme
  */
 
-#ifndef IREGULAR2DSCHEME_HPP
-#define IREGULAR2DSCHEME_HPP
+#ifndef IREGULARSHSCHEME_HPP
+#define IREGULARSHSCHEME_HPP
 
 // Configuration includes
 //
@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of a generic regular 2D scheme
+    * @brief Implementation of Regular basis + Spherical Harmonics scheme
     */
-   class IRegular2DScheme: public ISpatialScheme
+   class IRegularSHScheme: public ISpatialScheme
    {
       public:
          /**
@@ -44,17 +44,19 @@ namespace Schemes {
          /**
           * @brief Constructor
           *
-          * @param dim     Chebyshev truncations
+          * @param dim 0: radial, 1: latitudinal, 2: longitudinal
           */
-         explicit IRegular2DScheme(const ArrayI& dim);
+         explicit IRegularSHScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~IRegular2DScheme();
+         virtual ~IRegularSHScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set
+          *
+          * \epmTodo Partial splitting needs to be optimized
           *
           * @param transId Transform ID
           * @param fwd1D   Storage for forward indexes of first dimension
@@ -79,19 +81,27 @@ namespace Schemes {
          
       protected:
          /**
-          * @brief First truncation
+          * @brief Regular truncation
           */
          int   mI;
 
          /**
-          * @brief Second truncation
+          * @brief Spherical harmonic degree
           */
-         int   mJ;
+         int   mL;
+
+         /**
+          * @brief Spherical harmonic order
+          */
+         int   mM;
 
       private:
+         /**
+          * @brief Build the ML map of the spherical harmonics
+          */
+         void buildMLMap(std::multimap<int,int>& harmonics, const int id, const int bins);
    };
-
 }
 }
 
-#endif // IREGULAR2DSCHEME_HPP
+#endif // IREGULARSHSCHEME_HPP

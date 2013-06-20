@@ -18,6 +18,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    const int IRegular1DScheme::DIMENSIONS = 1;
 
    bool IRegular1DScheme::isRegular()
@@ -78,4 +80,5 @@ namespace GeoMHDiSCC {
       throw Exception("There is no splitting algorithm for 1D problems!");
    }
 
+}
 }

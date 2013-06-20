@@ -24,6 +24,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * @brief Implementation of Chebyshev(FFT) + Chebyshev(FFT) scheme
     */
@@ -90,6 +92,7 @@ namespace GeoMHDiSCC {
          Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
    };
 
+}
 }
 
 #endif // TTSCHEME_HPP

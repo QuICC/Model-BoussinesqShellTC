@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    ISpatialScheme::ISpatialScheme(const int dims)
       : ISchemeCosts(dims), mDims(dims)
    {
@@ -77,4 +79,5 @@ namespace GeoMHDiSCC {
       return this->mDims;
    }
 
+}
 }

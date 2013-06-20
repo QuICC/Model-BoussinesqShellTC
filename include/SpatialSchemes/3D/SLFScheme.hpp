@@ -1,9 +1,9 @@
-/** \file FFScheme.hpp
- *  \brief Implementation of the Fourier + Fourier scheme
+/** \file SLFScheme.hpp
+ *  \brief Implementation of the spherical Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
  */
 
-#ifndef FFSCHEME_HPP
-#define FFSCHEME_HPP
+#ifndef SLFSCHEME_HPP
+#define SLFSCHEME_HPP
 
 // Configuration includes
 //
@@ -17,9 +17,10 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "FastTransforms/FftwTools.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/2D/IRegular2DScheme.hpp"
+#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
 namespace GeoMHDiSCC {
@@ -27,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of Fourier + Fourier scheme
+    * @brief Implementation of the spherical Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
     */
-   class FFScheme: public IRegular2DScheme
+   class SLFScheme: public IRegularSHScheme
    {
       public:
          /**
@@ -40,14 +41,14 @@ namespace Schemes {
          /**
           * @brief Constructor
           *
-          * @param dim  Fourier truncations
+          * @param dim     Chebyshev truncations 
           */
-         explicit FFScheme(const ArrayI& dim);
+         explicit SLFScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~FFScheme();
+         virtual ~SLFScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -90,9 +91,14 @@ namespace Schemes {
           * @brief Construct setup object for second transform
           */
          Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
+
+         /**
+          * @brief Construct setup object for third transform
+          */
+         Transform::SharedFftSetup  spSetup3D(SharedResolution spRes) const;
    };
 
 }
 }
 
-#endif // FFSCHEME_HPP
+#endif // SLFSCHEME_HPP

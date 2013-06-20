@@ -17,6 +17,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    ISchemeCosts::ISchemeCosts(const int dims)
       : mCosts(dims), mScalings(dims), mMemory(dims)
    {
@@ -119,4 +121,5 @@ namespace GeoMHDiSCC {
       this->mMemory(static_cast<int>(id)) = c;
    }
 
+}
 }

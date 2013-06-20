@@ -5,5 +5,7 @@ set(MHDSources
    TFFScheme.cpp
    FFFScheme.cpp
    CFTScheme.cpp
+   SLFScheme.cpp
    IRegular3DScheme.cpp
+   IRegularSHScheme.cpp
 )

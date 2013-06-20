@@ -23,6 +23,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * @brief Implementation of a generic regular 3D scheme
     */
@@ -42,7 +44,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           *
-          * @param dim     Chebyshev truncations 
+          * @param dim Dimension truncations 
           */
          explicit IRegular3DScheme(const ArrayI& dim);
 
@@ -94,6 +96,7 @@ namespace GeoMHDiSCC {
       private:
    };
 
+}
 }
 
 #endif // IREGULAR3DSCHEME_HPP

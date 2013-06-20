@@ -17,6 +17,8 @@
 //
 
 namespace GeoMHDiSCC {
+
+namespace Schemes {
    
    std::string CFTScheme::type()
    {
@@ -211,4 +213,5 @@ namespace GeoMHDiSCC {
    {
       return true;
    }
+}
 }

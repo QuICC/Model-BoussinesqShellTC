@@ -18,6 +18,8 @@
 #include "FastTransforms/FftwTools.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Schemes {
    
    std::string FScheme::type()
    {
@@ -101,4 +103,5 @@ namespace GeoMHDiSCC {
    {
       return true;
    }
+}
 }

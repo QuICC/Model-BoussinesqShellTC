@@ -84,7 +84,7 @@ namespace Parallel {
          /**
           * @brief Shared spatial scheme
           */
-         SharedISpatialScheme  mspScheme;
+         Schemes::SharedISpatialScheme  mspScheme;
 
          /**
           * @brief Initialise the CPU factors

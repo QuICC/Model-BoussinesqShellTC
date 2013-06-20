@@ -18,6 +18,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    const int IRegular3DScheme::DIMENSIONS = 3;
 
    bool IRegular3DScheme::isRegular()
@@ -47,6 +49,7 @@ namespace GeoMHDiSCC {
       bwd1D.clear();
       idx2D.clear();
 
+      // Multimap for the modes
       std::multimap<int,int> modes;
 
       int i0 = -1;
@@ -185,6 +188,7 @@ namespace GeoMHDiSCC {
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
          }
       }
+
       // Counter
       int c = 0;
 
@@ -338,10 +342,9 @@ namespace GeoMHDiSCC {
       }
       
       // If none of the previous conditions were right
-      assert(false);
-
       throw Exception("Tried to split in a unknown dimension for 3D regular case");
 
       return -1;
    }
+}
 }

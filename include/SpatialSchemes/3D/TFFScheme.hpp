@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * @brief Implementation of Chebyshev(FFT) + Fourier + Fourier scheme
     */
@@ -97,6 +99,7 @@ namespace GeoMHDiSCC {
 
    };
 
+}
 }
 
 #endif // TFFSCHEME_HPP

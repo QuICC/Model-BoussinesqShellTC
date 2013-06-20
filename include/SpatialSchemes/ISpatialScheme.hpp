@@ -25,6 +25,8 @@
 
 namespace GeoMHDiSCC {
 
+namespace Schemes {
+
    /**
     * @brief Implementation of the basic components of the spatial scheme
     */
@@ -122,6 +124,6 @@ namespace GeoMHDiSCC {
    /// Typedef for a shared pointer to a ISpatialScheme object
    typedef SharedPtrMacro<ISpatialScheme>   SharedISpatialScheme;
 }
-
+}
 
 #endif // ISPATIALSCHEME_HPP

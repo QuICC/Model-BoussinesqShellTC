@@ -1,5 +1,5 @@
-/** \file TFTScheme.cpp
- *  \brief Source of the Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme implementation
+/** \file SLFScheme.cpp
+ *  \brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
  */
 
 // System includes
@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/TFTScheme.hpp"
+#include "SpatialSchemes/3D/SLFScheme.hpp"
 
 // Project includes
 //
@@ -20,12 +20,12 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
    
-   std::string TFTScheme::type()
+   std::string SLFScheme::type()
    {
-      return "TFT";
+      return "SLF";
    }
 
-   void TFTScheme::addTransformSetups(SharedResolution spRes) const
+   void SLFScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
       Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
@@ -40,7 +40,7 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::SharedFftSetup TFTScheme::spSetup1D(SharedResolution spRes) const
+   Transform::SharedFftSetup SLFScheme::spSetup1D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -58,7 +58,7 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
    }
 
-   Transform::SharedFftSetup TFTScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedFftSetup SLFScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
@@ -76,7 +76,7 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
-   Transform::SharedFftSetup TFTScheme::spSetup3D(SharedResolution spRes) const
+   Transform::SharedFftSetup SLFScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
@@ -94,86 +94,86 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
    }
 
-   TFTScheme::TFTScheme(const ArrayI& dim)
-      : IRegular3DScheme(dim)
+   SLFScheme::SLFScheme(const ArrayI& dim)
+      : IRegularSHScheme(dim)
    {
    }
 
-   TFTScheme::~TFTScheme()
+   SLFScheme::~SLFScheme()
    {
    }
 
-   void TFTScheme::setDimensions()
+   void SLFScheme::setDimensions()
    {
       //
       // Compute sizes
       //
 
       // Get standard dealiased FFT size
-      int nX = Transform::FftwTools::dealiasFft(this->mI+1);
+      int nR = Transform::FftwTools::dealiasFft(this->mI+1);
       // Check for optimised FFT sizes
-      nX = Transform::FftwTools::optimizeFft(nX);
+      nR = Transform::FftwTools::optimizeFft(nR);
 
       // Get mixed dealiased FFT size
-      int nY = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
+      int nTh = Transform::FftwTools::dealiasMixedFft(this->mL+1);
       // Check for optimised FFT sizes
-      nY = Transform::FftwTools::optimizeFft(nY);
+      nTh = Transform::FftwTools::optimizeFft(nTh);
 
       // Get standard dealiased FFT size
-      int nZ = Transform::FftwTools::dealiasFft(this->mK+1);
+      int nPh = Transform::FftwTools::dealiasMixedFft(this->mM+1);
       // Check for optimised FFT sizes
-      nZ = Transform::FftwTools::optimizeFft(nZ);
+      nPh = Transform::FftwTools::optimizeFft(nPh);
 
       //
       // Initialise first transform
       //
 
       // Initialise forward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
+      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mK + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(this->mL + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+      this->setDimension(this->mM + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform
       //
 
       // Initialise forward dimension of second transform
-      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
+      this->setDimension(nTh, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of second transform
-      this->setDimension(nY/2 + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
+      this->setDimension(nTh, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of second transform
-      this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
+      this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of second transform
-      this->setDimension(this->mK + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
+      this->setDimension(this->mM + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
 
       //
       // Initialise third transform
       //
 
       // Initialise forward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
+      this->setDimension(nPh, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
+      this->setDimension(nPh/2 + 1, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of third transform
-      this->setDimension(nY, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
+      this->setDimension(nTh, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of third transform
-      this->setDimension(nX, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
+      this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void TFTScheme::setCosts()
+   void SLFScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
@@ -185,7 +185,7 @@ namespace Schemes {
       this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void TFTScheme::setScalings()
+   void SLFScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
@@ -197,7 +197,7 @@ namespace Schemes {
       this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void TFTScheme::setMemoryScore()
+   void SLFScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
@@ -209,7 +209,7 @@ namespace Schemes {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool TFTScheme::applicable() const
+   bool SLFScheme::applicable() const
    {
       return true;
    }
