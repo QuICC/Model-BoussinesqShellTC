@@ -36,8 +36,8 @@ set(MHDAllSrcDirs
    Communicators
    Diagnostics
    EigenSolver
-   Equations
    Enums
+   Equations
    Exceptions
    FastTransforms
    Framework
@@ -51,6 +51,7 @@ set(MHDAllSrcDirs
    IoVariable
    IoXml
    LoadSplitter
+   PolynomialTransforms
    Profiler
    Resolutions
    Simulation

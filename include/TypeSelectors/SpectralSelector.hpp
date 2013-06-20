@@ -20,6 +20,8 @@
 #include "SpectralOperators/ChebyshevBoundary.hpp"
 #include "SpectralOperators/CylindricalChebyshevOperator.hpp"
 #include "SpectralOperators/CylindricalChebyshevBoundary.hpp"
+#include "SpectralOperators/SphericalChebyshevOperator.hpp"
+#include "SpectralOperators/SphericalChebyshevBoundary.hpp"
 #include "SpectralOperators/UnitOperator.hpp"
 
 namespace GeoMHDiSCC {
@@ -97,6 +99,26 @@ namespace GeoMHDiSCC {
             typedef  ChebyshevBoundary  BcType;
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+
+      // Configure code to use SLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
+         {
+            /// Typedef for the spectral operator
+            typedef  SphericalChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  SphericalChebyshevBoundary  BcType;
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
+         {
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLF
 
    }
 }

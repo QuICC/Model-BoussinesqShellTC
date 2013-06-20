@@ -20,6 +20,8 @@
 #include "FastTransforms/FftwTransform.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
 #include "FastTransforms/CylindricalChebyshevFftwTransform.hpp"
+#include "FastTransforms/SphericalChebyshevFftwTransform.hpp"
+#include "PolynomialTransforms/AssociatedLegendreTransform.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Communicators/Communicator.hpp"
 
@@ -91,6 +93,27 @@ namespace GeoMHDiSCC {
             typedef ChebyshevFftwTransform Type;
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+
+      // Configure code to use SLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef SphericalChebyshevFftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef AssociatedLegendreTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef FftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLF
    }
 
    namespace Parallel {

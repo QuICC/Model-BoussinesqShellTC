@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Resolutions/TransformSetup.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -26,7 +27,7 @@ namespace Transform {
    /**
     * @brief Implementation of the FFT setup class
     */ 
-   class FftSetup
+   class FftSetup: public TransformSetup
    {
       public:
          /**
@@ -69,22 +70,7 @@ namespace Transform {
          /**
           * @brief Get the size of the transform
           */
-         int fwdSize() const;
-
-         /**
-          * @brief Get the size of the transform
-          */
          int bwdSize() const;
-
-         /**
-          * @brief Get the number of similar transforms
-          */
-         int howmany() const;
-
-         /**
-          * @brief Get the spectral size of the transform
-          */
-         int specSize() const;
 
          /**
           * @brief Get the size of the padding
@@ -100,24 +86,9 @@ namespace Transform {
 
       private:
          /**
-          * @brief Size of the forward transform
-          */
-         int mFwdSize;
-
-         /**
           * @brief Size of the backward transform
           */
          int mBwdSize;
-
-         /**
-          * @brief Number of similar transforms
-          */
-         int mHowmany;
-
-         /**
-          * @brief Spectral size
-          */
-         int mSpecSize;
 
          /**
           * @brief Transform is of C2R/R2C type?

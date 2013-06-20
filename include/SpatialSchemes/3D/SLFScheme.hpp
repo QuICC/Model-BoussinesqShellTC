@@ -22,6 +22,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/3D/IRegularSHScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "PolynomialTransforms/PolySetup.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -90,7 +91,7 @@ namespace Schemes {
          /**
           * @brief Construct setup object for second transform
           */
-         Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
+         Transform::SharedPolySetup  spSetup2D(SharedResolution spRes) const;
 
          /**
           * @brief Construct setup object for third transform

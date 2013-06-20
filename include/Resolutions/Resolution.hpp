@@ -21,7 +21,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Resolutions/SimulationResolution.hpp"
 #include "Resolutions/CoreResolution.hpp"
-#include "FastTransforms/FftSetup.hpp"
+#include "Resolutions/TransformSetup.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -71,7 +71,7 @@ namespace GeoMHDiSCC {
           *
           * @param dim Dimension for which to get setup
           */
-         Transform::SharedFftSetup spTransformSetup(const Dimensions::Transform::Id dim) const;
+         Transform::SharedTransformSetup spTransformSetup(const Dimensions::Transform::Id dim) const;
 
          /**
           * @brief Add a transform setup 
@@ -79,7 +79,7 @@ namespace GeoMHDiSCC {
           * @param dim     Dimension corresponding to setup
           * @param spSetup Transform setup
           */
-         void addTransformSetup(const Dimensions::Transform::Id dim, Transform::SharedFftSetup spSetup);
+         void addTransformSetup(const Dimensions::Transform::Id dim, Transform::SharedTransformSetup spSetup);
 
          /**
           * @brief Get the forward scalar field setup
@@ -133,7 +133,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the transform setups
           */
-         std::map<Dimensions::Transform::Id,Transform::SharedFftSetup>   mTSetups;
+         std::map<Dimensions::Transform::Id,Transform::SharedTransformSetup>   mTSetups;
    };
 
    /// Typedef for a shared pointer to a Resolution object

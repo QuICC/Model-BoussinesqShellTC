@@ -22,6 +22,7 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
+#include "Equations/Tools/Scalar1DEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -122,13 +123,13 @@ namespace Equations {
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return timeRow1DPeriodic(*this, compId, matIdx);
+         return Scalar1DEigenTools::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return linearRow1DPeriodic(*this, compId, matIdx);
+         return Scalar1DEigenTools::linearRow(*this, compId, matIdx);
       } else if(opId == IEquation::BOUNDARYROW)
       {
-         return boundaryRow1DPeriodic(*this, compId, matIdx);
+         return Scalar1DEigenTools::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -282,7 +283,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      boundaryBlock1DPeriodic(eq, mat, fieldId, pX, pZ, cX, cZ);
+      Scalar1DEigenTools::boundaryBlock(eq, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

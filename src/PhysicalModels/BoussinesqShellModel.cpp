@@ -22,6 +22,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "Generator/States/ShellExactScalarState.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,6 +31,9 @@ namespace GeoMHDiSCC {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
 
+      // Add temperature
+      ids.push_back(PhysicalNames::TEMPERATURE);
+
       return ids;
    }
 
@@ -37,6 +41,12 @@ namespace GeoMHDiSCC {
    {
       // Create storage
       std::vector<NonDimensional::Id> ids;
+
+      // Add gap width
+      ids.push_back(NonDimensional::GAPWIDTH);
+
+      // Add radii ratio
+      ids.push_back(NonDimensional::RRATIO);
 
       return ids;
    }
@@ -52,29 +62,40 @@ namespace GeoMHDiSCC {
       box.push_back(false);
 
       // Z direction is not periodic box
-      box.push_back(true);
+      box.push_back(false);
 
       return box;
    }
 
    void BoussinesqShellModel::addEquations(SharedSimulation spSim)
    {
-      throw Exception("Not implemented yet!");
+      throw Exception("addEquations: Not implemented yet!");
    }
 
    void BoussinesqShellModel::addStates(SharedStateGenerator spGen)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to equation
+      Equations::SharedShellExactScalarState spExact;
+
+      // Add initial state generator
+      spExact = spGen->addScalarEquation<Equations::ShellExactScalarState>();
+      spExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spExact->setStateType(Equations::ShellExactScalarState::CONSTANT);
+
+      // Add output file
+//      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+//      spOut->expect(PhysicalNames::TEMPERATURE);
+//      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqShellModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
-      throw Exception("Not implemented yet!");
+      throw Exception("addVisualizers: Not implemented yet!");
    }
 
    void BoussinesqShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
-      throw Exception("Not implemented yet!");
+      throw Exception("setVisualizationState: Not implemented yet!");
    }
 
    void BoussinesqShellModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -112,8 +133,6 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
-
-      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

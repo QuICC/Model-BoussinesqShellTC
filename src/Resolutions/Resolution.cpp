@@ -88,12 +88,12 @@ namespace GeoMHDiSCC {
       return this->mCores.at(id);
    }
 
-   void Resolution::addTransformSetup(const Dimensions::Transform::Id id, Transform::SharedFftSetup spSetup)
+   void Resolution::addTransformSetup(const Dimensions::Transform::Id id, Transform::SharedTransformSetup spSetup)
    {
       this->mTSetups.insert(std::make_pair(id, spSetup));
    }
 
-   Transform::SharedFftSetup  Resolution::spTransformSetup(const Dimensions::Transform::Id id) const
+   Transform::SharedTransformSetup  Resolution::spTransformSetup(const Dimensions::Transform::Id id) const
    {
       // Assert for correct size
       assert(this->mTSetups.size() > static_cast<size_t>(id));

@@ -32,7 +32,7 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
 
       // Add setup for second transform
-      Transform::SharedFftSetup  spS2D = this->spSetup2D(spRes);
+      Transform::SharedPolySetup  spS2D = this->spSetup2D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA2D, spS2D);
 
       // Add setup for third transform
@@ -58,12 +58,12 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
    }
 
-   Transform::SharedFftSetup SLFScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedPolySetup SLFScheme::spSetup2D(SharedResolution spRes) const
    {
-      // Get size of FFT transform
+      // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
 
-      // Get spectral size of the FFT
+      // Get physical size of the polynomial transform
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
@@ -73,7 +73,10 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
+      std::vector<ArrayI>  fast;
+      ArrayI  slow;
+
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow));
    }
 
    Transform::SharedFftSetup SLFScheme::spSetup3D(SharedResolution spRes) const
@@ -91,7 +94,7 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
    SLFScheme::SLFScheme(const ArrayI& dim)

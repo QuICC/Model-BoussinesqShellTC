@@ -22,7 +22,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    FftSetup::FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type)
-      : mFwdSize(size), mBwdSize(0), mHowmany(howmany), mSpecSize(specSize), mType(type), mScale(-1)
+      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1)
    {
       // Set the backward size
       if(this->mType == FftSetup::MIXED)
@@ -58,24 +58,9 @@ namespace Transform {
       return this->mType;
    }
 
-   int FftSetup::fwdSize() const
-   {
-      return this->mFwdSize;
-   }
-
    int FftSetup::bwdSize() const
    {
       return this->mBwdSize;
-   }
-
-   int FftSetup::howmany() const
-   {
-      return this->mHowmany;
-   }
-
-   int FftSetup::specSize() const
-   {
-      return this->mSpecSize;
    }
 
    int FftSetup::padSize() const

@@ -165,7 +165,7 @@ namespace GeoMHDiSCC {
    template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
    {
       // Initialise the transforms
-      this->initTransform(spRes->spTransformSetup(Dimensions::Transform::TRA1D));
+      this->initTransform(std::tr1::static_pointer_cast<typename T1D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA1D)));
 
       // Store information about variables
       this->mVarInfo = varInfo;

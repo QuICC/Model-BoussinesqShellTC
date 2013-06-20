@@ -4,4 +4,5 @@ set(MHDSources
    TransformResolution.cpp
    CoreResolution.cpp
    Resolution.cpp
+   TransformSetup.cpp
 )
