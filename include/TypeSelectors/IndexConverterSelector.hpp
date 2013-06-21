@@ -25,11 +25,21 @@ namespace GeoMHDiSCC {
       /**
        * @brief Specialialised IndexConverterSelector for the second transform
        */
-      template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
-      {
-         /// Typedef for the type of the index converter
-         typedef NoIndexConv  Type;
-      };
+      // Configure code to use SLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+         template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the type of the index converter
+            typedef SHIndexConv  Type;
+         };
+      #else //GEOMHDISCC_SPATIALSCHEME_SLF
+         template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the type of the index converter
+            typedef NoIndexConv  Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLF
+
 
       /**
        * @brief Specialialised IndexConverterSelector for the second transform

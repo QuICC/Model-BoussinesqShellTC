@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
       // Add initial state generator
       spExact = spGen->addScalarEquation<Equations::ShellExactScalarState>();
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::ShellExactScalarState::CONSTANT);
+      spExact->setStateType(Equations::ShellExactScalarState::HARMONICS);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

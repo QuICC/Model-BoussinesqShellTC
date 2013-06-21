@@ -36,6 +36,7 @@ namespace Equations {
           */
          enum StateTypeId {
             CONSTANT,
+            HARMONICS
          };
 
          /**
