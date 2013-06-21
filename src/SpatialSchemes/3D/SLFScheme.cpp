@@ -15,6 +15,7 @@
 
 // Project includes
 //
+#include "PolynomialTransforms/PolynomialTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -66,17 +67,32 @@ namespace Schemes {
       // Get physical size of the polynomial transform
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
-      // Get number of transforms
+      // Storage for the list of indexes
+      std::vector<ArrayI>  fast;
+      fast.reserve(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>());
+      ArrayI  slow(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>());
+
+      // Multiplier from second dimension 
+      ArrayI mult(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>());
+
+      // Get number of transforms and list of indexes
       int howmany = 0;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
+
+         slow(i) = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i);
+
+         fast.push_back(ArrayI(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATB1D>(i)));
+         for(int j = 0; j < fast.at(i).size(); j++)
+         {
+            fast.at(i)(j) = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DATB1D>(j,i);
+         }
+
+         mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      std::vector<ArrayI>  fast;
-      ArrayI  slow;
-
-      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow));
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
    Transform::SharedFftSetup SLFScheme::spSetup3D(SharedResolution spRes) const
@@ -117,10 +133,8 @@ namespace Schemes {
       // Check for optimised FFT sizes
       nR = Transform::FftwTools::optimizeFft(nR);
 
-      // Get mixed dealiased FFT size
-      int nTh = Transform::FftwTools::dealiasMixedFft(this->mL+1);
-      // Check for optimised FFT sizes
-      nTh = Transform::FftwTools::optimizeFft(nTh);
+      // Get gealiased associated legendre transform size
+      int nTh = Transform::PolynomialTools::dealias(this->mL+1);
 
       // Get standard dealiased FFT size
       int nPh = Transform::FftwTools::dealiasMixedFft(this->mM+1);
@@ -151,7 +165,7 @@ namespace Schemes {
       this->setDimension(nTh, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of second transform
-      this->setDimension(nTh, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mL + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of second transform
       this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);

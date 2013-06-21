@@ -21,8 +21,8 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   PolySetup::PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow)
-      : TransformSetup(size, howmany, specSize), mFast(fast), mSlow(slow)
+   PolySetup::PolySetup(const int size, const int howmany, const int specSize, const std::vector<ArrayI>& fast, const ArrayI& slow, const ArrayI& mult)
+      : TransformSetup(size, howmany, specSize), mFast(fast), mSlow(slow), mMult(mult)
    {
    }
 
@@ -30,8 +30,19 @@ namespace Transform {
    {
    }
 
-   void PolySetup::init()
+   const std::vector<ArrayI>& PolySetup::fast() const
    {
+      return this->mFast;
+   }
+
+   const ArrayI& PolySetup::slow() const
+   {
+      return this->mSlow;
+   }
+
+   const ArrayI& PolySetup::mult() const
+   {
+      return this->mMult;
    }
 
 }

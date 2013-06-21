@@ -29,7 +29,6 @@
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -112,7 +111,7 @@ namespace Transform {
          /**
           * @brief Get the physical grid
           */
-         Array meshGrid() const; 
+         const Array& meshGrid() const; 
 
          /**
           * @brief Compute quadrature integration
@@ -157,6 +156,11 @@ namespace Transform {
          void initProjector();
 
          /**
+          * @brief Initialise the derivative
+          */
+         void initDerivative();
+
+         /**
           * @brief Storage for the quadrature points
           */
          Array mGrid;
@@ -174,11 +178,20 @@ namespace Transform {
          /**
           * @brief Projector matrix
           */
-         Matrix   mProjector;
+         std::vector<Matrix>  mProjector;
+
+         /**
+          * @brief Derivative matrix
+          */
+         std::vector<Matrix>  mDerivative;
    };
 
    template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator)
    {
+      //
+      /// \mhdBug Implementation should work but is probably slow!
+      //
+      
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
@@ -190,7 +203,15 @@ namespace Transform {
       assert(rSpecVal.cols() == this->mspSetup->howmany());
 
       // Compute integration
-      rSpecVal = this->mProjector * physVal;
+      int start = 0;
+      int physRows = this->mGrid.size(); 
+      for(size_t i = 0; i < this->mProjector.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = this->mProjector.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = this->mProjector.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+         start += cols;
+      }
    }
 
    template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreTransform::ProjectorType::Id projector)
@@ -205,16 +226,31 @@ namespace Transform {
       assert(rPhysVal.rows() == this->mspSetup->fwdSize());
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
-      // Compute first derivative of real part
+      // Compute first derivative
       if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
       {
-         std::cerr << "OUWOUWRAOIUFAOUFA NOT IMPLEMENTED YET!" << std::endl;
-         rPhysVal = this->mProjector * specVal;
+         int start = 0;
+         int physRows = this->mGrid.size(); 
+         for(size_t i = 0; i < this->mDerivative.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDerivative.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mDerivative.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
 
-      // Compute simple projection of real part
+      // Compute simple projection
       } else
       {
-         rPhysVal = this->mProjector * specVal;
+         int start = 0;
+         int physRows = this->mGrid.size(); 
+         for(size_t i = 0; i < this->mProjector.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mProjector.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mProjector.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
       }
    }
 

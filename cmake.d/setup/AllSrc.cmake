@@ -53,6 +53,7 @@ set(MHDAllSrcDirs
    LoadSplitter
    PolynomialTransforms
    Profiler
+   Quadratures
    Resolutions
    Simulation
    SparseSolvers
