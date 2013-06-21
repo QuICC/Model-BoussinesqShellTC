@@ -51,6 +51,11 @@ namespace Equations {
       this->mTypeId = id;
    }
 
+   void ShellExactScalarState::setHarmonicOptions(const std::vector<std::tr1::tuple<int,int,MHDComplex> >& modes)
+   {
+      this->mSHModes = modes;
+   }
+
    void ShellExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
       this->initSpectralMatrices1DPeriodic(spBcIds);
@@ -101,7 +106,7 @@ namespace Equations {
       if(this->mTypeId == CONSTANT)
       {
          rNLComp.rData().setConstant(42);
-      } else if(this->mTypeId == HARMONICS)
+      } else if(this->mTypeId == HARMONIC)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -114,87 +119,26 @@ namespace Equations {
          Array funcPh(nPh);
          MHDFloat funcR(nR);
          MHDFloat funcTh;
+         std::vector<std::tr1::tuple<int,int,MHDComplex> >::const_iterator it;
+         rNLComp.rData().setConstant(0);
          for(int iR = 0; iR < nR; ++iR)
          {
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
                funcR = 1.0;
 
-               // Spherical harmonic Y_0^0
-               funcPh.setConstant(1);
-               funcTh = std::tr1::sph_legendre(0,0, thGrid(iTh));
-               rNLComp.setProfile(funcPh*funcR*funcTh,iTh,iR);
+               for(it = this->mSHModes.begin(); it != this->mSHModes.end(); ++it)
+               {
+                  int l = std::tr1::get<0>(*it);
+                  int m = std::tr1::get<1>(*it);
+                  MHDFloat re = std::tr1::get<2>(*it).real();
+                  MHDFloat im = std::tr1::get<2>(*it).imag();
 
-               // Spherical harmonic Y_1^0
-               funcPh.setConstant(1);
-               funcTh = std::tr1::sph_legendre(1,0, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_1^1
-               funcPh = phGrid.array().sin();
-               funcTh = std::tr1::sph_legendre(1,1, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_2^0
-               funcPh.setConstant(1);
-               funcTh = std::tr1::sph_legendre(2,0, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_2^1
-               funcPh = phGrid.array().cos();
-               funcTh = std::tr1::sph_legendre(2,1, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_2^2
-               funcPh = (2.*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(2,2, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_3^0
-               funcPh.setConstant(1.0);
-               funcTh = std::tr1::sph_legendre(3,0, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_3^1
-               funcPh.setConstant(1.0);
-               funcPh = phGrid.array().cos();
-               funcTh = std::tr1::sph_legendre(3,1, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_3^2
-               funcPh = (2*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(3,2, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_3^3
-               funcPh = (3*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(3,3, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_4^0
-               funcPh.setConstant(1.0);
-               funcTh = std::tr1::sph_legendre(4,0, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_4^1
-               funcPh = phGrid.array().cos();
-               funcTh = std::tr1::sph_legendre(4,1, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_4^2
-               funcPh = (2*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(4,2, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_4^3
-               funcPh = (3*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(4,3, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
-
-               // Spherical harmonic Y_4^4
-               funcPh = (4*phGrid).array().cos();
-               funcTh = std::tr1::sph_legendre(4,4, thGrid(iTh));
-               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+                  // Spherical harmonic Y_l^m
+                  funcPh = re*(static_cast<MHDFloat>(m)*phGrid).array().cos() + im*(static_cast<MHDFloat>(m)*phGrid).array().sin();
+                  funcTh = std::tr1::sph_legendre(l,m, thGrid(iTh));
+                  rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+               }
             }
          }
       } else

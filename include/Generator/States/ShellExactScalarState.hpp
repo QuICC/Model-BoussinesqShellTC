@@ -11,6 +11,8 @@
 
 // System includes
 //
+#include <vector>
+#include <tr1/tuple>
 
 // External includes
 //
@@ -36,7 +38,7 @@ namespace Equations {
           */
          enum StateTypeId {
             CONSTANT,
-            HARMONICS
+            HARMONIC
          };
 
          /**
@@ -92,6 +94,13 @@ namespace Equations {
           */
          void setStateType(const ShellExactScalarState::StateTypeId id);
 
+         /**
+          * @brief Set options for the harmonics states
+          *
+          * @param modes   List of harmonics with amplitude to create
+          */
+         void setHarmonicOptions(const std::vector<std::tr1::tuple<int, int, MHDComplex> >& modes);
+
       protected:
          /**
           * @brief Set variable requirements
@@ -118,6 +127,11 @@ namespace Equations {
           * @brief Type of the state to generate
           */
          StateTypeId mTypeId;
+
+         /**
+          * @brief Storage for the list of spherical harmonic modes to generate
+          */
+         std::vector<std::tr1::tuple<int,int,MHDComplex> > mSHModes;
    };
 
    /// Typedef for a shared ShellExactScalarState
