@@ -19,6 +19,10 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
+   void ISpatialScheme::tuneResolution(SharedResolution spRes)
+   {
+   }
+
    ISpatialScheme::ISpatialScheme(const int dims)
       : ISchemeCosts(dims), mDims(dims)
    {

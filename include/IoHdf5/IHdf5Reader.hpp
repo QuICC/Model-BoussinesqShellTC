@@ -322,7 +322,7 @@ namespace IoHdf5 {
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Select memory hyperslabs (i.e. minimum between file and memory spaces)
-         // Check that at list one index is stored in file
+         // Check that at least one index is stored in file
          if(this->mFileOffsets.at(i).size() > 0)
          {
             iDims[0] = std::min(std::tr1::get<1>(storage.at(i)), std::max(0,static_cast<int>(fDims[nDims-2]-this->mFileOffsets.at(i).at(1))));

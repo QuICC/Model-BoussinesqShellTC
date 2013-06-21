@@ -135,26 +135,14 @@ namespace IoVariable {
 
    void IVariableHdf5NWriter::setDatasetSize()
    {
-      if(this->mIsRegular)
-      {
-         // Get dimensions ordered by index access speed (fast -> slow)
-         ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
+      // Get dimensions ordered by index access speed (fast -> slow)
+      ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
 
-         int nDims = oDims.size();
-         for(int i = 0; i < nDims; ++i)
-         {
-            // Set the dimension size in reverse order for HDF5
-            this->mFileDims.push_back(oDims(nDims-1-i));
-         }
-      } else
+      int nDims = oDims.size();
+      for(int i = 0; i < nDims; ++i)
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
-//         // Set the slow dimension size
-//IS WRONG         this->mFileDims.push_back(this->mspRes->sim()->nSlow(this->mSpaceId));
-//
-//         // Set the second dimension size (fastest in C ordering)
-//IS WRONG         this->mFileDims.push_back(this->mspRes->sim()->nFast(this->mSpaceId));
+         // Set the dimension size in reverse order for HDF5
+         this->mFileDims.push_back(oDims(nDims-1-i));
       }
    }
 

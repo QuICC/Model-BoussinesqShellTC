@@ -34,6 +34,11 @@ namespace Schemes {
    {
       public:
          /**
+          * @brief Tune the shared resolution used by simulation
+          */
+         static void tuneResolution(SharedResolution spRes);
+
+         /**
           * @brief Constructor
           *
           * @param dims Dimension of the domain

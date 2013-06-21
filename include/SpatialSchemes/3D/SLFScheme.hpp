@@ -35,6 +35,11 @@ namespace Schemes {
    {
       public:
          /**
+          * @brief Tune the resolution
+          */
+         static void tuneResolution(SharedResolution spRes);
+
+         /**
           * @brief Get type string for the scheme
           */
          static std::string type();
