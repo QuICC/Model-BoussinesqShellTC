@@ -20,6 +20,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
+#include "Resolutions/Tools/IndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -51,9 +52,11 @@ namespace GeoMHDiSCC {
          int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId) const;
 
          /**
-          * @brief Get the simulation dimensions ordered by index access speed (fast -> slow)
+          * @brief Get the array of dimensions 1D, 2D, 3D
+          *
+          * @param spaceId ID of the space (PHYSICAL, SPECTRAL)
           */
-         ArrayI orderedDims(const Dimensions::Space::Id spaceId) const;
+         const ArrayI& dimensions(const Dimensions::Space::Id spaceId) const;
 
          /**
           * @brief Get the box scale

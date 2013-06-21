@@ -1,5 +1,5 @@
 /** \file TransformSetup.hpp
- *  \brief Implementation of base class for a generalize transform setup
+ *  \brief Implementation of base class for a generalized transform setup
  */
 
 #ifndef TRANSFORMSETUP_HPP
@@ -23,7 +23,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * @brief Implementation of base class for a generalize transform setup
+    * @brief Implementation of base class for a generalized transform setup
     */ 
    class TransformSetup
    {
@@ -36,6 +36,11 @@ namespace Transform {
           * @param specSize   Spectral output size (i.e without the padding)
           */
          TransformSetup(const int size, const int howmany, const int specSize);
+
+         /**
+          * @brief Empty destructor
+          */
+         ~TransformSetup();
 
          /**
           * @brief Get the size of the transform
@@ -51,11 +56,6 @@ namespace Transform {
           * @brief Get the spectral size of the transform
           */
          int specSize() const;
-
-         /**
-          * @brief Empty destructor
-          */
-         ~TransformSetup();
          
       protected:
          /**

@@ -22,6 +22,7 @@
 #include "Resolutions/SimulationResolution.hpp"
 #include "Resolutions/CoreResolution.hpp"
 #include "Resolutions/TransformSetup.hpp"
+#include "Resolutions/Tools/IndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -110,6 +111,16 @@ namespace GeoMHDiSCC {
           */
          void setBoxScale(const Array& boxScale);
 
+         /**
+          * @brief Set the index counter
+          */
+         void setIndexCounter(SharedIndexCounter spCounter);
+
+         /**
+          * @brief Get the index counter
+          */
+         SharedIndexCounter counter();
+
       protected:
 
       private:
@@ -134,6 +145,11 @@ namespace GeoMHDiSCC {
           * @brief Storage for the transform setups
           */
          std::map<Dimensions::Transform::Id,Transform::SharedTransformSetup>   mTSetups;
+
+         /**
+          * @brief Storage for the index counter
+          */
+         SharedIndexCounter   mspCounter;
    };
 
    /// Typedef for a shared pointer to a Resolution object

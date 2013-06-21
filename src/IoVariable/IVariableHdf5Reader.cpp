@@ -107,90 +107,90 @@ namespace IoVariable {
 
    void IVariableHdf5Reader::setReadArguments()
    {
-      /// \mhdBug Code assumes irregular data
-
-      Dimensions::Transform::Id  transId;
-      Dimensions::Simulation::Id simId;
-
-      // Select transform dimension depending on dimension space
-      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
-      {
-         transId = Dimensions::Transform::TRA1D;
-         simId = Dimensions::Simulation::SIM2D;
-      } else
-      {
-         transId = Dimensions::Transform::TRA3D;
-         simId = Dimensions::Simulation::SIM3D;
-      }
+//      Dimensions::Transform::Id  transId;
+//      Dimensions::Simulation::Id simId;
+//
+//      // Select transform dimension depending on dimension space
+//      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+//      {
+//         transId = Dimensions::Transform::TRA1D;
+//         simId = Dimensions::Simulation::SIM2D;
+//      } else
+//      {
+//         transId = Dimensions::Transform::TRA3D;
+//         simId = Dimensions::Simulation::SIM3D;
+//      }
 
       // Get the ordered dimensions
-      ArrayI oDims = this->mspRes->sim()->orderedDims(this->mSpaceId);
+      ArrayI oDims = this->mspRes->counter()->orderedDimensions(this->mSpaceId);
       // Get the ordered file dimensions
-      ArrayI oFDims = this->mspFileRes->orderedDims(this->mSpaceId);
+      ArrayI oFDims = this->mspRes->counter()->orderedDimensions(this->mspFileRes->dimensions(this->mSpaceId), this->mSpaceId);
 
       // Set block size (i.e. number of contiguous elements)
       this->mBlock = std::min(oDims(0), oFDims(0));
 
-      if(this->mIsRegular)
-      {
-         // Loop over the stored indexes
-         std::vector<hsize_t>  offV;
-         offV.push_back(0);
-         offV.push_back(0);
-         for(int i = 0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
-         {
-            int i_ = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
-            // Check if value is available in file
-            if(i_ < this->mspFileRes->dim(simId,this->mSpaceId))
-            {
-               // Compute offset for third dimension
-               offV.at(0) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
-
-               // Compute offset for second dimension
-               offV.at(1) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
-
-               // Add offset to vector
-               this->mFileOffsets.push_back(offV);
-            }
-         }
-      } else
-      {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
-
-//         // offset HDF5 type
-//         hsize_t offset;
+      this->mspRes->counter()->computeOffsets(this->mFileOffsets, this->mSpaceId, this->mspFileRes);
+//      if(this->mIsRegular)
+//      {
 //
 //         // Loop over the stored indexes
 //         std::vector<hsize_t>  offV;
-//         for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+//         offV.push_back(0);
+//         offV.push_back(0);
+//         for(int i = 0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
 //         {
-//            int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+//            int i_ = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
 //            // Check if value is available in file
-//IS WRONG            if(idx3D < this->mspFileRes->dim(Dimensions::Simulation::SIM3D,this->mSpaceId))
+//            if(i_ < this->mspFileRes->dim(simId,this->mSpaceId))
 //            {
-//               // Compute offset from previous index
-//               offset = 0;
-//               for(int j = 0; j < idx3D; ++j)
-//               {
-//IS WRONG                  offset += this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId);
-//               }
+//               // Compute offset for third dimension
+//               offV.at(0) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
 //
-//               // Compute the offset for the local indexes
-//               for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(i); ++j)
-//               {
-//                  if(this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i) < this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId))
-//                  {
-//IS WRONG                     offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
-//                  }
-//               }
+//               // Compute offset for second dimension
+//               offV.at(1) = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 //
 //               // Add offset to vector
 //               this->mFileOffsets.push_back(offV);
-//               offV.clear();
 //            }
 //         }
-      }
+//      } else
+//      {
+//         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
+//         throw Exception("Irregular data is not yet implemented in HDF5 storage");
+//
+////         // offset HDF5 type
+////         hsize_t offset;
+////
+////         // Loop over the stored indexes
+////         std::vector<hsize_t>  offV;
+////         for(int i=0; i < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+////         {
+////            int idx3D = this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+////            // Check if value is available in file
+////IS WRONG            if(idx3D < this->mspFileRes->dim(Dimensions::Simulation::SIM3D,this->mSpaceId))
+////            {
+////               // Compute offset from previous index
+////               offset = 0;
+////               for(int j = 0; j < idx3D; ++j)
+////               {
+////IS WRONG                  offset += this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId);
+////               }
+////
+////               // Compute the offset for the local indexes
+////               for(int j = 0; j < this->mspRes->cpu()->dim(transId)->dim<Dimensions::Data::DAT2D>(i); ++j)
+////               {
+////                  if(this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i) < this->mspFileRes->dim(Dimensions::Simulation::SIM2D,this->mSpaceId))
+////                  {
+////IS WRONG                     offV.push_back(offset + this->mspRes->cpu()->dim(transId)->idx<Dimensions::Data::DAT2D>(j,i));
+////                  }
+////               }
+////
+////               // Add offset to vector
+////               this->mFileOffsets.push_back(offV);
+////               offV.clear();
+////            }
+////         }
+//      }
 
       // Get the "global" local minimum for MPI code
       this->mCollIoRead = this->mFileOffsets.size();

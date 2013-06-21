@@ -388,6 +388,7 @@ namespace IoHdf5 {
          for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
          {
             pOffset[0] = this->mFileOffsets.at(i).at(j);
+
             H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
          }
 

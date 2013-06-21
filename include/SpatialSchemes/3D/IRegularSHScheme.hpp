@@ -32,6 +32,11 @@ namespace Schemes {
    {
       public:
          /**
+          * @brief Tune the resolution
+          */
+         static void tuneResolution(SharedResolution spRes);
+
+         /**
           * @brief Dimensionality of the scheme
           */
          static const int DIMENSIONS;
@@ -56,7 +61,7 @@ namespace Schemes {
          /**
           * @brief Create indexes for a possibly restricted set
           *
-          * \epmTodo Partial splitting needs to be optimized
+          * \mhdTodo Partial splitting needs to be optimized
           *
           * @param transId Transform ID
           * @param fwd1D   Storage for forward indexes of first dimension

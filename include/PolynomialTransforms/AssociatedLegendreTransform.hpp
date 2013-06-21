@@ -20,7 +20,6 @@
 
 // External includes
 //
-#include <fftw3.h>
 
 // Project includes
 //
@@ -161,9 +160,14 @@ namespace Transform {
          void initDerivative();
 
          /**
-          * @brief Storage for the quadrature points
+          * @brief Storage for the quadrature points x = [-1, 1]
           */
-         Array mGrid;
+         Array mXGrid;
+
+         /**
+          * @brief Storage for the quadrature points th = [0, pi]
+          */
+         Array mThGrid;
 
          /**
           * @brief Storage for the quadrature weights
@@ -204,7 +208,7 @@ namespace Transform {
 
       // Compute integration
       int start = 0;
-      int physRows = this->mGrid.size(); 
+      int physRows = this->mspSetup->fwdSize(); 
       for(size_t i = 0; i < this->mProjector.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
@@ -230,7 +234,7 @@ namespace Transform {
       if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
       {
          int start = 0;
-         int physRows = this->mGrid.size(); 
+         int physRows = this->mspSetup->fwdSize(); 
          for(size_t i = 0; i < this->mDerivative.size(); i++)
          {
             int cols = this->mspSetup->mult()(i);
@@ -243,7 +247,7 @@ namespace Transform {
       } else
       {
          int start = 0;
-         int physRows = this->mGrid.size(); 
+         int physRows = this->mspSetup->fwdSize(); 
          for(size_t i = 0; i < this->mProjector.size(); i++)
          {
             int cols = this->mspSetup->mult()(i);

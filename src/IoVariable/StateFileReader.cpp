@@ -116,14 +116,10 @@ namespace IoVariable {
       // Check for data regularity
       if(this->mIsRegular)
       {
-         // Read the codensity expansion
          this->readRegularField(group, name, fieldInfo);
       } else
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
-         // Read the codensity expansion
-         //this->readIrregularField(group, name, rScalar.rSliced());
+         this->readIrregularField(group, name, fieldInfo);
       }
       
       // close group
@@ -151,15 +147,13 @@ namespace IoVariable {
          }
       } else
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
          for(size_t i = 0; i < rVector.size(); i++)
          {
             // create component field information
             fieldInfo = Datatypes::FieldTools::createInfo(rVector.at(i));
 
             // Read component from file 
-//IS WRONG            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
          }
       }
       
@@ -182,10 +176,8 @@ namespace IoVariable {
          this->readRegularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
       } else
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
          // Read the field component
-         //this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
+         this->readIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(id), fieldInfo);
       }
       
       // close group

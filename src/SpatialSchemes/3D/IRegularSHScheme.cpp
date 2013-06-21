@@ -16,10 +16,18 @@
 // Project includes
 //
 #include "SpatialSchemes/Tools/SphericalHarmonicTools.hpp"
+#include "Resolutions/Tools/SphericalHarmonicIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
+
+   void IRegularSHScheme::tuneResolution(SharedResolution spRes)
+   {
+      SharedSphericalHarmonicIndexCounter   spCounter(new SphericalHarmonicIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
+   }
 
    const int IRegularSHScheme::DIMENSIONS = 3;
 

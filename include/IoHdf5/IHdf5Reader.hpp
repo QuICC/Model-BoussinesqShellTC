@@ -438,6 +438,7 @@ namespace IoHdf5 {
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Set size of read block (file resolution and memory resolution might be different)
+         iDims[0] = this->mFileOffsets.at(i).size();
          iDims[1] = this->mBlock;
          // Select memory hyperslabs
          H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);

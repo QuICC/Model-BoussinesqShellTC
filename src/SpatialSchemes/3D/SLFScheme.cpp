@@ -20,10 +20,6 @@
 namespace GeoMHDiSCC {
 
 namespace Schemes {
-
-   void SLFScheme::tuneResolution(SharedResolution spRes)
-   {
-   }
    
    std::string SLFScheme::type()
    {

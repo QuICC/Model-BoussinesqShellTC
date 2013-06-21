@@ -14,6 +14,7 @@
 
 // Project includes
 //
+#include "Resolutions/Tools/RegularIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -21,6 +22,9 @@ namespace Schemes {
 
    void ISpatialScheme::tuneResolution(SharedResolution spRes)
    {
+      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
    }
 
    ISpatialScheme::ISpatialScheme(const int dims)

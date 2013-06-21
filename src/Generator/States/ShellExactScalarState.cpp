@@ -22,6 +22,7 @@
 #include "TypeSelectors/SpectralSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -98,23 +99,52 @@ namespace Equations {
 
       if(this->mTypeId == CONSTANT)
       {
-         int nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
 
          Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, 1, 0.35);
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         Array zGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nZ);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
+         Array funcPh(nPh);
+         MHDFloat funcR(nR);
+         MHDFloat funcTh;
          for(int iR = 0; iR < nR; ++iR)
          {
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               Array funcZ = 2.*(5.*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
-               Array funcR = 1 + rGrid.array() + rGrid.array().pow(3);
-               MHDFloat funcTh = std::cos(thGrid(iTh));
+               funcR = 1.0;
 
-               rNLComp.setProfile(funcZ*funcR(iR)*funcTh,iTh,iR);
+               // Spherical harmonic Y_0^0
+               funcPh.setConstant(1);
+               funcTh = 0.5*std::sqrt(1./MathConstants::PI);
+               rNLComp.setProfile(funcPh*funcR*funcTh,iTh,iR);
+
+               // Spherical harmonic Y_1^0
+               funcPh.setConstant(1);
+               funcTh = 0.5*std::sqrt(3./(MathConstants::PI))*std::cos(thGrid(iTh));
+               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+
+               // Spherical harmonic Y_1^1
+               funcPh = phGrid.array().sin();
+               funcTh = -0.5*std::sqrt(3./(2.*MathConstants::PI))*std::sin(thGrid(iTh));
+               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+
+               // Spherical harmonic Y_2^0
+               funcPh.setConstant(1);
+               funcTh = 0.25*std::sqrt(5./MathConstants::PI)*(3.*std::pow(std::cos(thGrid(iTh)),2)-1);
+               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+
+               // Spherical harmonic Y_2^1
+               funcPh = phGrid.array().cos();
+               funcTh = -0.5*std::sqrt(15./(2.*MathConstants::PI))*std::sin(thGrid(iTh))*std::cos(thGrid(iTh));
+               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+
+               // Spherical harmonic Y_2^2
+               funcPh = (2.*phGrid).array().cos();
+               funcTh = 0.25*std::sqrt(15./(2.*MathConstants::PI))*std::pow(std::sin(thGrid(iTh)),2);
+               rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
             }
          }
       } else

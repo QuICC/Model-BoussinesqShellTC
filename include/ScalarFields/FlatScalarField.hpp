@@ -122,6 +122,15 @@ namespace Datatypes {
          template <typename Derived> void setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k = 0);
 
          /**
+          * @brief Add a profile of the field
+          *
+          * @param pf   Profile values
+          * @param j    Index of the profile
+          * @param k    Index of the slice
+          */
+         template <typename Derived> void addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k = 0);
+
+         /**
           * @brief Set a 2D slice of the field
           *
           * @param sl   Slice values
@@ -332,6 +341,18 @@ namespace Datatypes {
       assert(this->mspField->cols() > 0);
 
       this->mspField->col(this->mspSetup->colIdx(j,k)) = pf;
+   }
+
+   template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   {
+      // Profiles only make sense in 2D and 3D
+      Debug::StaticAssert< (DIMENSION == Dimensions::TWOD) || (DIMENSION == Dimensions::THREED) >();
+
+      // Assert for positive sizes
+      assert(this->mspField->rows() > 0);
+      assert(this->mspField->cols() > 0);
+
+      this->mspField->col(this->mspSetup->colIdx(j,k)) += pf;
    }
 
    template <typename TData, Dimensions::Type DIMENSION> template<typename Derived> void FlatScalarField<TData, DIMENSION>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k)

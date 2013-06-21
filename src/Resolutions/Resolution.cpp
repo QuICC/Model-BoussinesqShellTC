@@ -65,8 +65,24 @@ namespace GeoMHDiSCC {
       this->mspSim->setBoxScale(boxScale);
    }
 
+   void Resolution::setIndexCounter(SharedIndexCounter spCounter)
+   {
+      this->mspCounter = spCounter;
+   }
+
+   SharedIndexCounter   Resolution::counter()
+   {
+      // Safety assert
+      assert(this->mspCounter);
+
+      return this->mspCounter;
+   }
+
    SharedCSimulationResolution Resolution::sim() const
    {
+      // Safety assert
+      assert(this->mspSim);
+
       return this->mspSim;
    }
 

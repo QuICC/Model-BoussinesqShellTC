@@ -378,17 +378,17 @@ namespace GeoMHDiSCC {
                // Initialise to zero
                this->mScalarVariables.at(infoIt->first)->setZeros();
 
-               #ifdef EPMPHOENIX_STORAGEPROFILE
-                  StorageProfilerMacro_update(StorageProfiler::VARIABLES, this->mScalarVariables.at(infoIt->first)->requiredStorage());
-               #endif // EPMPHOENIX_STORAGEPROFILE
+               #ifdef GEOMHDISCC_STORAGEPROFILE
+                  StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, this->mScalarVariables.at(infoIt->first)->requiredStorage());
+               #endif // GEOMHDISCC_STORAGEPROFILE
             } else
             {
                // Initialise to zero
                this->mVectorVariables.at(infoIt->first)->setZeros();
 
-               #ifdef EPMPHOENIX_STORAGEPROFILE
-                  StorageProfilerMacro_update(StorageProfiler::VARIABLES, this->mVectorVariables.at(infoIt->first)->requiredStorage());
-               #endif // EPMPHOENIX_STORAGEPROFILE
+               #ifdef GEOMHDISCC_STORAGEPROFILE
+                  StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, this->mVectorVariables.at(infoIt->first)->requiredStorage());
+               #endif // GEOMHDISCC_STORAGEPROFILE
             }
          }
       }

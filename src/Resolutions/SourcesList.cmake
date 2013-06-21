@@ -6,3 +6,7 @@ set(MHDSources
    Resolution.cpp
    TransformSetup.cpp
 )
+
+set(MHDSrcSubDirs
+   Tools
+)

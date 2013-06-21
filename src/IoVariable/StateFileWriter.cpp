@@ -88,10 +88,8 @@ namespace IoVariable {
          this->writeRegularField(group, name, fieldInfo);
       } else
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
          // Write the scalar values
-         //this->writeIrregularField(group, name, fieldInfo);
+         this->writeIrregularField(group, name, fieldInfo);
       }
       
       // close group
@@ -119,15 +117,13 @@ namespace IoVariable {
          }
       } else
       {
-         /// \mhdBug Irregular grid is not working, requires modification of simulation resolution
-         throw Exception("Irregular data is not yet implemented in HDF5 storage");
          for(size_t i = 0; i < vector.size(); i++)
          {
             // create component field information
             fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
 
             // Write vector component
-            //this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
          }
       }
       

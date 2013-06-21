@@ -23,6 +23,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/ShellExactScalarState.hpp"
+#include "Generator/Visualizers/FieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -83,19 +84,37 @@ namespace GeoMHDiSCC {
       spExact->setStateType(Equations::ShellExactScalarState::CONSTANT);
 
       // Add output file
-//      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-//      spOut->expect(PhysicalNames::TEMPERATURE);
-//      spGen->addOutputFile(spOut);
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqShellModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
-      throw Exception("addVisualizers: Not implemented yet!");
+      // Shared pointer to basic field visualizer
+      Equations::SharedFieldVisualizer spField;
+
+      // Add first field visualization
+      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add output file
+      IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spVis->addOutputFile(spOut);
    }
 
    void BoussinesqShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
-      throw Exception("setVisualizationState: Not implemented yet!");
+      // Create and add initial state file to IO
+      IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
+
+      // Set expected fields
+      spIn->expect(PhysicalNames::TEMPERATURE);
+
+      // Set simulation state
+      spVis->setInitialState(spIn);
    }
 
    void BoussinesqShellModel::addAsciiOutputFiles(SharedSimulation spSim)
