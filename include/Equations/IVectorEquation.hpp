@@ -66,6 +66,11 @@ namespace Equations {
          const Datatypes::VectorVariableType& unknown() const;
 
          /**
+          * @brief Access the shared resolution
+          */
+         virtual SharedResolution spRes() const;
+
+         /**
           * @brief Get the number of spectral components
           */
          int nSpectral() const; 

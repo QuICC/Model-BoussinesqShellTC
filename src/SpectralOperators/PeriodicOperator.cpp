@@ -1,5 +1,5 @@
 /** \file PeriodicOperator.cpp
- *  \brief Source of the implementation of the spectral operator for the Chebyshev basis
+ *  \brief Source of the implementation of the spectral operators with periodic directions
  */
 
 // System includes

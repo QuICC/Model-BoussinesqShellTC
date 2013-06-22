@@ -131,15 +131,15 @@ namespace Equations {
 
    void BoussinesqPerBetaCylGVertical::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
-      quasiInverseBlock(*this, mat);
+      quasiInverseBlock(*this, compId, mat);
    }
 
    void BoussinesqPerBetaCylGVertical::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
-      linearBlock(*this, mat, fieldId, k);
+      linearBlock(*this, compId, mat, fieldId, k);
    }
 
-   void quasiInverseBlock(const BoussinesqPerBetaCylGVertical& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const BoussinesqPerBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
    {
       // Get X and Z dimensions
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -154,7 +154,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const BoussinesqPerBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const BoussinesqPerBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -204,7 +204,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void timeBlock(const BoussinesqPerBetaCylGVertical& eq, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const BoussinesqPerBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -228,7 +228,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const BoussinesqPerBetaCylGVertical& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const BoussinesqPerBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Rescale wave number to [-1, 1]
       MHDFloat kY_ = kY/2.;

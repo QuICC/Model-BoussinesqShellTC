@@ -22,6 +22,8 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqShellTransport.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqShellVelocity.hpp"
 #include "Generator/States/ShellExactScalarState.hpp"
 #include "Generator/Visualizers/FieldVisualizer.hpp"
 
@@ -34,6 +36,9 @@ namespace GeoMHDiSCC {
 
       // Add temperature
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add temperature
+      ids.push_back(PhysicalNames::VELOCITY);
 
       return ids;
    }
@@ -70,7 +75,11 @@ namespace GeoMHDiSCC {
 
    void BoussinesqShellModel::addEquations(SharedSimulation spSim)
    {
-      throw Exception("addEquations: Not implemented yet!");
+      // Add transport equation
+      spSim->addScalarEquation<Equations::BoussinesqShellTransport>();
+      
+      // Add Navier-Stokes equation
+      spSim->addVectorEquation<Equations::BoussinesqShellVelocity>();
    }
 
    void BoussinesqShellModel::addStates(SharedStateGenerator spGen)

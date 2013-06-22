@@ -143,7 +143,7 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     */
-   void quasiInverseBlock(const ShellExactScalarState& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
 
    /**
     * @brief Get the linear matrix block for an equation on given field
@@ -152,7 +152,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void linearBlock(const ShellExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field
@@ -161,7 +161,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void boundaryBlock(const ShellExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }

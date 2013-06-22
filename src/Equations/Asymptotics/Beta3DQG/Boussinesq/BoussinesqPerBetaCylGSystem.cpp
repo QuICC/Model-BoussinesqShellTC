@@ -141,7 +141,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void BoussinesqPerBetaCylGSystem::timeBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqPerBetaCylGSystem::timeBlock(DecoupledZSparse& mat, FieldComponents::Spectral::Id compId, const SpectralFieldId eqId, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
@@ -183,7 +183,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void BoussinesqPerBetaCylGSystem::linearBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqPerBetaCylGSystem::linearBlock(DecoupledZSparse& mat, FieldComponents::Spectral::Id compId, const SpectralFieldId eqId, const SpectralFieldId fieldId, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
@@ -291,7 +291,7 @@ namespace Equations {
 
    }
 
-   void BoussinesqPerBetaCylGSystem::boundaryBlock(DecoupledZSparse& mat, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
+   void BoussinesqPerBetaCylGSystem::boundaryBlock(DecoupledZSparse& mat, FieldComponents::Spectral::Id compId, const SpectralFieldId eqId, const SpectralFieldId fieldId, const SharedSimulationBoundary spBcIds, const int nZ, const MHDFloat kX, const MHDFloat kY, const MHDFloat Ra, const MHDFloat Pr, const MHDFloat Gamma, const MHDFloat chi)
    {
       // Create spectral operators
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);

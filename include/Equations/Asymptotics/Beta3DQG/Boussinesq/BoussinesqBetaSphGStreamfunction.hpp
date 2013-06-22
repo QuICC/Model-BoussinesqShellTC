@@ -93,7 +93,7 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     */
-   void quasiInverseBlock(const BoussinesqBetaSphGStreamfunction& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqBetaSphGStreamfunction& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block for an equation
@@ -103,7 +103,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
+   void timeBlock(const BoussinesqBetaSphGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block for an equation on given field
@@ -114,7 +114,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void linearBlock(const BoussinesqBetaSphGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field
@@ -125,7 +125,7 @@ namespace Equations {
     * @param nZ      Matrix size in Z
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaSphGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
+   void boundaryBlock(const BoussinesqBetaSphGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int nX, const int nZ, const MHDFloat k);
 
 }
 }

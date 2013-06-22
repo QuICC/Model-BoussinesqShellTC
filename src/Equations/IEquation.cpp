@@ -37,7 +37,7 @@ namespace Equations {
       this->setCoupling();
    }
 
-   void IEquation::initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes)
+   void IEquation::initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
       // Store the boundary condition list
       this->mspBcIds = spBcIds;
@@ -46,7 +46,7 @@ namespace Equations {
       int nSystems = this->couplingInfo(compId).nSystems();
 
       // Boxscale
-      MHDFloat boxScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+      MHDFloat boxScale = this->spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
 
       //
       // Initialise the quasi-inverse operators for the nonlinear terms (if required)
@@ -79,7 +79,7 @@ namespace Equations {
          // Create matrices
          for(int i = 0; i < nSystems; ++i)
          {
-            MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
+            MHDFloat k_ = boxScale*static_cast<MHDFloat>(this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
 
             // Get linear block
             tmpMat.push_back(DecoupledZSparse());
@@ -121,7 +121,7 @@ namespace Equations {
       }
    }
 
-   void IEquation::initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes)
+   void IEquation::initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
       // Store the boundary condition list
       this->mspBcIds = spBcIds;
@@ -130,8 +130,8 @@ namespace Equations {
       int nSystems = this->couplingInfo(compId).nSystems();
 
       // Boxscale
-      MHDFloat box2DScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
-      MHDFloat box3DScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM3D);
+      MHDFloat box2DScale = this->spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
+      MHDFloat box3DScale = this->spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D);
 
       //
       // Initialise the quasi-inverse operators for the nonlinear terms (if required)
@@ -165,7 +165,7 @@ namespace Equations {
          for(int i = 0; i < nSystems; ++i)
          {
             // Get mode indexes
-            ArrayI mode = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->mode(i);
+            ArrayI mode = this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(i);
 
             // Get 2D wave number rescaled to box size
             MHDFloat k2D_ = box2DScale*static_cast<MHDFloat>(mode(0));
@@ -432,22 +432,22 @@ namespace Equations {
       }
    }
 
-   void quasiInverseBlock(const IEquation& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
    {
       throw Exception("quasiInverseBlock: dummy implementation called!");
    }
 
-   void timeBlock(const IEquation& eq, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
    {
       throw Exception("timeBlock: dummy implementation called!");
    }
 
-   void linearBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       throw Exception("linearBlock: dummy implementation called!");
    }
 
-   void boundaryBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       throw Exception("boundaryBlock: dummy implementation called!");
    }

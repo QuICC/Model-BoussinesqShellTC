@@ -47,7 +47,7 @@ namespace Equations {
 
    void TestTFTDiffusion2D::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
    }
 
    void TestTFTDiffusion2D::setCoupling()
@@ -110,7 +110,7 @@ namespace Equations {
       }
    }
 
-   void linearBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -144,7 +144,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void timeBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -166,7 +166,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const TestTFTDiffusion2D& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       int pX = 0;
       int pZ = 0;

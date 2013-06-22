@@ -53,6 +53,11 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
+   SharedResolution IScalarEquation::spRes() const
+   {
+      return this->unknown().dom(0).spRes();
+   }
+
    void IScalarEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId)
    {
       // Assert scalar

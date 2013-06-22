@@ -94,7 +94,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eqId    Physical ID of the equation
     */
-   void quasiInverseBlock(const BoussinesqFPlaneTransport& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqFPlaneTransport& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block
@@ -103,7 +103,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const BoussinesqFPlaneTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -113,7 +113,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const BoussinesqFPlaneTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -123,7 +123,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const BoussinesqFPlaneTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }

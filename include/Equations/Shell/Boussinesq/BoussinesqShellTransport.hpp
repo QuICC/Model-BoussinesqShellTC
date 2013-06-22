@@ -94,16 +94,17 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eqId    Physical ID of the equation
     */
-   void quasiInverseBlock(const BoussinesqShellTransport& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block
     *
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
-    * @param k       Wave number k
+    * @param l       Harmonic degree
+    * @param m       Harmonic order
     */
-   void timeBlock(const BoussinesqShellTransport& eq, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat l, const MHDFloat m);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -111,9 +112,10 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param l       Harmonic degree
+    * @param m       Harmonic order
     */
-   void linearBlock(const BoussinesqShellTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat l, const MHDFloat m);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -121,9 +123,10 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param l       Harmonic degree
+    * @param m       Harmonic order
     */
-   void boundaryBlock(const BoussinesqShellTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat l, const MHDFloat m);
 
 }
 }

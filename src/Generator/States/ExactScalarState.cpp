@@ -61,7 +61,7 @@ namespace Equations {
 
    void ExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
    }
 
    void ExactScalarState::setCoupling()
@@ -167,15 +167,15 @@ namespace Equations {
 
    void ExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
-      Equations::quasiInverseBlock(*this, mat);
+      Equations::quasiInverseBlock(*this, compId, mat);
    }
 
    void ExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
-      Equations::linearBlock(*this, mat, fieldId, k);
+      Equations::linearBlock(*this, compId, mat, fieldId, k);
    }
 
-   void quasiInverseBlock(const ExactScalarState& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -192,7 +192,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const ExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -214,7 +214,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const ExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       int pX = 0;
       int pZ = 0;

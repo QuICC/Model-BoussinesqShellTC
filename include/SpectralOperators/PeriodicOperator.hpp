@@ -157,7 +157,7 @@ namespace Spectral {
          /**
           * @brief Constructor
           */
-         PeriodicOperator(const int idx, const int polyN, const ArrayI& specIdx);
+         PeriodicOperator();
 
          /**
           * @brief Empty Destructor

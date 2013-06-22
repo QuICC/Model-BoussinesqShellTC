@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGVorticity::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
    }
 
    void BoussinesqBetaCylGVorticity::setCoupling()
@@ -129,10 +129,10 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, mat, fieldId, k);
+      linearBlock(*this, compId, mat, fieldId, k);
    }
 
-   void linearBlock(const BoussinesqBetaCylGVorticity& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const BoussinesqBetaCylGVorticity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);

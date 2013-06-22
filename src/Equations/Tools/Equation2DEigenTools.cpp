@@ -26,10 +26,10 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   void Equation2DEigenTools::boundaryBlock2DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
+   void Equation2DEigenTools::boundaryBlock2DEigen(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
    {
       // Get 1D dimension
-      int n1D = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int n1D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Create equation ID
       SpectralFieldId eqId = std::make_pair(eq.name(), compId);

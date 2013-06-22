@@ -11,4 +11,5 @@ set(MHDSources
    SphericalChebyshevBoundary.cpp
    CylindricalChebyshevOperator.cpp
    CylindricalChebyshevBoundary.cpp
+   SphericalHarmonicOperator.cpp
 )

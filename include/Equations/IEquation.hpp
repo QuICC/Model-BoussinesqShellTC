@@ -57,6 +57,11 @@ namespace Equations {
          virtual ~IEquation();
 
          /**
+          * @brief Access the shared resolution
+          */
+         virtual SharedResolution spRes() const = 0;
+
+         /**
           * @brief Initialise the equation
           */
          virtual void init();
@@ -109,18 +114,16 @@ namespace Equations {
           *
           * @param spBcIds List of boundary condition IDs
           * @param compId  Spectral component
-          * @param spRes   Shared resolution
           */
-         void initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes);
+         void initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
 
          /**
           * @brief Initialise the spectral equation matrices with two "eigen" direction
           *
           * @param spBcIds List of boundary condition IDs
           * @param compId  Spectral component
-          * @param spRes   Shared resolution
           */
-         void initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes);
+         void initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
 
       private:
          /**
@@ -180,17 +183,17 @@ namespace Equations {
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void timeBlock(const IEquation& eq, DecoupledZSparse& mat, const MHDFloat k); //= 0;
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k); //= 0;
 
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void linearBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
 
    /**
     * @brief Dummy implementation. This should never get called!
     */
-   void boundaryBlock(const IEquation& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
    
 }
 }

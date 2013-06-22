@@ -58,6 +58,11 @@ namespace Equations {
          const Datatypes::ScalarVariableType& unknown() const;
 
          /**
+          * @brief Access the shared resolution
+          */
+         virtual SharedResolution spRes() const;
+
+         /**
           * @brief Update unknown from dealised data
           *
           * @param rhs     Dealised input

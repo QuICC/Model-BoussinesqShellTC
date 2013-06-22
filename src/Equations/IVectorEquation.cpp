@@ -52,6 +52,11 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
+   SharedResolution IVectorEquation::spRes() const
+   {
+      return this->unknown().dom(0).spRes();
+   }
+
    int IVectorEquation::nSpectral() const
    {
       return this->mSpectralIds.size();

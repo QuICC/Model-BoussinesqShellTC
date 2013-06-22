@@ -41,7 +41,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGStreamfunction::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
    }
 
    void BoussinesqBetaCylGStreamfunction::setCoupling()
@@ -141,7 +141,7 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      quasiInverseBlock(*this, mat);
+      quasiInverseBlock(*this, compId, mat);
    }
 
    void BoussinesqBetaCylGStreamfunction::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
@@ -149,10 +149,10 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, mat, fieldId, k);
+      linearBlock(*this, compId, mat, fieldId, k);
    }
 
-   void quasiInverseBlock(const BoussinesqBetaCylGStreamfunction& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -170,7 +170,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -221,7 +221,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
    {
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -246,7 +246,7 @@ namespace Equations {
       mat.second.prune(1e-32);
    }
 
-   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;

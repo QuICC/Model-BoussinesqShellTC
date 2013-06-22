@@ -58,7 +58,7 @@ namespace Equations {
 
    void ShellExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
    }
 
    void ShellExactScalarState::setCoupling()
@@ -177,25 +177,25 @@ namespace Equations {
 
    void ShellExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
-      Equations::quasiInverseBlock(*this, mat);
+      Equations::quasiInverseBlock(*this, compId, mat);
    }
 
    void ShellExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
-      Equations::linearBlock(*this, mat, fieldId, k);
+      Equations::linearBlock(*this, compId, mat, fieldId, k);
    }
 
-   void quasiInverseBlock(const ShellExactScalarState& eq, SparseMatrix& mat)
+   void quasiInverseBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
    {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void linearBlock(const ShellExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void boundaryBlock(const ShellExactScalarState& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
    {
       // Compute boundary block operator
       throw Exception("Operators for 2D eigen directions not implemented yet");

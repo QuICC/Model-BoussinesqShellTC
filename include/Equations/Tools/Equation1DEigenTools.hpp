@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IEquation.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -52,13 +52,13 @@ namespace Equations {
          /**
           * @brief General implementation of the boundary block for equations with a single "eigen" dimensions
           */
-         static void boundaryBlock1DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
+         static void boundaryBlock1DEigen(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
    };
 
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -76,7 +76,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         linearBlock(eq, block, *fIt, k_);
+         linearBlock(eq, compId, block, *fIt, k_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -95,7 +95,7 @@ namespace Equations {
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -107,7 +107,7 @@ namespace Equations {
       // Create time row
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
-      timeBlock(eq, block, k_);
+      timeBlock(eq, compId, block, k_);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
       matrixRow.first += tmp;
       Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -123,7 +123,7 @@ namespace Equations {
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -141,7 +141,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         boundaryBlock(eq, block, *fIt, k_);
+         boundaryBlock(eq, compId, block, *fIt, k_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
