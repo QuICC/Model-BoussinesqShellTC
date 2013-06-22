@@ -1,9 +1,9 @@
-/** \file Scalar1DEigenTools.hpp
+/** \file Equation1DEigenTools.hpp
  *  \brief Implementation of some tools for schemes with a single eigen direction
  */
 
-#ifndef SCALAR1DEIGENTOOLS_HPP
-#define SCALAR1DEIGENTOOLS_HPP
+#ifndef EQUATION1DEIGENTOOLS_HPP
+#define EQUATION1DEIGENTOOLS_HPP
 
 // Configuration includes
 //
@@ -31,7 +31,7 @@ namespace Equations {
    /**
     * @brief Implementation of some tools for schemes with a single eigen direction
     */
-   class Scalar1DEigenTools
+   class Equation1DEigenTools
    {
       public:
          /**
@@ -55,7 +55,7 @@ namespace Equations {
          static void boundaryBlock1DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
    };
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation1DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
       MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
@@ -92,7 +92,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation1DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
       MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
@@ -120,7 +120,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get wave number rescale to box size
       MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
@@ -160,4 +160,4 @@ namespace Equations {
 }
 }
 
-#endif // SCALAR1DEIGENTOOLS_HPP
+#endif // EQUATION1DEIGENTOOLS_HPP

@@ -21,7 +21,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Tools/Scalar1DEigenTools.hpp"
+#include "Equations/Tools/Equation1DEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -108,7 +108,7 @@ namespace Equations {
    {
       if(opId == IEquation::LINEARROW)
       {
-         return Scalar1DEigenTools::linearRow(*this, compId, matIdx);
+         return Equation1DEigenTools::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");

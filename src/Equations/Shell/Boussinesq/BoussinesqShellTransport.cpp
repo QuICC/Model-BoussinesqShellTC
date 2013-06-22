@@ -20,7 +20,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Tools/Scalar2DEigenTools.hpp"
+#include "Equations/Tools/Equation2DEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -98,13 +98,13 @@ namespace Equations {
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return Scalar2DEigenTools::timeRow(*this, compId, matIdx);
+         return Equation2DEigenTools::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return Scalar2DEigenTools::linearRow(*this, compId, matIdx);
+         return Equation2DEigenTools::linearRow(*this, compId, matIdx);
       } else if(opId == IEquation::BOUNDARYROW)
       {
-         return Scalar2DEigenTools::boundaryRow(*this, compId, matIdx);
+         return Equation2DEigenTools::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");

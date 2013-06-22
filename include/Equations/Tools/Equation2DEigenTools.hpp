@@ -1,9 +1,9 @@
-/** \file Scalar2DEigenTools.hpp
+/** \file Equation2DEigenTools.hpp
  *  \brief Implementation of some tools for schemes with two eigen direction
  */
 
-#ifndef SCALAR2DEIGENTOOLS_HPP
-#define SCALAR2DEIGENTOOLS_HPP
+#ifndef EQUATION2DEIGENTOOLS_HPP
+#define EQUATION2DEIGENTOOLS_HPP
 
 // Configuration includes
 //
@@ -30,7 +30,7 @@ namespace Equations {
    /**
     * @brief Implementation of some tools for schemes with two eigen direction
     */
-   class Scalar2DEigenTools
+   class Equation2DEigenTools
    {
       public:
          /**
@@ -54,7 +54,7 @@ namespace Equations {
          static void boundaryBlock2DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
    };
 
-   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation2DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get mode indexes
       ArrayI mode = ew.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -95,7 +95,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation2DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get mode indexes
       ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -127,7 +127,7 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Equation2DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       // Get mode indexes
       ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -171,4 +171,4 @@ namespace Equations {
 }
 }
 
-#endif // SCALAR2DEIGENTOOLS_HPP
+#endif // EQUATION2DEIGENTOOLS_HPP

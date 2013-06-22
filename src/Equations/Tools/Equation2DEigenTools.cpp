@@ -1,4 +1,4 @@
-/** \file Scalar2DEigenTools.cpp
+/** \file Equation2DEigenTools.cpp
  *  \brief Source of the tools for schemes with two eigen direction
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Tools/Scalar2DEigenTools.hpp"
+#include "Equations/Tools/Equation2DEigenTools.hpp"
 
 // Project includes
 //
@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   void Scalar2DEigenTools::boundaryBlock2DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
+   void Equation2DEigenTools::boundaryBlock2DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
    {
       // Get 1D dimension
       int n1D = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
