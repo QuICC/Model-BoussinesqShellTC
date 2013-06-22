@@ -817,10 +817,11 @@ namespace GeoMHDiSCC {
       std::vector<Equations::SharedIVectorEquation>::iterator  doneVEqIt;
       
       // Loop over the vector equations
-      bool coupledOne = false;
-      bool coupledTwo = false;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; ++vectEqIt)
       {
+         // Get coupled counter for each component
+         ArrayI counter((*vectEqIt)->nSpectral());
+
          // Loop over the (identified) scalar equations
          for(doneSEqIt = scalEq.first; doneSEqIt != scalEq.second; ++doneSEqIt)
          {
@@ -829,227 +830,135 @@ namespace GeoMHDiSCC {
             Equations::CouplingInformation::FieldId_range fRange = (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).implicitRange();
             for(fIt = fRange.first; fIt != fRange.second; ++fIt)
             {
-               // Check if field's first component is in implicit range
-               compId = FieldComponents::Spectral::ONE;
-               if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+               Equations::IVectorEquation::SpectralComponent_iterator compIt;
+               Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+               int i = 0;
+               for(compIt = compRange.first; compIt != compRange.second; ++compIt, ++i)
                {
-                  // Set the solver index
-                  (*vectEqIt)->setSolverIndex(compId, (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
-                  
-                  // Debug statements
-                  DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                  DebuggerMacro_showValue("---> component: ", 2, compId);
-                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-                  
-                  // Set coupling flag and break out
-                  coupledOne = true;
-               }
+                  // Check if field's first component is in implicit range
+                  if(counter(i) == 0 && *fIt == std::make_pair((*vectEqIt)->name(), *compIt))
+                  {
+                     // Set the solver index
+                     (*vectEqIt)->setSolverIndex(*compIt, (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
 
-               // Check if field's second component is in implicit range
-               compId = FieldComponents::Spectral::TWO;
-               if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
-               {
-                  // Set the solver index
-                  (*vectEqIt)->setSolverIndex(compId, (*doneSEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
-                  
-                  // Debug statements
-                  DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                  DebuggerMacro_showValue("---> component: ", 2, compId);
-                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-                  
-                  // Set coupling flag and break out
-                  coupledTwo = true;
+                     // Debug statements
+                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                     DebuggerMacro_showValue("---> component: ", 2, *compIt);
+                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
+                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
+
+                     // Set coupling flag and break out
+                     counter(i) = 1;
+                  }
                }
 
                // Break out of loop if already identified
-               if(coupledOne && coupledTwo)
+               if(counter.sum() == counter.size())
                {
                   break;
                }
             }
 
             // Break out of loop if already identified
-            if(coupledOne && coupledTwo)
+            if(counter.sum() == counter.size())
             {
                break;
             }
          }
 
-         if(!coupledOne || !coupledTwo)
+         if(counter.sum() < counter.size())
          {
             // Loop over the (identified) vector equations
             for(doneVEqIt = vectEq.first; doneVEqIt != vectEqIt; ++doneVEqIt)
             {
-               // loop over the implicit range of first component
-               FieldComponents::Spectral::Id doneId = FieldComponents::Spectral::ONE;
-               Equations::CouplingInformation::FieldId_iterator fIt;
-               Equations::CouplingInformation::FieldId_range fRange = (*doneVEqIt)->couplingInfo(doneId).implicitRange();
-               for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+               Equations::IVectorEquation::SpectralComponent_iterator doneIt;
+               Equations::IVectorEquation::SpectralComponent_range  doneRange = (*doneVEqIt)->spectralRange();
+               for(doneIt = doneRange.first; doneIt != doneRange.second; ++doneIt)
                {
-                  // Check if field's first component is in implicit range
-                  compId = FieldComponents::Spectral::ONE;
-                  if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
+                  // loop over the implicit range of identified components
+                  Equations::CouplingInformation::FieldId_iterator fIt;
+                  Equations::CouplingInformation::FieldId_range fRange = (*doneVEqIt)->couplingInfo(*doneIt).implicitRange();
+                  for(fIt = fRange.first; fIt != fRange.second; ++fIt)
                   {
-                     // Set the solver index
-                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
+                     Equations::IVectorEquation::SpectralComponent_iterator compIt;
+                     Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+                     int i = 0;
+                     for(compIt = compRange.first; compIt != compRange.second; ++compIt, ++i)
+                     {
+                        // Check if field's first component is in implicit range
+                        if(counter(i) == 0 && *fIt == std::make_pair((*vectEqIt)->name(), *compIt))
+                        {
+                           // Set the solver index
+                           (*vectEqIt)->setSolverIndex(*compIt, (*doneVEqIt)->couplingInfo(*doneIt).solverIndex());
 
-                     // Debug statements
-                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                     DebuggerMacro_showValue("---> component: ", 2, compId);
-                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
+                           // Debug statements
+                           DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
+                           DebuggerMacro_showValue("---> component: ", 2, *compIt);
+                           DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
+                           DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
 
-                     // Set coupling flag and break out
-                     coupledOne = true;
-                  }
+                           // Set coupling flag and break out
+                           counter(i) = 1;
+                        }
+                     }
 
-                  // Check if field's first component is in implicit range
-                  compId = FieldComponents::Spectral::TWO;
-                  if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
-                  {
-                     // Set the solver index
-                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
 
-                     // Debug statements
-                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                     DebuggerMacro_showValue("---> component: ", 2, compId);
-                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-
-                     // Set coupling flag and break out
-                     coupledTwo = true;
+                     // Break out of loop if already identified
+                     if(counter.sum() == counter.size())
+                     {
+                        break;
+                     }
                   }
 
                   // Break out of loop if already identified
-                  if(coupledOne && coupledTwo)
+                  if(counter.sum() == counter.size())
                   {
                      break;
                   }
-               }
-
-               // loop over the implicit range of second component
-               doneId = FieldComponents::Spectral::TWO;
-               fRange = (*doneVEqIt)->couplingInfo(doneId).implicitRange();
-               for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-               {
-                  // Check if field's first component is in implicit range
-                  compId = FieldComponents::Spectral::ONE;
-                  if(!coupledOne && *fIt == std::make_pair((*vectEqIt)->name(), compId))
-                  {
-                     // Set the solver index
-                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
-
-                     // Debug statements
-                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                     DebuggerMacro_showValue("---> component: ", 2, compId);
-                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-
-                     // Set coupling flag and break out
-                     coupledOne = true;
-                  }
-
-                  // Check if field's first component is in implicit range
-                  compId = FieldComponents::Spectral::TWO;
-                  if(!coupledTwo && *fIt == std::make_pair((*vectEqIt)->name(), compId))
-                  {
-                     // Set the solver index
-                     (*vectEqIt)->setSolverIndex(compId, (*doneVEqIt)->couplingInfo(doneId).solverIndex());
-
-                     // Debug statements
-                     DebuggerMacro_showValue("Identified coupled vector solver: ", 2, (*vectEqIt)->name());
-                     DebuggerMacro_showValue("---> component: ", 2, compId);
-                     DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-                     DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-
-                     // Set coupling flag and break out
-                     coupledTwo = true;
-                  }
-
-                  // Break out of loop if already identified
-                  if(coupledOne && coupledTwo)
-                  {
-                     break;
-                  }
-               }
-
-               // Break out of loop if already identified
-               if(coupledOne && coupledTwo)
-               {
-                  break;
                }
             }
          }
 
          // All checked and equation is not coupled
-         if(!coupledOne || !coupledTwo)
+         if(counter.sum() < counter.size())
          {
-            if(!coupledOne)
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            int i = 0;
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt, ++i)
             {
-               compId = FieldComponents::Spectral::ONE;
-
-               // Set solver index for complex equation
-               if((*vectEqIt)->couplingInfo(compId).isComplex())
+               if(counter(i) == 0)
                {
-                  // Set complex solver index
-                  (*vectEqIt)->setSolverIndex(compId, zIdx);
+                  // Set solver index for complex equation
+                  if((*vectEqIt)->couplingInfo(*compIt).isComplex())
+                  {
+                     // Set complex solver index
+                     (*vectEqIt)->setSolverIndex(*compIt, zIdx);
 
-                  // Increment complex solver index
-                  zIdx++;
+                     // Increment complex solver index
+                     zIdx++;
 
-               // Set solver index for real equation
-               } else
-               {
-                  // Set real solver index
-                  (*vectEqIt)->setSolverIndex(compId, dIdx);
+                     // Set solver index for real equation
+                  } else
+                  {
+                     // Set real solver index
+                     (*vectEqIt)->setSolverIndex(*compIt, dIdx);
 
-                  // Increment real solver index
-                  dIdx++;
+                     // Increment real solver index
+                     dIdx++;
+                  }
+
+                  // Debug statements
+                  DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
+                  DebuggerMacro_showValue("---> component: ", 2, *compIt);
+                  DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(*compIt).solverIndex());
+                  DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(*compIt).isComplex());
                }
-
-               // Debug statements
-               DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
-               DebuggerMacro_showValue("---> component: ", 2, compId);
-               DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-               DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
-            }
-
-            if(!coupledTwo)
-            {
-               compId = FieldComponents::Spectral::TWO;
-
-               // Set solver index for complex equation
-               if((*vectEqIt)->couplingInfo(compId).isComplex())
-               {
-                  // Set complex solver index
-                  (*vectEqIt)->setSolverIndex(compId, zIdx);
-
-                  // Increment complex solver index
-                  zIdx++;
-
-               // Set solver index for real equation
-               } else
-               {
-                  // Set real solver index
-                  (*vectEqIt)->setSolverIndex(compId, dIdx);
-
-                  // Increment real solver index
-                  dIdx++;
-               }
-
-               // Debug statements
-               DebuggerMacro_showValue("Identified first vector solver: ", 2, (*vectEqIt)->name());
-               DebuggerMacro_showValue("---> component: ", 2, compId);
-               DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compId).solverIndex());
-               DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compId).isComplex());
             }
          }
 
          // Reset coupling flag
-         coupledOne = false;
-         coupledTwo = false;
+         counter.setConstant(0);
       }
    }
 

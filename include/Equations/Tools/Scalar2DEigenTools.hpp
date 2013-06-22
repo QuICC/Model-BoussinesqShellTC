@@ -1,9 +1,9 @@
-/** \file Scalar1DEigenTools.hpp
- *  \brief Implementation of some tools for schemes with a single eigen direction
+/** \file Scalar2DEigenTools.hpp
+ *  \brief Implementation of some tools for schemes with two eigen direction
  */
 
-#ifndef SCALAR1DEIGENTOOLS_HPP
-#define SCALAR1DEIGENTOOLS_HPP
+#ifndef SCALAR2DEIGENTOOLS_HPP
+#define SCALAR2DEIGENTOOLS_HPP
 
 // Configuration includes
 //
@@ -22,43 +22,46 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of some tools for schemes with a single eigen direction
+    * @brief Implementation of some tools for schemes with two eigen direction
     */
-   class Scalar1DEigenTools
+   class Scalar2DEigenTools
    {
       public:
          /**
-          * @brief General implementation of linear row for equations with a single "eigen" dimension
+          * @brief General implementation of linear row for equations with two "eigen" dimension
           */
          template <typename TEquation> static DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of time row for equations with a single "eigen" dimension
+          * @brief General implementation of time row for equations with two "eigen" dimension
           */
          template <typename TEquation> static DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of boundary row for equations with a single "eigen" dimension
+          * @brief General implementation of boundary row for equations with two "eigen" dimension
           */
          template <typename TEquation> static DecoupledZSparse boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of the boundary block for equations with a single "eigen" dimensions
+          * @brief General implementation of the boundary block for equations with two "eigen" dimensions
           */
-         static void boundaryBlock1DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
+         static void boundaryBlock2DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
    };
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      // Get mode indexes
+      ArrayI mode = ew.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+      // Get wave number rescaled to box size (if required)
+      MHDFloat k2D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(mode(0));
+      MHDFloat k3D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*static_cast<MHDFloat>(mode(1));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -76,7 +79,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         linearBlock(eq, block, *fIt, k_);
+         linearBlock(eq, block, *fIt, k2D_, k3D_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -92,10 +95,14 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      // Get mode indexes
+      ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+      // Get wave number rescaled to box size (if required)
+      MHDFloat k2D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(mode(0));
+      MHDFloat k3D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*static_cast<MHDFloat>(mode(1));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -107,7 +114,7 @@ namespace Equations {
       // Create time row
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
-      timeBlock(eq, block, k_);
+      timeBlock(eq, block, k2D_, 3D_);
       Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
       matrixRow.first += tmp;
       Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -120,10 +127,14 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse Scalar1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse Scalar2DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      // Get mode indexes
+      ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+      // Get wave number rescaled to box size (if required)
+      MHDFloat k2D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(mode(0));
+      MHDFloat k3D_ = eq.unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*static_cast<MHDFloat>(mode(1));
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -141,7 +152,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         boundaryBlock(eq, block, *fIt, k_);
+         boundaryBlock(eq, block, *fIt, k2D_, k3D_);
          Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
          matrixRow.first += tmp;
          Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
@@ -160,4 +171,4 @@ namespace Equations {
 }
 }
 
-#endif // SCALAR1DEIGENTOOLS_HPP
+#endif // SCALAR2DEIGENTOOLS_HPP

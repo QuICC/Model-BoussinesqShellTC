@@ -1,9 +1,9 @@
-/** \file BoussinesqFPlaneTransport.hpp
- *  \brief Implementation of the transport equation for the Boussinesq 3DQG f-plane model
+/** \file BoussinesqShellVelocity.hpp
+ *  \brief Implementation of the Navier-Stokes equation for the Boussinesq spherical shell model
  */
 
-#ifndef BOUSSINESQFPLANETRANSPORT_HPP
-#define BOUSSINESQFPLANETRANSPORT_HPP
+#ifndef BOUSSINESQSHELLVELOCITY_HPP
+#define BOUSSINESQSHELLVELOCITY_HPP
 
 // Configuration includes
 //
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Boussinesq 3DQG f-plane model
+    * \brief Implementation of the Navier-Stokes equation for the Boussinesq spherical shell model 
     */
-   class BoussinesqFPlaneTransport: public IScalarEquation
+   class BoussinesqShellVelocity: public IVectorEquation
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqFPlaneTransport(SharedEquationParameters spEqParams);
+         BoussinesqShellVelocity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlaneTransport();
+         virtual ~BoussinesqShellVelocity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -54,7 +54,7 @@ namespace Equations {
          /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const;
 
          /**
           * @brief Initialise the spectral equation matrices
@@ -94,7 +94,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eqId    Physical ID of the equation
     */
-   void quasiInverseBlock(const BoussinesqFPlaneTransport& eq, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqShellVelocity& eq, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block
@@ -103,7 +103,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param k       Wave number k
     */
-   void timeBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const BoussinesqShellVelocity& eq, DecoupledZSparse& mat, const MHDFloat k);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -113,7 +113,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void linearBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const BoussinesqShellVelocity& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -123,9 +123,9 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param k       Wave number k
     */
-   void boundaryBlock(const BoussinesqFPlaneTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const BoussinesqShellVelocity& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
 
 }
 }
 
-#endif // BOUSSINESQFPLANETRANSPORT_HPP
+#endif // BOUSSINESQSHELLVELOCITY_HPP

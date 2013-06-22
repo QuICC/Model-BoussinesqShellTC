@@ -14,8 +14,6 @@
 
 // External includes
 //
-#include <Eigen/Sparse>
-#include <Eigen/KroneckerProduct>
 
 // Project includes
 //
@@ -89,30 +87,11 @@ namespace Equations {
          
       protected:
          /**
-          * @brief Initialise the spectral equation matrices
-          *
-          * @param spBcIds   List of boundary condition IDs
-          */
-         void initSpectralMatrices1DPeriodic(const SharedSimulationBoundary spBcIds);
-
-         /**
           * @brief Set the unknown variable
           */
          Datatypes::ScalarVariableType& rUnknown();
 
       private:
-         /**
-          * @brief Set the quasi inverse matrix operator
-          *
-          * It has only a dummy implementation and should never get called!
-          */
-         virtual void setQuasiInverse(SparseMatrix &mat) const; //= 0;
-
-         /**
-          * @brief Set the explicit linear matrix operator
-          */
-         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const; //= 0;
-
          /**
           * @brief Storage for the shared scalar variable
           */

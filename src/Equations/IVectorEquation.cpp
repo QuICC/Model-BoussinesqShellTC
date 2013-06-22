@@ -52,6 +52,16 @@ namespace Equations {
       return *this->mspUnknown;
    }
 
+   int IVectorEquation::nSpectral() const
+   {
+      return this->mSpectralIds.size();
+   }
+
+   IVectorEquation::SpectralComponent_range IVectorEquation::spectralRange() const
+   {
+      return std::make_pair(this->mSpectralIds.begin(), this->mSpectralIds.end());
+   }
+
    void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId)
    {
       // Assert dealiasing has taken place!

@@ -10,8 +10,6 @@
 
 // External includes
 //
-#include <Eigen/Sparse>
-#include <Eigen/KroneckerProduct>
 
 // Class include
 //
@@ -69,6 +67,9 @@ namespace Equations {
 
    void IScalarEquation::storeSolution(FieldComponents::Spectral::Id compId, const DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
@@ -112,6 +113,9 @@ namespace Equations {
 
    void IScalarEquation::storeSolution(FieldComponents::Spectral::Id compId, const MatrixZ& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
@@ -169,102 +173,11 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::initSpectralMatrices1DPeriodic(const SharedSimulationBoundary spBcIds)
-   {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
-      // Get the number of systems
-      int nSystems = this->couplingInfo(FieldComponents::Spectral::SCALAR).nSystems();
-
-      // Boxscale
-      MHDFloat boxScale = this->unknown().dom(0).spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D);
-
-      //
-      // Initialise the quasi-inverse operators for the nonlinear terms (if required)
-      //
-      if(this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse())
-      {
-         this->mNLMatrices.insert(std::make_pair(FieldComponents::Spectral::SCALAR, std::vector<SparseMatrix>()));
-         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(FieldComponents::Spectral::SCALAR);
-         qIt->second.reserve(nSystems);
-         for(int i = 0; i < nSystems; ++i)
-         {
-            qIt->second.push_back(SparseMatrix());
-
-            this->setQuasiInverse(qIt->second.back());
-         }
-      }
-
-      //
-      // Initialise the explicit linear operators
-      //
-      CouplingInformation::FieldId_iterator fIt;
-      CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
-      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-      {
-         std::vector<DecoupledZSparse> tmpMat;
-         tmpMat.reserve(nSystems);
-
-         bool isComplex = false;
-
-         // Create matrices
-         for(int i = 0; i < nSystems; ++i)
-         {
-            MHDFloat k_ = boxScale*static_cast<MHDFloat>(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
-
-            // Get linear block
-            tmpMat.push_back(DecoupledZSparse());
-            this->setExplicitLinearBlock(tmpMat.at(i), *fIt, k_);
-
-            // Explicit operator requires an additional minus sign
-            tmpMat.at(i).first = -tmpMat.at(i).first;
-            tmpMat.at(i).second = -tmpMat.at(i).second;
-
-            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
-         }
-
-         // Create key
-         std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(FieldComponents::Spectral::SCALAR, *fIt);
-
-         // Select real or complex operator
-         if(isComplex)
-         {
-            this->mLZMatrices.insert(std::make_pair(key, std::vector<SparseMatrixZ>()));
-            this->mLZMatrices.find(key)->second.reserve(nSystems);
-
-            for(int i = 0; i < nSystems; ++i)
-            {
-               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
-               this->mLZMatrices.find(key)->second.push_back(tmp);
-            }
-         } else
-         {
-            this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
-            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
-
-            for(int i = 0; i < nSystems; ++i)
-            {
-               this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
-
-               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
-            }
-         }
-      }
-   }
-
-   void IScalarEquation::setQuasiInverse(SparseMatrix &mat) const
-   {
-      throw Exception("setQuasiInverse: dummy implementation was called!");
-   }
-
-   void IScalarEquation::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
-   {
-      throw Exception("setExplicitLinearBlock: dummy implementation was called!");
-   }
-
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
@@ -325,6 +238,9 @@ namespace Equations {
 
    void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // matIdx is the index of the slowest varying direction
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
@@ -377,6 +293,9 @@ namespace Equations {
 
    void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // Check if a nonlinear computation took place
       if(eq.couplingInfo(compId).hasNonlinear())
       {
@@ -447,6 +366,9 @@ namespace Equations {
 
    void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // Check if a nonlinear computation took place
       if(eq.couplingInfo(compId).hasNonlinear())
       {
@@ -509,6 +431,9 @@ namespace Equations {
 
    void addSource(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // Add source term if required
       if(eq.couplingInfo(compId).hasSource())
       {
@@ -579,6 +504,9 @@ namespace Equations {
 
    void addSource(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start)
    {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // Add source term if required
       if(eq.couplingInfo(compId).hasSource())
       {

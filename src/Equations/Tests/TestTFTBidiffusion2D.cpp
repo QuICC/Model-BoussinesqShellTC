@@ -47,7 +47,7 @@ namespace Equations {
 
    void TestTFTBidiffusion2D::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DPeriodic(spBcIds);
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
    }
 
    void TestTFTBidiffusion2D::setCoupling()
@@ -176,7 +176,7 @@ namespace Equations {
       MHDFloat cZ = 0.0;
 
       // Compute boundary block operator
-      Scalar1DEigenTools::boundaryBlock(eq, mat, fieldId, pX, pZ, cX, cZ);
+      Scalar1DEigenTools::boundaryBlock1DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

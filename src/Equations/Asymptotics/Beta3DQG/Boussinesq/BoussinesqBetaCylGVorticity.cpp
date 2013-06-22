@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGVorticity::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DPeriodic(spBcIds);
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
    }
 
    void BoussinesqBetaCylGVorticity::setCoupling()
@@ -115,14 +115,20 @@ namespace Equations {
       }
    }
 
-   void BoussinesqBetaCylGVorticity::setQuasiInverse(SparseMatrix& mat) const
+   void BoussinesqBetaCylGVorticity::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
+      // Safety assert
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       // Quasi inverse is not required without nonlinear computations
       assert(false);
    }
 
-   void BoussinesqBetaCylGVorticity::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void BoussinesqBetaCylGVorticity::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
+      // Safety assert
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       linearBlock(*this, mat, fieldId, k);
    }
 

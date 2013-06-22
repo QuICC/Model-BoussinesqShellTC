@@ -41,7 +41,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGStreamfunction::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DPeriodic(spBcIds);
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
    }
 
    void BoussinesqBetaCylGStreamfunction::setCoupling()
@@ -136,13 +136,19 @@ namespace Equations {
       }
    }
 
-   void BoussinesqBetaCylGStreamfunction::setQuasiInverse(SparseMatrix& mat) const
+   void BoussinesqBetaCylGStreamfunction::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
+      // Safety assert
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       quasiInverseBlock(*this, mat);
    }
 
-   void BoussinesqBetaCylGStreamfunction::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void BoussinesqBetaCylGStreamfunction::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
+      // Safety assert
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
       linearBlock(*this, mat, fieldId, k);
    }
 
@@ -283,7 +289,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      Scalar1DEigenTools::boundaryBlock(eq, mat, fieldId, pX, pZ, cX, cZ);
+      Scalar1DEigenTools::boundaryBlock1DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

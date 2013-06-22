@@ -52,7 +52,7 @@ namespace Equations {
 
    void AnnulusExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
    {
-      this->initSpectralMatrices1DPeriodic(spBcIds);
+      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR, this->unknown().dom(0).spRes());
    }
 
    void AnnulusExactScalarState::setCoupling()
@@ -152,12 +152,12 @@ namespace Equations {
       }
    }
 
-   void AnnulusExactScalarState::setQuasiInverse(SparseMatrix& mat) const
+   void AnnulusExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
       Equations::quasiInverseBlock(*this, mat);
    }
 
-   void AnnulusExactScalarState::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void AnnulusExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
       Equations::linearBlock(*this, mat, fieldId, k);
    }
@@ -211,7 +211,7 @@ namespace Equations {
       MHDFloat cZ = 1.0;
 
       // Compute boundary block operator
-      Scalar1DEigenTools::boundaryBlock(eq, mat, fieldId, pX, pZ, cX, cZ);
+      Scalar1DEigenTools::boundaryBlock1DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

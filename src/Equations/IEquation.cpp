@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Base/MathConstants.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,6 +35,196 @@ namespace Equations {
    void IEquation::init()
    {
       this->setCoupling();
+   }
+
+   void IEquation::initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes)
+   {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      // Get the number of systems
+      int nSystems = this->couplingInfo(compId).nSystems();
+
+      // Boxscale
+      MHDFloat boxScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+
+      //
+      // Initialise the quasi-inverse operators for the nonlinear terms (if required)
+      //
+      if(this->couplingInfo(compId).hasQuasiInverse())
+      {
+         this->mNLMatrices.insert(std::make_pair(compId, std::vector<SparseMatrix>()));
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(compId);
+         qIt->second.reserve(nSystems);
+         for(int i = 0; i < nSystems; ++i)
+         {
+            qIt->second.push_back(SparseMatrix());
+
+            this->setQuasiInverse(compId, qIt->second.back());
+         }
+      }
+
+      //
+      // Initialise the explicit linear operators
+      //
+      CouplingInformation::FieldId_iterator fIt;
+      CouplingInformation::FieldId_range fRange = this->couplingInfo(compId).explicitRange();
+      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+      {
+         std::vector<DecoupledZSparse> tmpMat;
+         tmpMat.reserve(nSystems);
+
+         bool isComplex = false;
+
+         // Create matrices
+         for(int i = 0; i < nSystems; ++i)
+         {
+            MHDFloat k_ = boxScale*static_cast<MHDFloat>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
+
+            // Get linear block
+            tmpMat.push_back(DecoupledZSparse());
+            this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, k_);
+
+            // Explicit operator requires an additional minus sign
+            tmpMat.at(i).first = -tmpMat.at(i).first;
+            tmpMat.at(i).second = -tmpMat.at(i).second;
+
+            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+         }
+
+         // Create key
+         std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, *fIt);
+
+         // Select real or complex operator
+         if(isComplex)
+         {
+            this->mLZMatrices.insert(std::make_pair(key, std::vector<SparseMatrixZ>()));
+            this->mLZMatrices.find(key)->second.reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               this->mLZMatrices.find(key)->second.push_back(tmp);
+            }
+         } else
+         {
+            this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
+            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
+
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+            }
+         }
+      }
+   }
+
+   void IEquation::initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes)
+   {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      // Get the number of systems
+      int nSystems = this->couplingInfo(compId).nSystems();
+
+      // Boxscale
+      MHDFloat box2DScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM2D);
+      MHDFloat box3DScale = spRes->sim()->boxScale(Dimensions::Simulation::SIM3D);
+
+      //
+      // Initialise the quasi-inverse operators for the nonlinear terms (if required)
+      //
+      if(this->couplingInfo(compId).hasQuasiInverse())
+      {
+         this->mNLMatrices.insert(std::make_pair(compId, std::vector<SparseMatrix>()));
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator qIt = this->mNLMatrices.find(compId);
+         qIt->second.reserve(nSystems);
+         for(int i = 0; i < nSystems; ++i)
+         {
+            qIt->second.push_back(SparseMatrix());
+
+            this->setQuasiInverse(compId, qIt->second.back());
+         }
+      }
+
+      //
+      // Initialise the explicit linear operators
+      //
+      CouplingInformation::FieldId_iterator fIt;
+      CouplingInformation::FieldId_range fRange = this->couplingInfo(compId).explicitRange();
+      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
+      {
+         std::vector<DecoupledZSparse> tmpMat;
+         tmpMat.reserve(nSystems);
+
+         bool isComplex = false;
+
+         // Create matrices
+         for(int i = 0; i < nSystems; ++i)
+         {
+            // Get mode indexes
+            ArrayI mode = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->mode(i);
+
+            // Get 2D wave number rescaled to box size
+            MHDFloat k2D_ = box2DScale*static_cast<MHDFloat>(mode(0));
+            // Get 3D wave number rescaled to box size
+            MHDFloat k3D_ = box3DScale*static_cast<MHDFloat>(mode(1));
+
+            // Get linear block
+            tmpMat.push_back(DecoupledZSparse());
+            this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, k2D_, k3D_);
+
+            // Explicit operator requires an additional minus sign
+            tmpMat.at(i).first = -tmpMat.at(i).first;
+            tmpMat.at(i).second = -tmpMat.at(i).second;
+
+            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+         }
+
+         // Create key
+         std::pair<FieldComponents::Spectral::Id, SpectralFieldId>   key = std::make_pair(compId, *fIt);
+
+         // Select real or complex operator
+         if(isComplex)
+         {
+            this->mLZMatrices.insert(std::make_pair(key, std::vector<SparseMatrixZ>()));
+            this->mLZMatrices.find(key)->second.reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               this->mLZMatrices.find(key)->second.push_back(tmp);
+            }
+         } else
+         {
+            this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
+            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
+
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+            }
+         }
+      }
+   }
+
+   void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat) const
+   {
+      throw Exception("setQuasiInverse: dummy implementation was called!");
+   }
+
+   void IEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   {
+      throw Exception("setExplicitLinearBlock: dummy implementation was called!");
+   }
+
+   void IEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k2D, const MHDFloat k3D) const
+   {
+      throw Exception("setExplicitLinearBlock: dummy implementation was called!");
    }
 
    void IEquation::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

@@ -104,7 +104,42 @@ namespace Equations {
           */
          virtual void setCoupling() = 0;
 
+         /**
+          * @brief Initialise the spectral equation matrices with a single "eigen" direction
+          *
+          * @param spBcIds List of boundary condition IDs
+          * @param compId  Spectral component
+          * @param spRes   Shared resolution
+          */
+         void initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes);
+
+         /**
+          * @brief Initialise the spectral equation matrices with two "eigen" direction
+          *
+          * @param spBcIds List of boundary condition IDs
+          * @param compId  Spectral component
+          * @param spRes   Shared resolution
+          */
+         void initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId, SharedResolution spRes);
+
       private:
+         /**
+          * @brief Set the quasi inverse matrix operator
+          *
+          * It has only a dummy implementation and should never get called!
+          */
+         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const; //= 0;
+
+         /**
+          * @brief Set the explicit linear matrix operator with a single eigen direction
+          */
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const; //= 0;
+
+         /**
+          * @brief Set the explicit linear matrix operator with two eigen direction
+          */
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k2D, const MHDFloat k3D) const; //= 0;
+
    };
 
    /// Typedef for a smart IEquation

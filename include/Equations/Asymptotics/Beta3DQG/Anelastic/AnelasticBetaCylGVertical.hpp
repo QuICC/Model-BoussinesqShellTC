@@ -54,7 +54,7 @@ namespace Equations {
          /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const;
 
          /**
           * @brief Initialise the spectral equation matrices
@@ -77,12 +77,12 @@ namespace Equations {
          /**
           * @brief Set the quasi inverse matrix operator
           */
-         virtual void setQuasiInverse(SparseMatrix &mat) const;
+         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const;
 
          /**
           * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
 
       private:
    };

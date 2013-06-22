@@ -58,11 +58,13 @@ namespace Solver {
       {
          DebuggerMacro_msg("---> vector solver", 2);
 
-         // Get type information for the linear solvers for the first component
-         this->createSolver((*vectEqIt), FieldComponents::Spectral::ONE);
-
-         // Get type information for the linear solvers for the first component
-         this->createSolver((*vectEqIt), FieldComponents::Spectral::TWO);
+         // Get type information for the linear solvers 
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+         {
+            this->createSolver((*vectEqIt), *compIt);
+         }
       }
       DebuggerMacro_stop("Linear: create solvers t = ", 2);
 
@@ -79,7 +81,7 @@ namespace Solver {
          {
             DebuggerMacro_msg("---> scalar storage", 2);
 
-            // Create (coupled) matrices
+            // Create storage
             this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
 
@@ -88,11 +90,13 @@ namespace Solver {
          {
             DebuggerMacro_msg("---> vector storage", 2);
 
-            // Create (coupled) matrices
-            this->createStorage((*vectEqIt), FieldComponents::Spectral::ONE);
-
-            // Create (coupled) matrices
-            this->createStorage((*vectEqIt), FieldComponents::Spectral::TWO);
+            // Create storage
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+            {
+               this->createStorage((*vectEqIt), *compIt);
+            }
          }
       }
       DebuggerMacro_stop("Linear: create storage t = ", 2);
@@ -120,10 +124,12 @@ namespace Solver {
             DebuggerMacro_msg("---> vector operators", 2);
 
             // Create (coupled) matrices
-            this->createMatrices((*vectEqIt), FieldComponents::Spectral::ONE);
-
-            // Create (coupled) matrices
-            this->createMatrices((*vectEqIt), FieldComponents::Spectral::TWO);
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+            {
+               this->createMatrices((*vectEqIt), *compIt);
+            }
          }
       }
       DebuggerMacro_stop("Linear: create operators t = ", 2);

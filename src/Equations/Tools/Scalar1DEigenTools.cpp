@@ -26,26 +26,26 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   void boundaryBlock1DPeriodic(const Scalar1DEigenTools& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int pX, const int pZ, const MHDFloat cX, const MHDFloat cZ)
+   void Scalar1DEigenTools::boundaryBlock1DEigen(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
    {
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      // Get 1D and 3D dimensions
+      int n1D = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int n3D = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create equation ID
-      SpectralFieldId eqId = std::make_pair(eq.name(), FieldComponents::Spectral::SCALAR);
+      SpectralFieldId eqId = std::make_pair(eq.name(), compId);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(n1D);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(n3D);
 
       // Create spectral boundary operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(nZ);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(n1D);
+      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(n3D);
 
       // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
+      mat.first.resize(n1D*n3D,n1D*n3D);
+      mat.second.resize(n1D*n3D,n1D*n3D);
 
       // Storage for the boundary quasi-inverses
       SparseMatrix q1D;
@@ -54,11 +54,11 @@ namespace Equations {
       // Set boundary "operators"
       if(eq.bcIds().hasEquation(eqId))
       {
-         // Set X boundary quasi-inverse
-         q1D = spec1D.shiftId(pX);
+         // Set 1D boundary quasi-inverse
+         q1D = spec1D.shiftId(p1D);
 
-         // Set Z boundary quasi-inverse
-         q3D = spec3D.id(pZ);
+         // Set 3D boundary quasi-inverse
+         q3D = spec3D.id(p3D);
       // Unknown equation
       } else
       {
@@ -77,18 +77,18 @@ namespace Equations {
             tau = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
             if(tau.first.nonZeros() > 0)
             {
-               if(cX != 1.0)
+               if(c1D != 1.0)
                {
-                  tau.first *= cX;
+                  tau.first *= c1D;
                }
                Eigen::kroneckerProduct(q3D, tau.first, mat.first);
             }
 
             if(tau.second.nonZeros() > 0)
             {
-               if(cX != 1.0)
+               if(c1D != 1.0)
                {
-                  tau.second *= cX;
+                  tau.second *= c1D;
                }
                Eigen::kroneckerProduct(q3D, tau.second, mat.second);
             }
@@ -100,9 +100,9 @@ namespace Equations {
             tau = Spectral::BoundaryConditions::tauMatrix(bound3D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second);
             if(tau.first.nonZeros() > 0)
             {
-               if(cZ != 1.0)
+               if(c3D != 1.0)
                {
-                  tau.first *= cZ;
+                  tau.first *= c3D;
                }
                SparseMatrix tmp;
                Eigen::kroneckerProduct(tau.first, q1D, tmp);
@@ -110,9 +110,9 @@ namespace Equations {
             }
             if(tau.second.nonZeros() > 0)
             {
-               if(cZ != 1.0)
+               if(c3D != 1.0)
                {
-                  tau.second *= cZ;
+                  tau.second *= c3D;
                }
                SparseMatrix tmp;
                Eigen::kroneckerProduct(tau.second, q1D, tmp);

@@ -294,69 +294,42 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         // Get field identity
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-
-         // Get index of solver
-         int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+         // Loop over the vector equation components
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
+            // Get field identity
+            myId = std::make_pair((*vectEqIt)->name(), *compIt);
 
-            // Get solver output for first component
-            for(int i = 0; i < (*solZIt)->nSystem(); i++)
+            // Get index of solver
+            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+            // Linear solve matrices are complex
+            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
             {
-               (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
-            }
+               // Create iterator to current complex solver
+               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               std::advance(solZIt, myIdx);
 
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
+               // Get solver output for first component
+               for(int i = 0; i < (*solZIt)->nSystem(); i++)
+               {
+                  (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
+               }
 
-            // Get solver output for first component
-            for(int i = 0; i < (*solDIt)->nSystem(); i++)
+               // Linear solve matrices are real
+            } else
             {
-               (*vectEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
-            }
-         }
+               // Create iterator to current real solver
+               SolverD_iterator solDIt = this->mDSolvers.begin();
+               std::advance(solDIt, myIdx);
 
-         // Get field identity
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
-
-         // Get index of solver
-         myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
-         {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
-
-            // Get solver input for second component
-            for(int i = 0; i < (*solZIt)->nSystem(); i++)
-            {
-               (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
-            }
-
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
-
-            // Get solver output for second component
-            for(int i = 0; i < (*solDIt)->nSystem(); i++)
-            {
-               (*vectEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
+               // Get solver output for first component
+               for(int i = 0; i < (*solDIt)->nSystem(); i++)
+               {
+                  (*vectEqIt)->storeSolution(myId.second, (*solDIt)->solution(i), i, (*solDIt)->startRow(myId,i));
+               }
             }
          }
       }
@@ -409,69 +382,41 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         // Get field identity
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-
-         // Get index of solver
-         int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
+            // Get field identity
+            myId = std::make_pair((*vectEqIt)->name(), *compIt);
 
-            // Get solver input for toroidal component
-            for(int i = 0; i < (*solZIt)->nSystem(); i++)
+            // Get index of solver
+            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+            // Linear solve matrices are complex
+            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
-            }
+               // Create iterator to current complex solver
+               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               std::advance(solZIt, myIdx);
 
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
+               // Get solver input for toroidal component
+               for(int i = 0; i < (*solZIt)->nSystem(); i++)
+               {
+                  Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
+               }
 
-            // Get solver input for toroidal component
-            for(int i = 0; i < (*solDIt)->nSystem(); i++)
+               // Linear solve matrices are real
+            } else
             {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
-            }
-         }
+               // Create iterator to current real solver
+               SolverD_iterator solDIt = this->mDSolvers.begin();
+               std::advance(solDIt, myIdx);
 
-         // Get field identity
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
-
-         // Get index of solver
-         myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
-         {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
-
-            // Get solver input for poloidal component
-            for(int i = 0; i < (*solZIt)->nSystem(); i++)
-            {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
-            }
-
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
-
-            // Get solver input for poloidal component
-            for(int i = 0; i < (*solDIt)->nSystem(); i++)
-            {
-               Equations::copyUnknown(*(*vectEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
+               // Get solver input for toroidal component
+               for(int i = 0; i < (*solDIt)->nSystem(); i++)
+               {
+                  Equations::copyUnknown(*(*vectEqIt), myId.second, (*solDIt)->rSolution(i), i, (*solDIt)->startRow(myId,i));
+               }
             }
          }
       }
@@ -518,58 +463,36 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         // Get field identity for first component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::ONE);
-
-         // Get index of solver
-         int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
+            // Get field identity for first component
+            myId = std::make_pair((*vectEqIt)->name(), *compIt);
 
-            // Get solver input
-            this->getSolverInput(vectEqIt, myId, solZIt);
+            // Get index of solver
+            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
 
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
+            // Linear solve matrices are complex
+            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+            {
+               // Create iterator to current complex solver
+               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               std::advance(solZIt, myIdx);
 
-            // Get solver input
-            this->getSolverInput(vectEqIt, myId, solDIt);
-         }
+               // Get solver input
+               this->getSolverInput(vectEqIt, myId, solZIt);
 
-         // Get field identity for second component
-         myId = std::make_pair((*vectEqIt)->name(), FieldComponents::Spectral::TWO);
+               // Linear solve matrices are real
+            } else
+            {
+               // Create iterator to current real solver
+               SolverD_iterator solDIt = this->mDSolvers.begin();
+               std::advance(solDIt, myIdx);
 
-         // Get index of solver
-         myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // Linear solve matrices are complex
-         if((*vectEqIt)->couplingInfo(myId.second).isComplex())
-         {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
-            std::advance(solZIt, myIdx);
-
-            // Get solver input
-            this->getSolverInput(vectEqIt, myId, solZIt);
-
-         // Linear solve matrices are real
-         } else
-         {
-            // Create iterator to current real solver
-            SolverD_iterator solDIt = this->mDSolvers.begin();
-            std::advance(solDIt, myIdx);
-
-            // Get solver input
-            this->getSolverInput(vectEqIt, myId, solDIt);
+               // Get solver input
+               this->getSolverInput(vectEqIt, myId, solDIt);
+            }
          }
       }
    }

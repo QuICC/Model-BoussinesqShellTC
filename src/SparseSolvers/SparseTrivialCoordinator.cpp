@@ -65,11 +65,13 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
       {
-         // Get type information for the solvers for the first component
-         this->createSolver((*vectEqIt), FieldComponents::Spectral::ONE);
-
-         // Get type information for the solvers for the first component
-         this->createSolver((*vectEqIt), FieldComponents::Spectral::TWO);
+         // Get type information for the solvers
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+         {
+            this->createSolver((*vectEqIt), *compIt);
+         }
       }
       DebuggerMacro_stop("Trivial: create solvers t = ", 2);
 
@@ -84,18 +86,20 @@ namespace Solver {
          // Loop over all scalar equations
          for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
          {
-            // Create (coupled) matrices
+            // Create storage 
             this->createStorage((*scalEqIt), FieldComponents::Spectral::SCALAR);
          }
 
          // Loop over all vector equations
          for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
          {
-            // Create (coupled) matrices
-            this->createStorage((*vectEqIt), FieldComponents::Spectral::ONE);
-
-            // Create (coupled) matrices
-            this->createStorage((*vectEqIt), FieldComponents::Spectral::TWO);
+            // Create storage 
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+            {
+               this->createStorage((*vectEqIt), *compIt);
+            }
          }
       }
       DebuggerMacro_stop("Trivial: create storage t = ", 2);

@@ -129,12 +129,12 @@ namespace Equations {
       }
    }
 
-   void BoussinesqPerBetaCylGTransport::setQuasiInverse(SparseMatrix& mat) const
+   void BoussinesqPerBetaCylGTransport::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
       quasiInverseBlock(*this, mat);
    }
 
-   void BoussinesqPerBetaCylGTransport::setExplicitLinearBlock(DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void BoussinesqPerBetaCylGTransport::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
    {
       linearBlock(*this, mat, fieldId, k);
    }

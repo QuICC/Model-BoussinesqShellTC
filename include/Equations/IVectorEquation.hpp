@@ -11,6 +11,7 @@
 
 // System includes
 //
+#include <vector>
 
 // External includes
 //
@@ -21,8 +22,6 @@
 #include "Enums/FieldIds.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEquation.hpp"
-#include "TypeSelectors/ScalarSelector.hpp"
-#include "TypeSelectors/VariableSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,6 +33,12 @@ namespace Equations {
    class IVectorEquation: public IEquation
    {
       public:
+         /// Typedef for the the spectral field component ID iterator
+         typedef std::vector<FieldComponents::Spectral::Id>::const_iterator   SpectralComponent_iterator;
+
+         /// Typedef for the the spectral field component ID iterator range
+         typedef std::pair<SpectralComponent_iterator,SpectralComponent_iterator>  SpectralComponent_range;
+
          /**
           * \brief Simple constructor
           *
@@ -61,6 +66,16 @@ namespace Equations {
          const Datatypes::VectorVariableType& unknown() const;
 
          /**
+          * @brief Get the number of spectral components
+          */
+         int nSpectral() const; 
+
+         /**
+          * @brief Get vector spectral component range
+          */
+         SpectralComponent_range spectralRange() const;
+
+         /**
           * @brief Update unknown from dealised data
           *
           * @param rhs     Dealised input
@@ -84,6 +99,11 @@ namespace Equations {
           * @brief Set the unknown variable
           */
          Datatypes::VectorVariableType& rUnknown();
+
+         /**
+          * @brief List of the avaiable vector components
+          */
+         std::vector<FieldComponents::Spectral::Id>   mSpectralIds;
 
       private:
          /**
