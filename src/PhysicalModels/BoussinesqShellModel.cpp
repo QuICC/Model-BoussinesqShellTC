@@ -92,12 +92,12 @@ namespace GeoMHDiSCC {
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::ShellExactScalarState::HARMONIC);
       std::vector<std::tr1::tuple<int,int,MHDComplex> >  modes;
-      modes.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
-      modes.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-      modes.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+      //modes.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+      //modes.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
+      //modes.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
       modes.push_back(std::tr1::make_tuple(6,3,MHDComplex(1,0)));
-      modes.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-      modes.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+      //modes.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+      //modes.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
       spExact->setHarmonicOptions(modes);
 
       // Add output file
