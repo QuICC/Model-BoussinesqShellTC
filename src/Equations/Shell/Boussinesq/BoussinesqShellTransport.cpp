@@ -59,6 +59,9 @@ namespace Equations {
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
+      // Set index type: use MODE
+      infoIt.first->second.setIndexType(CouplingInformation::MODE);
+
       // Equation is coupled to temperature equation (self)
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 

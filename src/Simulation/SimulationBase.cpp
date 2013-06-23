@@ -713,15 +713,21 @@ namespace GeoMHDiSCC {
 
       // Identifiy the solver indexes by analysing the coupling between the equations
       DebuggerMacro_enter("identifyCoupling_Prognostic",1);
+      DebuggerMacro_showValue("---> Prognostic scalar equations: ",1, this->mScalarPrognosticRange.second - this->mScalarPrognosticRange.first);
+      DebuggerMacro_showValue("---> Prognostic vector equations: ",1, this->mVectorPrognosticRange.second - this->mVectorPrognosticRange.first);
       this->identifyCoupling(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       DebuggerMacro_leave("identifyCoupling_Prognostic",1);
 
       DebuggerMacro_enter("identifyCoupling_Diagnostic",1);
-      this->identifyCoupling(this->mScalarDiagnosticRange, this->mVectorPrognosticRange);
+      DebuggerMacro_showValue("---> Diagnostic scalar equations: ",1, this->mScalarDiagnosticRange.second - this->mScalarDiagnosticRange.first);
+      DebuggerMacro_showValue("---> Diagnostic vector equations: ",1, this->mVectorDiagnosticRange.second - this->mVectorDiagnosticRange.first);
+      this->identifyCoupling(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
       DebuggerMacro_leave("identifyCoupling_Diagnostic",1);
 
       DebuggerMacro_enter("identifyCoupling_Trivial",1);
-      this->identifyCoupling(this->mScalarTrivialRange, this->mVectorPrognosticRange);
+      DebuggerMacro_showValue("---> Trivial scalar equations: ",1, this->mScalarTrivialRange.second - this->mScalarTrivialRange.first);
+      DebuggerMacro_showValue("---> Trivial vector equations: ",1, this->mVectorTrivialRange.second - this->mVectorTrivialRange.first);
+      this->identifyCoupling(this->mScalarTrivialRange, this->mVectorTrivialRange);
       DebuggerMacro_leave("identifyCoupling_Trivial",1);
    }
 
@@ -821,6 +827,7 @@ namespace GeoMHDiSCC {
       {
          // Get coupled counter for each component
          ArrayI counter((*vectEqIt)->nSpectral());
+         counter.setConstant(0);
 
          // Loop over the (identified) scalar equations
          for(doneSEqIt = scalEq.first; doneSEqIt != scalEq.second; ++doneSEqIt)

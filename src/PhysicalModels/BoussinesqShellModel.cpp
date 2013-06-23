@@ -170,6 +170,52 @@ namespace GeoMHDiSCC {
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
 
+      // Temperature equation
+      //    ... boundary conditions
+      eqId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
+      {
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      } else
+      {
+         throw Exception("Unknown temperature boundary conditions in configuration file");
+      }
+
+      // Velocity equation
+      //    ... toroidal boundary conditions
+      eqId = std::make_pair(PhysicalNames::VELOCITY, FieldComponents::Spectral::ONE);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(PhysicalNames::VELOCITY, FieldComponents::Spectral::ONE);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
+      {
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      } else
+      {
+         throw Exception("Unknown toroidal velocity boundary conditions in configuration file");
+      }
+      //    ... poloidal boundary conditions
+      eqId = std::make_pair(PhysicalNames::VELOCITY, FieldComponents::Spectral::TWO);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(PhysicalNames::VELOCITY, FieldComponents::Spectral::TWO);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
+      {
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      } else
+      {
+         throw Exception("Unknown toroidal velocity boundary conditions in configuration file");
+      }
+
       return spBcs;
    }
 
