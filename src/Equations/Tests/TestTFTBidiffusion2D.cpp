@@ -160,6 +160,7 @@ namespace Equations {
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
       Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(4,0), mat.first);
+      mat.first = -mat.first;
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

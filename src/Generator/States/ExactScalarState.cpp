@@ -125,8 +125,8 @@ namespace Equations {
             {
                Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
                Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
-               //MHDFloat yVal = std::cos(yGrid(iY));
-               MHDFloat yVal = 1.0;
+               MHDFloat yVal = std::cos(yGrid(iY));
+               //MHDFloat yVal = 1.0;
 
                rNLComp.setProfile(sinZ*sinX(iX)*yVal,iY,iX);
             }

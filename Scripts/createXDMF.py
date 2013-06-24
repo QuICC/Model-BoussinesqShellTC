@@ -54,6 +54,7 @@ def main(argv):
    print '2D grid size: ', n2D
    print '3D grid size: ', n3D
    print 'Time: ', time
+   h5_file.close()
 
    # Open file
    xdmfHead = '<?xml version="1.0" ?>\n<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n<Xdmf Version="2.0">\n\t<Domain>'
@@ -70,6 +71,8 @@ def main(argv):
    if snapshots > 1:
       print >>out_file, xdmfSeries
    for fId in range(sId, sId+snapshots):
+      current = basename+str(fId).zfill(4)+'.hdf5'
+      h5_file = h5py.File(current, 'r')
       if scheme in ('TFT'):
          #if fId == 1:
          #   boxXYZ(h5_file)
@@ -87,9 +90,11 @@ def main(argv):
       for s in list(h5_file):
          if s in list(h5_file[s]):
             print >>out_file, xdmfScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'sname': s, 'fid': fId, 'basename': basename}
+      time = h5_file['run']['time'].value
       print >>out_file, xdmfTime % {'time': time}
       if snapshots > 1:
          print >>out_file, xdmfEndSeries
+      h5_file.close()
    print >>out_file, xdmfEnd
    out_file.close()
 

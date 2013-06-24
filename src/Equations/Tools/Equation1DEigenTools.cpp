@@ -28,6 +28,12 @@ namespace Equations {
 
    void Equation1DEigenTools::boundaryBlock1DEigen(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
    {
+      /// \mhdBug Does not seem to handle both types of boundray conditions yet!
+      if(p1D > 0  && p3D == 0)
+      {
+         throw Exception("This type of boundary conditions is not yet implemented correctly");
+      }
+
       // Get 1D and 3D dimensions
       int n1D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int n3D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -54,11 +60,40 @@ namespace Equations {
       // Set boundary "operators"
       if(eq.bcIds().hasEquation(eqId))
       {
-         // Set 1D boundary quasi-inverse
-         q1D = spec1D.shiftId(p1D);
+         // Impose 1D condition in corners
+         if(p1D == 0 && p3D > 0)
+         {
+            int nBC3D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second.size();
 
-         // Set 3D boundary quasi-inverse
-         q3D = spec3D.id(p3D);
+            // Set 1D boundary quasi-inverse
+            q1D = spec1D.id(p1D);
+
+            // Set 3D boundary quasi-inverse
+            q3D = spec3D.shiftId(nBC3D);
+
+         // Impose 3D condition in corners
+         } else if(p3D == 0 && p1D > 0)
+         {
+            int nBC1D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second.size();
+
+            // Set 1D boundary quasi-inverse
+            q1D = spec1D.shiftId(nBC1D);
+
+            // Set 3D boundary quasi-inverse
+            q3D = spec3D.id(p3D);
+
+         // Special case for "no" boundary condition
+         } else if(p1D == 0 && p3D == 0 && (c1D == 0 || c3D == 0))
+         {
+            // Set 1D boundary quasi-inverse
+            q1D = spec1D.id(p1D);
+
+            // Set 3D boundary quasi-inverse
+            q3D = spec3D.id(p3D);
+         } else
+         {
+            throw Exception("Boundary conditions setup is incompatible!");
+         }
       // Unknown equation
       } else
       {

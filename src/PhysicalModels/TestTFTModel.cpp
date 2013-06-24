@@ -97,22 +97,22 @@ namespace GeoMHDiSCC {
       Equations::SharedTestTFTCoupledBidiffusion2DTwo   spCB2D2;
 
       // Add first scalar test equation
-      //spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
-      //spD3D->setIdentity(PhysicalNames::TEMPERATURE);
+      spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      spD3D->setIdentity(PhysicalNames::TEMPERATURE);
       //spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
       //spD2D->setIdentity(PhysicalNames::TEMPERATURE);
       //spB2D = spSim->addScalarEquation<Equations::TestTFTBidiffusion2D>();
       //spB2D->setIdentity(PhysicalNames::TEMPERATURE);
-      spB3D = spSim->addScalarEquation<Equations::TestTFTBidiffusion3D>();
-      spB3D->setIdentity(PhysicalNames::TEMPERATURE);
+      //spB3D = spSim->addScalarEquation<Equations::TestTFTBidiffusion3D>();
+      //spB3D->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add second scalar test equation
       //spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
       //spD3D->setIdentity(PhysicalNames::STREAMFUNCTION);
-      //spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
-      //spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spB2D = spSim->addScalarEquation<Equations::TestTFTBidiffusion2D>();
-      spB2D->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
+      spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
+      //spB2D = spSim->addScalarEquation<Equations::TestTFTBidiffusion2D>();
+      //spB2D->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       spCB2D1 = spSim->addScalarEquation<Equations::TestTFTCoupledBidiffusion2DOne>();
       spCB2D1->setIdentity(PhysicalNames::VORTICITY, PhysicalNames::PRESSURE);
@@ -246,14 +246,14 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
 
       // Second scalar equation Dirichlet boundary conditions
       fieldName = PhysicalNames::STREAMFUNCTION;
@@ -270,8 +270,8 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
 
       // Second scalar equation Dirichlet boundary conditions
       fieldName = PhysicalNames::VORTICITY;
