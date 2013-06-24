@@ -20,7 +20,7 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/TFTScheme.hpp"
+#include "SpatialSchemes/3D/WLFScheme.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,7 +34,7 @@ namespace GeoMHDiSCC {
          static const int DIMENSION = 3;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::TFTScheme SchemeType;
+         typedef Schemes::WLFScheme SchemeType;
 
          /**
           * @brief Get vector of names for the boundary conditions

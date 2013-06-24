@@ -30,6 +30,12 @@ namespace GeoMHDiSCC {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
 
+      // Add temperature
+      ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add temperature
+      ids.push_back(PhysicalNames::VELOCITY);
+
       return ids;
    }
 
@@ -52,7 +58,7 @@ namespace GeoMHDiSCC {
       box.push_back(false);
 
       // Z direction is not periodic box
-      box.push_back(true);
+      box.push_back(false);
 
       return box;
    }

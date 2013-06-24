@@ -1,5 +1,5 @@
-/** \file CFTScheme.cpp
- *  \brief Source of the cylindrical Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme implementation
+/** \file WFTScheme.cpp
+ *  \brief Source of the cylindrical Worland(poly) + Fourier + Chebyshev(FFT) scheme implementation
  */
 
 // System includes
@@ -11,24 +11,25 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/CFTScheme.hpp"
+#include "SpatialSchemes/3D/WFTScheme.hpp"
 
 // Project includes
 //
+#include "PolynomialTransforms/PolynomialTools.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
    
-   std::string CFTScheme::type()
+   std::string WFTScheme::type()
    {
-      return "CFT";
+      return "WFT";
    }
 
-   void CFTScheme::addTransformSetups(SharedResolution spRes) const
+   void WFTScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
-      Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
+      Transform::SharedPolySetup  spS1D = this->spSetup1D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
 
       // Add setup for second transform
@@ -40,25 +41,43 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::SharedFftSetup CFTScheme::spSetup1D(SharedResolution spRes) const
+   Transform::SharedPolySetup WFTScheme::spSetup1D(SharedResolution spRes) const
    {
-      // Get size of FFT transform
+      // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
-      // Get spectral size of the FFT
+      // Get spectral size of the polynomial transform
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-      // Get number of transforms
+      // Storage for the list of indexes
+      std::vector<ArrayI>  fast;
+      fast.reserve(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      ArrayI  slow(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+
+      // Multiplier from second dimension 
+      ArrayI mult(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+
+      // Get number of transforms and list of indexes
       int howmany = 0;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+
+         slow(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i);
+
+         fast.push_back(ArrayI(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i)));
+         for(int j = 0; j < fast.at(i).size(); j++)
+         {
+            fast.at(i)(j) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(j,i);
+         }
+
+         mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
-   Transform::SharedFftSetup CFTScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedFftSetup WFTScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
@@ -76,7 +95,7 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
-   Transform::SharedFftSetup CFTScheme::spSetup3D(SharedResolution spRes) const
+   Transform::SharedFftSetup WFTScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
@@ -94,25 +113,23 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
    }
 
-   CFTScheme::CFTScheme(const ArrayI& dim)
+   WFTScheme::WFTScheme(const ArrayI& dim)
       : IRegular3DScheme(dim)
    {
    }
 
-   CFTScheme::~CFTScheme()
+   WFTScheme::~WFTScheme()
    {
    }
 
-   void CFTScheme::setDimensions()
+   void WFTScheme::setDimensions()
    {
       //
       // Compute sizes
       //
 
-      // Get standard dealiased FFT size
-      int nR = Transform::FftwTools::dealiasFft(this->mI+1);
-      // Check for optimised FFT sizes
-      nR = Transform::FftwTools::optimizeFft(nR);
+      // Get dealiased Worland size
+      int nR = Transform::PolynomialTools::dealias(this->mI+1);
 
       // Get mixed dealiased FFT size
       int nTh = Transform::FftwTools::dealiasMixedFft(this->mJ+1);
@@ -132,7 +149,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
       this->setDimension(this->mK + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
@@ -173,7 +190,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void CFTScheme::setCosts()
+   void WFTScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
@@ -185,7 +202,7 @@ namespace Schemes {
       this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void CFTScheme::setScalings()
+   void WFTScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
@@ -197,7 +214,7 @@ namespace Schemes {
       this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void CFTScheme::setMemoryScore()
+   void WFTScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
@@ -209,7 +226,7 @@ namespace Schemes {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool CFTScheme::applicable() const
+   bool WFTScheme::applicable() const
    {
       return true;
    }

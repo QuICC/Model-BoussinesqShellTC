@@ -33,42 +33,51 @@ foreach(ModelFile ${PhysicalModels})
    # Show message
    message(STATUS " --> Added ${ModelName} executable")
 
+   # Create new name for executable
+   STRING(REGEX REPLACE "Model" "Config" ExecName ${ModelName})
+
    # Create list of source files
    set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
-   add_executable(${ModelName}Config ${SrcsList})
+   add_executable(${ExecName} ${SrcsList})
 
    # Set special properties of target
-   set_target_properties(${ModelName}Config PROPERTIES OUTPUT_NAME
-      ${ModelName}Config COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
+      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Show message
-   message(STATUS " --> Added ${ModelName}Config executable")
+   message(STATUS " --> Added ${ExecName} executable")
+
+   # Create new name for executable
+   STRING(REGEX REPLACE "Model" "State" ExecName ${ModelName})
 
    # Create list of source files
    set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
-   add_executable(${ModelName}State ${SrcsList})
+   add_executable(${ExecName} ${SrcsList})
 
    # Set special properties of target
-   set_target_properties(${ModelName}State PROPERTIES OUTPUT_NAME
-      ${ModelName}State COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
+      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Show message
-   message(STATUS " --> Added ${ModelName}State executable")
+   message(STATUS " --> Added ${ExecName} executable")
+
+   # Create new name for executable
+   STRING(REGEX REPLACE "Model" "Visu" ExecName ${ModelName})
 
    # Create list of source files
    set(SrcsList VisualizeState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
 
    # Add executable to target list
-   add_executable(${ModelName}Visu ${SrcsList})
+   add_executable(${ExecName} ${SrcsList})
 
    # Set special properties of target
-   set_target_properties(${ModelName}Visu PROPERTIES OUTPUT_NAME
-      ${ModelName}Visu COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
+      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
 
    # Show message
-   message(STATUS " --> Added ${ModelName}Visu executable")
+   message(STATUS " --> Added ${ExecName} executable")
 endforeach(ModelFile)

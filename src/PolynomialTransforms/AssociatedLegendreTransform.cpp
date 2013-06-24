@@ -175,7 +175,16 @@ namespace Transform {
       mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mWeights.size();
 
       // Storage for the projector
-      mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mProjector.size();
+      for(size_t i = 0; i < this->mProjector.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mProjector.at(i).rows()*this->mProjector.at(i).cols();
+      }
+
+      // Storage for the derivative
+      for(size_t i = 0; i < this->mDerivative.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDerivative.at(i).rows()*this->mDerivative.at(i).cols();
+      }
 
       return mem;
    }

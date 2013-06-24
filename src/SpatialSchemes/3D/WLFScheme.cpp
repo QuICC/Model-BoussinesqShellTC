@@ -1,5 +1,5 @@
-/** \file SLFScheme.cpp
- *  \brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
+/** \file WLFScheme.cpp
+ *  \brief Source of the spherical Worland(poly) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
  */
 
 // System includes
@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/SLFScheme.hpp"
+#include "SpatialSchemes/3D/WLFScheme.hpp"
 
 // Project includes
 //
@@ -21,15 +21,15 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
    
-   std::string SLFScheme::type()
+   std::string WLFScheme::type()
    {
-      return "SLF";
+      return "WLF";
    }
 
-   void SLFScheme::addTransformSetups(SharedResolution spRes) const
+   void WLFScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
-      Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
+      Transform::SharedPolySetup  spS1D = this->spSetup1D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
 
       // Add setup for second transform
@@ -41,25 +41,43 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::SharedFftSetup SLFScheme::spSetup1D(SharedResolution spRes) const
+   Transform::SharedPolySetup WLFScheme::spSetup1D(SharedResolution spRes) const
    {
-      // Get size of FFT transform
+      // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
-      // Get spectral size of the FFT
+      // Get spectral size of the polynomial transform
       int specSize = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-      // Get number of transforms
+      // Storage for the list of indexes
+      std::vector<ArrayI>  fast;
+      fast.reserve(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      ArrayI  slow(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+
+      // Multiplier from second dimension 
+      ArrayI mult(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+
+      // Get number of transforms and list of indexes
       int howmany = 0;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+
+         slow(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i);
+
+         fast.push_back(ArrayI(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i)));
+         for(int j = 0; j < fast.at(i).size(); j++)
+         {
+            fast.at(i)(j) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(j,i);
+         }
+
+         mult(i) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
+      return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
-   Transform::SharedPolySetup SLFScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedPolySetup WLFScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
@@ -95,7 +113,7 @@ namespace Schemes {
       return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
-   Transform::SharedFftSetup SLFScheme::spSetup3D(SharedResolution spRes) const
+   Transform::SharedFftSetup WLFScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
@@ -113,25 +131,23 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
-   SLFScheme::SLFScheme(const ArrayI& dim)
+   WLFScheme::WLFScheme(const ArrayI& dim)
       : IRegularSHScheme(dim)
    {
    }
 
-   SLFScheme::~SLFScheme()
+   WLFScheme::~WLFScheme()
    {
    }
 
-   void SLFScheme::setDimensions()
+   void WLFScheme::setDimensions()
    {
       //
       // Compute sizes
       //
 
-      // Get standard dealiased FFT size
-      int nR = Transform::FftwTools::dealiasFft(this->mI+1);
-      // Check for optimised FFT sizes
-      nR = Transform::FftwTools::optimizeFft(nR);
+      // Get dealiased Worland transform size
+      int nR = Transform::PolynomialTools::dealias(this->mI+1);
 
       // Get dealiased associated Legendre transform size
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
@@ -149,7 +165,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
 
       // Initialise backward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
       this->setDimension(this->mL + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
@@ -190,7 +206,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void SLFScheme::setCosts()
+   void WLFScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
@@ -202,7 +218,7 @@ namespace Schemes {
       this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void SLFScheme::setScalings()
+   void WLFScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
@@ -214,7 +230,7 @@ namespace Schemes {
       this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void SLFScheme::setMemoryScore()
+   void WLFScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
@@ -226,7 +242,7 @@ namespace Schemes {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool SLFScheme::applicable() const
+   bool WLFScheme::applicable() const
    {
       return true;
    }
