@@ -249,7 +249,7 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Set boundary condition prefactors
-         cX = 1.0;
+         cX = 0.0;
          cZ = k_*std::tan((MathConstants::PI/180.)*chi)/Gamma;
 
       // Boundary condition for the vertical velocity

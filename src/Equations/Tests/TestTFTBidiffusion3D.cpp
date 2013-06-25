@@ -132,6 +132,7 @@ namespace Equations {
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
          mat.first = Spectral::PeriodicOperator::qBilaplacian3D(spec1D, spec3D, k_, 4, 4);
+         mat.first = -mat.first;
 
       // Unknown field
       } else
@@ -160,7 +161,6 @@ namespace Equations {
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
       Eigen::kroneckerProduct(spec3D.qDiff(4,0), spec1D.qDiff(4,0), mat.first);
-      mat.first = -mat.first;
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

@@ -265,7 +265,7 @@ namespace Equations {
       {
          // Set boundary condition prefactors
          cX = 1.0;
-         cZ = 1.0;
+         cZ = 0.0;
 
       // Unknown field
       } else

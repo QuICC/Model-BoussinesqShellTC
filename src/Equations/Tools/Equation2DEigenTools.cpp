@@ -44,40 +44,43 @@ namespace Equations {
       mat.first.resize(n1D,n1D);
       mat.second.resize(n1D,n1D);
 
-      // Safety check to abort early
-      if(!eq.bcIds().hasEquation(eqId))
+      if(c1D != 0)
       {
-         throw Exception("Missing condition(s) for boundary operator!");
-      }
-
-      // Set boundary conditions on fieldId
-      if(eq.bcIds().hasField(eqId,fieldId))
-      {
-         // Set 1D boundary conditions
-         if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
+         // Safety check to abort early
+         if(!eq.bcIds().hasEquation(eqId))
          {
-            mat = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
-            if(mat.first.nonZeros() > 0)
-            {
-               if(c1D != 1.0)
-               {
-                  mat.first *= c1D;
-               }
-            }
+            throw Exception("Missing condition(s) for boundary operator!");
+         }
 
-            if(mat.second.nonZeros() > 0)
+         // Set boundary conditions on fieldId
+         if(eq.bcIds().hasField(eqId,fieldId))
+         {
+            // Set 1D boundary conditions
+            if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
             {
-               if(c1D != 1.0)
+               mat = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
+               if(mat.first.nonZeros() > 0)
                {
-                  mat.second *= c1D;
+                  if(c1D != 1.0)
+                  {
+                     mat.first *= c1D;
+                  }
+               }
+
+               if(mat.second.nonZeros() > 0)
+               {
+                  if(c1D != 1.0)
+                  {
+                     mat.second *= c1D;
+                  }
                }
             }
          }
-      }
 
-      // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+         // Prune matrices for safety
+         mat.first.prune(1e-32);
+         mat.second.prune(1e-32);
+      }
    }
 }
 }

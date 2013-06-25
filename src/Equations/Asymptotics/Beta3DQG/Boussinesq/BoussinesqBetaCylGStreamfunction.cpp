@@ -272,7 +272,7 @@ namespace Equations {
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          // Set boundary condition prefactors
-         cX = 1.0;
+         cX = 0.0;
          cZ = 1.0;
 
       // Boundary condition for the temperature
