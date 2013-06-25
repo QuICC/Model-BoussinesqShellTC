@@ -94,6 +94,27 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
+      // Configure code to use WFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef CylindricalChebyshevFftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef FftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef ChebyshevFftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_WFT
+
       // Configure code to use SLF scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
          template<> struct TransformSelector<Dimensions::Transform::TRA1D>
@@ -114,6 +135,27 @@ namespace GeoMHDiSCC {
             typedef FftwTransform Type;
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_SLF
+
+      // Configure code to use WLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
+         template<> struct TransformSelector<Dimensions::Transform::TRA1D>
+         {
+            /// Typedef for the first transform
+            typedef SphericalChebyshevFftwTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA2D>
+         {
+            /// Typedef for the second transform
+            typedef AssociatedLegendreTransform Type;
+         };
+
+         template<> struct TransformSelector<Dimensions::Transform::TRA3D>
+         {
+            /// Typedef for the third transform
+            typedef FftwTransform Type;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_WLF
    }
 
    namespace Parallel {

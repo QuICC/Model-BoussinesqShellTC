@@ -74,17 +74,17 @@ def main(argv):
       current = basename+str(fId).zfill(4)+'.hdf5'
       h5_file = h5py.File(current, 'r')
       if scheme in ('TFT'):
-         #if fId == 1:
+         #if fId == sId:
          #   boxXYZ(h5_file)
          #print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}
          print >>out_file, xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D}
       elif scheme in ('CFT'):
-         if fId == 1:
+         if fId == sId:
             annulusXYZ(h5_file)
             annulusWedgeXYZ(h5_file)
          print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'annulus_grid'}
       elif scheme in ('SLF'):
-         if fId == 1:
+         if fId == sId:
             shellXYZ(h5_file)
          print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'shell_grid'}
       for s in list(h5_file):
