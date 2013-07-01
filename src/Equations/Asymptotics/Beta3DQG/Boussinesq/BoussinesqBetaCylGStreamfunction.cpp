@@ -207,8 +207,8 @@ namespace Equations {
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-//         SparseMatrix tmp = k_*(1.0/16.)*(Ra/Pr)*spec3D.qDiff(1,0);
-//         Eigen::kroneckerProduct(tmp, spec1D.qDiff(4,0), mat.second);
+         SparseMatrix tmp = k_*(1.0/16.)*(Ra/Pr)*spec3D.qDiff(1,0);
+         Eigen::kroneckerProduct(tmp, spec1D.qDiff(4,0), mat.second);
 
          // Unknown field
       } else
@@ -272,7 +272,7 @@ namespace Equations {
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          // Set boundary condition prefactors
-         cX = 0.0;
+         cX = 1.0;
          cZ = 1.0;
 
       // Boundary condition for the temperature

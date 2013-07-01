@@ -36,7 +36,8 @@ namespace Equations {
           */
          enum StateTypeId {
             CONSTANT,
-            SINE
+            SINESINE,
+            SINECOSINE
          };
 
          /**

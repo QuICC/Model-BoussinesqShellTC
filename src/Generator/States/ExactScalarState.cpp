@@ -109,7 +109,7 @@ namespace Equations {
       if(this->mTypeId == CONSTANT)
       {
          rNLComp.rData().setConstant(42.0);
-      } else if(this->mTypeId == SINE)
+      } else if(this->mTypeId == SINESINE)
       {
          int nX = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          int nY = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -124,6 +124,28 @@ namespace Equations {
             for(int iY = 0; iY < nY; ++iY)
             {
                Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
+               Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
+               MHDFloat yVal = std::cos(yGrid(iY));
+               //MHDFloat yVal = 1.0;
+
+               rNLComp.setProfile(sinZ*sinX(iX)*yVal,iY,iX);
+            }
+         }
+      } else if(this->mTypeId == SINECOSINE)
+      {
+         int nX = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         int nY = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         Array xGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nX);
+         Array yGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nY);
+         Array zGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nZ);
+
+         for(int iX = 0; iX < nX; ++iX)
+         {
+            for(int iY = 0; iY < nY; ++iY)
+            {
+               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().cos();
                Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
                MHDFloat yVal = std::cos(yGrid(iY));
                //MHDFloat yVal = 1.0;

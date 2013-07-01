@@ -113,14 +113,16 @@ namespace GeoMHDiSCC {
       spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
       
       // Add streamfunction initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
+      spExact->setSineOptions(1.0, 3, 1.0, 7.0);
       
       // Add vertical velocity initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spRand->setIdentity(PhysicalNames::VELOCITYZ);
-      spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::VELOCITYZ);
+      spExact->setStateType(Equations::ExactScalarState::SINESINE);
+      spExact->setSineOptions(1.0, 3, 1.0, 6.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

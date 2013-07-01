@@ -187,8 +187,8 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         //SparseMatrix tmp = k_*spec3D.id(0);
-         //Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
+         SparseMatrix tmp = k_*spec3D.id(0);
+         Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
 
          /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
