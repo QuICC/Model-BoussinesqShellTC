@@ -23,6 +23,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -260,40 +261,48 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateForwardCommunication()
    {
-      // Synchronize CPUs
-      FrameworkMacro::synchronize();
+      // Don't do anything if the number of packs is zero
+      if(this->mPacks > 0)
+      {
+         // Synchronize CPUs
+         FrameworkMacro::synchronize();
 
-      // Store the number of packs in active send
-      this->mActiveBSendPacks = this->mPacks;
+         // Store the number of packs in active send
+         this->mActiveBSendPacks = this->mPacks;
 
-      // Prepost the receive calls
-      MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
-      this->resetRecvPositions();
-      this->mIsReceiving = true;
+         // Prepost the receive calls
+         MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
+         this->resetRecvPositions();
+         this->mIsReceiving = true;
 
-      // Post non blocking send calls 
-      MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
-      this->resetSendPositions();
-      this->mIsSending = true;
+         // Post non blocking send calls 
+         MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
+         this->resetSendPositions();
+         this->mIsSending = true;
+      }
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateBackwardCommunication()
    {
-      // Synchronize CPUs
-      FrameworkMacro::synchronize();
+      // Don't do anything if the number of packs is zero
+      if(this->mPacks > 0)
+      {
+         // Synchronize CPUs
+         FrameworkMacro::synchronize();
 
-      // Store the number of packs in active send
-      this->mActiveFSendPacks = this->mPacks;
+         // Store the number of packs in active send
+         this->mActiveFSendPacks = this->mPacks;
 
-      // Prepost the receive calls
-      MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
-      this->resetRecvPositions();
-      this->mIsReceiving = true;
+         // Prepost the receive calls
+         MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
+         this->resetRecvPositions();
+         this->mIsReceiving = true;
 
-      // Post non blocking send calls 
-      MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
-      this->resetSendPositions();
-      this->mIsSending = true;
+         // Post non blocking send calls 
+         MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
+         this->resetSendPositions();
+         this->mIsSending = true;
+      }
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
@@ -303,8 +312,20 @@ namespace Parallel {
       this->mBackwardPacks = bwdPacks;
 
       // initialise the previous active packs to a possible value
-      this->mActiveFSendPacks = this->mBackwardPacks(0);
-      this->mActiveBSendPacks = this->mForwardPacks(0);
+      if(this->mBackwardPacks.size() > 0)
+      {
+         this->mActiveBSendPacks = this->mBackwardPacks(0);
+      } else
+      {
+         this->mActiveBSendPacks = 0;
+      }
+      if(this->mForwardPacks.size() > 0)
+      {
+         this->mActiveFSendPacks = this->mForwardPacks(0);
+      } else
+      {
+         this->mActiveFSendPacks = 0;
+      }
 
       // initialise the data types
       this->initTypes(spRes, fwdDim, fwdTmp, bwdTmp);

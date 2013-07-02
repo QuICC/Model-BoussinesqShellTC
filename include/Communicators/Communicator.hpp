@@ -284,7 +284,23 @@ namespace Parallel {
             SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
 
             // Get maximum number of packs
-            int max2D = std::max(packs1DFwd(packs1DFwd.size()-1), packs1DBwd(packs1DBwd.size()-1));
+            int p1DFwd;
+            if(packs1DFwd.size() > 0)
+            {
+               p1DFwd = packs1DFwd(packs1DFwd.size()-1);
+            } else
+            {
+               p1DFwd = 0;
+            }
+            int p1DBwd;
+            if(packs1DBwd.size() > 0)
+            {
+               p1DBwd = packs1DBwd(packs1DBwd.size()-1);
+            } else
+            {
+               p1DBwd = 0;
+            }
+            int max2D = std::max(p1DFwd, p1DBwd);
 
             // Allocate first 2D buffers
             spBufferOne->allocate(spConv->fwdSizes(), max2D);
@@ -382,7 +398,23 @@ namespace Parallel {
             SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
 
             // Get maximum number of packs
-            int max3D = std::max(packs2DFwd(packs2DFwd.size()-1), packs2DBwd(packs2DBwd.size()-1));
+            int p2DFwd;
+            if(packs2DFwd.size() > 0)
+            {
+               p2DFwd = packs2DFwd(packs2DFwd.size()-1);
+            } else
+            {
+               p2DFwd = 0;
+            }
+            int p2DBwd;
+            if(packs2DBwd.size() > 0)
+            {
+               p2DBwd = packs2DBwd(packs2DBwd.size()-1);
+            } else
+            {
+               p2DBwd = 0;
+            }
+            int max3D = std::max(p2DFwd, p2DBwd);
 
             // Allocate first 3D buffers
             spBufferOne->allocate(spConv->fwdSizes(), max3D);
@@ -425,10 +457,42 @@ namespace Parallel {
             SharedCommunicationBuffer  spBufferThree(new CommunicationBuffer());
 
             // Get maximum number of packs
-            int max2D = std::max(packs1DFwd(packs1DFwd.size()-1), packs1DBwd(packs1DBwd.size()-1));
+            int p1DFwd;
+            if(packs1DFwd.size() > 0)
+            {
+               p1DFwd = packs1DFwd(packs1DFwd.size()-1);
+            } else
+            {
+               p1DFwd = 0;
+            }
+            int p1DBwd;
+            if(packs1DBwd.size() > 0)
+            {
+               p1DBwd = packs1DBwd(packs1DBwd.size()-1);
+            } else
+            {
+               p1DBwd = 0;
+            }
+            int max2D = std::max(p1DFwd, p1DBwd);
 
             // Get maximum number of packs
-            int max3D = std::max(packs2DFwd(packs2DFwd.size()-1), packs2DBwd(packs2DBwd.size()-1));
+            int p2DFwd;
+            if(packs2DFwd.size() > 0)
+            {
+               p2DFwd = packs2DFwd(packs2DFwd.size()-1);
+            } else
+            {
+               p2DFwd = 0;
+            }
+            int p2DBwd;
+            if(packs2DBwd.size() > 0)
+            {
+               p2DBwd = packs2DBwd(packs2DBwd.size()-1);
+            } else
+            {
+               p2DBwd = 0;
+            }
+            int max3D = std::max(p2DFwd, p2DBwd);
 
             // Allocate shared buffer
             spBufferOne->allocateMax(spConv12->fwdSizes(), max2D, spConv23->bwdSizes(), max3D);

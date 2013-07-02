@@ -63,24 +63,44 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Number of first exchange packets required for a scalar
+          * @brief Constant number of first exchange packets required for a scalar
           */
-         const int mScalarPacks1D;
+         const int mcScalarPacks1D;
 
          /**
-          * @brief Number of second exchange packets required for a scalar
+          * @brief Constant number of second exchange packets required for a scalar
           */
-         const int mScalarPacks2D;
+         const int mcScalarPacks2D;
 
          /**
-          * @brief Number of first exchange packets required for a vector field
+          * @brief Constant number of first exchange packets required for a vector field
           */
-         const int mVectorPacks1D;
+         const int mcVectorPacks1D;
 
          /**
-          * @brief Number of second exchange packets required for a vector field
+          * @brief Constant number of second exchange packets required for a vector field
           */
-         const int mVectorPacks2D;
+         const int mcVectorPacks2D;
+
+         /**
+          * @brief Actual number of first exchange packets required for a scalar
+          */
+         int mScalarPacks1D;
+
+         /**
+          * @brief Actula number of second exchange packets required for a scalar
+          */
+         int mScalarPacks2D;
+
+         /**
+          * @brief Actual number of first exchange packets required for a vector field
+          */
+         int mVectorPacks1D;
+
+         /**
+          * @brief Actual number of second exchange packets required for a vector field
+          */
+         int mVectorPacks2D;
 
          /**
           * @brief Get the list of pack numbers for the first exchange

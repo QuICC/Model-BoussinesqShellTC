@@ -62,7 +62,7 @@ namespace Equations {
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // set nonlinear flags: has nonlinear term, has quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
+      infoIt.first->second.setNonlinear(true, true);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
@@ -98,7 +98,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 0.0);
+      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
    void BoussinesqBetaCylGStreamfunction::setRequirements()
@@ -107,7 +107,7 @@ namespace Equations {
       this->setName(PhysicalNames::STREAMFUNCTION);
 
       // Set streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, true));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
@@ -116,7 +116,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, false));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      //this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, true));
+      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, true));
    }
 
    DecoupledZSparse BoussinesqBetaCylGStreamfunction::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
