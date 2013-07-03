@@ -123,7 +123,7 @@ namespace Transform {
       for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
       {
          // Setup the second exchange communication step
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D[scalIt->first], coord);
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(scalIt->first), coord);
          // Compute second step of transform for scalar fields
          TConfigurator::secondStep(scalIt->first, *(scalIt->second), coord);
          // Initiate the second exchnage communication
@@ -137,7 +137,7 @@ namespace Transform {
       for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
       {
          // Setup the second exchange communication step
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D[vectIt->first], coord);
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(vectIt->first), coord);
          // Compute second step of transform for vector fields
          TConfigurator::secondStep(vectIt->first, *(vectIt->second), coord);
          // Initiate the second exchange communication

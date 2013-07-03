@@ -327,22 +327,22 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pRecvBRequests(const int size)
    {
-      return &(this->mRecvBRequests[size].front());
+      return &(this->mRecvBRequests.at(size).front());
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pRecvFRequests(const int size)
    {
-      return &(this->mRecvFRequests[size].front());
+      return &(this->mRecvFRequests.at(size).front());
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pSendBRequests(const int size)
    {
-      return &(this->mSendBRequests[size].front());
+      return &(this->mSendBRequests.at(size).front());
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pSendFRequests(const int size)
    {
-      return &(this->mSendFRequests[size].front());
+      return &(this->mSendFRequests.at(size).front());
    }
       
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverterBase()
@@ -430,14 +430,14 @@ namespace Parallel {
          this->mRecvFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            this->mRecvFRequests[packs].push_back(MPI_REQUEST_NULL);
+            this->mRecvFRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Initialise send backward with empty requests
          this->mSendBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            this->mSendBRequests[packs].push_back(MPI_REQUEST_NULL);
+            this->mSendBRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Create receive forward requests
@@ -457,10 +457,10 @@ namespace Parallel {
 
             //Safety asserts
             assert(static_cast<size_t>(grpSrc) < this->mFSizes.size());
-            assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests[packs].size());
+            assert(static_cast<size_t>(grpSrc) < this->mRecvFRequests.at(packs).size());
 
             // initialise the Recv request
-            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvFRequests[packs].at(grpSrc)));
+            MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvFRequests.at(packs).at(grpSrc)));
          }
 
          // Create send backward requests
@@ -477,10 +477,10 @@ namespace Parallel {
 
             //Safety asserts
             assert(static_cast<size_t>(grpDest) < this->mBSizes.size());
-            assert(static_cast<size_t>(grpDest) < this->mSendBRequests[packs].size());
+            assert(static_cast<size_t>(grpDest) < this->mSendBRequests.at(packs).size());
 
             // initialise the Send request
-            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendBRequests[packs].at(grpDest)));
+            MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendBRequests.at(packs).at(grpDest)));
          }
       }
 
@@ -494,14 +494,14 @@ namespace Parallel {
          this->mRecvBRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            this->mRecvBRequests[packs].push_back(MPI_REQUEST_NULL);
+            this->mRecvBRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Initialise send forward with empty requests
          this->mSendFRequests.insert(std::make_pair<int, std::vector<MPI_Request> >(packs, std::vector<MPI_Request>()));
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            this->mSendFRequests[packs].push_back(MPI_REQUEST_NULL);
+            this->mSendFRequests.at(packs).push_back(MPI_REQUEST_NULL);
          }
 
          // Create receive backward requests
@@ -516,7 +516,7 @@ namespace Parallel {
             // Set MPI tag
             tag = src;
             // initialise the Recv request
-            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests[packs].at(grpSrc)));
+            MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
          }
 
          // Create send forward requests
@@ -531,7 +531,7 @@ namespace Parallel {
             // Get global MPI destination rank
             dest = this->fCpu(grpDest);
             // initialise the Send request
-            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests[packs].at(grpDest)));
+            MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests.at(packs).at(grpDest)));
          }
       }
    }

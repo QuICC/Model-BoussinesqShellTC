@@ -89,9 +89,9 @@ namespace Transform {
       for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
       {
          // Setup the first exchange communication step for scalar fields
-         TConfigurator::setup1DCommunication(this->mNamedPacks1D[scalIt->first], coord);
+         TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(scalIt->first), coord);
          // Setup the second exchange communication step for scalar fields
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D[scalIt->first], coord);
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(scalIt->first), coord);
 
          // Compute first step of transform for scalar fields
          TConfigurator::firstStep(scalIt->first, *(scalIt->second), coord);
@@ -112,9 +112,9 @@ namespace Transform {
       for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
       {
          // Setup the first exchange communication step for vector fields
-         TConfigurator::setup1DCommunication(this->mNamedPacks1D[vectIt->first], coord);
+         TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(vectIt->first), coord);
          // Setup the second exchange communication step for vector fields
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D[vectIt->first], coord);
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(vectIt->first), coord);
 
          // Compute first step of transform for vector fields
          TConfigurator::firstStep(vectIt->first, *(vectIt->second), coord);

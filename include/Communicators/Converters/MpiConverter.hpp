@@ -23,7 +23,6 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -314,14 +313,14 @@ namespace Parallel {
       // initialise the previous active packs to a possible value
       if(this->mBackwardPacks.size() > 0)
       {
-         this->mActiveBSendPacks = this->mBackwardPacks(0);
+         this->mActiveBSendPacks = this->mForwardPacks(0);
       } else
       {
          this->mActiveBSendPacks = 0;
       }
       if(this->mForwardPacks.size() > 0)
       {
-         this->mActiveFSendPacks = this->mForwardPacks(0);
+         this->mActiveFSendPacks = this->mBackwardPacks(0);
       } else
       {
          this->mActiveFSendPacks = 0;
