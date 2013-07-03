@@ -64,42 +64,42 @@ namespace Transform {
          /**
           * @brief Number of first exchange packets required for a scalar
           */
-         const int mScalarPacks1D;
+         const int mcScalarPacks1D;
 
          /**
           * @brief Number of first exchange packets required for a scalar
           */
-         const int mGradientPacks1D;
+         const int mcGradientPacks1D;
 
          /**
           * @brief Number of first exchange packets required for a vector field
           */
-         const int mVectorPacks1D;
+         const int mcVectorPacks1D;
 
          /**
           * @brief Number of first exchange packets required for a vector curl
           */
-         const int mCurlPacks1D;
+         const int mcCurlPacks1D;
 
          /**
           * @brief Number of second exchange packets required for a scalar
           */
-         const int mScalarPacks2D;
+         const int mcScalarPacks2D;
 
          /**
           * @brief Number of second exchange packets required for a gradient
           */
-         const int mGradientPacks2D;
+         const int mcGradientPacks2D;
 
          /**
           * @brief Number of second exchange packets required for a vector field
           */
-         const int mVectorPacks2D;
+         const int mcVectorPacks2D;
 
          /**
           * @brief Number of second exchange packets required for a vector curl
           */
-         const int mCurlPacks2D;
+         const int mcCurlPacks2D;
 
          /**
           * @brief Storage for named packet sizes for the first exchange

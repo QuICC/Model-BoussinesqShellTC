@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    IBackwardGrouper::IBackwardGrouper()
-      : split(Splitting::Locations::NONE), mScalarPacks1D(1), mGradientPacks1D(2), mVectorPacks1D(3), mCurlPacks1D(3), mScalarPacks2D(1), mGradientPacks2D(2), mVectorPacks2D(3), mCurlPacks2D(3)
+      : split(Splitting::Locations::NONE), mcScalarPacks1D(1), mcGradientPacks1D(2), mcVectorPacks1D(3), mcCurlPacks1D(3), mcScalarPacks2D(1), mcGradientPacks2D(2), mcVectorPacks2D(3), mcCurlPacks2D(3)
    {
    }
 
@@ -46,10 +46,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               list.insert(this->mScalarPacks1D);
+               list.insert(this->mcScalarPacks1D);
             } else
             {
-               list.insert(this->mVectorPacks1D);
+               list.insert(this->mcVectorPacks1D);
             }
          }
 
@@ -58,10 +58,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               list.insert(this->mGradientPacks1D);
+               list.insert(this->mcGradientPacks1D);
             } else
             {
-               list.insert(this->mCurlPacks1D);
+               list.insert(this->mcCurlPacks1D);
             }
          }
 
@@ -95,10 +95,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               list.insert(this->mScalarPacks2D);
+               list.insert(this->mcScalarPacks2D);
             } else
             {
-               list.insert(this->mVectorPacks2D);
+               list.insert(this->mcVectorPacks2D);
             }
          }
 
@@ -107,10 +107,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               list.insert(this->mGradientPacks2D);
+               list.insert(this->mcGradientPacks2D);
             } else
             {
-               list.insert(this->mCurlPacks2D);
+               list.insert(this->mcCurlPacks2D);
             }
          }
       }
@@ -144,10 +144,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               tmp += this->mScalarPacks1D;
+               tmp += this->mcScalarPacks1D;
             } else
             {
-               tmp += this->mVectorPacks1D;
+               tmp += this->mcVectorPacks1D;
             }
          }
 
@@ -156,10 +156,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               tmp += this->mGradientPacks1D;
+               tmp += this->mcGradientPacks1D;
             } else
             {
-               tmp += this->mCurlPacks1D;
+               tmp += this->mcCurlPacks1D;
             }
          }
 
@@ -207,10 +207,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               tmp += this->mScalarPacks2D;
+               tmp += this->mcScalarPacks2D;
             } else
             {
-               tmp += this->mVectorPacks2D;
+               tmp += this->mcVectorPacks2D;
             }
          }
 
@@ -219,10 +219,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               tmp += this->mGradientPacks2D + 1;
+               tmp += this->mcGradientPacks2D + 1;
             } else
             {
-               tmp += this->mCurlPacks2D;
+               tmp += this->mcCurlPacks2D;
             }
          }
 
@@ -270,10 +270,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               packs(0) += this->mScalarPacks1D;
+               packs(0) += this->mcScalarPacks1D;
             } else
             {
-               packs(0) += this->mVectorPacks1D;
+               packs(0) += this->mcVectorPacks1D;
             }
          }
 
@@ -282,10 +282,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               packs(0) += this->mGradientPacks1D;
+               packs(0) += this->mcGradientPacks1D;
             } else
             {
-               packs(0) += this->mCurlPacks1D;
+               packs(0) += this->mcCurlPacks1D;
             }
          }
       }
@@ -308,10 +308,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               packs(0) += this->mScalarPacks2D;
+               packs(0) += this->mcScalarPacks2D;
             } else
             {
-               packs(0) += this->mVectorPacks2D;
+               packs(0) += this->mcVectorPacks2D;
             }
          }
 
@@ -320,10 +320,10 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               packs(0) += this->mGradientPacks2D + 1;
+               packs(0) += this->mcGradientPacks2D + 1;
             } else
             {
-               packs(0) += this->mCurlPacks2D;
+               packs(0) += this->mcCurlPacks2D;
             }
          }
       }

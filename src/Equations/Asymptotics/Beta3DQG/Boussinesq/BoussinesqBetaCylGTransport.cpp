@@ -62,7 +62,7 @@ namespace Equations {
       infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
 
       // Set nonlinear flags: has nonlinear term, has quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
+      infoIt.first->second.setNonlinear(true, true);
 
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
@@ -97,7 +97,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 0.0);
+      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqBetaCylGTransport::setRequirements()
@@ -106,10 +106,10 @@ namespace Equations {
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
    DecoupledZSparse BoussinesqBetaCylGTransport::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const

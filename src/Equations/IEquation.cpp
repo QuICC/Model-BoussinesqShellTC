@@ -109,7 +109,7 @@ namespace Equations {
          } else
          {
             this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
-            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+            this->mLDMatrices.find(key)->second.reserve(nSystems);
 
             for(int i = 0; i < nSystems; ++i)
             {
