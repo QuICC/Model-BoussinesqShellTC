@@ -128,12 +128,12 @@ namespace Timestep {
       }
    }
 
-   void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
 
       ProfilerMacro_start(ProfilerMacro::TSTEPIN);
       // Update the equation input to the timestepper
-      this->getInput(scalEq, vectEq);
+      this->getInput(scalEq, vectEq, scalVar, vectVar);
       ProfilerMacro_stop(ProfilerMacro::TSTEPIN);
 
       ProfilerMacro_start(ProfilerMacro::TSTEPRHS);

@@ -54,10 +54,12 @@ namespace Solver {
          /**
           * @brief Solve the equations
           *
-          * @param scalEq Shared scalar equations
-          * @param vectEq Shared vector equations
+          * @param scalEq  Shared scalar equations
+          * @param vectEq  Shared vector equations
+          * @param scalVar Shared scalar variables
+          * @param vectVar Shared vector variables
           */
-         void solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar);
          
       protected:
          /**

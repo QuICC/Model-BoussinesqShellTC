@@ -84,8 +84,10 @@ namespace Timestep {
           *
           * @param scalEq Shared scalar equations
           * @param vectEq Shared vector equations
+          * @param scalVar Shared scalar variables
+          * @param vectVar Shared vector variables
           */
-         void stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar);
 
          /**
           * @brief Get current simulation time

@@ -35,10 +35,10 @@ namespace Solver {
    {
    }
 
-   void SparseLinearCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void SparseLinearCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Update the equation input to the timestepper
-      this->getInput(scalEq, vectEq);
+      this->getInput(scalEq, vectEq, scalVar, vectVar);
 
       // Solve all the linear systems
       this->solveSystems();

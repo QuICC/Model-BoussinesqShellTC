@@ -130,7 +130,7 @@ namespace Equations {
    void RandomScalarState::setRequirements()
    {
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }
 
 }

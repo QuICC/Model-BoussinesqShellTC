@@ -279,7 +279,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
-      this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange);
+      this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
       DebuggerMacro_stop("Solve trivial t = ",4);
 
@@ -294,7 +294,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve diagnotic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-      this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
+      this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
       DebuggerMacro_stop("Solve diagnostic t = ",4);
 
@@ -600,116 +600,62 @@ namespace GeoMHDiSCC {
       // Sort scalar equations
       std::stable_sort(this->mScalarEquations.begin(), this->mScalarEquations.end(), sortScalarEquationType);
 
-      // Initialise scalar ranges: prognostic is full, the two other are empty
-      this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), this->mScalarEquations.end());
+      // Initialise empty scalar ranges
+      this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
       this->mScalarDiagnosticRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
       this->mScalarTrivialRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
 
       // Determine the ranges for the different types
-      int group = 1;
       std::vector<Equations::SharedIScalarEquation>::iterator  scalEqIt;
-      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt != this->mScalarEquations.end(); ++scalEqIt)
+
+      scalEqIt = std::find_if(this->mScalarEquations.begin(), this->mScalarEquations.end(), scalarIsPrognostic);
+      if(scalEqIt != this->mScalarEquations.end())
       {
-         // Transition from prognostic to the two others
-         if(group == 1 && computeScalarEquationType(*scalEqIt) > 1)
-         {
-            // No prognostic equation present
-            if(scalEqIt == this->mScalarEquations.begin())
-            {
-               this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.end(), this->mScalarEquations.end());
-            
-            // With prognostic equations present
-            } else
-            {
-               this->mScalarPrognosticRange = std::make_pair(this->mScalarEquations.begin(), scalEqIt);
-            }
+         this->mScalarPrognosticRange = std::equal_range(this->mScalarEquations.begin(), this->mScalarEquations.end(), *scalEqIt, sortScalarEquationType);
+      }
 
-            // Transitions to diagnostic equations
-            if(computeScalarEquationType(*scalEqIt) == 2)
-            {
-               // Set diagnostic equation range
-               this->mScalarDiagnosticRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
+      scalEqIt = std::find_if(this->mScalarEquations.begin(), this->mScalarEquations.end(), scalarIsDiagnostic);
+      if(scalEqIt != this->mScalarEquations.end())
+      {
+         this->mScalarDiagnosticRange = std::equal_range(this->mScalarEquations.begin(), this->mScalarEquations.end(), *scalEqIt, sortScalarEquationType);
+      }
 
-            // Transitions to trivial equations
-            } else
-            {
-               // Set trivial equation range
-               this->mScalarTrivialRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
-               break;
-            }
-            group++;
-         }
-
-         // Transition from diagnostic to trivial
-         if(group == 2 && computeScalarEquationType(*scalEqIt) == 3)
-         {
-            // Set diagnostic equation range
-            this->mScalarDiagnosticRange.second = scalEqIt;
-
-            // Set trivial equation range
-            this->mScalarTrivialRange = std::make_pair(scalEqIt, this->mScalarEquations.end());
-
-            // Exit loop
-            break;
-         }
+      scalEqIt = std::find_if(this->mScalarEquations.begin(), this->mScalarEquations.end(), scalarIsTrivial);
+      if(scalEqIt != this->mScalarEquations.end())
+      {
+         this->mScalarTrivialRange = std::equal_range(this->mScalarEquations.begin(), this->mScalarEquations.end(), *scalEqIt, sortScalarEquationType);
       }
 
       // Sort vector equations
       std::stable_sort(this->mVectorEquations.begin(), this->mVectorEquations.end(), sortVectorEquationType);
 
-      // Initialise vector ranges: prognostic is full, the two other are empty
-      this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), this->mVectorEquations.end());
+      // Initialise empty vector ranges
+      this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
       this->mVectorDiagnosticRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
       this->mVectorTrivialRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
 
-      // Set the ranges for the different types
-      group = 1;
+      // Determine the ranges for the different types
       std::vector<Equations::SharedIVectorEquation>::iterator  vectEqIt;
-      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt != this->mVectorEquations.end(); ++vectEqIt)
+
+      vectEqIt = std::find_if(this->mVectorEquations.begin(), this->mVectorEquations.end(), vectorIsPrognostic);
+      if(vectEqIt != this->mVectorEquations.end())
       {
-         // Transition from prognostic to the two others
-         if(group == 1 && computeVectorEquationType(*vectEqIt) > 1)
-         {
-            // No prognostic equation present
-            if(vectEqIt == this->mVectorEquations.begin())
-            {
-               this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.end(), this->mVectorEquations.end());
-            
-            // With prognostic equations present
-            } else
-            {
-               this->mVectorPrognosticRange = std::make_pair(this->mVectorEquations.begin(), vectEqIt);
-            }
-
-            // Transitions to diagnostic equations
-            if(computeVectorEquationType(*vectEqIt) == 2)
-            {
-               // Set diagnostic equation range
-               this->mVectorDiagnosticRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
-
-            // Transitions to trivial equations
-            } else
-            {
-               // Set trivial equation range
-               this->mVectorTrivialRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
-               break;
-            }
-            group++;
-         }
-
-         // Transition from diagnostic to trivial
-         if(group == 2 && computeVectorEquationType(*vectEqIt) == 3)
-         {
-            // Set diagnostic equation range
-            this->mVectorDiagnosticRange.second = vectEqIt;
-
-            // Set trivial equation range
-            this->mVectorTrivialRange = std::make_pair(vectEqIt, this->mVectorEquations.end());
-
-            // Exit loop
-            break;
-         }
+         this->mVectorPrognosticRange = std::equal_range(this->mVectorEquations.begin(), this->mVectorEquations.end(), *vectEqIt, sortVectorEquationType);
       }
+
+      vectEqIt = std::find_if(this->mVectorEquations.begin(), this->mVectorEquations.end(), vectorIsDiagnostic);
+      if(vectEqIt != this->mVectorEquations.end())
+      {
+         this->mVectorDiagnosticRange = std::equal_range(this->mVectorEquations.begin(), this->mVectorEquations.end(), *vectEqIt, sortVectorEquationType);
+      }
+
+      vectEqIt = std::find_if(this->mVectorEquations.begin(), this->mVectorEquations.end(), vectorIsTrivial);
+      if(vectEqIt != this->mVectorEquations.end())
+      {
+         this->mVectorTrivialRange = std::equal_range(this->mVectorEquations.begin(), this->mVectorEquations.end(), *vectEqIt, sortVectorEquationType);
+      }
+
+      // Set the ranges for the different types
 
       // Identifiy the solver indexes by analysing the coupling between the equations
       DebuggerMacro_enter("identifyCoupling_Prognostic",1);
@@ -989,4 +935,43 @@ namespace GeoMHDiSCC {
       return computeVectorEquationType(eqA) < computeVectorEquationType(eqB);
    }
 
+   bool scalarIsPrognostic(Equations::SharedIScalarEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == Equations::CouplingInformation::PROGNOSTIC;
+   }
+
+   bool scalarIsDiagnostic(Equations::SharedIScalarEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == Equations::CouplingInformation::DIAGNOSTIC;
+   }
+
+   bool scalarIsTrivial(Equations::SharedIScalarEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == Equations::CouplingInformation::TRIVIAL;
+   }
+
+   bool scalarIsWrapper(Equations::SharedIScalarEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == Equations::CouplingInformation::WRAPPER;
+   }
+
+   bool vectorIsPrognostic(Equations::SharedIVectorEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == Equations::CouplingInformation::PROGNOSTIC;
+   }
+
+   bool vectorIsDiagnostic(Equations::SharedIVectorEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == Equations::CouplingInformation::DIAGNOSTIC;
+   }
+
+   bool vectorIsTrivial(Equations::SharedIVectorEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == Equations::CouplingInformation::TRIVIAL;
+   }
+
+   bool vectorIsWrapper(Equations::SharedIVectorEquation eqA)
+   {
+      return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == Equations::CouplingInformation::WRAPPER;
+   }
 }

@@ -28,7 +28,8 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGVorticity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -110,29 +111,29 @@ namespace GeoMHDiSCC {
       // Add transport initial state generation equation
       spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
       spRand->setIdentity(PhysicalNames::TEMPERATURE);
-      spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
-      
-//      // Add streamfunction initial state generation equation
-//      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
-//      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-//      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
-//      spExact->setSineOptions(1.0, 3, 1.0, 7.0);
-//      
-//      // Add vertical velocity initial state generation equation
-//      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
-//      spExact->setIdentity(PhysicalNames::VELOCITYZ);
-//      spExact->setStateType(Equations::ExactScalarState::SINESINE);
-//      spExact->setSineOptions(1.0, 3, 1.0, 6.0);
+      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
       
       // Add streamfunction initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
+      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
+      spExact->setSineOptions(1.0, 3, 1.0, 7.0);
       
       // Add vertical velocity initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spRand->setIdentity(PhysicalNames::VELOCITYZ);
-      spRand->setSpectrum(-1,1, 1e4, 1e4, 1e4);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact->setIdentity(PhysicalNames::VELOCITYZ);
+      spExact->setStateType(Equations::ExactScalarState::SINESINE);
+      spExact->setSineOptions(1.0, 3, 1.0, 6.0);
+      
+//      // Add streamfunction initial state generation equation
+//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+//      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
+//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+//      
+//      // Add vertical velocity initial state generation equation
+//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+//      spRand->setIdentity(PhysicalNames::VELOCITYZ);
+//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -145,28 +146,34 @@ namespace GeoMHDiSCC {
    void BoussinesqBetaCylGModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spField;
 
       // Add transport field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
-      spField->setFields(true, false);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
-      spField->setFields(true, false);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
-      spField->setFields(true, false);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
+      
+      // Add vorticity field visualization
+      Equations::SharedVorticityStreamVisualizer spVort;
+      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>();
+      spVort->setFields(true, true);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITY);
       spVis->addOutputFile(spOut);
    }
 

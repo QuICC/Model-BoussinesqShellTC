@@ -19,6 +19,7 @@
 //
 #include "Base/MathConstants.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -287,27 +288,65 @@ namespace Equations {
       }
    }
 
-   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx)
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx)
    {
-      // Safety asserts
-      assert(eqField.first.cols() == linField.first.cols());
-      assert(eqField.second.cols() == linField.second.cols());
-
       // Compute with complex linear operator
       if(eq.hasExplicitZLinear(compId, fieldId))
       {
          // Create pointer to sparse operator
          const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.first.cols();
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            // Get number of rows and columns of block
+            int rows = op->rows()*op->cols();
+            int cols = eqField.first.cols();
 
-         // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
-         eqField.first.block(eqStart, 0, rows, cols) += op->real()*linField.first.block(linStart, 0, rows, cols);
-         eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*linField.second.block(linStart, 0, rows, cols);
-         eqField.second.block(eqStart, 0, rows, cols) += op->real()*linField.second.block(linStart, 0, rows, cols);
-         eqField.second.block(eqStart, 0, rows, cols) += op->imag()*linField.first.block(linStart, 0, rows, cols);
+            //Safety assertion
+            assert(rows+eqStart <= eqField.first.rows());
+            assert(rows+eqStart <= eqField.second.rows());
+
+            /// \mhdBug very bad and slow implementation!
+            ArrayZ   tmp(rows);
+            int k = 0;
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(k) = explicitField.point(i,j,matIdx);
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+            // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
+            eqField.first.block(eqStart, 0, rows, cols) += op->real()*tmp.real();
+            eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*tmp.imag();
+            eqField.second.block(eqStart, 0, rows, cols) += op->real()*tmp.imag();
+            eqField.second.block(eqStart, 0, rows, cols) += op->imag()*tmp.real();
+
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            // Get mode indexes
+            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+            // Assert correct sizes
+            assert(op->rows() == explicitField.slice(mode(0)).rows());
+            assert(eqField.first.cols() == 1);
+            assert(eqField.second.cols() == 1);
+
+            // Get number of rows and columns of block
+            int rows = op->rows();
+            int cols = eqField.first.cols();
+
+            // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
+            eqField.first.block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*explicitField.slice(mode(0)).col(mode(1)).imag();
+            eqField.second.block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).imag();
+            eqField.second.block(eqStart, 0, rows, cols) += op->imag()*explicitField.slice(mode(0)).col(mode(1)).real();
+         }
       }
 
       // Compute with real linear operator
@@ -316,119 +355,160 @@ namespace Equations {
          // Create pointer to sparse operator
          const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.first.cols();
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            // Get number of rows and columns of block
+            int rows = explicitField.slice(matIdx).size();
+            int cols = eqField.first.cols();
 
-         // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-         eqField.first.block(eqStart, 0, rows, cols) += (*op)*linField.first.block(linStart, 0, rows, cols);
-         eqField.second.block(eqStart, 0, rows, cols) += (*op)*linField.second.block(linStart, 0, rows, cols);
+            //Safety assertion
+            assert(rows+eqStart <= eqField.first.rows());
+            assert(rows+eqStart <= eqField.second.rows());
+
+            /// \mhdBug very bad and slow implementation!
+            ArrayZ   tmp(rows);
+            int k = 0;
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(k) = explicitField.point(i,j,matIdx);
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+            // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
+            eqField.first.block(eqStart, 0, rows, cols) += (*op)*tmp.real();
+            eqField.second.block(eqStart, 0, rows, cols) += (*op)*tmp.imag();
+
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            // Get mode indexes
+            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+            // Assert correct sizes
+            assert(op->rows() == explicitField.slice(mode(0)).rows());
+            assert(eqField.first.cols() == 1);
+            assert(eqField.second.cols() == 1);
+
+            // Get number of rows and columns of block
+            int rows = op->rows();
+            int cols = eqField.first.cols();
+
+            // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
+            eqField.first.block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.second.block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).imag();
+         }
       }
    }
 
-   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx)
+   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx)
    {
-      // Safety asserts
-      assert(eqField.first.cols() == linField.cols());
-      assert(eqField.second.cols() == linField.cols());
-
+      // Compute with complex linear operator
       if(eq.hasExplicitZLinear(compId, fieldId))
       {
          // Create pointer to sparse operator
          const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.first.cols();
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            // Get number of rows and columns of block
+            int rows = op->rows()*op->cols();
+            int cols = eqField.cols();
 
-         // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
-         eqField.first.block(eqStart, 0, rows, cols) += op->real()*linField.block(linStart, 0, rows,cols).real();
-         eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*linField.block(linStart, 0, rows, cols).imag();
-         eqField.second.block(eqStart, 0, rows, cols) += op->real()*linField.block(linStart, 0, rows, cols).imag();
-         eqField.second.block(eqStart, 0, rows, cols) += op->imag()*linField.block(linStart, 0, rows, cols).real();
+            //Safety assertion
+            assert(rows+eqStart <= eqField.rows());
+
+            /// \mhdBug very bad and slow implementation!
+            ArrayZ   tmp(rows);
+            int k = 0;
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(k) = explicitField.point(i,j,matIdx);
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+            // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
+            eqField.block(eqStart, 0, rows, cols) += (*op)*tmp;
+
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            // Get mode indexes
+            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+            // Assert correct sizes
+            assert(op->rows() == explicitField.slice(mode(0)).rows());
+            assert(eqField.cols() == 1);
+
+            // Get number of rows and columns of block
+            int rows = op->rows();
+            int cols = eqField.cols();
+
+            // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
+            eqField.block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1));
+         }
       }
 
+      // Compute with real linear operator
       if(eq.hasExplicitDLinear(compId, fieldId))
       {
          // Create pointer to sparse operator
          const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.first.cols();
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            // Get number of rows and columns of block
+            int rows = explicitField.slice(matIdx).size();
+            int cols = eqField.cols();
 
-         // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-         eqField.first.block(eqStart, 0, rows, cols) += (*op)*linField.block(linStart, 0, rows, cols).real();
-         eqField.second.block(eqStart, 0, rows, cols) += (*op)*linField.block(linStart, 0, rows, cols).imag();
-      }
-   }
+            //Safety assertion
+            assert(rows+eqStart <= eqField.rows());
 
-   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const DecoupledZMatrix& linField, const int linStart, const int matIdx)
-   {
-      // Safety asserts
-      assert(eqField.cols() == linField.first.cols());
-      assert(eqField.cols() == linField.second.cols());
+            /// \mhdBug very bad and slow implementation!
+            ArrayZ   tmp(rows);
+            int k = 0;
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(k) = explicitField.point(i,j,matIdx);
 
-      if(eq.hasExplicitZLinear(compId, fieldId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
+                  // increase storage counter
+                  k++;
+               }
+            }
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.cols();
+            // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
+            eqField.block(eqStart, 0, rows, cols).real() += (*op)*tmp.real();
+            eqField.block(eqStart, 0, rows, cols).imag() += (*op)*tmp.imag();
 
-         // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
-         eqField.block(eqStart, 0, rows, cols).real() += op->real()*linField.first.block(linStart, 0, rows, cols);
-         eqField.block(eqStart, 0, rows, cols).real() -= op->imag()*linField.second.block(linStart, 0, rows, cols);
-         eqField.block(eqStart, 0, rows, cols).imag() += op->imag()*linField.second.block(linStart, 0, rows, cols);
-         eqField.block(eqStart, 0, rows, cols).imag() += op->imag()*linField.first.block(linStart, 0, rows, cols);
-      }
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            // Get mode indexes
+            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
 
-      if(eq.hasExplicitDLinear(compId, fieldId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
+            // Assert correct sizes
+            assert(op->rows() == explicitField.slice(mode(0)).rows());
+            assert(eqField.cols() == 1);
 
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.cols();
+            // Get number of rows and columns of block
+            int rows = op->rows();
+            int cols = eqField.cols();
 
-         // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-         eqField.block(eqStart, 0, rows, cols).real() += (*op)*linField.first.block(linStart, 0, rows, cols);
-         eqField.block(eqStart, 0, rows, cols).imag() += (*op)*linField.second.block(linStart, 0, rows, cols);
-      }
-   }
-
-   void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& eqField, const int eqStart, SpectralFieldId fieldId, const MatrixZ& linField, const int linStart, const int matIdx)
-   {
-      // Safety asserts
-      assert(eqField.cols() == linField.cols());
-
-      if(eq.hasExplicitZLinear(compId, fieldId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
-
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.cols();
-
-         // Apply operator to field: eq += op*lin
-         eqField.block(eqStart, 0, rows, cols) += (*op)*linField.block(linStart, 0, rows, cols);
-      }
-
-      if(eq.hasExplicitDLinear(compId, fieldId))
-      {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
-
-         // Get number of rows and columns of block
-         int rows = op->rows();
-         int cols = eqField.cols();
-
-         eqField.block(eqStart, 0, rows, cols).real() += (*op)*linField.block(linStart, 0, rows, cols).real();
-         eqField.block(eqStart, 0, rows, cols).imag() += (*op)*linField.block(linStart, 0, rows, cols).imag();
+            // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
+            eqField.block(eqStart, 0, rows, cols).real() += (*op)*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.block(eqStart, 0, rows, cols).imag() += (*op)*explicitField.slice(mode(0)).col(mode(1)).imag();
+         }
       }
    }
 

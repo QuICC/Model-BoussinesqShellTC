@@ -62,6 +62,9 @@ namespace IoVariable {
       for(sit = sRange.first; sit != sRange.second; ++sit)
       {
          this->writePhysicalScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->dom(0).phys());
+
+         this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad", sit->second->dom(0).grad().data());
+
       }
 
       // Write all the vectors

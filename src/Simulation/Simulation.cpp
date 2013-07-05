@@ -174,7 +174,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
-      this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
       DebuggerMacro_stop("Solve prognostic t = ",4);
 

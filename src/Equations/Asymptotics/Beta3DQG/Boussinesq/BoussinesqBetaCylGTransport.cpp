@@ -97,7 +97,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 0.0);
+      Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqBetaCylGTransport::setRequirements()
@@ -180,7 +180,7 @@ namespace Equations {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      // Get Physical parameters Ra, Pr, Gamma, chi
+      // Get Physical parameters Pr
       MHDFloat Pr = eq.eqParams().nd(NonDimensional::PRANDTL);
 
       /// - Streamfunction : \f$ i \frac{k}{2} \left(D_x^{-2} \otimes I_Z\right) \f$

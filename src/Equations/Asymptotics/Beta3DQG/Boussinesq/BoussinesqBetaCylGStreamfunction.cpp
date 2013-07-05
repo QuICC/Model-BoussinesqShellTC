@@ -98,7 +98,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 0.0);
+      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0);
    }
 
    void BoussinesqBetaCylGStreamfunction::setRequirements()
@@ -251,7 +251,7 @@ namespace Equations {
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
 
-      // Get Physical parameters Ra, Pr, Gamma, chi
+      // Get Physical parameters Gamma, chi
       MHDFloat Gamma = eq.eqParams().nd(NonDimensional::GAMMA);
       MHDFloat chi = eq.eqParams().nd(NonDimensional::CHI);
 

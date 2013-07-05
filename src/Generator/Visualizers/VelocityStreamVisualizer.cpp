@@ -1,5 +1,5 @@
-/** \file FieldVisualizer.cpp
- *  \brief Source of the implementation of the basic field visualizer
+/** \file VelocityStreamVisualizer.cpp
+ *  \brief Source of the implementation of the streamfunction + axial velocity to velocity field visualizer
  */
 
 // Configuration includes
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Generator/Visualizers/VelocityStreamVisualizer.hpp"
 
 // Project includes
 //
@@ -26,32 +26,29 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   FieldVisualizer::FieldVisualizer(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false)
+   VelocityStreamVisualizer::VelocityStreamVisualizer(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams), mViewField(true), mViewGradient(false)
    {
-   }
-
-   FieldVisualizer::~FieldVisualizer()
-   {
-   }
-
-   void FieldVisualizer::setIdentity(const PhysicalNames::Id name)
-   {
-      // Set the name
-      this->setName(name);
-
       // Set the variable requirements
       this->setRequirements();
    }
 
-   void FieldVisualizer::setFields(const bool viewField, const bool viewGradient)
+   VelocityStreamVisualizer::~VelocityStreamVisualizer()
+   {
+   }
+
+   void VelocityStreamVisualizer::setIdentity(const PhysicalNames::Id name)
+   {
+   }
+
+   void VelocityStreamVisualizer::setFields(const bool viewField, const bool viewGradient)
    {
       this->mViewField = viewField;
 
       this->mViewGradient = viewGradient;
    }
 
-   void FieldVisualizer::setCoupling()
+   void VelocityStreamVisualizer::setCoupling()
    {
       // Get X dimension
       int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -88,10 +85,13 @@ namespace Equations {
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
    }
 
-   void FieldVisualizer::setRequirements()
+   void VelocityStreamVisualizer::setRequirements()
    {
+      // Set the name
+      this->setName(PhysicalNames::VELOCITY);
+
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(this->name(), FieldRequirement(true, true, this->mViewField, this->mViewGradient));
+      this->mRequirements.addField(this->name(), FieldRequirement(false, false, this->mViewField, this->mViewGradient));
    }
 
 }

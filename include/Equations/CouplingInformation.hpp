@@ -58,8 +58,10 @@ namespace Equations {
             PROGNOSTIC = 1,
             /// Equation needs a solver
             DIAGNOSTIC = 2,
-            /// Equation is trivial
-            TRIVIAL = 3
+            /// Equation is trivial (but with NL, QI, source, explicit)
+            TRIVIAL = 3,
+            /// Equation does nothing (ie "wrapper" for variable)
+            WRAPPER = 4
          };
 
          /**

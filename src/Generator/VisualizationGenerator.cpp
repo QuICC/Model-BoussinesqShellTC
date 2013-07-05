@@ -53,6 +53,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("mainRun",1);
 
+      // Solve the trivial equations
+      this->solveTrivialEquations();
+
       // Compute nonlinear terms
       this->computeNonlinear();
 

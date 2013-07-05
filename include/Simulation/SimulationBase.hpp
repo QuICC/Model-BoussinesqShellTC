@@ -59,6 +59,24 @@ namespace GeoMHDiSCC {
          /// Typedef for a shared vector equation range
          typedef std::pair<VectorEquation_iterator, VectorEquation_iterator>  VectorEquation_range;
 
+         /// Typedef for a shared scalar variable map
+         typedef std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  ScalarVariable_map;
+
+         /// Typedef for a shared vector variable map
+         typedef std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  VectorVariable_map;
+
+         /// Typedef for a shared scalar variable iterator
+         typedef ScalarVariable_map::iterator  ScalarVariable_iterator;
+
+         /// Typedef for a shared vector variable iterator
+         typedef VectorVariable_map::iterator  VectorVariable_iterator;
+
+         /// Typedef for a shared scalar variable range
+         typedef std::pair<ScalarVariable_iterator, ScalarVariable_iterator>  ScalarVariable_range;
+
+         /// Typedef for a shared vector variable range
+         typedef std::pair<VectorVariable_iterator, VectorVariable_iterator>  VectorVariable_range;
+
          /**
           * @brief Constructor
           */
@@ -376,6 +394,46 @@ namespace GeoMHDiSCC {
     * @brief Sorting function for the vector equations to obtain time/solver/trivial ordering
     */
    bool sortVectorEquationType(Equations::SharedIVectorEquation eqA, Equations::SharedIVectorEquation eqB);
+
+   /**
+    * @brief Check if scalar equation is prognostic
+    */
+   bool scalarIsPrognostic(Equations::SharedIScalarEquation eqA);
+
+   /**
+    * @brief Check if scalar equation is diagnostic
+    */
+   bool scalarIsDiagnostic(Equations::SharedIScalarEquation eqA);
+
+   /**
+    * @brief Check if scalar equation is trivial
+    */
+   bool scalarIsTrivial(Equations::SharedIScalarEquation eqA);
+
+   /**
+    * @brief Check if scalar equation is wrapper
+    */
+   bool scalarIsWrapper(Equations::SharedIScalarEquation eqA);
+
+   /**
+    * @brief Check if vector equation is prognostic
+    */
+   bool vectorIsPrognostic(Equations::SharedIVectorEquation eqA);
+
+   /**
+    * @brief Check if vector equation is diagnostic
+    */
+   bool vectorIsDiagnostic(Equations::SharedIVectorEquation eqA);
+
+   /**
+    * @brief Check if vector equation is trivial
+    */
+   bool vectorIsTrivial(Equations::SharedIVectorEquation eqA);
+
+   /**
+    * @brief Check if vector equation is wrapper
+    */
+   bool vectorIsWrapper(Equations::SharedIVectorEquation eqA);
 
    template <typename TScheme> void SimulationBase::initResolution()
    {

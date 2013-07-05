@@ -1,9 +1,9 @@
-/** \file FieldVisualizer.hpp
- *  \brief Implementation of the basic field visualizer
+/** \file VelocityStreamVisualizer.hpp
+ *  \brief Implementation of the streamfunction + axial velocity to velocity field visualizer
  */
 
-#ifndef FIELDVISUALIZER_HPP
-#define FIELDVISUALIZER_HPP
+#ifndef VELOCITYSTREAMVISUALIZER_HPP
+#define VELOCITYSTREAMVISUALIZER_HPP
 
 // Configuration includes
 //
@@ -19,16 +19,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of thecw basic field visualizer
+    * @brief Implementation of the streamfunction + axial velocity to velocity field visualizer
     */
-   class FieldVisualizer: public IScalarEquation
+   class VelocityStreamVisualizer: public IVectorEquation
    {
       public:
          /**
@@ -37,17 +37,12 @@ namespace Equations {
           * @param spEqParams Shared equation parameters
           * @paarm name       Name of the field
           */
-         FieldVisualizer(SharedEquationParameters spEqParams);
+         VelocityStreamVisualizer(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~FieldVisualizer();
-
-         /**
-          * @brief Set the unknown name and requirements
-          */
-         void setIdentity(const PhysicalNames::Id name);
+         virtual ~VelocityStreamVisualizer();
 
          /**
           * @brief Set which fields to output
@@ -77,10 +72,10 @@ namespace Equations {
          bool mViewGradient;
    };
 
-   /// Typedef for a shared FieldVisualizer
-   typedef SharedPtrMacro<FieldVisualizer> SharedFieldVisualizer;
+   /// Typedef for a shared VelocityStreamVisualizer
+   typedef SharedPtrMacro<VelocityStreamVisualizer> SharedVelocityStreamVisualizer;
 
 }
 }
 
-#endif // FIELDVISUALIZER_HPP
+#endif // VELOCITYSTREAMVISUALIZER_HPP

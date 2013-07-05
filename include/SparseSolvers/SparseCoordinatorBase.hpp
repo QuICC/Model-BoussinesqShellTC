@@ -50,6 +50,24 @@ namespace Solver {
          /// Typedef for a shared vector equation range
          typedef std::pair<VectorEquation_iterator, VectorEquation_iterator>  VectorEquation_range;
 
+         /// Typedef for a shared scalar variable map
+         typedef std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>  ScalarVariable_map;
+
+         /// Typedef for a shared vector variable map
+         typedef std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  VectorVariable_map;
+
+         /// Typedef for a shared scalar variable iterator
+         typedef ScalarVariable_map::iterator  ScalarVariable_iterator;
+
+         /// Typedef for a shared vector variable iterator
+         typedef VectorVariable_map::iterator  VectorVariable_iterator;
+
+         /// Typedef for a shared scalar variable range
+         typedef std::pair<ScalarVariable_iterator, ScalarVariable_iterator>  ScalarVariable_range;
+
+         /// Typedef for a shared vector variable range
+         typedef std::pair<VectorVariable_iterator, VectorVariable_iterator>  VectorVariable_range;
+
          /**
           * @brief Constructor
           */
@@ -87,7 +105,7 @@ namespace Solver {
          /**
           * @brief Get the solver input independently of solver type
           */
-         template <typename TEquationIt, typename TSolverIt> void getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt);
+         template <typename TEquationIt, typename TSolverIt> void getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar);
 
          /**
           * @brief Create the correct solver
@@ -118,7 +136,7 @@ namespace Solver {
           * @param scalEq Scalar equations
           * @param vectEq Vector equations
           */
-         void getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar);
 
          /**
           * @brief Update equation unkowns with solver output 
@@ -422,7 +440,7 @@ namespace Solver {
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedDSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedDSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   template <typename TSharedZSolver, typename TSharedDSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedDSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -445,7 +463,7 @@ namespace Solver {
             std::advance(solZIt, myIdx);
 
             // Get solver input
-            this->getSolverInput(scalEqIt, myId, solZIt);
+            this->getSolverInput(scalEqIt, myId, solZIt, scalVar, vectVar);
 
          // Linear solve matrices are real
          } else
@@ -455,7 +473,7 @@ namespace Solver {
             std::advance(solDIt, myIdx);
 
             // Get solver input
-            this->getSolverInput(scalEqIt, myId, solDIt);
+            this->getSolverInput(scalEqIt, myId, solDIt, scalVar, vectVar);
          }
       }
 
@@ -481,7 +499,7 @@ namespace Solver {
                std::advance(solZIt, myIdx);
 
                // Get solver input
-               this->getSolverInput(vectEqIt, myId, solZIt);
+               this->getSolverInput(vectEqIt, myId, solZIt, scalVar, vectVar);
 
                // Linear solve matrices are real
             } else
@@ -491,13 +509,13 @@ namespace Solver {
                std::advance(solDIt, myIdx);
 
                // Get solver input
-               this->getSolverInput(vectEqIt, myId, solDIt);
+               this->getSolverInput(vectEqIt, myId, solDIt, scalVar, vectVar);
             }
          }
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedDSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TSharedZSolver,TSharedDSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt)
+   template <typename TSharedZSolver, typename TSharedDSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TSharedZSolver,TSharedDSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Get timestep input
       for(int i = 0; i < (*solveIt)->nSystem(); i++)
@@ -511,25 +529,16 @@ namespace Solver {
          // Apply quasi-inverse to nonlinear terms
          Equations::addSource(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
-         // Loop over all complex solvers
-         for(SolverZ_iterator solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
+         // Loop over explicit fields
+         Equations::CouplingInformation::FieldId_range   fRange = (*eqIt)->couplingInfo(id.second).explicitRange();
+         for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
          {
-            // Loop over all fields
-            Equations::CouplingInformation::FieldId_range   fRange = (*solZIt)->fieldRange();
-            for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+            if(fIt->second == FieldComponents::Spectral::SCALAR)
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, (*solZIt)->rRHSData(i), (*solZIt)->startRow(*fIt,i), i);
-            }
-         }
-
-         // Loop over all real solvers
-         for(SolverD_iterator solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
-         {
-            // Loop over all fields
-            Equations::CouplingInformation::FieldId_range   fRange = (*solDIt)->fieldRange();
-            for(Equations::CouplingInformation::FieldId_iterator  fIt = fRange.first; fIt != fRange.second; ++fIt)
+               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, scalVar.find(fIt->first)->second->dom(0).perturbation(), i);
+            } else
             {
-               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, (*solDIt)->rRHSData(i), (*solDIt)->startRow(*fIt,i), i);
+               Equations::addExplicitLinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), *fIt, vectVar.find(fIt->first)->second->dom(0).perturbation().comp(fIt->second), i);
             }
          }
       }
