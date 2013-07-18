@@ -131,25 +131,25 @@ namespace Timestep {
    void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
 
-      ProfilerMacro_start(ProfilerMacro::TSTEPIN);
+      DetailedProfilerMacro_start(ProfilerMacro::TSTEPIN);
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq, scalVar, vectVar);
-      ProfilerMacro_stop(ProfilerMacro::TSTEPIN);
+      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPIN);
 
-      ProfilerMacro_start(ProfilerMacro::TSTEPRHS);
+      DetailedProfilerMacro_start(ProfilerMacro::TSTEPRHS);
       // Compute the RHS of the linear systems
       this->computeRHS();
-      ProfilerMacro_stop(ProfilerMacro::TSTEPRHS);
+      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPRHS);
 
-      ProfilerMacro_start(ProfilerMacro::TSTEPSOLVE);
+      DetailedProfilerMacro_start(ProfilerMacro::TSTEPSOLVE);
       // Solve all the linear systems
       this->solveSystems();
-      ProfilerMacro_stop(ProfilerMacro::TSTEPSOLVE);
+      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPSOLVE);
       
-      ProfilerMacro_start(ProfilerMacro::TSTEPOUT);
+      DetailedProfilerMacro_start(ProfilerMacro::TSTEPOUT);
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
-      ProfilerMacro_stop(ProfilerMacro::TSTEPOUT);
+      DetailedProfilerMacro_stop(ProfilerMacro::TSTEPOUT);
 
       // Update the internal step counter, counting from 0 to steps - 1
       this->mStep = (this->mStep + 1) % this->mNStep;
