@@ -106,13 +106,25 @@ namespace Schemes {
             jN = nN.tail(iN);
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+         // Splitting is on slowest index on first transforms
+         } else if(flag == Splitting::Locations::FIXED)
+         {
+            i0 = n0(0);
+            iN = nN(0);
+            j0.resize(iN);
+            jN.resize(iN);
+            j0.setConstant(0);
+            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
+            c0 = 0;
+            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
          }
 
       // Create index list for second transform
       } else if(transId == Dimensions::Transform::TRA2D)
       {
          // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
+         if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::FIXED)
          {
             i0 = 0;
             iN = this->dim(transId, Dimensions::Data::DAT3D);
@@ -152,7 +164,7 @@ namespace Schemes {
       } else if(transId == Dimensions::Transform::TRA3D)
       {
          // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
+         if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::FIXED)
          {
             i0 = n0(0);
             iN = nN(0);
@@ -338,6 +350,23 @@ namespace Schemes {
          } else if(transId == Dimensions::Transform::TRA3D)
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
+         }
+      } else if(flag == Splitting::Locations::FIXED)
+      {
+         // Get total size for first transform
+         if(transId == Dimensions::Transform::TRA1D)
+         {
+            return this->dim(transId, Dimensions::Data::DAT3D);
+
+         // Get total size for second transform
+         } else if(transId == Dimensions::Transform::TRA2D)
+         {
+            return this->dim(transId, Dimensions::Data::DAT2D);
+
+         // Get total size for third transform
+         } else if(transId == Dimensions::Transform::TRA3D)
+         {
+            return this->dim(transId, Dimensions::Data::DAT3D);
          }
       }
       
