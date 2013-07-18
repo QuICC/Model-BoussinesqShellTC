@@ -38,7 +38,7 @@ endif(memoryTest)
 # Choose the type of MPI parallelisation or serial setup.
 # Possible options are: Serial, Auto, Single1D, Single2D, Tubular
 #
-set(GEOMHDISCC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular")
+set(GEOMHDISCC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular" "Fixed")
 
 geomhdiscc_provide_choice(GEOMHDISCC_MPIALGOS "MPI algorithm" GEOMHDISCC_MPIALGO mpiTest)
 
@@ -51,7 +51,7 @@ if(mpiTest)
    if(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
       geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
    else(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
-      set(algos "Single1D" "Single2D" "Tubular")
+      set(algos "Single1D" "Single2D" "Tubular" "Fixed")
       foreach(GEOMHDISCC_MPIALGO ${algos})
          geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
       endforeach(GEOMHDISCC_MPIALGO ${algos})
