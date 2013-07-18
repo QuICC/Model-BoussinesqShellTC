@@ -87,6 +87,18 @@ namespace GeoMHDiSCC {
       };
       #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
+      #ifdef GEOMHDISCC_MPIALGO_FIXED
+      /// Transform configurator selector specialised for FIXED case
+      template <> struct ConfigSelector<Splitting::Algorithms::FIXED>
+      {
+         /// Typedef for forward configurator
+         typedef ForwardSingle1DConfigurator   FwdConfigType;
+
+         /// Typedef for forward configurator
+         typedef BackwardSingle1DConfigurator  BwdConfigType;
+      };
+      #endif //GEOMHDISCC_MPIALGO_FIXED
+
       /// Transform grouper selector template
       template <Splitting::Groupers::Id TGrouper,Splitting::Algorithms::Id TAlgo> struct GrouperSelector;
 
@@ -187,6 +199,11 @@ namespace GeoMHDiSCC {
          {
             setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
          #endif //GEOMHDISCC_MPIALGO_TUBULAR
+         #ifdef GEOMHDISCC_MPIALGO_FIXED
+         } else if(algo == Splitting::Algorithms::FIXED)
+         {
+            setGrouper<TGroup,Splitting::Algorithms::FIXED>(spFwdGrouper, spBwdGrouper);
+         #endif //GEOMHDISCC_MPIALGO_FIXED
       #endif //GEOMHDISCC_MPI
          }
       }

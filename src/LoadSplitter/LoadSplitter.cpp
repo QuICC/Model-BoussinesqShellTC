@@ -31,6 +31,7 @@
 #include "LoadSplitter/Algorithms/SerialSplitting.hpp"
 #include "LoadSplitter/Algorithms/SingleSplitting.hpp"
 #include "LoadSplitter/Algorithms/TubularSplitting.hpp"
+#include "LoadSplitter/Algorithms/FixedSplitting.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -68,6 +69,12 @@ namespace Parallel {
                   // Add the single splitting algorithm for first data exchange
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST)));
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
+
+               #ifdef GEOMHDISCC_MPIALGO_FIXED
+                  // Add the single splitting algorithm for first data exchange
+                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new FixedSplitting(this->mId, this->mNCpu, dim)));
+               #endif //GEOMHDISCC_MPIALGO_FIXED
+
 
                // Check if problem is 3D
                if(dim.size() == 3)
@@ -189,6 +196,9 @@ namespace Parallel {
             case(Splitting::Algorithms::TUBULAR):
                tmpStr = "Tubular";
                break;
+            case(Splitting::Algorithms::FIXED):
+               tmpStr = "Fixed";
+               break;
          }
          IoTools::Formatter::printCentered(std::cout, "Algorithm: " + tmpStr);
 
@@ -205,7 +215,7 @@ namespace Parallel {
                tmpStr += " x ";
             }
          }
-         if(descr.algorithm == Splitting::Algorithms::SINGLE1D)
+         if(descr.algorithm == Splitting::Algorithms::SINGLE1D || descr.algorithm == Splitting::Algorithms::FIXED)
          {
             tmpStr += " x 1";
          } else if(descr.algorithm == Splitting::Algorithms::SINGLE2D)
