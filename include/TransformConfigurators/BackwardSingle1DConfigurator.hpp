@@ -1,7 +1,7 @@
 /** \file BackwardSingle1DConfigurator.hpp
  *  \brief This defines the backward transform first exchange single splitting operations
  */
-#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
+#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
 
 #ifndef BACKWARDSINGLE1DCONFIGURATOR_HPP
 #define BACKWARDSINGLE1DCONFIGURATOR_HPP
@@ -256,4 +256,4 @@ namespace Transform {
 
 #endif // BACKWARDSINGLE1DCONFIGURATOR_HPP
 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D
+#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED

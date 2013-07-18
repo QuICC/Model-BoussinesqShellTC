@@ -267,7 +267,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
          {
             // Create shared MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType>());
@@ -369,7 +369,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
          {
             // Create shared serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
