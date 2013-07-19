@@ -118,7 +118,13 @@ namespace Equations {
 
          MHDComplex val;
          val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
-         val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) != 0)
+         {
+            val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+         } else
+         {
+            val.imag() = 0.0;
+         }
 
          return val*aX*aY*aZ;
       } else
