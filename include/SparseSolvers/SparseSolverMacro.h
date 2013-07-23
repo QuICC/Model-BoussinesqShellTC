@@ -18,7 +18,7 @@
    #define SparseSolverMacro Eigen::SuperLU
 #endif //GEOMHDISCC_SPLINALG_SUPERLU
 
-// TR1 Version
+// UMFPack Version
 #ifdef GEOMHDISCC_SPLINALG_UMFPACK
    // Include the right header
    #include <Eigen/UmfPackSupport>
@@ -30,5 +30,18 @@
     */
    #define SparseSolverMacro Eigen::UmfPackLU
 #endif //GEOMHDISCC_SPLINALG_UMFPACK
+
+// SparseLU Version
+#ifdef GEOMHDISCC_SPLINALG_SPARSELU
+   // Include the right header
+   #include <Eigen/SparseLU>
+
+   /**
+    * @def SparseSolverMacro
+    * Macro allowing to use different implementations of the sparse solvers.
+    * Sets up the Eigen internal SparseLU version.
+    */
+   #define SparseSolverMacro Eigen::SparseLU
+#endif //GEOMHDISCC_SPLINALG_SPARSELU
 
 #endif // SPARSESOLVERMACRO_H

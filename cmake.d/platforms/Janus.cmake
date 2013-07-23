@@ -38,7 +38,7 @@ set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "UmfPack" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "UmfPack" "SparseLU" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK "/home/phma6156/share/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK "/home/phma6156/share/lib" PARENT_SCOPE)
