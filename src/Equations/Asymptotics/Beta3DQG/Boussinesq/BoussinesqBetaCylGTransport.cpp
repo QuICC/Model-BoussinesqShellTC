@@ -157,7 +157,7 @@ namespace Equations {
 
       /// - Transport equation: \f$ \left( D_x^{-2} \otimes I_Z\right) \f$
       // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), mat);
+      mat = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
 
       // Prune matrices for safety
       mat.prune(1e-32);
@@ -188,7 +188,7 @@ namespace Equations {
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
          SparseMatrix tmp = k_*spec3D.id(0);
-         Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0), mat.second);
+         mat.second = Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0));
 
          /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
@@ -202,7 +202,7 @@ namespace Equations {
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
          SparseMatrix tmp = (1./Pr)*spec3D.id(0);
-         Eigen::kroneckerProduct(tmp, Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2), mat.first);
+         mat.first = Eigen::kroneckerProduct(tmp, Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2));
 
          // Unknown field
       } else
@@ -230,7 +230,7 @@ namespace Equations {
       mat.second.resize(nX*nZ,nX*nZ);
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0), mat.first);
+      mat.first = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

@@ -94,9 +94,9 @@ namespace Equations {
 
          SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
          BoussinesqPerBetaCylGSystem::linearBlock(block, eqId, *fIt, nZ, kX_, kY_, Ra, Pr, Gamma, chi);
-         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
-         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
          matrixRow.second += tmp;
 
          colIdx++;
@@ -138,9 +138,9 @@ namespace Equations {
       blockMatrix.insert(this->couplingInfo(comp).fieldIndex(), this->couplingInfo(comp).fieldIndex()) = 1;
       SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
       BoussinesqPerBetaCylGSystem::timeBlock(block, eqId, nZ, kX_, kY_, Ra, Pr, Gamma, chi);
-      Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
       matrixRow.first += tmp;
-      Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
       matrixRow.second += tmp;
 
       // Make sure matrices are in compressed format
@@ -185,9 +185,9 @@ namespace Equations {
 
          SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
          BoussinesqPerBetaCylGSystem::boundaryBlock(block, eqId, *fIt, this->mspBcIds, nZ, kX_, kY_, Ra, Pr, Gamma, chi);
-         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
-         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
          matrixRow.second += tmp;
 
          colIdx++;

@@ -143,7 +143,7 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0), mat.first);
+         mat.first = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0));
 
       // Unknown field
       } else

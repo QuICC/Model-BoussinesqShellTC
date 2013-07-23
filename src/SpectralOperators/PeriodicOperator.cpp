@@ -78,11 +78,11 @@ namespace Spectral {
    {
       // Compute sparse laplacian
       SparseMatrix lapl;
-      Eigen::kroneckerProduct(opB.diff(nBCB, 2), opA.id(nBCB), lapl);
+      lapl = Eigen::kroneckerProduct(opB.diff(nBCB, 2), opA.id(nBCB));
       SparseMatrix tmp;
-      Eigen::kroneckerProduct(opB.id(nBCB), opA.diff(nBCB,2), tmp);
+      tmp = Eigen::kroneckerProduct(opB.id(nBCB), opA.diff(nBCB,2));
       lapl = lapl + tmp;
-      Eigen::kroneckerProduct(opB.id(nBCB), opA.id(nBCA), tmp);
+      tmp = Eigen::kroneckerProduct(opB.id(nBCB), opA.id(nBCA));
       lapl = lapl - std::pow(k,2)*tmp;
 
       // Prune sparse laplacian
@@ -131,11 +131,11 @@ namespace Spectral {
    {
       // Compute quasi inverse of laplacian
       SparseMatrix qLapl;
-      Eigen::kroneckerProduct(opB.qDiff(pB, 2), opA.qDiff(pA,0), qLapl);
+      qLapl = Eigen::kroneckerProduct(opB.qDiff(pB, 2), opA.qDiff(pA,0));
       SparseMatrix tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,2), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,2));
       qLapl = qLapl + tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,0), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB, 0), opA.qDiff(pA,0));
       qLapl = qLapl - std::pow(k,2)*tmp;
 
       // Prune sparse matrix
@@ -148,17 +148,17 @@ namespace Spectral {
    {
       // Compute quasi inverse of laplacian
       SparseMatrix qLapl;
-      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,4), qLapl);
+      qLapl = Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,4));
       SparseMatrix tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB,4), opA.qDiff(pA,0), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB,4), opA.qDiff(pA,0));
       qLapl = qLapl + tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,2), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,2));
       qLapl = qLapl + 2*std::pow(k,2)*tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,2), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,2));
       qLapl = qLapl - 2*std::pow(k,2)*tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,0), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB,2), opA.qDiff(pA,0));
       qLapl = qLapl - 2*std::pow(k,2)*tmp;
-      Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,0), tmp);
+      tmp = Eigen::kroneckerProduct(opB.qDiff(pB,0), opA.qDiff(pA,0));
       qLapl = qLapl + std::pow(k,4)*tmp;
 
       // Prune sparse matrix

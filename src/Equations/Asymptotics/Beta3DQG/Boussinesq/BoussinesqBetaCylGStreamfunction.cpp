@@ -164,7 +164,7 @@ namespace Equations {
 
       /// - Streamfunction equation: \f$ \left(D_x^{-4} \otimes D_Z^{-1}\right) \f$
       // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(4,0), mat);
+      mat = Eigen::kroneckerProduct(spec3D.qDiff(1,0), spec1D.qDiff(4,0));
 
       // Prune matrices for safety
       mat.prune(1e-32);
@@ -194,21 +194,21 @@ namespace Equations {
       /// - Streamfunction : \f$ \left(D_x^{-4}\nabla_\perp^{4} \otimes D_Z^{-1}\right) \f$
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4), mat.first);
+         // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
+         mat.first = Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4));
 
          /// - Vertical velocity : \f$ \left(D_x^{-4} \otimes I_z^{-1}\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         Eigen::kroneckerProduct(spec3D.id(1), spec1D.qDiff(4,0), mat.first);
+         // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
+         mat.first = Eigen::kroneckerProduct(spec3D.id(1), spec1D.qDiff(4,0));
 
          /// - Temperature : \f$ i \frac{k}{2}\frac{1}{16}\frac{Ra}{Pr}\left( D_x^{-4} \otimes D_Z^{-1}\right) \f$
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
+         // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
          SparseMatrix tmp = k_*(1.0/16.)*(Ra/Pr)*spec3D.qDiff(1,0);
-         Eigen::kroneckerProduct(tmp, spec1D.qDiff(4,0), mat.second);
+         mat.second = Eigen::kroneckerProduct(tmp, spec1D.qDiff(4,0));
 
          // Unknown field
       } else
@@ -239,7 +239,7 @@ namespace Equations {
       MHDFloat k_ = k/2.;
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 4), mat.first);
+      mat.first = Eigen::kroneckerProduct(spec3D.qDiff(1,0), Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 4));
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

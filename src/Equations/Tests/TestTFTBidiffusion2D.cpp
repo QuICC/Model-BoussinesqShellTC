@@ -131,7 +131,7 @@ namespace Equations {
       if(fieldId.first == eq.name())
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4), mat.first);
+         mat.first = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::qBilaplacian2D(spec1D, k_, 4));
          mat.first = -mat.first;
 
       // Unknown field
@@ -160,7 +160,7 @@ namespace Equations {
       mat.second.resize(nX*nZ,nX*nZ);
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(4,0), mat.first);
+      mat.first = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(4,0));
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

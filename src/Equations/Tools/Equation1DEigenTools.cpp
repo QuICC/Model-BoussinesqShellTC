@@ -114,7 +114,7 @@ namespace Equations {
                   {
                      tau.first *= c1D;
                   }
-                  Eigen::kroneckerProduct(q3D, tau.first, mat.first);
+                  mat.first = Eigen::kroneckerProduct(q3D, tau.first);
                }
 
                if(tau.second.nonZeros() > 0)
@@ -123,7 +123,7 @@ namespace Equations {
                   {
                      tau.second *= c1D;
                   }
-                  Eigen::kroneckerProduct(q3D, tau.second, mat.second);
+                  mat.second = Eigen::kroneckerProduct(q3D, tau.second);
                }
             }
 
@@ -138,7 +138,7 @@ namespace Equations {
                      tau.first *= c3D;
                   }
                   SparseMatrix tmp;
-                  Eigen::kroneckerProduct(tau.first, q1D, tmp);
+                  tmp = Eigen::kroneckerProduct(tau.first, q1D);
                   mat.first += tmp;
                }
                if(tau.second.nonZeros() > 0)
@@ -148,7 +148,7 @@ namespace Equations {
                      tau.second *= c3D;
                   }
                   SparseMatrix tmp;
-                  Eigen::kroneckerProduct(tau.second, q1D, tmp);
+                  tmp = Eigen::kroneckerProduct(tau.second, q1D);
                   mat.second += tmp;
                }
             }

@@ -207,8 +207,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
-      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0), mat);
+      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B) => out = A(i,j)*B)
+      mat = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
 
       // Prune matrices for safety
       mat.prune(1e-32);
@@ -228,8 +228,8 @@ namespace Equations {
       mat.first.resize(nX*nZ,nX*nZ);
       mat.second.resize(nX*nZ,nX*nZ);
 
-      // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0), mat.first);
+      // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
+      mat.first = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

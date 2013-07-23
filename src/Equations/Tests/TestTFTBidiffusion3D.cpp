@@ -160,7 +160,7 @@ namespace Equations {
       mat.second.resize(nX*nZ,nX*nZ);
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      Eigen::kroneckerProduct(spec3D.qDiff(4,0), spec1D.qDiff(4,0), mat.first);
+      mat.first = Eigen::kroneckerProduct(spec3D.qDiff(4,0), spec1D.qDiff(4,0));
 
       // Prune matrices for safety
       mat.first.prune(1e-32);

@@ -81,9 +81,9 @@ namespace Equations {
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
          linearBlock(eq, compId, block, *fIt, k2D_, k3D_);
-         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
-         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
          matrixRow.second += tmp;
 
          colIdx++;
@@ -116,9 +116,9 @@ namespace Equations {
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
       timeBlock(eq, compId, block, k2D_, k3D_);
-      Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
       matrixRow.first += tmp;
-      Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
       matrixRow.second += tmp;
 
       // Make sure matrices are in compressed format
@@ -154,9 +154,9 @@ namespace Equations {
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
          boundaryBlock(eq, compId, block, *fIt, k2D_, k3D_);
-         Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
-         Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
          matrixRow.second += tmp;
 
          colIdx++;
