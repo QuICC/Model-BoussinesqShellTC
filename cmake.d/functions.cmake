@@ -99,6 +99,19 @@ function (geomhdiscc_link_external varName)
    foreach(inc ${GEOMHDISCC_INCLUDES_${libName}})
       include_directories(${inc})
    endforeach(inc)
+   # Get upper case compiler
+   set(tmp ${GEOMHDISCC_COMPILER})
+   if(NOT ${tmp} STREQUAL "")
+      string(TOUPPER ${tmp} compUP)
+   endif(NOT ${tmp} STREQUAL "")
+   # Loop over all library directories to add that are compiler specific
+   foreach(inc ${GEOMHDISCC_LIBDIR_${libName}_${compUP}})
+      link_directories(${inc})
+   endforeach(inc)
+   # Loop over all include directories to add that are compiler specific
+   foreach(inc ${GEOMHDISCC_INCLUDES_${libName}_${compUP}})
+      include_directories(${inc})
+   endforeach(inc)
 endfunction (geomhdiscc_link_external libName)
 
 #

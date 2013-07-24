@@ -6,7 +6,7 @@
 #-------------- AVAILABLE COMPILERS --------------#
 ###################################################
 
-set(GEOMHDISCC_COMPILERS "GCC" PARENT_SCOPE)
+set(GEOMHDISCC_COMPILERS "GCC" "Intel" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE SMART POINTERS ------------#
@@ -40,10 +40,13 @@ set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 
 set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_UMFPACK "/home/phma6156/share/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_UMFPACK "/home/phma6156/share/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_SUPERLU "/home/phma6156/share/SuperLU_4.3/SRC" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_UMFPACK_GCC "/home/phma6156/share/gcc/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_UMFPACK_GCC "/home/phma6156/share/gcc/lib" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/SRC" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "/home/phma6156/share/intel/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL "/home/phma6156/share/intel/lib" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SRC" PARENT_SCOPE)
 
 ###################################################
 #-------- AVAILABLE SPARSE EIGEN SOLVERS ---------#
@@ -82,6 +85,20 @@ set(GEOMHDISCC_CC_INC_MPI_GCC ${GEOMHDISCC_CC_INC_GCC} PARENT_SCOPE)
 set(GEOMHDISCC_CC_LIB_GCC "" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_SERIAL_INTEL "icpc" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_MPI_INTEL "mpic++" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_ARCH_INTEL "-O2" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_INC_INTEL "" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_INC_MPI_INTEL ${GEOMHDISCC_CC_INC_GCC} PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_LIB_INTEL "" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_LIB_MPI_INTEL ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 
 ###################################################
 #-------------- GENERAL LIBRARIES ----------------#
