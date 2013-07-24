@@ -40,13 +40,15 @@ set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 
 set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_GCC "/home/phma6156/share/gcc/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_GCC "/home/phma6156/share/gcc/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/SRC" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "/home/phma6156/share/intel/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL "/home/phma6156/share/intel/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SRC" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib" PARENT_SCOPE)
 
 ###################################################
 #-------- AVAILABLE SPARSE EIGEN SOLVERS ---------#
