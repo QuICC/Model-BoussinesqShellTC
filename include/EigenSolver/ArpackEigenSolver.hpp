@@ -15,7 +15,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "SparseSolvers/SparseSolverMacro.h"
+#include "TypeSelectors/SparseSolverSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -126,7 +126,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Sparse linear solver
           */
-         SparseSolverMacro<SparseMatrixZ> mSolver;
+         SparseSolverSelector<SparseMatrixZ>::SolverType mSolver;
 
          /**
           * @defgroup Work memory for ARPACK

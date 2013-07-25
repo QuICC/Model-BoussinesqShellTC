@@ -55,7 +55,7 @@ namespace Solver {
       this->mSolver.reserve(this->mLHSMatrix.size());
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> >  solver(new SparseSolverMacro<SparseMatrixZ>());
+         SharedPtrMacro<SparseSolverSelector<SparseMatrixZ>::SolverType >  solver(new SparseSolverSelector<SparseMatrixZ>::SolverType());
 
          this->mSolver.push_back(solver);
       }

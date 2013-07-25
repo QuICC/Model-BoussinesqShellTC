@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "SparseSolvers/SparseSolverMacro.h"
+#include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseSolverBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -126,7 +126,7 @@ namespace Solver {
          /**
           * @brief Create sparse solvers
           */
-         std::vector<SharedPtrMacro<SparseSolverMacro<SparseMatrixZ> > >  mSolver;
+         std::vector<SharedPtrMacro<SparseSolverSelector<SparseMatrixZ>::SolverType > >  mSolver;
 
       private:
    };

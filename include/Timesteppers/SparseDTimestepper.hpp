@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "SparseSolvers/SparseSolverMacro.h"
+#include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseDLinearSolver.hpp"
 
 namespace GeoMHDiSCC {
