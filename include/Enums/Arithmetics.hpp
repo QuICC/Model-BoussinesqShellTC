@@ -1,5 +1,5 @@
 /** \file Arithmetics.hpp
- *  \brief Definition of some useful enums for basis arithmetics
+ *  \brief Definition of some useful enums for basic arithmetic operations
  */
 
 #ifndef ARITHMETICS_HPP

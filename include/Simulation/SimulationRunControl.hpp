@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Enums/Runtime.hpp"
+#include "Enums/RuntimeStatus.hpp"
 #include "IoControl/ControlInterface.hpp"
 
 namespace GeoMHDiSCC {
@@ -50,7 +50,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Should the simulation keep running?
           */
-         Runtime::Status::Id status() const;
+         RuntimeStatus::Id status() const;
 
          /**
           * @brief Update the status from control file
@@ -75,7 +75,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Current runtime status
           */
-         Runtime::Status::Id mStatus;
+         RuntimeStatus::Id mStatus;
 
          /**
           * @brief External control file

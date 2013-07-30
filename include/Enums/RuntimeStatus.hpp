@@ -1,9 +1,9 @@
-/** \file Runtime.hpp
- *  \brief Definition of some useful enums for runtime information
+/** \file RuntimeStatus.hpp
+ *  \brief Definition of some useful enums for runtime status
  */
 
-#ifndef RUNTIME_HPP
-#define RUNTIME_HPP
+#ifndef RUNTIMESTATUS_HPP
+#define RUNTIMESTATUS_HPP
 
 // Configuration includes
 //
@@ -19,12 +19,10 @@
 
 namespace GeoMHDiSCC {
 
-namespace Runtime {
-
    /**
     * @brief Simple struck holding the runtime statuses
     */
-   struct Status {
+   struct RuntimeStatus {
 
       /**
        * @name Enum for useful runtime statuses
@@ -37,6 +35,5 @@ namespace Runtime {
       };
    };
 }
-}
 
-#endif // RUNTIME_HPP
+#endif // RUNTIMESTATUS_HPP

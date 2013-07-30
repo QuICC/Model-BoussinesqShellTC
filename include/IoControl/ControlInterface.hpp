@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Enums/Runtime.hpp"
+#include "Enums/RuntimeStatus.hpp"
 #include "IoControl/ControlFile.hpp"
 
 namespace GeoMHDiSCC {
@@ -45,7 +45,7 @@ namespace IoControl {
          /**
           * @brief Current runtime status?
           */
-         Runtime::Status::Id status() const;
+         RuntimeStatus::Id status() const;
          
       protected:
 
@@ -58,7 +58,7 @@ namespace IoControl {
          /**
           * @brief Current runtime status
           */
-         Runtime::Status::Id mStatus;
+         RuntimeStatus::Id mStatus;
 
          /**
           * @brief Initialise control file

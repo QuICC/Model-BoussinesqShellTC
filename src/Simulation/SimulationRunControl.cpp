@@ -19,7 +19,7 @@
 namespace GeoMHDiSCC {
 
    SimulationRunControl::SimulationRunControl()
-      : mStatus(Runtime::Status::GOON), mCtrlFile(), mSteps(0), mMaxSimTime(0.0), mMaxWallTime(0.0)
+      : mStatus(RuntimeStatus::GOON), mCtrlFile(), mSteps(0), mMaxSimTime(0.0), mMaxWallTime(0.0)
    {
    }
 
@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   Runtime::Status::Id SimulationRunControl::status() const
+   RuntimeStatus::Id SimulationRunControl::status() const
    {
       return this->mStatus;
    }
@@ -40,12 +40,12 @@ namespace GeoMHDiSCC {
       // Not ideal but OK for the moment
       this->mCtrlFile.read();
 
-      this->mStatus = static_cast<Runtime::Status::Id>(static_cast<int>(this->mStatus) + static_cast<int>(this->mCtrlFile.status()));
+      this->mStatus = static_cast<RuntimeStatus::Id>(static_cast<int>(this->mStatus) + static_cast<int>(this->mCtrlFile.status()));
 
       // Check for maximum simulation time
       if(this->mMaxSimTime > 0 && simTime > this->mMaxSimTime)
       {
-         this->mStatus = Runtime::Status::STOP;
+         this->mStatus = RuntimeStatus::STOP;
 
          // Produce a nice looking output to std output 
          IoTools::Formatter::printLine(std::cout, '#');
@@ -56,7 +56,7 @@ namespace GeoMHDiSCC {
       // Check for maximum simulation steps
       if(this->mMaxSimTime < 0 && this->mSteps > std::abs(this->mMaxSimTime))
       {
-         this->mStatus = Runtime::Status::STOP;
+         this->mStatus = RuntimeStatus::STOP;
 
          // Produce a nice looking output to std output 
          IoTools::Formatter::printLine(std::cout, '#');
@@ -67,7 +67,7 @@ namespace GeoMHDiSCC {
       // Check if timestepper requested abort due to too small timestep
       if(simDt < 0)
       {
-         this->mStatus = Runtime::Status::STOP;
+         this->mStatus = RuntimeStatus::STOP;
 
          // Produce a nice looking output to std output 
          IoTools::Formatter::printLine(std::cout, '#');

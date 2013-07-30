@@ -64,7 +64,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("mainRun",1);
 
       // Start main loop of simulation
-      while(this->mSimRunCtrl.status() == Runtime::Status::GOON)
+      while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
       {
          // Compute the nonlinear terms
          this->computeNonlinear();

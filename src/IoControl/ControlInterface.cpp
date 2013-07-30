@@ -29,7 +29,7 @@ namespace IoControl {
 
 
    ControlInterface::ControlInterface()
-      : ControlFile(), mStatus(Runtime::Status::GOON)
+      : ControlFile(), mStatus(RuntimeStatus::GOON)
    {
       this->init();
    }
@@ -39,7 +39,7 @@ namespace IoControl {
       this->finalize();
    }
 
-   Runtime::Status::Id  ControlInterface::status() const
+   RuntimeStatus::Id  ControlInterface::status() const
    {
       return this->mStatus;
    }
@@ -60,7 +60,7 @@ namespace IoControl {
    void ControlInterface::read()
    {
       // Reset the current status
-      this->mStatus = Runtime::Status::GOON;
+      this->mStatus = RuntimeStatus::GOON;
 
       // Check if the framework allows IO to be performed
       if(FrameworkMacro::allowsIO())
@@ -119,12 +119,12 @@ namespace IoControl {
       if(! this->mFile.is_open())
       {
          // File doesn't exits abort run
-         this->mStatus = Runtime::Status::STOP;
+         this->mStatus = RuntimeStatus::STOP;
 
       // File exist keep going
       } else
       {
-         this->mStatus = Runtime::Status::GOON;
+         this->mStatus = RuntimeStatus::GOON;
       }
    }
 
@@ -146,7 +146,7 @@ namespace IoControl {
    void ControlInterface::update()
    {
       // Check if status requests stop of simulation
-      if(this->mStatus == Runtime::Status::STOP)
+      if(this->mStatus == RuntimeStatus::STOP)
       {
          // Check if the framework allows IO to be performed
          if(FrameworkMacro::allowsIO())
