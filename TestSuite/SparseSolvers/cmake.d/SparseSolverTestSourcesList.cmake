@@ -1,5 +1,6 @@
 # Create list of sources for test case
 set(MHDTestSources
+   IoTools/Formatter.cpp
 )
 
 # Include all files for the framework

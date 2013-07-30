@@ -73,9 +73,86 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Test case 1 for sparse solvers
+    * @brief Small and simple "analytical" solution
     */
-   TEST_F(SparseSolverTest, SparseSolver1)
+   TEST_F(SparseSolverTest, Simple)
+   {
+   }
+
+   /**
+    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Dirichlet boundary conditions
+    */
+   TEST_F(SparseSolverTest, HarmonicDirichlet1D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, HarmonicNeumann1D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Dirichlet boundary conditions
+    */
+   TEST_F(SparseSolverTest, BiHarmonicDirichlet1D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, BiHarmonicNeumann1D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Dirichlet/Dirichlet boundary conditions
+    */
+   TEST_F(SparseSolverTest, HarmonicDirichlet2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Neumann/Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, HarmonicNeumann2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, HarmonicMixed2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Dirichlet/Dirichlet boundary conditions
+    */
+   TEST_F(SparseSolverTest, BiHarmonicDirichlet2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Neumann/Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, BiHarmonicNeumann2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, BiHarmonicMixed2D)
+   {
+   }
+
+   /**
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    */
+   TEST_F(SparseSolverTest, MixedHarmonicMixed2D)
    {
    }
 
