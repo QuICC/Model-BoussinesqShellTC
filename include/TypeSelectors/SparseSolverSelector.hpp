@@ -42,7 +42,7 @@
    // Include the right header
    #include <Eigen/SparseLU>
    #include <Eigen/OrderingMethods>
-   #include <Eigen/MetisSupport>
+   //#include <Eigen/MetisSupport>
 
    namespace GeoMHDiSCC {
       /**
@@ -52,8 +52,8 @@
       {
          //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > SolverType;
          //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > SolverType;
-         //typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > SolverType;
-         typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > SolverType;
+         typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > SolverType;
+         //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > SolverType;
       };
    }
 #endif //GEOMHDISCC_SPLINALG_SPARSELU
