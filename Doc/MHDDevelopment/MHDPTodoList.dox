@@ -4,14 +4,6 @@
  *
  * \mhdTodo Implement a coupled storage data type (i.e. the storage required for the complex solves to avoid copies/temporary storage)
  *
- * \mhdTodo TypeSelectors/IndexConverterSelector depends on model/scheme
- *
- * \mhdTodo TypeSelectors/ScalarSelector depends on model/scheme
- *
- * \mhdTodo TypeSelectors/SpectralSelector depends on model/scheme
- *
- * \mhdTodo TypeSelectors/TransformSelector depends on model/scheme
- *
  * \mhdTodo TypeSelectors/VariableSelector depends very loosly on model/scheme???
  *
  * \mhdTodo Restructure IoHdf5
