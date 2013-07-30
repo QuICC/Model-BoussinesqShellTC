@@ -10,26 +10,59 @@
  * @namespace GeoMHDiSCC::Debug
  * @brief This namespace provides all the debugging related code.
  *
+ * @namespace GeoMHDiSCC::Diagnostics
+ * @brief This namespace provides the diagnostics related code.
+ *
  * @namespace GeoMHDiSCC::Dimensions
- * @brief This namespace provided all the dimensionality related code.
+ * @brief This namespace provides all the dimensionality related code.
+ *
+ * @namespace GeoMHDiSCC::Equations
+ * @brief This namespace provides all the equation related code.
  *
  * @namespace GeoMHDiSCC::IoAscii
- * @brief This namespace provides all the ASCII IO related code
+ * @brief This namespace provides all the ASCII IO related code.
  *
  * @namespace GeoMHDiSCC::IoBinary
- * @brief This namespace provides all the Binary ASCII IO related code
+ * @brief This namespace provides all the binary ASCII IO related code.
+ *
+ * @namespace GeoMHDiSCC::IoConfig
+ * @brief This namespace provides all the configuration file IO related code.
+ *
+ * @namespace GeoMHDiSCC::IoControl
+ * @brief This namespace provides all the IO control related code.
  *
  * @namespace GeoMHDiSCC::IoHdf5
- * @brief This namespace provides all the HDF5 IO related code
+ * @brief This namespace provides all the HDF5 IO related code.
  *
  * @namespace GeoMHDiSCC::IoTools
- * @brief This namespace provides all the IO tools related code
+ * @brief This namespace provides all the IO tools related code.
+ *
+ * @namespace GeoMHDiSCC::IoVariable
+ * @brief This namespace provides all the high level variable IO related code.
  *
  * @namespace GeoMHDiSCC::IoXml
- * @brief This namespace provides all the XML IO related code
+ * @brief This namespace provides all the XML IO related code.
+ *
+ * @namespace GeoMHDiSCC::Parallel
+ * @brief This namespace provides all the parallelisation related code.
+ *
+ * @namespace GeoMHDiSCC::Physical
+ * @brief This namespace provides all the physical space computation related code.
+ *
+ * @namespace GeoMHDiSCC::Runtime
+ * @brief This namespace provides all the runtime control related code.
+ *
+ * @namespace GeoMHDiSCC::Schemes
+ * @brief This namespace provides all the spatial schemes related code.
+ *
+ * @namespace GeoMHDiSCC::Solver
+ * @brief This namespace provides all the linear solver related code.
  *
  * @namespace GeoMHDiSCC::Spectral
- * @brief This namespace provides all the spectral space related code
+ * @brief This namespace provides all the spectral space related code.
+ *
+ * @namespace GeoMHDiSCC::Timestep
+ * @brief This namespace provides all the timestep related code.
  *
  * @namespace GeoMHDiSCC::Transform
  * @brief This namespace provides all the transform related code

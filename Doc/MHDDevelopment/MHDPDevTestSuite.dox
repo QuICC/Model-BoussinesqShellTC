@@ -1,0 +1,21 @@
+/** \page mhdTestSuite Test suite
+ *
+ * \section mhdTSTransform Fast transforms
+ *
+ * \section mhdTSSparseSolvers Sparse solvers
+ *
+ * \section mhdTSIO Input/Output
+ *
+ * \section mhdTSSpectralOperators Spectral operators
+ *
+ * \section mhdTSBoundary Boundary conditions
+ *
+ * \section mhdTSEigensolver Eigensolver
+ *
+ * \section mhdTSLoadSplitter Load splitter
+ *
+ * \section mhdTSSpatialSchemes Spatial schemes
+ *
+ * \section mhdTSGrouper Communication grouper
+ *
+ */

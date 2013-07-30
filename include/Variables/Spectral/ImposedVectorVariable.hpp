@@ -22,7 +22,7 @@
 
 namespace GeoMHDiSCC {
 
-namespace Dataypes {
+namespace Datatypes {
 
    /**
     * \brief Implementation of vector variable with an imposed component
