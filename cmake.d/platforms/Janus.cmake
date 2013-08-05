@@ -38,10 +38,11 @@ set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "KentLU" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "KentLU" "MKLPardiso" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_KENTLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "klu" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MKLPARDISO "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_GCC "/home/phma6156/share/gcc/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_UMFPACK_GCC "/home/phma6156/share/gcc/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU_GCC "/home/phma6156/share/gcc/SuperLU_4.3/SRC" PARENT_SCOPE)
