@@ -74,9 +74,9 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Small and simple problem taken from Pardiso example
+    * @brief Small and simple real problem taken from Pardiso example
     */
-   TEST_F(SparseSolverTest, Simple)
+   TEST_F(SparseSolverTest, SimpleReal)
    {
       // Build test matrix triplets
       typedef Eigen::Triplet<MHDFloat> T;
@@ -129,6 +129,66 @@ namespace TestSuite {
       for(int i = 0; i < rhs.size(); ++i)
       {
          EXPECT_NEAR(sol(i), exact(i), 1e-14) << "i = " << i;
+      }
+   }
+
+   /**
+    * @brief Small and simple complex problem taken from Pardiso example
+    */
+   TEST_F(SparseSolverTest, SimpleComplex)
+   {
+      // Build test matrix triplets
+      typedef Eigen::Triplet<MHDComplex> T;
+      std::vector<T> tripletList;
+      tripletList.reserve(20);
+      tripletList.push_back(T(0,0,MHDComplex( 7.0 , 1.0)));
+      tripletList.push_back(T(0,2,MHDComplex( 1.0 , 1.0)));
+      tripletList.push_back(T(0,5,MHDComplex( 2.0 , 1.0)));
+      tripletList.push_back(T(0,6,MHDComplex( 7.0 , 1.0)));
+      tripletList.push_back(T(1,1,MHDComplex(-4.0 , 0.0)));
+      tripletList.push_back(T(1,2,MHDComplex( 8.0 , 1.0)));
+      tripletList.push_back(T(1,4,MHDComplex( 2.0 , 1.0)));
+      tripletList.push_back(T(2,2,MHDComplex( 1.0 , 1.0)));
+      tripletList.push_back(T(2,7,MHDComplex( 5.0 , 1.0)));
+      tripletList.push_back(T(3,3,MHDComplex( 7.0 , 0.0)));
+      tripletList.push_back(T(3,6,MHDComplex( 9.0 , 1.0)));
+      tripletList.push_back(T(4,1,MHDComplex(-4.0 , 1.0)));
+      tripletList.push_back(T(5,2,MHDComplex( 7.0 , 1.0)));
+      tripletList.push_back(T(5,5,MHDComplex( 3.0 , 1.0)));
+      tripletList.push_back(T(5,7,MHDComplex( 8.0 , 0.0)));
+      tripletList.push_back(T(6,1,MHDComplex( 1.0 , 1.0)));
+      tripletList.push_back(T(6,6,MHDComplex( 11.0, 1.0)));
+      tripletList.push_back(T(7,2,MHDComplex(-3.0 , 1.0)));
+      tripletList.push_back(T(7,6,MHDComplex( 2.0 , 1.0)));
+      tripletList.push_back(T(7,7,MHDComplex( 5.0 , 0.0)));
+
+      // Build test matrix
+      SparseMatrixZ   matA(8,8);
+      matA.setFromTriplets(tripletList.begin(), tripletList.end());
+
+      // Build RHS
+      ArrayZ rhs(8);
+      rhs.setConstant(MHDComplex(1.0, 1.0));
+
+      // Create solver
+      SparseSolverSelector<SparseMatrixZ>::SolverType   solver;
+
+      // Compute factorisation
+      solver.compute(matA);
+
+      // Compute solution
+      ArrayZ sol(8);
+      sol = solver.solve(rhs);
+
+      // Exact solution
+      ArrayZ exact(8);
+      exact(0) = MHDComplex(0.174767984570878, 0.021177242044359);exact(1) = MHDComplex(-0.176470588235294, -0.294117647058824);exact(2) = MHDComplex(0.049321761491482, 0.029598199935712);exact(3) = MHDComplex(0.042981126876980, -0.031409285025486);exact(4) = MHDComplex(-0.120858887817422, -0.170859530697525);exact(5) = MHDComplex(-0.369347476695596, -0.000861459337833);exact(6) = MHDComplex(0.091610414657666, 0.125361620057859);exact(7) = MHDComplex(0.223940855030537, 0.139427836708454);
+
+      // Check solution
+      for(int i = 0; i < rhs.size(); ++i)
+      {
+         EXPECT_NEAR(sol(i).real(), exact(i).real(), 1e-14) << "Re i = " << i;
+         EXPECT_NEAR(sol(i).imag(), exact(i).imag(), 1e-14) << "Im i = " << i;
       }
    }
 
