@@ -1,6 +1,8 @@
 # Create list of sources for test case
 set(MHDTestSources
    IoTools/Formatter.cpp
+   ../External/Interfaces/Pardiso_Real.cpp
+   ../External/Interfaces/Pardiso_Complex.cpp
 )
 
 # Include all files for the framework

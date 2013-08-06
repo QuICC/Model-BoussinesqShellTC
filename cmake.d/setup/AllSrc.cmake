@@ -65,6 +65,7 @@ set(MHDAllSrcDirs
    TransformGroupers
    TypeSelectors
    Variables
+   ../External/Interfaces
 )
 
 

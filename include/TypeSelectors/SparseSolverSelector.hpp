@@ -114,7 +114,7 @@
 // Pardiso Version
 #ifdef GEOMHDISCC_SPLINALG_PARDISO
    // Include the right header
-   #include <Eigen/PardisoSupport>
+   #include "../External/Interfaces/PardisoLU.hpp"
 
    namespace GeoMHDiSCC {
       /**
@@ -126,6 +126,22 @@
       };
    }
 #endif //GEOMHDISCC_SPLINALG_PARDISO
+
+// MKL Pardiso Version
+#ifdef GEOMHDISCC_SPLINALG_MKLPARDISO
+   // Include the right header
+   #include <Eigen/PardisoSupport>
+
+   namespace GeoMHDiSCC {
+      /**
+       * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
+       */
+      template<typename TMatrix> struct SparseSolverSelector
+      {
+         typedef Eigen::PardisoLU<TMatrix> SolverType;
+      };
+   }
+#endif //GEOMHDISCC_SPLINALG_MKLPARDISO
 
 // BiCGSTAB Version
 #ifdef GEOMHDISCC_SPLINALG_BICGSTAB
