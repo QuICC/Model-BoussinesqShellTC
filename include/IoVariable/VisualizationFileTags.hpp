@@ -1,5 +1,9 @@
-/** \file VisualizationFileTags.hpp
- *  \brief Definitions and names use by the visualisation file writers
+/** 
+ * @file VisualizationFileTags.hpp
+ * @brief Definitions and names use by the visualisation file writers
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef VISUALIZATIONFILEDEFS_HPP

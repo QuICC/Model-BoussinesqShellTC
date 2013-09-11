@@ -1,5 +1,9 @@
-/** \file SparseDTrivialSolver.hpp
- *  \brief Implementation of a real (coupled) trivial solver structure
+/** 
+ * @file SparseDTrivialSolver.hpp
+ * @brief Implementation of a real (coupled) trivial solver structure
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSEDTRIVIALSOLVER_HPP
@@ -24,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    /**
-    *  \brief Implementation of a real (coupled) trivial solver structure
+    * @brief Implementation of a real (coupled) trivial solver structure
     */
    class SparseDTrivialSolver: public SparseSolverBase
    {

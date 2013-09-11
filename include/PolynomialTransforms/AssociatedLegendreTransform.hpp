@@ -1,5 +1,9 @@
-/** \file AssociatedLegendreTransform.hpp
- *  \brief Implementation of the associated Legendre transform
+/** 
+ * @file AssociatedLegendreTransform.hpp
+ * @brief Implementation of the associated Legendre transform
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ASSOCIATEDLEGENDRETRANSFORM_HPP

@@ -1,5 +1,9 @@
-/** \file ForwardSingle2DGrouper.hpp
- *  \brief This class defines the forward single grouping exchange grouping algorithm for the second exchange
+/** 
+ * @file ForwardSingle2DGrouper.hpp
+ * @brief This class defines the forward single grouping exchange grouping algorithm for the second exchange
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE2D
 

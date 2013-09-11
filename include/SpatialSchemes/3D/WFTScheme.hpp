@@ -1,5 +1,9 @@
-/** \file WFTScheme.hpp
- *  \brief Implementation of the cylindrical Worland(poly) + Fourier + Chebyshev(FFT) scheme
+/** 
+ * @file WFTScheme.hpp
+ * @brief Implementation of the cylindrical Worland(poly) + Fourier + Chebyshev(FFT) scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef WFTSCHEME_HPP

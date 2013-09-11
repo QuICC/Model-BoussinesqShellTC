@@ -1,5 +1,9 @@
-/** \file TestTFTModel.hpp
- *  \brief Implementation of test model for the TFT scheme
+/** 
+ * @file TestTFTModel.hpp
+ * @brief Implementation of test model for the TFT scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TESTTFTMODEL_HPP

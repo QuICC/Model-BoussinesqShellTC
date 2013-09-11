@@ -1,5 +1,9 @@
-/** \file ISchemeCosts.hpp
- *  \brief Base implementation of a cost based spatial schemes
+/** 
+ * @file ISchemeCosts.hpp
+ * @brief Base implementation of a cost based spatial schemes
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ISCHEMECOSTS_HPP

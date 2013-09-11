@@ -1,5 +1,9 @@
-/** \file ISpatialScheme.hpp
- *  \brief Implementation of the basic components of the spatial scheme
+/** 
+ * @file ISpatialScheme.hpp
+ * @brief Implementation of the basic components of the spatial scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ISPATIALSCHEME_HPP

@@ -1,5 +1,9 @@
-/** \file TFScheme.hpp
- *  \brief Implementation of the Chebyshev(FFT) + Fourier scheme
+/** 
+ * @file TFScheme.hpp
+ * @brief Implementation of the Chebyshev(FFT) + Fourier scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TFSCHEME_HPP

@@ -1,4 +1,5 @@
-/** \file PrueferAlgorithm.hpp
+/** 
+ * @file PrueferAlgorithm.hpp
  *  @brief Implementation of an Pruefer algorithm to compute a quadrature rule
  */
 

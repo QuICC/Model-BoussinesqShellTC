@@ -1,5 +1,9 @@
-/** \file SphericalHarmonicTools.hpp
- *  \brief Implementation of the tools for the spherical harmonics based schemes
+/** 
+ * @file SphericalHarmonicTools.hpp
+ * @brief Implementation of the tools for the spherical harmonics based schemes
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPHERICALHARMONICSTOOLS_HPP

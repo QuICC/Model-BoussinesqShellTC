@@ -1,5 +1,9 @@
-/** \file SparseDTimestepper.hpp
- *  \brief Implementation of a real valued (coupled) equation timestepper
+/** 
+ * @file SparseDTimestepper.hpp
+ * @brief Implementation of a real valued (coupled) equation timestepper
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSEDTIMESTEPPER_HPP
@@ -25,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    *  \brief Implementation of a real valued (coupled) equation timestepper
+    * @brief Implementation of a real valued (coupled) equation timestepper
     */
    class SparseDTimestepper: public Solver::SparseDLinearSolver
    {

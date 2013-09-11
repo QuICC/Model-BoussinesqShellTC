@@ -1,5 +1,9 @@
-/** \file BackwardSingle1DConfigurator.hpp
- *  \brief This defines the backward transform first exchange single splitting operations
+/** 
+ * @file BackwardSingle1DConfigurator.hpp
+ * @brief This defines the backward transform first exchange single splitting operations
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 #if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
 

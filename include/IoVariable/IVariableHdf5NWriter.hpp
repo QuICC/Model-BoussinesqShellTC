@@ -1,5 +1,9 @@
-/** \file IVariableHdf5NWriter.hpp
- *  \brief Implementation of a generic variable to file writer
+/** 
+ * @file IVariableHdf5NWriter.hpp
+ * @brief Implementation of a generic variable to file writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IVARIABLEHDF5WRITER_HPP

@@ -1,5 +1,9 @@
-/** \file Hdf5Types.hpp
- *  \brief Implementation of a simple HDF5 datatype converter
+/** 
+ * @file Hdf5Types.hpp
+ * @brief Implementation of a simple HDF5 datatype converter
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef HDF5TYPES_HPP

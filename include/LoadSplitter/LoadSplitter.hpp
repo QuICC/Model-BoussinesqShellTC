@@ -1,5 +1,9 @@
-/** \file LoadSplitter.hpp
- *  \brief Implementation of the workload splitter over the available CPUs
+/** 
+ * @file LoadSplitter.hpp
+ * @brief Implementation of the workload splitter over the available CPUs
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef LOADSPLITTER_HPP

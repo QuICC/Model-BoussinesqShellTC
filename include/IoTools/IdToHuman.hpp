@@ -1,5 +1,9 @@
-/** \file IdToHuman.hpp
- *  \brief Small routines to convert enum ID into human strings
+/** 
+ * @file IdToHuman.hpp
+ * @brief Small routines to convert enum ID into human strings
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IDTOHUMAN_HPP

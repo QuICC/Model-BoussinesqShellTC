@@ -1,5 +1,9 @@
-/** \file BoundaryPart.hpp 
- *  \brief Implementation of the boundary part of the configuration file
+/** 
+ * @file BoundaryPart.hpp 
+ * @brief Implementation of the boundary part of the configuration file
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef BOUNDARYPART_HPP

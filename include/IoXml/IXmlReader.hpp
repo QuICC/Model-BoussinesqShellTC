@@ -1,5 +1,9 @@
-/** \file IXmlReader.hpp
- *  \brief Interface to an XML reader
+/** 
+ * @file IXmlReader.hpp
+ * @brief Interface to an XML reader
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IXMLREADER_HPP

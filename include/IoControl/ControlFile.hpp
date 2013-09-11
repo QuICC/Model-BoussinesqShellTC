@@ -1,5 +1,9 @@
-/** \file ControlFile.hpp
- *  \brief Implementation of a control file
+/** 
+ * @file ControlFile.hpp
+ * @brief Implementation of a control file
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef CONTROLFILE_HPP

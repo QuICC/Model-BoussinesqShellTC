@@ -1,5 +1,9 @@
-/** \file SparseSolverSelector.hpp
- *  \brief Small template to select different sparse solvers.
+/** 
+ * @file SparseSolverSelector.hpp
+ * @brief Small template to select different sparse solvers.
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSESOLVERSELECTOR_HPP

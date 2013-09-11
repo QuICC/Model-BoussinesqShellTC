@@ -1,5 +1,9 @@
-/** \file FFFScheme.hpp
- *  \brief Implementation of the Fourier + Fourier + Fourier scheme
+/** 
+ * @file FFFScheme.hpp
+ * @brief Implementation of the Fourier + Fourier + Fourier scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FFFSCHEME_HPP

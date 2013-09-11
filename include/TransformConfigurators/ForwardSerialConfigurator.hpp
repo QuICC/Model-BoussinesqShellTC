@@ -1,5 +1,9 @@
-/** \file ForwardSerialConfigurator.hpp
- *  \brief This class defines the forward transform serial operations
+/** 
+ * @file ForwardSerialConfigurator.hpp
+ * @brief This class defines the forward transform serial operations
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FORWARDSERIALCONFIGURATOR_HPP

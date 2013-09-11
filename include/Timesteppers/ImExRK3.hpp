@@ -1,5 +1,9 @@
-/** \file ImExRK3.hpp
- *  \brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
+/** 
+ * @file ImExRK3.hpp
+ * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IMEXRK3_HPP

@@ -1,5 +1,9 @@
-/** \file ImposedScalarVariable.hpp
- *  \brief Implementation of scalar field variable with imposed component
+/** 
+ * @file ImposedScalarVariable.hpp
+ * @brief Implementation of scalar field variable with imposed component
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IMPOSEDSCALARVARIABLE_HPP

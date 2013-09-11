@@ -1,5 +1,9 @@
-/** \file CoreResolution.hpp
- *  \brief Definition of a resolution object for a single CPU
+/** 
+ * @file CoreResolution.hpp
+ * @brief Definition of a resolution object for a single CPU
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef CORERESOLUTION_HPP

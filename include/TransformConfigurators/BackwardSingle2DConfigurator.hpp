@@ -1,5 +1,9 @@
-/** \file BackwardSingle2DConfigurator.hpp
- *  \brief This defines the backward transform second exchange single splitting operations
+/** 
+ * @file BackwardSingle2DConfigurator.hpp
+ * @brief This defines the backward transform second exchange single splitting operations
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
 

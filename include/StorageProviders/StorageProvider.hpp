@@ -1,5 +1,9 @@
-/** \file StorageProvider.hpp
- *  \brief Templated implementation of a single data storage provider.
+/** 
+ * @file StorageProvider.hpp
+ * @brief Templated implementation of a single data storage provider.
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef STORAGEPROVIDER_HPP

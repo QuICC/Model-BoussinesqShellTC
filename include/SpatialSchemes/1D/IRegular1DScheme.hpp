@@ -1,5 +1,9 @@
-/** \file IRegular1DScheme.hpp
- *  \brief Implementation of a generic regular 1D scheme
+/** 
+ * @file IRegular1DScheme.hpp
+ * @brief Implementation of a generic regular 1D scheme
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IREGULAR1DSCHEME_HPP

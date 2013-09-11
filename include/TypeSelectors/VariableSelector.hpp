@@ -1,5 +1,9 @@
-/** \file VariableSelector.hpp
- *  \brief Definition of some useful typedefs for the variables used in the code
+/** 
+ * @file VariableSelector.hpp
+ * @brief Definition of some useful typedefs for the variables used in the code
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef VARIABLESELECTOR_HPP

@@ -1,5 +1,9 @@
-/** \file TransformSteps.hpp
- *  \brief Definition of some useful enums for steps involved in a full transform
+/** 
+ * @file TransformSteps.hpp
+ * @brief Definition of some useful enums for steps involved in a full transform
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  *
  *  \mhdBug Needs documentation and splitting out model/scheme part
  *  \mhdBug Might depend on model/scheme

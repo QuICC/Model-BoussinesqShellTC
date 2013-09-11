@@ -1,5 +1,9 @@
-/** \file Transform3DCoordinator.hpp
- *  \brief Implementation of a transform coordinator in 3D
+/** 
+ * @file Transform3DCoordinator.hpp
+ * @brief Implementation of a transform coordinator in 3D
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TRANSFORM3DCOORDINATOR_HPP

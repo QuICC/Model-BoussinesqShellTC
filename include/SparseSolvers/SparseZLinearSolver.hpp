@@ -1,5 +1,9 @@
-/** \file SparseZLinearSolver.hpp
- *  \brief Implementation of a complex (coupled) linear solver structure
+/** 
+ * @file SparseZLinearSolver.hpp
+ * @brief Implementation of a complex (coupled) linear solver structure
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSEZLINEARSOLVER_HPP
@@ -25,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    /**
-    *  \brief Implementation of a complex (coupled) linear solver structure
+    * @brief Implementation of a complex (coupled) linear solver structure
     */
    class SparseZLinearSolver: public SparseSolverBase
    {

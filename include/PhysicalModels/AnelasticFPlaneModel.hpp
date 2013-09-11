@@ -1,5 +1,9 @@
-/** \file AnelasticFPlaneModel.hpp
- *  \brief Implementation of the anelastic f-plane 3DQG model
+/** 
+ * @file AnelasticFPlaneModel.hpp
+ * @brief Implementation of the anelastic f-plane 3DQG model
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ANELASTICFPLANEMODEL_HPP

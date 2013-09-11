@@ -1,5 +1,9 @@
-/** \file VisualizationFileWriter.hpp
- *  \brief Implementation of the HDF5 visualisation file writer
+/** 
+ * @file VisualizationFileWriter.hpp
+ * @brief Implementation of the HDF5 visualisation file writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef VISUALIZATIONFILEWRITER_HPP

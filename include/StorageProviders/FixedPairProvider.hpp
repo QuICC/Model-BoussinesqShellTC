@@ -1,5 +1,9 @@
-/** \file FixedPairProvider.hpp
- *  \brief Templated implementation of a data pair storage provider with fixed size.
+/** 
+ * @file FixedPairProvider.hpp
+ * @brief Templated implementation of a data pair storage provider with fixed size.
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FIXEDPAIRPROVIDER_HPP

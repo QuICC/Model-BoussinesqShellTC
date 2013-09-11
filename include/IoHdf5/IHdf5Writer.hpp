@@ -1,5 +1,9 @@
-/** \file IHdf5Writer.hpp
- *  \brief Interface to a general HDF5 writer
+/** 
+ * @file IHdf5Writer.hpp
+ * @brief Interface to a general HDF5 writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IHDF5WRITER_HPP

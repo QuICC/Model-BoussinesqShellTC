@@ -1,5 +1,9 @@
-/** \file StateFileTags.hpp
- *  \brief Definitions and names use by the state file readers/writers
+/** 
+ * @file StateFileTags.hpp
+ * @brief Definitions and names use by the state file readers/writers
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef STATEFILEDEFS_HPP

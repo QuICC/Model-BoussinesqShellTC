@@ -1,5 +1,9 @@
-/** \file FieldRequirement.hpp
- *  \brief Implementation of a class to store requirements for a field
+/** 
+ * @file FieldRequirement.hpp
+ * @brief Implementation of a class to store requirements for a field
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FIELDREQUIREMENT_HPP

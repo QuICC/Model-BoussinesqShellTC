@@ -1,5 +1,9 @@
-/** \file MemorySize.hpp
- *  \brief Simple template for the memory usage of the different types
+/** 
+ * @file MemorySize.hpp
+ * @brief Simple template for the memory usage of the different types
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MEMORYSIZE_HPP

@@ -1,5 +1,9 @@
-/** \file BackwardSerialConfigurator.hpp
- *  \brief This defines the backward transform serial operations
+/** 
+ * @file BackwardSerialConfigurator.hpp
+ * @brief This defines the backward transform serial operations
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef BACKWARDSERIALCONFIGURATOR_HPP

@@ -1,5 +1,9 @@
-/** \file BackwardSingle1DGrouper.hpp
- *  \brief This class defines the backward single grouping exchange grouping algorithm for the first exchange
+/** 
+ * @file BackwardSingle1DGrouper.hpp
+ * @brief This class defines the backward single grouping exchange grouping algorithm for the first exchange
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_SINGLE1D
 

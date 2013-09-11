@@ -1,5 +1,9 @@
-/** \file FixedSplitting.hpp
- *  \brief Implementation of a fixed load splitting algorithm (only splits the slowest dimension)
+/** 
+ * @file FixedSplitting.hpp
+ * @brief Implementation of a fixed load splitting algorithm (only splits the slowest dimension)
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FIXEDSPLITTING_HPP

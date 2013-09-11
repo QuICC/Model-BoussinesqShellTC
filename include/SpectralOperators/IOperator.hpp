@@ -1,5 +1,9 @@
-/** \file IOperator.hpp
- *  \brief Interface for a general spectral operator implementation (direct and quasi inverses)
+/** 
+ * @file IOperator.hpp
+ * @brief Interface for a general spectral operator implementation (direct and quasi inverses)
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IOPERATOR_HPP

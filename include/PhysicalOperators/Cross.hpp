@@ -1,5 +1,9 @@
-/** \file Cross.hpp
- *  \brief Implementation of a generic vector cross product
+/** 
+ * @file Cross.hpp
+ * @brief Implementation of a generic vector cross product
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef CROSS_HPP

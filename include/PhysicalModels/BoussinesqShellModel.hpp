@@ -1,5 +1,9 @@
-/** \file BoussinesqShellModel.hpp
- *  \brief Implementation of the Boussinesq spherical shell model
+/** 
+ * @file BoussinesqShellModel.hpp
+ * @brief Implementation of the Boussinesq spherical shell model
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQSHELLMODEL_HPP

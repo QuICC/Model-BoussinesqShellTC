@@ -1,5 +1,9 @@
-/** \file IForwardGrouper.hpp
- *  \brief This class defines some basic forward transform grouping tools
+/** 
+ * @file IForwardGrouper.hpp
+ * @brief This class defines some basic forward transform grouping tools
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IFORWARDGROUPER_HPP

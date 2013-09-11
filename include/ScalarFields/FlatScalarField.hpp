@@ -1,5 +1,9 @@
-/** \file FlatScalarField.hpp
- *  \brief Base for a  scalar field with flat data layout
+/** 
+ * @file FlatScalarField.hpp
+ * @brief Base for a  scalar field with flat data layout
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FLATSCALARFIELD_HPP

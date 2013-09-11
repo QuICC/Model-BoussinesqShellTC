@@ -1,5 +1,9 @@
-/** \file SparseTrivialCoordinator.hpp
- *  \brief Implementation of the base for a general sparse trivial solver coordinator
+/** 
+ * @file SparseTrivialCoordinator.hpp
+ * @brief Implementation of the base for a general sparse trivial solver coordinator
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSETRIVIALCOORDINATOR_HPP

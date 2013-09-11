@@ -1,5 +1,9 @@
-/** \file PolynomialTools.hpp
- *  \brief Definition of some useful constants and tools for polynomial transforms
+/** 
+ * @file PolynomialTools.hpp
+ * @brief Definition of some useful constants and tools for polynomial transforms
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef POLYNOMIALTOOLS_HPP

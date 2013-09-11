@@ -1,5 +1,9 @@
-/** \file SerialSplitting.hpp
- *  \brief Implementation of a serial "load splitting" algorithm
+/** 
+ * @file SerialSplitting.hpp
+ * @brief Implementation of a serial "load splitting" algorithm
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SERIALSPLITTING_HPP

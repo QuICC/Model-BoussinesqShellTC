@@ -1,5 +1,9 @@
-/** \file SparseZTimestepper.hpp
- *  \brief Implementation of a complex valued (coupled) equation timestepper
+/** 
+ * @file SparseZTimestepper.hpp
+ * @brief Implementation of a complex valued (coupled) equation timestepper
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPARSEZTIMESTEPPER_HPP
@@ -25,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    *  \brief Implementation of a complex valued (coupled) equation timestepper
+    * @brief Implementation of a complex valued (coupled) equation timestepper
     */
    class SparseZTimestepper: public Solver::SparseZLinearSolver
    {
