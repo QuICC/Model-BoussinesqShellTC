@@ -1,6 +1,9 @@
-/** 
+/**
  * @file PrueferAlgorithm.hpp
- *  @brief Implementation of an Pruefer algorithm to compute a quadrature rule
+ * @brief Implementation of an Pruefer algorithm to compute a quadrature rule 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef PRUEFERALGORITHM_HPP
