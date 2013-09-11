@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the voriticity computation for the Anelastic beta model with cylindrical gravity
+    * @brief Implementation of the voriticity computation for the Anelastic beta model with cylindrical gravity
     */
    class AnelasticBetaCylGVorticity: public IScalarEquation
    {

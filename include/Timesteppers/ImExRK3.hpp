@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    * \brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
+    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
     */
    class ImExRK3
    {

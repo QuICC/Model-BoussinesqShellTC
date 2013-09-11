@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 namespace Spectral {
 
    /**
-    * \brief Implementation of the unit spectral operator with quasi inverses
+    * @brief Implementation of the unit spectral operator with quasi inverses
     */
    class UnitOperator: IOperator
    {

@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Datatypes {
 
    /**
-    * \brief Implementation of vector variable with an imposed component
+    * @brief Implementation of vector variable with an imposed component
     */
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class ImposedVectorVariable: public VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS> 
    {

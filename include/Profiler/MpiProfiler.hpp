@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of a MPI timer
+    * @brief Implementation of a MPI timer
     */
    class MpiProfiler: public ProfilerBase
    {

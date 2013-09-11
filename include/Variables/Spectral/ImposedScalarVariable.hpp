@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Datatypes {
 
    /**
-    * \brief Implementation of scalar field variable with imposed component
+    * @brief Implementation of scalar field variable with imposed component
     */
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class ImposedScalarVariable: public ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS> 
    {

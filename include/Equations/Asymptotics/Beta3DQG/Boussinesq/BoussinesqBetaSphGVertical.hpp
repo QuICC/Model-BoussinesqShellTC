@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the vertical velocity equation for the Boussinesq beta model with spherical gravity
+    * @brief Implementation of the vertical velocity equation for the Boussinesq beta model with spherical gravity
     */
    class BoussinesqBetaSphGVertical: public IScalarEquation
    {

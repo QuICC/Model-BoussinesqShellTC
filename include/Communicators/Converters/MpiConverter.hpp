@@ -32,7 +32,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of the FDSH MPI data converter.
+    * @brief Implementation of the FDSH MPI data converter.
     */
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverter: public MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>
    {

@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of some toos for the strorage profiler
+    * @brief Implementation of some toos for the strorage profiler
     */
    class StorageProfilerTools
    {

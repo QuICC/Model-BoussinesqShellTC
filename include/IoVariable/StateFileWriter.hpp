@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * \brief Implementation of the HDF5 state file writer
+    * @brief Implementation of the HDF5 state file writer
     */
    class StateFileWriter: public IVariableHdf5NWriter
    {

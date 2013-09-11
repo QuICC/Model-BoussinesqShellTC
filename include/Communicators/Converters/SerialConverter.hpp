@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of the serial data converter.
+    * @brief Implementation of the serial data converter.
     */
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverter : public SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {

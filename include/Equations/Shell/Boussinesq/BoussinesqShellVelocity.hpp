@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the Navier-Stokes equation for the Boussinesq spherical shell model 
+    * @brief Implementation of the Navier-Stokes equation for the Boussinesq spherical shell model 
     */
    class BoussinesqShellVelocity: public IVectorEquation
    {

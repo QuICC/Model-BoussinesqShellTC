@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Boussinesq 3DQG f-plane model
+    * @brief Implementation of the transport equation for the Boussinesq 3DQG f-plane model
     */
    class BoussinesqFPlaneTransport: public IScalarEquation
    {

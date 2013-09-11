@@ -23,7 +23,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of a serial timer
+    * @brief Implementation of a serial timer
     */
    class SerialTimer: public ITimer
    {

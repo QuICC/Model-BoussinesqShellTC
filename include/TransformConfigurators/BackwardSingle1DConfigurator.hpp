@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * \brief This class defines the backward transform first exchange single splitting operations
+    * @brief This class defines the backward transform first exchange single splitting operations
     */
    class BackwardSingle1DConfigurator: public BackwardConfigurator
    {

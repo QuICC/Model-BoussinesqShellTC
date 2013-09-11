@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of a single fixed splitting algorithm (only splits the slowest dimension)
+    * @brief Implementation of a single fixed splitting algorithm (only splits the slowest dimension)
     */
    class FixedSplitting: public SplittingAlgorithm
    {

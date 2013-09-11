@@ -23,7 +23,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of timer tools
+    * @brief Implementation of timer tools
     */
    class TimerTools
    {

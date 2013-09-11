@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace IoAscii {
 
    /**
-    * \brief General interface to an ASCII writer
+    * @brief General interface to an ASCII writer
     */
    class IAsciiWriter: public AsciiFile
    {

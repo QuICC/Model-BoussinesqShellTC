@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the anelastic 3DQG f-plane model
+    * @brief Implementation of the streamfunction equation for the anelastic 3DQG f-plane model
     */
    class AnelasticFPlaneStreamfunction: public IScalarEquation
    {

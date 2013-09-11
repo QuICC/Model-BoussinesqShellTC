@@ -42,7 +42,7 @@ namespace Equations {
    {
       public:
          /**
-          * \brief Simple constructor
+          * @brief Simple constructor
           */
          explicit EquationData(SharedEquationParameters spEqParams);
 

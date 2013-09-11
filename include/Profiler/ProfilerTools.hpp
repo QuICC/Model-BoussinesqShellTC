@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of some tools for the profiling timer
+    * @brief Implementation of some tools for the profiling timer
     */
    class ProfilerTools
    {

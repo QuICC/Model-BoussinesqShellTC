@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace IoTools {
 
    /**
-    * \brief Implementation of a few useful output formating static functions
+    * @brief Implementation of a few useful output formating static functions
     */
    class VisualizeResolution
    {

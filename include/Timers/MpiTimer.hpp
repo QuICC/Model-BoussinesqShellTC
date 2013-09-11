@@ -23,7 +23,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of a MPI timer
+    * @brief Implementation of a MPI timer
     */
    class MpiTimer: public ITimer
    {

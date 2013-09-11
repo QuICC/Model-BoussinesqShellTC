@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    /**
-    * \brief This class defines the backward transform tubular splitting operations
+    * @brief This class defines the backward transform tubular splitting operations
     */
    class BackwardTubularConfigurator: public BackwardConfigurator
    {

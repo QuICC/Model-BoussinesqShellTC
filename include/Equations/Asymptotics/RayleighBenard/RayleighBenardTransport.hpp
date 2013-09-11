@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Rayleigh-Benard model
+    * @brief Implementation of the transport equation for the Rayleigh-Benard model
     */
    class RayleighBenardTransport: public IScalarEquation
    {

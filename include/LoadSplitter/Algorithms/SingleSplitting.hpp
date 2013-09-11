@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of a single load splitting algorithm
+    * @brief Implementation of a single load splitting algorithm
     */
    class SingleSplitting: public SplittingAlgorithm
    {

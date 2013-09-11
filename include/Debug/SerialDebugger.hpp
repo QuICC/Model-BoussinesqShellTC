@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of a very simple serial debugger
+    * @brief Implementation of a very simple serial debugger
     */
    class SerialDebugger
    {

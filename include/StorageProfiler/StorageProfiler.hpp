@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of a storage profiler
+    * @brief Implementation of a storage profiler
     */
    class StorageProfiler
    {

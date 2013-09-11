@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace IoAscii {
 
    /**
-    * \brief Implementation of a direct access ASCII writer
+    * @brief Implementation of a direct access ASCII writer
     */
    class DirectAsciiWriter: public IAsciiWriter
    {

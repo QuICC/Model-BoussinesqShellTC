@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of a serial "load splitting" algorithm
+    * @brief Implementation of a serial "load splitting" algorithm
     */
    class SerialSplitting: public SplittingAlgorithm
    {

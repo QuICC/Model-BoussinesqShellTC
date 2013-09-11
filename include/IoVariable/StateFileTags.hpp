@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * \brief Definitions and names use by the state file readers/writers
+    * @brief Definitions and names use by the state file readers/writers
     */
    class StateFileTags
    {

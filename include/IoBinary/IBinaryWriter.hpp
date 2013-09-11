@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace IoBinary {
 
    /**
-    * \brief Interface to a general binary writer
+    * @brief Interface to a general binary writer
     */
    class IBinaryWriter: public BinaryFile
    {

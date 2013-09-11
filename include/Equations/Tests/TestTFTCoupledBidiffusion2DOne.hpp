@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the TFT test equation for 2D bi-diffusion as coupled system: part one (within 3D model)
+    * @brief Implementation of the TFT test equation for 2D bi-diffusion as coupled system: part one (within 3D model)
     */
    class TestTFTCoupledBidiffusion2DOne: public IScalarEquation
    {

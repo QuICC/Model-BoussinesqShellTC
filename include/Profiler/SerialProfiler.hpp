@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Debug {
 
    /**
-    * \brief Implementation of a serial timer
+    * @brief Implementation of a serial timer
     */
    class SerialProfiler: public ProfilerBase
    {

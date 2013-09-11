@@ -30,13 +30,13 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base for the implementation of a scalar equation
+    * @brief Base for the implementation of a scalar equation
     */
    class IScalarEquation: public IEquation
    {
       public:
          /**
-          * \brief Simple constructor
+          * @brief Simple constructor
           *
           * \param spEqParams Shared equation parameters
           */

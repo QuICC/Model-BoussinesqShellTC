@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of the index converter for spherical harmonics
+    * @brief Implementation of the index converter for spherical harmonics
     */
    class SHIndexConv
    {

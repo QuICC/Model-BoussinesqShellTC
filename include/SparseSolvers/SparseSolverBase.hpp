@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    /**
-    * \brief Implementation of the base for the solver structures
+    * @brief Implementation of the base for the solver structures
     */
    class SparseSolverBase
    {

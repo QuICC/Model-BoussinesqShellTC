@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity
     */
    class BoussinesqBetaCylGTransport: public IScalarEquation
    {

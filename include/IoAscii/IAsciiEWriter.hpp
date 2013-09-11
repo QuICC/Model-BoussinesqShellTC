@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace IoAscii {
 
    /**
-    * \brief General interface of an "extending" ASCII writer
+    * @brief General interface of an "extending" ASCII writer
     */
    class IAsciiEWriter: public IAsciiWriter
    {

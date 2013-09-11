@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity with periodic radius
+    * @brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity with periodic radius
     *
     * The implementation of all operators assume that all equations are written in the form
     * \f$ L - T = NL \f$

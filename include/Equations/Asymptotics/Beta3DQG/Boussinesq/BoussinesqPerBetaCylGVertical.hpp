@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity with periodic radius
+    * @brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity with periodic radius
     */
    class BoussinesqPerPerBetaCylGVertical: public IScalarEquation
    {

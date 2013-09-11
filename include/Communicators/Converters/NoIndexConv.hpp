@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of the index converter doing nothing
+    * @brief Implementation of the index converter doing nothing
     */
    class NoIndexConv
    {

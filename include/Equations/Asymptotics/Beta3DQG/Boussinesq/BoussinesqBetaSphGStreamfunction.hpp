@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
+    * @brief Implementation of the streamfunction equation for the Boussinesq beta model with spherical gravity
     */
    class BoussinesqBetaSphGStreamfunction: public IScalarEquation
    {

@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * \brief Implementation of HDF5 state file reader
+    * @brief Implementation of HDF5 state file reader
     */
    class StateFileReader: public IVariableHdf5Reader
    {

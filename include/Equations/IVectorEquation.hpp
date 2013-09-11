@@ -32,7 +32,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Base for the implementation of a vector equation
+    * @brief Base for the implementation of a vector equation
     */
    class IVectorEquation: public IEquation
    {
@@ -44,7 +44,7 @@ namespace Equations {
          typedef std::pair<SpectralComponent_iterator,SpectralComponent_iterator>  SpectralComponent_range;
 
          /**
-          * \brief Simple constructor
+          * @brief Simple constructor
           *
           * \param spEqParams Shared equation parameters
           */

@@ -22,7 +22,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of a Legendre quadrature rule
+    * @brief Implementation of a Legendre quadrature rule
     */
    class LegendreRule
    {

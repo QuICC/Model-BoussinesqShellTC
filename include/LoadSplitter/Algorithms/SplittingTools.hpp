@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Base of the implementation of the load splitting algorithms
+    * @brief Base of the implementation of the load splitting algorithms
     */
    class SplittingTools
    {

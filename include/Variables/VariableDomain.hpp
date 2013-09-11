@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Datatypes {
 
    /**
-    * \brief Implementation for a full sphere field
+    * @brief Implementation for a full sphere field
     *
     * \tparam TVariable Type of the variable
     * \tparam DOMAINS   Number of different domains

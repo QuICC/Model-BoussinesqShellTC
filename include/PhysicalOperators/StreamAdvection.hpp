@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Physical {
 
    /**
-    * \brief Implementation of a generic streamfunction advection
+    * @brief Implementation of a generic streamfunction advection
     */
    class StreamAdvection
    {

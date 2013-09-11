@@ -32,7 +32,7 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * \brief Base implementation of a cost based spatial schemes
+    * @brief Base implementation of a cost based spatial schemes
     */
    class ISchemeCosts
    {

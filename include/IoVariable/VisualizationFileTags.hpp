@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * \brief Definitions and names use by the visualisation file writers
+    * @brief Definitions and names use by the visualisation file writers
     */
    class VisualizationFileTags
    {

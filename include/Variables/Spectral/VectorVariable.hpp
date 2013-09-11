@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Datatypes {
 
    /**
-    * \brief Implementation of vector variable
+    * @brief Implementation of vector variable
     */
    template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class VectorVariable: public VectorPhysicalVariable<TPScalar, PCOMPONENTS>
    {

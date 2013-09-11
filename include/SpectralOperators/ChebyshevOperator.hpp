@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 namespace Spectral {
 
    /**
-    * \brief Implementation of the spectral operators for the chebyshev basis
+    * @brief Implementation of the spectral operators for the chebyshev basis
     */
    class ChebyshevOperator: public IOperator
    {

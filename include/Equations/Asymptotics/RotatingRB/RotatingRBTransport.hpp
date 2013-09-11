@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the rotating Rayleigh-Benard model
+    * @brief Implementation of the transport equation for the rotating Rayleigh-Benard model
     */
    class RotatingRBTransport: public IScalarEquation
    {

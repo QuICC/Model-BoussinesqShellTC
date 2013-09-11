@@ -22,7 +22,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of a timer interface
+    * @brief Implementation of a timer interface
     */
    class ITimer
    {

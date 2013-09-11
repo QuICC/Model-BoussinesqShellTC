@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the transport equation for the Boussinesq spherical shell model 
+    * @brief Implementation of the transport equation for the Boussinesq spherical shell model 
     */
    class BoussinesqShellTransport: public IScalarEquation
    {

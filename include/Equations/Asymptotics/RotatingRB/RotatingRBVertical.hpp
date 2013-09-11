@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the vertical velocity equation for the rotating Rayleigh-Benard model
+    * @brief Implementation of the vertical velocity equation for the rotating Rayleigh-Benard model
     */
    class RotatingRBVertical: public IScalarEquation
    {

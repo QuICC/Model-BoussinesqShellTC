@@ -26,7 +26,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * \brief Implementation of an execution timer
+    * @brief Implementation of an execution timer
     */
    class ExecutionTimer: public TimerMacro
    {

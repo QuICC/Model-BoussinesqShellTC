@@ -40,7 +40,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Templated implementation of the base of a MPI data converter.
+    * @brief Templated implementation of the base of a MPI data converter.
     */
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverterBase: public IConverter<TFwdA,TBwdA,TFwdB,TBwdB>
    {

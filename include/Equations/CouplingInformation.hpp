@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implemenation of the coupling information of the equation
+    * @brief Implemenation of the coupling information of the equation
     */
    class CouplingInformation
    {

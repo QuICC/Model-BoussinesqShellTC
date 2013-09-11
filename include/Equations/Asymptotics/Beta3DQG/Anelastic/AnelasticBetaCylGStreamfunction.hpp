@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * \brief Implementation of the streamfunction equation for the Anelastic beta model with cylindrical gravity
+    * @brief Implementation of the streamfunction equation for the Anelastic beta model with cylindrical gravity
     */
    class AnelasticBetaCylGStreamfunction: public IScalarEquation
    {

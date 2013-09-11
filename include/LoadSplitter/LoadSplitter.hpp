@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * \brief Implementation of the workload splitter over the available CPUs
+    * @brief Implementation of the workload splitter over the available CPUs
     */
    class LoadSplitter
    {
