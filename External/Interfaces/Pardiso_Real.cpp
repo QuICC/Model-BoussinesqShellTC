@@ -1,5 +1,9 @@
-/** \file Pardiso_Real.cpp
- *  Implementation of the C++ wrapper functions for the real valued Pardiso routines
+/**
+ * @file Pardiso_Real.cpp
+ * @brief Implementation of the C++ wrapper functions for the real valued Pardiso routines 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #include "../External/Interfaces/Pardiso_Interface.hpp"

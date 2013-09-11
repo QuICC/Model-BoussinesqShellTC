@@ -1,6 +1,11 @@
-/** \file RunSimulation.cpp
- *  \brief General executable for the simulation implementations
+/**
+ * @file RunSimulation.cpp
+ * @brief General executable for the simulation implementations 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
+
 /// Set the path to the simulation implementation
 #define MODELPATH PhysicalModels/GEOMHDISCC_RUNSIM_MODEL.hpp
 /// Define small macros allowing to convert to string

@@ -1,5 +1,9 @@
-/** \file Pardiso_Complex.hpp
- *  This file contains the declarations needed to use the complex Pardiso routines in the C++
+/**
+ * @file Pardiso_Complex.cpp
+ * @brief Declarations needed to use the complex Pardiso routines in the C++ 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #include "../External/Interfaces/Pardiso_Interface.hpp"

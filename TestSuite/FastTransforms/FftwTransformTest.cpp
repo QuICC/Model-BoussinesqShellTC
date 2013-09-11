@@ -1,5 +1,9 @@
-/** \file FftwTransformTest.cpp
- *  \brief Implementation of a test case for FftwTransform
+/** 
+ * @file FftwTransformTest.cpp
+ * @brief Implementation of a test case for FftwTransform
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #include "gtest/gtest.h"

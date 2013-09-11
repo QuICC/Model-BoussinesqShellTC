@@ -1,5 +1,9 @@
-/** \file SerialTimerTest.cpp
- *  \brief Implementation of test case for SerialTimer
+/** 
+ * @file SerialTimerTest.cpp
+ * @brief Implementation of test case for SerialTimer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #include "Timers/SerialTimer.hpp"

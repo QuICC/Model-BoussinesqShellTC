@@ -1,5 +1,9 @@
-/** \file ARPACK_Interface.hpp
- *  This file contains the declarations needed to use ARPACK routines in the C++
+/**
+ * @file ARPACK_Interface.h
+ * @brief Declarations needed to use ARPACK routines in the C++
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ARPACK_INTERFACE_HPP
