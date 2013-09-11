@@ -1,5 +1,9 @@
-/** \file IdToHuman.cpp
- *  \brief Source of enum id to human strings converters
+/** 
+ * @file IdToHuman.cpp
+ * @brief Source of enum id to human strings converters
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

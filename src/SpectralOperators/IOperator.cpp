@@ -1,5 +1,9 @@
-/** \file IOperator.cpp
- *  \brief Source of the interface for spectral operators with quasi inverses
+/** 
+ * @file IOperator.cpp
+ * @brief Source of the interface for spectral operators with quasi inverses
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

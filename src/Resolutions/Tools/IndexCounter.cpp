@@ -1,5 +1,9 @@
-/** \file IndexCounter.cpp
- *  \brief Source of base class for the index counters
+/** 
+ * @file IndexCounter.cpp
+ * @brief Source of base class for the index counters
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

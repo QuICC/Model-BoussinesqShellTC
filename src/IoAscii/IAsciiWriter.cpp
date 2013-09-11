@@ -1,5 +1,9 @@
-/** \file IAsciiWriter.cpp
- *  \brief Source of the interfact to a general ASCII writer
+/** 
+ * @file IAsciiWriter.cpp
+ * @brief Source of the interfact to a general ASCII writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

@@ -1,5 +1,9 @@
-/** \file CouplingInformation.cpp
- *  \brief Source of the base implementation of a scalar equation
+/** 
+ * @file CouplingInformation.cpp
+ * @brief Source of the base implementation of a scalar equation
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Debug includes

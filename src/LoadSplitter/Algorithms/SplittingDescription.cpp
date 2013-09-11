@@ -1,5 +1,9 @@
-/** \file SplittingDescription.cpp
- *  \brief Source of the base of the implementation of the load splitting algorithm description
+/** 
+ * @file SplittingDescription.cpp
+ * @brief Source of the base of the implementation of the load splitting algorithm description
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

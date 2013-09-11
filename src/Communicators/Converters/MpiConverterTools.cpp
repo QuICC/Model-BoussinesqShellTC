@@ -1,5 +1,9 @@
-/** \file MpiConverterTools.cpp
- *  \brief Source of the tools for the MPI converter
+/** 
+ * @file MpiConverterTools.cpp
+ * @brief Source of the tools for the MPI converter
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

@@ -1,5 +1,9 @@
-/** \file Resolution.cpp
- *  \brief Source of the resolution object for several CPUs
+/** 
+ * @file Resolution.cpp
+ * @brief Source of the resolution object for several CPUs
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

@@ -1,5 +1,9 @@
-/** \file BinaryFile.cpp
- *  \brief Source of the general binary file implementation
+/** 
+ * @file BinaryFile.cpp
+ * @brief Source of the general binary file implementation
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

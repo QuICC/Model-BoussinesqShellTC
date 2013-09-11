@@ -1,5 +1,9 @@
-/** \file SphericalChebyshevFftwTransform.cpp
- *  \brief Source of the implementation of the Chebyshev FFTW transform for a spherical radius
+/** 
+ * @file SphericalChebyshevFftwTransform.cpp
+ * @brief Source of the implementation of the Chebyshev FFTW transform for a spherical radius
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

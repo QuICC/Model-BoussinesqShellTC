@@ -1,5 +1,9 @@
-/** \file StorageProfilerTools.cpp
- *  \brief Source of the implementation of tools for the storage profiler
+/** 
+ * @file StorageProfilerTools.cpp
+ * @brief Source of the implementation of tools for the storage profiler
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

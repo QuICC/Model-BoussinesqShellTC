@@ -1,5 +1,9 @@
-/** \file SparseDTrivialSolver.cpp
- *  \brief Implementation of a general real trivial solver structure
+/** 
+ * @file SparseDTrivialSolver.cpp
+ * @brief Implementation of a general real trivial solver structure
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

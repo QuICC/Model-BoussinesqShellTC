@@ -1,5 +1,9 @@
-/** \file FftSetup.cpp
- *  \brief Source of FFT setup class
+/** 
+ * @file FftSetup.cpp
+ * @brief Source of FFT setup class
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

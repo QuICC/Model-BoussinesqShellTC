@@ -1,5 +1,9 @@
-/** \file RayleighBenardModel.cpp
- *  \brief Source of the Rayleigh-Benard physical model
+/** 
+ * @file RayleighBenardModel.cpp
+ * @brief Source of the Rayleigh-Benard physical model
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

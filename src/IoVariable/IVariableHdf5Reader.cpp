@@ -1,5 +1,9 @@
-/** \file IVariableHdf5Reader.cpp
- *  \brief Source of the implementation of a generic variable data file reader
+/** 
+ * @file IVariableHdf5Reader.cpp
+ * @brief Source of the implementation of a generic variable data file reader
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

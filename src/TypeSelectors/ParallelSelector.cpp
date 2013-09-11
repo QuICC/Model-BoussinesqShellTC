@@ -1,5 +1,9 @@
-/** \file ParallelSelector.cpp
- *  \brief Definitions of the ParallelSelector grouper selection
+/** 
+ * @file ParallelSelector.cpp
+ * @brief Definitions of the ParallelSelector grouper selection
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

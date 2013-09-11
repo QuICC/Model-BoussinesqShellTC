@@ -1,5 +1,9 @@
-/** \file IRegular3DScheme.cpp
- *  \brief Source of the Chebyshev + Chebyshev scheme implementation
+/** 
+ * @file IRegular3DScheme.cpp
+ * @brief Source of the Chebyshev + Chebyshev scheme implementation
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

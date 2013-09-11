@@ -1,5 +1,9 @@
-/** \file RandomScalarState.cpp
- *  \brief Source of the implementation of the general random scalar state equation
+/** 
+ * @file RandomScalarState.cpp
+ * @brief Source of the implementation of the general random scalar state equation
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

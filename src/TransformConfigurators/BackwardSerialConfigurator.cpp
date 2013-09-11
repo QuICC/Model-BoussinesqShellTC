@@ -1,5 +1,9 @@
-/** \file BackwardSerialConfigurator.cpp
- *  \brief Source of the implementation of the serial backward transform configurator
+/** 
+ * @file BackwardSerialConfigurator.cpp
+ * @brief Source of the implementation of the serial backward transform configurator
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

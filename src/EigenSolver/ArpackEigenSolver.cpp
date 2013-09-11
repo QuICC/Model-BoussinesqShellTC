@@ -1,5 +1,9 @@
-/** \file ArpackEigenSolver.cpp
- *  \brief Implementation of an eigensolver based on ARPACK
+/** 
+ * @file ArpackEigenSolver.cpp
+ * @brief Implementation of an eigensolver based on ARPACK
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

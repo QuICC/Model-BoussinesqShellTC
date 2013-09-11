@@ -1,5 +1,9 @@
-/** \file VariableHdf5TagsDefs.cpp
- *  \brief Source of the definitions and names used by the variable data files
+/** 
+ * @file VariableHdf5TagsDefs.cpp
+ * @brief Source of the definitions and names used by the variable data files
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

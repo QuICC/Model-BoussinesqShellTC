@@ -1,5 +1,9 @@
-/** \file RayleighBenardTransport.cpp
- *  \brief Source of the implementation of the transport equation in the Rayleigh-Benard model
+/** 
+ * @file RayleighBenardTransport.cpp
+ * @brief Source of the implementation of the transport equation in the Rayleigh-Benard model
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

@@ -1,5 +1,9 @@
-/** \file VisualizationGenerator.cpp
- *  \brief Source of the high level state generator
+/** 
+ * @file VisualizationGenerator.cpp
+ * @brief Source of the high level state generator
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Debug includes

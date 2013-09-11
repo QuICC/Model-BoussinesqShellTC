@@ -1,5 +1,9 @@
-/** \file BoussinesqPerBetaCylGVertical.cpp
- *  \brief Source of the implementation of the vertical velocity equation in the 3DQG beta model with periodic radius
+/** 
+ * @file BoussinesqPerBetaCylGVertical.cpp
+ * @brief Source of the implementation of the vertical velocity equation in the 3DQG beta model with periodic radius
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

@@ -1,5 +1,9 @@
-/** \file TubularSplitting.cpp
- *  \brief Source of the implementation of the double load splitting algorithm, aka "Tubular" splitting
+/** 
+ * @file TubularSplitting.cpp
+ * @brief Source of the implementation of the double load splitting algorithm, aka "Tubular" splitting
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

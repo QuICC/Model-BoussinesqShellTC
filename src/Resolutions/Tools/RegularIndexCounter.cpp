@@ -1,5 +1,9 @@
-/** \file RegularIndexCounter.cpp
- *  \brief Source of regular index counter
+/** 
+ * @file RegularIndexCounter.cpp
+ * @brief Source of regular index counter
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

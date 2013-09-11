@@ -1,5 +1,9 @@
-/** \file VisualizationFileTags.cpp
- *  \brief Source of the definitions and names used by the visualisation file writers
+/** 
+ * @file VisualizationFileTags.cpp
+ * @brief Source of the definitions and names used by the visualisation file writers
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

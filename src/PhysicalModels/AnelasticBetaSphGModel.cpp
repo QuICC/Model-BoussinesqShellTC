@@ -1,5 +1,9 @@
-/** \file AnelasticBetaSphGModel.cpp
- *  \brief Source of the anelastic beta 3DQG model with spherical gravity
+/** 
+ * @file AnelasticBetaSphGModel.cpp
+ * @brief Source of the anelastic beta 3DQG model with spherical gravity
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes

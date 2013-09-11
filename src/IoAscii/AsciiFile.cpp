@@ -1,5 +1,9 @@
-/** \file AsciiFile.cpp
- *  \brief Source of the general ASCII file implementation
+/** 
+ * @file AsciiFile.cpp
+ * @brief Source of the general ASCII file implementation
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

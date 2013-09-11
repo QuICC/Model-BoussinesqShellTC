@@ -1,5 +1,9 @@
-/** \file IBoundary.cpp
- *  \brief Source of the interface for spectral boundary operators
+/** 
+ * @file IBoundary.cpp
+ * @brief Source of the interface for spectral boundary operators
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // System includes

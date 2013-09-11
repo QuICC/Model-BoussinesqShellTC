@@ -1,5 +1,9 @@
-/** \file BackwardSingle1DConfigurator.cpp
- *  \brief Source of the implementation of the backward transform first single splitting algorith configurator
+/** 
+ * @file BackwardSingle1DConfigurator.cpp
+ * @brief Source of the implementation of the backward transform first single splitting algorith configurator
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 // Configuration includes
