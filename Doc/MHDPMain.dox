@@ -1,8 +1,9 @@
 /** \mainpage Geophysical (M)HD in Spheres, Cylinders and Cartesian boxes
  *
  * <center>
- * | \subpage mhdPModels |
- *   \subpage mhdPExternal |
+ * | \subpage mhdPNonlinear |
+ *   \subpage mhdPEigen |
+ *   \subpage mhdPFeatures |
  *   \subpage mhdPDevelopment |
  * </center>
  */

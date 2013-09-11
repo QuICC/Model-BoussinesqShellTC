@@ -1,0 +1,24 @@
+/** \page mhdPOther Other
+ *
+ * \section mhdSOtherMPFRCpp MPFR C++ 
+ *
+ *    Homepage: <a href="http://www.holoborodko.com/pavel/mpfr/">MPFR C++</a> 
+ *
+ * \section mhdSOtherSmartPtr Smart pointers
+ *
+ *    \subsection mhdSOtherSmartTr1 C++ Technical report 1 (TR1)
+ *
+ *    Homepage: <a href="http://en.wikipedia.org/wiki/C++_Technical_Report_1">TR1</a> (Wikipedia)
+ *
+ *    \subsection mhdSOtherSmartBoost Boost C++ libraries
+ *
+ *    Homepage: <a href="http://www.boost.org/">Boost C++ libraries</a>
+ *
+ *    \subsection mhdSOtherSmartC0x C++ 11
+ *
+ *    Homepage: <a href="http://en.wikipedia.org/wiki/C++11">C++ 11</a> (Wikipedia)
+ *
+ * \section mhdPOtherGraphviz Graphviz DOT format
+ *
+ *    Homepage: <a href="http://www.graphviz.org/">Graphviz</a>
+ */

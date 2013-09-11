@@ -1,10 +1,10 @@
-/** \page mhdPModels Physical models
+/** \page mhdPEigen Eigen problems
  *
  *    - <em>Reduced Boussinesq Rayleigh-Bénard</em>
  *
  *    - <em>Reduced Boussinesq rotating Rayleigh-Bénard</em>
  *
- *    - \ref mhdPReducedBoussinesqBPlane <em>(Work in progress)</em>
+ *    - \subpage mhdPEigReducedBoussinesqBPlane <em>(Work in progress)</em>
  *
  *    - <em>Reduced Boussinesq f-plane</em>
  *

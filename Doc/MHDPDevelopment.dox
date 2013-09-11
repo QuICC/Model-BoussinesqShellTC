@@ -3,7 +3,9 @@
  *  <center>
  *    | \subpage mhdBug |
  *    \subpage mhdTodo |
- *    \subpage mhdBoundary |
- *    \subpage mhdTestSuite |
+ *    \subpage mhdPDevBoundary |
+ *    \subpage mhdPDevDebug |
+ *    \subpage mhdPDevProfile |
+ *    \subpage mhdPDevTestSuite |
  *  </center>
  */

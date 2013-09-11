@@ -1,4 +1,4 @@
-/** \page mhdBoundary Boundary conditions
+/** \page mhdPDevBoundary Boundary conditions
  *
  * The implementation of boundary conditions within the quasi-inverse framework requires care. 
  *

@@ -1,4 +1,4 @@
-/** \page mhdTodoList Global ToDo list
+/** \page mhdPDevTodoList Global ToDo list
  *
  * \mhdTodo Test stride FFT for chebyshev complex -> complex (should avoir copy of data and temporary storage)
  *
