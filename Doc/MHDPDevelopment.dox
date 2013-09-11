@@ -1,7 +1,8 @@
 /** \page mhdPDevelopment Development
  *
  *  <center>
- *    | \subpage mhdBug |
+ *  | \subpage mhdPDevStatus |
+ *    \subpage mhdBug |
  *    \subpage mhdTodo |
  *    \subpage mhdPDevBoundary |
  *    \subpage mhdPDevDebug |

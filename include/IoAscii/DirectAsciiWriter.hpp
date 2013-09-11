@@ -1,5 +1,9 @@
-/** \file DirectAsciiWriter.hpp
- *  \brief Implementation of a direct access ASCII writer
+/**
+ * @file DirectAsciiWriter.hpp
+ * @brief Implementation of a direct access ASCII writer 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef DIRECTASCIIWRITER_HPP

@@ -1,5 +1,9 @@
-/** \file AnelasticFPlaneVertical.hpp
- *  \brief Implementation of the vertical velocity equation for the anelastic 3DQG f-plane model
+/**
+ * @file AnelasticFPlaneVertical.hpp
+ * @brief Implementation of the vertical velocity equation for the anelastic 3DQG f-plane model 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ANELASTICFPLANEVERTICAL_HPP

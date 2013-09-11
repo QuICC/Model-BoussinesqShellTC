@@ -1,5 +1,9 @@
-/** \file FftwLibrary.hpp
- *  \brief Static interface to the global features of the FFTW library 
+/**
+ * @file FftwLibrary.hpp
+ * @brief Static interface to the global features of the FFTW library  
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FFTWLIBRARY_HPP

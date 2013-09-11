@@ -1,5 +1,9 @@
-/** \file MpiConverterTools.hpp
- *  \brief Implementation of some tools used by the MPI converter.
+/**
+ * @file MpiConverterTools.hpp
+ * @brief Implementation of some tools used by the MPI converter 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MPICONVERTERTOOLS_HPP

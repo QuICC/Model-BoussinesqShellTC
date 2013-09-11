@@ -1,5 +1,9 @@
-/** \file StateGenerator.hpp
- *  \brief High level implementation of a general state generator
+/**
+ * @file StateGenerator.hpp
+ * @brief High level implementation of a general state generator 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef STATEGENERATOR_HPP

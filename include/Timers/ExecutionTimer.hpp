@@ -1,5 +1,9 @@
-/** \file ExecutionTimer.hpp
- *  \brief Implementation of an execution timer
+/**
+ * @file ExecutionTimer.hpp
+ * @brief Implementation of an execution timer 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef EXECUTIONTIMER_HPP

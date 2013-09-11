@@ -1,5 +1,9 @@
-/** \file ScalarFieldVisualizer.hpp
- *  \brief Implementation of the basic scalar field visualizer
+/**
+ * @file ScalarFieldVisualizer.hpp
+ * @brief Implementation of the basic scalar field visualizer 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SCALARFIELDVISUALIZER_HPP

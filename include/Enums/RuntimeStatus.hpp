@@ -1,5 +1,9 @@
-/** \file RuntimeStatus.hpp
- *  \brief Definition of some useful enums for runtime status
+/**
+ * @file RuntimeStatus.hpp
+ * @brief Definition of some useful enums for runtime status 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef RUNTIMESTATUS_HPP

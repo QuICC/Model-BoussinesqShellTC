@@ -1,5 +1,9 @@
-/** \file TimerMacro.h
- *  \brief Preprocessor macros to setup timers depending on parallelisation options
+/**
+ * @file TimerMacro.h
+ * @brief Preprocessor macros to setup timers depending on parallelisation options 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TIMERMACRO_H

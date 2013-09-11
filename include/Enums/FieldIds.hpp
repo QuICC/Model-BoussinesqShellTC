@@ -1,5 +1,9 @@
-/** \file FieldIds.hpp
- *  \brief Definition of some useful enums used to access fields by ID
+/**
+ * @file FieldIds.hpp
+ * @brief Definition of some useful enums used to access fields by ID 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FIELDIDS_HPP

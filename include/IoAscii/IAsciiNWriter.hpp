@@ -1,5 +1,9 @@
-/** \file IAsciiNWriter.hpp
- *  \brief Interface to a numbered file ASCII writer
+/**
+ * @file IAsciiNWriter.hpp
+ * @brief Interface to a numbered file ASCII writer 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IASCIINWRITER_HPP

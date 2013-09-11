@@ -1,5 +1,9 @@
-/** \file MpiTimer.hpp
- *  \brief Implementation of a MPI timer
+/**
+ * @file MpiTimer.hpp
+ * @brief Implementation of a MPI timer 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MPITIMER_HPP

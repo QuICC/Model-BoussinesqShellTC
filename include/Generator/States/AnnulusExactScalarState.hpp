@@ -1,5 +1,9 @@
-/** \file AnnulusExactScalarState.hpp
- *  \brief Implementation of the equation to generate exact scalar states in an annulus
+/**
+ * @file AnnulusExactScalarState.hpp
+ * @brief Implementation of the equation to generate exact scalar states in an annulus 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ANNULUSEXACTSCALARSTATE_HPP

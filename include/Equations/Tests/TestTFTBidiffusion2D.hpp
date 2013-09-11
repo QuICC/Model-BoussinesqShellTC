@@ -1,5 +1,9 @@
-/** \file TestTFTBidiffusion2D.hpp
- *  \brief Implementation of the TFT test equation for 2D bi-diffusion (bilaplacian)
+/**
+ * @file TestTFTBidiffusion2D.hpp
+ * @brief Implementation of the TFT test equation for 2D bi-diffusion (bilaplacian) 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TESTTFTBIDIFFUSION2D_HPP

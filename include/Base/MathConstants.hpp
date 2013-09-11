@@ -1,5 +1,9 @@
-/** \file MathConstants.hpp
- *  \brief Definition of some useful math constants
+/**
+ * @file MathConstants.hpp
+ * @brief Definition of some useful math constants
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MATHCONSTANTS_HPP

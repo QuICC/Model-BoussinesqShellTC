@@ -1,5 +1,9 @@
-/** \file EquationParameters.hpp
- *  \brief Definition of the non-dimensional parameters
+/**
+ * @file EquationParameters.hpp
+ * @brief Definition of the non-dimensional parameters
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef EQUATIONPARAMETERS_HPP

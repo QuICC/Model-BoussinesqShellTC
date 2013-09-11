@@ -1,0 +1,48 @@
+/** \page mhdPDevStatus Status
+ *
+ * \section MHDSStatusEig Sparse eigen solvers
+ *
+ * \section MHDSStatusSolver Sparse linear solvers
+ *
+ * \section MHDSStatusTime Timestepping scheme
+ *
+ * \section MHDSStatusEq Equations
+ *
+ * \subsection MHDSStatusEqTrivial Trivial
+ *
+ * \subsection MHDSStatusEqDiagnostic Diagnostic
+ *
+ * \subsection MHDSStatusEqPrognostic Prognostic
+ *
+ * \section MHDSStatusAvg Averaging schemes
+ *
+ * \section MHDSStatusTra Transforms
+ *
+ * \subsection MHDSStatusTraFFT  FFT
+ *
+ * \subsection MHDSStatusTraCheb  Chebyshev
+ *
+ * \subsection MHDSStatusTraSHT  Spherical harmonics
+ *
+ * \section MHDSStatusPara Parallelisation
+ *
+ * \section MHDSStatusIo Input/Output
+ *
+ * \subsection MHDSStatusIoCtl Runtime control
+ *
+ * \subsection MHDSStatusIoCfg Configuration
+ *
+ * \subsection MHDSStatusIoDiag Diagnostics
+ *
+ * \subsection MHDSStatusIoState State file
+ *
+ * \subsection MHDSStatusIoVis Visualization
+ *
+ * \section MHDSStatusProf Profiling
+ *
+ * \subsection MHDSStatusProfMem Memory
+ *
+ * \subsection MHDSStatusProfMem Computation
+ *
+ * \subsection MHDSStatusProfScale Scaling
+ */

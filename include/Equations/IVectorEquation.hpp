@@ -1,5 +1,9 @@
-/** \file IVectorEquation.hpp
- *  \brief Base for the implementation of a vector equation
+/**
+ * @file IVectorEquation.hpp
+ * @brief Base for the implementation of a vector equation 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef IVECTOREQUATION_HPP

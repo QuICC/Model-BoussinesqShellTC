@@ -1,5 +1,9 @@
-/** \file RandomScalarState.hpp
- *  \brief Implementation of the equation to generate a random scalar state
+/**
+ * @file RandomScalarState.hpp
+ * @brief Implementation of the equation to generate a random scalar state 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef RANDOMSCALARSTATE_HPP

@@ -1,5 +1,9 @@
-/** \file DirectBinaryWriter.hpp
- *  \brief Implementation of a direct access binary writer
+/** 
+ * @file DirectBinaryWriter.hpp
+ * @brief Implementation of a direct access binary writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef DIRECTBINARYWRITER_HPP
@@ -20,7 +24,10 @@ namespace GeoMHDiSCC {
 namespace IoBinary {
 
    /**
-    * \brief Implementation of a direct access binary writer
+    *@brief Implementation of a direct access binary writer
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
     */
    class DirectBinaryWriter: public IBinaryWriter
    {

@@ -1,5 +1,9 @@
-/** \file FftSetup.hpp
- *  \brief Implementation of the FFT setup class
+/**
+ * @file FftSetup.hpp
+ * @brief Implementation of the FFT setup class 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef FFTSETUP_HPP

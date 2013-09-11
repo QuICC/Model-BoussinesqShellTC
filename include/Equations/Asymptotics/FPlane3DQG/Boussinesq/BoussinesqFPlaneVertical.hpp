@@ -1,5 +1,9 @@
-/** \file BoussinesqFPlaneVertical.hpp
- *  \brief Implementation of the vertical velocity equation for the Boussinesq 3DQG f-plane model
+/**
+ * @file BoussinesqFPlaneVertical.hpp
+ * @brief Implementation of the vertical velocity equation for the Boussinesq 3DQG f-plane model 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQFPLANEVERTICAL_HPP

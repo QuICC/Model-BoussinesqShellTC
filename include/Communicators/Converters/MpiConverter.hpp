@@ -1,5 +1,9 @@
-/** \file MpiConverter.hpp
- *  \brief Implementation of the FDSH MPI data converter.
+/**
+ * @file MpiConverter.hpp
+ * @brief Implementation of the FDSH MPI data converter 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MPICONVERTER_HPP

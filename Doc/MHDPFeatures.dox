@@ -4,6 +4,7 @@
  * | \subpage mhdPIo |
  *   \subpage mhdPGpu |
  *   \subpage mhdPLinAlg |
+ *   \subpage mhdPCompiler |
  *   \subpage mhdPOther |
  *   \subpage mhdPBuild |
  *   \subpage mhdPMpi |

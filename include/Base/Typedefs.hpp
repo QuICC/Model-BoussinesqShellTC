@@ -1,5 +1,9 @@
-/** \file Typedefs.hpp
- *  \brief Definition of some useful typedefs used in the whole project
+/**
+ * @file Typedefs.hpp
+ * @brief Some general typedefs used in the whole project 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef TYPEDEFS_HPP

@@ -1,5 +1,9 @@
-/** \file MpTypedefs.hpp
- *  \brief Definition of some useful typedefs used in the whole project
+/**
+ * @file MpTypedefs.hpp
+ * @brief Definition of typedefs for muliple precision computations
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MPTYPEDEFS_HPP

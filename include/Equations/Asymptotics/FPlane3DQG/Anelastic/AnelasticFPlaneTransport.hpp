@@ -1,5 +1,9 @@
-/** \file AnelasticFPlaneTransport.hpp
- *  \brief Implementation of the transport equation for the anelastic 3DQG f-plane model
+/**
+ * @file AnelasticFPlaneTransport.hpp
+ * @brief Implementation of the transport equation for the anelastic 3DQG f-plane model 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef ANELASTICFPLANETRANSPORT_HPP

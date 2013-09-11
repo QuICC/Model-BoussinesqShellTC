@@ -1,5 +1,9 @@
-/** \file MpiFramework.hpp
- *  \brief Implementation of the MPI framework
+/**
+ * @file MpiFramework.hpp
+ * @brief Implementation of the MPI framework 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef MPIFRAMEWORK_HPP

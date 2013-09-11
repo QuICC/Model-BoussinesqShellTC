@@ -1,5 +1,9 @@
-/** \file BoussinesqPerPerBetaCylGStreamfunction.hpp
- *  \brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity with periodic radius
+/**
+ * @file BoussinesqPerBetaCylGStreamfunction.hpp
+ * @brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity with periodic radius 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQPERBETACYLGSTREAMFUNCTION_HPP

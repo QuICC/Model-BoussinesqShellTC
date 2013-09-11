@@ -1,5 +1,9 @@
-/** \file Splitting.hpp
- *  \brief Definition of some useful enums for splitting algorithms
+/**
+ * @file Splitting.hpp
+ * @brief Definition of some useful enums for splitting algorithms 
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ * @version 0.9.0
+ * @date 2013-09-11
  */
 
 #ifndef SPLITTING_HPP
