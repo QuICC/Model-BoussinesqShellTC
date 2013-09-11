@@ -1,6 +1,6 @@
 /** 
  * @file ParallelSelector.hpp
- * @brief Definition of some useful typedefs for the parallelisation algorithms
+ * @brief Typedefs for the parallelisation algorithms
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11

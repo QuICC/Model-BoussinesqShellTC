@@ -1,6 +1,6 @@
 /**
  * @file PrueferAlgorithm.hpp
- * @brief Implementation of an Pruefer algorithm to compute a quadrature rule 
+ * @brief Implementation of a Pruefer algorithm to compute a quadrature rule 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
     * @brief Implementation of an iterative quadrature rule computation.
     *
     * This implementation relies (in general) on a coarse Runge-Kutta solver to find an initial guess. Newton
-    * iterations are then used to reach high accuracy. It does not required any linear algebra solvers, removing the
+    * iterations are then used to reach high accuracy. It does not require any linear algebra solvers, removing the
     * issues coming from the lack of special matrix solvers in Eigen. Multiple precision values are obtained through
     * the MPFR wrapper.
     *

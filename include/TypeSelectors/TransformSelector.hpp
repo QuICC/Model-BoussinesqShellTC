@@ -1,6 +1,6 @@
 /** 
  * @file TransformSelector.hpp
- * @brief Definition of some useful typedefs for the variables used in the code
+ * @brief Typedefs to setup the correct transforms
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11

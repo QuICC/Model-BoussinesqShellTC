@@ -1,6 +1,6 @@
 /** 
  * @file StoragePairProviderMacro.h
- * @brief Preprocessor macros used to setup the shared pointer implementation depending on CMake setup.
+ * @brief Preprocessor macros used to setup the storage pair provider.
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11

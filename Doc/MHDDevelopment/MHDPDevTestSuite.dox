@@ -1,10 +1,74 @@
 /** \page mhdPDevTestSuite Test suite
  *
- * \section mhdSTSTransform Fast transforms
+ * \section mhdSTSTransform Transforms
+ *
+ * \subsection mhdSTSTraFast Fast transforms
+ *
+ *    - FFT (FFTW): \mhdFailed
+ *    - Cartesian Chebyshev (FFTW): \mhdFailed
+ *    - Cylindrical Chebyshev (FFTW): \mhdFailed
+ *    - Spherical Chebyshev (FFTW): \mhdFailed
+ *
+ * \subsection mhdSTSTraPoly Polynomial transforms
+ *
+ *    - Associated Legendre: \mhdFailed
+ *    - Worland: \mhdFailed 
  *
  * \section mhdSTSSparseSolvers Sparse solvers
  *
- * \section mhdSTSIO Input/Output
+ * \section mhdSTSIo Input/Output
+ *
+ * \subsection mhdSTSIoCtl Control file
+ *
+ *    - Read ASCII control file: \mhdFailed
+ *
+ * \subsection mhdSTSIoCfg Configuration file
+ *
+ *    - Read XML configuration file: \mhdFailed
+ *    - Write XML configuration file: \mhdFailed
+ *
+ * \subsection mhdSTSIoDiag Diagnostic file
+ *
+ *    - Write ASCII diagnostic file: \mhdFailed
+ *    - Write binary ASCII diagnostic file: \mhdFailed
+ *    - Write scalar energy for TTT: \mhdFailed
+ *    - Write scalar energy for TFT: \mhdFailed
+ *    - Write scalar energy for TFF: \mhdFailed
+ *    - Write scalar energy for FFF: \mhdFailed
+ *    - Write scalar energy for CFT: \mhdFailed
+ *    - Write scalar energy for SLF: \mhdFailed
+ *    - Write scalar energy for WFT: \mhdFailed
+ *    - Write scalar energy for WLF: \mhdFailed
+ *
+ * \subsection mhdSTSIoState State file
+ *
+ *    - Read TTT HDF5 state file: \mhdFailed
+ *    - Write TTT HDF5 state file: \mhdFailed
+ *    - Read TFT HDF5 state file: \mhdFailed
+ *    - Write TFT HDF5 state file: \mhdFailed
+ *    - Read TFF HDF5 state file: \mhdFailed
+ *    - Write TFF HDF5 state file: \mhdFailed
+ *    - Read FFF HDF5 state file: \mhdFailed
+ *    - Write FFF HDF5 state file: \mhdFailed
+ *    - Read CFT HDF5 state file: \mhdFailed
+ *    - Write CFT HDF5 state file: \mhdFailed
+ *    - Read SLF HDF5 state file: \mhdFailed
+ *    - Write SLF HDF5 state file: \mhdFailed
+ *    - Read WFT HDF5 state file: \mhdFailed
+ *    - Write WFT HDF5 state file: \mhdFailed
+ *    - Read WLF HDF5 state file: \mhdFailed
+ *    - Write WLF HDF5 state file: \mhdFailed
+ *
+ * \subsection mhdSTSIoState Visualization file
+ *
+ *    - Write TTT HDF5 visualization file: \mhdFailed
+ *    - Write TFT HDF5 visualization file: \mhdFailed
+ *    - Write TFF HDF5 visualization file: \mhdFailed
+ *    - Write FFF HDF5 visualization file: \mhdFailed
+ *    - Write CFT HDF5 visualization file: \mhdFailed
+ *    - Write SLF HDF5 visualization file: \mhdFailed
+ *    - Write WFT HDF5 visualization file: \mhdFailed
+ *    - Write WLF HDF5 visualization file: \mhdFailed
  *
  * \section mhdSTSSpectralOperators Spectral operators
  *

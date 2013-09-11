@@ -1,10 +1,20 @@
 /** \page mhdPDevStatus Status
  *
+ * \section MHDSStatusBase Base elements
+ *
+ * \subsection MHDSStatusBaseScalar Scalar field
+ *
+ * \subsection MHDSStatusBaseVector Vector field
+ *
+ * \subsection MHDSStatusBaseSpecOp Spectral operator
+ *
+ * \subsection MHDSStatusBaseTimer Timer
+ *
  * \section MHDSStatusEig Sparse eigen solvers
  *
  * \section MHDSStatusSolver Sparse linear solvers
  *
- * \section MHDSStatusTime Timestepping scheme
+ * \section MHDSStatusTStep Timestepping scheme
  *
  * \section MHDSStatusEq Equations
  *
