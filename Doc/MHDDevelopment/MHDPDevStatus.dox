@@ -1,58 +1,252 @@
 /** \page mhdPDevStatus Status
  *
- * \section MHDSStatusBase Base elements
+ *    \mhdTable{
+ *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
+ *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
+ *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
+ *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but ist not yet fully tested</td></tr>
+ *       <tr>\mhdStatTest<td>Component implementation is done and tested!</td></tr>
+ *    }   
  *
- * \subsection MHDSStatusBaseScalar Scalar field
+ * \section mhdSStatusBase Base elements
  *
- * \subsection MHDSStatusBaseVector Vector field
+ *    \mhdTable{
+ *       \mhdStatus{Multiple precision, \mhdStatTodo}
+ *       \mhdStatus{Scalar field, \mhdStatTodo}
+ *       \mhdStatus{Vector field, \mhdStatTodo}
+ *       \mhdStatus{Serial timer, \mhdStatTodo}
+ *       \mhdStatus{MPI timer, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusBaseSpecOp Spectral operator
+ * \section mhdSStatusTra Transforms
  *
- * \subsection MHDSStatusBaseTimer Timer
+ *    \mhdTable{
+ *       \mhdStatus{TTT Spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{TFT spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{TFF spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{FFF spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{CFT spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{SLF spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{WFT spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{WLF spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{FFT, \mhdStatTodo}
+ *       \mhdStatus{Cartesian Chebyshev transform, \mhdStatTodo}
+ *       \mhdStatus{Cylindrical Chebyshev transform, \mhdStatTodo}
+ *       \mhdStatus{Spherical Chebyshev transform, \mhdStatTodo}
+ *       \mhdStatus{Associated Legendre transform, \mhdStatTodo}
+ *       \mhdStatus{Associated Legendre transform (online), \mhdStatIdea}
+ *       \mhdStatus{Spherical harmonic transform, \mhdStatTodo}
+ *       \mhdStatus{Doubly covered sphere, \mhdStatIdea}
+ *       \mhdStatus{Quadruply covered sphere, \mhdStatIdea}
+ *       \mhdStatus{Worland transform, \mhdStatTodo}
+ *       \mhdStatus{Worland transform (online), \mhdStatIdea}
+ *       \mhdStatus{FFTW backend, \mhdStatTodo}
+ *       \mhdStatus{MKL FFT backend, \mhdStatIdea}
+ *       \mhdStatus{KissFFT backend, \mhdStatIdea}
+ *    }   
  *
- * \section MHDSStatusEig Sparse eigen solvers
+ * \section mhdSStatusEig Sparse eigen solvers
  *
- * \section MHDSStatusSolver Sparse linear solvers
+ *    \mhdTable{
+ *       \mhdStatus{ARPACK backend, \mhdStatTodo}
+ *    }   
  *
- * \section MHDSStatusTStep Timestepping scheme
+ * \section mhdSStatusSpecOp Sparse spectral operators
  *
- * \section MHDSStatusEq Equations
+ *    \mhdTable{
+ *       \mhdStatus{Derivative operators, \mhdStatTodo}
+ *       \mhdStatus{Laplacian operators, \mhdStatTodo}
+ *       \mhdStatus{Non constant operators, \mhdStatTodo}
+ *       \mhdStatus{1D bounded operator, \mhdStatTodo}
+ *       \mhdStatus{2D bounded operator, \mhdStatTodo}
+ *       \mhdStatus{3D bounded operator, \mhdStatTodo}
+ *       \mhdStatus{Direct tau method, \mhdStatTodo}
+ *       \mhdStatus{Quasi-inverse tau method, \mhdStatTodo}
+ *       \mhdStatus{Direct Galerkin method, \mhdStatTodo}
+ *       \mhdStatus{Quasi-inverse Galerkin method, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusEqTrivial Trivial
+ * \section mhdSStatusSolver Sparse linear solvers
  *
- * \subsection MHDSStatusEqDiagnostic Diagnostic
+ *    \mhdTable{
+ *       \mhdStatus{Direct solver, \mhdStatTodo}
+ *       \mhdStatus{Iterative solver, \mhdStatTodo}
+ *       \mhdStatus{UmfPack backend, \mhdStatTodo}
+ *       \mhdStatus{SuperLU backend, \mhdStatTodo}
+ *       \mhdStatus{SparseLU (eigen) backend, \mhdStatTodo}
+ *       \mhdStatus{MKL Pardiso backend, \mhdStatTodo}
+ *       \mhdStatus{Pardiso backend, \mhdStatTodo}
+ *       \mhdStatus{MUMPS backend, \mhdStatTodo}
+ *       \mhdStatus{PaStiX backend, \mhdStatTodo}
+ *       \mhdStatus{SparseQR (eigen) backend, \mhdStatTodo}
+ *       \mhdStatus{SPQR backend, \mhdStatTodo}
+ *       \mhdStatus{BiCSTAB (eigen) backend, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusEqPrognostic Prognostic
+ * \section mhdSStatusTStep Timestepping scheme
  *
- * \section MHDSStatusAvg Averaging schemes
+ *    \mhdTable{
+ *       \mhdStatus{Timestepper, \mhdStatTodo}
+ *       \mhdStatus{RK3 scheme, \mhdStatTodo}
+ *    }   
  *
- * \section MHDSStatusTra Transforms
+ * \section mhdSStatusEq Equations
  *
- * \subsection MHDSStatusTraFFT  FFT
+ *    \mhdTable{
+ *       \mhdStatus{Scalar equation, \mhdStatTodo}
+ *       \mhdStatus{Vector equation, \mhdStatTodo}
+ *       \mhdStatus{Trivial equation, \mhdStatTodo}
+ *       \mhdStatus{Diagnostic equation, \mhdStatTodo}
+ *       \mhdStatus{Prognostic equation, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusTraCheb  Chebyshev
+ * \section mhdSStatusAvg Averaging schemes
  *
- * \subsection MHDSStatusTraSHT  Spherical harmonics
+ *    \mhdTable{
+ *       \mhdStatus{Temporal averaging, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for TTT, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for TFT, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for TFF, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for FFF, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for CFT, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for SLF, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for WFT, \mhdStatTodo}
+ *       \mhdStatus{Spacial average for WLF, \mhdStatTodo}
+ *    }   
  *
- * \section MHDSStatusPara Parallelisation
+ * \section mhdSStatusPara Parallelisation
  *
- * \section MHDSStatusIo Input/Output
+ *    \mhdTable{
+ *       \mhdStatus{Serial, \mhdStatTodo}
+ *       \mhdStatus{MPI Single 1D splitting, \mhdStatTodo}
+ *       \mhdStatus{MPI Single 2D splitting, \mhdStatTodo}
+ *       \mhdStatus{MPI Tubular splitting, \mhdStatTodo}
+ *       \mhdStatus{Automatic MPI splitting, \mhdStatTodo}
+ *       \mhdStatus{MPI Equation grouping, \mhdStatTodo}
+ *       \mhdStatus{MPI Transform grouping, \mhdStatTodo}
+ *       \mhdStatus{MPI Single 1D grouping, \mhdStatTodo}
+ *       \mhdStatus{MPI Single 2D grouping, \mhdStatTodo}
+ *       \mhdStatus{Automatic MPI grouping, \mhdStatTodo}
+ *       \mhdStatus{Serial sparse solver, \mhdStatTodo}
+ *       \mhdStatus{MPI sparse solver, \mhdStatTodo}
+ *       \mhdStatus{Hybrid MPI-OpenMP, \mhdStatIdea}
+ *       \mhdStatus{Hybrid MPI-GPGPU, \mhdStatIdea}
+ *       \mhdStatus{Pure OpenMP, \mhdStatIdea}
+ *       \mhdStatus{OpenMP-GPGPU (Desktop), \mhdStatIdea}
+ *    }   
  *
- * \subsection MHDSStatusIoCtl Runtime control
+ * \section mhdSStatusIo Input/Output
  *
- * \subsection MHDSStatusIoCfg Configuration
+ * \subsection mhdSStatusIoCtl Runtime control
  *
- * \subsection MHDSStatusIoDiag Diagnostics
+ *    \mhdTable{
+ *       \mhdStatus{Abort simulation, \mhdStatTodo}
+ *       \mhdStatus{Trigger ASCII output, \mhdStatIdea}
+ *       \mhdStatus{Trigger State output, \mhdStatIdea}
+ *       \mhdStatus{Change resolution, \mhdStatIdea}
+ *       \mhdStatus{Change wall time, \mhdStatIdea}
+ *       \mhdStatus{Change timestepping, \mhdStatIdea}
+ *       \mhdStatus{Change parameters, \mhdStatIdea}
+ *    }   
  *
- * \subsection MHDSStatusIoState State file
+ * \subsection mhdSStatusIoCfg Configuration
  *
- * \subsection MHDSStatusIoVis Visualization
+ *    \mhdTable{
+ *       \mhdStatus{XML configuration file, \mhdStatTodo}
+ *    }   
  *
- * \section MHDSStatusProf Profiling
+ * \subsection mhdSStatusIoDiag Diagnostics
  *
- * \subsection MHDSStatusProfMem Memory
+ *    \mhdTable{
+ *       \mhdStatus{Scalar energy for TTT, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for TTT, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for TFT, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for TFT, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for TFF, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for TFF, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for FFF, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for FFF, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for CTF, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for CTF, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for SLF, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for SLF, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for WFT, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for WFT, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy for WLF, \mhdStatTodo}
+ *       \mhdStatus{Vector energy for WLF, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for TTT, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for TTT, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for TFT, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for TFT, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for TFF, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for TFF, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for FFF, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for FFF, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for CTF, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for CTF, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for SLF, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for SLF, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for WFT, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for WFT, \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum for WLF, \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum for WLF, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusProfMem Computation
+ * \subsection mhdSStatusIoState State file
+ *    \mhdTable{
+ *       \mhdStatus{State file for TTT, \mhdStatTodo}
+ *       \mhdStatus{State file for TFT, \mhdStatTodo}
+ *       \mhdStatus{State file for TFF, \mhdStatTodo}
+ *       \mhdStatus{State file for FFF, \mhdStatTodo}
+ *       \mhdStatus{State file for CTF, \mhdStatTodo}
+ *       \mhdStatus{State file for SLF, \mhdStatTodo}
+ *       \mhdStatus{State file for WFT, \mhdStatTodo}
+ *       \mhdStatus{State file for WLF, \mhdStatTodo}
+ *    }   
  *
- * \subsection MHDSStatusProfScale Scaling
+ * \subsection mhdSStatusIoVis Visualization
+ *
+ *    \mhdTable{
+ *       \mhdStatus{Visualization for TTT, \mhdStatTodo}
+ *       \mhdStatus{Visualization for TFT, \mhdStatTodo}
+ *       \mhdStatus{Visualization for TFF, \mhdStatTodo}
+ *       \mhdStatus{Visualization for FFF, \mhdStatTodo}
+ *       \mhdStatus{Visualization for CTF, \mhdStatTodo}
+ *       \mhdStatus{Visualization for SLF, \mhdStatTodo}
+ *       \mhdStatus{Visualization for WFT, \mhdStatTodo}
+ *       \mhdStatus{Visualization for WLF, \mhdStatTodo}
+ *       \mhdStatus{ParaView reader for TTT, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for TFT, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for TFF, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for FFF, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for CTF, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for SLF, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for WFT, \mhdStatIdea}
+ *       \mhdStatus{ParaView reader for WLF, \mhdStatIdea}
+ *    }   
+ *
+ * \section mhdSStatusProf Profiling
+ *
+ *    \mhdTable{
+ *       \mhdStatus{Coarse memory usage, \mhdStatTodo}
+ *       \mhdStatus{Detailed Memory usage, \mhdStatTodo}
+ *       \mhdStatus{Coarse Timing, \mhdStatTodo}
+ *       \mhdStatus{Detailed Timing, \mhdStatTodo}
+ *       \mhdStatus{Parallel weak scaling, \mhdStatTodo}
+ *       \mhdStatus{Parallel strong scaling, \mhdStatTodo}
+ *    }   
+ *
+ * \section mhdSStatusGpu GPGPU accelerator
+ *
+ *    \mhdTable{
+ *       \mhdStatus{Sparse linear solver, \mhdStatIdea}
+ *       \mhdStatus{Sparse eigen solver, \mhdStatIdea}
+ *       \mhdStatus{FFT, \mhdStatIdea}
+ *       \mhdStatus{Chebyshev transform, \mhdStatIdea}
+ *       \mhdStatus{Associated legendre transform, \mhdStatIdea}
+ *       \mhdStatus{Worland transform, \mhdStatIdea}
+ *       \mhdStatus{ViennaCL backend, \mhdStatIdea}
+ *    }  
+ *
+ *
  */
