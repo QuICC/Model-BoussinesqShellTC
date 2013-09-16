@@ -1,6 +1,6 @@
 /** 
  * @file SerialTimerTest.cpp
- * @brief Implementation of test case for SerialTimer
+ * @brief Implementation of test case for the serial timer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -65,7 +65,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test default constructor
+    * @brief Test default constructor 
+    *
+    * @param SerialTimerTest     Test fixture ID
+    * @param DefaultConstructor  Test ID
     */
    TEST_F(SerialTimerTest, DefaultConstructor) {
       // Create timer with default constructor
@@ -85,7 +88,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test with explicit noautostart
+    * @brief Test explicit noautostart 
+    *
+    * @param SerialTimerTest  Test fixture ID
+    * @param NoAutostart      Test ID
     */
    TEST_F(SerialTimerTest, NoAutostart) {
       // Create timer with no autostart
@@ -105,7 +111,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test the autostart feature
+    * @brief Test autostart 
+    *
+    * @param SerialTimerTest  Test fixture ID
+    * @param Autostart        Test ID
     */
    TEST_F(SerialTimerTest, Autostart) {
       // Create timer with autostart
@@ -128,7 +137,12 @@ namespace TestSuite {
 }
 }
 
-/// Main to execute all test from test case
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
    return RUN_ALL_TESTS();

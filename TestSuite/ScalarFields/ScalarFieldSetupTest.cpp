@@ -1,6 +1,6 @@
 /** 
  * @file ScalarFieldSetupTest.cpp
- * @brief Implementation of test case for ScalarFieldSetup
+ * @brief Implementation of test cases for the scalar field setup object
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -46,27 +46,10 @@ namespace TestSuite {
 
    ScalarFieldSetupTest::ScalarFieldSetupTest()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    ScalarFieldSetupTest::~ScalarFieldSetupTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void ScalarFieldSetupTest::SetUp()
@@ -80,6 +63,12 @@ namespace TestSuite {
    /**
     * @brief Test 1D 
     */
+   /**
+    * @brief Test 1D scalar field 
+    *
+    * @param ScalarFieldSetupTest   Test fixture ID
+    * @param OneDimensional         Test ID
+    */
    TEST_F(ScalarFieldSetupTest, OneDimensional)
    {
       // Create 1D scalar field setup
@@ -92,7 +81,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test 2D 
+    * @brief Test 2D scalar field
+    *
+    * @param ScalarFieldSetupTest   Test fixture ID
+    * @param TwoDimensional         Test ID
     */
    TEST_F(ScalarFieldSetupTest, TwoDimensional)
    {
@@ -114,7 +106,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test 3D 
+    * @brief Test 3D scalar field 
+    *
+    * @param ScalarFieldSetupTest   Test fixture ID
+    * @param ThreeDimensional       Test ID
     */
    TEST_F(ScalarFieldSetupTest, ThreeDimensional)
    {
@@ -155,8 +150,34 @@ namespace TestSuite {
 }
 }
 
-/// Main to execute all test from test case
-int main(int argc, char **argv) {
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }

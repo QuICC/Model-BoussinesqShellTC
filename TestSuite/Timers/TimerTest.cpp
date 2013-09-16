@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file TimerTest.cpp
+ * @brief Implementation of test cases for the generic timer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the Timer implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class TimerTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         TimerTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~TimerTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   TimerTest::TimerTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   TimerTest::~TimerTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void TimerTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void TimerTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param TimerTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(TimerTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

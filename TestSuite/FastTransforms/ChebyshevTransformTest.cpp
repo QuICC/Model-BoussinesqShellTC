@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file ChebyshevTransformTest.cpp
+ * @brief Implementation of test cases for a generic Chebyshev transform (independent of backend)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the ChebyshevTransform implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class ChebyshevTransformTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         ChebyshevTransformTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~ChebyshevTransformTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   ChebyshevTransformTest::ChebyshevTransformTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   ChebyshevTransformTest::~ChebyshevTransformTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void ChebyshevTransformTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void ChebyshevTransformTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param ChebyshevTransformTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(ChebyshevTransformTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

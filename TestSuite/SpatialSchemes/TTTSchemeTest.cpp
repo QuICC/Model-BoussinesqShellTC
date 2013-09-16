@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file TTTSchemeTest.cpp
+ * @brief Implementation of test cases for the Chebyshev/Chebyshev/Chebyshev spatial scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the TTTScheme implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class TTTSchemeTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         TTTSchemeTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~TTTSchemeTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   TTTSchemeTest::TTTSchemeTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   TTTSchemeTest::~TTTSchemeTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void TTTSchemeTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void TTTSchemeTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param TTTSchemeTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(TTTSchemeTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

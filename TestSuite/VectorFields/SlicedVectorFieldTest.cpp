@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file SlicedVectorFieldTest.cpp
+ * @brief Implementation of test cases for the sliced storage vector field
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the SlicedVectorField implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class SlicedVectorFieldTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         SlicedVectorFieldTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~SlicedVectorFieldTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   SlicedVectorFieldTest::SlicedVectorFieldTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   SlicedVectorFieldTest::~SlicedVectorFieldTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void SlicedVectorFieldTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void SlicedVectorFieldTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param SlicedVectorFieldTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(SlicedVectorFieldTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

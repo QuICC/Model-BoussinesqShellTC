@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file TFTTauOperatorTest.cpp
+ * @brief Implementation of test cases for TFTTauOperator
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the TFTTauOperator implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class TFTTauOperatorTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         TFTTauOperatorTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~TFTTauOperatorTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   TFTTauOperatorTest::TFTTauOperatorTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   TFTTauOperatorTest::~TFTTauOperatorTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void TFTTauOperatorTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void TFTTauOperatorTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param TFTTauOperatorTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(TFTTauOperatorTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

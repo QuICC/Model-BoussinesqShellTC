@@ -29,6 +29,7 @@
  *       \mhdStatus{SLF spatial scheme,\mhdStatTodo}
  *       \mhdStatus{WFT spatial scheme,\mhdStatTodo}
  *       \mhdStatus{WLF spatial scheme,\mhdStatTodo}
+ *       \mhdStatus{SFF spatial scheme,\mhdStatIdea}
  *       \mhdStatus{FFT, \mhdStatTodo}
  *       \mhdStatus{Cartesian Chebyshev transform, \mhdStatTodo}
  *       \mhdStatus{Cylindrical Chebyshev transform, \mhdStatTodo}
@@ -45,12 +46,6 @@
  *       \mhdStatus{KissFFT backend, \mhdStatIdea}
  *    }   
  *
- * \section mhdSStatusEig Sparse eigen solvers
- *
- *    \mhdTable{
- *       \mhdStatus{ARPACK backend, \mhdStatTodo}
- *    }   
- *
  * \section mhdSStatusSpecOp Sparse spectral operators
  *
  *    \mhdTable{
@@ -64,6 +59,12 @@
  *       \mhdStatus{Quasi-inverse tau method, \mhdStatTodo}
  *       \mhdStatus{Direct Galerkin method, \mhdStatTodo}
  *       \mhdStatus{Quasi-inverse Galerkin method, \mhdStatTodo}
+ *    }   
+ *
+ * \section mhdSStatusEig Sparse eigen solvers
+ *
+ *    \mhdTable{
+ *       \mhdStatus{ARPACK backend, \mhdStatTodo}
  *    }   
  *
  * \section mhdSStatusSolver Sparse linear solvers
@@ -82,6 +83,12 @@
  *       \mhdStatus{SPQR backend, \mhdStatTodo}
  *       \mhdStatus{BiCSTAB (eigen) backend, \mhdStatTodo}
  *    }   
+ *
+ * \section mhdSStatusSolver Sparse nonlinear solvers
+ *
+ *    \mhdTable{
+ *       \mhdStatus{Nonlinear Newton solver, \mhdStatIdea}
+ *    }
  *
  * \section mhdSStatusTStep Timestepping scheme
  *
@@ -104,14 +111,14 @@
  *
  *    \mhdTable{
  *       \mhdStatus{Temporal averaging, \mhdStatTodo}
- *       \mhdStatus{Spacial average for TTT, \mhdStatTodo}
- *       \mhdStatus{Spacial average for TFT, \mhdStatTodo}
- *       \mhdStatus{Spacial average for TFF, \mhdStatTodo}
- *       \mhdStatus{Spacial average for FFF, \mhdStatTodo}
- *       \mhdStatus{Spacial average for CFT, \mhdStatTodo}
- *       \mhdStatus{Spacial average for SLF, \mhdStatTodo}
- *       \mhdStatus{Spacial average for WFT, \mhdStatTodo}
- *       \mhdStatus{Spacial average for WLF, \mhdStatTodo}
+ *       \mhdStatus{Spatial average (TTT), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (TFT), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (TFF), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (FFF), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (CFT), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (SLF), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (WFT), \mhdStatTodo}
+ *       \mhdStatus{Spatial average (WLF), \mhdStatTodo}
  *    }   
  *
  * \section mhdSStatusPara Parallelisation
@@ -158,71 +165,71 @@
  * \subsection mhdSStatusIoDiag Diagnostics
  *
  *    \mhdTable{
- *       \mhdStatus{Scalar energy for TTT, \mhdStatTodo}
- *       \mhdStatus{Vector energy for TTT, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for TFT, \mhdStatTodo}
- *       \mhdStatus{Vector energy for TFT, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for TFF, \mhdStatTodo}
- *       \mhdStatus{Vector energy for TFF, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for FFF, \mhdStatTodo}
- *       \mhdStatus{Vector energy for FFF, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for CTF, \mhdStatTodo}
- *       \mhdStatus{Vector energy for CTF, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for SLF, \mhdStatTodo}
- *       \mhdStatus{Vector energy for SLF, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for WFT, \mhdStatTodo}
- *       \mhdStatus{Vector energy for WFT, \mhdStatTodo}
- *       \mhdStatus{Scalar energy for WLF, \mhdStatTodo}
- *       \mhdStatus{Vector energy for WLF, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for TTT, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for TTT, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for TFT, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for TFT, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for TFF, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for TFF, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for FFF, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for FFF, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for CTF, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for CTF, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for SLF, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for SLF, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for WFT, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for WFT, \mhdStatTodo}
- *       \mhdStatus{Scalar spectrum for WLF, \mhdStatTodo}
- *       \mhdStatus{Vector spectrum for WLF, \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (TTT), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (TTT), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (TFT), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (TFT), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (TFF), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (TFF), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (FFF), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (FFF), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (CTF), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (CTF), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (SLF), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (SLF), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (WFT), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (WFT), \mhdStatTodo}
+ *       \mhdStatus{Scalar energy (WLF), \mhdStatTodo}
+ *       \mhdStatus{Vector energy (WLF), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (TTT), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (TTT), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (TFT), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (TFT), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (TFF), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (TFF), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (FFF), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (FFF), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (CTF), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (CTF), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (SLF), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (SLF), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (WFT), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (WFT), \mhdStatTodo}
+ *       \mhdStatus{Scalar spectrum (WLF), \mhdStatTodo}
+ *       \mhdStatus{Vector spectrum (WLF), \mhdStatTodo}
  *    }   
  *
  * \subsection mhdSStatusIoState State file
  *    \mhdTable{
- *       \mhdStatus{State file for TTT, \mhdStatTodo}
- *       \mhdStatus{State file for TFT, \mhdStatTodo}
- *       \mhdStatus{State file for TFF, \mhdStatTodo}
- *       \mhdStatus{State file for FFF, \mhdStatTodo}
- *       \mhdStatus{State file for CTF, \mhdStatTodo}
- *       \mhdStatus{State file for SLF, \mhdStatTodo}
- *       \mhdStatus{State file for WFT, \mhdStatTodo}
- *       \mhdStatus{State file for WLF, \mhdStatTodo}
+ *       \mhdStatus{State file (TTT), \mhdStatTodo}
+ *       \mhdStatus{State file (TFT), \mhdStatTodo}
+ *       \mhdStatus{State file (TFF), \mhdStatTodo}
+ *       \mhdStatus{State file (FFF), \mhdStatTodo}
+ *       \mhdStatus{State file (CTF), \mhdStatTodo}
+ *       \mhdStatus{State file (SLF), \mhdStatTodo}
+ *       \mhdStatus{State file (WFT), \mhdStatTodo}
+ *       \mhdStatus{State file (WLF), \mhdStatTodo}
  *    }   
  *
  * \subsection mhdSStatusIoVis Visualization
  *
  *    \mhdTable{
- *       \mhdStatus{Visualization for TTT, \mhdStatTodo}
- *       \mhdStatus{Visualization for TFT, \mhdStatTodo}
- *       \mhdStatus{Visualization for TFF, \mhdStatTodo}
- *       \mhdStatus{Visualization for FFF, \mhdStatTodo}
- *       \mhdStatus{Visualization for CTF, \mhdStatTodo}
- *       \mhdStatus{Visualization for SLF, \mhdStatTodo}
- *       \mhdStatus{Visualization for WFT, \mhdStatTodo}
- *       \mhdStatus{Visualization for WLF, \mhdStatTodo}
- *       \mhdStatus{ParaView reader for TTT, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for TFT, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for TFF, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for FFF, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for CTF, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for SLF, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for WFT, \mhdStatIdea}
- *       \mhdStatus{ParaView reader for WLF, \mhdStatIdea}
+ *       \mhdStatus{Visualization (TTT), \mhdStatTodo}
+ *       \mhdStatus{Visualization (TFT), \mhdStatTodo}
+ *       \mhdStatus{Visualization (TFF), \mhdStatTodo}
+ *       \mhdStatus{Visualization (FFF), \mhdStatTodo}
+ *       \mhdStatus{Visualization (CTF), \mhdStatTodo}
+ *       \mhdStatus{Visualization (SLF), \mhdStatTodo}
+ *       \mhdStatus{Visualization (WFT), \mhdStatTodo}
+ *       \mhdStatus{Visualization (WLF), \mhdStatTodo}
+ *       \mhdStatus{ParaView reader (TTT), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (TFT), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (TFF), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (FFF), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (CTF), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (SLF), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (WFT), \mhdStatIdea}
+ *       \mhdStatus{ParaView reader (WLF), \mhdStatIdea}
  *    }   
  *
  * \section mhdSStatusProf Profiling

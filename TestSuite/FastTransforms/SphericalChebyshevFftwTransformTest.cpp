@@ -1,6 +1,6 @@
 /** 
  * @file SphericalChebyshevFftwTransformTest.cpp
- * @brief Implementation of a test case for SphericalChebyshevFftwTransform
+ * @brief Implementation of test cases for spherical fast Chebyshev transform (FFTW backend)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -74,7 +74,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test mesh grid
+    * @brief Test the mesh grid 
+    *
+    * @param SphericalChebyshevFftwTransformTest   Test fixture ID
+    * @param MeshGrid                              Test ID
     */
    TEST_F(SphericalChebyshevFftwTransformTest, MeshGrid)
    {
@@ -98,7 +101,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a real forward transform 
+    *
+    * @param SphericalChebyshevFftwTransformTest   Test fixture ID
+    * @param ForwardRealAccuracy                   Test ID
     */
    TEST_F(SphericalChebyshevFftwTransformTest, ForwardRealAccuracy)
    {
@@ -154,7 +160,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a real backward transform
+    *
+    * @param SphericalChebyshevFftwTransformTest   Test fixture ID
+    * @param BackwardRealAccuracy                  Test ID
     */
    TEST_F(SphericalChebyshevFftwTransformTest, BackwardRealAccuracy)
    {
@@ -203,7 +212,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a complex forward transform 
+    *
+    * @param SphericalChebyshevFftwTransformTest
+    * @param ForwardComplexAccuracy
     */
    TEST_F(SphericalChebyshevFftwTransformTest, ForwardComplexAccuracy)
    {
@@ -272,7 +284,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a complex backward transform 
+    *
+    * @param SphericalChebyshevFftwTransformTest   Test fixture ID
+    * @param BackwardComplexAccuracy               Test ID
     */
    TEST_F(SphericalChebyshevFftwTransformTest, BackwardComplexAccuracy)
    {
@@ -349,7 +364,12 @@ namespace TestSuite {
 }
 }
 
-/// Main to execute all test from test case
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
    return RUN_ALL_TESTS();

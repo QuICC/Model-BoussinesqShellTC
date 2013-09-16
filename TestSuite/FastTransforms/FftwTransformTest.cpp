@@ -1,6 +1,6 @@
 /** 
  * @file FftwTransformTest.cpp
- * @brief Implementation of a test case for FftwTransform
+ * @brief Implementation of test cases for FFT transforms (FFTW backend)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -17,7 +17,7 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the FftwTransform implementation
+    * @brief Googletest fixture for the FftwTransform implementation
     */
    class FftwTransformTest : public ::testing::Test {
       public:
@@ -74,7 +74,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test mesh grid
+    * @brief Test the mesh grid
+    *
+    * @param FftwTransformTest   Test fixture ID
+    * @param MeshGrid            Test ID
     */
    TEST_F(FftwTransformTest, MeshGrid)
    {
@@ -97,7 +100,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy for forward mixed transform
+    * @brief Accuracy test for mixed forward transform
+    *
+    * @param FftwTransformTest      Test fixture ID
+    * @param ForwardMixedAccuracy   Test ID
     */
    TEST_F(FftwTransformTest, ForwardMixedAccuracy)
    {
@@ -144,7 +150,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy for backward mixed transform
+    * @brief Accuracy test for mixed backward transform
+    *
+    * @param FftwTransformTest      Test fixture ID
+    * @param BackwardMixedAccuracy  Test ID
     */
    TEST_F(FftwTransformTest, BackwardMixedAccuracy)
    {
@@ -191,7 +200,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy for backward mixed derivative transform
+    * @brief Accuracy test for mixed backward derivative transform
+    *
+    * @param FftwTransformTest         Test fixture ID
+    * @param BackwardMixedDiffAccuracy Test ID
     */
    TEST_F(FftwTransformTest, BackwardMixedDiffAccuracy)
    {
@@ -241,7 +253,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy for forward transform
+    * @brief Accuracy test for forward transform
+    *
+    * @param FftwTransformTest   Test fixture ID
+    * @param ForwardAccuracy     Test ID
     */
    TEST_F(FftwTransformTest, ForwardAccuracy)
    {
@@ -290,7 +305,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy for backward transform
+    * @brief Accuracy test for backward transform
+    *
+    * @param FftwTransformTest   Test fixture ID
+    * @param BackwardAccuracy    Test ID
     */
    TEST_F(FftwTransformTest, BackwardAccuracy)
    {
@@ -346,7 +364,12 @@ namespace TestSuite {
 }
 }
 
-/// Main to execute all test from test case
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
    return RUN_ALL_TESTS();

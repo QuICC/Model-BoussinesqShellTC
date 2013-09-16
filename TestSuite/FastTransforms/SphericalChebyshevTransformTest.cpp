@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file SphericalChebyshevTransformTest.cpp
+ * @brief Implementation of test cases for a generic spherical Chebyshev transform (independent of backend)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the SphericalChebyshevTransform implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class SphericalChebyshevTransformTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         SphericalChebyshevTransformTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~SphericalChebyshevTransformTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   SphericalChebyshevTransformTest::SphericalChebyshevTransformTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   SphericalChebyshevTransformTest::~SphericalChebyshevTransformTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void SphericalChebyshevTransformTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void SphericalChebyshevTransformTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param SphericalChebyshevTransformTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(SphericalChebyshevTransformTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

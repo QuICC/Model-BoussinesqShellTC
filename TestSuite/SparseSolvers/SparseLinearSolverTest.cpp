@@ -1,6 +1,6 @@
 /** 
- * @file SparseSolverTest.cpp
- * @brief Implementation of test case for the sparse solvers
+ * @file SparseLinearSolverTest.cpp
+ * @brief Implementation of test cases for a generic sparse linear solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -19,19 +19,19 @@ namespace TestSuite {
    /**
     * @brief Test fixture for the sparse solvers
     */
-   class SparseSolverTest : public ::testing::Test {
+   class SparseLinearSolverTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         SparseSolverTest();
+         SparseLinearSolverTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~SparseSolverTest();
+         virtual ~SparseLinearSolverTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -44,43 +44,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   SparseSolverTest::SparseSolverTest()
+   SparseLinearSolverTest::SparseLinearSolverTest()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
-   SparseSolverTest::~SparseSolverTest()
+   SparseLinearSolverTest::~SparseLinearSolverTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
-//   void SparseSolverTest::SetUp()
+//   void SparseLinearSolverTest::SetUp()
 //   {
 //   }
 
-//   void SparseSolverTest::TearDown()
+//   void SparseLinearSolverTest::TearDown()
 //   {
 //   }
 
    /**
-    * @brief Small and simple real problem taken from Pardiso example
+    * @brief Small and simple real problem taken from Pardiso example 
+    *
+    * @param SparseLinearSolverTest Test fixture ID
+    * @param SimpleReal       Test ID
     */
-   TEST_F(SparseSolverTest, SimpleReal)
+   TEST_F(SparseLinearSolverTest, SimpleReal)
    {
       // Build test matrix triplets
       typedef Eigen::Triplet<MHDFloat> T;
@@ -137,9 +123,12 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Small and simple complex problem taken from Pardiso example
+    * @brief Small and simple complex problem taken from Pardiso example 
+    *
+    * @param SparseLinearSolverTest Test fixture ID
+    * @param SimpleComplex    Test ID
     */
-   TEST_F(SparseSolverTest, SimpleComplex)
+   TEST_F(SparseLinearSolverTest, SimpleComplex)
    {
       // Build test matrix triplets
       typedef Eigen::Triplet<MHDComplex> T;
@@ -197,87 +186,146 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Dirichlet boundary conditions
+    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Dirichlet boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param HarmonicDirichlet1D Test ID
     */
-   TEST_F(SparseSolverTest, HarmonicDirichlet1D)
+   TEST_F(SparseLinearSolverTest, HarmonicDirichlet1D)
    {
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Neumann boundary conditions
+    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param HarmonicNeumann1D   Test ID
     */
-   TEST_F(SparseSolverTest, HarmonicNeumann1D)
+   TEST_F(SparseLinearSolverTest, HarmonicNeumann1D)
    {
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Dirichlet boundary conditions
+    * @brief  Cartesian 1D \f$\nabla^4 x = b\f$ with Dirichlet boundary conditions
+    *
+    * @param SparseLinearSolverTest       Test fixture ID
+    * @param BiHarmonicDirichlet1D  Test ID
     */
-   TEST_F(SparseSolverTest, BiHarmonicDirichlet1D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet1D)
    {
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Neumann boundary conditions
+    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param BiHarmonicNeumann1D Test ID
     */
-   TEST_F(SparseSolverTest, BiHarmonicNeumann1D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicNeumann1D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Dirichlet/Dirichlet boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Dirichlet/Dirichlet boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param HarmonicDirichlet2D Test ID
     */
-   TEST_F(SparseSolverTest, HarmonicDirichlet2D)
+   TEST_F(SparseLinearSolverTest, HarmonicDirichlet2D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Neumann/Neumann boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Neumann/Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param HarmonicNeumann2D   Test ID
     */
-   TEST_F(SparseSolverTest, HarmonicNeumann2D)
+   TEST_F(SparseLinearSolverTest, HarmonicNeumann2D)
    {
    }
 
    /**
     * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    *
+    * @param SparseLinearSolverTest Test fixture ID
+    * @param HarmonicMixed2D  Test ID
     */
-   TEST_F(SparseSolverTest, HarmonicMixed2D)
+   TEST_F(SparseLinearSolverTest, HarmonicMixed2D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Dirichlet/Dirichlet boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Dirichlet/Dirichlet boundary conditions 
+    *
+    * @param SparseLinearSolverTest       Test fixture ID
+    * @param BiHarmonicDirichlet2D  Test ID
     */
-   TEST_F(SparseSolverTest, BiHarmonicDirichlet2D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet2D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Neumann/Neumann boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Neumann/Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param BiHarmonicNeumann2D Test ID
     */
-   TEST_F(SparseSolverTest, BiHarmonicNeumann2D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicNeumann2D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with mixed Dirichlet/Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest    Test fixture ID
+    * @param BiHarmonicMixed2D   Test ID
     */
-   TEST_F(SparseSolverTest, BiHarmonicMixed2D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicMixed2D)
    {
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions 
+    *
+    * @param SparseLinearSolverTest       Test fixture ID
+    * @param MixedHarmonicMixed2D   Test ID
     */
-   TEST_F(SparseSolverTest, MixedHarmonicMixed2D)
+   TEST_F(SparseLinearSolverTest, MixedHarmonicMixed2D)
    {
    }
 
 }
 }
 
-/// Main to execute all test from test case
-int main(int argc, char **argv) {
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
+int main(int argc, char **argv)
+{
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }

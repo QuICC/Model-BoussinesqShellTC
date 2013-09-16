@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file MKLPardisoDirectSolverTest.cpp
+ * @brief Implementation of test cases for MKL's Pardiso direct solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the MKLPardisoDirectSolver implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class MKLPardisoDirectSolverTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         MKLPardisoDirectSolverTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~MKLPardisoDirectSolverTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   MKLPardisoDirectSolverTest::MKLPardisoDirectSolverTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   MKLPardisoDirectSolverTest::~MKLPardisoDirectSolverTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void MKLPardisoDirectSolverTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void MKLPardisoDirectSolverTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param MKLPardisoDirectSolverTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(MKLPardisoDirectSolverTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

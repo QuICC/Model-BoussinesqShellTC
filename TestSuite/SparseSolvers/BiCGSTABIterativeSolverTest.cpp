@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file BiCGSTABIterativeSolverTest.cpp
+ * @brief Implementation of test cases for Eigen's BiCGSTAB iterativeS solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the BiCGSTABIterativeSolver implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class BiCGSTABIterativeSolverTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         BiCGSTABIterativeSolverTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~BiCGSTABIterativeSolverTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   BiCGSTABIterativeSolverTest::BiCGSTABIterativeSolverTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   BiCGSTABIterativeSolverTest::~BiCGSTABIterativeSolverTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void BiCGSTABIterativeSolverTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void BiCGSTABIterativeSolverTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param BiCGSTABIterativeSolverTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(BiCGSTABIterativeSolverTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

@@ -1,6 +1,6 @@
 /** 
- * @file ++TESTNAME++Test.cpp
- * @brief Implementation of test cases for ++TESTNAME++
+ * @file UmfPackDirectSolverTest.cpp
+ * @brief Implementation of test cases for SuiteSparse's UmfPack direct solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -15,21 +15,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the ++TESTNAME++ implementation
+    * @brief Test fixture for the UmfPackDirectSolver implementation
     */
-   class ++TESTNAME++Test : public ::testing::Test {
+   class UmfPackDirectSolverTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         ++TESTNAME++Test();
+         UmfPackDirectSolverTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~++TESTNAME++Test();
+         virtual ~UmfPackDirectSolverTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -42,29 +42,29 @@ namespace TestSuite {
          //virtual void TearDown() {};
    };
 
-   ++TESTNAME++Test::++TESTNAME++Test()
+   UmfPackDirectSolverTest::UmfPackDirectSolverTest()
    {
    }
 
-   ++TESTNAME++Test::~++TESTNAME++Test()
+   UmfPackDirectSolverTest::~UmfPackDirectSolverTest()
    {
    }
 
-//   void ++TESTNAME++Test::SetUp()
+//   void UmfPackDirectSolverTest::SetUp()
 //   {
 //   }
 
-//   void ++TESTNAME++Test::TearDown()
+//   void UmfPackDirectSolverTest::TearDown()
 //   {
 //   }
 
    /**
     * @brief Dummy placeholder test
     *
-    * @param ++TESTNAME++Test Test fixture ID
+    * @param UmfPackDirectSolverTest Test fixture ID
     * @param Placeholder      Test ID
     */
-   TEST_F(++TESTNAME++Test, Placeholder)
+   TEST_F(UmfPackDirectSolverTest, Placeholder)
    {
       ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
    }

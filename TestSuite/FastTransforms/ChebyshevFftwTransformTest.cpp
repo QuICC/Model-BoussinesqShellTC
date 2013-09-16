@@ -1,6 +1,6 @@
 /** 
  * @file ChebyshevFftwTransformTest.cpp
- * @brief Implementation of a test case for ChebyshevFftwTransform
+ * @brief Implementation of test cases for fast Chebyshev transforms (FFTW backend)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -74,7 +74,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test mesh grid
+    * @brief Test the mesh grid 
+    *
+    * @param ChebyshevFftwTransformTest   Test fixture ID
+    * @param MeshGrid                     Test ID
     */
    TEST_F(ChebyshevFftwTransformTest, MeshGrid)
    {
@@ -98,7 +101,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for real forward transform
+    *
+    * @param ChebyshevFftwTransformTest   Test fixture ID
+    * @param ForwardRealAccuracy          Test ID
     */
    TEST_F(ChebyshevFftwTransformTest, ForwardRealAccuracy)
    {
@@ -154,7 +160,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for real backward transform
+    *
+    * @param ChebyshevFftwTransformTest   Test fixture ID
+    * @param BackwardRealAccuracy         Test ID
     */
    TEST_F(ChebyshevFftwTransformTest, BackwardRealAccuracy)
    {
@@ -203,7 +212,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a complex forward transform 
+    *
+    * @param ChebyshevFftwTransformTest Test fixture ID
+    * @param ForwardComplexAccuracy     Test ID
     */
    TEST_F(ChebyshevFftwTransformTest, ForwardComplexAccuracy)
    {
@@ -272,7 +284,10 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test accuracy
+    * @brief Accuracy test for a complex backward transform 
+    *
+    * @param ChebyshevFftwTransformTest   Test fixture ID
+    * @param BackwardComplexAccuracy      Test ID
     */
    TEST_F(ChebyshevFftwTransformTest, BackwardComplexAccuracy)
    {
@@ -349,7 +364,12 @@ namespace TestSuite {
 }
 }
 
-/// Main to execute all test from test case
+/**
+ * @brief Main function to execute all test cases
+ *
+ * @param argc Number of arguments
+ * @param argv Arguments
+ */
 int main(int argc, char **argv) {
    ::testing::InitGoogleTest(&argc, argv);
    return RUN_ALL_TESTS();

@@ -10,74 +10,134 @@
  * \section mhdSTSBase Base
  *
  *    \mhdTable{
- *       \mhdStatus{Multiple precision,\mhdStatNA}
- *       \mhdStatus{Vector field,\mhdStatNA}
- *       \mhdStatus{Scalar field,\mhdStatNA}
- *       \mhdStatus{Serial timer,\mhdStatNA}
- *       \mhdStatus{MPI timer,\mhdStatNA}
+ *       \mhdStatus{\ref MultiplePrecisionTest.cpp "Multiple precision",\mhdStatNA}
+ *       }
+ *
+ * \section mhdSTSFramework Framework
+ *
+ *    \mhdTable{
+ *       \mhdStatus{\ref FrameworkTest.cpp "Framework",\mhdStatNA}
+ *       \mhdStatus{\ref SerialFrameworkTest.cpp "SerialFramework",\mhdStatNA}
+ *       \mhdStatus{\ref MpiFrameworkTest.cpp "MpiFramework",\mhdStatNA}
+ *       }
+ *
+ * \section mhdSTSSField Scalar field
+ *
+ *    \mhdTable{
+ *       \mhdStatus{\ref ScalarFieldSetupTest.cpp "Scalar field setup",\mhdStatNA}
+ *       \mhdStatus{\ref ScalarFieldTest.cpp "Scalar field",\mhdStatNA}
+ *       \mhdStatus{\ref FlatScalarFieldTest.cpp "Flat scalar field",\mhdStatNA}
+ *       \mhdStatus{\ref SlicedScalarFieldTest.cpp "Sliced scalar field",\mhdStatNA}
+ *       }
+ *
+ * \section mhdSTSVField Vector field
+ *
+ *    \mhdTable{
+ *       \mhdStatus{\ref VectorFieldTest.cpp "Vector field",\mhdStatNA}
+ *       \mhdStatus{\ref FlatVectorFieldTest.cpp "Flat vector field",\mhdStatNA}
+ *       \mhdStatus{\ref SlicedVectorFieldTest.cpp "Sliced vector field",\mhdStatNA}
+ *       }
+ *
+ * \section mhdSTSTimers Timers
+ *
+ *    \mhdTable{
+ *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatNA}
+ *       \mhdStatus{\ref SerialTimerTest.cpp "Serial timer",\mhdStatNA}
+ *       \mhdStatus{\ref MpiTimerTest.cpp "MPI timer",\mhdStatNA}
  *       }
  *
  * \section mhdSTSTransform Transforms
  *
  *    \mhdTable{
- *       \mhdStatus{TTT Spatial scheme,\mhdStatNA}
- *       \mhdStatus{TFT spatial scheme,\mhdStatNA}
- *       \mhdStatus{TFF spatial scheme,\mhdStatNA}
- *       \mhdStatus{FFF spatial scheme,\mhdStatNA}
- *       \mhdStatus{CFT spatial scheme,\mhdStatNA}
- *       \mhdStatus{SLF spatial scheme,\mhdStatNA}
- *       \mhdStatus{WFT spatial scheme,\mhdStatNA}
- *       \mhdStatus{WLF spatial scheme,\mhdStatNA}
- *       \mhdStatus{FFT (FFTW),\mhdStatNA}
- *       \mhdStatus{Cartesian Chebyshev (FFTW),\mhdStatNA}
- *       \mhdStatus{Cylindrical Chebyshev (FFTW),\mhdStatNA}
- *       \mhdStatus{Spherical Chebyshev (FFTW),\mhdStatNA}
- *       \mhdStatus{Associated Legendre transform,\mhdStatNA}
- *       \mhdStatus{Worland transform,\mhdStatNA}
+ *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref FftwTransformTest.cpp "FFT (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref ChebyshevFftwTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref CylindricalChebyshevFftwTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref SphericalChebyshevFftwTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNA}
+ *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNA}
+ *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNA}
+ *       \mhdStatus{\ref WorlandOnlineTransformTest.cpp "Worland transform (online)",\mhdStatNA}
  *    }
- *
- * \section mhdSTSEig Sparse eigen solvers
- *
- *    \mhdTable{
- *       \mhdStatus{Sparse eigen solver (ARPACK), \mhdStatNA}
- *    }   
  *
  * \section mhdSTSSpecOp Sparse spectral operators
  *
  *    \mhdTable{
- *       \mhdStatus{1D bounded operator (Direct tau), \mhdStatNA}
- *       \mhdStatus{2D bounded operator (Direct tau), \mhdStatNA}
- *       \mhdStatus{3D bounded operator (Direct tau), \mhdStatNA}
- *       \mhdStatus{1D bounded operator (QI tau), \mhdStatNA}
- *       \mhdStatus{2D bounded operator (QI tau), \mhdStatNA}
- *       \mhdStatus{3D bounded operator (QI tau), \mhdStatNA}
- *       \mhdStatus{1D bounded operator (Galerkin tau), \mhdStatNA}
- *       \mhdStatus{2D bounded operator (Galerkin tau), \mhdStatNA}
- *       \mhdStatus{3D bounded operator (Galerkin tau), \mhdStatNA}
- *       \mhdStatus{1D bounded operator (Galerkin QI), \mhdStatNA}
- *       \mhdStatus{2D bounded operator (Galerkin QI), \mhdStatNA}
- *       \mhdStatus{3D bounded operator (Galerkin QI), \mhdStatNA}
+ *       \mhdStatus{\ref TTTTauOperatorTest.cpp "Tau operator (TTT)", \mhdStatNA}
+ *       \mhdStatus{\ref TFTTauOperatorTest.cpp "Tau operator (TFT)", \mhdStatNA}
+ *       \mhdStatus{\ref TFFTauOperatorTest.cpp "Tau operator (TFF)", \mhdStatNA}
+ *       \mhdStatus{\ref FFFTauOperatorTest.cpp "Tau operator (FFF)", \mhdStatNA}
+ *       \mhdStatus{\ref CFTTauOperatorTest.cpp "Tau operator (CFT)", \mhdStatNA}
+ *       \mhdStatus{\ref SLFTauOperatorTest.cpp "Tau operator (SLF)", \mhdStatNA}
+ *       \mhdStatus{\ref WFTTauOperatorTest.cpp "Tau operator (WFT)", \mhdStatNA}
+ *       \mhdStatus{\ref WLFTauOperatorTest.cpp "Tau operator (WLF)", \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (TTT), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (TFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (TFF), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (FFF), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (CFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (SLF), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (WFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin operator (WLF), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (TTT), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (TFT), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (TFF), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (FFF), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (CFT), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (SLF), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (WFT), \mhdStatNA}
+ *       \mhdStatus{Tau QI operator (WLF), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (TTT), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (TFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (TFF), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (FFF), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (CFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (SLF), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (WFT), \mhdStatNA}
+ *       \mhdStatus{Galerkin QI operator (WLF), \mhdStatNA}
+ *    }   
+ *
+ * \section mhdSTSEig Sparse eigen solvers
+ *
+ *    \mhdTable{
+ *       \mhdStatus{Sparse eigen solver (generic), \mhdStatNA}
+ *       \mhdStatus{Eigen solver (ARPACK), \mhdStatNA}
  *    }   
  *
  * \section mhdSTSSparseSolver Sparse linear solvers
  *    
  *    \mhdTable{
- *       \mhdStatus{Direct solver (UmfPack),\mhdStatNA}
- *       \mhdStatus{Direct solver (SuperLU),\mhdStatNA}
- *       \mhdStatus{Direct solver (eigen/SparseLU),\mhdStatNA}
- *       \mhdStatus{Direct solver (MKL Pardiso),\mhdStatNA}
- *       \mhdStatus{Direct solver (Pardiso),\mhdStatNA}
- *       \mhdStatus{Direct solver (Mumps),\mhdStatNA}
- *       \mhdStatus{Direct solver (PaStiX),\mhdStatNA}
- *       \mhdStatus{Direct solver (eigen/SparseQR),\mhdStatNA}
- *       \mhdStatus{Direct solver (SPQR),\mhdStatNA}
- *       \mhdStatus{Iterative solver (eigen/BiCGSTAB),\mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref UmfPackDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNA}
+ *       \mhdStatus{\ref SuperLUDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseLUDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNA}
+ *       \mhdStatus{\ref MKLPardisoDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNA}
+ *       \mhdStatus{\ref PardisoDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNA}
+ *       \mhdStatus{\ref MumpsDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNA}
+ *       \mhdStatus{\ref PaStiXDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseQRDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNA}
+ *       \mhdStatus{\ref SPQRDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNA}
+ *       \mhdStatus{\ref BiCGSTABIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNA}
  *    }
  *
  * \section mhdSTSTStep Timestepping scheme
  *
  *    \mhdTable{
- *       \mhdStatus{Timestepper (RK3), \mhdStatNA}
+ *       \mhdStatus{Timestepper, \mhdStatNA}
+ *       \mhdStatus{Euler scheme, \mhdStatNA}
+ *       \mhdStatus{RK3 scheme, \mhdStatNA}
+ *       \mhdStatus{RK4 scheme, \mhdStatNA}
  *    }   
  *
  * \section mhdSTSEq Equations
@@ -93,15 +153,17 @@
  * \section mhdSTSAvg Averaging schemes
  *
  *    \mhdTable{
+ *       \mhdStatus{Temporal averaging (Euler), \mhdStatNA}
  *       \mhdStatus{Temporal averaging (RK3), \mhdStatNA}
- *       \mhdStatus{Spacial average for TTT, \mhdStatNA}
- *       \mhdStatus{Spacial average for TFT, \mhdStatNA}
- *       \mhdStatus{Spacial average for TFF, \mhdStatNA}
- *       \mhdStatus{Spacial average for FFF, \mhdStatNA}
- *       \mhdStatus{Spacial average for CFT, \mhdStatNA}
- *       \mhdStatus{Spacial average for SLF, \mhdStatNA}
- *       \mhdStatus{Spacial average for WFT, \mhdStatNA}
- *       \mhdStatus{Spacial average for WLF, \mhdStatNA}
+ *       \mhdStatus{Temporal averaging (RK4), \mhdStatNA}
+ *       \mhdStatus{Spatial average (TTT), \mhdStatNA}
+ *       \mhdStatus{Spatial average (TFT), \mhdStatNA}
+ *       \mhdStatus{Spatial average (TFF), \mhdStatNA}
+ *       \mhdStatus{Spatial average (FFF), \mhdStatNA}
+ *       \mhdStatus{Spatial average (CFT), \mhdStatNA}
+ *       \mhdStatus{Spatial average (SLF), \mhdStatNA}
+ *       \mhdStatus{Spatial average (WFT), \mhdStatNA}
+ *       \mhdStatus{Spatial average (WLF), \mhdStatNA}
  *    }   
  *
  * \section mhdSStatusPara Parallelisation
@@ -142,114 +204,114 @@
  * \subsection mhdSTSIoDiag Diagnostics
  *
  *    \mhdTable{
- *    	\mhdStatus{Compute scalar energy for TTT,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for TTT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for TFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for TFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for TFF,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for TFF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for FFF,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for FFF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for CFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for CFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for SLF,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for SLF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for WFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for WFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy for WLF,\mhdStatNA}
- *    	\mhdStatus{Compute vector energy for WLF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for TTT,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for TTT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for TFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for TFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for TFF,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for TFF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for FFF,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for FFF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for CFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for CFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for SLF,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for SLF,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for WFT,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for WFT,\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum for WLF,\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum for WLF,\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (TTT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (TTT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (TFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (TFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (TFF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (TFF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (FFF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (FFF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (CFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (CFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (SLF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (SLF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (WFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (WFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (WLF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector energy (WLF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (TTT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (TTT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (TFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (TFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (TFF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (TFF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (FFF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (FFF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (CFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (CFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (SLF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (SLF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (WFT),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (WFT),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar spectrum (WLF),\mhdStatNA}
+ *    	\mhdStatus{Compute vector spectrum (WLF),\mhdStatNA}
  *    	\mhdStatus{Write ASCII diagnostic file,\mhdStatNA}
  *    	\mhdStatus{Write binary ASCII diagnostic file,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for TTT,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for TTT,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for TFT,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for TFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for TFF,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for TFF,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for FFF,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for FFF,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for CFT,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for CFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for SLF,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for SLF,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for WFT,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for WFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy for WLF,\mhdStatNA}
- *    	\mhdStatus{Write vector energy for WLF,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for TTT,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for TTT,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for TFT,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for TFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for TFF,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for TFF,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for FFF,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for FFF,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for CFT,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for CFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for SLF,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for SLF,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for WFT,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for WFT,\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum for WLF,\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum for WLF,\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar energy (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write vector energy (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write scalar spectrum (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write vector spectrum (WLF),\mhdStatNA}
  *    }
  *
  * \subsection mhdSTSIoState State file
  *
  *    \mhdTable{
- *    	\mhdStatus{Read TTT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write TTT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read TFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write TFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read TFF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write TFF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read FFF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write FFF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read CFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write CFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read SLF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write SLF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read WFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write WFT HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Read WLF HDF5 state file,\mhdStatNA}
- *    	\mhdStatus{Write WLF HDF5 state file,\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (TTT),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (TFT),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (TFF),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (FFF),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (CFT),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (SLF),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (WFT),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 state file (WLF),\mhdStatNA}
  *    }
  *
  * \subsection mhdSTSIoState Visualization file
  *
  *    \mhdTable{
- *    	\mhdStatus{Write TTT HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write TFT HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write TFF HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write FFF HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write CFT HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write SLF HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write WFT HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write WLF HDF5 visualization file,\mhdStatNA}
- *    	\mhdStatus{Write TTT XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write TFT XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write TFF XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write FFF XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write CFT XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write SLF XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write WFT XDMF wrapper file,\mhdStatNA}
- *    	\mhdStatus{Write WLF XDMF wrapper file,\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (TTT),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (TFT),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (TFF),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (FFF),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (CFT),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (SLF),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (WFT),\mhdStatNA}
+ *    	\mhdStatus{Write XDMF wrapper file (WLF),\mhdStatNA}
  *    }
  *
  * \section mhdSTSProf Profiling
@@ -266,38 +328,38 @@
  * \section mhdSTSBoundary Boundary conditions
  *
  *    \mhdTable{
- *       \mhdStatus{No-slip for TTT, \mhdStatNA}
- *       \mhdStatus{No-slip for TFT, \mhdStatNA}
- *       \mhdStatus{No-slip for TFF, \mhdStatNA}
- *       \mhdStatus{No-slip for FFF, \mhdStatNA}
- *       \mhdStatus{No-slip for CTF, \mhdStatNA}
- *       \mhdStatus{No-slip for SLF, \mhdStatNA}
- *       \mhdStatus{No-slip for WFT, \mhdStatNA}
- *       \mhdStatus{No-slip for WLF, \mhdStatNA}
- *       \mhdStatus{Stress-free for TTT, \mhdStatNA}
- *       \mhdStatus{Stress-free for TFT, \mhdStatNA}
- *       \mhdStatus{Stress-free for TFF, \mhdStatNA}
- *       \mhdStatus{Stress-free for FFF, \mhdStatNA}
- *       \mhdStatus{Stress-free for CTF, \mhdStatNA}
- *       \mhdStatus{Stress-free for SLF, \mhdStatNA}
- *       \mhdStatus{Stress-free for WFT, \mhdStatNA}
- *       \mhdStatus{Stress-free for WLF, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for TTT, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for TFT, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for TFF, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for FFF, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for CTF, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for SLF, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for WFT, \mhdStatNA}
- *       \mhdStatus{Fixed temperature for WLF, \mhdStatNA}
- *       \mhdStatus{Fixed flux for TTT, \mhdStatNA}
- *       \mhdStatus{Fixed flux for TFT, \mhdStatNA}
- *       \mhdStatus{Fixed flux for TFF, \mhdStatNA}
- *       \mhdStatus{Fixed flux for FFF, \mhdStatNA}
- *       \mhdStatus{Fixed flux for CTF, \mhdStatNA}
- *       \mhdStatus{Fixed flux for SLF, \mhdStatNA}
- *       \mhdStatus{Fixed flux for WFT, \mhdStatNA}
- *       \mhdStatus{Fixed flux for WLF, \mhdStatNA}
+ *       \mhdStatus{No-slip (TTT), \mhdStatNA}
+ *       \mhdStatus{No-slip (TFT), \mhdStatNA}
+ *       \mhdStatus{No-slip (TFF), \mhdStatNA}
+ *       \mhdStatus{No-slip (FFF), \mhdStatNA}
+ *       \mhdStatus{No-slip (CTF), \mhdStatNA}
+ *       \mhdStatus{No-slip (SLF), \mhdStatNA}
+ *       \mhdStatus{No-slip (WFT), \mhdStatNA}
+ *       \mhdStatus{No-slip (WLF), \mhdStatNA}
+ *       \mhdStatus{Stress-free (TTT), \mhdStatNA}
+ *       \mhdStatus{Stress-free (TFT), \mhdStatNA}
+ *       \mhdStatus{Stress-free (TFF), \mhdStatNA}
+ *       \mhdStatus{Stress-free (FFF), \mhdStatNA}
+ *       \mhdStatus{Stress-free (CTF), \mhdStatNA}
+ *       \mhdStatus{Stress-free (SLF), \mhdStatNA}
+ *       \mhdStatus{Stress-free (WFT), \mhdStatNA}
+ *       \mhdStatus{Stress-free (WLF), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (TTT), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (TFT), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (TFF), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (FFF), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (CTF), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (SLF), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (WFT), \mhdStatNA}
+ *       \mhdStatus{Fixed temperature (WLF), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (TTT), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (TFT), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (TFF), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (FFF), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (CTF), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (SLF), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (WFT), \mhdStatNA}
+ *       \mhdStatus{Fixed flux (WLF), \mhdStatNA}
  *    }
  *
  */
