@@ -2,8 +2,6 @@
  * @file Simulation.hpp
  * @brief High level implementation of a base for the simulations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SIMULATIONBASE_HPP

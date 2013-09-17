@@ -2,8 +2,6 @@
  * @file SerialConverter.hpp
  * @brief Implementation of the serial data converter 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SERIALCONVERTER_HPP

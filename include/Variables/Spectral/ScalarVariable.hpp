@@ -2,8 +2,6 @@
  * @file ScalarVariable.hpp
  * @brief Implementation of scalar field variable
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SCALARVARIABLE_HPP

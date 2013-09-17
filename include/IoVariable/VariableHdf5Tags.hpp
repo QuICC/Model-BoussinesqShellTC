@@ -2,8 +2,6 @@
  * @file VariableHdf5Tags.hpp
  * @brief Definitions and names used by the spectral space data files
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SPECTRALFILEDEFS_HPP

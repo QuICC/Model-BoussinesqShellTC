@@ -2,8 +2,6 @@
  * @file IRegular3DScheme.hpp
  * @brief Implementation of a generic regular 3D scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef IREGULAR3DSCHEME_HPP

@@ -2,8 +2,6 @@
  * @file VisualizationGeneratorFactory.hpp
  * @brief Implementation of the visualization generator model factory
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef VISUALIZATIONGENERATORFACTORY_HPP

@@ -2,8 +2,6 @@
  * @file VisualizeResolution.hpp
  * @brief Implementation of a few useful tools to output resolution and load splitting
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  *
  *  \mhdBug Implementation needs to be checked
  */

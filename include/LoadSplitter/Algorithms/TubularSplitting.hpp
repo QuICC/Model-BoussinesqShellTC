@@ -2,8 +2,6 @@
  * @file TubularSplitting.hpp
  * @brief Implementation of a double load splitting algorithm, aka "Tubular" splitting
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TUBULARSPLITTING_HPP

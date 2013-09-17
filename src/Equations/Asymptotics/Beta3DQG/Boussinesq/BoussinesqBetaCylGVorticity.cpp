@@ -2,8 +2,6 @@
  * @file BoussinesqBetaCylGVorticity.cpp
  * @brief Source of the implementation of the vorticity computation in the 3DQG beta model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

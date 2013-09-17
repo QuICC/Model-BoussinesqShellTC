@@ -2,8 +2,6 @@
  * @file BoussinesqFPlaneTransport.hpp
  * @brief Implementation of the transport equation for the Boussinesq 3DQG f-plane model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQFPLANETRANSPORT_HPP

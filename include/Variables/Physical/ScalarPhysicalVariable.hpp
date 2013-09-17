@@ -2,8 +2,6 @@
  * @file ScalarPhysicalVariable.hpp
  * @brief Base of the implementation of the physical components of a scalar variable
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SCALARPHYSICALVARIABLE_HPP

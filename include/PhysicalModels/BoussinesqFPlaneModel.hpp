@@ -2,8 +2,6 @@
  * @file BoussinesqFPlaneModel.hpp
  * @brief Implementation of the Boussinesq f-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQFPLANEMODEL_HPP

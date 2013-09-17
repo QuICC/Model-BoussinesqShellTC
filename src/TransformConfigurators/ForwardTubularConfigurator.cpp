@@ -2,8 +2,6 @@
  * @file ForwardTubularConfigurator.cpp
  * @brief Source of the implementation of the forward transform tubula algorithm configurator
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

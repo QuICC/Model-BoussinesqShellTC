@@ -2,8 +2,6 @@
  * @file TimerTools.hpp
  * @brief Implementation of timer tools 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TIMERTOOLS_HPP

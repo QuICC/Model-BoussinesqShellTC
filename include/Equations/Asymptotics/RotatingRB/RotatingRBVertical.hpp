@@ -2,8 +2,6 @@
  * @file RotatingRBVertical.hpp
  * @brief Implementation of the vertical velocity equation for the rotating Rayleigh-Benard model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef ROTATINGRBVERTICAL_HPP

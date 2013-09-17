@@ -2,8 +2,6 @@
  * @file ForwardSingle1DConfigurator.cpp
  * @brief Source of the implementation of the forward single splitting algorithm on first dimension configurator
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

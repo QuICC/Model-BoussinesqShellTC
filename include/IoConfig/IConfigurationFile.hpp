@@ -2,8 +2,6 @@
  * @file IConfigurationFile.hpp 
  * @brief Implementation of the base for a configuration file
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef ICONFIGURATIONFILE_HPP

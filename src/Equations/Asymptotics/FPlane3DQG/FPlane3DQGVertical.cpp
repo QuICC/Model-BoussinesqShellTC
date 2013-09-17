@@ -2,8 +2,6 @@
  * @file FPlane3DQGVertical.cpp
  * @brief Source of the implementation of the vertical velocity equation in the 3DQG f-plane model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

@@ -2,8 +2,6 @@
  * @file Equation2DEigenTools.cpp
  * @brief Source of the tools for schemes with two eigen direction
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

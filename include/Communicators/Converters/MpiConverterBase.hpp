@@ -2,8 +2,6 @@
  * @file MpiConverterBase.hpp
  * @brief Templated implementation of the base of a MPI data converter 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef MPICONVERTERBASE_HPP

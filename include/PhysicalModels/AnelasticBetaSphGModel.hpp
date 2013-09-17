@@ -2,8 +2,6 @@
  * @file AnelasticBetaSphGModel.hpp
  * @brief Implementation of the anelastic beta 3DQG model with spherical gravity
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef ANELASTICBETASPHGMODEL_HPP

@@ -2,8 +2,6 @@
  * @file SplittingDescription.hpp
  * @brief Implementation basic description of the obtained splitting (for any algorithm)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SPLITTINGDESCRIPTION_HPP

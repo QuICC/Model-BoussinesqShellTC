@@ -2,8 +2,6 @@
  * @file TestTFTBidiffusion3D.hpp
  * @brief Implementation of the TFT test equation for 3D bi-diffusion (bilaplacian) 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TESTTFTBIDIFFUSION3D_HPP

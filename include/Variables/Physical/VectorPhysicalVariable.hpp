@@ -2,8 +2,6 @@
  * @file VectorPhysicalVariable.hpp
  * @brief Base of the implementation of the physical components of a vector variable
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef VECTORPHYSICALVARIABLE_HPP

@@ -2,8 +2,6 @@
  * @file ForwardConfigurator.hpp
  * @brief This class defines the base operations for a forward transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef FORWARDCONFIGURATOR_HPP

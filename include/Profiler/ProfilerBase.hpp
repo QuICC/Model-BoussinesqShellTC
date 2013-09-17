@@ -2,8 +2,6 @@
  * @file ProfilerBase.hpp
  * @brief Implementation of the base of a profiling timer 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef PROFILERBASE_HPP

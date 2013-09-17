@@ -2,8 +2,6 @@
  * @file BoussinesqPerBetaCylGSystem.hpp
  * @brief Implementation of the matrix blocks for the Boussinesq beta model with cylindrical gravity with periodic radius 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQPERBETACYLGSYSTEM_HPP

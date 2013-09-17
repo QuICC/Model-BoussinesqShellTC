@@ -2,8 +2,6 @@
  * @file VectorFieldVisualizer.hpp
  * @brief Implementation of the basic vector field visualizer 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef VECTORFIELDVISUALIZER_HPP

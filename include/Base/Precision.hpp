@@ -2,8 +2,6 @@
  * @file Precision.hpp
  * @brief Small wrapper class for generic normal of multiple precision internal computations 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef PRECISION_HPP

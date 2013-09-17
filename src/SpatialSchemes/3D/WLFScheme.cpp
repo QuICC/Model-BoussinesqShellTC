@@ -2,8 +2,6 @@
  * @file WLFScheme.cpp
  * @brief Source of the spherical Worland(poly) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // System includes

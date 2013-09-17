@@ -2,8 +2,6 @@
  * @file Transform1DCoordinator.hpp
  * @brief Implementation of a transform coordinator in 1D
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TRANSFORM1DCOORDINATOR_HPP

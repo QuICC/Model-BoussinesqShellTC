@@ -2,8 +2,6 @@
  * @file ModelFactory.hpp
  * @brief Implementation of the physical model factory
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef MODELFACTORY_HPP

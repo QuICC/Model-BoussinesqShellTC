@@ -2,8 +2,6 @@
  * @file IHdf5Reader.hpp
  * @brief Interface to a general HDF5 file reader
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef IHDF5READER_HPP

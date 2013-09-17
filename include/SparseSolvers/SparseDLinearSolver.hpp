@@ -2,8 +2,6 @@
  * @file SparseDLinearSolver.hpp
  * @brief Implementation of a real (coupled) linear solver structure
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SPARSEDLINEARSOLVER_HPP

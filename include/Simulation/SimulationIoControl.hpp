@@ -2,8 +2,6 @@
  * @file SimulationIoControl.hpp
  * @brief Implementation of the control instance for the simulation IO related operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SIMULATIONIOCONTROL_HPP

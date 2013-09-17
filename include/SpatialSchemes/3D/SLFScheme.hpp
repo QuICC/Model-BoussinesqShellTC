@@ -2,8 +2,6 @@
  * @file SLFScheme.hpp
  * @brief Implementation of the spherical Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SLFSCHEME_HPP

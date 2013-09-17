@@ -2,8 +2,6 @@
  * @file PrueferAlgorithm.cpp
  * @brief Source of the implementation of the Pruefer algorithm for the computation of a quadrature rule
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

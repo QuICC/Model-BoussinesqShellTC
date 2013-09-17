@@ -2,8 +2,6 @@
  * @file CommunicationBuffer.hpp
  * @brief Implementation of a "raw" communication buffer 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef COMMUNICATIONBUFFER_HPP

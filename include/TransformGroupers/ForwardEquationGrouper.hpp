@@ -2,8 +2,6 @@
  * @file ForwardEquationGrouper.hpp
  * @brief This class defines a simple equation wise forward transform grouping algorithm (serial algorithm)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_TRANSGROUPER_EQUATION
 

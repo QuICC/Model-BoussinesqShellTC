@@ -2,8 +2,6 @@
  * @file SparseSolverBase.cpp
  * @brief Implementation of the base for linear solver structures
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // System includes

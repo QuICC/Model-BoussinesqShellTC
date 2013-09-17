@@ -2,8 +2,6 @@
  * @file IScalarEquation.hpp
  * @brief Base for the implementation of a scalar equation 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef ISCALAREQUATION_HPP

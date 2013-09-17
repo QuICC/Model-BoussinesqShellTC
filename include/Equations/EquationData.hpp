@@ -2,8 +2,6 @@
  * @file EquationData.hpp
  * @brief Lowest building block for the implementation of an equation 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef EQUATIONDATA_HPP

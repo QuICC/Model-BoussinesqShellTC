@@ -2,8 +2,6 @@
  * @file NoIndexConv.hpp
  * @brief Implementation of the index converter doing nothing 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef NOINDEXCONV_HPP

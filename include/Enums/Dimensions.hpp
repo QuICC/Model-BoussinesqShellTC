@@ -2,8 +2,6 @@
  * @file Dimensions.hpp
  * @brief Definition of some useful enums of the dimensions of the model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef DIMENSIONS_HPP

@@ -2,8 +2,6 @@
  * @file StreamHeatAdvection.hpp
  * @brief Implementation of a generic streamfunction advection including conducting state
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef STREAMHEATADVECTION_HPP

@@ -2,8 +2,6 @@
  * @file BackwardTubularConfigurator.hpp
  * @brief This defines the backward transform tubular splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_MPIALGO_TUBULAR
 

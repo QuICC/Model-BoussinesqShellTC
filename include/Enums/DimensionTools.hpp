@@ -2,8 +2,6 @@
  * @file DimensionTools.hpp
  * @brief Definition of some useful tools for the dimensions enums 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef DIMENSIONTOOLS_HPP

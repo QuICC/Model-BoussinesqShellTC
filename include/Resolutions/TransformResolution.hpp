@@ -2,8 +2,6 @@
  * @file TransformResolution.hpp
  * @brief Definition of the required resolution information for a transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TRANSFORMRESOLUTION_HPP

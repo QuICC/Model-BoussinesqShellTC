@@ -2,8 +2,6 @@
  * @file Hdf5File.hpp
  * @brief Implementation of a general HDF5 file
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef HDF5FILE_HPP

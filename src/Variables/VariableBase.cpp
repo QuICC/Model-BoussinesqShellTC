@@ -2,8 +2,6 @@
  * @file VariableBase.cpp
  * @brief Base of the implementation of the variables
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

@@ -2,8 +2,6 @@
  * @file StorageDispatcher.hpp
  * @brief Simple storage dispatcher for the communicator storage 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef STORAGEDISPATCHER_HPP

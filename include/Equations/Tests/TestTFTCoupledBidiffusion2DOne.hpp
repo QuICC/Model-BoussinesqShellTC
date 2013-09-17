@@ -2,8 +2,6 @@
  * @file TestTFTCoupledBidiffusion2DOne.hpp
  * @brief Implementation of the TFT test equation for 2D bi-diffusion as coupled system: part one (within 3D model) 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef TESTTFTCOUPLEDBIDIFFUSION2DONE_HPP

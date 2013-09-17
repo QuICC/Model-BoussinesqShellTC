@@ -2,8 +2,6 @@
  * @file StaticAssert.hpp
  * @brief Simple static assert implementation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef STATICASSERT_HPP

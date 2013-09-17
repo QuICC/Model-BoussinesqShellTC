@@ -2,8 +2,6 @@
  * @file StdOutPipe.hpp
  * @brief Implementation of standard output pipe file 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef STDOUTPIPE_HPP

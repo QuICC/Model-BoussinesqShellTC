@@ -2,8 +2,6 @@
  * @file Hdf5File.cpp
  * @brief Source of the implementation of a general HDF5 file
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

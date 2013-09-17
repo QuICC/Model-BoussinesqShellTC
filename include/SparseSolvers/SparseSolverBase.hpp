@@ -2,8 +2,6 @@
  * @file SparseSolverBase.hpp
  * @brief Implementation of the base for the solver structures
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SPARSESOLVERBASE_HPP

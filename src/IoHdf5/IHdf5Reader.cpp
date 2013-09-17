@@ -2,8 +2,6 @@
  * @file IHdf5Reader.cpp
  * @brief Source of the HDF5 reader implementation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // System includes

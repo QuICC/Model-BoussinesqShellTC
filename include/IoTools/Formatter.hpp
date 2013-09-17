@@ -2,8 +2,6 @@
  * @file Formatter.hpp
  * @brief Implementation of a few useful output formating static functions
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef FORMATTER_HPP

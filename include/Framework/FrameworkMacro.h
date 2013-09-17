@@ -2,8 +2,6 @@
  * @file FrameworkMacro.h
  * @brief Preprocessor macros to setup the framework depending on parallelisation options 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef FRAMEWORKMACRO_H

@@ -2,8 +2,6 @@
  * @file IXmlWriter.hpp
  * @brief Implementation of an XML writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef IXMLWRITER_HPP

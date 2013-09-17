@@ -2,8 +2,6 @@
  * @file ControlInterface.hpp
  * @brief Implementation of a external runtime control file
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef CONTROLINTERACE_HPP

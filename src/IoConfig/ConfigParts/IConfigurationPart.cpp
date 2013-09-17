@@ -2,8 +2,6 @@
  * @file IConfigurationPart.cpp
  * @brief Source of the implementation of the base of the configuration file parts
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

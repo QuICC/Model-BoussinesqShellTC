@@ -2,8 +2,6 @@
  * @file BoussinesqBetaCylGVorticity.hpp
  * @brief Implementation of the voriticity computation for the Boussinesq beta model with cylindrical gravity 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQBETACYLGVORTICITY_HPP

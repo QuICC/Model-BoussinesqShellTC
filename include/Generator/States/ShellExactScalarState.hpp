@@ -2,8 +2,6 @@
  * @file ShellExactScalarState.hpp
  * @brief Implementation of the equation to generate exact scalar states in a spherical shell 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SHELLEXACTSCALARSTATE_HPP

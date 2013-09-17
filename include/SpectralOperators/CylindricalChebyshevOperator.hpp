@@ -2,8 +2,6 @@
  * @file CylindricalChebyshevOperator.hpp
  * @brief Implementation of the spectral operators for the chebyshev basis for a cylindrical radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef CYLINDRICALCHEBYSHEVOPERATOR_HPP

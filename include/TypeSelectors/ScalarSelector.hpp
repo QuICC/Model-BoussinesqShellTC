@@ -2,8 +2,6 @@
  * @file ScalarSelector.hpp
  * @brief Small template to select the right scalar field types
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SCALARSELECTOR_HPP

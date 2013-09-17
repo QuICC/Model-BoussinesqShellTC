@@ -2,8 +2,6 @@
  * @file MpiProfiler.hpp
  * @brief Implementation of a MPI profiling timer 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef MPIPROFILER_HPP

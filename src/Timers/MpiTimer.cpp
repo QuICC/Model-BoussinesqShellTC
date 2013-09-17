@@ -2,8 +2,6 @@
  * @file MpiTimer.cpp
  * @brief Source of the implementation of MPI timer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

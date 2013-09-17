@@ -2,8 +2,6 @@
  * @file WFTSchemeTest.cpp
  * @brief Implementation of test cases for the Worland/Fourier/Chebyshev spatial scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #include "gtest/gtest.h"

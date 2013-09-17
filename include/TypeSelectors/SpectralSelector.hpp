@@ -2,8 +2,6 @@
  * @file SpectralSelector.hpp
  * @brief Small template to select the right spectral operator types
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SPECTRALSELECTOR_HPP

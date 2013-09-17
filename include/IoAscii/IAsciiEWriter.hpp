@@ -2,8 +2,6 @@
  * @file IAsciiEWriter.hpp
  * @brief General interface of an "extending" ASCII writer 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef IASCIIEWRITER_HPP

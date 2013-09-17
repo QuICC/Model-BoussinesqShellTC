@@ -2,8 +2,6 @@
  * @file DynamicPairProvider.hpp
  * @brief Templated implementation of a data pair storage provider adapting its size dynamically.
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef DYNAMICPAIRPROVIDER_HPP

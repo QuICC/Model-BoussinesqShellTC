@@ -2,8 +2,6 @@
  * @file BoussinesqBetaCylGStreamfunction.hpp
  * @brief Implementation of the streamfunction equation for the Boussinesq beta model with cylindrical gravity 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQBETACYLGSTREAMFUNCTION_HPP

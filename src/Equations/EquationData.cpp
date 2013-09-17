@@ -2,8 +2,6 @@
  * @file EquationData.cpp
  * @brief Source of building block for the implementation of a time dependend evolution equation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

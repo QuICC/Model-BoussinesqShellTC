@@ -2,8 +2,6 @@
  * @file ForwardSingle2DConfigurator.hpp
  * @brief This class defines the forward transform single second exchange splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 #ifdef GEOMHDISCC_MPIALGO_SINGLE2D
 

@@ -2,8 +2,6 @@
  * @file IVariableHdf5NWriter.cpp 
  * @brief Source of the implementation of the generic variable to file writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 // Configuration includes

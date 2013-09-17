@@ -2,8 +2,6 @@
  * @file BoussinesqBetaCylGModel.hpp
  * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef BOUSSINESQBETACYLGMODEL_HPP

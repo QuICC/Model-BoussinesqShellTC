@@ -2,8 +2,6 @@
  * @file SerialDebugger.hpp
  * @brief Implementation of a very simple serial debugger 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef SERIALDEBUGGER_HPP
