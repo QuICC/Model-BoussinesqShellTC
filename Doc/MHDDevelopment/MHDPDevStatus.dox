@@ -271,6 +271,7 @@
  *       \mhdStatus{Associated legendre transform, \mhdStatIdea}
  *       \mhdStatus{Worland transform, \mhdStatIdea}
  *       \mhdStatus{ViennaCL backend, \mhdStatIdea}
+ *       \mhdStatus{clMath/clBLAS/clFFT/clMAGMA backend, \mhdStatIdea}
  *    }  
  *
  */

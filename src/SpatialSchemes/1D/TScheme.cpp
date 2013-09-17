@@ -17,7 +17,7 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
-#include "FastTransforms/FftwTools.hpp"
+#include "TypeSelectors/FftSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -68,9 +68,9 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nX = Transform::FftwTools::dealiasFft(this->mI+1);
+      int nX = Transform::FftToolsType::dealiasFft(this->mI+1);
       // Check for optimised FFT sizes
-      nX = Transform::FftwTools::optimizeFft(nX);
+      nX = Transform::FftToolsType::optimizeFft(nX);
 
       //
       // Initialise first transform

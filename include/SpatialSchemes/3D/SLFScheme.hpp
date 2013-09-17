@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "FastTransforms/FftwTools.hpp"
+#include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "SpatialSchemes/3D/IRegularSHScheme.hpp"
