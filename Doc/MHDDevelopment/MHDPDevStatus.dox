@@ -4,13 +4,14 @@
  *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
  *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
  *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
- *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but ist not yet fully tested</td></tr>
- *       <tr>\mhdStatTest<td>Component implementation is done and tested!</td></tr>
+ *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but is not yet fully tested</td></tr>
+ *       <tr>\mhdStatTest<td>Component implementation is done and tested</td></tr>
  *    }   
  *
  * \section mhdSStatusBase Base elements
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Multiple precision, \mhdStatTodo}
  *       \mhdStatus{Scalar field, \mhdStatTodo}
  *       \mhdStatus{Vector field, \mhdStatTodo}
@@ -21,6 +22,7 @@
  * \section mhdSStatusTra Transforms
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{TTT Spatial scheme,\mhdStatTodo}
  *       \mhdStatus{TFT spatial scheme,\mhdStatTodo}
  *       \mhdStatus{TFF spatial scheme,\mhdStatTodo}
@@ -49,6 +51,7 @@
  * \section mhdSStatusSpecOp Sparse spectral operators
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Derivative operators, \mhdStatTodo}
  *       \mhdStatus{Laplacian operators, \mhdStatTodo}
  *       \mhdStatus{Non constant operators, \mhdStatTodo}
@@ -64,12 +67,14 @@
  * \section mhdSStatusEig Sparse eigen solvers
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{ARPACK backend, \mhdStatTodo}
  *    }   
  *
  * \section mhdSStatusSolver Sparse linear solvers
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Direct solver, \mhdStatTodo}
  *       \mhdStatus{Iterative solver, \mhdStatTodo}
  *       \mhdStatus{UmfPack backend, \mhdStatTodo}
@@ -87,12 +92,14 @@
  * \section mhdSStatusSolver Sparse nonlinear solvers
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Nonlinear Newton solver, \mhdStatIdea}
  *    }
  *
  * \section mhdSStatusTStep Timestepping scheme
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Timestepper, \mhdStatTodo}
  *       \mhdStatus{RK3 scheme, \mhdStatTodo}
  *    }   
@@ -100,6 +107,7 @@
  * \section mhdSStatusEq Equations
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Scalar equation, \mhdStatTodo}
  *       \mhdStatus{Vector equation, \mhdStatTodo}
  *       \mhdStatus{Trivial equation, \mhdStatTodo}
@@ -110,6 +118,7 @@
  * \section mhdSStatusAvg Averaging schemes
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Temporal averaging, \mhdStatTodo}
  *       \mhdStatus{Spatial average (TTT), \mhdStatTodo}
  *       \mhdStatus{Spatial average (TFT), \mhdStatTodo}
@@ -124,6 +133,7 @@
  * \section mhdSStatusPara Parallelisation
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Serial, \mhdStatTodo}
  *       \mhdStatus{MPI Single 1D splitting, \mhdStatTodo}
  *       \mhdStatus{MPI Single 2D splitting, \mhdStatTodo}
@@ -147,6 +157,7 @@
  * \subsection mhdSStatusIoCtl Runtime control
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Abort simulation, \mhdStatTodo}
  *       \mhdStatus{Trigger ASCII output, \mhdStatIdea}
  *       \mhdStatus{Trigger State output, \mhdStatIdea}
@@ -159,12 +170,14 @@
  * \subsection mhdSStatusIoCfg Configuration
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{XML configuration file, \mhdStatTodo}
  *    }   
  *
  * \subsection mhdSStatusIoDiag Diagnostics
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Scalar energy (TTT), \mhdStatTodo}
  *       \mhdStatus{Vector energy (TTT), \mhdStatTodo}
  *       \mhdStatus{Scalar energy (TFT), \mhdStatTodo}
@@ -200,7 +213,9 @@
  *    }   
  *
  * \subsection mhdSStatusIoState State file
+ *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{State file (TTT), \mhdStatTodo}
  *       \mhdStatus{State file (TFT), \mhdStatTodo}
  *       \mhdStatus{State file (TFF), \mhdStatTodo}
@@ -214,6 +229,7 @@
  * \subsection mhdSStatusIoVis Visualization
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Visualization (TTT), \mhdStatTodo}
  *       \mhdStatus{Visualization (TFT), \mhdStatTodo}
  *       \mhdStatus{Visualization (TFF), \mhdStatTodo}
@@ -235,6 +251,7 @@
  * \section mhdSStatusProf Profiling
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Coarse memory usage, \mhdStatTodo}
  *       \mhdStatus{Detailed Memory usage, \mhdStatTodo}
  *       \mhdStatus{Coarse Timing, \mhdStatTodo}
@@ -246,6 +263,7 @@
  * \section mhdSStatusGpu GPGPU accelerator
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Sparse linear solver, \mhdStatIdea}
  *       \mhdStatus{Sparse eigen solver, \mhdStatIdea}
  *       \mhdStatus{FFT, \mhdStatIdea}
@@ -254,6 +272,5 @@
  *       \mhdStatus{Worland transform, \mhdStatIdea}
  *       \mhdStatus{ViennaCL backend, \mhdStatIdea}
  *    }  
- *
  *
  */

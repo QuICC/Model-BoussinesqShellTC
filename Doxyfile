@@ -32,7 +32,7 @@ PROJECT_NAME           = "Geophysical MHD in Spheres, Cylinders and Cartesian bo
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 0.0.0
+PROJECT_NUMBER         = 0.9.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer
@@ -200,11 +200,14 @@ ALIASES                = "mhdBug=\xrefitem mhdBug \"Known bugs\" \"Known bugs\""
                          "mhdTSBug=\xrefitem mhdTSBug \"TestSuite known bugs\" \"TestSuite known bugs\"" \
                          "mhdTSTodo=\xrefitem mhdTSTodo \"TestSuite ToDo's\" \"TestSuite Todo's\"" \
                          "mhdTable{1}=<table>\1</table>" \
-                         "mhdStatus{2}=<tr><td>\1</td>\2</tr>" \
-                         "mhdStatPass=<td style=\"background-color:green;text-align:center;\"><span style=\"font-weight:bold;\">Passed!</span></td>" \
-                         "mhdStatFail=<td style=\"background-color:red;text-align:center;\"><span style=\"font-weight:bold;\">Failed!</span></td>" \
-                         "mhdStatPart=<td style=\"background-color:#F88017;text-align:center;\"><span style=\"font-weight:bold;\">Partial!</span></td>" \
-                         "mhdStatNA=<td style=\"background-color:#0020C2;text-align:center;\"><span style=\"font-weight:bold;\">N/A!</span></td>" \
+                         "mhdTableHeader=<tr style=\"font-weight:bold;\"><td>Name</td><td>Serial</td><td>Parallel</td></tr>" \
+                         "mhdStatDis=<td style=\"background-color:grey;\"></td>" \
+                         "mhdStatus{2}=<tr><td>\1</td>\2\mhdStatDis</tr>" \
+                         "mhdStatus{3}=<tr><td>\1</td>\2 \3</tr>" \
+                         "mhdStatPass=<td style=\"background-color:green;text-align:center;\"><span style=\"font-weight:bold;\">Passed</span></td>" \
+                         "mhdStatFail=<td style=\"background-color:red;text-align:center;\"><span style=\"font-weight:bold;\">Failed</span></td>" \
+                         "mhdStatPart=<td style=\"background-color:#F88017;text-align:center;\"><span style=\"font-weight:bold;\">Partial</span></td>" \
+                         "mhdStatNA=<td style=\"background-color:#0020C2;text-align:center;\"><span style=\"font-weight:bold;\">N/A</span></td>" \
                          "mhdStatIdea=<td style=\"background-color:#82CAFF;text-align:center;\"><span style=\"font-weight:bold;\">Idea</span></td>" \
                          "mhdStatTodo=<td style=\"background-color:red;text-align:center;\"><span style=\"font-weight:bold;\">Todo</span></td>" \
                          "mhdStatDone=<td style=\"background-color:#BCE954;text-align:center;\"><span style=\"font-weight:bold;\">Done</span></td>" \

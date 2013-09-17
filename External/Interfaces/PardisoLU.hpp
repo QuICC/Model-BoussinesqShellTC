@@ -2,8 +2,6 @@
  * @file PardisoLU.hpp
  * @brief Declarations needed to use the Pardiso routines in the C++ 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- * @version 0.9.0
- * @date 2013-09-11
  */
 
 #ifndef PARDISOLU_HPP

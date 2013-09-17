@@ -4,26 +4,29 @@
  *       <tr>\mhdStatNA<td>Component tests are not implemented yet</td></tr>
  *       <tr>\mhdStatPart<td>Component tests are partially implemented yet</td></tr>
  *       <tr>\mhdStatFail<td>Component tests are implemented but fail</td></tr>
- *       <tr>\mhdStatPass<td>Component tests are implemented and pass!</td></tr>
+ *       <tr>\mhdStatPass<td>Component tests are implemented and pass</td></tr>
  *    }   
  *
  * \section mhdSTSBase Base
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{\ref MultiplePrecisionTest.cpp "Multiple precision",\mhdStatNA}
  *       }
  *
  * \section mhdSTSFramework Framework
  *
  *    \mhdTable{
- *       \mhdStatus{\ref FrameworkTest.cpp "Framework",\mhdStatNA}
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref FrameworkTest.cpp "Framework",\mhdStatNA,\mhdStatNA}
  *       \mhdStatus{\ref SerialFrameworkTest.cpp "SerialFramework",\mhdStatNA}
- *       \mhdStatus{\ref MpiFrameworkTest.cpp "MpiFramework",\mhdStatNA}
+ *       \mhdStatus{\ref MpiFrameworkTest.cpp "MpiFramework",\mhdStatDis,\mhdStatNA}
  *       }
  *
  * \section mhdSTSSField Scalar field
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{\ref ScalarFieldSetupTest.cpp "Scalar field setup",\mhdStatNA}
  *       \mhdStatus{\ref ScalarFieldTest.cpp "Scalar field",\mhdStatNA}
  *       \mhdStatus{\ref FlatScalarFieldTest.cpp "Flat scalar field",\mhdStatNA}
@@ -33,6 +36,7 @@
  * \section mhdSTSVField Vector field
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{\ref VectorFieldTest.cpp "Vector field",\mhdStatNA}
  *       \mhdStatus{\ref FlatVectorFieldTest.cpp "Flat vector field",\mhdStatNA}
  *       \mhdStatus{\ref SlicedVectorFieldTest.cpp "Sliced vector field",\mhdStatNA}
@@ -41,7 +45,8 @@
  * \section mhdSTSTimers Timers
  *
  *    \mhdTable{
- *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatNA}
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatNA,\mhdStatNA}
  *       \mhdStatus{\ref SerialTimerTest.cpp "Serial timer",\mhdStatNA}
  *       \mhdStatus{\ref MpiTimerTest.cpp "MPI timer",\mhdStatNA}
  *       }
@@ -49,18 +54,19 @@
  * \section mhdSTSTransform Transforms
  *
  *    \mhdTable{
- *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNA}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNA}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNA}
- *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNA}
- *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNA}
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
  *       \mhdStatus{\ref FftwTransformTest.cpp "FFT (FFTW)",\mhdStatNA}
  *       \mhdStatus{\ref ChebyshevFftwTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNA}
  *       \mhdStatus{\ref CylindricalChebyshevFftwTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNA}
@@ -74,6 +80,7 @@
  * \section mhdSTSSpecOp Sparse spectral operators
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{\ref TTTTauOperatorTest.cpp "Tau operator (TTT)", \mhdStatNA}
  *       \mhdStatus{\ref TFTTauOperatorTest.cpp "Tau operator (TFT)", \mhdStatNA}
  *       \mhdStatus{\ref TFFTauOperatorTest.cpp "Tau operator (TFF)", \mhdStatNA}
@@ -111,13 +118,15 @@
  * \section mhdSTSEig Sparse eigen solvers
  *
  *    \mhdTable{
- *       \mhdStatus{Sparse eigen solver (generic), \mhdStatNA}
- *       \mhdStatus{Eigen solver (ARPACK), \mhdStatNA}
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref EigenSolverTest.cpp "Sparse eigen solver (generic)", \mhdStatNA}
+ *       \mhdStatus{\ref ArpackEigenSolverTest.cpp "Eigen solver (ARPACK)", \mhdStatNA}
  *    }   
  *
  * \section mhdSTSSparseSolver Sparse linear solvers
  *    
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNA}
  *       \mhdStatus{\ref UmfPackDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNA}
  *       \mhdStatus{\ref SuperLUDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNA}
@@ -134,6 +143,7 @@
  * \section mhdSTSTStep Timestepping scheme
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Timestepper, \mhdStatNA}
  *       \mhdStatus{Euler scheme, \mhdStatNA}
  *       \mhdStatus{RK3 scheme, \mhdStatNA}
@@ -143,6 +153,7 @@
  * \section mhdSTSEq Equations
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Scalar equation, \mhdStatNA}
  *       \mhdStatus{Vector equation, \mhdStatNA}
  *       \mhdStatus{Trivial equation, \mhdStatNA}
@@ -153,6 +164,7 @@
  * \section mhdSTSAvg Averaging schemes
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Temporal averaging (Euler), \mhdStatNA}
  *       \mhdStatus{Temporal averaging (RK3), \mhdStatNA}
  *       \mhdStatus{Temporal averaging (RK4), \mhdStatNA}
@@ -169,18 +181,25 @@
  * \section mhdSStatusPara Parallelisation
  *
  *    \mhdTable{
- *       \mhdStatus{Serial transform loop, \mhdStatNA}
- *       \mhdStatus{MPI Single 1D transform loop, \mhdStatNA}
- *       \mhdStatus{MPI Single 2D transform loop, \mhdStatNA}
- *       \mhdStatus{MPI Tubular transform loop, \mhdStatNA}
- *       \mhdStatus{Automatic MPI splitting, \mhdStatNA}
- *       \mhdStatus{MPI Equation grouping, \mhdStatNA}
- *       \mhdStatus{MPI Transform grouping, \mhdStatNA}
- *       \mhdStatus{MPI Single 1D grouping, \mhdStatNA}
- *       \mhdStatus{MPI Single 2D grouping, \mhdStatNA}
- *       \mhdStatus{Automatic MPI grouping, \mhdStatNA}
- *       \mhdStatus{Serial transform + solver loop, \mhdStatNA}
- *       \mhdStatus{MPI transform + solver loop, \mhdStatNA}
+ *       \mhdTableHeader
+ *       \mhdStatus{Load splitter (Serial), \mhdStatNA, \mhdStatDis}
+ *       \mhdStatus{Load splitter (Fixed), \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Single1D), \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Single2D), \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Tubular), \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Serial transform loop, \mhdStatNA, \mhdStatDis}
+ *       \mhdStatus{MPI Single 1D transform loop, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI Single 2D transform loop, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI Tubular transform loop, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Automatic MPI splitting, \mhdStatNA, \mhdStatNA}
+ *       \mhdStatus{MPI Equation grouping, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI Transform grouping, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI Single 1D grouping, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI Single 2D grouping, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Automatic MPI grouping, \mhdStatNA, \mhdStatNA}
+ *       \mhdStatus{Serial transform + solver loop, \mhdStatNA, \mhdStatDis}
+ *       \mhdStatus{MPI solver, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{MPI transform + MPI solver loop, \mhdStatDis, \mhdStatNA}
  *    }   
  *
  * \section mhdSTSIo Input/Output
@@ -188,6 +207,7 @@
  * \subsection mhdSTSIoCtl Runtime control
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *    	\mhdStatus{Abort simulation on deleted file,\mhdStatNA}
  *    	\mhdStatus{Read ASCII control file,\mhdStatNA}
  *    	\mhdStatus{Abort simulation on file command,\mhdStatNA}
@@ -196,6 +216,7 @@
  * \subsection mhdSTSIoCfg Configuration
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *    	\mhdStatus{Read XML configuration file,\mhdStatNA}
  *    	\mhdStatus{Write XML configuration file,\mhdStatNA}
  *    	\mhdStatus{Check XML configuration file,\mhdStatNA}
@@ -204,6 +225,7 @@
  * \subsection mhdSTSIoDiag Diagnostics
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *    	\mhdStatus{Compute scalar energy (TTT),\mhdStatNA}
  *    	\mhdStatus{Compute vector energy (TTT),\mhdStatNA}
  *    	\mhdStatus{Compute scalar energy (TFT),\mhdStatNA}
@@ -275,6 +297,7 @@
  * \subsection mhdSTSIoState State file
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *    	\mhdStatus{Read HDF5 state file (TTT),\mhdStatNA}
  *    	\mhdStatus{Write HDF5 state file (TTT),\mhdStatNA}
  *    	\mhdStatus{Read HDF5 state file (TFT),\mhdStatNA}
@@ -296,6 +319,7 @@
  * \subsection mhdSTSIoState Visualization file
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *    	\mhdStatus{Write HDF5 visualization file (TTT),\mhdStatNA}
  *    	\mhdStatus{Write HDF5 visualization file (TFT),\mhdStatNA}
  *    	\mhdStatus{Write HDF5 visualization file (TFF),\mhdStatNA}
@@ -317,6 +341,7 @@
  * \section mhdSTSProf Profiling
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{Coarse memory usage, \mhdStatNA}
  *       \mhdStatus{Detailed Memory usage, \mhdStatNA}
  *       \mhdStatus{Coarse Timing, \mhdStatNA}
@@ -328,6 +353,7 @@
  * \section mhdSTSBoundary Boundary conditions
  *
  *    \mhdTable{
+ *       \mhdTableHeader
  *       \mhdStatus{No-slip (TTT), \mhdStatNA}
  *       \mhdStatus{No-slip (TFT), \mhdStatNA}
  *       \mhdStatus{No-slip (TFF), \mhdStatNA}

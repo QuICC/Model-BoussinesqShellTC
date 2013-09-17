@@ -1,6 +1,6 @@
 /** 
  * @file EigenSolverTest.cpp
- * @brief Implementation of test case for EigenSolver
+ * @brief Implementation of test cases for the generic eigen solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  * @version 0.9.0
  * @date 2013-09-11
@@ -69,7 +69,10 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Test default constructor
+    * @brief Not a real test yet, just a toy
+    *
+    * @param EigenSolverTest  Test fixture ID
+    * @param Play             Test ID
     */
    TEST_F(EigenSolverTest, Play)
    {
