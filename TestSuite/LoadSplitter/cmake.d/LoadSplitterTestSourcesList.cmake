@@ -1,3 +1,7 @@
+# Required additional definitions
+set(MHDTestDefTag GEOMHDISCC_SPATIALSCHEME)
+set(MHDTestDefList "TTT" "TFT" "TFF" "FFF" "CFT" "WFT" "SLF" "WLF")
+
 # Create list of sources for test case
 set(MHDTestSources
    Exceptions/Exception.cpp
@@ -5,9 +9,9 @@ set(MHDTestSources
    Framework/FrameworkBase.cpp
    Enums/DimensionTools.cpp
    IoTools/Formatter.cpp
-   IoAscii/AsciiFile.cpp
-   IoAscii/IAsciiWriter.cpp
-   IoAscii/DirectAsciiWriter.cpp
+   IoXml/XmlFile.cpp
+   IoXml/IXmlWriter.cpp
+   IoXml/GxlWriter.cpp
    Resolutions/Resolution.cpp
    Resolutions/CoreResolution.cpp
    Resolutions/SimulationResolution.cpp
@@ -20,9 +24,11 @@ set(MHDTestSources
    SpatialSchemes/ISpatialScheme.cpp
    SpatialSchemes/3D/IRegular3DScheme.cpp
    SpatialSchemes/3D/TFTScheme.cpp
+   Resolutions/TransformSetup.cpp
+   Resolutions/Tools/IndexCounter.cpp
+   Resolutions/Tools/RegularIndexCounter.cpp
    FastTransforms/FftSetup.cpp
    FastTransforms/FftwTools.cpp
-   IoTools/VisualizeResolution.cpp
 )
 
 if(GEOMHDISCC_MPI)
@@ -39,3 +45,31 @@ else(GEOMHDISCC_MPI)
       LoadSplitter/Algorithms/SerialSplitting.cpp
       )
 endif(GEOMHDISCC_MPI)
+
+# Include all files for the framework
+include(../src/Framework/SourcesList.cmake)
+foreach(src ${MHDSources})
+   list(APPEND MHDTestSources Framework/${src})
+endforeach(src ${MHDSources})
+set(MHDSources )
+
+# Include all files for the exceptions
+include(../src/Exceptions/SourcesList.cmake)
+foreach(src ${MHDSources})
+   list(APPEND MHDTestSources Exceptions/${src})
+endforeach(src ${MHDSources})
+set(MHDSources )
+
+# Include all files for the storage profiler
+include(../src/StorageProfiler/SourcesList.cmake)
+foreach(src ${MHDSources})
+   list(APPEND MHDTestSources StorageProfiler/${src})
+endforeach(src ${MHDSources})
+set(MHDSources )
+
+# Include all files for the profiler
+include(../src/Profiler/SourcesList.cmake)
+foreach(src ${MHDSources})
+   list(APPEND MHDTestSources Profiler/${src})
+endforeach(src ${MHDSources})
+set(MHDSources )

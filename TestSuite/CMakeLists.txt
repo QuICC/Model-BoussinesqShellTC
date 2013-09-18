@@ -70,17 +70,32 @@ foreach(TestDir ${PossibleTestDirs})
          if(NOT ${MHDTestPrefix} STREQUAL "")
             set(TestExecName ${MHDTestPrefix}${TestExecName})
          endif(NOT ${MHDTestPrefix} STREQUAL "")
+         if(NOT ${MHDTestDefTag} STREQUAL "")
+            foreach(TestDef ${MHDTestDefList})
+               set(TestExecName2 ${TestDef}${TestExecName})
+               # Add test executable to target list
+               add_executable(${TestExecName2} ${TestSrcsList})
+               target_link_libraries(${TestExecName2} "gtest")
+               list(APPEND AllTests ${TestExecName2})
+               set_target_properties(${TestExecName2} PROPERTIES COMPILE_FLAGS
+                  "-D${MHDTestDefTag}_${TestDef}")
+               # Add message
+               message(STATUS " --> Added ${TestExecName2}")
+            endforeach(TestDef ${MHDTestDefList})
+         else(NOT ${MHDTestDefTag} STREQUAL "")
+            # Add test executable to target list
+            add_executable(${TestExecName} ${TestSrcsList})
+            target_link_libraries(${TestExecName} "gtest")
+            list(APPEND AllTests ${TestExecName})
 
-         # Add test executable to target list
-         add_executable(${TestExecName} ${TestSrcsList})
-         target_link_libraries(${TestExecName} "gtest")
-         list(APPEND AllTests ${TestExecName})
-
-         # Add message
-         message(STATUS " --> Added ${TestExecName}")
+            # Add message
+            message(STATUS " --> Added ${TestExecName}")
+         endif(NOT ${MHDTestDefTag} STREQUAL "")
 
          set(MHDTestBackendFlag "")
          set(MHDTestPrefix "")
+         set(MHDTestDefTag "")
+         set(MHDTestDefList "")
 
       endforeach(TestFile ${TestFiles})
 

@@ -6,10 +6,35 @@
 
 #include "Framework/FrameworkMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
-#include "SpatialSchemes/3D/TFTScheme.hpp"
-#include "IoTools/VisualizeResolution.hpp"
-#include "IoAscii/DirectAsciiWriter.hpp"
+#include "TypeSelectors/SpatialSchemeSelector.hpp"
+#include "IoXml/GxlWriter.hpp"
 #include "gtest/gtest.h"
+
+#ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+   #define SCHEMENAME "TTT"
+#endif //GEOMHDISCC_SPATIALSCHEME_TTT
+#ifdef GEOMHDISCC_SPATIALSCHEME_TFT
+   #define SCHEMENAME "TFT"
+#endif //GEOMHDISCC_SPATIALSCHEME_TFT
+#ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+   #define SCHEMENAME "TFF"
+#endif //GEOMHDISCC_SPATIALSCHEME_TFF
+#ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+   #define SCHEMENAME "FFF"
+#endif //GEOMHDISCC_SPATIALSCHEME_FFF
+#ifdef GEOMHDISCC_SPATIALSCHEME_CFT
+   #define SCHEMENAME "CFT"
+#endif //GEOMHDISCC_SPATIALSCHEME_CFT
+#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+   #define SCHEMENAME "WFT"
+#endif //GEOMHDISCC_SPATIALSCHEME_WFT
+#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+   #define SCHEMENAME "SLF"
+#endif //GEOMHDISCC_SPATIALSCHEME_SLF
+#ifdef GEOMHDISCC_SPATIALSCHEME_WLF
+   #define SCHEMENAME "WLF"
+#endif //GEOMHDISCC_SPATIALSCHEME_WLF
+
 
 namespace GeoMHDiSCC {
 
@@ -60,11 +85,11 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Test TFTScheme
+    * @brief Test spatial scheme load splitting
     */
-   TEST_F(LoadSplitterTest, TFTScheme)
+   TEST_F(LoadSplitterTest, SpatialScheme)
    {  
-      // Only one cPU needs to work
+      // Only one CPU needs to work
       if(FrameworkMacro::id() == 0)
       {
          // Create load splitter
@@ -74,26 +99,23 @@ namespace TestSuite {
          ArrayI dims(3);
          dims(0) = 64; dims(1) = 64; dims(2) = 64;
 
-         // Initialise the load splitter with TFT scheme
-         splitter.init<TFTScheme>(dims);
+         // Initialise the load splitter with spatial scheme
+         splitter.init<Schemes::SpatialType>(dims);
 
          // Show the 5 best splittings' description
          splitter.showSplittings(5);
 
-         // Set dot file name
-         std::string name = "TFT";
+         // Set the scheme name
+         std::string name = SCHEMENAME;
 
-         // Create direct access ASCII file
-         IoAscii::DirectAsciiWriter outFile(name, ".dot", "Transpose communication graph", "Graphviz dot file", "1.0");
+         // Create GXL graph format file
+         IoXml::GxlWriter gxl(name + "_transpose_graph");
 
-         // Initialise output file
-         outFile.init();
-
-         // Write communication graph structure to file
-         IoTools::VisualizeResolution::show(outFile.file(), name, splitter.bestSplitting().first);
-
-         // Finalise output file
-         outFile.finalize();
+         // Initialise and write graph for resolution
+         gxl.init();
+         gxl.graphResolution(splitter.bestSplitting().first);
+         gxl.write();
+         gxl.finalize();
 
          ASSERT_TRUE(true);
       }
