@@ -51,7 +51,7 @@ namespace TestSuite {
          int mHowmany;
          
          /**
-          * @brief Acceptable error
+          * @brief Acceptable absolute error
           */
          double mError;
          

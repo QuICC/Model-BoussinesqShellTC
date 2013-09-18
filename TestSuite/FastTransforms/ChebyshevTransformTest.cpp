@@ -39,53 +39,52 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+         
+         /**
+          * @brief Spectral size of transform
+          */
+         int mMaxN;
 
-         /// Acceptable error
+         /**
+          * @brief How many identical transforms to compute
+          */
+         int mHowmany;
+         
+         /**
+          * @brief Acceptable absolute error
+          */
          double mError;
+         
+         /**
+          * @brief Acceptable relative error
+          */
+         double mRelError;
+
    };
 
    ChebyshevFftTransformTest::ChebyshevFftTransformTest()
-      : mError(1e-13)
+      : mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    ChebyshevFftTransformTest::~ChebyshevFftTransformTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
    /**
     * @brief Test the mesh grid 
     *
     * @param ChebyshevFftTransformTest   Test fixture ID
-    * @param MeshGrid                     Test ID
+    * @param MeshGrid                    Test ID
     */
    TEST_F(ChebyshevFftTransformTest, MeshGrid)
    {
       // Set spectral and physical sizes
-      int maxN = 11;
-      int nN = maxN + 1;
+      int nN = this->mMaxN + 1;
       int xN = Transform::FftToolsType::dealiasFft(nN);
-      int howmany = 13;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -93,8 +92,9 @@ namespace TestSuite {
       // Initialise FFT
       fft.init(spSetup);
 
-      // Check size
       EXPECT_EQ(xN, fft.meshGrid().size());
+      EXPECT_LT(fft.meshGrid()(xN-1), 1.0);
+      EXPECT_GE(fft.meshGrid()(0), -1.0);
    }
 
    /**
@@ -106,13 +106,11 @@ namespace TestSuite {
    TEST_F(ChebyshevFftTransformTest, ForwardRealAccuracy)
    {
       // Set spectral and physical sizes
-      int maxN = 11;
-      int nN = maxN + 1;
+      int nN = this->mMaxN + 1;
       int xN = Transform::FftToolsType::dealiasFft(nN);
-      int howmany = 13;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -127,9 +125,9 @@ namespace TestSuite {
       // Get chebyshev grid
       Array x = fft.meshGrid();
 
-      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      // Initialise the physical test data as T_i(x)
       phys.setZero();
-      for(int i = 0; i < spSetup->specSize(); ++i)
+      for(int i = 0; i < spSetup->howmany(); ++i)
       {
          phys.col(i) = (static_cast<MHDFloat>(i)*x.array().acos()).cos();
       }
@@ -144,13 +142,13 @@ namespace TestSuite {
          {
             if(i == 0 && j == 0)
             {
-               EXPECT_NEAR(spec(i,j), 1.0, this->mError);
+               EXPECT_NEAR(1.0, spec(i,j), this->mError);
             } else if(j == i)
             {
-               EXPECT_NEAR(spec(i,j), 0.5, this->mError);
+               EXPECT_NEAR(0.5, spec(i,j), this->mError);
             } else
             {
-               EXPECT_NEAR(spec(i,j), 0, this->mError);
+               EXPECT_NEAR(0, spec(i,j), this->mError);
             }
          }
       }
@@ -165,13 +163,11 @@ namespace TestSuite {
    TEST_F(ChebyshevFftTransformTest, BackwardRealAccuracy)
    {
       // Set spectral and physical sizes
-      int maxN = 11;
-      int nN = maxN + 1;
+      int nN = this->mMaxN + 1;
       int xN = Transform::FftToolsType::dealiasFft(nN);
-      int howmany = 13;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -185,7 +181,7 @@ namespace TestSuite {
 
       // Initialise the spectral test data
       spec(0,0) = 1.0;
-      for(int i = 1; i < spSetup->specSize(); ++i)
+      for(int i = 1; i < spSetup->howmany(); ++i)
       {
          spec(i,i) = 0.5;
       }
@@ -197,13 +193,13 @@ namespace TestSuite {
       Array x = fft.meshGrid();
 
       // Check the solution
-      for(int i = 0; i < spSetup->specSize(); ++i)
+      for(int i = 0; i < spSetup->howmany(); ++i)
       {
          Array cheb = (static_cast<MHDFloat>(i)*x.array().acos()).cos();
 
          for(int j = 0; j < x.size(); ++j)
          {
-            EXPECT_NEAR(phys(j,i), cheb(j), this->mError);
+            EXPECT_NEAR(cheb(j), phys(j,i), this->mError);
          }
       }
    }
@@ -217,13 +213,11 @@ namespace TestSuite {
    TEST_F(ChebyshevFftTransformTest, ForwardComplexAccuracy)
    {
       // Set spectral and physical sizes
-      int maxN = 11;
-      int nN = maxN+1;
+      int nN = this->mMaxN + 1;
       int xN = Transform::FftToolsType::dealiasFft(nN);
-      int howmany = 13;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::COMPONENT));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -238,9 +232,9 @@ namespace TestSuite {
       // Get chebyshev grid
       Array x = fft.meshGrid();
 
-      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      // Initialise the physical test data as T_n(n*phi) + T_n(n*phi) up to the highest maxN
       phys.setZero();
-      for(int i = 0; i < spSetup->specSize(); ++i)
+      for(int i = 0; i < spSetup->howmany(); ++i)
       {
          phys.col(i).real() = (static_cast<MHDFloat>(i)*x.array().acos()).cos();
          phys.col(i).imag() = (static_cast<MHDFloat>(spSetup->specSize()-1-i)*x.array().acos()).cos();
@@ -257,24 +251,24 @@ namespace TestSuite {
          {
             if(i == 0 && j == 0)
             {
-               EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
+               EXPECT_NEAR(1.0, spec(i,j).real(), this->mError);
             } else if(i == j)
             {
-               EXPECT_NEAR(spec(i,j).real(), 0.5, this->mError);
+               EXPECT_NEAR(0.5, spec(i,j).real(), this->mError);
             } else
             {
-               EXPECT_NEAR(spec(i,j).real(), 0, this->mError);
+               EXPECT_NEAR(0, spec(i,j).real(), this->mError);
             }
 
             if(i == 0 && spSetup->specSize()-1-j == 0)
             {
-               EXPECT_NEAR(spec(i,j).imag(), 1.0, this->mError);
+               EXPECT_NEAR(1.0, spec(i,j).imag(), this->mError);
             } else if(j == spSetup->specSize()-1-i && j > 0)
             {
-               EXPECT_NEAR(spec(i,j).imag(), 0.5, this->mError);
+               EXPECT_NEAR(0.5, spec(i,j).imag(), this->mError);
             } else
             {
-               EXPECT_NEAR(spec(i,j).imag(), 0, this->mError);
+               EXPECT_NEAR(0, spec(i,j).imag(), this->mError);
             }
          }
       }
@@ -289,13 +283,11 @@ namespace TestSuite {
    TEST_F(ChebyshevFftTransformTest, BackwardComplexAccuracy)
    {
       // Set spectral and physical sizes
-      int maxN = 11;
-      int nN = maxN + 1;
+      int nN = this->mMaxN + 1;
       int xN = Transform::FftToolsType::dealiasFft(nN);
-      int howmany = 13;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::COMPONENT));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -339,20 +331,20 @@ namespace TestSuite {
 
 
       // Check the solution
-      for(int i = 0; i < spSetup->specSize(); ++i)
+      for(int i = 0; i < spSetup->howmany(); ++i)
       {
          Array chebReal = (static_cast<MHDFloat>(i)*x.array().acos()).cos();
          Array chebImag = (static_cast<MHDFloat>(spSetup->specSize()-i-1)*x.array().acos()).cos();
 
          for(int j = 0; j < x.size(); ++j)
          {
-            EXPECT_NEAR(phys(j,i).real(), chebReal(j), this->mError);
+            EXPECT_NEAR(chebReal(j), phys(j,i).real(), this->mError);
             if(i > 0)
             {
-               EXPECT_NEAR(phys(j,i).imag(), chebImag(j), this->mError);
+               EXPECT_NEAR(chebImag(j), phys(j,i).imag(), this->mError);
             } else
             {
-               EXPECT_NEAR(phys(j,i).imag(), 0.0, this->mError);
+               EXPECT_NEAR(0.0, phys(j,i).imag(), this->mError);
             }
          }
       }
@@ -368,6 +360,26 @@ namespace TestSuite {
  * @param argv Arguments
  */
 int main(int argc, char **argv) {
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }
