@@ -1,7 +1,24 @@
-# Create list of sources for test case
+# Set backend flag
+set(MHDTestBackendFlag GEOMHDISCC_FFT)
+
+# Create list of sources
 set(MHDTestSources
    IoTools/Formatter.cpp
+   Base/MathConstants.cpp
+   FastTransforms/FftSetup.cpp
+   SpectralOperators/IOperator.cpp
+   SpectralOperators/CylindricalChebyshevOperator.cpp
 )
+
+# Add FFTW backend files
+if(GEOMHDISCC_FFT STREQUAL "FFTW")
+   list(APPEND MHDTestSources 
+      FastTransforms/FftwTools.cpp
+      FastTransforms/FftwLibrary.cpp
+      FastTransforms/ChebyshevFftwTransform.cpp
+      FastTransforms/CylindricalChebyshevFftwTransform.cpp
+   )
+endif(GEOMHDISCC_FFT STREQUAL "FFTW")
 
 # Include all files for the framework
 include(../src/Framework/SourcesList.cmake)

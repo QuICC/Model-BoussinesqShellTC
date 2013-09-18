@@ -1,19 +1,20 @@
 /** 
  * @file FftTransformTest.cpp
- * @brief Implementation of test cases for a generic FFT (independent of backend)
+ * @brief Implementation of test cases for FFT transforms
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
 #include "gtest/gtest.h"
 
 #include "Framework/FrameworkMacro.h"
+#include "TypeSelectors/FftSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the FftTransform implementation
+    * @brief Googletest fixture for the FftTransform implementation
     */
    class FftTransformTest : public ::testing::Test {
       public:
@@ -38,9 +39,30 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+         
+         /**
+          * @brief Spectral size of transform
+          */
+         int mMaxN;
+
+         /**
+          * @brief How many identical transforms to compute
+          */
+         int mHowmany;
+         
+         /**
+          * @brief Acceptable error
+          */
+         double mError;
+         
+         /**
+          * @brief Acceptable relative error
+          */
+         double mRelError;
    };
 
    FftTransformTest::FftTransformTest()
+      : mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
    {
    }
 
@@ -48,23 +70,302 @@ namespace TestSuite {
    {
    }
 
-//   void FftTransformTest::SetUp()
-//   {
-//   }
+   /**
+    * @brief Test the mesh grid
+    *
+    * @param FftTransformTest   Test fixture ID
+    * @param MeshGrid            Test ID
+    */
+   TEST_F(FftTransformTest, MeshGrid)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
 
-//   void FftTransformTest::TearDown()
-//   {
-//   }
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      EXPECT_EQ(xN, fft.meshGrid().size());
+      EXPECT_LT(fft.meshGrid()(xN-1), 2.0*MathConstants::PI);
+      EXPECT_GE(fft.meshGrid()(0), 0);
+   }
 
    /**
-    * @brief Dummy placeholder test
+    * @brief Accuracy test for mixed forward transform
     *
-    * @param FftTransformTest Test fixture ID
-    * @param Placeholder      Test ID
+    * @param FftTransformTest      Test fixture ID
+    * @param ForwardMixedAccuracy   Test ID
     */
-   TEST_F(FftTransformTest, Placeholder)
+   TEST_F(FftTransformTest, ForwardMixedAccuracy)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get fft grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         phys.col(i) = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+      }
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+
+      // Check solution
+      EXPECT_NEAR(1.0, spec(0,0).real(), this->mError);
+      EXPECT_NEAR(0.0, spec(0,0).imag(), this->mError);
+      for(int i = 1; i < spSetup->specSize(); ++i)
+      {
+         for(int j = 0; j < spSetup->howmany(); ++j)
+         {
+            if(i == j)
+            {
+               EXPECT_NEAR(0.5, spec(i,i).real(), this->mError);
+               EXPECT_NEAR(-0.5, spec(i,i).imag(), this->mError);
+            } else
+            {
+               EXPECT_NEAR(0.0, spec(i,j).real(), this->mError);
+               EXPECT_NEAR(0.0, spec(i,j).imag(), this->mError);
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Accuracy test for mixed backward transform
+    *
+    * @param FftTransformTest      Test fixture ID
+    * @param BackwardMixedAccuracy  Test ID
+    */
+   TEST_F(FftTransformTest, BackwardMixedAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
+
+      // Create FFF transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Initialise the spectral test data as 0.5-0.5i up to maxN (1 for n = 0)
+      spec(0,0) = MHDComplex(1.0,0.0);
+      for(int i = 1; i < spSetup->howmany(); ++i)
+      {
+         spec(i,i) = MHDComplex(0.5,-0.5);
+      }
+
+      // Compute backward transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+
+      // Get phi grid
+      Array phi = fft.meshGrid();
+
+      // Check the solution
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         for(int j = 0; j < phi.size(); ++j)
+         {
+            EXPECT_NEAR(std::cos(static_cast<MHDFloat>(i)*phi(j)) + std::sin(static_cast<MHDFloat>(i)*phi(j)), phys(j,i), this->mError);
+         }
+      }
+   }
+
+   /**
+    * @brief Accuracy test for mixed backward derivative transform
+    *
+    * @param FftTransformTest         Test fixture ID
+    * @param BackwardMixedDiffAccuracy Test ID
+    */
+   TEST_F(FftTransformTest, BackwardMixedDiffAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get phi grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         phys.col(i) = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+      }
+
+      // Compute backward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+
+      // Compute derivative projection transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::DIFF);
+
+      // Check the solution
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         for(int j = 0; j < phi.size(); ++j)
+         {
+            EXPECT_NEAR(-static_cast<MHDFloat>(i)*std::sin(static_cast<MHDFloat>(i)*phi(j)) + static_cast<MHDFloat>(i)*std::cos(static_cast<MHDFloat>(i)*phi(j)), phys(j,i), this->mError);
+         }
+      }
+   }
+
+   /**
+    * @brief Accuracy test for forward transform
+    *
+    * @param FftTransformTest   Test fixture ID
+    * @param ForwardAccuracy     Test ID
+    */
+   TEST_F(FftTransformTest, ForwardAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      MatrixZ  phys = MatrixZ::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get fft grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) -/+ sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         phys.col(i).real() = (static_cast<MHDFloat>(i)*phi).array().cos() - (static_cast<MHDFloat>(i)*phi).array().sin();
+         phys.col(i).imag() = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+      }
+      phys.col(0).imag().setZero();
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+
+      // Check solution
+      EXPECT_NEAR(1.0, spec(0,0).real(), this->mError);
+      EXPECT_NEAR(0.0, spec(0,0).imag(), this->mError);
+      for(int i = 1; i < spSetup->specSize(); ++i)
+      {
+         for(int j = 0; j < spSetup->howmany(); ++j)
+         {
+            if(i == j)
+            {
+               EXPECT_NEAR(1.0, spec(i,i).real(), this->mError);
+               EXPECT_NEAR(1.0, spec(i,i).imag(), this->mError);
+            } else
+            {
+               EXPECT_NEAR(0.0, spec(i,j).real(), this->mError);
+               EXPECT_NEAR(0.0, spec(i,j).imag(), this->mError);
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Accuracy test for backward transform
+    *
+    * @param FftTransformTest   Test fixture ID
+    * @param BackwardAccuracy    Test ID
+    */
+   TEST_F(FftTransformTest, BackwardAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      MatrixZ  phys = MatrixZ::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Initialise the spectral test data as 1.0-1.0i up to maxN (1 for n = 0)
+      spec.setZero();
+      spec(0,0) = MHDComplex(1.0,0.0);
+      for(int i = 1; i < spSetup->howmany(); ++i)
+      {
+         spec(i,i) = MHDComplex(1.0,1.0);
+      }
+
+      // Compute backward transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+
+      // Get phi grid
+      Array phi = fft.meshGrid();
+
+      // Check the solution
+      for(int j = 0; j < phi.size(); ++j)
+      {
+         EXPECT_NEAR(1.0, phys(j,0).real(), this->mError);
+         EXPECT_NEAR(0.0, phys(j,0).imag(), this->mError);
+      }
+      for(int i = 1; i < spSetup->howmany(); ++i)
+      {
+         for(int j = 0; j < phi.size(); ++j)
+         {
+            EXPECT_NEAR(std::cos(static_cast<MHDFloat>(i)*phi(j)) - std::sin(static_cast<MHDFloat>(i)*phi(j)), phys(j,i).real(), this->mError);
+            EXPECT_NEAR(std::cos(static_cast<MHDFloat>(i)*phi(j)) + std::sin(static_cast<MHDFloat>(i)*phi(j)), phys(j,i).imag(), this->mError);
+         }
+      }
    }
 
 }

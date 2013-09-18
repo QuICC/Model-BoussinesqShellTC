@@ -62,13 +62,25 @@ foreach(TestDir ${PossibleTestDirs})
             list(APPEND TestSrcsList ${GEOMHDISCC_SRC_DIR}/${MHDSource})
          endforeach(MHDSource)
 
+         # Create test executable name
+         set(TestExecName ${TestName})
+         if(NOT ${MHDTestBackendFlag} STREQUAL "")
+            set(TestExecName ${${MHDTestBackendFlag}}${TestExecName})
+         endif(NOT ${MHDTestBackendFlag} STREQUAL "")
+         if(NOT ${MHDTestPrefix} STREQUAL "")
+            set(TestExecName ${MHDTestPrefix}${TestExecName})
+         endif(NOT ${MHDTestPrefix} STREQUAL "")
+
          # Add test executable to target list
-         add_executable(${TestName} ${TestSrcsList})
-         target_link_libraries(${TestName} "gtest")
-         list(APPEND AllTests ${TestName})
+         add_executable(${TestExecName} ${TestSrcsList})
+         target_link_libraries(${TestExecName} "gtest")
+         list(APPEND AllTests ${TestExecName})
 
          # Add message
-         message(STATUS " --> Added ${TestName}")
+         message(STATUS " --> Added ${TestExecName}")
+
+         set(MHDTestBackendFlag "")
+         set(MHDTestPrefix "")
 
       endforeach(TestFile ${TestFiles})
 

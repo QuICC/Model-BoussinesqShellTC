@@ -1,6 +1,6 @@
 /** 
  * @file LoadSplitterTest.cpp
- * @brief Implementation of test case for LoadSplitter
+ * @brief Implementation of test cases for LoadSplitter
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 

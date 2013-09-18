@@ -1,7 +1,18 @@
+# List of valid backends
+set(MHDTestBackendFlag  GEOMHDISCC_SPLINALG)
+
 # Create list of sources for test case
 set(MHDTestSources
    IoTools/Formatter.cpp
 )
+
+# Include solver specific files
+if(GEOMHDISCC_SPLINALG STREQUAL "Pardiso")
+   list(APPEND MHDTestSources 
+      ../External/Interfaces/Pardiso_Real.cpp
+      ../External/Interfaces/Pardiso_Complex.cpp
+   )
+endif(GEOMHDISCC_SPLINALG STREQUAL "Pardiso")
 
 # Include all files for the framework
 include(../src/Framework/SourcesList.cmake)

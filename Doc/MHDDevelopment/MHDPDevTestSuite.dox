@@ -67,10 +67,10 @@
  *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
  *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
  *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref FftwTransformTest.cpp "FFT (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref ChebyshevFftwTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref CylindricalChebyshevFftwTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref SphericalChebyshevFftwTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNA}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNA}
  *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNA}
  *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNA}
  *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNA}
@@ -128,16 +128,17 @@
  *    \mhdTable{
  *       \mhdTableHeader
  *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNA}
- *       \mhdStatus{\ref UmfPackDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNA}
- *       \mhdStatus{\ref SuperLUDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNA}
- *       \mhdStatus{\ref SparseLUDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNA}
- *       \mhdStatus{\ref MKLPardisoDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNA}
- *       \mhdStatus{\ref PardisoDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNA}
- *       \mhdStatus{\ref MumpsDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNA}
- *       \mhdStatus{\ref PaStiXDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNA}
- *       \mhdStatus{\ref SparseQRDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNA}
- *       \mhdStatus{\ref SPQRDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNA}
- *       \mhdStatus{\ref BiCGSTABIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (generic)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNA}
  *    }
  *
  * \section mhdSTSTStep Timestepping scheme

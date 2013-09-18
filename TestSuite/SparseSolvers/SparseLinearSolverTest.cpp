@@ -15,7 +15,7 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the sparse solvers
+    * @brief Test fixture for the sparse direct solvers
     */
    class SparseLinearSolverTest : public ::testing::Test {
       public:
