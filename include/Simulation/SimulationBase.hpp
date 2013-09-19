@@ -336,16 +336,6 @@ namespace GeoMHDiSCC {
          void sortEquations();
 
          /**
-          * @brief Identify the coupling among the equations to set solver indexes
-          *
-          * @param scalEq  Range of scalar equations
-          * @param vectEq  Range of vector equations
-          *
-          * \mhdBug This function needs to be cleaned up!
-          */
-         void identifyCoupling(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
-
-         /**
           * @brief Setup the output files added by the model
           */
          void setupOutput();
@@ -362,66 +352,6 @@ namespace GeoMHDiSCC {
           */
          virtual void tuneInitialState(IoVariable::SharedStateFileReader spInitFile);
    };
-
-   /**
-    * @brief Compute the scalar equation type flag for time/solver/trivial ordering
-    */
-   int computeScalarEquationType(Equations::SharedIScalarEquation eqA);
-
-   /**
-    * @brief Compute the vector equation type flag for time/solver/trivial ordering
-    */
-   int computeVectorEquationType(Equations::SharedIVectorEquation eqA);
-
-   /**
-    * @brief Sorting function for the scalar equations to obtain time/solver/trivial ordering
-    */
-   bool sortScalarEquationType(Equations::SharedIScalarEquation eqA, Equations::SharedIScalarEquation eqB);
-
-   /**
-    * @brief Sorting function for the vector equations to obtain time/solver/trivial ordering
-    */
-   bool sortVectorEquationType(Equations::SharedIVectorEquation eqA, Equations::SharedIVectorEquation eqB);
-
-   /**
-    * @brief Check if scalar equation is prognostic
-    */
-   bool scalarIsPrognostic(Equations::SharedIScalarEquation eqA);
-
-   /**
-    * @brief Check if scalar equation is diagnostic
-    */
-   bool scalarIsDiagnostic(Equations::SharedIScalarEquation eqA);
-
-   /**
-    * @brief Check if scalar equation is trivial
-    */
-   bool scalarIsTrivial(Equations::SharedIScalarEquation eqA);
-
-   /**
-    * @brief Check if scalar equation is wrapper
-    */
-   bool scalarIsWrapper(Equations::SharedIScalarEquation eqA);
-
-   /**
-    * @brief Check if vector equation is prognostic
-    */
-   bool vectorIsPrognostic(Equations::SharedIVectorEquation eqA);
-
-   /**
-    * @brief Check if vector equation is diagnostic
-    */
-   bool vectorIsDiagnostic(Equations::SharedIVectorEquation eqA);
-
-   /**
-    * @brief Check if vector equation is trivial
-    */
-   bool vectorIsTrivial(Equations::SharedIVectorEquation eqA);
-
-   /**
-    * @brief Check if vector equation is wrapper
-    */
-   bool vectorIsWrapper(Equations::SharedIVectorEquation eqA);
 
    template <typename TScheme> void SimulationBase::initResolution()
    {
