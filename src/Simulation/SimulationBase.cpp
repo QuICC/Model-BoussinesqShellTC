@@ -30,6 +30,8 @@
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
 #include "SpectralOperators/BoundaryConditions.hpp"
+#include "Variables/RequirementTools.hpp"
+#include "TransformCoordinators/TransformCoordinatorTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -87,13 +89,13 @@ namespace GeoMHDiSCC {
       VariableRequirement varInfo;
 
       // Initialise the variables and set general variable requirements
-      this->initVariables(varInfo);
+      RequirementTools::initVariables(varInfo, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
       // Storage for the nonlinear requirement info
       std::set<PhysicalNames::Id>   nonInfo;
 
       // Map variables to the equations and set nonlinear requirements
-      this->mapEquationVariables(nonInfo);
+      RequirementTools::mapEquationVariables(nonInfo, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
 
       // Initialise the transform coordinator
       this->initTransformCoordinator(varInfo, nonInfo);
@@ -303,231 +305,19 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
-
-   void SimulationBase::initVariables(VariableRequirement& varInfo)
-   {
-      // Iterator over info
-      VariableRequirement::const_iterator infoIt;
-
-      //
-      // Identify the required variables
-      //
-
-      // Loop over all scalar equations
-      std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
-      for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-      {
-         varInfo.merge((*scalEqIt)->requirements());
-      }
-
-      // Loop over all vector equations
-      std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-      for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-      {
-         varInfo.merge((*vectEqIt)->requirements());
-      }
-
-      // 
-      // Create the required variables
-      //
-
-      // Initialise variables
-      for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
-      {
-         // Check if spectral variable is required
-         if(infoIt->second.needSpectral())
-         {
-            // Separate scalar and vector fields
-            if(infoIt->second.isScalar())
-            {
-               // Create the shared scalar variable
-               this->mScalarVariables.insert(std::make_pair(infoIt->first, Datatypes::SharedScalarVariableType(new Datatypes::ScalarVariableType(this->mspRes))));
-            } else
-            {
-               // Create the shared vector variable
-               this->mVectorVariables.insert(std::make_pair(infoIt->first, Datatypes::SharedVectorVariableType(new Datatypes::VectorVariableType(this->mspRes))));
-            }
-
-            // Initialise the physical values if required
-            if(infoIt->second.needPhysical())
-            {
-               // Separate scalar and vector fields
-               if(infoIt->second.isScalar())
-               {
-                  this->mScalarVariables.at(infoIt->first)->initPhysical();
-               } else
-               {
-                  this->mVectorVariables.at(infoIt->first)->initPhysical();
-               }
-            }
-
-            // Initialise the physical differential values if required (gradient or curl)
-            if(infoIt->second.needPhysicalDiff())
-            {
-               // Separate scalar and vector fields
-               if(infoIt->second.isScalar())
-               {
-                  this->mScalarVariables.at(infoIt->first)->initPhysicalDiff();
-               } else
-               {
-                  this->mVectorVariables.at(infoIt->first)->initPhysicalDiff();
-               }
-            }
-
-            // Separate scalar and vector fields
-            if(infoIt->second.isScalar())
-            {
-               // Initialise to zero
-               this->mScalarVariables.at(infoIt->first)->setZeros();
-
-               #ifdef GEOMHDISCC_STORAGEPROFILE
-                  StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, this->mScalarVariables.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
-            } else
-            {
-               // Initialise to zero
-               this->mVectorVariables.at(infoIt->first)->setZeros();
-
-               #ifdef GEOMHDISCC_STORAGEPROFILE
-                  StorageProfilerMacro_update(Debug::StorageProfiler::VARIABLES, this->mVectorVariables.at(infoIt->first)->requiredStorage());
-               #endif // GEOMHDISCC_STORAGEPROFILE
-            }
-         }
-      }
-   }
-
-   void SimulationBase::mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo)
-   {
-      // Loop over all scalar variables
-      std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
-      for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
-      {
-         // Loop over scalar equations
-         std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
-         for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-         {
-            // Set scalar variable as unknown scalar field
-            if((*scalEqIt)->name() == scalIt->first)
-            {
-               (*scalEqIt)->setUnknown(this->mScalarVariables.at(scalIt->first));
-
-               // Finish initialisation of equation
-               (*scalEqIt)->init();
-
-               // Check for nonlinear requirements
-               if((*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
-               {
-                  nonInfo.insert((*scalEqIt)->name());
-               }
-            }
-
-            // Set scalar variable as additional scalar field
-            if((*scalEqIt)->requirements(scalIt->first).needPhysical() || (*scalEqIt)->requirements(scalIt->first).needPhysicalDiff())
-            {
-               (*scalEqIt)->setField(scalIt->first, this->mScalarVariables.at(scalIt->first));
-            }
-         }
-
-         // Loop over vector equations
-         std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-         for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-         {
-            // Set scalar variable as additional scalar field
-            if((*vectEqIt)->requirements(scalIt->first).needPhysical() || (*vectEqIt)->requirements(scalIt->first).needPhysicalDiff())
-            {
-               (*vectEqIt)->setField(scalIt->first, this->mScalarVariables.at(scalIt->first));
-            }
-         }
-      }
-
-      // Loop over all vector variables
-      std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
-      for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
-      {
-         // Loop over scalar equations
-         std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
-         for(scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); scalEqIt++)
-         {
-            // Set vector variable as additional vector field
-            if((*scalEqIt)->requirements(vectIt->first).needPhysical() || (*scalEqIt)->requirements(vectIt->first).needPhysicalDiff())
-            {
-               (*scalEqIt)->setField(vectIt->first, this->mVectorVariables.at(vectIt->first));
-            }
-         }
-
-         // Loop over vector equations
-         std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-         for(vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); vectEqIt++)
-         {
-            // Set vector variable as unknown vector field
-            if((*vectEqIt)->name() == vectIt->first)
-            {
-               (*vectEqIt)->setUnknown(this->mVectorVariables.at(vectIt->first));
-
-               // Finish initialisation of equation
-               (*vectEqIt)->init();
-
-               // Check for nonlinear requirements
-               if((*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
-               {
-                  nonInfo.insert((*vectEqIt)->name());
-               }
-            }
-
-            // Set vector variable as additional vector field
-            if((*vectEqIt)->requirements(vectIt->first).needPhysical() || (*vectEqIt)->requirements(vectIt->first).needPhysicalDiff())
-            {
-               (*vectEqIt)->setField(vectIt->first, this->mVectorVariables.at(vectIt->first));
-            }
-         }
-      }
-   }
       
    void SimulationBase::initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
-      // Initialise the transform coordinator
-      this->mTransformCoordinator.initTransforms(this->mspRes, varInfo);
-
-      // Initialise the communicator
-      this->mTransformCoordinator.initCommunicator(this->mspRes);
-
-      // Get the buffer pack sizes
-      ArrayI packs1DFwd = this->mspFwdGrouper->packs1D(varInfo, nonInfo);
-      ArrayI packs2DFwd = this->mspFwdGrouper->packs2D(varInfo, nonInfo);
-      ArrayI packs1DBwd = this->mspBwdGrouper->packs1D(varInfo);
-      ArrayI packs2DBwd = this->mspBwdGrouper->packs2D(varInfo);
-
-      // Initialise the converters
-      this->mTransformCoordinator.communicator().initConverter(this->mspRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, this->mspFwdGrouper->split);
-
-      // Get the list of required options
-      std::set<NonDimensional::Id>  requests;
-      this->mTransformCoordinator.requiredOptions(requests);
-
-      // Get the list of non-dimension parameters
-      std::vector<NonDimensional::Id> names = this->mspEqParams->ids();
-
-      // Storage for the options' values
-      std::map<NonDimensional::Id,MHDFloat> options;
-
-      // Extract options
+      // Extract the run options for the equation parameters
+      std::map<NonDimensional::Id,MHDFloat> runOptions;
       std::vector<NonDimensional::Id>::iterator it;
-      for(it = names.begin(); it != names.end(); ++it)
+      for(it = this->mspEqParams->ids().begin(); it != this->mspEqParams->ids().end(); ++it)
       {
-         if(requests.count(*it) > 0)
-         {
-            options.insert(std::make_pair(*it,this->mspEqParams->nd(*it)));
-         }
+         runOptions.insert(std::make_pair(*it, this->mspEqParams->nd(*it)));
       }
 
-      // Make sure everythin was present
-      if(requests.size() != options.size())
-      {
-         throw Exception("initTransformCoordinator: requested options have not been set!");
-      }
-
-      // Transfer options to transforms
-      this->mTransformCoordinator.setOptions(options);
+      // Initialise the transform coordinator
+      Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, nonInfo, this->mspRes, runOptions);
    }
 
    void SimulationBase::setupEquations(const SharedSimulationBoundary spBcs)

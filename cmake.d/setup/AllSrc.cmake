@@ -61,6 +61,7 @@ set(MHDAllSrcDirs
    StorageProfiler
    Timers
    Timesteppers
+   TransformCoordinators
    TransformConfigurators
    TransformGroupers
    TypeSelectors

@@ -4,37 +4,12 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+#include "gtest/gtest.h"
+
 #include "Framework/FrameworkMacro.h"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "TypeSelectors/SpatialSchemeSelector.hpp"
 #include "IoXml/GxlWriter.hpp"
-#include "gtest/gtest.h"
-
-#ifdef GEOMHDISCC_SPATIALSCHEME_TTT
-   #define SCHEMENAME "TTT"
-#endif //GEOMHDISCC_SPATIALSCHEME_TTT
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFT
-   #define SCHEMENAME "TFT"
-#endif //GEOMHDISCC_SPATIALSCHEME_TFT
-#ifdef GEOMHDISCC_SPATIALSCHEME_TFF
-   #define SCHEMENAME "TFF"
-#endif //GEOMHDISCC_SPATIALSCHEME_TFF
-#ifdef GEOMHDISCC_SPATIALSCHEME_FFF
-   #define SCHEMENAME "FFF"
-#endif //GEOMHDISCC_SPATIALSCHEME_FFF
-#ifdef GEOMHDISCC_SPATIALSCHEME_CFT
-   #define SCHEMENAME "CFT"
-#endif //GEOMHDISCC_SPATIALSCHEME_CFT
-#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
-   #define SCHEMENAME "WFT"
-#endif //GEOMHDISCC_SPATIALSCHEME_WFT
-#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
-   #define SCHEMENAME "SLF"
-#endif //GEOMHDISCC_SPATIALSCHEME_SLF
-#ifdef GEOMHDISCC_SPATIALSCHEME_WLF
-   #define SCHEMENAME "WLF"
-#endif //GEOMHDISCC_SPATIALSCHEME_WLF
-
 
 namespace GeoMHDiSCC {
 
@@ -105,11 +80,8 @@ namespace TestSuite {
          // Show the 5 best splittings' description
          splitter.showSplittings(5);
 
-         // Set the scheme name
-         std::string name = SCHEMENAME;
-
          // Create GXL graph format file
-         IoXml::GxlWriter gxl(name + "_transpose_graph");
+         IoXml::GxlWriter gxl(Schemes::SpatialType::type() + "_transpose_graph");
 
          // Initialise and write graph for resolution
          gxl.init();

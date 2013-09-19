@@ -43,7 +43,7 @@ namespace Schemes {
          /**
           * @brief Constructor
           *
-          * @param dim     Chebyshev truncations 
+          * @param dim Spectral truncations 
           */
          explicit TFTScheme(const ArrayI& dim);
 

@@ -84,27 +84,6 @@ namespace IoXml {
 
          pGraph->append_node(pCpu);
       }
-
-//      for(int j = 0; j < spRes->cpu(0)->nDim(); j++)
-//      {
-//      // Loop over CPUs
-//      for(int i = 0; i < spRes->nCpu(); i++)
-//      {
-//         for(int m = 0; m < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DATF1D>(); m++)
-//         {
-//            stream << i << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DATF1D>(m) << std::endl;
-//         }
-//      }
-//      stream << "- -" << std::endl;
-//
-//      for(int i = 0; i < spRes->nCpu(); i++)
-//      {
-//         for(int m = 0; m < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DATB1D>(); m++)
-//         {
-//            stream << i << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DATB1D>(m) << std::endl;
-//         }
-//      }
-//      }
    }
 
    void GxlWriter::graph2DResolution(SharedResolution spRes)
@@ -136,33 +115,6 @@ namespace IoXml {
 
          pGraph->append_node(pCpu);
       }
-//      for(int j = 0; j < spRes->cpu(0)->nDim(); j++)
-//      {
-//         // Loop over CPUs
-//         for(int i = 0; i < spRes->nCpu(); i++)
-//         {
-//            for(int l = 0; l < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DAT2D>(); l++)
-//            {
-//               for(int m = 0; m < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DATF1D>(l); m++)
-//               {
-//                  stream << i << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DATF1D>(m,l) << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DAT2D>(l) << std::endl;
-//               }
-//            }
-//         }
-//         stream << "- - -" << std::endl;
-//
-//         for(int i = 0; i < spRes->nCpu(); i++)
-//         {
-//            for(int l = 0; l < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DAT2D>(); l++)
-//            {
-//               for(int m = 0; m < spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->dim<Dimensions::Data::DATB1D>(l); m++)
-//               {
-//                  stream << i << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DATB1D>(m,l) << " " << spRes->cpu(i)->dim(static_cast<Dimensions::Transform::Id>(j))->idx<Dimensions::Data::DAT2D>(l) << std::endl;
-//               }
-//            }
-//         }
-//         stream << "- - -" << std::endl;
-//      }
    }
 
    void GxlWriter::graph3DResolution(SharedResolution spRes)

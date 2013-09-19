@@ -4,11 +4,9 @@ set(MHDTestDefList "TTT" "TFT" "TFF" "FFF" "CFT" "WFT" "SLF" "WLF")
 
 # Create list of sources for test case
 set(MHDTestSources
+   Base/MathConstants.cpp
    Enums/DimensionTools.cpp
    IoTools/Formatter.cpp
-   IoXml/XmlFile.cpp
-   IoXml/IXmlWriter.cpp
-   IoXml/GxlWriter.cpp
    Resolutions/Resolution.cpp
    Resolutions/CoreResolution.cpp
    Resolutions/SimulationResolution.cpp
@@ -17,6 +15,7 @@ set(MHDTestSources
    LoadSplitter/Algorithms/SplittingTools.cpp
    LoadSplitter/Algorithms/SplittingDescription.cpp
    LoadSplitter/Algorithms/SplittingAlgorithm.cpp
+   LoadSplitter/Algorithms/SerialSplitting.cpp
    SpatialSchemes/ISchemeCosts.cpp
    SpatialSchemes/ISpatialScheme.cpp
    SpatialSchemes/3D/IRegular3DScheme.cpp
@@ -29,22 +28,31 @@ set(MHDTestSources
    Resolutions/Tools/RegularIndexCounter.cpp
    FastTransforms/FftSetup.cpp
    FastTransforms/FftwTools.cpp
+   FastTransforms/FftwLibrary.cpp
+   FastTransforms/FftwTransform.cpp
+   FastTransforms/ChebyshevFftwTransform.cpp
+   Variables/VariableRequirement.cpp
+   Variables/FieldRequirement.cpp
+   Variables/RequirementTools.cpp
+   Variables/VariableBase.cpp
+   TypeSelectors/ParallelSelector.cpp
+   TransformGroupers/IForwardGrouper.cpp
+   TransformGroupers/IBackwardGrouper.cpp
+   TransformConfigurators/ForwardConfigurator.cpp
+   TransformConfigurators/ForwardSerialConfigurator.cpp
+   TransformConfigurators/BackwardConfigurator.cpp
+   TransformConfigurators/BackwardSerialConfigurator.cpp
+   TransformCoordinators/TransformCoordinatorTools.cpp
+   SpectralOperators/IOperator.cpp
+   SpectralOperators/ChebyshevOperator.cpp
+   Equations/CouplingInformation.cpp
+   Equations/EquationData.cpp
+   Equations/IEquation.cpp
+   Equations/IScalarEquation.cpp
+   Equations/IVectorEquation.cpp
+   Timers/ITimer.cpp
+   Timers/SerialTimer.cpp
 )
-
-if(GEOMHDISCC_MPI)
-   list(APPEND MHDTestSources
-      Framework/MpiFramework.cpp
-      Profiler/MpiProfiler.cpp
-      LoadSplitter/Algorithms/SingleSplitting.cpp
-      LoadSplitter/Algorithms/TubularSplitting.cpp
-      )
-else(GEOMHDISCC_MPI)
-   list(APPEND MHDTestSources
-      Framework/SerialFramework.cpp
-      Profiler/SerialProfiler.cpp
-      LoadSplitter/Algorithms/SerialSplitting.cpp
-      )
-endif(GEOMHDISCC_MPI)
 
 # Include all files for the framework
 include(../src/Framework/SourcesList.cmake)
@@ -71,5 +79,12 @@ set(MHDSources )
 include(../src/Profiler/SourcesList.cmake)
 foreach(src ${MHDSources})
    list(APPEND MHDTestSources Profiler/${src})
+endforeach(src ${MHDSources})
+set(MHDSources )
+
+# Include all files for the profiler
+include(../src/Debug/SourcesList.cmake)
+foreach(src ${MHDSources})
+   list(APPEND MHDTestSources Debug/${src})
 endforeach(src ${MHDSources})
 set(MHDSources )
