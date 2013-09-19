@@ -16,6 +16,8 @@
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Variables/RequirementTools.hpp"
 
+#include "Equations/Tests/TestTFTExactForwardScalar.hpp"
+
 namespace GeoMHDiSCC {
 
 namespace TestSuite {
@@ -47,7 +49,6 @@ namespace TestSuite {
           */
          //virtual void TearDown();
          
-      private:
          /**
           * @brief Shared resolution 
           */
@@ -87,6 +88,7 @@ namespace TestSuite {
           * @brief Map between name and pointer for the vector variables
           */
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectorVariables;
+      private:
    };
 
    SpatialSchemeTest::SpatialSchemeTest()
@@ -121,14 +123,17 @@ namespace TestSuite {
       // Initialise the load splitter with spatial scheme
       splitter.init<Schemes::SpatialType>(dims);
 
-      // Get best splitted resolution
-      this->mspRes = splitter.bestSplitting().first;
+      // Get best splitting
+      std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
+
+      // Get resolution
+      this->mspRes = best.first;
 
       // Set additional options on final resolution object
       Schemes::SpatialType::tuneResolution(this->mspRes);
 
       // Initialise the transform grouper
-      Parallel::setGrouper(splitter.bestSplitting().second, this->mspFwdGrouper, this->mspBwdGrouper);
+      Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
 
       // Set the transform options
       std::map<NonDimensional::Id,MHDFloat> runOptions;
@@ -149,7 +154,19 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, FwdLoopExact)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      Equations::SharedIScalarEquation   spEq(new Equations::TestTFTExactForwardScalar());
+
+      this->mScalarEquations.push_back(spEq);
+
+      // Synchronize  framework
+      FrameworkMacro::finalize();
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::finalize();
    }
 
    /**
@@ -160,7 +177,15 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, FwdLoopFull)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      // Synchronize  framework
+      FrameworkMacro::finalize();
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::finalize();
    }
 
    /**
@@ -171,7 +196,15 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, BwdLoopExact)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      // Synchronize  framework
+      FrameworkMacro::finalize();
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::finalize();
    }
 
    /**
@@ -182,7 +215,15 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, BwdLoopFull)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      // Synchronize  framework
+      FrameworkMacro::finalize();
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::finalize();
    }
 
    /**
@@ -193,7 +234,17 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, Accumulation)
    {
-      ASSERT_TRUE(false) << "##########################################" << std::endl << "## Tests have not yet been implemented! ##" << std::endl << "##########################################";
+      int nLoop = 100;
+
+      for(int i = 0; i < nLoop; i++)
+      {
+         // Synchronize  framework
+         FrameworkMacro::finalize();
+
+         this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+         this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+      }
    }
 
 }
