@@ -1,11 +1,11 @@
 /**
- * @file TestTTTForwardScalar.hpp
- * @brief Implementation of a test equation for the TTT scheme with exact known physical space scalar solution
+ * @file TestSpatialSchemeBackwardScalar.hpp
+ * @brief Implementation of a test equation for the spatial schemes with exact known spectral space scalar solution
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef TESTTTTFORWARDSCALAR_HPP
-#define TESTTTTFORWARDSCALAR_HPP
+#ifndef TESTSPATIALCHEMEBACKWARDSCALAR_HPP
+#define TESTSPATIALCHEMEBACKWARDSCALAR_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of a test equation for the TTT scheme with exact known physical space scalar solution
+    * @brief Implementation of a test equation for the spatial schemes with exact known spectral space scalar solution
     */
-   class TestTTTForwardScalar: public IScalarEquation
+   class TestSpatialSchemeBackwardScalar: public IScalarEquation
    {
       public:
          /**
@@ -39,18 +39,24 @@ namespace Equations {
          enum SolutionTypeId {
             ZERO,
             CONSTANT,
-            EXACT
+            EXACT,
+            FULL
          };
 
          /**
           * @brief Constructor
           */
-         TestTTTForwardScalar();
+         TestSpatialSchemeBackwardScalar();
 
          /**
           * @brief Destructor
           */
-         virtual ~TestTTTForwardScalar();
+         virtual ~TestSpatialSchemeBackwardScalar();
+
+         /**
+          * @brief Overloaded init
+          */
+         virtual void init();
 
          /**
           * @brief Set the unknown name and requirements 
@@ -64,7 +70,7 @@ namespace Equations {
           *
           * @param id ID of the exact solution
           */
-         void setSolutionType(const TestTTTForwardScalar::SolutionTypeId id);
+         void setSolutionType(const TestSpatialSchemeBackwardScalar::SolutionTypeId id);
 
          /**
           * @brief Set the exact solution as nonlinear interaction term
@@ -78,11 +84,6 @@ namespace Equations {
           * @brief Compute the error to exact solution for scalar value 
           */
          MHDFloat computeScalarError() const;
-
-         /**
-          * @brief Compute the error to exact solution for gradient value 
-          */
-         MHDFloat computeGradientError() const;
 
       protected:
          /**
@@ -99,25 +100,11 @@ namespace Equations {
          /**
           * @brief Compute single point of solution 
           *
-          * @param z    Z coordinate
-          * @param th   Theta coordinate
-          * @param x    X coordinate
-          *
-          * @return 
+          * @param i Fastest index
+          * @param j Medium index
+          * @param k Slow index
           */
-         MHDFloat scalarPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x) const;
-
-         /**
-          * @brief Compute single point of gradient of solution 
-          *
-          * @param z       Z coordinate
-          * @param th      Theta coordinate
-          * @param x       X coordinate
-          * @param compId  ID of component
-          *
-          * @return 
-          */
-         MHDFloat gradientPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x, const FieldComponents::Physical::Id compId) const;
+         MHDFloat scalarPoint(const int i, const int j, const int k) const;
 
          /**
           * @brief Type of the exact solution
@@ -125,10 +112,10 @@ namespace Equations {
          SolutionTypeId mTypeId;
    };
 
-   /// Typedef for a shared TestTTTForwardScalar
-   typedef SharedPtrMacro<TestTTTForwardScalar> SharedTestTTTForwardScalar;
+   /// Typedef for a shared TestSpatialSchemeBackwardScalar
+   typedef SharedPtrMacro<TestSpatialSchemeBackwardScalar> SharedTestSpatialSchemeBackwardScalar;
 
 }
 }
 
-#endif // TESTTTTFORWARDSCALAR_HPP
+#endif // TESTSPATIALCHEMEBACKWARDSCALAR_HPP

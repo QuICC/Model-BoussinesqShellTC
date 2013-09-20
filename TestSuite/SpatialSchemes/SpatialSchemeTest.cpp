@@ -15,7 +15,8 @@
 #include "TransformGroupers/IBackwardGrouper.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Variables/RequirementTools.hpp"
-#include "Equations/Tests/SpatialSchemeTestEquationSelector.hpp"
+#include "Equations/Tests/TestSpatialSchemeForwardScalar.hpp"
+#include "Equations/Tests/TestSpatialSchemeBackwardScalar.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -192,9 +193,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, FwdLoopZero)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeForwardScalar>   spEq(new Equations::TestSpatialSchemeForwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::ZERO);
+      spEq->setSolutionType(Equations::TestSpatialSchemeForwardScalar::ZERO);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -225,9 +226,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, FwdLoopConstant)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeForwardScalar>   spEq(new Equations::TestSpatialSchemeForwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::CONSTANT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeForwardScalar::CONSTANT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -258,9 +259,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, FwdLoopExact)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeForwardScalar>   spEq(new Equations::TestSpatialSchemeForwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::EXACT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeForwardScalar::EXACT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -291,9 +292,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, BwdLoopZero)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::ZERO);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::ZERO);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -322,9 +323,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, BwdLoopConstant)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::CONSTANT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::CONSTANT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -353,9 +354,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, BwdLoopExact)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::EXACT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::EXACT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -384,9 +385,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, BwdLoopFull)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::FULL);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::FULL);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -415,9 +416,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, AccumulationZero)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::ZERO);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::ZERO);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -449,9 +450,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, AccumulationConstant)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::CONSTANT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::CONSTANT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -483,9 +484,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, AccumulationExact)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::EXACT);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::EXACT);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator
@@ -517,9 +518,9 @@ namespace TestSuite {
    TEST_F(SpatialSchemeTest, AccumulationFull)
    {
       // Set correct equation
-      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      SharedPtrMacro<Equations::TestSpatialSchemeBackwardScalar>   spEq(new Equations::TestSpatialSchemeBackwardScalar());
       spEq->setIdentity(PhysicalNames::TEMPERATURE);
-      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::FULL);
+      spEq->setSolutionType(Equations::TestSpatialSchemeBackwardScalar::FULL);
       this->mScalarEquations.push_back(spEq);
 
       // Initialise transform coordinator

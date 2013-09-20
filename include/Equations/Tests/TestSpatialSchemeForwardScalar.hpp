@@ -1,11 +1,11 @@
 /**
- * @file TestSLFBackwardScalar.hpp
- * @brief Implementation of a test equation for the SLF scheme with exact known spectral space scalar solution
+ * @file TestSpatialSchemeForwardScalar.hpp
+ * @brief Implementation of a test equation for the spatial schemes with exact known physical space scalar solution
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef TESTSLFBACKWARDSCALAR_HPP
-#define TESTSLFBACKWARDSCALAR_HPP
+#ifndef TESTSPATIALCHEMEFORWARDSCALAR_HPP
+#define TESTSPATIALCHEMEFORWARDSCALAR_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of a test equation for the SLF scheme with exact known spectral space scalar solution
+    * @brief Implementation of a test equation for the spatial schemes with exact known physical space scalar solution
     */
-   class TestSLFBackwardScalar: public IScalarEquation
+   class TestSpatialSchemeForwardScalar: public IScalarEquation
    {
       public:
          /**
@@ -39,24 +39,18 @@ namespace Equations {
          enum SolutionTypeId {
             ZERO,
             CONSTANT,
-            EXACT,
-            FULL
+            EXACT
          };
 
          /**
           * @brief Constructor
           */
-         TestSLFBackwardScalar();
+         TestSpatialSchemeForwardScalar();
 
          /**
           * @brief Destructor
           */
-         virtual ~TestSLFBackwardScalar();
-
-         /**
-          * @brief Overloaded init
-          */
-         virtual void init();
+         virtual ~TestSpatialSchemeForwardScalar();
 
          /**
           * @brief Set the unknown name and requirements 
@@ -70,7 +64,7 @@ namespace Equations {
           *
           * @param id ID of the exact solution
           */
-         void setSolutionType(const TestSLFBackwardScalar::SolutionTypeId id);
+         void setSolutionType(const TestSpatialSchemeForwardScalar::SolutionTypeId id);
 
          /**
           * @brief Set the exact solution as nonlinear interaction term
@@ -84,6 +78,11 @@ namespace Equations {
           * @brief Compute the error to exact solution for scalar value 
           */
          MHDFloat computeScalarError() const;
+
+         /**
+          * @brief Compute the error to exact solution for gradient value 
+          */
+         MHDFloat computeGradientError() const;
 
       protected:
          /**
@@ -100,11 +99,25 @@ namespace Equations {
          /**
           * @brief Compute single point of solution 
           *
-          * @param i Fastest index
-          * @param j Medium index
-          * @param k Slow index
+          * @param z    Z coordinate
+          * @param th   Theta coordinate
+          * @param x    X coordinate
+          *
+          * @return 
           */
-         MHDFloat scalarPoint(const int i, const int j, const int k) const;
+         MHDFloat scalarPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x) const;
+
+         /**
+          * @brief Compute single point of gradient of solution 
+          *
+          * @param z       Z coordinate
+          * @param th      Theta coordinate
+          * @param x       X coordinate
+          * @param compId  ID of component
+          *
+          * @return 
+          */
+         MHDFloat gradientPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x, const FieldComponents::Physical::Id compId) const;
 
          /**
           * @brief Type of the exact solution
@@ -112,10 +125,10 @@ namespace Equations {
          SolutionTypeId mTypeId;
    };
 
-   /// Typedef for a shared TestSLFBackwardScalar
-   typedef SharedPtrMacro<TestSLFBackwardScalar> SharedTestSLFBackwardScalar;
+   /// Typedef for a shared TestSpatialSchemeForwardScalar
+   typedef SharedPtrMacro<TestSpatialSchemeForwardScalar> SharedTestSpatialSchemeForwardScalar;
 
 }
 }
 
-#endif // TESTSLFBACKWARDSCALAR_HPP
+#endif // TESTSPATIALCHEMEFORWARDSCALAR_HPP

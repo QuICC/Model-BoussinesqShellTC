@@ -51,24 +51,8 @@ set(MHDTestSources
    Equations/IEquation.cpp
    Equations/IScalarEquation.cpp
    Equations/IVectorEquation.cpp
-   Equations/Tests/TestTFTForwardScalar.cpp
-   Equations/Tests/TestTFTBackwardScalar.cpp
-   Equations/Tests/TestTTTForwardScalar.cpp
-   Equations/Tests/TestTTTBackwardScalar.cpp
-   Equations/Tests/TestTFTForwardScalar.cpp
-   Equations/Tests/TestTFTBackwardScalar.cpp
-   Equations/Tests/TestTFFForwardScalar.cpp
-   Equations/Tests/TestTFFBackwardScalar.cpp
-   Equations/Tests/TestFFFForwardScalar.cpp
-   Equations/Tests/TestFFFBackwardScalar.cpp
-   Equations/Tests/TestCFTForwardScalar.cpp
-   Equations/Tests/TestCFTBackwardScalar.cpp
-   Equations/Tests/TestSLFForwardScalar.cpp
-   Equations/Tests/TestSLFBackwardScalar.cpp
-   Equations/Tests/TestWFTForwardScalar.cpp
-   Equations/Tests/TestWFTBackwardScalar.cpp
-   Equations/Tests/TestWLFForwardScalar.cpp
-   Equations/Tests/TestWLFBackwardScalar.cpp
+   Equations/Tests/TestSpatialSchemeForwardScalar.cpp
+   Equations/Tests/TestSpatialSchemeBackwardScalar.cpp
    IoTools/IdToHuman.cpp
    IoTools/HumanToId.cpp
    Timers/ITimer.cpp
