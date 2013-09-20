@@ -15,8 +15,7 @@
 #include "TransformGroupers/IBackwardGrouper.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Variables/RequirementTools.hpp"
-
-#include "Equations/Tests/TestTFTExactForwardScalar.hpp"
+#include "Equations/Tests/SpatialSchemeTestEquationSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -48,6 +47,11 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown();
+         
+         /**
+          * @brief Initialise transform coordinator
+          */
+         void initCoord();
          
          /**
           * @brief Shared resolution 
@@ -88,10 +92,40 @@ namespace TestSuite {
           * @brief Map between name and pointer for the vector variables
           */
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>  mVectorVariables;
-      private:
+
+         /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+         
+         /**
+          * @brief Acceptable relative error
+          */
+         double mRelError;
+
+         /**
+          * @brief Number of accumulation loops
+          */
+         int mNAccumul;
+
+         /**
+          * @brief Maximum order in 1D
+          */
+         int mMax1D;
+
+         /**
+          * @brief Maximum order in 2D
+          */
+         int mMax2D;
+
+         /**
+          * @brief Maximum order in 3D
+          */
+         int mMax3D;
    };
 
    SpatialSchemeTest::SpatialSchemeTest()
+      : mError(1e-12), mRelError(1e-12), mNAccumul(10), mMax1D(63), mMax2D(57), mMax3D(64)
    {
    }
 
@@ -101,24 +135,12 @@ namespace TestSuite {
 
    void SpatialSchemeTest::SetUp()
    {
-      // Storage for the variable requirements
-      VariableRequirement varInfo;
-
-      // Initialise the variables and set general variable requirements
-      RequirementTools::initVariables(varInfo, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
-
-      // Storage for the nonlinear requirement info
-      std::set<PhysicalNames::Id>   nonInfo;
-
-      // Map variables to the equations and set nonlinear requirements
-      RequirementTools::mapEquationVariables(nonInfo, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
-
       // Create load splitter
       Parallel::LoadSplitter   splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
 
       // Create test resolution
       ArrayI dims(3);
-      dims(0) = 64; dims(1) = 64; dims(2) = 64;
+      dims(0) = this->mMax1D; dims(1) = this->mMax2D; dims(2) = this->mMax3D;
 
       // Initialise the load splitter with spatial scheme
       splitter.init<Schemes::SpatialType>(dims);
@@ -134,6 +156,25 @@ namespace TestSuite {
 
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+   }
+
+//   void SpatialSchemeTest::TearDown()
+//   {
+//   }
+
+   void SpatialSchemeTest::initCoord()
+   {
+      // Storage for the variable requirements
+      VariableRequirement varInfo;
+
+      // Storage for the nonlinear requirement info
+      std::set<PhysicalNames::Id>   nonInfo;
+
+      // Initialise the variables and set general variable requirements
+      RequirementTools::initVariables(varInfo, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
+
+      // Map variables to the equations and set nonlinear requirements
+      RequirementTools::mapEquationVariables(nonInfo, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
 
       // Set the transform options
       std::map<NonDimensional::Id,MHDFloat> runOptions;
@@ -142,9 +183,71 @@ namespace TestSuite {
       Transform::TransformCoordinatorTools::init(this->mCoord, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, nonInfo, this->mspRes, runOptions);
    }
 
-//   void SpatialSchemeTest::TearDown()
-//   {
-//   }
+   /**
+    * @brief Forward transform loop with exact zero solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, FwdLoopZero)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::ZERO);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+      // Check gradient solution
+      EXPECT_LT(spEq->computeGradientError(), this->mError);
+   }
+
+   /**
+    * @brief Forward transform loop with exact constant solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, FwdLoopConstant)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::CONSTANT);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+      // Check gradient solution
+      EXPECT_LT(spEq->computeGradientError(), this->mError);
+   }
 
    /**
     * @brief Forward transform loop with exact solution test
@@ -154,38 +257,91 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, FwdLoopExact)
    {
-      Equations::SharedIScalarEquation   spEq(new Equations::TestTFTExactForwardScalar());
-
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::ForwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::ForwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::ForwardScalarType::EXACT);
       this->mScalarEquations.push_back(spEq);
 
+      // Initialise transform coordinator
+      this->initCoord();
+
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
 
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
 
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
 
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+      // Check gradient solution
+      EXPECT_LT(spEq->computeGradientError(), this->mError);
    }
 
    /**
-    * @brief Forward transform loop with full resolution solution test
+    * @brief Backward transform loop with exact zero solution test
     *
     * @param SpatialSchemeTest Test fixture ID
     * @param Placeholder   Test ID
     */
-   TEST_F(SpatialSchemeTest, FwdLoopFull)
+   TEST_F(SpatialSchemeTest, BwdLoopZero)
    {
-      // Synchronize  framework
-      FrameworkMacro::finalize();
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::ZERO);
+      this->mScalarEquations.push_back(spEq);
 
-      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+      // Initialise transform coordinator
+      this->initCoord();
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
 
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
 
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+   }
+
+   /**
+    * @brief Backward transform loop with exact constant solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, BwdLoopConstant)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::CONSTANT);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+      this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
    }
 
    /**
@@ -196,34 +352,160 @@ namespace TestSuite {
     */
    TEST_F(SpatialSchemeTest, BwdLoopExact)
    {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::EXACT);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
 
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
 
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
 
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
    }
 
    /**
-    * @brief Backward transform loop with full resolution solution test
+    * @brief Backward transform loop with exact full resolution solution test
     *
     * @param SpatialSchemeTest Test fixture ID
     * @param Placeholder   Test ID
     */
    TEST_F(SpatialSchemeTest, BwdLoopFull)
    {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::FULL);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
 
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
 
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
 
       // Synchronize  framework
-      FrameworkMacro::finalize();
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+   }
+
+   /**
+    * @brief Error accumulation through many loops with zero solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, AccumulationZero)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::ZERO);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      for(int i = 0; i < this->mNAccumul; i++)
+      {
+         // Synchronize  framework
+         FrameworkMacro::synchronize();
+
+         this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+         this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+      }
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+   }
+
+   /**
+    * @brief Error accumulation through many loops with constant solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, AccumulationConstant)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::CONSTANT);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      for(int i = 0; i < this->mNAccumul; i++)
+      {
+         // Synchronize  framework
+         FrameworkMacro::synchronize();
+
+         this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+         this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+      }
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
+   }
+
+   /**
+    * @brief Error accumulation through many loops with exact solution test
+    *
+    * @param SpatialSchemeTest Test fixture ID
+    * @param Placeholder   Test ID
+    */
+   TEST_F(SpatialSchemeTest, AccumulationExact)
+   {
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::EXACT);
+      this->mScalarEquations.push_back(spEq);
+
+      // Initialise transform coordinator
+      this->initCoord();
+
+      for(int i = 0; i < this->mNAccumul; i++)
+      {
+         // Synchronize  framework
+         FrameworkMacro::synchronize();
+
+         this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
+
+         this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
+      }
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
    }
 
    /**
@@ -232,19 +514,32 @@ namespace TestSuite {
     * @param SpatialSchemeTest Test fixture ID
     * @param Placeholder   Test ID
     */
-   TEST_F(SpatialSchemeTest, Accumulation)
+   TEST_F(SpatialSchemeTest, AccumulationFull)
    {
-      int nLoop = 100;
+      // Set correct equation
+      SharedPtrMacro<SpatialSchemeTestEquationSelector::BackwardScalarType>   spEq(new SpatialSchemeTestEquationSelector::BackwardScalarType());
+      spEq->setIdentity(PhysicalNames::TEMPERATURE);
+      spEq->setSolutionType(SpatialSchemeTestEquationSelector::BackwardScalarType::FULL);
+      this->mScalarEquations.push_back(spEq);
 
-      for(int i = 0; i < nLoop; i++)
+      // Initialise transform coordinator
+      this->initCoord();
+
+      for(int i = 0; i < this->mNAccumul; i++)
       {
          // Synchronize  framework
-         FrameworkMacro::finalize();
+         FrameworkMacro::synchronize();
 
          this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mCoord);
 
          this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mCoord);
       }
+
+      // Synchronize  framework
+      FrameworkMacro::synchronize();
+
+      // Check scalar solution
+      EXPECT_LT(spEq->computeScalarError(), this->mError);
    }
 
 }
