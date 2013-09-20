@@ -110,7 +110,7 @@ namespace Equations {
          int nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(iK);
          for(int iJ = 0; iJ < nJ; ++iJ)
          {
-            iJ_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ);
+            iJ_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ, iK);
             for(int iI = 0; iI < nI; ++iI)
             {
                iI_ = iI;
@@ -158,7 +158,7 @@ namespace Equations {
          int nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(iK);
          for(int iJ = 0; iJ < nJ; ++iJ)
          {
-            iJ_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ);
+            iJ_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iJ, iK);
             for(int iI = 0; iI < nI; ++iI)
             {
                iI_ = iI;

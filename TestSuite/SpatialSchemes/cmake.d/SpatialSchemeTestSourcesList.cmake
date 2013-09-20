@@ -59,6 +59,35 @@ set(MHDTestSources
    Timers/SerialTimer.cpp
 )
 
+if(GEOMHDISCC_MPI)
+   list(APPEND MHDTestSources
+      Timers/MpiTimer.cpp
+      Communicators/CommunicationBuffer.cpp
+      Communicators/Converters/MpiConverterTools.cpp
+      LoadSplitter/Algorithms/SingleSplitting.cpp
+      LoadSplitter/Algorithms/FixedSplitting.cpp
+      LoadSplitter/Algorithms/TubularSplitting.cpp
+   )
+   if(GEOMHDISCC_MPIALGO STREQUAL "Single1D" OR GEOMHDISCC_MPIALGO STREQUAL "Fixed")
+      list(APPEND MHDTestSources
+         TransformConfigurators/BackwardSingle1DConfigurator.cpp
+         TransformConfigurators/ForwardSingle1DConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Single1D" OR GEOMHDISCC_MPIALGO STREQUAL "Fixed")
+   if(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
+      list(APPEND MHDTestSources
+         TransformConfigurators/BackwardSingle2DConfigurator.cpp
+         TransformConfigurators/ForwardSingle2DConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
+   if(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
+      list(APPEND MHDTestSources
+         TransformConfigurators/BackwardTubularConfigurator.cpp
+         TransformConfigurators/ForwardTubularConfigurator.cpp
+      )
+   endif(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
+endif(GEOMHDISCC_MPI)
+
 # Include all files for the framework
 include(../src/Framework/SourcesList.cmake)
 foreach(src ${MHDSources})

@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "IoTools/Formatter.hpp"
+#include "Framework/FrameworkMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -115,12 +116,15 @@ namespace Transform {
       // Size is not good and optimisation failed
       if(!good)
       {
-         // Create nice looking warnig message
-         IoTools::Formatter::printLine(std::cout, '%');
-         IoTools::Formatter::printCentered(std::cout, "WARNING: FFT size optimization failed", '%');
-         IoTools::Formatter::printCentered(std::cout, "Selected FFT size might be slow!", '%');
-         IoTools::Formatter::printLine(std::cout, '%');
-         IoTools::Formatter::printNewline(std::cout);
+         if(FrameworkMacro::allowsIO())
+         {
+            // Create nice looking warnig message
+            IoTools::Formatter::printLine(std::cout, '%');
+            IoTools::Formatter::printCentered(std::cout, "WARNING: FFT size optimization failed", '%');
+            IoTools::Formatter::printCentered(std::cout, "Selected FFT size might be slow!", '%');
+            IoTools::Formatter::printLine(std::cout, '%');
+            IoTools::Formatter::printNewline(std::cout);
+         }
 
          return size;
 
@@ -130,16 +134,19 @@ namespace Transform {
          // Create nice looking warning message
          if(opt > 0)
          {
-            IoTools::Formatter::printLine(std::cout, '%');
-            std::stringstream oss;
-            if(opt > 2)
+            if(FrameworkMacro::allowsIO())
             {
-               oss << "WARNING: ";
+               IoTools::Formatter::printLine(std::cout, '%');
+               std::stringstream oss;
+               if(opt > 2)
+               {
+                  oss << "WARNING: ";
+               }
+               oss << "Extended FFT size (+" << opt << ")!";
+               IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
+               IoTools::Formatter::printLine(std::cout, '%');
+               IoTools::Formatter::printNewline(std::cout);
             }
-            oss << "Extended FFT size (+" << opt << ")!";
-            IoTools::Formatter::printCentered(std::cout, oss.str(), '%');
-            IoTools::Formatter::printLine(std::cout, '%');
-            IoTools::Formatter::printNewline(std::cout);
          }
 
          return size + opt;
