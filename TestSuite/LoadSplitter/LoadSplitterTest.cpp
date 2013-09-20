@@ -109,10 +109,30 @@ int main(int argc, char **argv)
    #ifdef GEOMHDISCC_MPI
       // Get MPI size
       MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+
+      if(argc == 2)
+      {
+         if(nCpu == 1)
+         {
+            std::istringstream   iss;
+            iss.str(argv[1]);
+            iss >> nCpu;
+            std::cerr << nCpu << std::endl;
+         } else
+         {
+            throw GeoMHDiSCC::Exception("Can only emulate large run with single CPU");
+         }
+      }
    #endif //GEOMHDISCC_MPI
 
    // Setup framework
-   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+   try
+   {
+      GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+   }
+   catch(GeoMHDiSCC::Exception& e)
+   {
+   }
 
    ::testing::InitGoogleTest(&argc, argv);
    int status = RUN_ALL_TESTS();
