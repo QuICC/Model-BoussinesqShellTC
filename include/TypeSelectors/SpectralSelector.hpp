@@ -32,6 +32,36 @@ namespace GeoMHDiSCC {
 
       template <Dimensions::Simulation::Id TId>  struct SpectralSelector;
 
+      // Configure code to use TTT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TTT
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
+         {
+            /// Typedef for the spectral operator
+            typedef  ChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  ChebyshevBoundary  BcType;
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
+         {
+            /// Typedef for the spectral operator
+            typedef  ChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  ChebyshevBoundary  BcType;
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
+         {
+            /// Typedef for the spectral operator
+            typedef  ChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  ChebyshevBoundary  BcType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_TTT
+
       // Configure code to use TFT scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
          template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
@@ -77,6 +107,21 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_TFF
 
+      // Configure code to use FFF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_FFF
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
+         {
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
+         {
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_FFF
+
       // Configure code to use CFT scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
          template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
@@ -102,6 +147,26 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
+      // Configure code to use SLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
+         {
+            /// Typedef for the spectral operator
+            typedef  SphericalChebyshevOperator  OpType;
+
+            /// Typedef for the spectral boundary operator
+            typedef  SphericalChebyshevBoundary  BcType;
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
+         {
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLF
+
       // Configure code to use WFT scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
          template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
@@ -126,26 +191,6 @@ namespace GeoMHDiSCC {
             typedef  ChebyshevBoundary  BcType;
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_WFT
-
-      // Configure code to use SLF scheme
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
-         template <> struct SpectralSelector<Dimensions::Simulation::SIM1D>
-         {
-            /// Typedef for the spectral operator
-            typedef  SphericalChebyshevOperator  OpType;
-
-            /// Typedef for the spectral boundary operator
-            typedef  SphericalChebyshevBoundary  BcType;
-         };
-
-         template <> struct SpectralSelector<Dimensions::Simulation::SIM2D>
-         {
-         };
-
-         template <> struct SpectralSelector<Dimensions::Simulation::SIM3D>
-         {
-         };
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLF
 
       // Configure code to use WLF scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_WLF

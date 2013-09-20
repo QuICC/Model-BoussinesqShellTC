@@ -96,21 +96,6 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
-// Configure code to use WFT scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
-   // WFT includes
-   #include "SpatialSchemes/3D/WFTScheme.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Schemes {
-
-         /// Typedef for the WFT spatial scheme
-         typedef WFTScheme SpatialType;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_WFT
-
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
    // SLF includes
@@ -125,6 +110,21 @@
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_SLF
+
+// Configure code to use WFT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_WFT
+   // WFT includes
+   #include "SpatialSchemes/3D/WFTScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the WFT spatial scheme
+         typedef WFTScheme SpatialType;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_WFT
 
 // Configure code to use WLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
