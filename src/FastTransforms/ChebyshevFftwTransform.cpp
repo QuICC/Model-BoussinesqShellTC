@@ -85,7 +85,7 @@ namespace Transform {
 
    void ChebyshevFftwTransform::initFft()
    {  
-      /// \mhdBug implement strideed stranforms for complex <-> complex case if possible
+      /// \mhdBug implement strided stranforms for complex <-> complex case if possible
 
       int fwdSize = this->mspSetup->fwdSize();
       int bwdSize = this->mspSetup->bwdSize();
