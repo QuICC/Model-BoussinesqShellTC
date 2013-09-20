@@ -210,7 +210,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(z,11);
+         MHDFloat val;
+         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         val *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
+         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         return val;
       }
 
       // Unknown setup
@@ -247,13 +251,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+            val *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
+            val *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+            val *= (0.4 + 2.0*y + 8.0*std::pow(y,3));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(z,10);
+            MHDFloat val;
+            val = (1.0 + 4.0*z - 6.0*z);
+            val *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          }
       }
       // Unknown setup
@@ -274,7 +290,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(z,11);
+         MHDFloat val;
+         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         val *= (std::cos(5.0*th) + std::sin(7.0*th));
+         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         return val;
       }
 
       // Unknown setup
@@ -311,13 +331,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+            val *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(z,10);
+            MHDFloat val;
+            val = (1.0 + 4.0*z - 6.0*z);
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          }
       }
       // Unknown setup
@@ -338,7 +370,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(ph,11);
+         MHDFloat val;
+         val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         val *= (std::cos(5.0*th) + std::sin(7.0*th));
+         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         return val;
       }
 
       // Unknown setup
@@ -375,13 +411,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+            val *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(ph,10);
+            MHDFloat val;
+            val = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) + -2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            return val;
          }
       }
       // Unknown setup
@@ -402,7 +450,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(ph,11);
+         MHDFloat val;
+         val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         val *= (std::cos(5.0*th) + std::sin(7.0*th));
+         val *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+         return val;
       }
 
       // Unknown setup
@@ -439,13 +491,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (-3.0*std::sin(3.0*kh) + 4.0*std::cos(4.0*kh) - 2.0*std::sin(2.0*kh));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+            val *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+            val *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(ph,10);
+            MHDFloat val;
+            val = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) - 2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
+            val *= (std::cos(5.0*th) + std::sin(7.0*th));
+            val *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+            return val;
          }
       }
       // Unknown setup
@@ -466,7 +530,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(z,11);
+         MHDFloat val;
+         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+         val *= (std::sin(5.0*th) + std::cos(7.0*th));
+         val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+         return val;
       }
 
       // Unknown setup
@@ -503,13 +571,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4 + 6.0*r - 3.5*std::pow(r,4));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+            val *= (5.0*std::sin(5.0*th) - 7.0*std::sin(7.0*th));
+            val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(z,10);
+            MHDFloat val;
+            val = (1.0 + 4.0*z - 9.0*std::pow(z,2));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+            return val;
          }
       }
       // Unknown setup
@@ -530,7 +610,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(z,11);
+         MHDFloat val;
+         val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+         val *= (std::sin(5.0*th) + std::cos(7.0*th));
+         val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+         return val;
       }
 
       // Unknown setup
@@ -567,13 +651,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4 + 6.0*r - 3.5*std::pow(r,4) - 1.2*std::pow(r,5) + 27.9*std::pow(r,8));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+            val *= (5.0*std::cos(5.0*th) - 7.0*std::sin(7.0*th));
+            val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(ph,10);
+            MHDFloat val;
+            val = (std::cos(ph) + 3.0*std::sin(3.0*ph) + 4.0*std::cos(4.0*ph) - 5.0*std::sin(5.0*ph) - 5.0*std::cos(5.0*ph) - 7.0*std::sin(7.0*ph));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+            return val;
          }
       }
       // Unknown setup
@@ -594,7 +690,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(z,11);
+         MHDFloat val;
+         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+         val *= (std::sin(5.0*th) + std::cos(7.0*th));
+         val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+         return val;
       }
 
       // Unknown setup
@@ -631,13 +731,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4 + 6.0*r - 3.5*std::pow(r,4));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,3));
+            val *= (5.0*std::cos(5.0*th) - 7.0*std::sin(7.0*th));
+            val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(z,10);
+            MHDFloat val;
+            val = (1.0 + 4.0*z - 9.0*std::pow(z,2));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5));
+            return val;
          }
       }
       // Unknown setup
@@ -658,7 +770,11 @@ namespace Equations {
          return 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         return std::pow(ph,11);
+         MHDFloat val;
+         val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+         val *= (std::sin(5.0*th) + std::cos(7.0*th));
+         val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+         return val;
       }
 
       // Unknown setup
@@ -695,13 +811,25 @@ namespace Equations {
       {
          if(compId == FieldComponents::Physical::ONE)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (0.4 + 6.0*r - 3.5*std::pow(r,4) - 1.2*std::pow(r,5) + 27.9*std::pow(r,8));
+            return val;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            return 0.0;
+            MHDFloat val;
+            val = (std::sin(ph) - std::cos(3.0*ph) + std::sin(4.0*ph) + std::cos(5.0*ph) - std::sin(5.0*ph) + std::cos(7.0*ph));
+            val *= (5.0*std::cos(5.0*th) - 7.0*std::sin(7.0*th));
+            val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+            return val;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            return 11.0*std::pow(ph,10);
+            MHDFloat val;
+            val = (std::cos(ph) + 3.0*std::sin(3.0*ph) + 4.0*std::cos(4.0*ph) - 5.0*std::sin(5.0*ph) - 5.0*std::cos(5.0*ph) - 7.0*std::sin(7.0*ph));
+            val *= (std::sin(5.0*th) + std::cos(7.0*th));
+            val *= (-0.4 + 0.4*r + 3.0*std::pow(r,2) - 0.7*std::pow(r,5) - 0.2*std::pow(r,6) + 3.1*std::pow(r,9));
+            return val;
          }
       }
       // Unknown setup
