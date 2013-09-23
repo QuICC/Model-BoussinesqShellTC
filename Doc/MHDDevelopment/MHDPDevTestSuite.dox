@@ -1,7 +1,8 @@
 /** \page mhdPDevTestSuite Test suite
  *
  *    \mhdTable{
- *       <tr>\mhdStatNA<td>Component tests are not implemented yet</td></tr>
+ *       <tr>\mhdStatNA<td>Not applicable</td></tr>
+ *       <tr>\mhdStatNI<td>Component tests are not implemented yet</td></tr>
  *       <tr>\mhdStatPart<td>Component tests are partially implemented yet</td></tr>
  *       <tr>\mhdStatFail<td>Component tests are implemented but fail</td></tr>
  *       <tr>\mhdStatPass<td>Component tests are implemented and pass</td></tr>
@@ -11,196 +12,196 @@
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref MultiplePrecisionTest.cpp "Multiple precision",\mhdStatNA}
+ *       \mhdStatus{\ref MultiplePrecisionTest.cpp "Multiple precision",\mhdStatNI}
  *       }
  *
  * \section mhdSTSFramework Framework
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref FrameworkTest.cpp "Framework",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref SerialFrameworkTest.cpp "SerialFramework",\mhdStatNA}
- *       \mhdStatus{\ref MpiFrameworkTest.cpp "MpiFramework",\mhdStatDis,\mhdStatNA}
+ *       \mhdStatus{\ref FrameworkTest.cpp "Framework",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SerialFrameworkTest.cpp "SerialFramework",\mhdStatNI}
+ *       \mhdStatus{\ref MpiFrameworkTest.cpp "MpiFramework",\mhdStatNA,\mhdStatNI}
  *       }
  *
  * \section mhdSTSSField Scalar field
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref ScalarFieldSetupTest.cpp "Scalar field setup",\mhdStatNA}
- *       \mhdStatus{\ref ScalarFieldTest.cpp "Scalar field",\mhdStatNA}
- *       \mhdStatus{\ref FlatScalarFieldTest.cpp "Flat scalar field",\mhdStatNA}
- *       \mhdStatus{\ref SlicedScalarFieldTest.cpp "Sliced scalar field",\mhdStatNA}
+ *       \mhdStatus{\ref ScalarFieldSetupTest.cpp "Scalar field setup",\mhdStatNI}
+ *       \mhdStatus{\ref ScalarFieldTest.cpp "Scalar field",\mhdStatNI}
+ *       \mhdStatus{\ref FlatScalarFieldTest.cpp "Flat scalar field",\mhdStatNI}
+ *       \mhdStatus{\ref SlicedScalarFieldTest.cpp "Sliced scalar field",\mhdStatNI}
  *       }
  *
  * \section mhdSTSVField Vector field
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref VectorFieldTest.cpp "Vector field",\mhdStatNA}
- *       \mhdStatus{\ref FlatVectorFieldTest.cpp "Flat vector field",\mhdStatNA}
- *       \mhdStatus{\ref SlicedVectorFieldTest.cpp "Sliced vector field",\mhdStatNA}
+ *       \mhdStatus{\ref VectorFieldTest.cpp "Vector field",\mhdStatNI}
+ *       \mhdStatus{\ref FlatVectorFieldTest.cpp "Flat vector field",\mhdStatNI}
+ *       \mhdStatus{\ref SlicedVectorFieldTest.cpp "Sliced vector field",\mhdStatNI}
  *       }
  *
  * \section mhdSTSTimers Timers
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref SerialTimerTest.cpp "Serial timer",\mhdStatNA}
- *       \mhdStatus{\ref MpiTimerTest.cpp "MPI timer",\mhdStatNA}
+ *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatPass,\mhdStatPass}
+ *       \mhdStatus{\ref SerialTimerTest.cpp "Serial timer",\mhdStatPass}
+ *       \mhdStatus{\ref MpiTimerTest.cpp "MPI timer",\mhdStatNA,\mhdStatPass}
  *       }
  *
  * \section mhdSTSTransform Transforms
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNA,\mhdStatNA}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNA}
- *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNA}
- *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNA}
- *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNA}
- *       \mhdStatus{\ref WorlandOnlineTransformTest.cpp "Worland transform (online)",\mhdStatNA}
+ *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatNI}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNI}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNI}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNI}
+ *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNI}
+ *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNI}
+ *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNI}
+ *       \mhdStatus{\ref WorlandOnlineTransformTest.cpp "Worland transform (online)",\mhdStatNI}
  *    }
  *
  * \section mhdSTSSpecOp Sparse spectral operators
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref TTTTauOperatorTest.cpp "Tau operator (TTT)", \mhdStatNA}
- *       \mhdStatus{\ref TFTTauOperatorTest.cpp "Tau operator (TFT)", \mhdStatNA}
- *       \mhdStatus{\ref TFFTauOperatorTest.cpp "Tau operator (TFF)", \mhdStatNA}
- *       \mhdStatus{\ref FFFTauOperatorTest.cpp "Tau operator (FFF)", \mhdStatNA}
- *       \mhdStatus{\ref CFTTauOperatorTest.cpp "Tau operator (CFT)", \mhdStatNA}
- *       \mhdStatus{\ref SLFTauOperatorTest.cpp "Tau operator (SLF)", \mhdStatNA}
- *       \mhdStatus{\ref WFTTauOperatorTest.cpp "Tau operator (WFT)", \mhdStatNA}
- *       \mhdStatus{\ref WLFTauOperatorTest.cpp "Tau operator (WLF)", \mhdStatNA}
- *       \mhdStatus{Galerkin operator (TTT), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (TFT), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (TFF), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (FFF), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (CFT), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (SLF), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (WFT), \mhdStatNA}
- *       \mhdStatus{Galerkin operator (WLF), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (TTT), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (TFT), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (TFF), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (FFF), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (CFT), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (SLF), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (WFT), \mhdStatNA}
- *       \mhdStatus{Tau QI operator (WLF), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (TTT), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (TFT), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (TFF), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (FFF), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (CFT), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (SLF), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (WFT), \mhdStatNA}
- *       \mhdStatus{Galerkin QI operator (WLF), \mhdStatNA}
+ *       \mhdStatus{\ref TTTTauOperatorTest.cpp "Tau operator (TTT)", \mhdStatNI}
+ *       \mhdStatus{\ref TFTTauOperatorTest.cpp "Tau operator (TFT)", \mhdStatNI}
+ *       \mhdStatus{\ref TFFTauOperatorTest.cpp "Tau operator (TFF)", \mhdStatNI}
+ *       \mhdStatus{\ref FFFTauOperatorTest.cpp "Tau operator (FFF)", \mhdStatNI}
+ *       \mhdStatus{\ref CFTTauOperatorTest.cpp "Tau operator (CFT)", \mhdStatNI}
+ *       \mhdStatus{\ref SLFTauOperatorTest.cpp "Tau operator (SLF)", \mhdStatNI}
+ *       \mhdStatus{\ref WFTTauOperatorTest.cpp "Tau operator (WFT)", \mhdStatNI}
+ *       \mhdStatus{\ref WLFTauOperatorTest.cpp "Tau operator (WLF)", \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (TTT), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (TFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (TFF), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (FFF), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (CFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (SLF), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (WFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin operator (WLF), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (TTT), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (TFT), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (TFF), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (FFF), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (CFT), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (SLF), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (WFT), \mhdStatNI}
+ *       \mhdStatus{Tau QI operator (WLF), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (TTT), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (TFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (TFF), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (FFF), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (CFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (SLF), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (WFT), \mhdStatNI}
+ *       \mhdStatus{Galerkin QI operator (WLF), \mhdStatNI}
  *    }   
  *
  * \section mhdSTSEig Sparse eigen solvers
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref EigenSolverTest.cpp "Sparse eigen solver (generic)", \mhdStatNA}
- *       \mhdStatus{\ref ArpackEigenSolverTest.cpp "Eigen solver (ARPACK)", \mhdStatNA}
+ *       \mhdStatus{\ref EigenSolverTest.cpp "Sparse eigen solver (generic)", \mhdStatNI}
+ *       \mhdStatus{\ref ArpackEigenSolverTest.cpp "Eigen solver (ARPACK)", \mhdStatNI}
  *    }   
  *
  * \section mhdSTSSparseSolver Sparse linear solvers
  *    
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNA}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNA}
- *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (generic)",\mhdStatNA}
- *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (generic)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNI}
  *    }
  *
  * \section mhdSTSTStep Timestepping scheme
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{Timestepper, \mhdStatNA}
- *       \mhdStatus{Euler scheme, \mhdStatNA}
- *       \mhdStatus{RK3 scheme, \mhdStatNA}
- *       \mhdStatus{RK4 scheme, \mhdStatNA}
+ *       \mhdStatus{Timestepper, \mhdStatNI}
+ *       \mhdStatus{Euler scheme, \mhdStatNI}
+ *       \mhdStatus{RK3 scheme, \mhdStatNI}
+ *       \mhdStatus{RK4 scheme, \mhdStatNI}
  *    }   
  *
  * \section mhdSTSEq Equations
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{Scalar equation, \mhdStatNA}
- *       \mhdStatus{Vector equation, \mhdStatNA}
- *       \mhdStatus{Trivial equation, \mhdStatNA}
- *       \mhdStatus{Diagnostic equation, \mhdStatNA}
- *       \mhdStatus{Prognostic equation, \mhdStatNA}
+ *       \mhdStatus{Scalar equation, \mhdStatNI}
+ *       \mhdStatus{Vector equation, \mhdStatNI}
+ *       \mhdStatus{Trivial equation, \mhdStatNI}
+ *       \mhdStatus{Diagnostic equation, \mhdStatNI}
+ *       \mhdStatus{Prognostic equation, \mhdStatNI}
  *    }   
  *
  * \section mhdSTSAvg Averaging schemes
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{Temporal averaging (Euler), \mhdStatNA}
- *       \mhdStatus{Temporal averaging (RK3), \mhdStatNA}
- *       \mhdStatus{Temporal averaging (RK4), \mhdStatNA}
- *       \mhdStatus{Spatial average (TTT), \mhdStatNA}
- *       \mhdStatus{Spatial average (TFT), \mhdStatNA}
- *       \mhdStatus{Spatial average (TFF), \mhdStatNA}
- *       \mhdStatus{Spatial average (FFF), \mhdStatNA}
- *       \mhdStatus{Spatial average (CFT), \mhdStatNA}
- *       \mhdStatus{Spatial average (SLF), \mhdStatNA}
- *       \mhdStatus{Spatial average (WFT), \mhdStatNA}
- *       \mhdStatus{Spatial average (WLF), \mhdStatNA}
+ *       \mhdStatus{Temporal averaging (Euler), \mhdStatNI}
+ *       \mhdStatus{Temporal averaging (RK3), \mhdStatNI}
+ *       \mhdStatus{Temporal averaging (RK4), \mhdStatNI}
+ *       \mhdStatus{Spatial average (TTT), \mhdStatNI}
+ *       \mhdStatus{Spatial average (TFT), \mhdStatNI}
+ *       \mhdStatus{Spatial average (TFF), \mhdStatNI}
+ *       \mhdStatus{Spatial average (FFF), \mhdStatNI}
+ *       \mhdStatus{Spatial average (CFT), \mhdStatNI}
+ *       \mhdStatus{Spatial average (SLF), \mhdStatNI}
+ *       \mhdStatus{Spatial average (WFT), \mhdStatNI}
+ *       \mhdStatus{Spatial average (WLF), \mhdStatNI}
  *    }   
  *
  * \section mhdSStatusPara Parallelisation
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{Load splitter (Serial), \mhdStatNA, \mhdStatDis}
- *       \mhdStatus{Load splitter (Fixed), \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Load splitter (Single1D), \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Load splitter (Single2D), \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Load splitter (Tubular), \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Serial transform loop, \mhdStatNA, \mhdStatDis}
- *       \mhdStatus{MPI Single 1D transform loop, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI Single 2D transform loop, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI Tubular transform loop, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Automatic MPI splitting, \mhdStatNA, \mhdStatNA}
- *       \mhdStatus{MPI Equation grouping, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI Transform grouping, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI Single 1D grouping, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI Single 2D grouping, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{Automatic MPI grouping, \mhdStatNA, \mhdStatNA}
- *       \mhdStatus{Serial transform + solver loop, \mhdStatNA, \mhdStatDis}
- *       \mhdStatus{MPI solver, \mhdStatDis, \mhdStatNA}
- *       \mhdStatus{MPI transform + MPI solver loop, \mhdStatDis, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Serial), \mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Fixed), \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Load splitter (Single1D), \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Load splitter (Single2D), \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Load splitter (Tubular), \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Serial transform loop, \mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{MPI Single 1D transform loop, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI Single 2D transform loop, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI Tubular transform loop, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Automatic MPI splitting, \mhdStatNI, \mhdStatNI}
+ *       \mhdStatus{MPI Equation grouping, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI Transform grouping, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI Single 1D grouping, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI Single 2D grouping, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Automatic MPI grouping, \mhdStatNI, \mhdStatNI}
+ *       \mhdStatus{Serial transform + solver loop, \mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{MPI solver, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{MPI transform + MPI solver loop, \mhdStatNA, \mhdStatNI}
  *    }   
  *
  * \section mhdSTSIo Input/Output
@@ -209,198 +210,198 @@
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *    	\mhdStatus{Abort simulation on deleted file,\mhdStatNA}
- *    	\mhdStatus{Read ASCII control file,\mhdStatNA}
- *    	\mhdStatus{Abort simulation on file command,\mhdStatNA}
+ *    	\mhdStatus{Abort simulation on deleted file,\mhdStatNI}
+ *    	\mhdStatus{Read ASCII control file,\mhdStatNI}
+ *    	\mhdStatus{Abort simulation on file command,\mhdStatNI}
  *    }
  *
  * \subsection mhdSTSIoCfg Configuration
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *    	\mhdStatus{Read XML configuration file,\mhdStatNA}
- *    	\mhdStatus{Write XML configuration file,\mhdStatNA}
- *    	\mhdStatus{Check XML configuration file,\mhdStatNA}
+ *    	\mhdStatus{Read XML configuration file,\mhdStatNI}
+ *    	\mhdStatus{Write XML configuration file,\mhdStatNI}
+ *    	\mhdStatus{Check XML configuration file,\mhdStatNI}
  *    }
  *
  * \subsection mhdSTSIoDiag Diagnostics
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *    	\mhdStatus{Compute scalar energy (TTT),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (TTT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (TFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (TFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (TFF),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (TFF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (FFF),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (FFF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (CFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (CFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (SLF),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (SLF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (WFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (WFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar energy (WLF),\mhdStatNA}
- *    	\mhdStatus{Compute vector energy (WLF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (TTT),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (TTT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (TFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (TFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (TFF),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (TFF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (FFF),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (FFF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (CFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (CFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (SLF),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (SLF),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (WFT),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (WFT),\mhdStatNA}
- *    	\mhdStatus{Compute scalar spectrum (WLF),\mhdStatNA}
- *    	\mhdStatus{Compute vector spectrum (WLF),\mhdStatNA}
- *    	\mhdStatus{Write ASCII diagnostic file,\mhdStatNA}
- *    	\mhdStatus{Write binary ASCII diagnostic file,\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (TTT),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (TTT),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (TFT),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (TFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (TFF),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (TFF),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (FFF),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (FFF),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (CFT),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (CFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (SLF),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (SLF),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (WFT),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (WFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar energy (WLF),\mhdStatNA}
- *    	\mhdStatus{Write vector energy (WLF),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (TTT),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (TTT),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (TFT),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (TFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (TFF),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (TFF),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (FFF),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (FFF),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (CFT),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (CFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (SLF),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (SLF),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (WFT),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (WFT),\mhdStatNA}
- *    	\mhdStatus{Write scalar spectrum (WLF),\mhdStatNA}
- *    	\mhdStatus{Write vector spectrum (WLF),\mhdStatNA}
+ *    	\mhdStatus{Compute scalar energy (TTT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (TTT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (TFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (TFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (TFF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (TFF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (FFF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (FFF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (CFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (CFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (SLF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (SLF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (WFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (WFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar energy (WLF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector energy (WLF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (TTT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (TTT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (TFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (TFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (TFF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (TFF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (FFF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (FFF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (CFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (CFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (SLF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (SLF),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (WFT),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (WFT),\mhdStatNI}
+ *    	\mhdStatus{Compute scalar spectrum (WLF),\mhdStatNI}
+ *    	\mhdStatus{Compute vector spectrum (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write ASCII diagnostic file,\mhdStatNI}
+ *    	\mhdStatus{Write binary ASCII diagnostic file,\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar energy (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write vector energy (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write scalar spectrum (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write vector spectrum (WLF),\mhdStatNI}
  *    }
  *
  * \subsection mhdSTSIoState State file
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *    	\mhdStatus{Read HDF5 state file (TTT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (TTT),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (TFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (TFT),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (TFF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (TFF),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (FFF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (FFF),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (CFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (CFT),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (SLF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (SLF),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (WFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (WFT),\mhdStatNA}
- *    	\mhdStatus{Read HDF5 state file (WLF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 state file (WLF),\mhdStatNA}
+ *    	\mhdStatus{Read HDF5 state file (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (TTT),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (TFT),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (TFF),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (FFF),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (CFT),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (SLF),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (WFT),\mhdStatNI}
+ *    	\mhdStatus{Read HDF5 state file (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 state file (WLF),\mhdStatNI}
  *    }
  *
  * \subsection mhdSTSIoState Visualization file
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *    	\mhdStatus{Write HDF5 visualization file (TTT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (TFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (TFF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (FFF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (CFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (SLF),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (WFT),\mhdStatNA}
- *    	\mhdStatus{Write HDF5 visualization file (WLF),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (TTT),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (TFT),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (TFF),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (FFF),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (CFT),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (SLF),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (WFT),\mhdStatNA}
- *    	\mhdStatus{Write XDMF wrapper file (WLF),\mhdStatNA}
+ *    	\mhdStatus{Write HDF5 visualization file (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write HDF5 visualization file (WLF),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (TTT),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (TFT),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (TFF),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (FFF),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (CFT),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (SLF),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (WFT),\mhdStatNI}
+ *    	\mhdStatus{Write XDMF wrapper file (WLF),\mhdStatNI}
  *    }
  *
  * \section mhdSTSProf Profiling
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{Coarse memory usage, \mhdStatNA}
- *       \mhdStatus{Detailed Memory usage, \mhdStatNA}
- *       \mhdStatus{Coarse Timing, \mhdStatNA}
- *       \mhdStatus{Detailed Timing, \mhdStatNA}
- *       \mhdStatus{Parallel weak scaling, \mhdStatNA}
- *       \mhdStatus{Parallel strong scaling, \mhdStatNA}
+ *       \mhdStatus{Coarse memory usage, \mhdStatNI}
+ *       \mhdStatus{Detailed Memory usage, \mhdStatNI}
+ *       \mhdStatus{Coarse Timing, \mhdStatNI}
+ *       \mhdStatus{Detailed Timing, \mhdStatNI}
+ *       \mhdStatus{Parallel weak scaling, \mhdStatNI}
+ *       \mhdStatus{Parallel strong scaling, \mhdStatNI}
  *    }   
  *
  * \section mhdSTSBoundary Boundary conditions
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{No-slip (TTT), \mhdStatNA}
- *       \mhdStatus{No-slip (TFT), \mhdStatNA}
- *       \mhdStatus{No-slip (TFF), \mhdStatNA}
- *       \mhdStatus{No-slip (FFF), \mhdStatNA}
- *       \mhdStatus{No-slip (CTF), \mhdStatNA}
- *       \mhdStatus{No-slip (SLF), \mhdStatNA}
- *       \mhdStatus{No-slip (WFT), \mhdStatNA}
- *       \mhdStatus{No-slip (WLF), \mhdStatNA}
- *       \mhdStatus{Stress-free (TTT), \mhdStatNA}
- *       \mhdStatus{Stress-free (TFT), \mhdStatNA}
- *       \mhdStatus{Stress-free (TFF), \mhdStatNA}
- *       \mhdStatus{Stress-free (FFF), \mhdStatNA}
- *       \mhdStatus{Stress-free (CTF), \mhdStatNA}
- *       \mhdStatus{Stress-free (SLF), \mhdStatNA}
- *       \mhdStatus{Stress-free (WFT), \mhdStatNA}
- *       \mhdStatus{Stress-free (WLF), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (TTT), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (TFT), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (TFF), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (FFF), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (CTF), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (SLF), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (WFT), \mhdStatNA}
- *       \mhdStatus{Fixed temperature (WLF), \mhdStatNA}
- *       \mhdStatus{Fixed flux (TTT), \mhdStatNA}
- *       \mhdStatus{Fixed flux (TFT), \mhdStatNA}
- *       \mhdStatus{Fixed flux (TFF), \mhdStatNA}
- *       \mhdStatus{Fixed flux (FFF), \mhdStatNA}
- *       \mhdStatus{Fixed flux (CTF), \mhdStatNA}
- *       \mhdStatus{Fixed flux (SLF), \mhdStatNA}
- *       \mhdStatus{Fixed flux (WFT), \mhdStatNA}
- *       \mhdStatus{Fixed flux (WLF), \mhdStatNA}
+ *       \mhdStatus{No-slip (TTT), \mhdStatNI}
+ *       \mhdStatus{No-slip (TFT), \mhdStatNI}
+ *       \mhdStatus{No-slip (TFF), \mhdStatNI}
+ *       \mhdStatus{No-slip (FFF), \mhdStatNI}
+ *       \mhdStatus{No-slip (CTF), \mhdStatNI}
+ *       \mhdStatus{No-slip (SLF), \mhdStatNI}
+ *       \mhdStatus{No-slip (WFT), \mhdStatNI}
+ *       \mhdStatus{No-slip (WLF), \mhdStatNI}
+ *       \mhdStatus{Stress-free (TTT), \mhdStatNI}
+ *       \mhdStatus{Stress-free (TFT), \mhdStatNI}
+ *       \mhdStatus{Stress-free (TFF), \mhdStatNI}
+ *       \mhdStatus{Stress-free (FFF), \mhdStatNI}
+ *       \mhdStatus{Stress-free (CTF), \mhdStatNI}
+ *       \mhdStatus{Stress-free (SLF), \mhdStatNI}
+ *       \mhdStatus{Stress-free (WFT), \mhdStatNI}
+ *       \mhdStatus{Stress-free (WLF), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (TTT), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (TFT), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (TFF), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (FFF), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (CTF), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (SLF), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (WFT), \mhdStatNI}
+ *       \mhdStatus{Fixed temperature (WLF), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (TTT), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (TFT), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (TFF), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (FFF), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (CTF), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (SLF), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (WFT), \mhdStatNI}
+ *       \mhdStatus{Fixed flux (WLF), \mhdStatNI}
  *    }
  *
  * \section mhdSTSBoundary Physical models
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{"Test model (TTT)", \mhdStatNA}
- *       \mhdStatus{"Test model (TFT)", \mhdStatNA}
- *       \mhdStatus{"Test model (TFF)", \mhdStatNA}
- *       \mhdStatus{"Test model (FFF)", \mhdStatNA}
- *       \mhdStatus{"Test model (CFT)", \mhdStatNA}
- *       \mhdStatus{"Test model (SLF)", \mhdStatNA}
- *       \mhdStatus{"Test model (WFT)", \mhdStatNA}
- *       \mhdStatus{"Test model (WLF)", \mhdStatNA}
+ *       \mhdStatus{"Test model (TTT)", \mhdStatNI}
+ *       \mhdStatus{"Test model (TFT)", \mhdStatNI}
+ *       \mhdStatus{"Test model (TFF)", \mhdStatNI}
+ *       \mhdStatus{"Test model (FFF)", \mhdStatNI}
+ *       \mhdStatus{"Test model (CFT)", \mhdStatNI}
+ *       \mhdStatus{"Test model (SLF)", \mhdStatNI}
+ *       \mhdStatus{"Test model (WFT)", \mhdStatNI}
+ *       \mhdStatus{"Test model (WLF)", \mhdStatNI}
  *    }
  *
  */
