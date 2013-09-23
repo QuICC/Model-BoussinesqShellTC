@@ -62,7 +62,8 @@ namespace TestSuite {
    };
 
    FftTransformTest::FftTransformTest()
-      : mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
+      //: mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
+      : mMaxN(15), mHowmany(24), mError(1e-10), mRelError(1e-10)
    {
    }
 
@@ -364,6 +365,83 @@ namespace TestSuite {
          {
             EXPECT_NEAR(std::cos(static_cast<MHDFloat>(i)*phi(j)) - std::sin(static_cast<MHDFloat>(i)*phi(j)), phys(j,i).real(), this->mError);
             EXPECT_NEAR(std::cos(static_cast<MHDFloat>(i)*phi(j)) + std::sin(static_cast<MHDFloat>(i)*phi(j)), phys(j,i).imag(), this->mError);
+         }
+      }
+   }
+
+   /**
+    * @brief Accuracy test for forward-backward transform loo
+    *
+    * @param FftTransformTest   Test fixture ID
+    * @param ForwardAccuracy     Test ID
+    */
+   TEST_F(FftTransformTest, ForwardLoop)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      MatrixZ  phys = MatrixZ::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get fft grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) -/+ sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         //phys.col(i).real() = (static_cast<MHDFloat>(i)*phi).array().cos() - (static_cast<MHDFloat>(i)*phi).array().sin();
+         //phys.col(i).imag() = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+         phys.col(i).setZero();
+         phys.col(i).real() = (static_cast<MHDFloat>(i)*phi).array().sin();
+      }
+      phys.col(0).imag().setZero();
+
+      // Compute forward transform
+      //std::cerr << phys << std::endl;
+      std::cerr << phi.transpose() << std::endl;
+      std::cerr << phys.col(0).transpose() << std::endl;
+      std::cerr << phys.col(1).transpose() << std::endl;
+      std::cerr << phys.col(2).transpose() << std::endl;
+      std::cerr << "***********************************************" << std::endl;
+      spec.setZero();
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      //std::cerr << spec << std::endl;
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+      std::cerr << spec.col(0).transpose() << std::endl;
+      std::cerr << spec.col(1).transpose() << std::endl;
+      std::cerr << spec.col(2).transpose() << std::endl;
+      std::cerr << "------------------------------------------" << std::endl;
+      //std::cerr << phys << std::endl;
+      std::cerr << phys.col(0).transpose() << std::endl;
+      std::cerr << phys.col(1).transpose() << std::endl;
+      std::cerr << phys.col(2).transpose() << std::endl;
+
+      // Check solution
+      for(int j = 0; j < phi.size(); ++j)
+      {
+//         EXPECT_NEAR(1.0, phys(j,0).real(), this->mError);
+//         EXPECT_NEAR(0.0, phys(j,0).imag(), this->mError);
+      }
+      for(int i = 1; i < spSetup->howmany(); ++i)
+      {
+         for(int j = 0; j < phi.size(); ++j)
+         {
+            //EXPECT_NEAR(phys(j,i).real(), std::cos(static_cast<MHDFloat>(i)*phi(j)) - std::sin(static_cast<MHDFloat>(i)*phi(j)), this->mError);
+            //EXPECT_NEAR(phys(j,i).imag(), std::cos(static_cast<MHDFloat>(i)*phi(j)) + std::sin(static_cast<MHDFloat>(i)*phi(j)), this->mError);
+//            EXPECT_NEAR(phys(j,i).real(), std::sin(static_cast<MHDFloat>(i)*phi(j)), this->mError);
+//            EXPECT_NEAR(phys(j,i).imag(), 0.0, this->mError);
          }
       }
    }

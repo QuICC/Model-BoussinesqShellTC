@@ -23,6 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -157,6 +158,7 @@ namespace Equations {
             }
          }
       }
+      //std::cerr << this->unknown().dom(0).perturbation().data() << std::endl;
 
       return error;
    }
@@ -371,9 +373,12 @@ namespace Equations {
       } else if(this->mTypeId == EXACT)
       {
          MHDFloat val;
-         val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-         val *= (std::cos(5.0*th) + std::sin(7.0*th));
-         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         //val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         //val *= (std::cos(5.0*th) + std::sin(7.0*th));
+         //val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         val = (std::cos(1.0*th) + std::cos(2.0*th) + x*std::cos(1.*th));
+         val = x;
+         val = std::sin(th);
          return val;
       }
 

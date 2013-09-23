@@ -32,6 +32,7 @@
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -332,20 +333,23 @@ namespace Transform {
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize()/2, 0, this->mspSetup->specSize()-1);
+         ArrayZ rfactor = (this->mspSetup->specSize()-1) - factor.array();
 
-         // Rescale results
-         this->mTmpZIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
+         // compute derivative
+         this->mTmpZIn.topRows(this->mspSetup->specSize()/2) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize()/2);
+         this->mTmpZIn.bottomRows(this->mspSetup->specSize()/2) = rfactor.asDiagonal()*fftVal.bottomRows(this->mspSetup->specSize()/2);
 
       // Compute simple projection
       } else
       {
          // Rescale results
-         this->mTmpZIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
+         this->mTmpZIn.topRows(this->mspSetup->specSize()/2) = fftVal.topRows(this->mspSetup->specSize()/2);
+         this->mTmpZIn.bottomRows(this->mspSetup->specSize()/2) = fftVal.bottomRows(this->mspSetup->specSize()/2);
       }
 
       // Set the padded values to zero
-      this->mTmpZIn.bottomRows(this->mspSetup->padSize()).setZero();
+      this->mTmpZIn.block(this->mspSetup->specSize()/2, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
       // Do transform
       fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
