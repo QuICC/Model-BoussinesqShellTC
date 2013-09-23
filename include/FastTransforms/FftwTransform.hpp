@@ -32,7 +32,6 @@
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -288,6 +287,8 @@ namespace Transform {
 
    template <Arithmetics::Id TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator)
    {
+      /// \mhdBug This is only a very preliminary implementation. Extraction of dealiased values is wrong derivatives most likely too.
+
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
@@ -311,6 +312,8 @@ namespace Transform {
 
    template <Arithmetics::Id TOperation> void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
+      /// \mhdBug This is only a very preliminary implementation. Extraction of dealiased values is wrong derivatives most likely too.
+
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 

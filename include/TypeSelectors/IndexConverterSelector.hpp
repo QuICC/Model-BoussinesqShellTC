@@ -42,6 +42,7 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_WLF
 
+     /// \mhdBug Schemes with multiple FFT transform most likely require a special  index conversion
 
       /**
        * @brief Specialialised IndexConverterSelector for the second transform

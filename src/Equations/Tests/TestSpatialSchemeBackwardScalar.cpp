@@ -23,7 +23,6 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -243,6 +242,7 @@ namespace Equations {
 
 // Set test problem for TFF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+   /// \mhdBug Test values are possibly too simple to fully test complex FFT
    MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       if(this->mTypeId == ZERO)
