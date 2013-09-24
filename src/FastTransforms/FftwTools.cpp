@@ -26,6 +26,8 @@ namespace Transform {
 
    const MHDFloat FftwTools::STD_DEALIASING = 3.0/2.0;
 
+   const MHDFloat FftwTools::COS_DEALIASING = 3.0/2.0;
+
    const MHDFloat FftwTools::MIXED_DEALIASING = 3.0;
 
    const MHDFloat FftwTools::OPTIMIZATION_WIDTH = 0.05;
@@ -38,6 +40,11 @@ namespace Transform {
    int FftwTools::dealiasMixedFft(const int size)
    {
       return std::ceil(FftwTools::MIXED_DEALIASING*static_cast<MHDFloat>(size));
+   }
+
+   int FftwTools::dealiasCosFft(const int size)
+   {
+      return std::ceil(FftwTools::COS_DEALIASING*static_cast<MHDFloat>(size));
    }
 
    int FftwTools::optimizeFft(const int size)

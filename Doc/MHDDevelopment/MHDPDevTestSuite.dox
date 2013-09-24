@@ -56,22 +56,23 @@
  *
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref TTTSchemeTest.cpp "TTT Spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref TFTSchemeTest.cpp "TFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref TFFSchemeTest.cpp "TFF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref FFFSchemeTest.cpp "FFF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref CFTSchemeTest.cpp "CFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref SLFSchemeTest.cpp "SLF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref WFTSchemeTest.cpp "WFT spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref WLFSchemeTest.cpp "WLF spatial scheme (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatNI}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatNI}
- *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatNI}
- *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "Spatial scheme (generic)",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TTT Spatial scheme",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFT spatial scheme",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFF spatial scheme",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "FFF spatial scheme",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "CFT spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "SLF spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "WFT spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "WLF spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatPart}
  *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNI}
  *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNI}
  *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNI}

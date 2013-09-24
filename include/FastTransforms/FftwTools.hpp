@@ -42,6 +42,13 @@ namespace Transform {
          static int dealiasMixedFft(const int size);
 
          /**
+          * @brief Compute the dealiased size for cosine FFT
+          *
+          * @param size Size to dealias
+          */
+         static int dealiasCosFft(const int size);
+
+         /**
           * @brief Optimise the FFT sizes
           *
           * @param size Current size of the FFT
@@ -60,6 +67,11 @@ namespace Transform {
           * @brief The real <-> complex fast Fourrier transform dealiasing factor
           */
          static const MHDFloat MIXED_DEALIASING;
+
+         /**
+          * @brief Cosine dealiasing factor (usually 3/2)
+          */
+         static const MHDFloat COS_DEALIASING;
 
          /**
           * @brief Maximul extension width to consider for optimization
