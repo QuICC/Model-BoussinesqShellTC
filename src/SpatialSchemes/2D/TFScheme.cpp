@@ -86,6 +86,14 @@ namespace Schemes {
    void TFScheme::setDimensions()
    {
       //
+      // Set transform space sizes
+      //
+      ArrayI traSize(2);
+      traSize(0) = this->mI + 1;
+      traSize(1) = this->mJ + 1;
+      this->setTransformSpace(traSize);
+
+      //
       // Compute sizes
       //
 
@@ -110,7 +118,7 @@ namespace Schemes {
       this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       //
       // Initialise second transform

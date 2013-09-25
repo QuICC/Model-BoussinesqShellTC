@@ -88,7 +88,7 @@ namespace TestSuite {
       int howmany = 5;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::REAL));
 
       // Create SphericalChebyshevFftwTransform
       Transform::SphericalChebyshevFftwTransform fft;
@@ -162,7 +162,7 @@ namespace TestSuite {
       int howmany = 5;
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::REAL));
 
       // Create SphericalChebyshevFftwTransform
       Transform::SphericalChebyshevFftwTransform fft;

@@ -64,6 +64,13 @@ namespace Schemes {
    void FScheme::setDimensions()
    {
       //
+      // Set transform space sizes
+      //
+      ArrayI traSize(1);
+      traSize(0) = this->mI + 1;
+      this->setTransformSpace(traSize);
+
+      //
       // Compute sizes
       //
 

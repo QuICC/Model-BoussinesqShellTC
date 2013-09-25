@@ -97,7 +97,7 @@ namespace Dimensions {
    };
 
    /**
-    * @brief Simple struct holding IDs for the two spaces
+    * @brief Simple struct holding IDs for the different "spaces"
     */
    struct Space {
       /**
@@ -107,7 +107,9 @@ namespace Dimensions {
          /// Spectral space
          SPECTRAL = 0,
          /// Physical space
-         PHYSICAL
+         PHYSICAL,
+         /// Transform space (useful if spectral != transform)
+         TRANSFORM
       };
    };
 }

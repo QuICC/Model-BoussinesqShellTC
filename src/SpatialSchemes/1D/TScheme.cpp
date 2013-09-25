@@ -49,7 +49,7 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }
 
    TScheme::TScheme(const ArrayI& dim)
@@ -63,6 +63,13 @@ namespace Schemes {
 
    void TScheme::setDimensions()
    {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(1);
+      traSize(0) = this->mI + 1;
+      this->setTransformSpace(traSize);
+
       //
       // Compute sizes
       //

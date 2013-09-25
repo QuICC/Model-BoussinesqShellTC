@@ -24,21 +24,21 @@
 
 namespace GeoMHDiSCC {
 
-   Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim)
+   Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim, const ArrayI& transDim)
       : mCores(coreRes)
    {
       // Assert simulation dimensions are the same as cpu dimensions
       assert(simDim.size() == this->cpu()->nDim());
 
       // Init the simulation resolution
-      this->initSimResolution(simDim);
+      this->initSimResolution(simDim, transDim);
    }
 
    Resolution::~Resolution()
    {
    }
 
-   void Resolution::initSimResolution(const ArrayI& simDim)
+   void Resolution::initSimResolution(const ArrayI& simDim, const ArrayI& transDim)
    {
       // Get number of dimensions
       int nDim = this->cpu()->nDim();
@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
       spec.array() += 1;
 
       // Create shared pointer of simulation resolution
-      this->mspSim = SharedSimulationResolution(new SimulationResolution(phys, spec));
+      this->mspSim = SharedSimulationResolution(new SimulationResolution(phys, spec, transDim));
    }
 
    int Resolution::nCpu() const
@@ -170,7 +170,7 @@ namespace GeoMHDiSCC {
       
       // Get backward dimensions
       SharedArrayI   spDim1D(new ArrayI(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>()));
-      spDim1D->setConstant(this->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
+      spDim1D->setConstant(this->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM));
 
       // Get 2D dimensions
       SharedArrayI   spDim2D(new ArrayI(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>()));

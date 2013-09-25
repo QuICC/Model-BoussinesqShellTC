@@ -90,6 +90,11 @@ namespace Schemes {
           * @brief Add scheme specific transform setups to resolution
           */
          virtual void addTransformSetups(SharedResolution spRes) const = 0;
+
+         /**
+          * @brief Get the simulation wide spectral array dimensions (can be different from spectral resolution)
+          */
+         const ArrayI& getTransformSpace() const;
          
       protected:
          /**
@@ -112,6 +117,11 @@ namespace Schemes {
          void setDimension(int d, const Dimensions::Transform::Id transId, const Dimensions::Data::Id dataId);
 
          /**
+          * @brief Set transform dimension
+          */
+         void setTransformSpace(const ArrayI& dim);
+
+         /**
           * @brief Get dimension of the domain
           */
          int dims() const;
@@ -121,6 +131,11 @@ namespace Schemes {
           * @brief Dimension of the domain
           */
          int   mDims;
+
+         /**
+          * @brief Array size of the spectral arrays (can be different from spectral resolution)
+          */
+         ArrayI mTransformSpace;
 
          /**
           * @brief Full dimensions of the domain

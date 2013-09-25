@@ -287,13 +287,11 @@ namespace Transform {
 
    template <Arithmetics::Id TOperation> void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator)
    {
-      /// \mhdBug This is only a very preliminary implementation. Extraction of dealiased values is wrong derivatives most likely too.
-
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a non mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::EQUAL);
+      assert(this->mspSetup->type() == FftSetup::COMPLEX);
 
       // assert right sizes for input matrix
       assert(physVal.rows() == this->mspSetup->fwdSize());
@@ -312,13 +310,11 @@ namespace Transform {
 
    template <Arithmetics::Id TOperation> void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector)
    {
-      /// \mhdBug This is only a very preliminary implementation. Extraction of dealiased values is wrong derivatives most likely too.
-
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
       // Assert that a non mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::EQUAL);
+      assert(this->mspSetup->type() == FftSetup::COMPLEX);
 
       // assert on the padding size
       assert(this->mspSetup->padSize() >= 0);
@@ -336,23 +332,23 @@ namespace Transform {
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize()/2, 0, this->mspSetup->specSize()-1);
+         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
          ArrayZ rfactor = (this->mspSetup->specSize()-1) - factor.array();
 
          // compute derivative
-         this->mTmpZIn.topRows(this->mspSetup->specSize()/2) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize()/2);
-         this->mTmpZIn.bottomRows(this->mspSetup->specSize()/2) = rfactor.asDiagonal()*fftVal.bottomRows(this->mspSetup->specSize()/2);
+         this->mTmpZIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
+         this->mTmpZIn.bottomRows(this->mspSetup->specSize()) = rfactor.asDiagonal()*fftVal.bottomRows(this->mspSetup->specSize());
 
       // Compute simple projection
       } else
       {
          // Rescale results
-         this->mTmpZIn.topRows(this->mspSetup->specSize()/2) = fftVal.topRows(this->mspSetup->specSize()/2);
-         this->mTmpZIn.bottomRows(this->mspSetup->specSize()/2) = fftVal.bottomRows(this->mspSetup->specSize()/2);
+         this->mTmpZIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
+         this->mTmpZIn.bottomRows(this->mspSetup->specSize()) = fftVal.bottomRows(this->mspSetup->specSize());
       }
 
       // Set the padded values to zero
-      this->mTmpZIn.block(this->mspSetup->specSize()/2, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
+      this->mTmpZIn.block(this->mspSetup->specSize(), 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
       // Do transform
       fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));

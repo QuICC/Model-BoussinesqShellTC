@@ -83,7 +83,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -109,7 +109,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -172,7 +172,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;
@@ -235,7 +235,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
       Transform::ChebyshevTransformType fft;

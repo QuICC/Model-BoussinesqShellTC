@@ -37,10 +37,11 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           *
-          * @param coreRes Resolution object for the different CPUs
-          * @param simDim  Simulation dimensions
+          * @param coreRes    Resolution object for the different CPUs
+          * @param simDim     Simulation dimensions
+          * @param transDim   Transform dimensions
           */
-         Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim);
+         Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim, const ArrayI& transDim);
 
          /**
           * @brief Empty Destructor
@@ -129,9 +130,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the simulation resolution
           *
-          * @param simDim  Simulation dimensions
+          * @param simDim     Simulation dimensions
+          * @param transDim   Transform dimensions
           */
-         void initSimResolution(const ArrayI& simDim);
+         void initSimResolution(const ArrayI& simDim, const ArrayI& transDim);
 
          /**
           * @brief Shared simulation resolution

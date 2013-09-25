@@ -24,6 +24,7 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -47,18 +48,6 @@ namespace Equations {
 
    void BoussinesqPerBetaCylGStreamfunction::setCoupling()
    {
-      // Get Z dimension
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-
-      // Get Y dimension
-      int nY = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-
-      int modes = 0;
-      for(int i = 0; i < nY; i++)
-      {
-         modes += this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-      }
-
       // Set coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
@@ -79,12 +68,12 @@ namespace Equations {
       // Equation is coupled to vertical velocity equation
       infoIt.first->second.addImplicitField(PhysicalNames::VELOCITYZ,FieldComponents::Spectral::SCALAR);
 
-      // Set sizes of blocks and matrices
-      ArrayI blockNs(modes);
-      blockNs.setConstant(nZ);
-      ArrayI rhsCols(modes);
-      rhsCols.setConstant(1);
-      infoIt.first->second.setSizes(modes, blockNs, rhsCols); 
+      // Set mininal matrix coupling
+      int nMat;
+      ArrayI blockNs;
+      ArrayI rhsCols;
+      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);

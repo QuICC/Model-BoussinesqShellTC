@@ -70,6 +70,19 @@ namespace Schemes {
       return this->mDimensions.at(static_cast<int>(transId))(static_cast<int>(dataId));
    }
 
+   void ISpatialScheme::setTransformSpace(const ArrayI& dim)
+   {
+      this->mTransformSpace = dim;
+   }
+
+   const ArrayI& ISpatialScheme::getTransformSpace() const
+   {
+      assert(this->mTransformSpace.size() == this->dims());
+      assert(this->mTransformSpace.array().abs().minCoeff() > 0);
+
+      return this->mTransformSpace;
+   }
+
    void ISpatialScheme::setDimension(int n, const Dimensions::Transform::Id transId, const Dimensions::Data::Id dataId)
    {
       // Assert for positive size

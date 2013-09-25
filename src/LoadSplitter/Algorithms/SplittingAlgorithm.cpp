@@ -95,7 +95,8 @@ namespace Parallel {
       }
 
       // Create shared resolution
-      SharedResolution  spRes(new Resolution(coreRes, this->mSimDim));
+      ArrayI transDim = this->mspScheme->getTransformSpace();
+      SharedResolution  spRes(new Resolution(coreRes, this->mSimDim, transDim));
 
       // Add the transform setups to the resolution
       this->mspScheme->addTransformSetups(spRes);

@@ -62,8 +62,7 @@ namespace TestSuite {
    };
 
    FftTransformTest::FftTransformTest()
-      //: mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
-      : mMaxN(15), mHowmany(24), mError(1e-10), mRelError(1e-10)
+      : mMaxN(511), mHowmany(100), mError(1e-10), mRelError(1e-10)
    {
    }
 
@@ -357,7 +356,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
       Transform::FftTransformType fft;
@@ -423,7 +422,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
       Transform::FftTransformType fft;
@@ -445,7 +444,7 @@ namespace TestSuite {
             spec(i,i) = MHDComplex(1.0,1.0);
          }
       }
-
+      
       // Compute backward transform
       fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
 
@@ -460,7 +459,13 @@ namespace TestSuite {
             for(int i = 0; i < phi.size(); ++i)
             {
                EXPECT_NEAR(phys(i,j).real(), std::cos(static_cast<MHDFloat>(j)*phi(i)) - std::sin(static_cast<MHDFloat>(j)*phi(i)), this->mError);
-               EXPECT_NEAR(phys(i,j).imag(), std::cos(static_cast<MHDFloat>(j)*phi(i)) + std::sin(static_cast<MHDFloat>(j)*phi(i)), this->mError);
+               if(j != 0)
+               {
+                  EXPECT_NEAR(phys(i,j).imag(), std::cos(static_cast<MHDFloat>(j)*phi(i)) + std::sin(static_cast<MHDFloat>(j)*phi(i)), this->mError);
+               } else
+               {
+                  EXPECT_NEAR(phys(i,j).imag(), 0.0, this->mError);
+               }
             }
          } else
          {
@@ -486,7 +491,7 @@ namespace TestSuite {
       int xN = Transform::FftToolsType::dealiasFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::EQUAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
       Transform::FftTransformType fft;
@@ -504,6 +509,8 @@ namespace TestSuite {
       // Initialise the spectral test data as 1-i up to maxN (1 for n = 0)
       spec.setZero();
       spec.block(0,0,spSetup->specSize(),spSetup->howmany()).setConstant(MHDComplex(1.0,1.0));
+      //spec.row(0).imag().setZero();
+      spec.block(spSetup->bwdSize()-spSetup->specSize(), 0, spSetup->specSize(),spSetup->howmany()).setConstant(MHDComplex(1.0,1.0));
 
       // Compute backward transform
       fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
@@ -514,22 +521,97 @@ namespace TestSuite {
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
       {
-         for(int i = 0; i < spSetup->specSize(); ++i)
+         for(int i = 0; i < spSetup->bwdSize()/2; ++i)
          {
-            if(i != 0)
+            if(i < spSetup->specSize())
             {
                EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
                EXPECT_NEAR(spec(i,j).imag(), 1.0, this->mError);
+               EXPECT_NEAR(spec(spSetup->bwdSize()-i-1,j).real(), 1.0, this->mError);
+               EXPECT_NEAR(spec(spSetup->bwdSize()-i-1,j).imag(), 1.0, this->mError);
             } else
             {
-               EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
+               EXPECT_NEAR(spec(i,j).real(), 0.0, this->mError);
                EXPECT_NEAR(spec(i,j).imag(), 0.0, this->mError);
+               EXPECT_NEAR(spec(spSetup->bwdSize()-i-1,j).real(), 0.0, this->mError);
+               EXPECT_NEAR(spec(spSetup->bwdSize()-i-1,j).imag(), 0.0, this->mError);
             }
          }
-         for(int i = spSetup->specSize(); i < spSetup->bwdSize(); ++i)
+      }
+   }
+
+   /**
+    * @brief Accuracy test for backward 1st derivative transform
+    *
+    * @param FftTransformTest Test fixture ID
+    * @param ForwardAccuracy  Test ID
+    */
+   TEST_F(FftTransformTest, BackwardDiffAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
+
+      // Create FFT transform
+      Transform::FftTransformType fft;
+
+      // Initialise FFT
+      fft.init(spSetup);
+
+      // Create test data storage
+      MatrixZ  phys = MatrixZ::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ  spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get fft grid
+      Array phi = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) -/+ sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
          {
-            EXPECT_NEAR(spec(i,j).real(), 0.0, this->mError);
-            EXPECT_NEAR(spec(i,j).imag(), 0.0, this->mError);
+            phys.col(i).real() = (static_cast<MHDFloat>(i)*phi).array().cos() - (static_cast<MHDFloat>(i)*phi).array().sin();
+            phys.col(i).imag() = (static_cast<MHDFloat>(i)*phi).array().cos() + (static_cast<MHDFloat>(i)*phi).array().sin();
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
+      phys.col(0).imag().setZero();
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+
+      // Compute backward transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::DIFF);
+
+      // Check solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         if(j < spSetup->specSize())
+         {
+            for(int i = 0; i < phi.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j).real(), -static_cast<MHDFloat>(j)*std::sin(static_cast<MHDFloat>(j)*phi(i)) - static_cast<MHDFloat>(j)*std::cos(static_cast<MHDFloat>(j)*phi(i)), this->mError);
+               if(j != 0)
+               {
+                  EXPECT_NEAR(phys(i,j).imag(), -static_cast<MHDFloat>(j)*std::sin(static_cast<MHDFloat>(j)*phi(i)) + static_cast<MHDFloat>(j)*std::cos(static_cast<MHDFloat>(j)*phi(i)), this->mError);
+               } else
+               {
+                  EXPECT_NEAR(phys(i,j).imag(), 0.0, this->mError);
+               }
+            }
+         } else
+         {
+            for(int i = 0; i < phi.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j).real(), 0.0, this->mError);
+               EXPECT_NEAR(phys(i,j).imag(), 0.0, this->mError);
+            }
          }
       }
    }

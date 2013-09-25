@@ -30,7 +30,10 @@ namespace Transform {
       if(this->mType == FftSetup::MIXED)
       {
          this->mBwdSize = this->mFwdSize/2 + 1;
-      } else if(this->mType == FftSetup::EQUAL)
+      } else if(this->mType == FftSetup::REAL)
+      {
+         this->mBwdSize = this->mFwdSize;
+      } else if(this->mType == FftSetup::COMPLEX)
       {
          this->mBwdSize = this->mFwdSize;
       } else if(this->mType == FftSetup::COMPONENT)
@@ -67,7 +70,13 @@ namespace Transform {
 
    int FftSetup::padSize() const
    {
-      return this->mBwdSize - this->mSpecSize;
+      if(this->mType == FftSetup::COMPLEX)
+      {
+         return this->mBwdSize - 2*this->mSpecSize;
+      } else
+      {
+         return this->mBwdSize - this->mSpecSize;
+      }
    }
 
    MHDFloat FftSetup::scale() const

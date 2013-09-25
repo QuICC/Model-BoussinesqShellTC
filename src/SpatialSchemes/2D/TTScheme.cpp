@@ -53,7 +53,7 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }
 
    Transform::SharedFftSetup TTScheme::spSetup2D(SharedResolution spRes) const
@@ -71,7 +71,7 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }
 
    TTScheme::TTScheme(const ArrayI& dim)
@@ -85,6 +85,14 @@ namespace Schemes {
 
    void TTScheme::setDimensions()
    {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(2);
+      traSize(0) = this->mI + 1;
+      traSize(1) = this->mJ + 1;
+      this->setTransformSpace(traSize);
+
       //
       // Compute sizes
       //
@@ -110,7 +118,7 @@ namespace Schemes {
       this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       //
       // Initialise second transform

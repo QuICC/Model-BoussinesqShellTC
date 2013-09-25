@@ -37,6 +37,16 @@ namespace Equations {
    {
       public:
          /**
+          * @brief Create setup for matrices with minial coupling
+          *
+          * @param spRes   Shared resolution
+          * @param nMat    Number of matrices
+          * @param blocks  Size of the blocks
+          * @param cols    Number of right-hand sides
+          */
+         static void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
+
+         /**
           * @brief General implementation of linear row for equations with a single "eigen" dimension
           */
          template <typename TEquation> static DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);

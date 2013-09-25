@@ -93,7 +93,7 @@ namespace Schemes {
          howmany += spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::EQUAL));
+      return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::REAL));
    }
 
    CFTScheme::CFTScheme(const ArrayI& dim)
@@ -107,6 +107,15 @@ namespace Schemes {
 
    void CFTScheme::setDimensions()
    {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(3);
+      traSize(0) = this->mI + 1;
+      traSize(1) = this->mJ + 1;
+      traSize(2) = this->mK + 1;
+      this->setTransformSpace(traSize);
+
       //
       // Compute sizes
       //
@@ -137,10 +146,10 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mK + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->setDimension(this->mJ + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform
@@ -156,7 +165,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of second transform
-      this->setDimension(this->mK + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
 
       //
       // Initialise third transform

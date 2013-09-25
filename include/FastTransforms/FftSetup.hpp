@@ -36,8 +36,10 @@ namespace Transform {
           * List of possible size combinations
           */
          enum Type {
-            /// Input and output size are the same
-            EQUAL,
+            /// Real <-> real
+            REAL,
+            /// Complex <-> Complex
+            COMPLEX,
             /// Complex -> real, real -> complex sizes
             MIXED,
             /// Complex -> complex but componentwise

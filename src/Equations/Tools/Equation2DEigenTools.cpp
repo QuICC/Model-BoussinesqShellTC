@@ -28,6 +28,22 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
+   void Equation2DEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
+   {
+      // Get 1D dimension (fast)
+      int nI = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM);
+
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++i)
+      {
+         nMat += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+      }
+
+      blocks.resize(nMat);
+      blocks.setConstant(nI);
+      cols.resize(nMat);
+      cols.setConstant(1);
+   }
+
    void Equation2DEigenTools::boundaryBlock2DEigen(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
    {
       // Get 1D dimension

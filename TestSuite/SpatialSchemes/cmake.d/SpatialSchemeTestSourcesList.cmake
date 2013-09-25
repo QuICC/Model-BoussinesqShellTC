@@ -59,6 +59,19 @@ set(MHDTestSources
    Timers/SerialTimer.cpp
 )
 
+function(geomhdiscc_append_test condition srcs)
+   if(${condition} STREQUAL "TFT")
+      set(${srcs}
+         Equations/Tools/Equation1DEigenTools.cpp
+         PARENT_SCOPE)
+   endif(${condition} STREQUAL "TFT")
+   if(${condition} STREQUAL "TFF")
+      set(${srcs}
+         Equations/Tools/Equation2DEigenTools.cpp
+         PARENT_SCOPE)
+   endif(${condition} STREQUAL "TFF")
+endfunction(geomhdiscc_append_test condition srcs)
+
 if(GEOMHDISCC_MPI)
    list(APPEND MHDTestSources
       Timers/MpiTimer.cpp

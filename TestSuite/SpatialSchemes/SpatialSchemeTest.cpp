@@ -127,7 +127,7 @@ namespace TestSuite {
 
    SpatialSchemeTest::SpatialSchemeTest()
       //: mError(1e-12), mRelError(1e-12), mNAccumul(10), mMax1D(63), mMax2D(57), mMax3D(64)
-      : mError(1e-12), mRelError(1e-12), mNAccumul(10), mMax1D(15), mMax2D(15), mMax3D(15)
+      : mError(1e-12), mRelError(1e-12), mNAccumul(10), mMax1D(13), mMax2D(15), mMax3D(17)
    {
    }
 
@@ -183,6 +183,23 @@ namespace TestSuite {
 
       // Initialise the transform coordinator
       Transform::TransformCoordinatorTools::init(this->mCoord, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, nonInfo, this->mspRes, runOptions);
+   }
+
+   /**
+    * @brief Test the resolution object
+    *
+    * @param SpatialSchemeTest   Test fixture ID
+    * @param Placeholder         Test ID
+    */
+   TEST_F(SpatialSchemeTest, Resolution)
+   {
+      EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL),this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>());
+      EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL),this->mspRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>());
+      EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL),this->mspRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>());
+
+      //EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM),this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>());
+      EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::TRANSFORM),this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      EXPECT_EQ(this->mspRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::TRANSFORM),this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>());
    }
 
    /**

@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Tools/Equation2DEigenTools.hpp"
+#include "TypeSelectors/EquationToolsSelector.hpp"
 #include "SpectralOperators/SphericalHarmonicOperator.hpp"
 
 namespace GeoMHDiSCC {
@@ -74,20 +74,12 @@ namespace Equations {
       // Initialise common dimensional settings
       //
 
-      // Get radial dimension
-      int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get latitudinal dimension
-      int nL = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-
-      // Set sizes of blocks and matrices
-      ArrayI blockNs(nL);
-      blockNs.setConstant(nR);
-      ArrayI rhsCols(nL);
-      for(int i = 0; i < rhsCols.size(); i++)
-      {
-         rhsCols(i) = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-      }
-      infoIt.first->second.setSizes(nL, blockNs, rhsCols); 
+      // Set mininal matrix coupling
+      int nMat;
+      ArrayI blockNs;
+      ArrayI rhsCols;
+      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
    }
 
    void BoussinesqShellTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -111,13 +103,13 @@ namespace Equations {
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return Equation2DEigenTools::timeRow(*this, compId, matIdx);
+         return EquationToolsType::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return Equation2DEigenTools::linearRow(*this, compId, matIdx);
+         return EquationToolsType::linearRow(*this, compId, matIdx);
       } else if(opId == IEquation::BOUNDARYROW)
       {
-         return Equation2DEigenTools::boundaryRow(*this, compId, matIdx);
+         return EquationToolsType::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -256,7 +248,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      Equation2DEigenTools::boundaryBlock2DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, cR);
+      EquationToolsType::boundaryBlock2DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, cR);
    }
 
 }

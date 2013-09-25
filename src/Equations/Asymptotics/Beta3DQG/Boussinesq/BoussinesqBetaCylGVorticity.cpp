@@ -23,7 +23,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
-#include "Equations/Tools/Equation1DEigenTools.hpp"
+#include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -47,13 +47,6 @@ namespace Equations {
 
    void BoussinesqBetaCylGVorticity::setCoupling()
    {
-      // Get X dimension
-      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get Y dimension
-      int nY = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      // Get Z dimension
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
       // Initialise coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
@@ -74,12 +67,12 @@ namespace Equations {
       // Equation has explicit temperature
       infoIt.first->second.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
-      // Set sizes of blocks and matrices
-      ArrayI blockNs(nY);
-      blockNs.setConstant(nX*nZ);
-      ArrayI rhsCols(nY);
-      rhsCols.setConstant(1);
-      infoIt.first->second.setSizes(nY, blockNs, rhsCols); 
+      // Set mininal matrix coupling
+      int nMat;
+      ArrayI blockNs;
+      ArrayI rhsCols;
+      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
@@ -110,7 +103,7 @@ namespace Equations {
    {
       if(opId == IEquation::LINEARROW)
       {
-         return Equation1DEigenTools::linearRow(*this, compId, matIdx);
+         return EquationToolsType::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");

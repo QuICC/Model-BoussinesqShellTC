@@ -24,7 +24,7 @@
 
 namespace GeoMHDiSCC {
 
-   SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec)
+   SimulationResolution::SimulationResolution(const ArrayI& phys, const ArrayI& spec, const ArrayI& trans)
       : mBoxScale(Array::Ones(spec.size()))
    {
       // Assert both spaces have same dimensionalisty
@@ -34,6 +34,8 @@ namespace GeoMHDiSCC {
       this->mDim.insert(std::make_pair(Dimensions::Space::PHYSICAL, phys));
       // Add spectral space dimensions
       this->mDim.insert(std::make_pair(Dimensions::Space::SPECTRAL, spec));
+      // Add transform space dimensions
+      this->mDim.insert(std::make_pair(Dimensions::Space::TRANSFORM, trans));
    }
 
    SimulationResolution::~SimulationResolution()

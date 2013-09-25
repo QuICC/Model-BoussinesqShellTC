@@ -105,7 +105,7 @@ namespace Equations {
           *
           * @return 
           */
-         MHDFloat scalarPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x) const;
+         Datatypes::PhysicalScalarType::PointType scalarPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x) const;
 
          /**
           * @brief Compute single point of gradient of solution 
@@ -117,7 +117,7 @@ namespace Equations {
           *
           * @return 
           */
-         MHDFloat gradientPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x, const FieldComponents::Physical::Id compId) const;
+         Datatypes::PhysicalScalarType::PointType gradientPoint(const MHDFloat z, const MHDFloat th, const MHDFloat x, const FieldComponents::Physical::Id compId) const;
 
          /**
           * @brief Type of the exact solution

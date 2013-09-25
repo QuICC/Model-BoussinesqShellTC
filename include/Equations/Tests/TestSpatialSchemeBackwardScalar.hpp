@@ -104,7 +104,7 @@ namespace Equations {
           * @param j Medium index
           * @param k Slow index
           */
-         MHDFloat scalarPoint(const int i, const int j, const int k) const;
+         Datatypes::SpectralScalarType::PointType scalarPoint(const int i, const int j, const int k) const;
 
          /**
           * @brief Type of the exact solution

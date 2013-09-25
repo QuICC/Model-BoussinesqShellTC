@@ -144,6 +144,17 @@ namespace Schemes {
 
    void WLFScheme::setDimensions()
    {
+      /// \mhdBug Setup of resolution information doesn't seem right
+
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(3);
+      traSize(0) = this->mI + 1;
+      traSize(1) = this->mM + 1;
+      traSize(2) = this->mL + 1;
+      this->setTransformSpace(traSize);
+
       //
       // Compute sizes
       //
@@ -170,10 +181,10 @@ namespace Schemes {
       this->setDimension(this->mI+1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(this->mL + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->setDimension(this->mM + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform
@@ -189,7 +200,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of second transform
-      this->setDimension(this->mM + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
 
       //
       // Initialise third transform

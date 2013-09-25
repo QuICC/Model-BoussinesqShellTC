@@ -37,8 +37,9 @@ namespace GeoMHDiSCC {
           *
           * @param phys    Dimensions for the physical space
           * @param spec    Dimensions for the spectral space
+          * @param trans    Dimensions for the transform space
           */
-         SimulationResolution(const ArrayI& phys, const ArrayI& spec);
+         SimulationResolution(const ArrayI& phys, const ArrayI& spec, const ArrayI& trans);
 
          /**
           * @brief Empty Destructor

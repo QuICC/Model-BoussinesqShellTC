@@ -22,6 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
+#include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -52,13 +53,6 @@ namespace Equations {
 
    void TestSpatialSchemeBackwardScalar::setCoupling()
    {
-      // Get 1D dimension (fast)
-      int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get 2D dimension (slow)
-      int nJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-      // Get 3D dimension (medium)
-      int nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-
       // Initialise coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
       infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
@@ -76,12 +70,12 @@ namespace Equations {
       // Standalone equation (self)
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
-      // Set sizes of blocks and matrices
-      ArrayI blockNs(nK);
-      blockNs.setConstant(nI*nJ);
-      ArrayI rhsCols(nK);
-      rhsCols.setConstant(1);
-      infoIt.first->second.setSizes(nK, blockNs, rhsCols); 
+      // Set mininal matrix coupling
+      int nMat;
+      ArrayI blockNs;
+      ArrayI rhsCols;
+      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
@@ -172,282 +166,329 @@ namespace Equations {
 
 // Set test problem for TTT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TTT
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         vak = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = 2.0*k*std::pow(-1,i);
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = 1.0;
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      } 
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TTT
 
 // Set test problem for TFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TFT
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+          val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i), 1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      }
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TFT
 
 // Set test problem for TFF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
    /// \mhdBug Test values are possibly too simple to fully test complex FFT
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val =  0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i), 1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      }
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TFF
 
 // Set test problem for FFF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_FFF
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDCompleX(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
+         val = MHDComplex(1.0,1.0);
+      // Unknown setup
+      } else
+      {
+         throw Exception("Unknown exact state");
       }
 
-      // Unknown setup
-      throw Exception("Unknown exact state");
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_FFF
 
 // Set test problem for CFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      } 
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
 // Set test problem for SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val 42.0;
          } else
          {
-            return 0.0;
+            val 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val =  MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      }
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_SLF
 
 // Set test problem for WFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      }
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WFT
 
 // Set test problem for WLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
-   MHDFloat TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
+      Datatypes::SpectralScalarType::PointType val;
+
       if(this->mTypeId == ZERO)
       {
-         return 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
          {
-            return 42.0;
+            val = 42.0;
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == EXACT)
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            return 2.0*k*std::pow(-1,i);
+            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
          } else
          {
-            return 0.0;
+            val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         return 1.0;
-      }
+         val = MHDComplex(1.0,1.0);
 
       // Unknown setup
-      throw Exception("Unknown exact state");
+      } else
+      {
+         throw Exception("Unknown exact state");
+      }
+
+      return val;
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WLF
 
