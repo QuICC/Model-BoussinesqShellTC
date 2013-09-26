@@ -63,6 +63,9 @@ set(MHDTestSources
    SpectralOperators/BoundaryConditions.cpp
    SpectralOperators/ChebyshevBoundary.cpp
    SpectralOperators/ChebyshevOperator.cpp
+   Communicators/Converters/NoIndexConv.cpp
+   Communicators/Converters/SHIndexConv.cpp
+   Communicators/Converters/PMIndexConv.cpp
 )
 
 function(geomhdiscc_append_test condition srcs)

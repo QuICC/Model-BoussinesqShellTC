@@ -9,16 +9,29 @@
 #include "Framework/FrameworkMacro.h"
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SpectralOperators/ChebyshevOperator.hpp"
+#include "FastTransforms/ChebyshevFftwTransform.hpp"
+#include "SpectralOperators/PeriodicOperator.hpp"
+#include "TypeSelectors/FftSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace TestSuite {
+
+   typedef Eigen::Array<MHDFloat, Eigen::Dynamic, 1>   CoeffArray;
+
+   namespace internal {
+      void setSolution1(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const int bcId);
+   }
 
    /**
     * @brief Test fixture for the sparse direct solvers
     */
    class SparseLinearSolverTest : public ::testing::Test {
       public:
+
+         void solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA);
+         void setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const int bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const int));
 
       protected:
          /**
@@ -40,9 +53,30 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+         
+         /**
+          * @brief Spectral size of transform
+          */
+         int mMaxN;
+
+         /**
+          * @brief How many identical transforms to compute
+          */
+         int mHowmany;
+         
+         /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+         
+         /**
+          * @brief Acceptable relative error
+          */
+         double mRelError;
    };
 
    SparseLinearSolverTest::SparseLinearSolverTest()
+      : mMaxN(31), mHowmany(1), mError(1e-10), mRelError(1e-10)
    {
    }
 
@@ -183,6 +217,74 @@ namespace TestSuite {
       }
    }
 
+   void SparseLinearSolverTest::solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA)
+   {
+      // Create solver
+      SparseSolverSelector<SparseMatrix>::SolverType   solver;
+
+      solver.compute(matA);
+
+      sol.resize(rhs.rows(),1);
+      sol.setConstant(-4242);
+      sol = solver.solve(rhs);
+   }
+
+   void SparseLinearSolverTest::setupProblem(Matrix& sol, Matrix& rhs, const int bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const int))
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
+
+      // Create ChebyshevFftwTransform
+      Transform::ChebyshevFftwTransform fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   physSol = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   physRhs = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      sol.resize(spSetup->specSize(), spSetup->howmany());
+      rhs.resize(spSetup->specSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      Array x = fft.meshGrid();
+
+      (*pSolFct)(physSol, physRhs, x, param, bcId);
+
+      fft.integrate<Arithmetics::SET>(tmpSpec, physSol, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      sol = tmpSpec.topRows(spSetup->specSize());
+      fft.integrate<Arithmetics::SET>(tmpSpec, physRhs, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      rhs = tmpSpec.topRows(spSetup->specSize());
+   }
+
+   namespace internal 
+   {
+      void setSolution1(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const int bcId)
+      {
+         MHDFloat k = param(0);
+
+         if(bcId == 21)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         } else if(bcId == 22)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         } else if(bcId == 23)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         }
+      }
+   }
+
    /**
     * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Dirichlet boundary conditions 
     *
@@ -191,6 +293,30 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, HarmonicDirichlet1D)
    {
+      int nN = this->mMaxN + 1;
+      Array param(1);
+      param(0) = 5;
+
+      // Setup problem
+      Matrix exactSol;
+      Matrix rhs;
+      this->setupProblem(exactSol, rhs, param, 21, &internal::setSolution1);
+
+      // Create matrix
+      Spectral::ChebyshevOperator   op(nN);
+      SparseMatrix  matA(nN,nN);
+
+      // Solve
+      Matrix sol;
+      this->solveProblem(sol, rhs, matA);
+
+      // Test solution
+      for(int i = 0; i < nN; ++i)
+      {
+         MHDFloat eta = std::max(1.0, std::abs(exactSol(i)));
+         EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+      }
+
    }
 
    /**
@@ -201,6 +327,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, HarmonicNeumann1D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -211,6 +338,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet1D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -221,6 +349,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, BiHarmonicNeumann1D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -231,6 +360,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, HarmonicDirichlet2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -241,6 +371,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, HarmonicNeumann2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -251,6 +382,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, HarmonicMixed2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -261,6 +393,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -271,6 +404,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, BiHarmonicNeumann2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -281,6 +415,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, BiHarmonicMixed2D)
    {
+      ASSERT_TRUE(false);
    }
 
    /**
@@ -291,6 +426,7 @@ namespace TestSuite {
     */
    TEST_F(SparseLinearSolverTest, MixedHarmonicMixed2D)
    {
+      ASSERT_TRUE(false);
    }
 
 }

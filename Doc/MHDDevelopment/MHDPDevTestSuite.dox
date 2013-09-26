@@ -57,20 +57,20 @@
  *    \mhdTable{
  *       \mhdTableHeader
  *       \mhdStatus{\ref SpatialSchemeTest.cpp "Spatial scheme (generic)",\mhdStatPart,\mhdStatPart}
- *       \mhdStatus{\ref SpatialSchemeTest.cpp "TTT Spatial scheme",\mhdStatPart,\mhdStatPart}
- *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFT spatial scheme",\mhdStatPart,\mhdStatPart}
- *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFF spatial scheme",\mhdStatPart,\mhdStatPart}
- *       \mhdStatus{\ref SpatialSchemeTest.cpp "FFF spatial scheme",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TTT Spatial scheme",\mhdStatPart,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFT spatial scheme",\mhdStatPass,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFF spatial scheme",\mhdStatPart,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "FFF spatial scheme",\mhdStatPart,\mhdStatFail}
  *       \mhdStatus{\ref SpatialSchemeTest.cpp "CFT spatial scheme",\mhdStatNI,\mhdStatNI}
  *       \mhdStatus{\ref SpatialSchemeTest.cpp "SLF spatial scheme",\mhdStatNI,\mhdStatNI}
  *       \mhdStatus{\ref SpatialSchemeTest.cpp "WFT spatial scheme",\mhdStatNI,\mhdStatNI}
  *       \mhdStatus{\ref SpatialSchemeTest.cpp "WLF spatial scheme",\mhdStatNI,\mhdStatNI}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatPart}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatPass}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatPass}
  *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatPart}
  *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatPart}
- *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatPart}
- *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatPass}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatPass}
  *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatPart}
  *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatPart}
  *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNI}
@@ -83,6 +83,11 @@
  *
  *    \mhdTable{
  *       \mhdTableHeader
+ *       \mhdStatus{\ref PeriodicOperatorTest.cpp "Periodic operator", \mhdStatNI}
+ *       \mhdStatus{\ref ChebyshevOperatorTest.cpp "Chebyshev operator", \mhdStatNI}
+ *       \mhdStatus{\ref CylindricalChebyshevOperatorTest.cpp "Cylindrical Chebyshev operator", \mhdStatNI}
+ *       \mhdStatus{\ref SphericalChebyshevOperatorTest.cpp "Spherical Chebyshev operator", \mhdStatNI}
+ *       \mhdStatus{\ref SphericalHarmonicOperatorTest.cpp "Spherical harmonic operator", \mhdStatNI}
  *       \mhdStatus{\ref TTTTauOperatorTest.cpp "Tau operator (TTT)", \mhdStatNI}
  *       \mhdStatus{\ref TFTTauOperatorTest.cpp "Tau operator (TFT)", \mhdStatNI}
  *       \mhdStatus{\ref TFFTauOperatorTest.cpp "Tau operator (TFF)", \mhdStatNI}
@@ -129,18 +134,17 @@
  *    
  *    \mhdTable{
  *       \mhdTableHeader
- *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (UmfPack)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SuperLU)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Pardiso)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (Mumps)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatNI}
- *       \mhdStatus{\ref SparseDirectSolverTest.cpp "Direct solver (SPQR)",\mhdStatNI}
- *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (generic)",\mhdStatNI}
- *       \mhdStatus{\ref SparseIterativeSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatNI}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Sparse linear solver (generic)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (UmfPack)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (SuperLU)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (eigen/SparseLU)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (MKL Pardiso)",\mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (Pardiso)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (Mumps)",\mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (PaStiX)",\mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (eigen/SparseQR)",\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Direct solver (SPQR)",\mhdStatFail, \mhdStatNA}
+ *       \mhdStatus{\ref SparseLinearSolverTest.cpp "Iterative solver (eigen/BiCGSTAB)",\mhdStatFail, \mhdStatNA}
  *    }
  *
  * \section mhdSTSTStep Timestepping scheme
@@ -186,14 +190,10 @@
  *    \mhdTable{
  *       \mhdTableHeader
  *       \mhdStatus{Load splitter (Serial), \mhdStatNI, \mhdStatNA}
- *       \mhdStatus{Load splitter (Fixed), \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{Load splitter (Single1D), \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{Load splitter (Single2D), \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{Load splitter (Tubular), \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{Serial transform loop, \mhdStatNI, \mhdStatNA}
- *       \mhdStatus{MPI Single 1D transform loop, \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{MPI Single 2D transform loop, \mhdStatNA, \mhdStatNI}
- *       \mhdStatus{MPI Tubular transform loop, \mhdStatNA, \mhdStatNI}
+ *       \mhdStatus{Load splitter (Fixed), \mhdStatNA, \mhdStatNI, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Single1D), \mhdStatNA, \mhdStatNA, \mhdStatNI, \mhdStatNA, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Single2D), \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{Load splitter (Tubular), \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNI}
  *       \mhdStatus{Automatic MPI splitting, \mhdStatNI, \mhdStatNI}
  *       \mhdStatus{MPI Equation grouping, \mhdStatNA, \mhdStatNI}
  *       \mhdStatus{MPI Transform grouping, \mhdStatNA, \mhdStatNI}
@@ -391,7 +391,7 @@
  *       \mhdStatus{Fixed flux (WLF), \mhdStatNI}
  *    }
  *
- * \section mhdSTSBoundary Physical models
+ * \section mhdSTSModel Physical models
  *
  *    \mhdTable{
  *       \mhdTableHeader

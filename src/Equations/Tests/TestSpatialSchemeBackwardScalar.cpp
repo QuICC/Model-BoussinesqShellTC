@@ -157,10 +157,6 @@ namespace Equations {
             {
                iI_ = iI;
                error = std::max(error, std::abs(this->unknown().dom(0).perturbation().point(iI,iJ,iK) - this->scalarPoint(iI_, iJ_, iK_)));
-               if(iJ_ == 0)
-               {
-                  std::cerr << this->unknown().dom(0).perturbation().point(iI,iJ,iK) << " vs " << this->scalarPoint(iI_, iJ_, iK_) << iI_ << "<>" << iK_ <<std::endl;
-               }
             }
          }
       }
@@ -300,6 +296,9 @@ namespace Equations {
          if(j > 0)
          {
             val = MHDComplex(1.0,1.0);
+         } else
+         {
+            val = 1.0;
          }
 
       // Unknown setup

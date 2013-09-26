@@ -84,7 +84,7 @@ namespace Spectral {
       // Create storage for the inverse
       SparseMatrix invMat(this->basisN(), this->basisN());
 
-      // Create left preudo identity to extract rows
+      // Create left pseudo identity to extract rows
       SparseMatrix idL(this->basisN(), this->basisN() + p);
       idL.reserve(idL.rows()-p);
       for(int j = 0; j < idL.rows(); ++j)
@@ -100,7 +100,7 @@ namespace Spectral {
       }
       idL.finalize(); 
 
-      // Create right preudo identity to extract rows
+      // Create right pseudo identity to extract rows
       SparseMatrix idR(this->basisN() + p, this->basisN());
       idR.reserve(idR.cols()-pq);
       for(int j = 0; j < idR.cols()-pq; ++j)

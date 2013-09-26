@@ -153,6 +153,7 @@ namespace Parallel {
       // Store the shared pointer to the transform resolution
       this->mspTRes = spRes->cpu()->dim(id);
 
+      // Create index converter
       this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(this->mspTRes));
    }
 

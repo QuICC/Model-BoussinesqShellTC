@@ -223,6 +223,82 @@ namespace TestSuite {
    }
 
    /**
+    * @brief Accuracy test for real backward derivative transform
+    *
+    * @param ChebyshevTransformTest   Test fixture ID
+    * @param ForwardRealAccuracy          Test ID
+    */
+   TEST_F(ChebyshevTransformTest, BackwardRealDiffAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
+
+      // Create Chebyshev transform
+      Transform::ChebyshevTransformType fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      Array x = fft.meshGrid();
+
+      // Initialise the physical test data as T_i(x)
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
+         {
+            phys.col(i) = (5-i) - x.array() + x.array().pow(2) + -1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+
+      // Compute backward derivative transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::DIFF);
+
+      // Check the solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         if(j < spSetup->specSize())
+         {
+            Array cheb;
+            if(j > 0)
+            {
+               cheb = - 1 + 2.0*x.array() + -3.9*x.array().pow(2) + 4.0*j*x.array().pow(3) -3.0*j*x.array().pow(j-1);
+            } else
+            {
+               cheb = - 1 + 2.0*x.array().array() + -3.9*x.array().pow(2) + 4.0*j*x.array().pow(3);
+            }
+
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(cheb(i)));
+               EXPECT_NEAR(cheb(i)/eta, phys(i,j)/eta, this->mError);
+            }
+         } else
+         {
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j), 0.0, this->mError);
+            }
+         }
+      }
+   }
+
+   /**
     * @brief Accuracy test for real backward-forward transform loop
     *
     * @param ChebyshevTransformTest   Test fixture ID
@@ -385,24 +461,24 @@ namespace TestSuite {
          {
             if(i == 0 && j == 0 && j < spSetup->specSize())
             {
-               spec(i,j) = MHDComplex(1.0,0.0);
+               spec(i,j).real() = 1.0;
             } else if(i == j && j < spSetup->specSize() && j < spSetup->specSize())
             {
-               spec(i,j) = MHDComplex(0.5,0.0);
+               spec(i,j).real() = 0.5;
             } else
             {
-               spec(i,j) = 0.0;
+               spec(i,j).real() = 0.0;
             }
             
             if(i == 0 && spSetup->specSize()-1-j == 0 && j < spSetup->specSize())
             {
-               spec(i,j) = MHDComplex(0.0,1.0);
+               spec(i,j).imag() = 1.0;
             } else if(i == spSetup->specSize()-1-j && j > 0 && j < spSetup->specSize())
             {
-               spec(i,j) = MHDComplex(0.0,0.5);
+               spec(i,j).imag() = 0.5;
             } else
             {
-               spec(i,j) = 0.0;
+               spec(i,j).imag() = 0.0;
             }
          }
       }
@@ -442,6 +518,90 @@ namespace TestSuite {
          }
       }
    }
+
+   /**
+    * @brief Accuracy test for a complex forward derivative transform 
+    *
+    * @param ChebyshevTransformTest Test fixture ID
+    * @param ForwardComplexAccuracy     Test ID
+    */
+   TEST_F(ChebyshevTransformTest, ForwardComplexDiffAccuracy)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
+
+      // Create Chebyshev transform
+      Transform::ChebyshevTransformType fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      MatrixZ   phys = MatrixZ::Zero(spSetup->fwdSize(), spSetup->howmany());
+      MatrixZ   spec = MatrixZ::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      Array x = fft.meshGrid();
+
+      // Initialise the physical test data as T_n(n*phi) + T_n(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
+         {
+            phys.col(i).real() = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+            phys.col(i).imag() = 3.0*x.array() + 0.2*x.array().pow(3) - 2.1*i*x.array().pow(5) + x.array().pow(6) + 1.7*x.array().pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+
+      // Compute backward derivative transform
+      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::DIFF);
+
+      // Check solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         if(j < spSetup->specSize())
+         {
+            Array chebReal;
+            Array chebImag;
+            if(j > 0)
+            {
+               chebReal = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3) - 3.0*j*x.array().pow(j-1);
+               chebImag =  3.0 + 0.6*x.array().pow(2) - 10.5*j*x.array().pow(4) + 6.0*x.array().pow(5) + 1.7*j*x.array().pow(j-1);
+            } else
+            {
+               chebReal = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3);
+               chebImag =  3.0 + 0.6*x.array().pow(2) - 10.5*j*x.array().pow(4) + 6.0*x.array().pow(5);
+            }
+
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat etaReal = std::max(10.0, std::abs(chebReal(i)));
+               MHDFloat etaImag = std::max(10.0, std::abs(chebImag(i)));
+               EXPECT_NEAR(chebReal(i)/etaReal, phys(i,j).real()/etaReal, this->mError);
+               EXPECT_NEAR(chebImag(i)/etaImag, phys(i,j).imag()/etaImag, this->mError);
+            }
+         } else
+         {
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j).real(), 0.0, this->mError);
+               EXPECT_NEAR(phys(i,j).imag(), 0.0, this->mError);
+            }
+         }
+      }
+   }
+
 
    /**
     * @brief Accuracy test for a complex backward-forward transform  loop
@@ -486,15 +646,8 @@ namespace TestSuite {
       {
          for(int i = 0; i < spSetup->specSize(); ++i)
          {
-            if(i != 0)
-            {
-               EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
-               EXPECT_NEAR(spec(i,j).imag(), 1.0, this->mError);
-            } else
-            {
-               EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
-               EXPECT_NEAR(spec(i,j).imag(), 0.0, this->mError);
-            }
+            EXPECT_NEAR(spec(i,j).real(), 1.0, this->mError);
+            EXPECT_NEAR(spec(i,j).imag(), 1.0, this->mError);
          }
          for(int i = spSetup->specSize(); i < spSetup->bwdSize(); ++i)
          {

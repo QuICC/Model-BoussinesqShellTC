@@ -30,8 +30,17 @@ namespace Parallel {
    class NoIndexConv
    {
       public:
-         NoIndexConv(SharedCTransformResolution spTRes) {};
-         ~NoIndexConv() {};
+         /**
+          * @brief Constructor
+          *
+          * @param spTRes  Shared transform resolution
+          */
+         NoIndexConv(SharedCTransformResolution spTRes);
+
+         /**
+          * @brief Destructor 
+          */
+         ~NoIndexConv();
 
          /**
           * @brief Convert first index (3D)

@@ -3,8 +3,22 @@ set(MHDTestBackendFlag  GEOMHDISCC_SPLINALG)
 
 # Create list of sources for test case
 set(MHDTestSources
+   Base/MathConstants.cpp
    IoTools/Formatter.cpp
+   Resolutions/TransformSetup.cpp
+   FastTransforms/FftSetup.cpp
+   SpectralOperators/IOperator.cpp
+   SpectralOperators/ChebyshevOperator.cpp
 )
+
+# Add FFTW backend files
+if(GEOMHDISCC_FFT STREQUAL "FFTW")
+   list(APPEND MHDTestSources 
+      FastTransforms/FftwTools.cpp
+      FastTransforms/FftwLibrary.cpp
+      FastTransforms/ChebyshevFftwTransform.cpp
+   )
+endif(GEOMHDISCC_FFT STREQUAL "FFTW")
 
 # Include solver specific files
 if(GEOMHDISCC_SPLINALG STREQUAL "Pardiso")

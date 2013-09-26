@@ -30,8 +30,17 @@ namespace Parallel {
    class SHIndexConv
    {
       public:
-         SHIndexConv(SharedCTransformResolution spTRes) {};
-         ~SHIndexConv() {};
+         /**
+          * @brief Constructor
+          *
+          * @param spTRes  Shared transform resolution
+          */
+         SHIndexConv(SharedCTransformResolution spTRes);
+
+         /**
+          * @brief Destructor
+          */
+         ~SHIndexConv();
 
          /**
           * @brief Convert first index (3D)

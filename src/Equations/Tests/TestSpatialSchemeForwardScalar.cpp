@@ -206,9 +206,11 @@ namespace Equations {
          val = 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-         val *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
-         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         Datatypes::PhysicalScalarType::PointType val3D = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         Datatypes::PhysicalScalarType::PointType val2D = (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
+         Datatypes::PhysicalScalarType::PointType val1D = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
+         val = val1D*val2D*val3D + val1D*val2D + val1D*val3D + val2D*val3D;
 
       // Unknown setup
       } else
@@ -255,21 +257,25 @@ namespace Equations {
          }
       } else if(this->mTypeId == EXACT)
       {
+         Datatypes::PhysicalScalarType::PointType val3D = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         Datatypes::PhysicalScalarType::PointType val2D = (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
+         Datatypes::PhysicalScalarType::PointType val1D = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
          if(compId == FieldComponents::Physical::ONE)
          {
-            grad = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-            grad *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
-            grad *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            Datatypes::PhysicalScalarType::PointType grad1D = (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+
+            grad = grad1D*val2D*val3D + grad1D*val2D + grad1D*val3D;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            grad = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-            grad *= (0.4 + 2.0*y + 8.0*std::pow(y,3));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad2D = (0.4 + 2.0*y + 8.0*std::pow(y,3));
+
+            grad = val1D*grad2D*val3D + grad2D*val1D + grad2D*val3D;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            grad = (1.0 + 4.0*z - 6.0*z);
-            grad *= (1.0 - 0.4*y + 1.0*std::pow(y,2) + 2.0*std::pow(y,4));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad3D = (1.0 + 4.0*z - 6.0*z);
+
+            grad = val1D*val2D*grad3D + grad3D*val2D + grad3D*val2D;
          } else
          {
             throw Exception("Unknown gradient component");
@@ -299,9 +305,11 @@ namespace Equations {
          val = 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         val = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-         val *= (std::cos(5.0*th) + std::sin(7.0*th));
-         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         Datatypes::PhysicalScalarType::PointType val3D = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         Datatypes::PhysicalScalarType::PointType val2D = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
+         val = val1D*val2D*val3D + val1D*val2D + val1D*val3D + val2D*val3D;
 
       // Unknown setup
       } else
@@ -348,21 +356,25 @@ namespace Equations {
          }
       } else if(this->mTypeId == EXACT)
       {
+         Datatypes::PhysicalScalarType::PointType val3D = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
+         Datatypes::PhysicalScalarType::PointType val2D = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
          if(compId == FieldComponents::Physical::ONE)
          {
-            grad = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            Datatypes::PhysicalScalarType::PointType grad1D = (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+
+            grad = grad1D*val2D*val3D + grad1D*val2D + grad1D*val3D;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            grad = (-5.0 + 1.0*z + 2.0*std::pow(z,2) - 3.0*std::pow(z,2));
-            grad *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad2D = (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+
+            grad = val1D*grad2D*val3D + grad2D*val1D + grad2D*val3D;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            grad = (1.0 + 4.0*z - 6.0*z);
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad3D = (1.0 + 4.0*z - 6.0*z);
+
+            grad = val1D*val2D*grad3D + grad3D*val1D + grad3D*val2D;
          } else
          {
             throw Exception("Unknown gradient component");
@@ -391,9 +403,11 @@ namespace Equations {
          val = 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-         val *= (std::cos(5.0*th) + std::sin(7.0*th));
-         val *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+         Datatypes::PhysicalScalarType::PointType val3D = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         Datatypes::PhysicalScalarType::PointType val2D = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
+         val = val1D*val2D + val1D*val3D + val2D*val3D + val1D*val2D*val3D;
 
       // Unknown setup
       } else
@@ -440,22 +454,26 @@ namespace Equations {
          }
       } else if(this->mTypeId == EXACT)
       {
+         Datatypes::PhysicalScalarType::PointType val3D  = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         Datatypes::PhysicalScalarType::PointType val2D  = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D  = (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+
          if(compId == FieldComponents::Physical::ONE)
          {
-            grad = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+            Datatypes::PhysicalScalarType::PointType grad1D = (0.3 + 9.0*std::pow(x,2) - 2.8*std::pow(x,3));
+
+            grad = grad1D*val2D*val3D + grad1D*val2D + grad1D*val3D;
 
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            grad = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-            grad *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad2D = (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+
+            grad = val1D*grad2D*val3D + grad2D*val1D + grad2D*val3D;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            grad = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) - 2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (0.3*x + 3.0*std::pow(x,3) - 0.7*std::pow(x,4));
+            Datatypes::PhysicalScalarType::PointType grad3D = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) - 2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
+
+            grad = val1D*val2D*grad3D + grad3D*val1D + grad3D*val2D;
          } else
          {
             throw Exception("Unknown gradient component");
@@ -485,9 +503,11 @@ namespace Equations {
          val = 42.0;
       } else if(this->mTypeId == EXACT)
       {
-         val = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-         val *= (std::cos(5.0*th) + std::sin(7.0*th));
-         val *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+         Datatypes::PhysicalScalarType::PointType val3D = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         Datatypes::PhysicalScalarType::PointType val2D = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D = (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+
+         val = val1D*val2D*val3D + val1D*val2D + val1D*val3D + val2D*val3D;
       } else
       {
          // Unknown setup
@@ -533,21 +553,25 @@ namespace Equations {
          }
       } else if(this->mTypeId == EXACT)
       {
+         Datatypes::PhysicalScalarType::PointType val3D = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
+         Datatypes::PhysicalScalarType::PointType val2D = (std::cos(5.0*th) + std::sin(7.0*th));
+         Datatypes::PhysicalScalarType::PointType val1D = (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+
          if(compId == FieldComponents::Physical::ONE)
          {
-            grad = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (-3.0*std::sin(3.0*kh) + 4.0*std::cos(4.0*kh) - 2.0*std::sin(2.0*kh));
+            Datatypes::PhysicalScalarType::PointType grad1D = (-3.0*std::sin(3.0*kh) + 4.0*std::cos(4.0*kh) - 2.0*std::sin(2.0*kh));
+
+            grad = grad1D*val2D*val3D + grad1D*val2D + grad1D*val3D;
          } else if(compId == FieldComponents::Physical::TWO)
          {
-            grad = (0.3*std::cos(3.0*ph) + 2.0*std::sin(5.0*ph) + 0.7*std::cos(4.0*ph) - 1.0*std::sin(6.0*ph) - 3.0*std::cos(8.0*ph) + 0.1*std::sin(9.0*ph));
-            grad *= (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
-            grad *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+            Datatypes::PhysicalScalarType::PointType grad2D = (-5.0*std::sin(5.0*th) + 7.0*std::cos(7.0*th));
+
+            grad = val1D*grad2D*val3D + grad2D*val1D + grad2D*val3D;
          } else if(compId == FieldComponents::Physical::THREE)
          {
-            grad = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) - 2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
-            grad *= (std::cos(5.0*th) + std::sin(7.0*th));
-            grad *= (std::cos(3.0*kh) + std::sin(4.0*kh) + std::cos(2.0*kh));
+            Datatypes::PhysicalScalarType::PointType grad3D = (-0.9*std::sin(3.0*ph) + 10.0*std::cos(5.0*ph) - 2.8*std::sin(4.0*ph) - 6.0*std::cos(6.0*ph) + 24.0*std::sin(8.0*ph) + 0.9*std::cos(9.0*ph));
+
+            grad = val1D*val2D*grad3D + grad3D*val1D + grad3D*val2D;
          } else
          {
             throw Exception("Unknown gradient component");

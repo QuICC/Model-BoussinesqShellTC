@@ -31,9 +31,17 @@ namespace Parallel {
    class PMIndexConv
    {
       public:
-         PMIndexConv(SharedCTransformResolution spTRes)
-      {mspTRes = spTRes;};
-         ~PMIndexConv() {};
+         /**
+          * @brief Constructor
+          *
+          * @param spTRes  Shared transform resolution
+          */
+         PMIndexConv(SharedCTransformResolution spTRes);
+
+         /**
+          * @brief Destructor 
+          */
+         ~PMIndexConv();
 
          /**
           * @brief Convert first index (3D)
@@ -141,21 +149,23 @@ namespace Parallel {
           */
          int kS(const int i, const int j, const int k);
 
+      private:
+         /**
+          * @brief Shared transform resolution 
+          */
          SharedCTransformResolution mspTRes;
    };
 
    inline int PMIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      int nN = this->mspTRes->dim<Dimensions::Data::DAT3D>();
+      int sN = this->mspTRes->dim<Dimensions::Data::DAT3D>()/2;
 
-      //std::cerr << this->mspTRes->dim<Dimensions::Data::DAT3D>() << std::endl;
-
-      if (idxK >= nN/2)
-      {
-         return nN/2 + idxK;
-      } else
+      if(idxK < sN)
       {
          return idxK;
+      } else
+      {
+         return sN + idxK;
       }
    }
 

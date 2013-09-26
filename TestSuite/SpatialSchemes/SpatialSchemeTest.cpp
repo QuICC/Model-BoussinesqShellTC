@@ -188,6 +188,8 @@ namespace TestSuite {
    /**
     * @brief Test the resolution object
     *
+    * This test will fail in parallel setup, but it is difficult to setup correctly (depends on parallelisation algorithm)
+    *
     * @param SpatialSchemeTest   Test fixture ID
     * @param Placeholder         Test ID
     */

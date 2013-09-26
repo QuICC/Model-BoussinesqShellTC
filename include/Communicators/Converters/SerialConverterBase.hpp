@@ -35,6 +35,8 @@ namespace Parallel {
 
    /**
     * @brief Implementation of the serial data converter base.
+    *
+    * \mhdTodo Does index converter really need to be templated ? Is the type selector not enough?
     */
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB>
    {
@@ -85,6 +87,9 @@ namespace Parallel {
           */
          SharedCTransformResolution mspTRes;
 
+         /**
+          * @brief Index converter 
+          */
          SharedPtrMacro<TIdx>  mspIdxConv;
       private:
    };

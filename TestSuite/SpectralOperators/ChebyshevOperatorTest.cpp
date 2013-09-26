@@ -9,7 +9,7 @@
 #include "Framework/FrameworkMacro.h"
 #include "SpectralOperators/ChebyshevOperator.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
-#include "FastTransforms/FftwTools.hpp"
+#include "TypeSelectors/FftSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,31 +41,35 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+         
+         /**
+          * @brief Spectral size of transform
+          */
+         int mMaxN;
+
+         /**
+          * @brief How many identical transforms to compute
+          */
+         int mHowmany;
+         
+         /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+         
+         /**
+          * @brief Acceptable relative error
+          */
+         double mRelError;
    };
 
    ChebyshevOperatorTest::ChebyshevOperatorTest()
+      : mMaxN(31), mHowmany(10), mError(1e-10), mRelError(1e-10)
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    ChebyshevOperatorTest::~ChebyshevOperatorTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void ChebyshevOperatorTest::SetUp()
@@ -77,18 +81,16 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief Test c constant in by computing first derivative (fft transform loop)
+    * @brief First derivative (fft transform loop)
     */
    TEST_F(ChebyshevOperatorTest, Diff1)
    {
       // Set spectral and physical sizes
-      int maxN = 6;
-      int nN = maxN + 1;
-      int xN = Transform::FftwTools::dealiasFft(nN);
-      int howmany = 5;
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::REAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create ChebyshevFftwTransform
       Transform::ChebyshevFftwTransform fft;
@@ -98,71 +100,82 @@ namespace TestSuite {
 
       // Create test data storage
       Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
-      Matrix   spec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
 
       // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
       phys.setZero();
-      phys.col(0).setConstant(1.0);
-      phys.col(1) = x;
-      phys.col(2) = 1+x.array()*x.array();
-      phys.col(3) = 1+x.array().pow(2) - 3*x.array().pow(3)+ 4*x.array().pow(4)-2*x.array().pow(5)+x.array().pow(6);
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
+         {
+            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(tmpSpec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
 
       // Dealias
-      spec.bottomRows(xN-nN).setZero();
+      spec = tmpSpec.topRows(spSetup->specSize());
 
       // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   op(nN);
+      Spectral::ChebyshevOperator   op(spSetup->specSize());
 
       // Compute first derivative
-      spec.topRows(nN) = op.diff(0,1)*spec.topRows(nN);
+      spec = op.diff(0,1)*spec;
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
+      tmpSpec.topRows(spSetup->specSize()) = spec;
+      tmpSpec.bottomRows(spSetup->padSize()).setZero();
+      fft.project<Arithmetics::SET>(phys, tmpSpec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
 
       // Check the solution
-      for(int i = 0; i < howmany; ++i)
+      for(int j = 0; j < spSetup->howmany(); ++j)
       {
-         Array cheb = Array::Zero(xN);
-         if(i == 0)
+         if(j < spSetup->specSize())
          {
-            cheb.setConstant(0);
-         } else if(i == 1)
-         {
-            cheb.setConstant(1);
-         } else if(i == 2)
-         {
-            cheb = 2*x;
-         } else if(i == 3)
-         {
-            cheb = 2*x.array() - 9*x.array().pow(2)+ 16*x.array().pow(3)-10*x.array().pow(4)+6*x.array().pow(5);
-         }
+            Array cheb;
+            if(j > 0)
+            {
+               cheb = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3) - 3.0*j*x.array().pow(j-1);
+            } else
+            {
+               cheb = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3);
+            }
 
-         for(int j = 0; j < x.size(); ++j)
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(cheb(i)));
+               EXPECT_NEAR(cheb(i)/eta, phys(i,j)/eta, this->mError);
+            }
+         } else
          {
-            EXPECT_NEAR(phys(j,i), cheb(j), 1e-13) << "i = " << i << " j = " << j;
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j), 0.0, this->mError);
+            }
          }
       }
    }
 
    /**
-    * @brief Test c constant in by computing second derivative (fft transform loop)
+    * @brief Second derivative (fft transform loop)
     */
    TEST_F(ChebyshevOperatorTest, Diff2)
    {
       // Set spectral and physical sizes
-      int maxN = 6;
-      int nN = maxN + 1;
-      int xN = Transform::FftwTools::dealiasFft(nN);
-      int howmany = 5;
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
 
       // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, howmany, nN, Transform::FftSetup::REAL));
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create ChebyshevFftwTransform
       Transform::ChebyshevFftwTransform fft;
@@ -172,72 +185,156 @@ namespace TestSuite {
 
       // Create test data storage
       Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
-      Matrix   spec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
 
       // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
       phys.setZero();
-      phys.col(0).setConstant(1.0);
-      phys.col(1) = x;
-      phys.col(2) = 1+x.array()*x.array();
-      phys.col(3) = 1+x.array().pow(2) - 3*x.array().pow(3)+ 4*x.array().pow(4)-2*x.array().pow(5)+x.array().pow(6);
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
+         {
+            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(tmpSpec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
 
       // Dealias
-      spec.bottomRows(xN-nN).setZero();
+      spec = tmpSpec.topRows(spSetup->specSize());
 
       // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   op(nN);
+      Spectral::ChebyshevOperator   op(spSetup->specSize());
 
-      // Compute first derivative
-      spec.topRows(nN) = op.diff(0,2)*spec.topRows(nN);
+      // Compute second derivative
+      spec = op.diff(0,2)*spec;
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
+      tmpSpec.topRows(spSetup->specSize()) = spec;
+      tmpSpec.bottomRows(spSetup->padSize()).setZero();
+      fft.project<Arithmetics::SET>(phys, tmpSpec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
 
       // Check the solution
-      for(int i = 0; i < howmany; ++i)
+      for(int j = 0; j < spSetup->howmany(); ++j)
       {
-         Array cheb = Array::Zero(xN);
-         if(i == 0)
+         if(j < spSetup->specSize())
          {
-            cheb.setConstant(0);
-         } else if(i == 1)
-         {
-            cheb.setConstant(0);
-         } else if(i == 2)
-         {
-            cheb.setConstant(2);
-         } else if(i == 3)
-         {
-            cheb = 2 - 18*x.array()+ 48*x.array().pow(2)-40*x.array().pow(3)+30*x.array().pow(4);
-         }
+            Array cheb = 2.0 - 7.8*x.array() + 12.0*j*x.array().pow(2) - 3.0*j*(j-1)*x.array().pow(j-2);
 
-         for(int j = 0; j < x.size(); ++j)
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(cheb(i)));
+               EXPECT_NEAR(cheb(i)/eta, phys(i,j)/eta, this->mError);
+            }
+         } else
          {
-            EXPECT_NEAR(phys(j,i), cheb(j), 1e-12) << "i = " << i << " j = " << j;
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j), 0.0, this->mError);
+            }
          }
       }
    }
 
    /**
-    * @brief Test quasi identity through product
+    * @brief Fourth derivative operator (fft transform loop)
     */
-   TEST_F(ChebyshevOperatorTest, QuasiIdentity)
+   TEST_F(ChebyshevOperatorTest, Diff4)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
+
+      // Create ChebyshevFftwTransform
+      Transform::ChebyshevFftwTransform fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      Array x = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         if(i < spSetup->specSize())
+         {
+            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(tmpSpec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+
+      // Dealias
+      spec = tmpSpec.topRows(spSetup->specSize());
+
+      // Create Chebyshev spectral operator
+      Spectral::ChebyshevOperator   op(spSetup->specSize());
+
+      // Compute second derivative
+      spec = op.diff(0,4)*spec;
+
+      // Compute backward transform
+      tmpSpec.topRows(spSetup->specSize()) = spec;
+      tmpSpec.bottomRows(spSetup->padSize()).setZero();
+      fft.project<Arithmetics::SET>(phys, tmpSpec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
+
+      // Check the solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         if(j < spSetup->specSize())
+         {
+            Array cheb = 24.0*j - 3.0*j*(j-1)*(j-2)*(j-3)*x.array().pow(j-4);
+
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(cheb(i)));
+               EXPECT_NEAR(cheb(i)/eta, phys(i,j)/eta, this->mError);
+            }
+         } else
+         {
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j), 0.0, this->mError);
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Test quasi inverse through product
+    */
+   TEST_F(ChebyshevOperatorTest, QuasiInverse)
    {
       // Set size of the basis
-      int nN = 16;
+      int nN = this->mMaxN + 1;
 
       // Create Chebyshev spectral operator
       Spectral::ChebyshevOperator   spec(nN);
 
       // Get quasi-inverse of order 1
-      SparseMatrix sparse = spec.qDiff(1,0)*spec.diff(0,1);
-      Matrix qid = sparse;
+      SparseMatrix spqId = spec.qDiff(1,0)*spec.diff(0,1);
+      Matrix qId = spqId;
 
       // Check operator
       for(int j = 0; j < nN; ++j)
@@ -246,118 +343,60 @@ namespace TestSuite {
          {
             if(i > 0 && i == j)
             {
-               EXPECT_EQ(qid(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qid(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
-   }
 
-   /**
-    * @brief Test quasi inverse of order 1
-    */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse10)
-   {
-      // Set size of the basis
-      int nN = 16;
-
-      // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   spec(nN);
-
-      // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(1,0);
-
-      //std::cerr << qdiff << std::endl;
+      // Get quasi-inverse of order 2
+      spqId = spec.qDiff(2,0)*spec.diff(0,2);
+      qId = spqId;
 
       // Check operator
       for(int j = 0; j < nN; ++j)
       {
          for(int i = 0; i < nN; ++i)
          {
-            if(i > 0 && j < nN - 1)
+            if(i > 1 && i == j)
             {
-               //EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
-   }
 
-   /**
-    * @brief Test quasi inverse of order 2
-    */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse20)
-   {
-      // Set size of the basis
-      int nN = 16;
-
-      // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   spec(nN);
-
-      // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(2,0);
-
-      //std::cerr << qdiff << std::endl;
+      // Get quasi-inverse of order 4
+      spqId = spec.qDiff(4,0)*spec.diff(0,4);
+      qId = spqId;
 
       // Check operator
       for(int j = 0; j < nN; ++j)
       {
          for(int i = 0; i < nN; ++i)
          {
-            if(i > 1 && j < nN - 2)
+            if(i > 3 && i == j)
             {
-               //EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
    }
 
    /**
-    * @brief Test quasi inverse of order 4
+    * @brief Test quasi inverse D^{-p}*D^{p} without product
     */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse40)
+   TEST_F(ChebyshevOperatorTest, QuasiIdentity)
    {
       // Set size of the basis
-      int nN = 16;
-
-      // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   spec(nN);
-
-      // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(4,0);
-
-      //std::cerr << spec.qDiff(4,0) << std::endl;
-
-      // Check operator
-      for(int j = 0; j < nN; ++j)
-      {
-         for(int i = 0; i < nN; ++i)
-         {
-            if(i > 3 && j < nN - 4)
-            {
-               //EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
-            } else
-            {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
-            }
-         }
-      }
-   }
-
-   /**
-    * @brief Test quasi inverse of order 1 on derivative of order 1
-    */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse11)
-   {
-      // Set size of the basis
-      int nN = 16;
+      int nN = this->mMaxN + 1;
 
       // Create Chebyshev spectral operator
       Spectral::ChebyshevOperator   spec(nN);
@@ -379,6 +418,42 @@ namespace TestSuite {
             }
          }
       }
+
+      // Get quasi-inverse of order 2
+      qdiff = spec.qDiff(2,2);
+
+      // Check operator
+      for(int j = 0; j < nN; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            if(i > 1 && i==j)
+            {
+               EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+            } else
+            {
+               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+            }
+         }
+      }
+
+      // Get quasi-inverse of order 4
+      qdiff = spec.qDiff(4,4);
+
+      // Check operator
+      for(int j = 0; j < nN; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            if(i > 3 && i==j)
+            {
+               EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+            } else
+            {
+               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+            }
+         }
+      }
    }
 
    /**
@@ -387,27 +462,33 @@ namespace TestSuite {
    TEST_F(ChebyshevOperatorTest, QuasiInverse21)
    {
       // Set size of the basis
-      int nN = 16;
+      int nN = this->mMaxN + 1;
 
       // Create Chebyshev spectral operator
       Spectral::ChebyshevOperator   spec(nN);
 
       // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(2,1);
+      Matrix qExact = spec.qDiff(2,1);
+      SparseMatrix tmp = spec.id(2)*spec.qDiff(2,0)*spec.diff(0,1);
+      Matrix qProd = tmp;
 
-      // Check operator
-      Matrix corr = spec.qDiff(1,0);
+      // Compare exact and product
       for(int j = 0; j < nN; ++j)
       {
          for(int i = 0; i < nN; ++i)
          {
-            if(i > 1)
-            {
-               EXPECT_EQ(qdiff(i,j), corr(i,j)) << "i = " << i << " j = " << j;
-            } else
-            {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
-            }
+            EXPECT_NEAR(qExact(i,j), qProd(i,j), this->mError) << "i = " << i << " j = " << j;
+         }
+      }
+
+      // Check operator
+      tmp = spec.id(2)*spec.qDiff(1,0);
+      Matrix corr = tmp;
+      for(int j = 0; j < nN-1; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            EXPECT_EQ(qExact(i,j), corr(i,j)) << "i = " << i << " j = " << j;
          }
       }
    }
@@ -418,27 +499,33 @@ namespace TestSuite {
    TEST_F(ChebyshevOperatorTest, QuasiInverse42)
    {
       // Set size of the basis
-      int nN = 16;
+      int nN = this->mMaxN + 1;
 
       // Create Chebyshev spectral operator
       Spectral::ChebyshevOperator   spec(nN);
 
       // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(4,2);
+      Matrix qExact = spec.qDiff(4,2);
+      SparseMatrix tmp = spec.id(4)*spec.qDiff(4,0)*spec.diff(0,2);
+      Matrix qProd = tmp;
 
-      // Check operator
-      Matrix corr = spec.qDiff(2,0);
+      // Compare exact and product
       for(int j = 0; j < nN; ++j)
       {
          for(int i = 0; i < nN; ++i)
          {
-            if(i > 3)
-            {
-               EXPECT_EQ(qdiff(i,j), corr(i,j)) << "i = " << i << " j = " << j;
-            } else
-            {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
-            }
+            EXPECT_NEAR(qExact(i,j), qProd(i,j), this->mError) << "i = " << i << " j = " << j;
+         }
+      }
+
+      // Check operator
+      tmp = spec.id(4)*spec.qDiff(2,0);
+      Matrix corr = tmp;
+      for(int j = 0; j < nN-2; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            EXPECT_EQ(qExact(i,j), corr(i,j)) << "i = " << i << " j = " << j;
          }
       }
    }
@@ -448,6 +535,26 @@ namespace TestSuite {
 
 /// Main to execute all test from test case
 int main(int argc, char **argv) {
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }

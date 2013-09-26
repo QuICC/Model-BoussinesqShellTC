@@ -1,4 +1,7 @@
 set(MHDSources
+   NoIndexConv.cpp
+   SHIndexConv.cpp
+   PMIndexConv.cpp
 )
 
 if(GEOMHDISCC_MPI)
