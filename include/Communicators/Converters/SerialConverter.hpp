@@ -152,6 +152,8 @@ namespace Parallel {
    {
       // Store the shared pointer to the transform resolution
       this->mspTRes = spRes->cpu()->dim(id);
+
+      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(this->mspTRes));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

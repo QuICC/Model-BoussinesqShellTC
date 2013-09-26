@@ -75,10 +75,11 @@ foreach(TestDir ${PossibleTestDirs})
                set(TestExecName2 ${TestDef}${TestExecName})
                geomhdiscc_append_test(${TestDef} TestDefSrcs)
                # Add test executable to target list
+               set(TestDefSrcsList ${TestSrcsList})
                foreach(MHDSource ${TestDefSrcs})
-                  list(APPEND TestSrcsList ${GEOMHDISCC_SRC_DIR}/${MHDSource})
+                  list(APPEND TestDefSrcsList ${GEOMHDISCC_SRC_DIR}/${MHDSource})
                endforeach(MHDSource)
-               add_executable(${TestExecName2} ${TestSrcsList})
+               add_executable(${TestExecName2} ${TestDefSrcsList})
                target_link_libraries(${TestExecName2} "gtest")
                list(APPEND AllTests ${TestExecName2})
                set_target_properties(${TestExecName2} PROPERTIES COMPILE_FLAGS

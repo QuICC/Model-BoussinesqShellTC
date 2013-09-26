@@ -18,7 +18,9 @@
 
 // Project includes
 //
+#include "Resolutions/TransformResolution.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -29,6 +31,10 @@ namespace Parallel {
    class PMIndexConv
    {
       public:
+         PMIndexConv(SharedCTransformResolution spTRes)
+      {mspTRes = spTRes;};
+         ~PMIndexConv() {};
+
          /**
           * @brief Convert first index (3D)
           *
@@ -39,7 +45,7 @@ namespace Parallel {
           * @param idxJ Physical index of second dimension
           * @param idxK Physical index of third dimension
           */
-         static int i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
+         int i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
 
          /**
           * @brief Convert first index (3D) (specialised serial version)
@@ -48,17 +54,17 @@ namespace Parallel {
           * @param j    Array index of second dimension
           * @param k    Array index of third dimension
           */
-         static int iS(const int i, const int j, const int k);
+         int iS(const int i, const int j, const int k);
 
          /**
-          * @brief Convert first index (3D)
+          * @brief Convert first index (2D)
           *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
           * @param idxI Physical index of first dimension
           * @param idxJ Physical index of second dimension
           */
-         static int i(const int i, const int j, const int idxI, const int idxJ);
+         int i(const int i, const int j, const int idxI, const int idxJ);
 
          /**
           * @brief Convert first index (2D) (specialised serial version)
@@ -66,14 +72,14 @@ namespace Parallel {
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
           */
-         static int iS(const int i, const int j);
+         int iS(const int i, const int j);
 
          /**
           * @brief Convert first index (1D)
           *
           * @param i    Array index off first dimension
           */
-         static int i(const int i);
+         int i(const int i);
 
          /**
           * @brief Convert second index (3D)
@@ -85,7 +91,7 @@ namespace Parallel {
           * @param idxJ Physical index of second dimension
           * @param idxK Physical index of third dimension
           */
-         static int j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
+         int j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
 
          /**
           * @brief Convert second index (3D) (specialised serial version)
@@ -94,7 +100,7 @@ namespace Parallel {
           * @param j    Array index of second dimension
           * @param k    Array index of third dimension
           */
-         static int jS(const int i, const int j, const int k);
+         int jS(const int i, const int j, const int k);
 
          /**
           * @brief Convert second index (3D)
@@ -104,7 +110,7 @@ namespace Parallel {
           * @param idxI Physical index of first dimension
           * @param idxJ Physical index of second dimension
           */
-         static int j(const int i, const int j, const int idxI, const int idxJ);
+         int j(const int i, const int j, const int idxI, const int idxJ);
 
          /**
           * @brief Convert second index (2D) (specialised serial version)
@@ -112,7 +118,7 @@ namespace Parallel {
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
           */
-         static int jS(const int i, const int j);
+         int jS(const int i, const int j);
 
          /**
           * @brief Convert second index (3D)
@@ -124,7 +130,7 @@ namespace Parallel {
           * @param idxJ Physical index of second dimension
           * @param idxK Physical index of third dimension
           */
-         static int k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
+         int k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK);
 
          /**
           * @brief Convert third index (3D) (specialised serial version)
@@ -133,12 +139,24 @@ namespace Parallel {
           * @param j    Array index of second dimension
           * @param k    Array index of third dimension
           */
-         static int kS(const int i, const int j, const int k);
+         int kS(const int i, const int j, const int k);
+
+         SharedCTransformResolution mspTRes;
    };
 
    inline int PMIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      return k;
+      int nN = this->mspTRes->dim<Dimensions::Data::DAT3D>();
+
+      //std::cerr << this->mspTRes->dim<Dimensions::Data::DAT3D>() << std::endl;
+
+      if (idxK >= nN/2)
+      {
+         return nN/2 + idxK;
+      } else
+      {
+         return idxK;
+      }
    }
 
    inline int PMIndexConv::iS(const int i, const int j, const int k)

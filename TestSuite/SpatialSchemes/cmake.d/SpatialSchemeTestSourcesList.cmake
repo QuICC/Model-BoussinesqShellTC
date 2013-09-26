@@ -57,6 +57,12 @@ set(MHDTestSources
    IoTools/HumanToId.cpp
    Timers/ITimer.cpp
    Timers/SerialTimer.cpp
+   Simulation/SimulationBoundary.cpp
+   SpectralOperators/IOperator.cpp
+   SpectralOperators/IBoundary.cpp
+   SpectralOperators/BoundaryConditions.cpp
+   SpectralOperators/ChebyshevBoundary.cpp
+   SpectralOperators/ChebyshevOperator.cpp
 )
 
 function(geomhdiscc_append_test condition srcs)

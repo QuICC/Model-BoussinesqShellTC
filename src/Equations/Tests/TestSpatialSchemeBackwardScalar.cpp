@@ -93,7 +93,7 @@ namespace Equations {
       IEquation::init();
       
       int nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL);
+      int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM);
 
       int iI_;
       int iJ_;
@@ -141,7 +141,7 @@ namespace Equations {
       MHDFloat error = 0.0;
 
       int nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL);
+      int nI = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM);
 
       int iI_;
       int iJ_;
@@ -157,6 +157,10 @@ namespace Equations {
             {
                iI_ = iI;
                error = std::max(error, std::abs(this->unknown().dom(0).perturbation().point(iI,iJ,iK) - this->scalarPoint(iI_, iJ_, iK_)));
+               if(iJ_ == 0)
+               {
+                  std::cerr << this->unknown().dom(0).perturbation().point(iI,iJ,iK) << " vs " << this->scalarPoint(iI_, iJ_, iK_) << iI_ << "<>" << iK_ <<std::endl;
+               }
             }
          }
       }
@@ -172,7 +176,7 @@ namespace Equations {
 
       if(this->mTypeId == ZERO)
       {
-         vak = 0.0;
+         val = 0.0;
       } else if(this->mTypeId == CONSTANT)
       {
          if(i == 0 && j == 0 && k == 0)
@@ -186,7 +190,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = 2.0*k*std::pow(-1,i);
+            val = 2.0*(k+1)*std::pow(-1,i);
          } else
          {
             val = 0.0;
@@ -227,14 +231,26 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i), 1.5*k*std::pow(-1,i));
+            if(k == 0)
+            {
+               val = MHDComplex(2.0*(k+1)*std::pow(-1,i), 0.0);
+            } else
+            {
+               val = MHDComplex(2.0*(k+1)*std::pow(-1,i), 1.5*(k+1)*std::pow(-1,i));
+            }
          } else
          {
             val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         val = MHDComplex(1.0,1.0);
+         if(k == 0)
+         {
+            val = MHDComplex(1.0,0.0);
+         } else
+         {
+            val = MHDComplex(1.0,1.0);
+         }
 
       // Unknown setup
       } else
@@ -248,7 +264,6 @@ namespace Equations {
 
 // Set test problem for TFF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
-   /// \mhdBug Test values are possibly too simple to fully test complex FFT
    Datatypes::SpectralScalarType::PointType TestSpatialSchemeBackwardScalar::scalarPoint(const int i, const int j, const int k) const
    {
       Datatypes::SpectralScalarType::PointType val;
@@ -269,14 +284,23 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i), 1.5*k*std::pow(-1,i));
+            if(j > 0)
+            {
+               val = MHDComplex(2.0*(k+1)*std::pow(-1,i), 1.5*(k+1)*std::pow(-1,i));
+            } else
+            {
+              val = 1.0;
+            }
          } else
          {
             val = 0.0;
          }
       } else if(this->mTypeId == FULL)
       {
-         val = MHDComplex(1.0,1.0);
+         if(j > 0)
+         {
+            val = MHDComplex(1.0,1.0);
+         }
 
       // Unknown setup
       } else
@@ -310,7 +334,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDCompleX(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
+            val = MHDCompleX(2.0*(k+1)*std::pow(-1,i),1.5*(k+1)*std::pow(-1,i));
          } else
          {
             val = 0.0;
@@ -350,7 +374,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
+            val = MHDComplex(2.0*(k+1)*std::pow(-1,i),1.5*(k+1)*std::pow(-1,i));
          } else
          {
             val = 0.0;
@@ -391,7 +415,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
+            val = MHDComplex(2.0*(k+1)*std::pow(-1,i),1.5*(k+1)*std::pow(-1,i));
          } else
          {
             val = 0.0;
@@ -432,7 +456,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
+            val = MHDComplex(2.0*(k+1)*std::pow(-1,i),1.5*(k+1)*std::pow(-1,i));
          } else
          {
             val = 0.0;
@@ -473,7 +497,7 @@ namespace Equations {
       {
          if(i < 10 && j < 10 && k < 10)
          {
-            val = MHDComplex(2.0*k*std::pow(-1,i),1.5*k*std::pow(-1,i));
+            val = MHDComplex(2.0*(k+1)*std::pow(-1,i),1.5*(k+1)*std::pow(-1,i));
          } else
          {
             val = 0.0;

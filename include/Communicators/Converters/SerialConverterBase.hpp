@@ -85,6 +85,7 @@ namespace Parallel {
           */
          SharedCTransformResolution mspTRes;
 
+         SharedPtrMacro<TIdx>  mspIdxConv;
       private:
    };
 
@@ -214,30 +215,30 @@ namespace Parallel {
             int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,k);
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j,k);
             int idxK = this->mspTRes->template idx<Dimensions::Data::DAT3D>(k);
-            return in.point(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
+            return in.point(this->mspIdxConv->i(i,j,k,idxI,idxJ,idxK),this->mspIdxConv->j(i,j,k,idxI,idxJ,idxK),this->mspIdxConv->k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
             int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,j);
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
-            return in.point(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
+            return in.point(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::ONED)
          {
-            return in.point(TIdx::i(i));
+            return in.point(this->mspIdxConv->i(i));
          }
       #else
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            return in.point(TIdx::iS(i,j,k),TIdx::jS(i,j,k),TIdx::kS(i,j,k));
+            return in.point(this->mspIdxConv->iS(i,j,k),this->mspIdxConv->jS(i,j,k),this->mspIdxConv->kS(i,j,k));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            return in.point(TIdx::iS(i,j),TIdx::jS(i,j));
+            return in.point(this->mspIdxConv->iS(i,j),this->mspIdxConv->jS(i,j));
 
          } else if(TBwdB::FieldDimension == Dimensions::ONED)
          {
-            return in.point(TIdx::i(i));
+            return in.point(this->mspIdxConv->i(i));
          }
       #endif //GEOMHDISCC_MPI
    }
@@ -251,30 +252,30 @@ namespace Parallel {
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j,k);
             int idxK = this->mspTRes->template idx<Dimensions::Data::DAT3D>(k);
 
-            return rOut.rPoint(TIdx::i(i,j,k,idxI,idxJ,idxK),TIdx::j(i,j,k,idxI,idxJ,idxK),TIdx::k(i,j,k,idxI,idxJ,idxK));
+            return rOut.rPoint(this->mspIdxConv->i(i,j,k,idxI,idxJ,idxK),this->mspIdxConv->j(i,j,k,idxI,idxJ,idxK),this->mspIdxConv->k(i,j,k,idxI,idxJ,idxK));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
             int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,j);
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
-            return rOut.rPoint(TIdx::i(i,j,idxI,idxJ),TIdx::j(i,j,idxI,idxJ));
+            return rOut.rPoint(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            return rOut.rPoint(TIdx::i(i));
+            return rOut.rPoint(this->mspIdxConv->i(i));
          }
       #else
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            return rOut.rPoint(TIdx::iS(i,j,k),TIdx::jS(i,j,k),TIdx::kS(i,j,k));
+            return rOut.rPoint(this->mspIdxConv->iS(i,j,k),this->mspIdxConv->jS(i,j,k),this->mspIdxConv->kS(i,j,k));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            return rOut.rPoint(TIdx::iS(i,j),TIdx::jS(i,j));
+            return rOut.rPoint(this->mspIdxConv->iS(i,j),this->mspIdxConv->jS(i,j));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)
          {
-            return rOut.rPoint(TIdx::i(i));
+            return rOut.rPoint(this->mspIdxConv->i(i));
          }
       #endif //GEOMHDISCC_MPI
    }

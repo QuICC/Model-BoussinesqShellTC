@@ -321,6 +321,7 @@ namespace Transform {
       assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
 
       // assert right sizes for input  matrix
+      assert(fftVal.rows() % 2 == 0);
       assert(fftVal.rows() == this->mspSetup->bwdSize());
       assert(fftVal.cols() == this->mspSetup->howmany());
 
@@ -333,7 +334,8 @@ namespace Transform {
       {
          // Get differentiation factors
          ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
-         ArrayZ rfactor = (this->mspSetup->specSize()-1) - factor.array();
+         ArrayZ rfactor = -MathConstants::cI*static_cast<MHDFloat>(this->mspSetup->specSize()) + factor.array();
+         rfactor(0) = 0;
 
          // compute derivative
          this->mTmpZIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
