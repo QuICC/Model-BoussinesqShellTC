@@ -10,6 +10,8 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SpectralOperators/ChebyshevOperator.hpp"
+#include "SpectralOperators/ChebyshevBoundary.hpp"
+#include "SpectralOperators/BoundaryConditions.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/FftSelector.hpp"
@@ -21,7 +23,12 @@ namespace TestSuite {
    typedef Eigen::Array<MHDFloat, Eigen::Dynamic, 1>   CoeffArray;
 
    namespace internal {
-      void setSolution1(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const int bcId);
+      void setSolution1DA(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
+      void setSolution1DB(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
+      void setSolution1DC(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
+      void setSolution1DD(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
+      void setSolution1DE(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
+      void setSolution1DF(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId);
    }
 
    /**
@@ -31,7 +38,7 @@ namespace TestSuite {
       public:
 
          void solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA);
-         void setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const int bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const int));
+         void setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const ArrayI& bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const ArrayI&));
 
       protected:
          /**
@@ -229,7 +236,7 @@ namespace TestSuite {
       sol = solver.solve(rhs);
    }
 
-   void SparseLinearSolverTest::setupProblem(Matrix& sol, Matrix& rhs, const int bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const int))
+   void SparseLinearSolverTest::setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const ArrayI& bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const ArrayI&))
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -263,170 +270,341 @@ namespace TestSuite {
       rhs = tmpSpec.topRows(spSetup->specSize());
    }
 
-   namespace internal 
+   /**
+    * @brief Cartesian 1D \f[\nabla^2 x = b\f] with QI approach
+    *
+    * @param SparseLinearSolverTest Test fixture ID
+    * @param HarmonicDirichlet1D    Test ID
+    */
+   TEST_F(SparseLinearSolverTest, HarmonicQI1D)
    {
-      void setSolution1(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const int bcId)
+      // Loop over boundary condition ids
+      for(int ibc = 21; ibc <= 23; ++ibc)
       {
-         MHDFloat k = param(0);
+         int nN = this->mMaxN + 1;
+         Array param(1);
+         param(0) = 5;
+         ArrayI bcId(1);
+         bcId(0) = ibc;
 
-         if(bcId == 21)
+         // Setup problem
+         Matrix exactSol;
+         Matrix rhs;
+         this->setupProblem(exactSol, rhs, param, bcId, &internal::setSolution1DA);
+
+         // Create matrix
+         Spectral::ChebyshevOperator   op(nN);
+         Spectral::ChebyshevBoundary   bc(nN);
+         SparseMatrix  matA(nN,nN);
+         SparseMatrix  matQ(nN,nN);
+
+         std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > ids;
+         if(ibc == 21)
          {
-            sol = ((1 + x)*(1 - x)).pow(4);
-            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
-         } else if(bcId == 22)
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT));
+         } else if(ibc == 22)
          {
-            sol = ((1 + x)*(1 - x)).pow(4);
-            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
-         } else if(bcId == 23)
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT));
+         } else if(ibc == 23)
          {
-            sol = ((1 + x)*(1 - x)).pow(4);
-            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT));
+         }
+         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matQ = op.qDiff(2,0);
+
+         // Solve
+         Matrix sol;
+         rhs = matQ*rhs;
+         this->solveProblem(sol, rhs, matA);
+
+         // Test solution
+         for(int j = 0; j < exactSol.cols(); ++j)
+         {
+            for(int i = 0; i < exactSol.rows(); ++i)
+            {
+               MHDFloat eta = std::max(1.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+            }
          }
       }
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Dirichlet boundary conditions 
-    *
-    * @param SparseLinearSolverTest    Test fixture ID
-    * @param HarmonicDirichlet1D Test ID
-    */
-   TEST_F(SparseLinearSolverTest, HarmonicDirichlet1D)
-   {
-      int nN = this->mMaxN + 1;
-      Array param(1);
-      param(0) = 5;
-
-      // Setup problem
-      Matrix exactSol;
-      Matrix rhs;
-      this->setupProblem(exactSol, rhs, param, 21, &internal::setSolution1);
-
-      // Create matrix
-      Spectral::ChebyshevOperator   op(nN);
-      SparseMatrix  matA(nN,nN);
-
-      // Solve
-      Matrix sol;
-      this->solveProblem(sol, rhs, matA);
-
-      // Test solution
-      for(int i = 0; i < nN; ++i)
-      {
-         MHDFloat eta = std::max(1.0, std::abs(exactSol(i)));
-         EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
-      }
-
-   }
-
-   /**
-    * @brief Cartesian 1D \f$\nabla^2 x = b\f$ with Neumann boundary conditions 
-    *
-    * @param SparseLinearSolverTest    Test fixture ID
-    * @param HarmonicNeumann1D   Test ID
-    */
-   TEST_F(SparseLinearSolverTest, HarmonicNeumann1D)
-   {
-      ASSERT_TRUE(false);
-   }
-
-   /**
-    * @brief  Cartesian 1D \f$\nabla^4 x = b\f$ with Dirichlet boundary conditions
+    * @brief  Cartesian 1D \f[\nabla^4 x = b\f] with QI approach
     *
     * @param SparseLinearSolverTest       Test fixture ID
     * @param BiHarmonicDirichlet1D  Test ID
     */
-   TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet1D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicQI1D)
    {
-      ASSERT_TRUE(false);
+      // Loop over boundary condition ids
+      for(int ibc = 42; ibc <= 43; ++ibc)
+      {
+         int nN = this->mMaxN + 1;
+         Array param(1);
+         param(0) = 5;
+         ArrayI bcId(1);
+         bcId(0) = ibc;
+
+         // Setup problem
+         Matrix exactSol;
+         Matrix rhs;
+         this->setupProblem(exactSol, rhs, param, bcId, &internal::setSolution1DB);
+
+         // Create matrix
+         Spectral::ChebyshevOperator   op(nN);
+         Spectral::ChebyshevBoundary   bc(nN);
+         SparseMatrix  matA(nN,nN);
+         SparseMatrix  matQ(nN,nN);
+
+         std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > ids;
+         if(ibc == 42)
+         {
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT));
+         } else if(ibc == 43)
+         {
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT));
+         }
+         matA = Spectral::PeriodicOperator::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matQ = op.qDiff(4,0);
+
+         // Solve
+         Matrix sol;
+         rhs = matQ*rhs;
+         this->solveProblem(sol, rhs, matA);
+
+         // Test solution
+         for(int j = 0; j < exactSol.cols(); ++j)
+         {
+            for(int i = 0; i < exactSol.rows(); ++i)
+            {
+               MHDFloat eta = std::max(1.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+            }
+         }
+      }
    }
 
    /**
-    * @brief Cartesian 1D \f$\nabla^4 x = b\f$ with Neumann boundary conditions 
+    * @brief Cartesian 1D coupled system \f{eqnarray*}D_x u + v & = & b_1\\ -u + D_x v & = & b_2\f} with QI approach
     *
     * @param SparseLinearSolverTest    Test fixture ID
-    * @param BiHarmonicNeumann1D Test ID
+    * @param HarmonicDirichlet2D       Test ID
     */
-   TEST_F(SparseLinearSolverTest, BiHarmonicNeumann1D)
+   TEST_F(SparseLinearSolverTest, CoupledDQI1D)
    {
       ASSERT_TRUE(false);
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Dirichlet/Dirichlet boundary conditions 
+    * @brief Cartesian 1D coupled system \f{eqnarray*}\nabla^2 u + v & = & b_1\\ -u + \nabla^2 v & = & b_2\f} with QI approach
     *
     * @param SparseLinearSolverTest    Test fixture ID
-    * @param HarmonicDirichlet2D Test ID
+    * @param HarmonicDirichlet2D       Test ID
     */
-   TEST_F(SparseLinearSolverTest, HarmonicDirichlet2D)
+   TEST_F(SparseLinearSolverTest, CoupledLaplacianQI1D)
    {
       ASSERT_TRUE(false);
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with Neumann/Neumann boundary conditions 
+    * @brief Cartesian 1D coupled system \f{eqnarray*}\nabla^4 u + v & = & b_1\\ -u + \nabla^2 v & = & b_2\f} with QI approach
     *
     * @param SparseLinearSolverTest    Test fixture ID
-    * @param HarmonicNeumann2D   Test ID
+    * @param HarmonicDirichlet2D       Test ID
     */
-   TEST_F(SparseLinearSolverTest, HarmonicNeumann2D)
+   TEST_F(SparseLinearSolverTest, CoupledMixedLaplacianQI1D)
    {
       ASSERT_TRUE(false);
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^2 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions
+    * @brief Cartesian 2D \f[\nabla_x^2 \otimes\nabla_y^2 x = b\f] with QI approach 
     *
     * @param SparseLinearSolverTest Test fixture ID
-    * @param HarmonicMixed2D  Test ID
+    * @param HarmonicDirichlet2D    Test ID
     */
-   TEST_F(SparseLinearSolverTest, HarmonicMixed2D)
+   TEST_F(SparseLinearSolverTest, HarmonicQI2D)
    {
       ASSERT_TRUE(false);
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Dirichlet/Dirichlet boundary conditions 
+    * @brief Cartesian 2D \f[\nabla_x^4 \otimes\nabla_y^4 x = b\f] with QI approach 
     *
-    * @param SparseLinearSolverTest       Test fixture ID
+    * @param SparseLinearSolverTest Test fixture ID
     * @param BiHarmonicDirichlet2D  Test ID
     */
-   TEST_F(SparseLinearSolverTest, BiHarmonicDirichlet2D)
+   TEST_F(SparseLinearSolverTest, BiHarmonicQI2D)
    {
       ASSERT_TRUE(false);
    }
 
    /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with Neumann/Neumann boundary conditions 
+    * @brief Cartesian 2D \f[\nabla_x^4 \otimes\nabla_y^2 x = b\f] with QI approach 
     *
-    * @param SparseLinearSolverTest    Test fixture ID
-    * @param BiHarmonicNeumann2D Test ID
-    */
-   TEST_F(SparseLinearSolverTest, BiHarmonicNeumann2D)
-   {
-      ASSERT_TRUE(false);
-   }
-
-   /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^4 x = b\f$ with mixed Dirichlet/Neumann boundary conditions 
-    *
-    * @param SparseLinearSolverTest    Test fixture ID
-    * @param BiHarmonicMixed2D   Test ID
-    */
-   TEST_F(SparseLinearSolverTest, BiHarmonicMixed2D)
-   {
-      ASSERT_TRUE(false);
-   }
-
-   /**
-    * @brief Cartesian 2D \f$\nabla_x^4 \otimes\nabla_y^2 x = b\f$ with mixed Dirichlet/Neumann boundary conditions 
-    *
-    * @param SparseLinearSolverTest       Test fixture ID
+    * @param SparseLinearSolverTest Test fixture ID
     * @param MixedHarmonicMixed2D   Test ID
     */
-   TEST_F(SparseLinearSolverTest, MixedHarmonicMixed2D)
+   TEST_F(SparseLinearSolverTest, MixedHarmonicQI2D)
    {
       ASSERT_TRUE(false);
+   }
+
+   namespace internal 
+   {
+      void setSolution1DA(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         MHDFloat k = param(0);
+
+         if(bcId(0) == 21)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         } else if(bcId(0) == 22)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         } else if(bcId(0) == 23)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = -(-1 + x.pow(2)).pow(2)*(8 - 56*x.pow(2) + k*k*(-1 + x.pow(2)).pow(2));
+         }
+      }
+
+      void setSolution1DB(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         MHDFloat k = param(0);
+
+         if(bcId(0) == 42)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = std::pow(k,4)*(-1 + x.pow(2)).pow(4)-16*k*k*(-1 + x.pow(2)).pow(2)*(-1 + 7.*x.pow(2)) + 48.*(3. - 30.*x.pow(2) + 35.*x.pow(4));
+         } else if(bcId(0) == 43)
+         {
+            sol = ((1 + x)*(1 - x)).pow(4);
+            rhs = std::pow(k,4)*(-1 + x.pow(2)).pow(4)-16.*k*k*(-1 + x.pow(2)).pow(2)*(-1 + 7.*x.pow(2)) + 48.*(3. - 30.*x.pow(2) + 35.*x.pow(4));
+         }
+      }
+
+      void setSolution1DC(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         sol.resize(2*x.size(), 1);
+         rhs.resize(2*x.size(), 1);
+
+         if(bcId(0) == 1 && bcId(1) == -1)
+         {
+            sol.topRows(x.size()) = (1 - x).pow(8);
+            sol.bottomRows(x.size()) = (1 + x).pow(8);
+            rhs.topRows(x.size()) = 8.*(-1 + x).pow(7) + (1 + x).pow(8);
+            rhs.bottomRows(x.size()) = -(-1 + x).pow(8) + 8.*(1 + x).pow(7);
+         } else if(bcId(0) == 2 && bcId(1) == -2)
+         {
+            sol.topRows(x.size()) = (1 - x).pow(8);
+            sol.bottomRows(x.size()) = (1 + x).pow(8);
+            rhs.topRows(x.size()) = 8.*(-1 + x).pow(7) + (1 + x).pow(8);
+            rhs.bottomRows(x.size()) = -(-1 + x).pow(8) + 8.*(1 + x).pow(7);
+         } else if(bcId(0) == 3 && bcId(1) == -3)
+         {
+            sol.topRows(x.size()) = (1 - x).pow(8);
+            sol.bottomRows(x.size()) = (1 + x).pow(8);
+            rhs.topRows(x.size()) = 8.*(-1 + x).pow(7) + (1 + x).pow(8);
+            rhs.bottomRows(x.size()) = -(-1 + x).pow(8) + 8.*(1 + x).pow(7);
+         }
+      }
+
+      void setSolution1DD(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         sol.resize(2*x.size(), 1);
+         rhs.resize(2*x.size(), 1);
+
+         if(bcId(0) == 1 && bcId(1) == -1)
+         {
+            sol.topRows(x.size()) = (1-x).pow(8) + (1+x).pow(8);
+            sol.bottomRows(x.size()) = (1-x).pow(8) - (1+x).pow(8);
+            rhs.topRows(x.size()) = 32.*x*(3+7.*x.pow(2)*(2+x.pow(2)));
+            rhs.bottomRows(x.size()) = -2.*(9+196.*x.pow(2)+350.*x.pow(4)+84.*x.pow(6)+x.pow(8));
+         } else if(bcId(0) == 2 && bcId(1) == -2)
+         {
+            sol.topRows(x.size()) = (1-x).pow(8);
+            sol.bottomRows(x.size()) = (1+x).pow(8);
+            rhs.topRows(x.size()) = 8.*(-1+x).pow(7)+(1+x).pow(8);
+            rhs.bottomRows(x.size()) = -(-1+x).pow(8)+8.*(1+x).pow(7);
+         } else if(bcId(0) == 3 && bcId(1) == -3)
+         {
+            sol.topRows(x.size()) = (1-x).pow(8);
+            sol.bottomRows(x.size()) = (1+x).pow(8);
+            rhs.topRows(x.size()) = 8.*(-1+x).pow(7)+(1+x).pow(8);
+            rhs.bottomRows(x.size()) = -(-1+x).pow(8)+8.*(1+x).pow(7);
+         }
+      }
+
+      void setSolution1DE(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         MHDFloat k = param(0);
+         sol.resize(2*x.size(), 1);
+         rhs.resize(2*x.size(), 1);
+
+         if(bcId(0) == 21 && bcId(1) == 21)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = -(-1+x.pow(2)).pow(2)*(9-58.*x.pow(2)+x.pow(4)+k*k*(-1+x.pow(2)).pow(2));
+         } else if(bcId(0) == 21 && bcId(1) == 22)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = -(-1+x.pow(2)).pow(2)*(9-58.*x.pow(2)+x.pow(4)+k*k*(-1+x.pow(2)).pow(2));
+         } else if(bcId(0) == 22 && bcId(1) == 22)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = -(-1+x.pow(2)).pow(2)*(9-58.*x.pow(2)+x.pow(4)+k*k*(-1+x.pow(2)).pow(2));
+         }
+      }
+
+      void setSolution1DF(Matrix& sol, Matrix& rhs, const CoeffArray& x, const Array& param, const ArrayI& bcId)
+      {
+         MHDFloat k = param(0);
+
+         if(bcId(0) == 21 && bcId(1) == 42)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = 143 - 1436.*x.pow(2) + 1674.*x.pow(4) + 4.*x.pow(6) - x.pow(8) + std::pow(k,4)*(-1+x.pow(2)).pow(4) - 16.*k*k*(-1+x.pow(2)).pow(2)*(-1+7.*x.pow(2));
+         } else if(bcId(0) == 21 && bcId(1) == 43)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = 143 - 1436.*x.pow(2) + 1674.*x.pow(4) + 4.*x.pow(6) - x.pow(8) + std::pow(k,4)*(-1+x.pow(2)).pow(4) - 16.*k*k*(-1+x.pow(2)).pow(2)*(-1+7.*x.pow(2));
+         } else if(bcId(0) == 22 && bcId(1) == 42)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = 143 - 1436.*x.pow(2) + 1674.*x.pow(4) + 4.*x.pow(6) - x.pow(8) + std::pow(k,4)*(-1+x.pow(2)).pow(4) - 16.*k*k*(-1+x.pow(2)).pow(2)*(-1+7.*x.pow(2));
+         } else if(bcId(0) == 22 && bcId(1) == 43)
+         {
+            sol.topRows(x.size()) = (1-x.pow(2)).pow(4);
+            sol.bottomRows(x.size()) = (1-x.pow(2)).pow(4);
+            rhs.topRows(x.size()) = -(-1+x.pow(2)).pow(2)*(7+k*k*(-1+x.pow(2)).pow(2)-x.pow(2)*(54+x.pow(2)));
+            rhs.bottomRows(x.size()) = 143 - 1436.*x.pow(2) + 1674.*x.pow(4) + 4.*x.pow(6) - x.pow(8) + std::pow(k,4)*(-1+x.pow(2)).pow(4) - 16.*k*k*(-1+x.pow(2)).pow(2)*(-1+7.*x.pow(2));
+         }
+      }
    }
 
 }

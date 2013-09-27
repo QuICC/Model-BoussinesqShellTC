@@ -9,6 +9,10 @@ set(MHDTestSources
    FastTransforms/FftSetup.cpp
    SpectralOperators/IOperator.cpp
    SpectralOperators/ChebyshevOperator.cpp
+   SpectralOperators/IBoundary.cpp
+   SpectralOperators/ChebyshevBoundary.cpp
+   SpectralOperators/BoundaryConditions.cpp
+   SpectralOperators/PeriodicOperator.cpp
 )
 
 # Add FFTW backend files
