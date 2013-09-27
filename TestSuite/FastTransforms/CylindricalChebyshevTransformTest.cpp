@@ -54,15 +54,10 @@ namespace TestSuite {
           * @brief Acceptable absolute error
           */
          double mError;
-         
-         /**
-          * @brief Acceptable relative error
-          */
-         double mRelError;
    };
 
    CylindricalChebyshevTransformTest::CylindricalChebyshevTransformTest()
-      : mMaxN(512), mHowmany(100), mError(1e-10), mRelError(1e-10)
+      : mMaxN(512), mHowmany(100), mError(1e-10)
    {
    }
 

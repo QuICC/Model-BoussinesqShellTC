@@ -54,15 +54,10 @@ namespace TestSuite {
           * @brief Acceptable absolute error
           */
          double mError;
-         
-         /**
-          * @brief Acceptable relative error
-          */
-         double mRelError;
    };
 
    FftTransformTest::FftTransformTest()
-      : mMaxN(511), mHowmany(100), mError(1e-10), mRelError(1e-10)
+      : mMaxN(511), mHowmany(100), mError(1e-10)
    {
    }
 

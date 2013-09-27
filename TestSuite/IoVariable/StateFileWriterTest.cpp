@@ -9,7 +9,7 @@
 #include "Framework/FrameworkMacro.h"
 #include "IoVariable/StateFileWriter.hpp"
 #include "LoadSplitter/LoadSplitter.hpp"
-#include "SpatialSchemes/3D/TFTScheme.hpp"
+#include "TypeSelectors/SpatialSchemeSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,15 +35,41 @@ namespace TestSuite {
          /**
           * @brief Do Set-up work before each test
           */
-         //virtual void SetUp() {};
+         virtual void SetUp();
 
          /**
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+
+         /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+
+         /**
+          * @brief Maximum order in 1D
+          */
+         int mMax1D;
+
+         /**
+          * @brief Maximum order in 2D
+          */
+         int mMax2D;
+
+         /**
+          * @brief Maximum order in 3D
+          */
+         int mMax3D;
+         
+         /**
+          * @brief Shared resolution 
+          */
+         SharedResolution mspRes;
    };
 
    StateFileWriterTest::StateFileWriterTest()
+      : mError(1e-10), mMax1D(13), mMax2D(15), mMax3D(17)
    {
    }
 
@@ -51,9 +77,27 @@ namespace TestSuite {
    {
    }
 
-//   void StateFileWriterTest::SetUp()
-//   {
-//   }
+   void StateFileWriterTest::SetUp()
+   {
+      // Create load splitter
+      Parallel::LoadSplitter   splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
+
+      // Create test resolution
+      ArrayI dims(3);
+      dims(0) = this->mMax1D; dims(1) = this->mMax2D; dims(2) = this->mMax3D;
+
+      // Initialise the load splitter with spatial scheme
+      splitter.init<Schemes::SpatialType>(dims);
+
+      // Get best splitting
+      std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
+
+      // Get resolution
+      this->mspRes = best.first;
+
+      // Set additional options on final resolution object
+      Schemes::SpatialType::tuneResolution(this->mspRes);
+   }
 
 //   void StateFileWriterTest::TearDown()
 //   {
@@ -62,48 +106,30 @@ namespace TestSuite {
    /**
     * @brief Test default constructor
     */
-   TEST_F(StateFileWriterTest, TFTState)
+   TEST_F(StateFileWriterTest, WriteState)
    {
-      // Synchronize over CPUs
-      FrameworkMacro::synchronize();
-
-      // Set type string
-      std::string type = TFTScheme::type();
-      bool isRegular = TFTScheme::isRegular();
-
-      // Set spectral and physical dimensions
-      ArrayI dim(3); dim(0) = 11; dim(1) = 13; dim(2) = 12;
-     
-      // Create the load splitter
-      Parallel::LoadSplitter splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
-
-      // Initialise the load splitter
-      splitter.init<TFTScheme>(dim);
-
-      // Get best splitting resolution object
-      std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
-
-      // Store the shared resolution object
-      SharedResolution spRes = best.first;
-
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); ++i)
+            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); ++i)
             {
-               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                spScalar->rDom(0).rPerturbation().setPoint(MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)),i,j,k);
             }
          }
       }
+
+      // Set type string
+      std::string type = Schemes::SpatialType::type();
+      bool isRegular = Schemes::SpatialType::isRegular();
 
       // Create state file
       IoVariable::StateFileWriter   state(type, isRegular);

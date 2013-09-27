@@ -62,6 +62,11 @@ namespace TestSuite {
          //virtual void TearDown() {};
          
          /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+         
+         /**
           * @brief Spectral size of transform
           */
          int mMaxN;
@@ -70,20 +75,10 @@ namespace TestSuite {
           * @brief How many identical transforms to compute
           */
          int mHowmany;
-         
-         /**
-          * @brief Acceptable absolute error
-          */
-         double mError;
-         
-         /**
-          * @brief Acceptable relative error
-          */
-         double mRelError;
    };
 
    SparseLinearSolverTest::SparseLinearSolverTest()
-      : mMaxN(63), mHowmany(1), mError(1e-12), mRelError(1e-12)
+      : mError(1e-12), mMaxN(63), mHowmany(1)
    {
    }
 

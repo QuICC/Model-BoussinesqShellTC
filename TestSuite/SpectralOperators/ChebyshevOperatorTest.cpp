@@ -43,6 +43,11 @@ namespace TestSuite {
          //virtual void TearDown() {};
          
          /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
+         
+         /**
           * @brief Spectral size of transform
           */
          int mMaxN;
@@ -51,20 +56,10 @@ namespace TestSuite {
           * @brief How many identical transforms to compute
           */
          int mHowmany;
-         
-         /**
-          * @brief Acceptable absolute error
-          */
-         double mError;
-         
-         /**
-          * @brief Acceptable relative error
-          */
-         double mRelError;
    };
 
    ChebyshevOperatorTest::ChebyshevOperatorTest()
-      : mMaxN(31), mHowmany(10), mError(1e-10), mRelError(1e-10)
+      : mError(1e-10), mMaxN(31), mHowmany(10)
    {
    }
 

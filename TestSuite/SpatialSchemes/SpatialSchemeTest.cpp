@@ -98,11 +98,6 @@ namespace TestSuite {
           * @brief Acceptable absolute error
           */
          double mError;
-         
-         /**
-          * @brief Acceptable relative error
-          */
-         double mRelError;
 
          /**
           * @brief Number of accumulation loops
@@ -126,8 +121,8 @@ namespace TestSuite {
    };
 
    SpatialSchemeTest::SpatialSchemeTest()
-      //: mError(1e-12), mRelError(1e-12), mNAccumul(10), mMax1D(63), mMax2D(57), mMax3D(64)
-      : mError(1e-10), mRelError(1e-10), mNAccumul(10), mMax1D(13), mMax2D(15), mMax3D(17)
+      //: mError(1e-12), mNAccumul(10), mMax1D(63), mMax2D(57), mMax3D(64)
+      : mError(1e-10), mNAccumul(10), mMax1D(13), mMax2D(15), mMax3D(17)
    {
    }
 

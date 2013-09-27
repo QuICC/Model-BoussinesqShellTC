@@ -11,6 +11,9 @@ set(MHDTestSources
    Resolutions/CoreResolution.cpp
    Resolutions/SimulationResolution.cpp
    Resolutions/TransformResolution.cpp
+   Resolutions/TransformSetup.cpp
+   Resolutions/Tools/IndexCounter.cpp
+   Resolutions/Tools/RegularIndexCounter.cpp
    LoadSplitter/LoadSplitter.cpp
    LoadSplitter/Algorithms/SplittingTools.cpp
    LoadSplitter/Algorithms/SplittingDescription.cpp
@@ -23,9 +26,6 @@ set(MHDTestSources
    SpatialSchemes/3D/TFTScheme.cpp
    SpatialSchemes/3D/TFFScheme.cpp
    SpatialSchemes/3D/FFFScheme.cpp
-   Resolutions/TransformSetup.cpp
-   Resolutions/Tools/IndexCounter.cpp
-   Resolutions/Tools/RegularIndexCounter.cpp
    FastTransforms/FftSetup.cpp
    FastTransforms/FftwTools.cpp
    FastTransforms/FftwLibrary.cpp
