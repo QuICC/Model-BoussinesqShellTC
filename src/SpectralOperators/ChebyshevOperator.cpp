@@ -18,6 +18,7 @@
 // Project includes
 //
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Spectral {
@@ -123,7 +124,10 @@ namespace Spectral {
          return this->id(p);
       } else
       {
-         return this->id(p) * invMat;
+         /// \mhdBug This computation currently requires an ugly expression.
+         std::cerr << " !!!!! Using DANGEROUS expression for D^{-"<< p << "} D^{" << q << "} !!!!!" << std::endl;
+
+         return this->id(p) * invMat - this->id(p)*invMat*invMat*this->id(this->basisN()-p)*this->diff(q,q)*this->id(this->basisN()-q);
       }
    }
 

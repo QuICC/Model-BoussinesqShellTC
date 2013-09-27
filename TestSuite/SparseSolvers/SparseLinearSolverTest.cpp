@@ -83,7 +83,7 @@ namespace TestSuite {
    };
 
    SparseLinearSolverTest::SparseLinearSolverTest()
-      : mMaxN(31), mHowmany(1), mError(1e-10), mRelError(1e-10)
+      : mMaxN(63), mHowmany(1), mError(1e-12), mRelError(1e-12)
    {
    }
 
@@ -98,6 +98,52 @@ namespace TestSuite {
 //   void SparseLinearSolverTest::TearDown()
 //   {
 //   }
+
+   void SparseLinearSolverTest::solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA)
+   {
+      // Create solver
+      SparseSolverSelector<SparseMatrix>::SolverType   solver;
+
+      solver.compute(matA);
+
+      sol.resize(rhs.rows(),1);
+      sol.setConstant(-4242);
+      sol = solver.solve(rhs);
+   }
+
+   void SparseLinearSolverTest::setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const ArrayI& bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const ArrayI&))
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
+
+      // Create ChebyshevFftwTransform
+      Transform::ChebyshevFftwTransform fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   physSol = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   physRhs = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      sol.resize(spSetup->specSize(), spSetup->howmany());
+      rhs.resize(spSetup->specSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      Array x = fft.meshGrid();
+
+      (*pSolFct)(physSol, physRhs, x, param, bcId);
+
+      fft.integrate<Arithmetics::SET>(tmpSpec, physSol, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      sol = tmpSpec.topRows(spSetup->specSize());
+      fft.integrate<Arithmetics::SET>(tmpSpec, physRhs, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+      rhs = tmpSpec.topRows(spSetup->specSize());
+   }
 
    /**
     * @brief Small and simple real problem taken from Pardiso example 
@@ -224,52 +270,6 @@ namespace TestSuite {
       }
    }
 
-   void SparseLinearSolverTest::solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA)
-   {
-      // Create solver
-      SparseSolverSelector<SparseMatrix>::SolverType   solver;
-
-      solver.compute(matA);
-
-      sol.resize(rhs.rows(),1);
-      sol.setConstant(-4242);
-      sol = solver.solve(rhs);
-   }
-
-   void SparseLinearSolverTest::setupProblem(Matrix& sol, Matrix& rhs, const Array& param, const ArrayI& bcId, void (*pSolFct)(Matrix&, Matrix&, const CoeffArray&, const Array&, const ArrayI&))
-   {
-      // Set spectral and physical sizes
-      int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
-
-      // Create setup
-      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
-
-      // Create ChebyshevFftwTransform
-      Transform::ChebyshevFftwTransform fft;
-
-      // Initialise fft
-      fft.init(spSetup);
-
-      // Create test data storage
-      Matrix   physSol = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
-      Matrix   physRhs = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
-      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
-
-      sol.resize(spSetup->specSize(), spSetup->howmany());
-      rhs.resize(spSetup->specSize(), spSetup->howmany());
-
-      // Get chebyshev grid
-      Array x = fft.meshGrid();
-
-      (*pSolFct)(physSol, physRhs, x, param, bcId);
-
-      fft.integrate<Arithmetics::SET>(tmpSpec, physSol, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
-      sol = tmpSpec.topRows(spSetup->specSize());
-      fft.integrate<Arithmetics::SET>(tmpSpec, physRhs, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
-      rhs = tmpSpec.topRows(spSetup->specSize());
-   }
-
    /**
     * @brief Cartesian 1D \f[\nabla^2 x = b\f] with QI approach
     *
@@ -282,6 +282,7 @@ namespace TestSuite {
       for(int ibc = 21; ibc <= 23; ++ibc)
       {
          int nN = this->mMaxN + 1;
+         int minN = 9;
          Array param(1);
          param(0) = 5;
          ArrayI bcId(1);
@@ -289,8 +290,9 @@ namespace TestSuite {
 
          // Setup problem
          Matrix exactSol;
+         Matrix exactRhs;
          Matrix rhs;
-         this->setupProblem(exactSol, rhs, param, bcId, &internal::setSolution1DA);
+         this->setupProblem(exactSol, exactRhs, param, bcId, &internal::setSolution1DA);
 
          // Create matrix
          Spectral::ChebyshevOperator   op(nN);
@@ -315,9 +317,9 @@ namespace TestSuite {
          matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
          matQ = op.qDiff(2,0);
 
-         // Solve
+         // Solve problem
          Matrix sol;
-         rhs = matQ*rhs;
+         rhs = matQ*exactRhs;
          this->solveProblem(sol, rhs, matA);
 
          // Test solution
@@ -325,8 +327,26 @@ namespace TestSuite {
          {
             for(int i = 0; i < exactSol.rows(); ++i)
             {
-               MHDFloat eta = std::max(1.0, std::abs(exactSol(i,j)));
+               MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
                EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+            }
+         }
+
+         // Test minimal resolution
+         op = Spectral::ChebyshevOperator(minN);
+         bc = Spectral::ChebyshevBoundary(minN);
+         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matQ = op.qDiff(2,0);
+         rhs = matQ*exactRhs.block(0,0,minN, exactRhs.cols());
+         this->solveProblem(sol, rhs, matA);
+
+         // Test solution
+         for(int j = 0; j < sol.cols(); ++j)
+         {
+            for(int i = 0; i < sol.rows(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError);
             }
          }
       }
@@ -344,6 +364,7 @@ namespace TestSuite {
       for(int ibc = 42; ibc <= 43; ++ibc)
       {
          int nN = this->mMaxN + 1;
+         int minN = 9;
          Array param(1);
          param(0) = 5;
          ArrayI bcId(1);
@@ -351,8 +372,9 @@ namespace TestSuite {
 
          // Setup problem
          Matrix exactSol;
+         Matrix exactRhs;
          Matrix rhs;
-         this->setupProblem(exactSol, rhs, param, bcId, &internal::setSolution1DB);
+         this->setupProblem(exactSol, exactRhs, param, bcId, &internal::setSolution1DB);
 
          // Create matrix
          Spectral::ChebyshevOperator   op(nN);
@@ -379,7 +401,7 @@ namespace TestSuite {
 
          // Solve
          Matrix sol;
-         rhs = matQ*rhs;
+         rhs = matQ*exactRhs;
          this->solveProblem(sol, rhs, matA);
 
          // Test solution
@@ -387,8 +409,26 @@ namespace TestSuite {
          {
             for(int i = 0; i < exactSol.rows(); ++i)
             {
-               MHDFloat eta = std::max(1.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+               MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError);
+            }
+         }
+
+         // Test minimal resolution
+         op = Spectral::ChebyshevOperator(minN);
+         bc = Spectral::ChebyshevBoundary(minN);
+         matA = Spectral::PeriodicOperator::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matQ = op.qDiff(4,0);
+         rhs = matQ*exactRhs.block(0,0,minN, exactRhs.cols());
+         this->solveProblem(sol, rhs, matA);
+
+         // Test solution
+         for(int j = 0; j < sol.cols(); ++j)
+         {
+            for(int i = 0; i < sol.rows(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError);
             }
          }
       }
