@@ -40,8 +40,8 @@ namespace GeoMHDiSCC {
       // Storage for the ordered dimensions
       ArrayI oDims(dims.size());
 
-      // Spectral space ordering is 1D, 3D, 2D
-      if(spaceId == Dimensions::Space::SPECTRAL)
+      // Spectral and transform space ordering is 1D, 3D, 2D
+      if(spaceId == Dimensions::Space::SPECTRAL || spaceId == Dimensions::Space::TRANSFORM)
       {
          oDims(0) = dims(0);
          for(int i = 1; i < dims.size(); ++i)
@@ -72,7 +72,7 @@ namespace GeoMHDiSCC {
       Dimensions::Simulation::Id simId;
 
       // Select transform dimension depending on dimension space
-      if(spaceId == Dimensions::Space::SPECTRAL)
+      if(spaceId == Dimensions::Space::SPECTRAL || spaceId == Dimensions::Space::TRANSFORM)
       {
          transId = Dimensions::Transform::TRA1D;
          simId = Dimensions::Simulation::SIM2D;

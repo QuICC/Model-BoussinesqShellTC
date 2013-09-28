@@ -160,7 +160,7 @@ namespace IoVariable {
 
       // Select transform dimension depending on dimension space
       Dimensions::Transform::Id  transId;
-      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL || this->mSpaceId == Dimensions::Space::TRANSFORM)
       {
          transId = Dimensions::Transform::TRA1D;
       } else
@@ -195,6 +195,23 @@ namespace IoVariable {
 
          // Write truncation value to file
          this->writeScalar(subGroup, oss.str(), this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),Dimensions::Space::SPECTRAL)-1);
+
+         oss.str("");
+      }
+      
+      // close group
+      H5Gclose(subGroup);
+
+      // Create the transform truncation subgroup
+      subGroup = H5Gcreate(base, VariableHdf5Tags::TRUNCTRANSFORM.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      // Write transform resolution information
+      for(int i = 0; i < this->mspRes->cpu()->nDim(); i++)
+      {
+         oss << VariableHdf5Tags::TRUNCDIM << i+1 << "D";
+
+         // Write truncation value to file
+         this->writeScalar(subGroup, oss.str(), this->mspRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(i),Dimensions::Space::TRANSFORM)-1);
 
          oss.str("");
       }

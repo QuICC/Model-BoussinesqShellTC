@@ -43,24 +43,19 @@ namespace TestSuite {
          //virtual void TearDown() {};
 
          /**
-          * @brief Acceptable absolute error
-          */
-         double mError;
-
-         /**
           * @brief Maximum order in 1D
           */
-         int mMax1D;
+         int mFile1D;
 
          /**
           * @brief Maximum order in 2D
           */
-         int mMax2D;
+         int mFile2D;
 
          /**
           * @brief Maximum order in 3D
           */
-         int mMax3D;
+         int mFile3D;
          
          /**
           * @brief Shared resolution 
@@ -69,7 +64,7 @@ namespace TestSuite {
    };
 
    StateFileWriterTest::StateFileWriterTest()
-      : mError(1e-10), mMax1D(13), mMax2D(15), mMax3D(17)
+      : mFile1D(13), mFile2D(15), mFile3D(17)
    {
    }
 
@@ -84,7 +79,7 @@ namespace TestSuite {
 
       // Create test resolution
       ArrayI dims(3);
-      dims(0) = this->mMax1D; dims(1) = this->mMax2D; dims(2) = this->mMax3D;
+      dims(0) = this->mFile1D; dims(1) = this->mFile2D; dims(2) = this->mFile3D;
 
       // Initialise the load splitter with spatial scheme
       splitter.init<Schemes::SpatialType>(dims);
@@ -119,7 +114,7 @@ namespace TestSuite {
          for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
             j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); ++i)
+            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM); ++i)
             {
                i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                spScalar->rDom(0).rPerturbation().setPoint(MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)),i,j,k);

@@ -112,7 +112,7 @@ namespace IoHdf5 {
           *
           * \tparam T type of the scalar
           */
-         template <typename T> void readScalar(hid_t loc, const std::string dsname, T& val);
+         template <typename T> void readScalar(hid_t loc, const std::string dsname, T& val) const;
 
          /**
           * @brief Read Array dataset
@@ -125,7 +125,7 @@ namespace IoHdf5 {
           *
           * \tparam T type of the scalars
           */
-         template <typename T> void readArray(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, 1>& arr);
+         template <typename T> void readArray(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, 1>& arr) const;
 
          /**
           * @brief Read Matrix dataset
@@ -138,7 +138,7 @@ namespace IoHdf5 {
           *
           * \tparam T type of the scalars
           */
-         template <typename T> void readMatrix(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat);
+         template <typename T> void readMatrix(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat) const;
 
          /**
           * @brief Read an irregular field vector dataset
@@ -165,7 +165,7 @@ namespace IoHdf5 {
       private:
    };
 
-   template <typename T> void IHdf5Reader::readScalar(hid_t loc, const std::string dsname, T& val)
+   template <typename T> void IHdf5Reader::readScalar(hid_t loc, const std::string dsname, T& val) const
    {
       // Open dataset
       hid_t dataset = H5Dopen(loc, dsname.c_str(), H5P_DEFAULT);
@@ -177,7 +177,7 @@ namespace IoHdf5 {
       H5Dclose(dataset);
    }
 
-   template <typename T> void IHdf5Reader::readArray(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, 1>& arr)
+   template <typename T> void IHdf5Reader::readArray(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, 1>& arr) const
    {
       // Set data type correctly
       hid_t type = Hdf5Types::type<T>();
@@ -223,7 +223,7 @@ namespace IoHdf5 {
       H5Dclose(dataset);
    }
 
-   template <typename T> void IHdf5Reader::readMatrix(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat)
+   template <typename T> void IHdf5Reader::readMatrix(hid_t loc, const std::string dsname, Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat) const
    {
       // Set data type correctly
       hid_t type = Hdf5Types::type<T>();

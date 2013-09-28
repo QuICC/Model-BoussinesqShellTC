@@ -21,9 +21,18 @@ namespace TestSuite {
    class StateFileReaderTest : public ::testing::Test {
       public:
          /**
-          * @brief Setup the shared resolution
+          * @brief Create shared resolution
           */
-         void setupResolution(const int dim1D, const int dim2D, const int dim3D);
+         SharedResolution createResolution(const int dim1D, const int dim2D, const int dim3D);
+
+         /**
+          * @brief Create resolution ratio compared to file resolution
+          *
+          * @param ratio1D First dimension ratio
+          * @param ratio2D Second dimension ratio
+          * @param ratio3D Third dimension ratio
+          */
+         ArrayI resolutionRatio(const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D);
 
       protected:
          /**
@@ -39,7 +48,7 @@ namespace TestSuite {
          /**
           * @brief Do Set-up work before each test
           */
-         //virtual void SetUp() {};
+         virtual void SetUp();
 
          /**
           * @brief Do tear-down work after each test
@@ -47,33 +56,12 @@ namespace TestSuite {
          //virtual void TearDown() {};
 
          /**
-          * @brief Acceptable absolute error
+          * @brief Shared file resolution
           */
-         double mError;
-
-         /**
-          * @brief Maximum order in 1D
-          */
-         int mMax1D;
-
-         /**
-          * @brief Maximum order in 2D
-          */
-         int mMax2D;
-
-         /**
-          * @brief Maximum order in 3D
-          */
-         int mMax3D;
-         
-         /**
-          * @brief Shared resolution 
-          */
-         SharedResolution mspRes;
+         SharedSimulationResolution mspFileRes;
    };
 
    StateFileReaderTest::StateFileReaderTest()
-      : mError(1e-10), mMax1D(13), mMax2D(15), mMax3D(17)
    {
    }
 
@@ -81,15 +69,45 @@ namespace TestSuite {
    {
    }
 
-//   void StateFileReaderTest::SetUp()
-//   {
-//   }
+   void StateFileReaderTest::SetUp()
+   {
+      // Synchronize over CPUs
+      FrameworkMacro::synchronize();
+
+      SharedResolution spRes = this->createResolution(10, 10, 10);
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
+
+      // Set type string
+      std::string type = Schemes::SpatialType::type();
+      bool isRegular = Schemes::SpatialType::isRegular();
+
+      // Create state file
+      IoVariable::StateFileReader   state("0000", type, isRegular);
+      state.expect(PhysicalNames::TEMPERATURE);
+      state.addScalar(std::make_pair(PhysicalNames::TEMPERATURE, spScalar));
+
+      // Initialise state file
+      state.init();
+      this->mspFileRes = state.getFileTruncation();
+      state.finalize();
+   }
 
 //   void StateFileReaderTest::TearDown()
 //   {
 //   }
 
-   void StateFileReaderTest::setupResolution(const int dim1D, const int dim2D, const int dim3D)
+   ArrayI StateFileReaderTest::resolutionRatio(const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D)
+   {
+      // Create test resolution
+      ArrayI dims(3);
+      dims(0) = ratio1D*(this->mspFileRes->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL)-1);
+      dims(1) = ratio2D*(this->mspFileRes->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL)-1);
+      dims(2) = ratio3D*(this->mspFileRes->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::SPECTRAL)-1);
+
+      return dims;
+   }
+
+   SharedResolution StateFileReaderTest::createResolution(const int dim1D, const int dim2D, const int dim3D)
    {
       // Create load splitter
       Parallel::LoadSplitter   splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
@@ -105,10 +123,12 @@ namespace TestSuite {
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
 
       // Get resolution
-      this->mspRes = best.first;
+      SharedResolution spRes = best.first;
 
       // Set additional options on final resolution object
-      Schemes::SpatialType::tuneResolution(this->mspRes);
+      Schemes::SpatialType::tuneResolution(spRes);
+
+      return spRes;
    }
 
    /**
@@ -119,10 +139,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(this->mMax1D, this->mMax2D, this->mMax3D);
+      ArrayI dims = this->resolutionRatio(1.0, 1.0, 1.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -152,15 +173,15 @@ namespace TestSuite {
 
       // Chect test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
@@ -178,10 +199,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(2*this->mMax1D/3, this->mMax2D, this->mMax3D);
+      ArrayI dims = this->resolutionRatio(2.0/3.0, 1.0, 1.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -211,15 +233,15 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
@@ -237,10 +259,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(this->mMax1D, 2*this->mMax2D/3, this->mMax3D);
+      ArrayI dims = this->resolutionRatio(1.0, 2.0/3.0, 1.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -270,15 +293,15 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
@@ -296,10 +319,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(this->mMax1D, this->mMax2D, 2*this->mMax3D/3);
+      ArrayI dims = this->resolutionRatio(1.0, 1.0, 2.0/3.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -329,15 +353,15 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
                EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
             }
          }
@@ -355,10 +379,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(3*this->mMax1D/2, this->mMax2D, this->mMax3D);
+      ArrayI dims = this->resolutionRatio(3.0/2.0, 1.0, 1.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -388,16 +413,16 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
-               if( i_ < 12)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( i_ < this->mspFileRes->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM))
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else
@@ -420,10 +445,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(this->mMax1D, 3*this->mMax2D/2, this->mMax3D);
+      ArrayI dims = this->resolutionRatio(1.0, 3.0/2.0, 1.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -453,16 +479,16 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
-               if( k_ < 14)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( k_ < this->mspFileRes->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::TRANSFORM))
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else
@@ -485,10 +511,11 @@ namespace TestSuite {
       // Synchronize over CPUs
       FrameworkMacro::synchronize();
 
-      this->setupResolution(this->mMax1D, this->mMax2D, 3*this->mMax3D/2);
+      ArrayI dims = this->resolutionRatio(1.0, 1.0, 3.0/2.0);
+      SharedResolution spRes = this->createResolution(dims(0), dims(1), dims(2));
 
       // Create scalar variable
-      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(this->mspRes));
+      Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
       std::string type = Schemes::SpatialType::type();
@@ -518,16 +545,16 @@ namespace TestSuite {
 
       // Create test data
       int i_, j_, k_;
-      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-         for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+         k_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
-            j_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::SPECTRAL); ++i)
+            j_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+            for(int i = 0; i < spRes->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::TRANSFORM); ++i)
             {
-               i_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
-               if( j_ < 13)
+               i_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATB1D>(i,k);
+               if( j_ < this->mspFileRes->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::TRANSFORM))
                {
                   EXPECT_EQ(spScalar->dom(0).perturbation().point(i,j,k), MHDComplex(static_cast<MHDFloat>(-k_),static_cast<MHDFloat>(i_)*0.01+static_cast<MHDFloat>(j_)));
                } else

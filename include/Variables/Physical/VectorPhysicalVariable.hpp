@@ -84,6 +84,16 @@ namespace Datatypes {
           */
          void initPhysicalDiff();
 
+         /**
+          * @brief Check if variable has physical data setup
+          */
+         bool hasPhys() const;
+
+         /**
+          * @brief Check if variable has curl data setup
+          */
+         bool hasCurl() const;
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
@@ -104,6 +114,16 @@ namespace Datatypes {
           */
          SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspCurl;
    };
+
+   template <typename TScalar, int COMPONENTS> inline bool VectorPhysicalVariable<TScalar,COMPONENTS>::hasPhys() const
+   {
+      return this->mspPhys;
+   }
+
+   template <typename TScalar, int COMPONENTS> inline bool VectorPhysicalVariable<TScalar,COMPONENTS>::hasCurl() const
+   {
+      return this->mspCurl;
+   }
 
    template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::phys() const
    {

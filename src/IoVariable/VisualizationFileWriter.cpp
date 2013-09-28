@@ -63,9 +63,15 @@ namespace IoVariable {
       VisualizationFileWriter::scalar_iterator sit;
       for(sit = sRange.first; sit != sRange.second; ++sit)
       {
-         this->writePhysicalScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->dom(0).phys());
+         if(sit->second->dom(0).hasPhys())
+         {
+            this->writePhysicalScalar(IoTools::IdToHuman::toTag(sit->first), sit->second->dom(0).phys());
+         }
 
-         this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad", sit->second->dom(0).grad().data());
+         if(sit->second->dom(0).hasGrad())
+         {
+            this->writePhysicalVector(IoTools::IdToHuman::toTag(sit->first)+"_grad", sit->second->dom(0).grad().data());
+         }
 
       }
 
@@ -74,7 +80,15 @@ namespace IoVariable {
       VisualizationFileWriter::vector_iterator vit;
       for(vit = vRange.first; vit != vRange.second; ++vit)
       {
-         this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).phys().data());
+         if(vit->second->dom(0).hasPhys())
+         {
+            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).phys().data());
+         }
+
+         if(vit->second->dom(0).hasCurl())
+         {
+            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).curl().data());
+         }
       }
 
       // Close file

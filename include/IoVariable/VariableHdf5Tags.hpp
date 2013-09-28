@@ -38,6 +38,11 @@ namespace IoVariable {
          static const std::string   TRUNCPHYSICAL;
 
          /**
+          * @brief Transform truncation group tag name
+          */
+         static const std::string   TRUNCTRANSFORM;
+
+         /**
           * @brief Spectral truncation group tag name
           */
          static const std::string   TRUNCSPECTRAL;

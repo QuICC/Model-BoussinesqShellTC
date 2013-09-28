@@ -40,6 +40,18 @@ set(MHDTestSources
    Variables/VariableRequirement.cpp
    Variables/FieldRequirement.cpp
    Variables/RequirementTools.cpp
+   SpectralOperators/IOperator.cpp
+   SpectralOperators/IBoundary.cpp
+   SpectralOperators/BoundaryConditions.cpp
+   SpectralOperators/ChebyshevBoundary.cpp
+   SpectralOperators/ChebyshevOperator.cpp
+   Simulation/SimulationBoundary.cpp
+   Equations/CouplingInformation.cpp
+   Equations/EquationData.cpp
+   Equations/EquationParameters.cpp
+   Equations/IEquation.cpp
+   Equations/IScalarEquation.cpp
+   Equations/IVectorEquation.cpp
    Debug/SerialDebugger.cpp
    Timers/ITimer.cpp
    Timers/SerialTimer.cpp
@@ -47,9 +59,9 @@ set(MHDTestSources
 
 function(geomhdiscc_append_test condition srcs)
    if(${condition} STREQUAL "TTT")
-      # set(${srcs}
+       set(${srcs}
       #   Equations/Tools/EquationNoEigenTools.cpp
-      #    PARENT_SCOPE)
+          PARENT_SCOPE)
    endif(${condition} STREQUAL "TTT")
    if(${condition} STREQUAL "TFT")
       set(${srcs}
@@ -62,9 +74,9 @@ function(geomhdiscc_append_test condition srcs)
          PARENT_SCOPE)
    endif(${condition} STREQUAL "TFF")
    if(${condition} STREQUAL "FFF")
-      #set(${srcs}
+      set(${srcs}
       #   Equations/Tools/Equation3DEigenTools.cpp
-      #   PARENT_SCOPE)
+         PARENT_SCOPE)
    endif(${condition} STREQUAL "FFF")
 endfunction(geomhdiscc_append_test condition srcs)
 

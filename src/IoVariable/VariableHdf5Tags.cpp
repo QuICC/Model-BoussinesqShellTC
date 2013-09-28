@@ -25,6 +25,8 @@ namespace IoVariable {
 
    const std::string VariableHdf5Tags::TRUNCPHYSICAL = "physical";
 
+   const std::string VariableHdf5Tags::TRUNCTRANSFORM = "transform";
+
    const std::string VariableHdf5Tags::TRUNCSPECTRAL = "spectral";
 
    const std::string VariableHdf5Tags::TRUNCDIM = "dim";

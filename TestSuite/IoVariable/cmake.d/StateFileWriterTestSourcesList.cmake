@@ -60,9 +60,9 @@ set(MHDTestSources
 
 function(geomhdiscc_append_test condition srcs)
    if(${condition} STREQUAL "TTT")
-      # set(${srcs}
+       set(${srcs}
       #   Equations/Tools/EquationNoEigenTools.cpp
-      #    PARENT_SCOPE)
+          PARENT_SCOPE)
    endif(${condition} STREQUAL "TTT")
    if(${condition} STREQUAL "TFT")
       set(${srcs}
@@ -75,9 +75,9 @@ function(geomhdiscc_append_test condition srcs)
          PARENT_SCOPE)
    endif(${condition} STREQUAL "TFF")
    if(${condition} STREQUAL "FFF")
-      #set(${srcs}
+      set(${srcs}
       #   Equations/Tools/Equation3DEigenTools.cpp
-      #   PARENT_SCOPE)
+         PARENT_SCOPE)
    endif(${condition} STREQUAL "FFF")
 endfunction(geomhdiscc_append_test condition srcs)
 

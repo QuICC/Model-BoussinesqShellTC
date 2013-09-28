@@ -84,6 +84,16 @@ namespace Datatypes {
           */
          void initPhysicalDiff();
 
+         /**
+          * @brief Check if variable has physical data setup
+          */
+         bool hasPhys() const;
+
+         /**
+          * @brief Check if variable has gradient data setup
+          */
+         bool hasGrad() const;
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
@@ -104,6 +114,16 @@ namespace Datatypes {
           */
          SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspGrad;
    };
+
+   template <typename TScalar, int COMPONENTS> inline bool ScalarPhysicalVariable<TScalar,COMPONENTS>::hasPhys() const
+   {
+      return this->mspPhys;
+   }
+
+   template <typename TScalar, int COMPONENTS> inline bool ScalarPhysicalVariable<TScalar,COMPONENTS>::hasGrad() const
+   {
+      return this->mspGrad;
+   }
 
    template <typename TScalar, int COMPONENTS> inline const TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::phys() const
    {

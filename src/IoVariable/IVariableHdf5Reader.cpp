@@ -201,7 +201,7 @@ namespace IoVariable {
       #endif // GEOMHDISCC_MPI
    }
 
-   void IVariableHdf5Reader::readTruncation()
+   SharedSimulationResolution IVariableHdf5Reader::getFileTruncation() const
    {
       std::ostringstream   oss;
 
@@ -229,12 +229,33 @@ namespace IoVariable {
       // close group
       H5Gclose(subGroup);
 
+      // Open the transform truncation parameters group
+      subGroup = H5Gopen(base, VariableHdf5Tags::TRUNCTRANSFORM.c_str(), H5P_DEFAULT);
+
+      ArrayI trans(this->mspRes->cpu()->nDim());
+
+      // Read transform resolution information
+      for(int i = 0; i < this->mspRes->cpu()->nDim(); i++)
+      {
+         oss << VariableHdf5Tags::TRUNCDIM << i+1 << "D";
+
+         // Read dimension from file
+         this->readScalar(subGroup, oss.str(), trans(i));
+
+         oss.str("");
+      }
+      // Increment by one to get size
+      trans.array() += 1;
+
+      // close group
+      H5Gclose(subGroup);
+
       // Open the physical truncation parameters group
       subGroup = H5Gopen(base, VariableHdf5Tags::TRUNCPHYSICAL.c_str(), H5P_DEFAULT);
 
       ArrayI phys(this->mspRes->cpu()->nDim());
 
-      // Read spectral resolution information
+      // Read physical resolution information
       for(int i = 0; i < this->mspRes->cpu()->nDim(); i++)
       {
          oss << VariableHdf5Tags::TRUNCDIM << i+1 << "D";
@@ -253,7 +274,12 @@ namespace IoVariable {
       // close group
       H5Gclose(base);
 
-      this->mspFileRes = SharedSimulationResolution(new SimulationResolution(phys,spec));
+      return SharedSimulationResolution(new SimulationResolution(phys,spec,trans));
+   }
+
+   void IVariableHdf5Reader::readTruncation()
+   {
+      this->mspFileRes = this->getFileTruncation();
    }
 
    void IVariableHdf5Reader::checkTruncation()

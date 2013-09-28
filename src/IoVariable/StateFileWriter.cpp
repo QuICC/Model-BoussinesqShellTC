@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    StateFileWriter::StateFileWriter(std::string type, const bool isRegular)
-      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, isRegular)
+      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::TRANSFORM, isRegular)
    {
    }
 
@@ -82,6 +82,7 @@ namespace IoVariable {
 
       // Storage for the field information
       std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
+
 
       // Check for data regularity
       if(this->mIsRegular)

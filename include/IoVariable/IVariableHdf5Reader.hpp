@@ -78,6 +78,11 @@ namespace IoVariable {
           * @brief Write State to file
           */
          virtual void read() = 0;
+
+         /**
+          * @brief Get file truncation information
+          */
+         SharedSimulationResolution getFileTruncation() const;
          
       protected:
          /// Typedef for the scalar const iterator
