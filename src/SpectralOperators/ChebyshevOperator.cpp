@@ -171,13 +171,17 @@ namespace Spectral {
 
       // Fill sparse matrix
       int lastRow = std::min(mat.cols()-2,mat.cols() - nBC);
+      MHDFloat dj;
+      MHDFloat di;
       for(int j = 2; j < mat.cols(); ++j)
       {
+         dj = static_cast<MHDFloat>(j);
          // Create column j
          mat.startVec(j);
          for(int i = j%2; i < std::min(j,lastRow); i+=2)
          {
-            mat.insertBack(i,j) = static_cast<MHDFloat>(j*(j*j-i*i))*this->c_1(i);
+            di = static_cast<MHDFloat>(i);
+            mat.insertBack(i,j) = dj*(dj*dj-di*di)*this->c_1(i);
          }
       }
       mat.finalize(); 
@@ -223,27 +227,30 @@ namespace Spectral {
       mat.reserve(3);
 
       // Fill sparse matrix
+      MHDFloat dj;
       for(int j = 0; j < mat.cols()-2; ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          // Create column j
          mat.startVec(j);
 
          // Create super diagonal entry for j-2
          if(j > 3)
          {
-            mat.insertBack(j-2,j) = (1.0/static_cast<MHDFloat>(4*(j-2)*(j-1)));
+            mat.insertBack(j-2,j) = (1.0/(4.0*(dj-2.0)*(dj-1.0)));
          }
 
          // Create diagonal entry
          if(j > 1)
          {
-            mat.insertBack(j,j) = (-1.0/static_cast<MHDFloat>(2*(j*j-1)));
+            mat.insertBack(j,j) = (-1.0/(2.0*(dj*dj-1.0)));
          }
 
          // Create sub diagonal entry for j+2
          if(j < mat.rows()-2)
          {
-            mat.insertBack(j+2,j) = (this->c(j)/static_cast<MHDFloat>(4*(j+2)*(j+1)));
+            mat.insertBack(j+2,j) = (this->c(j)/(4.0*(dj+2.0)*(dj+1.0)));
          }
       }
       mat.finalize(); 
@@ -255,33 +262,36 @@ namespace Spectral {
       mat.reserve(4);
 
       // Fill sparse matrix
+      MHDFloat dj;
       for(int j = 0; j < mat.cols()-3; ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          // Create column j
          mat.startVec(j);
 
          // Create super diagonal entry for j-3
          if(j > 5)
          {
-            mat.insertBack(j-3,j) = (-1.0/static_cast<MHDFloat>(8*(j-3)*(j-2)*(j-1)));
+            mat.insertBack(j-3,j) = (-1.0/(8.0*(dj-3.0)*(dj-2.0)*(dj-1.0)));
          }
 
          // Create super diagonal entry for j-1
          if(j > 4)
          {
-            mat.insertBack(j-1,j) = (3.0/static_cast<MHDFloat>(8*(j-2)*(j-1)*(j+1)));
+            mat.insertBack(j-1,j) = (3.0/(8.0*(dj-2.0)*(dj-1.0)*(dj+1.0)));
          }
 
          // Create sub diagonal entry for j+1
          if(j < mat.rows()-3)
          {
-            mat.insertBack(j+1,j) = (-3.0/static_cast<MHDFloat>(8*(j-1)*(j+1)*(j+2)));
+            mat.insertBack(j+1,j) = (-3.0/(8.0*(dj-1.0)*(dj+1.0)*(dj+2.0)));
          }
 
          // Create sub diagonal entry for j+3
          if(j < mat.rows()-3)
          {
-            mat.insertBack(j+3,j) = (this->c(j)/static_cast<MHDFloat>(8*(j+1)*(j+2)*(j+3)));
+            mat.insertBack(j+3,j) = (this->c(j)/(8.0*(dj+1.0)*(dj+2.0)*(dj+3.0)));
          }
       }
       mat.finalize(); 
@@ -293,39 +303,42 @@ namespace Spectral {
       mat.reserve(5);
 
       // Fill sparse matrix
+      MHDFloat dj;
       for(int j = 0; j < mat.cols()-4; ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          // Create column j
          mat.startVec(j);
 
          // Create super diagonal entry for j-4
          if(j > 7)
          {
-            mat.insertBack(j-4,j) = (1.0/static_cast<MHDFloat>(16*(j-4)*(j-3)*(j-2)*(j-1)));
+            mat.insertBack(j-4,j) = (1.0/(16.0*(dj-4.0)*(dj-3.0)*(dj-2.0)*(dj-1.0)));
          }
 
          // Create super diagonal entry for j-2
          if(j > 5)
          {
-            mat.insertBack(j-2,j) = (-1.0/static_cast<MHDFloat>(4*(j-3)*(j-2)*(j-1)*(j+1)));
+            mat.insertBack(j-2,j) = (-1.0/(4.0*(dj-3.0)*(dj-2.0)*(dj-1.0)*(dj+1.0)));
          }
 
          // Create diagonal entry
          if(j > 3)
          {
-            mat.insertBack(j,j) = (3.0/static_cast<MHDFloat>(8*(j-2)*(j-1)*(j+1)*(j+2)));
+            mat.insertBack(j,j) = (3.0/(8.0*(dj-2.0)*(dj-1.0)*(dj+1.0)*(dj+2.0)));
          }
 
          // Create sub diagonal entry for j+2
          if(j > 1 && j < mat.rows()-4)
          {
-            mat.insertBack(j+2,j) = (-1.0/static_cast<MHDFloat>(4*(j-1)*(j+1)*(j+2)*(j+3)));
+            mat.insertBack(j+2,j) = (-1.0/(4.0*(dj-1.0)*(dj+1.0)*(dj+2.0)*(dj+3.0)));
          }
 
          // Create sub diagonal entry for j+4
          if(j < mat.rows()-4)
          {
-            mat.insertBack(j+4,j) = (this->c(j)/static_cast<MHDFloat>(16*(j+1)*(j+2)*(j+3)*(j+4)));
+            mat.insertBack(j+4,j) = (this->c(j)/(16.0*(dj+1.0)*(dj+2.0)*(dj+3.0)*(dj+4.0)));
          }
       }
       mat.finalize(); 
@@ -417,20 +430,23 @@ namespace Spectral {
       }
 
       // Fill in correction to Q1
+      MHDFloat dj;
       for(int j = mat.cols()-1; j < mat.cols(); ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          mat.startVec(j);
 
          // Create super diagonal entry
          if(j > 3)
          {
-            mat.insertBack(j-3,j) = (-static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-2)*(j-3)));
+            mat.insertBack(j-3,j) = (-dj/(2.0*(dj-2.0)*(dj-3.0)));
          }
 
          // Create diagonal entry
          if(j > 1)
          {
-            mat.insertBack(j-1,j) = (static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-2)*(j-1)));
+            mat.insertBack(j-1,j) = (dj/(2.0*(dj-2.0)*(dj-1.0)));
          }
       }
       mat.finalize(); 
@@ -442,47 +458,52 @@ namespace Spectral {
       mat.reserve(3);
 
       // Fill Q2 matrix
+      MHDFloat dj;
       for(int j = 0; j < mat.cols()-2; ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          // Create column j
          mat.startVec(j);
 
          // Create super diagonal entry for j-2
          if(j > 5)
          {
-            mat.insertBack(j-2,j) = (1.0/static_cast<MHDFloat>(4*(j-2)*(j-1)));
+            mat.insertBack(j-2,j) = (1.0/(4.0*(dj-2.0)*(dj-1.0)));
          }
 
          // Create diagonal entry
          if(j > 3)
          {
-            mat.insertBack(j,j) = (-1.0/static_cast<MHDFloat>(2*(j*j-1)));
+            mat.insertBack(j,j) = (-1.0/(2.0*(dj*dj-1.0)));
          }
 
          // Create sub diagonal entry for j+2
          if(j > 1 && j < mat.rows()-2)
          {
-            mat.insertBack(j+2,j) = (this->c(j)/static_cast<MHDFloat>(4*(j+2)*(j+1)));
+            mat.insertBack(j+2,j) = (this->c(j)/(4.0*(dj+2.0)*(dj+1.0)));
          }
       }
 
       // Fill in correction to Q2
       for(int j = mat.cols()-2; j < mat.cols(); ++j)
       {
+         dj = static_cast<MHDFloat>(j);
+
          // Create column j
          mat.startVec(j);
 
          // (Super diagonal at +4 for col (N-2))
-         mat.insertBack(j-6,j) = (-static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(4*(j-6)*(j-5)*(j-4)*(j-3)));
+         mat.insertBack(j-6,j) = (-(dj*(dj-1.0))/(4.0*(dj-6.0)*(dj-5.0)*(dj-4.0)*(dj-3.0)));
 
          // (Diagonal for col (N-2)) + (super diagonal at +4 for col (N-1))
-         mat.insertBack(j-4,j) = (static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(2*(j-5)*(j-4)*(j-3)*(j-3)) + static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-4)*(j-3)*(j-3)));
+         mat.insertBack(j-4,j) = ((dj*(dj-1.0))/static_cast<MHDFloat>(2.0*(dj-5.0)*(dj-4.0)*(dj-3.0)*(dj-3.0)) + (dj)/(2.0*(dj-4.0)*(dj-3.0)*(dj-3.0)));
 
          // (Sub diagonal at - 2 for col (N-2)) + (diagonal for col (N-1))
-         mat.insertBack(j-2,j) = (-static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(4*(j-4)*(j-3)*(j-3)*(j-2)) - static_cast<MHDFloat>(j)/static_cast<MHDFloat>((j-3)*(j-1)*(j-3)));
+         mat.insertBack(j-2,j) = (-(dj*(dj-1.0))/static_cast<MHDFloat>(4.0*(dj-4.0)*(dj-3.0)*(dj-3.0)*(dj-2.0)) - (dj)/((dj-3.0)*(dj-1.0)*(dj-3.0)));
 
          // (Sub diagonal at - 2 for col (N-1))
-         mat.insertBack(j,j) = (1.0/static_cast<MHDFloat>(2*(j-1)*(j-3)));
+         mat.insertBack(j,j) = (1.0/(2.0*(dj-1.0)*(dj-3.0)));
       }
       mat.finalize(); 
    }
