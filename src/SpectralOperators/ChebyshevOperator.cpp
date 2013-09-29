@@ -500,7 +500,7 @@ namespace Spectral {
          mat.insertBack(j-4,j) = ((dj*(dj-1.0))/static_cast<MHDFloat>(2.0*(dj-5.0)*(dj-4.0)*(dj-3.0)*(dj-3.0)) + (dj)/(2.0*(dj-4.0)*(dj-3.0)*(dj-3.0)));
 
          // (Sub diagonal at - 2 for col (N-2)) + (diagonal for col (N-1))
-         mat.insertBack(j-2,j) = (-(dj*(dj-1.0))/static_cast<MHDFloat>(4.0*(dj-4.0)*(dj-3.0)*(dj-3.0)*(dj-2.0)) - (dj)/((dj-3.0)*(dj-1.0)*(dj-3.0)));
+         mat.insertBack(j-2,j) = (-(dj*(dj-1.0))/static_cast<MHDFloat>(4.0*(dj-4.0)*(dj-3.0)*(dj-3.0)*(dj-2.0)) - (dj)/((dj-3.0)*(dj-3.0)*(dj-1.0)));
 
          // (Sub diagonal at - 2 for col (N-1))
          mat.insertBack(j,j) = (1.0/(2.0*(dj-1.0)*(dj-3.0)));
