@@ -560,7 +560,7 @@ namespace TestSuite {
 
       // Get quasi-inverse of order 1
       Matrix qExact = spec.qDiff(2,1);
-      SparseMatrix tmp = spec.id(2)*spec.qDiff(2,0)*spec.diff(0,1);
+      SparseMatrix tmp = spec.id(2)*spec.qDiff(2,0)*spec.id(-2)*spec.diff(0,1);
       Matrix qProd = tmp;
 
       // Compare exact and product
@@ -595,9 +595,10 @@ namespace TestSuite {
       // Create Chebyshev spectral operator
       Spectral::ChebyshevOperator   spec(nN);
 
+
       // Get quasi-inverse of order 1
       Matrix qExact = spec.qDiff(4,2);
-      SparseMatrix tmp = spec.id(4)*spec.qDiff(4,0)*spec.diff(0,2);
+      SparseMatrix tmp = spec.id(4)*spec.qDiff(4,0)*spec.id(-4)*spec.diff(0,2);
       Matrix qProd = tmp;
 
       // Compare exact and product

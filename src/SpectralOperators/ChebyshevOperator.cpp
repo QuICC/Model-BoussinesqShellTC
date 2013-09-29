@@ -394,18 +394,97 @@ namespace Spectral {
 
    void ChebyshevOperator::buildQ2D1(SparseMatrix& mat) const
    {
-      this->buildQDProduct(mat, 2, 1);
-      
-      /// \mhdBug This computation currently requires an ugly expression.
-      std::cerr << " !!!!! Using DANGEROUS product to compute matrix" << std::endl;
+      // Reserve the expected number of nonzero elements
+      mat.reserve(2);
+
+      // Fill sparse matrix
+      for(int j = 0; j < mat.cols()-1; ++j)
+      {
+         // Create column j
+         mat.startVec(j);
+
+         // Create super diagonal entry for j-1
+         if(j > 2)
+         {
+            mat.insertBack(j-1,j) = (-1.0/static_cast<MHDFloat>(2*(j-1)));
+         }
+
+         // Create sub diagonal entry for j+1
+         if(j > 0 && j < mat.rows()-1)
+         {
+            mat.insertBack(j+1,j) = (1.0/static_cast<MHDFloat>(2*(j+1)))*this->c(j);
+         }
+      }
+
+      // Fill in correction to Q1
+      for(int j = mat.cols()-1; j < mat.cols(); ++j)
+      {
+         mat.startVec(j);
+
+         // Create super diagonal entry
+         if(j > 3)
+         {
+            mat.insertBack(j-3,j) = (-static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-2)*(j-3)));
+         }
+
+         // Create diagonal entry
+         if(j > 1)
+         {
+            mat.insertBack(j-1,j) = (static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-2)*(j-1)));
+         }
+      }
+      mat.finalize(); 
    }
 
    void ChebyshevOperator::buildQ4D2(SparseMatrix& mat) const
    {
-      this->buildQDProduct(mat, 4, 2);
-      
-      /// \mhdBug This computation currently requires an ugly expression.
-      std::cerr << " !!!!! Using DANGEROUS product to compute matrix" << std::endl;
+      // Reserve the expected number of nonzero elements
+      mat.reserve(3);
+
+      // Fill Q2 matrix
+      for(int j = 0; j < mat.cols()-2; ++j)
+      {
+         // Create column j
+         mat.startVec(j);
+
+         // Create super diagonal entry for j-2
+         if(j > 5)
+         {
+            mat.insertBack(j-2,j) = (1.0/static_cast<MHDFloat>(4*(j-2)*(j-1)));
+         }
+
+         // Create diagonal entry
+         if(j > 3)
+         {
+            mat.insertBack(j,j) = (-1.0/static_cast<MHDFloat>(2*(j*j-1)));
+         }
+
+         // Create sub diagonal entry for j+2
+         if(j > 1 && j < mat.rows()-2)
+         {
+            mat.insertBack(j+2,j) = (this->c(j)/static_cast<MHDFloat>(4*(j+2)*(j+1)));
+         }
+      }
+
+      // Fill in correction to Q2
+      for(int j = mat.cols()-2; j < mat.cols(); ++j)
+      {
+         // Create column j
+         mat.startVec(j);
+
+         // (Super diagonal at +4 for col (N-2))
+         mat.insertBack(j-6,j) = (-static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(4*(j-6)*(j-5)*(j-4)*(j-3)));
+
+         // (Diagonal for col (N-2)) + (super diagonal at +4 for col (N-1))
+         mat.insertBack(j-4,j) = (static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(2*(j-5)*(j-4)*(j-3)*(j-3)) + static_cast<MHDFloat>(j)/static_cast<MHDFloat>(2*(j-4)*(j-3)*(j-3)));
+
+         // (Sub diagonal at - 2 for col (N-2)) + (diagonal for col (N-1))
+         mat.insertBack(j-2,j) = (-static_cast<MHDFloat>(j*(j-1))/static_cast<MHDFloat>(4*(j-4)*(j-3)*(j-3)*(j-2)) - static_cast<MHDFloat>(j)/static_cast<MHDFloat>((j-3)*(j-1)*(j-3)));
+
+         // (Sub diagonal at - 2 for col (N-1))
+         mat.insertBack(j,j) = (1.0/static_cast<MHDFloat>(2*(j-1)*(j-3)));
+      }
+      mat.finalize(); 
    }
 
    void ChebyshevOperator::buildQDProduct(SparseMatrix& mat, const int p, const int q) const
