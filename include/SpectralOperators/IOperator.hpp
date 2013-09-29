@@ -54,7 +54,7 @@ namespace Spectral {
           *
           * @param p Order of the quasi identity
           */
-         virtual SparseMatrix id(const int p) const;
+         virtual SparseMatrix id(const int p = 0) const;
 
          /**
           * @brief Get the shifted (quasi) identity matrix of order p
@@ -82,17 +82,6 @@ namespace Spectral {
           * @param q    Order of the derivative
           */
          virtual SparseMatrix qDiff(const int p, const int q) const = 0;
-
-         /**
-          * @brief Convert tau lines into sparse matrix pair
-          *
-          * Any unused component (real, imaginary) will have a zero
-          * size if it is not required.
-          *
-          * @param lines   Tau lines. Matrices have zero size or the same
-          * @param atTop   Put tau lines at top of matrix?
-          */
-         DecoupledZSparse  tau(const DecoupledZMatrix& lines, const bool atTop) const;
          
       protected:
          /**

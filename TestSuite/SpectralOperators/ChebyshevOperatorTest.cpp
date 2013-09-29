@@ -76,9 +76,80 @@ namespace TestSuite {
 //   }
 
    /**
-    * @brief First derivative (fft transform loop)
+    * @brief Test the identity and pseudo identity
     */
-   TEST_F(ChebyshevOperatorTest, Diff1)
+   TEST_F(ChebyshevOperatorTest, Identity)
+   {
+      int nN = this->mMaxN + 1;
+      Spectral::ChebyshevOperator   spec(nN);
+
+      // Identity
+      SparseMatrix qId = spec.id();
+      for(int j = 0; j < nN; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            if(i==j)
+            {
+               EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
+            } else
+            {
+               EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
+            }
+         }
+      }
+
+      // Positive q
+      for(int q = 0; q < 5; ++q)
+      {
+         qId = spec.id(q);
+         for(int j = 0; j < nN; ++j)
+         {
+            for(int i = 0; i < nN; ++i)
+            {
+               if(i > q-1 && i==j)
+               {
+                  EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
+               } else
+               {
+                  EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
+               }
+            }
+         }
+      }
+
+      // Negative q
+      for(int q = -4; q < 0; ++q)
+      {
+         qId = spec.id(q);
+         for(int j = 0; j < nN; ++j)
+         {
+            for(int i = 0; i < nN; ++i)
+            {
+               if(i < (nN + q) && i==j)
+               {
+                  EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
+               } else
+               {
+                  EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Test the shifted identity
+    */
+   TEST_F(ChebyshevOperatorTest, ShiftedIdentity)
+   {
+      ASSERT_TRUE(false) << "Test is not implemented yet!";
+   }
+
+   /**
+    * @brief Test \f$D^{1}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, D1)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -161,9 +232,9 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Second derivative (fft transform loop)
+    * @brief Test \f$D^{2}\f$ operator
     */
-   TEST_F(ChebyshevOperatorTest, Diff2)
+   TEST_F(ChebyshevOperatorTest, D2)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -239,9 +310,9 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Fourth derivative operator (fft transform loop)
+    * @brief Test \f$D^{4}\f$ operator
     */
-   TEST_F(ChebyshevOperatorTest, Diff4)
+   TEST_F(ChebyshevOperatorTest, D4)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -317,19 +388,39 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test quasi inverse through product
+    * @brief Test \f$D^{-1}\f$ operator
     */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse)
+   TEST_F(ChebyshevOperatorTest, Q1)
    {
-      // Set size of the basis
-      int nN = this->mMaxN + 1;
+      ASSERT_TRUE(false) << "Test is not implemented yet!";
+   }
 
-      // Create Chebyshev spectral operator
+   /**
+    * @brief Test \f$D^{-2}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, Q2)
+   {
+      ASSERT_TRUE(false) << "Test is not implemented yet!";
+   }
+
+   /**
+    * @brief Test \f$D^{-4}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, Q4)
+   {
+      ASSERT_TRUE(false) << "Test is not implemented yet!";
+   }
+
+   /**
+    * @brief Test \f$D^{-1}D^{1}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, Q1D1)
+   {
+      int nN = this->mMaxN + 1;
       Spectral::ChebyshevOperator   spec(nN);
 
-      // Get quasi-inverse of order 1
-      SparseMatrix spqId = spec.qDiff(1,0)*spec.diff(0,1);
-      Matrix qId = spqId;
+      // Compute product explicitly
+      SparseMatrix qId = spec.qDiff(1,0)*spec.diff(0,1);
 
       // Check operator
       for(int j = 0; j < nN; ++j)
@@ -338,66 +429,16 @@ namespace TestSuite {
          {
             if(i > 0 && i == j)
             {
-               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId.coeff(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
+               EXPECT_NEAR(qId.coeff(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
 
-      // Get quasi-inverse of order 2
-      spqId = spec.qDiff(2,0)*spec.diff(0,2);
-      qId = spqId;
-
-      // Check operator
-      for(int j = 0; j < nN; ++j)
-      {
-         for(int i = 0; i < nN; ++i)
-         {
-            if(i > 1 && i == j)
-            {
-               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
-            } else
-            {
-               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
-            }
-         }
-      }
-
-      // Get quasi-inverse of order 4
-      spqId = spec.qDiff(4,0)*spec.diff(0,4);
-      qId = spqId;
-
-      // Check operator
-      for(int j = 0; j < nN; ++j)
-      {
-         for(int i = 0; i < nN; ++i)
-         {
-            if(i > 3 && i == j)
-            {
-               EXPECT_NEAR(qId(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
-            } else
-            {
-               EXPECT_NEAR(qId(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
-            }
-         }
-      }
-   }
-
-   /**
-    * @brief Test quasi inverse D^{-p}*D^{p} without product
-    */
-   TEST_F(ChebyshevOperatorTest, QuasiIdentity)
-   {
-      // Set size of the basis
-      int nN = this->mMaxN + 1;
-
-      // Create Chebyshev spectral operator
-      Spectral::ChebyshevOperator   spec(nN);
-
-      // Get quasi-inverse of order 1
-      Matrix qdiff = spec.qDiff(1,1);
+      // Get implicit product (no computation involved)
+      qId = spec.qDiff(1,1);
 
       // Check operator
       for(int j = 0; j < nN; ++j)
@@ -406,16 +447,43 @@ namespace TestSuite {
          {
             if(i > 0 && i==j)
             {
-               EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Test \f$D^{-2}D^{2}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, Q2D2)
+   {
+      int nN = this->mMaxN + 1;
+      Spectral::ChebyshevOperator   spec(nN);
+
+      // Compute product explicitly
+      SparseMatrix qId = spec.qDiff(2,0)*spec.diff(0,2);
+
+      // Check operator
+      for(int j = 0; j < nN; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            if(i > 1 && i == j)
+            {
+               EXPECT_NEAR(qId.coeff(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
+            } else
+            {
+               EXPECT_NEAR(qId.coeff(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
 
-      // Get quasi-inverse of order 2
-      qdiff = spec.qDiff(2,2);
+      // Get implicit product (no computation involved)
+      qId = spec.qDiff(2,2);
 
       // Check operator
       for(int j = 0; j < nN; ++j)
@@ -424,16 +492,44 @@ namespace TestSuite {
          {
             if(i > 1 && i==j)
             {
-               EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
+            }
+         }
+      }
+   }
+
+   /**
+    * @brief Test \f$D^{-4}D^{4}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, Q4D4)
+   {
+      // Set size of the basis
+      int nN = this->mMaxN + 1;
+      Spectral::ChebyshevOperator   spec(nN);
+
+      // Compute product explicitly
+      SparseMatrix qId = spec.qDiff(4,0)*spec.diff(0,4);
+
+      // Check operator
+      for(int j = 0; j < nN; ++j)
+      {
+         for(int i = 0; i < nN; ++i)
+         {
+            if(i > 3 && i == j)
+            {
+               EXPECT_NEAR(qId.coeff(i,j), 1.0, this->mError) << "i = " << i << " j = " << j;
+            } else
+            {
+               EXPECT_NEAR(qId.coeff(i,j), 0.0, this->mError) << "i = " << i << " j = " << j;
             }
          }
       }
 
-      // Get quasi-inverse of order 4
-      qdiff = spec.qDiff(4,4);
+      // Get implicit product (no computation involved)
+      qId = spec.qDiff(4,4);
 
       // Check operator
       for(int j = 0; j < nN; ++j)
@@ -442,19 +538,19 @@ namespace TestSuite {
          {
             if(i > 3 && i==j)
             {
-               EXPECT_EQ(qdiff(i,j), 1.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 1.0) << "i = " << i << " j = " << j;
             } else
             {
-               EXPECT_EQ(qdiff(i,j), 0.0) << "i = " << i << " j = " << j;
+               EXPECT_EQ(qId.coeff(i,j), 0.0) << "i = " << i << " j = " << j;
             }
          }
       }
    }
 
    /**
-    * @brief Test quasi inverse of order 2 on derivative of order 1
+    * @brief Test \f$D^{-2}D^{1}\f$ operator
     */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse21)
+   TEST_F(ChebyshevOperatorTest, Q2D1)
    {
       // Set size of the basis
       int nN = this->mMaxN + 1;
@@ -489,9 +585,9 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Test quasi inverse of order 4 on derivative of order 2
+    * @brief Test \f$D^{-4}D^{2}\f$ operator
     */
-   TEST_F(ChebyshevOperatorTest, QuasiInverse42)
+   TEST_F(ChebyshevOperatorTest, Q4D2)
    {
       // Set size of the basis
       int nN = this->mMaxN + 1;

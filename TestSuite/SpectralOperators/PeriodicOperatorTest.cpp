@@ -42,31 +42,19 @@ namespace TestSuite {
           * @brief Do tear-down work after each test
           */
          //virtual void TearDown() {};
+         
+         /**
+          * @brief Acceptable absolute error
+          */
+         double mError;
    };
 
    PeriodicOperatorTest::PeriodicOperatorTest()
    {
-      // Initilise framework
-      FrameworkMacro::init();
-
-      // Set nCpu for serial run
-      int nCpu = 1;
-
-      // Set ID and nCpu in MPI case
-      #ifdef GEOMHDISCC_MPI
-         // Get MPI size
-         int size;
-         MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-      #endif //GEOMHDISCC_MPI
-
-      // Setup framework
-      FrameworkMacro::setup(nCpu);
    }
 
    PeriodicOperatorTest::~PeriodicOperatorTest()
    {
-      // Finalise framework
-      FrameworkMacro::finalize();
    }
 
 //   void PeriodicOperatorTest::SetUp()
@@ -76,6 +64,35 @@ namespace TestSuite {
 //   void PeriodicOperatorTest::TearDown()
 //   {
 //   }
+
+   TEST_F(PeriodicOperatorTest, Laplacian2D)
+   TEST_F(PeriodicOperatorTest, Laplacian2D_F)
+   TEST_F(PeriodicOperatorTest, Laplacian2D_FF)
+   TEST_F(PeriodicOperatorTest, Bilaplacian2D)
+   TEST_F(PeriodicOperatorTest, Bilaplacian2D_F)
+   TEST_F(PeriodicOperatorTest, Bilaplacian2D_FF)
+   TEST_F(PeriodicOperatorTest, Laplacian3D)
+   TEST_F(PeriodicOperatorTest, Laplacian3D_F)
+   TEST_F(PeriodicOperatorTest, Laplacian3D_FF)
+   TEST_F(PeriodicOperatorTest, Laplacian3D_FFF)
+   TEST_F(PeriodicOperatorTest, Bilaplacian3D)
+   TEST_F(PeriodicOperatorTest, Bilaplacian3D_F)
+   TEST_F(PeriodicOperatorTest, Bilaplacian3D_FF)
+   TEST_F(PeriodicOperatorTest, Bilaplacian3D_FFF)
+   TEST_F(PeriodicOperatorTest, QLaplacian2D)
+   TEST_F(PeriodicOperatorTest, QLaplacian2D_F)
+   TEST_F(PeriodicOperatorTest, QLaplacian2D_FF)
+   TEST_F(PeriodicOperatorTest, QBilaplacian2D)
+   TEST_F(PeriodicOperatorTest, QBilaplacian2D_F)
+   TEST_F(PeriodicOperatorTest, QBilaplacian2D_FF)
+   TEST_F(PeriodicOperatorTest, QLaplacian3D)
+   TEST_F(PeriodicOperatorTest, QLaplacian3D_F)
+   TEST_F(PeriodicOperatorTest, QLaplacian3D_FF)
+   TEST_F(PeriodicOperatorTest, QLaplacian3D_FFF)
+   TEST_F(PeriodicOperatorTest, QBilaplacian3D)
+   TEST_F(PeriodicOperatorTest, QBilaplacian3D_F)
+   TEST_F(PeriodicOperatorTest, QBilaplacian3D_FF)
+   TEST_F(PeriodicOperatorTest, QBilaplacian3D_FFF)
 
    /**
     * @brief Test default constructor
@@ -247,6 +264,26 @@ namespace TestSuite {
 
 /// Main to execute all test from test case
 int main(int argc, char **argv) {
+   // Initilise framework
+   GeoMHDiSCC::FrameworkMacro::init();
+
+   // Set nCpu for serial run
+   int nCpu = 1;
+
+   // Set ID and nCpu in MPI case
+   #ifdef GEOMHDISCC_MPI
+      // Get MPI size
+      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
+   #endif //GEOMHDISCC_MPI
+
+   // Setup framework
+   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
+
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   int status = RUN_ALL_TESTS();
+
+   // Finalise framework
+   GeoMHDiSCC::FrameworkMacro::finalize();
+
+   return status;
 }
