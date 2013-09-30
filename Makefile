@@ -17,6 +17,7 @@ all:
 	@echo "#############################################################"
 	@echo "#   This Makefile only generates the code documentations.   #"
 	@echo "#    - Use 'make doc' to generate the documentation.        #"
+	@echo "#    - Use 'make clean' to delete the documentation.        #"
 	@echo "#    - Use CMake to generate the real Makefiles.            #"
 	@echo "#############################################################"
 	@echo "#############################################################"
