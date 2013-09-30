@@ -15,6 +15,7 @@
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/FftSelector.hpp"
+#include "SpectralOperators/GalerkinChebyshev.hpp"
 
 namespace GeoMHDiSCC {
 

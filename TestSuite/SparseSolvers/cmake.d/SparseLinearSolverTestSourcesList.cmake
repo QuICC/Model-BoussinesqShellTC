@@ -13,6 +13,7 @@ set(MHDTestSources
    SpectralOperators/ChebyshevBoundary.cpp
    SpectralOperators/BoundaryConditions.cpp
    SpectralOperators/PeriodicOperator.cpp
+   SpectralOperators/GalerkinChebyshev.cpp
 )
 
 # Add FFTW backend files

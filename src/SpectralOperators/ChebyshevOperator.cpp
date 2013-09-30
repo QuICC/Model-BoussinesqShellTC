@@ -149,7 +149,7 @@ namespace Spectral {
       assert(nBC >= 0);
 
       // Reserve the expected number of nonzero elements
-      mat.reserve(2*mat.cols()-1);
+      mat.reserve(mat.cols()*mat.cols()/4);
 
       // Fill sparse matrix
       int lastRow = std::min(mat.cols()-1,mat.cols() - nBC);
@@ -170,7 +170,7 @@ namespace Spectral {
       assert(nBC >= 0);
 
       // Reserve the expected number of nonzero elements
-      mat.reserve(2*mat.cols()-1);
+      mat.reserve(mat.cols()*mat.cols()/4);
 
       // Fill sparse matrix
       int lastRow = std::min(mat.cols()-2,mat.cols() - nBC);
@@ -195,7 +195,7 @@ namespace Spectral {
 //      assert(nBC >= 0);
 //
 //      // Reserve the expected number of nonzero elements
-//      mat.reserve(2*mat.cols()-1);
+//      mat.reserve(mat.cols()*mat.cols()/4);
 //
 //      // Fill sparse matrix
 //      int lastRow = std::min(mat.cols()-3,mat.cols() - nBC);
@@ -230,7 +230,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ1(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(2);
+      mat.reserve(2*mat.cols());
 
       // Fill sparse matrix
       for(int j = 0; j < mat.cols()-1; ++j)
@@ -256,7 +256,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ2(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(3);
+      mat.reserve(3*mat.cols());
 
       // Fill sparse matrix
       MHDFloat dj;
@@ -291,7 +291,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ3(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(4);
+      mat.reserve(4*mat.cols());
 
       // Fill sparse matrix
       MHDFloat dj;
@@ -332,7 +332,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ4(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(5);
+      mat.reserve(5*mat.cols());
 
       // Fill sparse matrix
       MHDFloat dj;
@@ -440,7 +440,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ2D1(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(2);
+      mat.reserve(2*mat.cols() + 2);
 
       // Fill sparse matrix
       for(int j = 0; j < mat.cols()-1; ++j)
@@ -487,7 +487,7 @@ namespace Spectral {
    void ChebyshevOperator::buildQ4D2(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
-      mat.reserve(3);
+      mat.reserve(3*mat.cols() + 8);
 
       // Fill Q2 matrix
       MHDFloat dj;
