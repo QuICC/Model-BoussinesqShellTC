@@ -53,6 +53,24 @@ namespace Spectral {
           * @param nEq  Number of equations (only independent of BC for coupled systems)
           */
          static SparseMatrix constrain(const SparseMatrix& mat, const GalerkinCondition::Id bcId, const int nEq);
+
+         /**
+          * @brief Extend Galerkin basis coefficients to tau expansion 
+          *
+          * @param spec Matrix of spectral coefficients
+          * @param bcId ID for the boundary condition to impose
+          * @param nEq  Number of equations (only independent of BC for coupled systems)
+          */
+         static Matrix extend(const Matrix& spec, const GalerkinCondition::Id bcId, const int nEq);
+
+         /**
+          * @brief Restrict tau coefficients to galerkin size 
+          *
+          * @param spec Matrix of spectral coefficients
+          * @param bcId ID for the boundary condition to impose
+          * @param nEq  Number of equations (only independent of BC for coupled systems)
+          */
+         static Matrix restrict(const Matrix& spec, const GalerkinCondition::Id bcId, const int nEq);
          
       protected:
          /**
@@ -146,6 +164,20 @@ namespace Spectral {
           * @param cols Number of columns
           */
          static void zeroD1D2(SparseMatrix& rStencil, const int cols);
+
+         /**
+          * @brief C factor for Chebyshev polynomials
+          *
+          * @param n Order of polynial
+          */
+         static MHDFloat c(const int n);
+
+         /**
+          * @brief 1/C factor for Chebyshev polynomials (to avoid 1/0 problems)
+          *
+          * @param n Order of polynial
+          */
+         static MHDFloat c_1(const int n);
 
       private:
          /**

@@ -73,6 +73,13 @@ namespace Spectral {
          MHDFloat c(const int n) const;
 
          /**
+          * @brief 1/C factor
+          *
+          * @param n Order of polynial
+          */
+         MHDFloat c_1(const int n) const;
+
+         /**
           * @brief Get array of unit values for left boundary
           */
          Array leftUnit() const;

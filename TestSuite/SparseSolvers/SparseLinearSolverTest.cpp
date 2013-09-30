@@ -313,10 +313,28 @@ namespace TestSuite {
          matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
          matQ = op.qDiff(2,0);
 
+         rhs = matQ*exactRhs;
+         SparseMatrix matB;
+         Matrix rhsB;
+         if(ibc == 21)
+         {
+            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_VALUE, 2);
+            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_VALUE, 2);
+         } else if(ibc == 22)
+         {
+            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_D1, 2);
+            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D1, 2);
+         } else if(ibc == 23)
+         {
+            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_D2, 2);
+            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D2, 2);
+         }
+
          // Solve problem
          Matrix sol;
-         rhs = matQ*exactRhs;
          this->solveProblem(sol, rhs, matA);
+         Matrix solB;
+         this->solveProblem(solB, rhsB, matB);
 
          // Test solution
          for(int j = 0; j < exactSol.cols(); ++j)
@@ -324,11 +342,31 @@ namespace TestSuite {
             for(int i = 0; i < exactSol.rows(); ++i)
             {
                MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError);
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Tau";
             }
          }
 
-         // Test minimal resolution
+         // Test Galerkin solution
+         if(ibc == 21)
+         {
+            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_VALUE, 2);
+         } else if(ibc == 22)
+         {
+            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_D1, 2);
+         } else if(ibc == 23)
+         {
+            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_D2, 2);
+         }
+         for(int j = 0; j < exactSol.cols(); ++j)
+         {
+            for(int i = 0; i < exactSol.rows(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Galerkin";
+            }
+         }
+
+         // Test minimal resolution for Tau
          op = Spectral::ChebyshevOperator(minN);
          bc = Spectral::ChebyshevBoundary(minN);
          matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
@@ -342,7 +380,7 @@ namespace TestSuite {
             for(int i = 0; i < sol.rows(); ++i)
             {
                MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError);
+               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError) << "Minial Tau";
             }
          }
       }

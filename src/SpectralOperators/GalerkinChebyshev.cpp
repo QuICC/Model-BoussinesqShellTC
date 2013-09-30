@@ -72,6 +72,59 @@ namespace Spectral {
       return GalerkinChebyshev::restrictL(nEq, mat.cols())*mat*matR;
    }
 
+   Matrix GalerkinChebyshev::extend(const Matrix& gal, const GalerkinCondition::Id bcId, const int nEq)
+   {
+      SparseMatrix matR;
+
+      if(bcId == GalerkinCondition::ZERO_VALUE_LEFT)
+      {
+         GalerkinChebyshev::zeroValueLeft(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_VALUE_RIGHT)
+      {
+         GalerkinChebyshev::zeroValueRight(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_VALUE)
+      {
+         GalerkinChebyshev::zeroValue(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D1_LEFT)
+      {
+         GalerkinChebyshev::zeroD1Left(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D1_RIGHT)
+      {
+         GalerkinChebyshev::zeroD1Right(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D1)
+      {
+         GalerkinChebyshev::zeroD1(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D2_LEFT)
+      {
+         GalerkinChebyshev::zeroD2Left(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D2_RIGHT)
+      {
+         GalerkinChebyshev::zeroD2Right(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D2)
+      {
+         GalerkinChebyshev::zeroD2(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_VALUED1)
+      {
+         GalerkinChebyshev::zeroVD1(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_VALUED2)
+      {
+         GalerkinChebyshev::zeroVD2(matR, gal.rows()+nEq);
+      } else if(bcId == GalerkinCondition::ZERO_D1D2)
+      {
+         GalerkinChebyshev::zeroD1D2(matR, gal.rows()+nEq);
+      } else
+      {
+         throw Exception("Stencil has not been implemented!");
+      }
+
+      return matR*gal;
+   }
+
+   Matrix GalerkinChebyshev::restrict(const Matrix& spec, const GalerkinCondition::Id bcId, const int nEq)
+   {
+      return spec.topRows(spec.rows()-nEq);
+   }
+
    SparseMatrix GalerkinChebyshev::restrictL(const int nEq, const int cols)
    {
       assert(cols > 0);
@@ -157,12 +210,12 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -1.0;
+         rStencil.insertBack(j,j) = -1.0*GalerkinChebyshev::c_1(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
          {
-            rStencil.insertBack(j+2,j) = 1.0;
+            rStencil.insertBack(j+2,j) = 1.0*GalerkinChebyshev::c_1(j);
          }
       }
       rStencil.finalize(); 
@@ -308,6 +361,47 @@ namespace Spectral {
       throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-4);
    }
+
+   MHDFloat GalerkinChebyshev::c(const int n)
+   {
+      if(n == 0)
+      {
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 1.0;
+         #else
+            return 2.0;
+         #endif
+
+      } else if(n < 0)
+      {
+         return 0.0;
+
+      } else
+      {
+         return 1.0;
+      }
+   }
+
+   MHDFloat GalerkinChebyshev::c_1(const int n)
+   {
+      if(n == 0)
+      {
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 1.0;
+         #else
+            return 0.5;
+         #endif
+
+      } else if(n < 0)
+      {
+         return 0.0;
+
+      } else
+      {
+         return 1.0;
+      }
+   }
+
 
 }
 }

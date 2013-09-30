@@ -35,8 +35,31 @@ namespace Spectral {
    {
       if(n == 0)
       {
-         return 2.0;
-         //return 1.0;
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 1.0;
+         #else
+            return 2.0;
+         #endif
+
+      } else if(n < 0)
+      {
+         return 0.0;
+
+      } else
+      {
+         return 1.0;
+      }
+   }
+
+   MHDFloat ChebyshevBoundary::c_1(const int n) const
+   {
+      if(n == 0)
+      {
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 1.0;
+         #else
+            return 0.5;
+         #endif
 
       } else if(n < 0)
       {
@@ -53,7 +76,7 @@ namespace Spectral {
       Array unit(this->basisN());
       for(int i = 0; i < unit.size(); i++)
       {
-         unit(i) = (1.0/this->c(i))*std::pow(-1.0,i);
+         unit(i) = this->c_1(i)*std::pow(-1.0,i);
       }
 
       return unit;
@@ -64,7 +87,7 @@ namespace Spectral {
       Array unit(this->basisN());
       for(int i = 0; i < unit.size(); i++)
       {
-         unit(i) = (1.0/this->c(i));
+         unit(i) = this->c_1(i);
       }
 
       return unit;
