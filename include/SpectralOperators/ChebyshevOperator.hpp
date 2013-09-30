@@ -88,6 +88,13 @@ namespace Spectral {
          void buildD2(SparseMatrix& mat, const int nBC) const;
 
          /**
+          * @brief Build \f$D^{3}\f$ operator through recurrence relation
+          *
+          * @param mat  Output operator matrix
+          */
+         void buildD3(SparseMatrix& mat, const int nBC) const;
+
+         /**
           * @brief Build \f$D^{4}\f$ operator through recurrence relation
           *
           * @param mat  Output operator matrix

@@ -44,9 +44,9 @@ namespace Spectral {
           * @brief Get the derivative operator of order p
           *
           * @param nBC  Number of boundary
-          * @param p    Order of the derivative
+          * @param q    Order of the derivative
           */
-         SparseMatrix diff(const int nBC, const int p) const;
+         SparseMatrix diff(const int nBC, const int q) const;
 
          /**
           * @brief Get the quasi inverse derivative for D^-p D^q
@@ -65,6 +65,13 @@ namespace Spectral {
           * @param n Order of polynial
           */
          MHDFloat c(const int n) const;
+
+         /**
+          * @brief 1/C factor for Chebyshev polynomials (to avoid 1/0 problems)
+          *
+          * @param n Order of polynial
+          */
+         MHDFloat c_1(const int n) const;
 
          /**
           * @brief Build the derivative matrix

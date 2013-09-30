@@ -31,10 +31,10 @@ namespace Spectral {
    {
    }
 
-   SparseMatrix CylindricalChebyshevOperator::diff(const int nBC, const int p) const
+   SparseMatrix CylindricalChebyshevOperator::diff(const int nBC, const int q) const
    {
       // Check that requested order is possible
-      assert(p > 0);
+      assert(q > 0);
 
       // Create temporary object
       SparseMatrix diffMat(this->basisN(), this->basisN());
@@ -44,7 +44,7 @@ namespace Spectral {
 
       // Compute right derivative order
       SparseMatrix op = diffMat;
-      for(int i = 1; i < p; i++)
+      for(int i = 1; i < q; i++)
       {
          diffMat = op*diffMat;
       }
@@ -131,7 +131,31 @@ namespace Spectral {
    {
       if(n == 0)
       {
-         return 2.0;
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 2.0;
+         #else
+            return 1.0;
+         #endif
+
+      } else if(n < 0)
+      {
+         return 0.0;
+
+      } else
+      {
+         return 1.0;
+      }
+   }
+
+   MHDFloat CylindricalChebyshevOperator::c_1(const int n) const
+   {
+      if(n == 0)
+      {
+         #ifdef GEOMHDISCC_CHEBYSHEV_HAS_C
+            return 0.5;
+         #else
+            return 1.0;
+         #endif
 
       } else if(n < 0)
       {

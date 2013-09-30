@@ -46,6 +46,9 @@ namespace Spectral {
       } else if(p == 2)
       {
          this->buildD2(mat, nBC);
+      } else if(p == 3)
+      {
+         this->buildD3(mat, nBC);
       } else if(p == 4)
       {
          this->buildD4(mat, nBC);
@@ -185,6 +188,35 @@ namespace Spectral {
          }
       }
       mat.finalize(); 
+   }
+
+   void ChebyshevOperator::buildD3(SparseMatrix& mat, const int nBC) const
+   {
+//      assert(nBC >= 0);
+//
+//      // Reserve the expected number of nonzero elements
+//      mat.reserve(2*mat.cols()-1);
+//
+//      // Fill sparse matrix
+//      int lastRow = std::min(mat.cols()-3,mat.cols() - nBC);
+//      MHDFloat dj;
+//      MHDFloat di;
+//      for(int j = 3; j < mat.cols(); ++j)
+//      {
+//         dj = static_cast<MHDFloat>(j);
+//         // Create column j
+//         mat.startVec(j);
+//         for(int i = (j-1)%2; i < std::min(j-2,lastRow); i+=2)
+//         {
+//            di = static_cast<MHDFloat>(i);
+//            mat.insertBack(i,j) = dj*(dj*dj-di*di)*((dj-2.0)*(dj-2.0)-(di-2.0)*(di-2.0))*this->c_1(i);
+//         }
+//      }
+//      mat.finalize(); 
+      this->buildDFromD1(mat, 3, nBC);
+      
+      /// \mhdBug This computation currently requires an ugly expression.
+      std::cerr << " !!!!! Using DANGEROUS product to compute matrix" << std::endl;
    }
 
    void ChebyshevOperator::buildD4(SparseMatrix& mat, const int nBC) const

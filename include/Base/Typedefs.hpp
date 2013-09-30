@@ -52,6 +52,18 @@ namespace GeoMHDiSCC {
    //@}
 
    /**
+    * @name Coefficient wise array types typedefs
+    */
+   //@{
+   /// Typedef for an array of integer values
+   typedef Eigen::Array<int, Eigen::Dynamic, 1>   ACoeffI;
+   /// Typedef for an array of float values
+   typedef Eigen::Array<MHDFloat, Eigen::Dynamic, 1>   ACoeff;
+   /// Typedef for an array of complex values
+   typedef Eigen::Array<MHDComplex, Eigen::Dynamic, 1>   ACoeffZ;
+   //@}
+
+   /**
     * @name Matrix types typedefs
     */
    //@{

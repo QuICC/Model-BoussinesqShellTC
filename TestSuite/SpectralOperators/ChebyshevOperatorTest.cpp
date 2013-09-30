@@ -170,15 +170,17 @@ namespace TestSuite {
       Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
 
       // Get chebyshev grid
-      Array x = fft.meshGrid();
+      ACoeff x = fft.meshGrid();
 
       // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
       phys.setZero();
       for(int i = 0; i < spSetup->howmany(); ++i)
       {
+         MHDFloat di = static_cast<MHDFloat>(i);
+
          if(i < spSetup->specSize())
          {
-            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+            phys.col(i) = (5.0-di) - x + x.pow(2) - 1.3*x.pow(3) + di*x.pow(4) -3.0*x.pow(i);
          } else
          {
             phys.col(i).setZero();
@@ -205,16 +207,11 @@ namespace TestSuite {
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
       {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
          if(j < spSetup->specSize())
          {
-            Array cheb;
-            if(j > 0)
-            {
-               cheb = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3) - 3.0*j*x.array().pow(j-1);
-            } else
-            {
-               cheb = -1.0 + 2.0*x.array() - 3.9*x.array().pow(2) + 4.0*j*x.array().pow(3);
-            }
+            Array cheb = -1.0 + 2.0*x - 3.9*x.pow(2) + 4.0*dj*x.pow(3) - 3.0*dj*x.pow(j-1);
 
             for(int i = 0; i < x.size(); ++i)
             {
@@ -255,15 +252,17 @@ namespace TestSuite {
       Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
 
       // Get chebyshev grid
-      Array x = fft.meshGrid();
+      ACoeff x = fft.meshGrid();
 
       // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
       phys.setZero();
       for(int i = 0; i < spSetup->howmany(); ++i)
       {
+         MHDFloat di = static_cast<MHDFloat>(i);
+
          if(i < spSetup->specSize())
          {
-            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+            phys.col(i) = (5.0-di) - x + x.pow(2) - 1.3*x.pow(3) + di*x.pow(4) -3.0*x.pow(i);
          } else
          {
             phys.col(i).setZero();
@@ -290,9 +289,11 @@ namespace TestSuite {
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
       {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
          if(j < spSetup->specSize())
          {
-            Array cheb = 2.0 - 7.8*x.array() + 12.0*j*x.array().pow(2) - 3.0*j*(j-1)*x.array().pow(j-2);
+            Array cheb = 2.0 - 7.8*x + 12.0*dj*x.pow(2) - 3.0*dj*(dj-1.0)*x.pow(j-2);
 
             for(int i = 0; i < x.size(); ++i)
             {
@@ -308,6 +309,91 @@ namespace TestSuite {
          }
       }
    }
+
+   /**
+    * @brief Test \f$D^{3}\f$ operator
+    */
+   TEST_F(ChebyshevOperatorTest, D3)
+   {
+      // Set spectral and physical sizes
+      int nN = this->mMaxN + 1;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
+
+      // Create ChebyshevFftwTransform
+      Transform::ChebyshevFftwTransform fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   tmpSpec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      ACoeff x = fft.meshGrid();
+
+      // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
+      phys.setZero();
+      for(int i = 0; i < spSetup->howmany(); ++i)
+      {
+         MHDFloat di = static_cast<MHDFloat>(i);
+
+         if(i < spSetup->specSize())
+         {
+            phys.col(i) = (5.0-di) - x + x.pow(2) - 1.3*x.pow(3) + di*x.pow(4) -3.0*x.pow(i);
+         } else
+         {
+            phys.col(i).setZero();
+         }
+      }
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(tmpSpec, phys, Transform::ChebyshevFftwTransform::IntegratorType::INTG);
+
+      // Dealias
+      spec = tmpSpec.topRows(spSetup->specSize());
+
+      // Create Chebyshev spectral operator
+      Spectral::ChebyshevOperator   op(spSetup->specSize());
+
+      // Compute second derivative
+      spec = op.diff(0,3)*spec;
+
+      std::cerr << op.diff(0,3) << std::endl;
+
+      // Compute backward transform
+      tmpSpec.topRows(spSetup->specSize()) = spec;
+      tmpSpec.bottomRows(spSetup->padSize()).setZero();
+      fft.project<Arithmetics::SET>(phys, tmpSpec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
+
+      // Check the solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         if(j < spSetup->specSize())
+         {
+            Array cheb = - 7.8 + 24.0*dj*x - 3.0*dj*(dj-1.0)*(dj-2.0)*x.pow(j-3);
+
+            for(int i = 0; i < x.size(); ++i)
+            {
+               MHDFloat eta = std::max(10.0, std::abs(cheb(i)));
+               EXPECT_NEAR(cheb(i)/eta, phys(i,j)/eta, this->mError);
+            }
+         } else
+         {
+            for(int i = 0; i < x.size(); ++i)
+            {
+               EXPECT_NEAR(phys(i,j), 0.0, this->mError);
+            }
+         }
+      }
+   }
+
 
    /**
     * @brief Test \f$D^{4}\f$ operator
@@ -333,15 +419,17 @@ namespace TestSuite {
       Matrix   spec = Matrix::Zero(spSetup->specSize(), spSetup->howmany());
 
       // Get chebyshev grid
-      Array x = fft.meshGrid();
+      ACoeff x = fft.meshGrid();
 
       // Initialise the physical test data as cos(n*phi) + sin(n*phi) up to the highest maxN
       phys.setZero();
       for(int i = 0; i < spSetup->howmany(); ++i)
       {
+         MHDFloat di = static_cast<MHDFloat>(i);
+
          if(i < spSetup->specSize())
          {
-            phys.col(i) = (5-i) - x.array() + x.array().pow(2) - 1.3*x.array().pow(3) + i*x.array().pow(4) -3.0*x.array().pow(i);
+            phys.col(i) = (5.0-di) - x + x.pow(2) - 1.3*x.pow(3) + di*x.pow(4) -3.0*x.pow(i);
          } else
          {
             phys.col(i).setZero();
@@ -368,9 +456,10 @@ namespace TestSuite {
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
       {
+         MHDFloat dj = static_cast<MHDFloat>(j);
          if(j < spSetup->specSize())
          {
-            Array cheb = 24.0*j - 3.0*j*(j-1)*(j-2)*(j-3)*x.array().pow(j-4);
+            Array cheb = 24.0*dj - 3.0*dj*(dj-1.0)*(dj-2.0)*(dj-3.0)*x.pow(j-4);
 
             for(int i = 0; i < x.size(); ++i)
             {
