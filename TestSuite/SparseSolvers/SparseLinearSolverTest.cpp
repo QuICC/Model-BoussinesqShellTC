@@ -277,7 +277,6 @@ namespace TestSuite {
       // Loop over boundary condition ids
       for(int ibc = 21; ibc <= 23; ++ibc)
       {
- std::cerr << " -------------- SOLVING PROBLEM IBC = " << ibc << " --------------" << std::endl;
          int nN = this->mMaxN + 1;
          int minN = 9;
          Array param(1);
@@ -291,82 +290,65 @@ namespace TestSuite {
          Matrix rhs;
          this->setupProblem(exactSol, exactRhs, param, bcId, &internal::setSolution1DA);
 
+         // Define boundary condition flags
+         std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > ids;
+         Spectral::GalerkinCondition::Id  gId;
+         if(ibc == 21)
+         {
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT));
+            gId = Spectral::GalerkinCondition::ZERO_VALUE;
+         } else if(ibc == 22)
+         {
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT));
+            gId = Spectral::GalerkinCondition::ZERO_D1;
+         } else if(ibc == 23)
+         {
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT));
+            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT));
+            gId = Spectral::GalerkinCondition::ZERO_D2;
+         }
+
          // Create matrix
          Spectral::ChebyshevOperator   op(nN);
          Spectral::ChebyshevBoundary   bc(nN);
          SparseMatrix  matA(nN,nN);
          SparseMatrix  matQ(nN,nN);
-
-         std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > ids;
-         if(ibc == 21)
-         {
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT));
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT));
-         } else if(ibc == 22)
-         {
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT));
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT));
-         } else if(ibc == 23)
-         {
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT));
-            ids.push_back(std::make_pair(Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT));
-         }
+         SparseMatrix matG;
          matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matG = Spectral::GalerkinChebyshev::constrain(matA, gId, 2);
+         matA = matA + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
          matQ = op.qDiff(2,0);
 
          rhs = matQ*exactRhs;
-         SparseMatrix matC = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2);
-         SparseMatrix matB;
-         Matrix rhsB;
-         if(ibc == 21)
-         {
-            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_VALUE, 2);
-            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_VALUE, 2);
-         } else if(ibc == 22)
-         {
-            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_D1, 2);
-            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D1, 2);
-         } else if(ibc == 23)
-         {
-            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_D2, 2);
-            rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D2, 2);
-         }
-         std::cerr << matA << std::endl;
-         std::cerr << matB << std::endl;
+         Matrix rhsG = Spectral::GalerkinChebyshev::restrict(rhs, gId, 2);
 
-         // Solve problem
+         // Solve Tau problem
          Matrix sol;
          this->solveProblem(sol, rhs, matA);
-         Matrix solB;
-         this->solveProblem(solB, rhsB, matB);
+         // Solve Galerkin problem
+         Matrix solG;
+         this->solveProblem(solG, rhsG, matG);
 
-         // Test solution
+         // Check Tau solution
          for(int j = 0; j < exactSol.cols(); ++j)
          {
             for(int i = 0; i < exactSol.rows(); ++i)
             {
                MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Tau";
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Tau" << ibc;
             }
          }
 
-         // Test Galerkin solution
-         if(ibc == 21)
-         {
-            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_VALUE, 2);
-         } else if(ibc == 22)
-         {
-            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_D1, 2);
-         } else if(ibc == 23)
-         {
-            sol = Spectral::GalerkinChebyshev::extend(solB, Spectral::GalerkinCondition::ZERO_D2, 2);
-         }
+         // Check Galerkin solution
+         sol = Spectral::GalerkinChebyshev::extend(solG, gId, 2);
          for(int j = 0; j < exactSol.cols(); ++j)
          {
             for(int i = 0; i < exactSol.rows(); ++i)
             {
                MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Galerkin";
+               EXPECT_NEAR(sol(i)/eta, exactSol(i)/eta, this->mError) << "Galerkin: " << ibc;
             }
          }
 
@@ -384,7 +366,7 @@ namespace TestSuite {
             for(int i = 0; i < sol.rows(); ++i)
             {
                MHDFloat eta = std::max(10.0, std::abs(exactSol(i,j)));
-               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError) << "Minial Tau";
+               EXPECT_NEAR(sol(i,j)/eta, exactSol(i,j)/eta, this->mError) << "Minial Tau" << ibc;
             }
          }
       }

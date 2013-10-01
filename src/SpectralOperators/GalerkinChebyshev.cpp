@@ -20,6 +20,7 @@
 //
 #include "Exceptions/Exception.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Spectral {
@@ -148,6 +149,7 @@ namespace Spectral {
 
    void GalerkinChebyshev::zeroValueLeft(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS VALUE(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
       rStencil.resize(cols,cols-1);
@@ -173,6 +175,7 @@ namespace Spectral {
 
    void GalerkinChebyshev::zeroValueRight(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS VALUE(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
       rStencil.resize(cols,cols-1);
@@ -210,12 +213,11 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -1.0*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = -GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
          {
-            //rStencil.insertBack(j+2,j) = 1.0*GalerkinChebyshev::c(j);
             rStencil.insertBack(j+2,j) = 1.0;
          }
       }
@@ -224,18 +226,58 @@ namespace Spectral {
 
    void GalerkinChebyshev::zeroD1Left(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D1(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-1);
+      rStencil.reserve(2*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = -((dj+1.0)*(dj+1.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
+
+         // Create sub diagonal entry for j+1
+         if(j < rStencil.rows()-1)
+         {
+            rStencil.insertBack(j+1,j) = (dj*dj)/(2.0*dj*dj + 2.0*dj + 1.0);
+         }
+      }
+      rStencil.finalize(); 
    }
 
    void GalerkinChebyshev::zeroD1Right(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D1(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-1);
+      rStencil.reserve(2*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+1.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
+
+         // Create sub diagonal entry for j+1
+         if(j < rStencil.rows()-1)
+         {
+            rStencil.insertBack(j+1,j) = (dj*dj)/(2.0*dj*dj + 2.0*dj + 1.0);
+         }
+      }
+      rStencil.finalize(); 
    }
 
    void GalerkinChebyshev::zeroD1(SparseMatrix& rStencil, const int cols)
@@ -254,7 +296,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))/(2.0*dj*dj + 4.0*dj + 4.0)*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 4.0*dj + 4.0);
 
          // Create sub diagonal entry for j+2
          if(j > 0 && j < rStencil.rows()-2)
@@ -267,26 +309,86 @@ namespace Spectral {
 
    void GalerkinChebyshev::zeroD2Left(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D2(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-1);
+      rStencil.reserve(2*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*(dj*dj + dj + 1.0));
+
+         // Create sub diagonal entry for j+1
+         if(j > 1 && j < rStencil.rows()-1)
+         {
+            rStencil.insertBack(j+1,j) = ((dj-1.0)*dj)/(2.0*(dj*dj + dj + 1.0));
+         }
+      }
+      rStencil.finalize(); 
    }
 
    void GalerkinChebyshev::zeroD2Right(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D2(1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-1);
+      rStencil.reserve(2*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*(dj*dj + dj + 1.0));
+
+         // Create sub diagonal entry for j+1
+         if(j > 1 && j < rStencil.rows()-1)
+         {
+            rStencil.insertBack(j+1,j) = -((dj-1.0)*dj)/(2.0*(dj*dj + dj + 1.0));
+         }
+      }
+      rStencil.finalize(); 
    }
 
    void GalerkinChebyshev::zeroD2(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D2 STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 2);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-2);
+      rStencil.reserve(2*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0)*(dj+3.0))*GalerkinChebyshev::c(j)/(2.0*(dj+1.0)*(dj*dj + 2.0*dj + 6.0));
+
+         // Create sub diagonal entry for j+2
+         if(j > 1 && j < rStencil.rows()-2)
+         {
+            rStencil.insertBack(j+2,j) = -((dj-1.0)*dj*dj)/(2.0*(dj+1.0)*(dj*dj + 2.0*dj + 6.0));
+         }
+      }
+      rStencil.finalize(); 
    }
 
    void GalerkinChebyshev::zeroVD1(SparseMatrix& rStencil, const int cols)
@@ -305,7 +407,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 1.0*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -338,7 +440,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 1.0*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -357,10 +459,36 @@ namespace Spectral {
 
    void GalerkinChebyshev::zeroD1D2(SparseMatrix& rStencil, const int cols)
    {
+      std::cerr << "---------- THIS D1-D2 STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 4);
 
-      throw Exception("Stencil has not been implemented yet!");
       rStencil.resize(cols,cols-4);
+      rStencil.reserve(3*cols);
+
+      // Fill sparse matrix
+      for(int j = 0; j < rStencil.cols(); ++j)
+      {
+         MHDFloat dj = static_cast<MHDFloat>(j);
+
+         // Create column j
+         rStencil.startVec(j);
+
+         // Create diagonal
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+3.0)*(dj+4.0)*(dj+4.0))*GalerkinChebyshev::c(j)/(4.0*(dj*dj*dj*dj + 8.0*dj*dj*dj*dj + 24.0*dj*dj + 32.0*dj + 24.0));
+
+         // Create sub diagonal entry for j+2
+         if(j < rStencil.rows()-2)
+         {
+            rStencil.insertBack(j+2,j) = -(dj*dj*(dj+4.0)*(dj+4.0))/(2.0*(dj*dj*dj*dj + 8.0*dj*dj*dj*dj + 24.0*dj*dj + 32.0*dj + 24.0));
+         }
+
+         // Create sub diagonal entry for j+4
+         if(j < rStencil.rows()-4)
+         {
+            rStencil.insertBack(j+4,j) = (dj*dj*(dj+1.0)*(dj+2.0))/(4.0*(dj*dj*dj*dj + 8.0*dj*dj*dj*dj + 24.0*dj*dj + 32.0*dj + 24.0));
+         }
+      }
+      rStencil.finalize(); 
    }
 
    MHDFloat GalerkinChebyshev::c(const int n)
