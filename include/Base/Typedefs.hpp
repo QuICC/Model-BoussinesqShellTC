@@ -26,6 +26,7 @@
 
 // Project includes
 //
+#include "Base/DecoupledComplex.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -73,6 +74,7 @@ namespace GeoMHDiSCC {
    typedef Eigen::Matrix<MHDComplex, Eigen::Dynamic, Eigen::Dynamic>   MatrixZ;
    /// Typedef for a pair of real matrices used as a complex matrix
    typedef std::pair<Matrix,Matrix> DecoupledZMatrix;
+   //typedef DecoupledComplex<Matrix> DecoupledZMatrix;
    //@}
 
    /**
@@ -85,6 +87,7 @@ namespace GeoMHDiSCC {
    typedef Eigen::SparseMatrix<MHDComplex>   SparseMatrixZ;
    /// Typedef for a pair of real sparse matrices used as a sparse complex matrix
    typedef std::pair<SparseMatrix,SparseMatrix> DecoupledZSparse;
+   //typedef DecoupledComplex<SparseMatrix> DecoupledZSparse;
    /// Typedef for the real triplets used to initialise sparse real matrices
    typedef Eigen::Triplet<MHDFloat>   Triplet;
    /// Typedef for the complex triplets used to initialise sparse complex matrices
