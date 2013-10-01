@@ -40,11 +40,6 @@ namespace Equations {
    {
    }
 
-   void BoussinesqBetaCylGVorticity::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void BoussinesqBetaCylGVorticity::setCoupling()
    {
       // Initialise coupling information

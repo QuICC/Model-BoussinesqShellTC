@@ -41,11 +41,6 @@ namespace Equations {
    {
    }
 
-   void BoussinesqPerBetaCylGTransport::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices2DPeriodic(spBcIds);
-   }
-
    void BoussinesqPerBetaCylGTransport::setCoupling()
    {
       // Set coupling information

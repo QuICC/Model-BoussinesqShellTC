@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
+#include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -169,14 +170,30 @@ namespace Equations {
       this->mspBcIds = spBcIds;
 
       // Make sure it is safe to do nothing
-      bool notsafe = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
+      bool needInit = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
 
       CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
-      notsafe = notsafe && (fRange.first == fRange.second);
+      needInit = needInit && (fRange.first == fRange.second);
 
-      if(notsafe)
+      // Initialise spectral matrices
+      if(needInit)
       {
-         throw Exception("initSpectralMatrices: dummy implementation was called!");
+         if(EquationToolsType::EIGEN_DIMS == 0)
+         {
+            this->initSpectralMatricesNoEigen(spBcIds, FieldComponents::Spectral::SCALAR);
+         } else if(EquationToolsType::EIGEN_DIMS == 1)
+         {
+            this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
+         } else if(EquationToolsType::EIGEN_DIMS == 2)
+         {
+            this->initSpectralMatrices2DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
+         } else if(EquationToolsType::EIGEN_DIMS == 3)
+         {
+            this->initSpectralMatrices3DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
+         } else
+         {
+            throw Exception("initSpectralMatrices: unhandled number of eigen dimensions!");
+         }
       }
    }
 

@@ -54,13 +54,6 @@ namespace Equations {
           * @brief Generic operator row dispatcher
           */
          virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
-
-         /**
-          * @brief Initialise the spectral equation matrices
-          *
-          * @param spBcIds   List of boundary condition IDs
-          */
-         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
          
       protected:
          /**

@@ -112,6 +112,14 @@ namespace Equations {
          virtual void setCoupling() = 0;
 
          /**
+          * @brief Initialise the spectral equation matrices without "eigen" direction
+          *
+          * @param spBcIds List of boundary condition IDs
+          * @param compId  Spectral component
+          */
+         void initSpectralMatricesNoEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
+
+         /**
           * @brief Initialise the spectral equation matrices with a single "eigen" direction
           *
           * @param spBcIds List of boundary condition IDs
@@ -126,6 +134,14 @@ namespace Equations {
           * @param compId  Spectral component
           */
          void initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
+
+         /**
+          * @brief Initialise the spectral equation matrices with three "eigen" direction
+          *
+          * @param spBcIds List of boundary condition IDs
+          * @param compId  Spectral component
+          */
+         void initSpectralMatrices3DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
 
       private:
          /**

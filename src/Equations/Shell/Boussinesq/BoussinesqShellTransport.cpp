@@ -40,11 +40,6 @@ namespace Equations {
    {
    }
 
-   void BoussinesqShellTransport::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices2DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void BoussinesqShellTransport::setCoupling()
    {
       // Initialise coupling information
@@ -248,7 +243,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock2DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, cR);
+      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, cR);
    }
 
 }

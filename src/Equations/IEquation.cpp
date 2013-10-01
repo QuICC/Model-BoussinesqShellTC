@@ -40,11 +40,13 @@ namespace Equations {
       this->setCoupling();
    }
 
+   void IEquation::initSpectralMatricesNoEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
+   {
+      throw Exception("Initialisation of 0 eigen dimensions spectral matrices not implemented yet!");
+   }
+
    void IEquation::initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
       // Get the number of systems
       int nSystems = this->couplingInfo(compId).nSystems();
 
@@ -126,9 +128,6 @@ namespace Equations {
 
    void IEquation::initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
-      // Store the boundary condition list
-      this->mspBcIds = spBcIds;
-
       // Get the number of systems
       int nSystems = this->couplingInfo(compId).nSystems();
 
@@ -213,6 +212,11 @@ namespace Equations {
             }
          }
       }
+   }
+
+   void IEquation::initSpectralMatrices3DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
+   {
+      throw Exception("Initialisation of 3 eigen dimensions spectral matrices not implemented yet!");
    }
 
    void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat) const

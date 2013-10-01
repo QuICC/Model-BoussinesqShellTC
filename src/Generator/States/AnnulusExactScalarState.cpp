@@ -52,11 +52,6 @@ namespace Equations {
       this->mTypeId = id;
    }
 
-   void AnnulusExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void AnnulusExactScalarState::setCoupling()
    {
       // Initialise coupling information
@@ -206,7 +201,7 @@ namespace Equations {
       MHDFloat cZ = 1.0;
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock1DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

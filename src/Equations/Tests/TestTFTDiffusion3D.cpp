@@ -47,11 +47,6 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void TestTFTDiffusion3D::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void TestTFTDiffusion3D::setCoupling()
    {
       // Initialise coupling information
@@ -68,7 +63,7 @@ namespace Equations {
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
-      // Equation is coupled to temperature equation (self)
+      // Standalone equation
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
@@ -171,7 +166,7 @@ namespace Equations {
       MHDFloat cZ = 1.0;
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock1DEigen(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

@@ -1,0 +1,21 @@
+set(MHDPhysicalModels 
+   AnelasticBetaSphGModel.hpp
+   AnelasticFPlaneModel.hpp
+   BoussinesqAnnulusModel.hpp
+   BoussinesqBetaCylGModel.hpp
+   BoussinesqBetaSphGModel.hpp
+   BoussinesqCylinderModel.hpp
+   BoussinesqFPlaneModel.hpp
+   BoussinesqPerBetaCylGModel.hpp
+   BoussinesqShellModel.hpp
+   BoussinesqSphereModel.hpp
+   RayleighBenardModel.hpp
+   RotatingRBModel.hpp
+   )
+
+set(MHDTestModels 
+   TestTTTModel.hpp
+   TestTFTModel.hpp
+   TestTFFModel.hpp
+   TestFFFModel.hpp
+   )

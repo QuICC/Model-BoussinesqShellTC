@@ -58,11 +58,6 @@ namespace Equations {
       this->mSHModes = modes;
    }
 
-   void ShellExactScalarState::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void ShellExactScalarState::setCoupling()
    {
       // Initialise coupling information

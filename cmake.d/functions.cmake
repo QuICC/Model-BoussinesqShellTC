@@ -140,3 +140,34 @@ function (geomhdiscc_append_sources MHDAll MHDPath MHDDirs)
    endforeach(MHDDir)
 endfunction ()
 
+#
+# Append path to list of files
+#
+function (geomhdiscc_add_path MHDList MHDPath)
+   set(MHDTmp )
+   foreach(MHDFile ${${MHDList}})
+      list(APPEND MHDTmp ${MHDPath}/${MHDFile})
+   endforeach(MHDFile ${${MHDList}})
+   set(${MHDList} ${MHDTmp} PARENT_SCOPE)
+endfunction()
+
+#
+# Creat executable
+#
+function (geomhdiscc_add_executable MHDModel MHDScheme MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
+   # Create new name for executable
+   STRING(REGEX REPLACE "Model" ${MHDPostfix} ExecName ${MHDModel})
+
+   # Create list of source files
+   set(SrcsList ${MHDExecSrc} ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${MHDModel}.cpp ${${MHDAllSrcs}} ${${MHDModelSrcs}})
+
+   # Add executable to target list
+   add_executable(${ExecName} ${SrcsList})
+
+   # Set special properties of target
+   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
+      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${MHDScheme} -DGEOMHDISCC_RUNSIM_MODEL=${MHDModel}")
+
+   # Show message
+   message(STATUS " --> Added ${ExecName} executable")
+endfunction ()

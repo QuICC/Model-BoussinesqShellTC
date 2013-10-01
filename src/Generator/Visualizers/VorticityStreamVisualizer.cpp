@@ -38,11 +38,6 @@ namespace Equations {
    {
    }
 
-   void VorticityStreamVisualizer::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-   }
-
    void VorticityStreamVisualizer::setFields(const bool viewField, const bool viewGradient)
    {
       this->mViewField = viewField;

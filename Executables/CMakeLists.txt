@@ -2,12 +2,13 @@
 #%%%%% Create all the targets with a general implementation %%%%%#
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
-# Get list of physical models
-file(GLOB PhysicalModels
-   ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/*Model.hpp)
+# Get list of physical models and test models
+include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/ModelsList.cmake)
+geomhdiscc_add_path(MHDPhysicalModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
+geomhdiscc_add_path(MHDTestModels ${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels)
 
 # Loop over all physical models
-foreach(ModelFile ${PhysicalModels})
+foreach(ModelFile ${MHDPhysicalModels})
 
    # Extract filename from full path
    get_filename_component(ModelName ${ModelFile} NAME_WE)
@@ -20,64 +21,50 @@ foreach(ModelFile ${PhysicalModels})
    # Get model specific sources
    include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
 
-   # Create list of source files
-   set(SrcsList RunSimulation.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
+   # Create simulation target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Model" "RunSimulation.cpp"
+      MHDModelSources All_Srcs)
 
-   # Add executable to target list
-   add_executable(${ModelName} ${SrcsList})
+   # Create configuration file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Config" "WriteConfig.cpp"
+      MHDModelSources All_Srcs)
 
-   # Set special properties of target
-   set_target_properties(${ModelName} PROPERTIES OUTPUT_NAME ${ModelName}
-      COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+   # Create state file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "State" "GenerateState.cpp"
+      MHDModelSources All_Srcs)
 
-   # Show message
-   message(STATUS " --> Added ${ModelName} executable")
+   # Create visualization file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Visu" "VisualizeState.cpp"
+      MHDModelSources All_Srcs)
+endforeach(ModelFile)
 
-   # Create new name for executable
-   STRING(REGEX REPLACE "Model" "Config" ExecName ${ModelName})
+# Loop over all test models
+foreach(ModelFile ${MHDTestModels})
 
-   # Create list of source files
-   set(SrcsList WriteConfig.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
+   # Extract filename from full path
+   get_filename_component(ModelName ${ModelFile} NAME_WE)
 
-   # Add executable to target list
-   add_executable(${ExecName} ${SrcsList})
+   # Extract the spatial scheme from model file
+   file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
+   STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
+   STRING(REGEX REPLACE " " "" Scheme ${Scheme})
 
-   # Set special properties of target
-   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
+   # Get model specific sources
+   include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
 
-   # Show message
-   message(STATUS " --> Added ${ExecName} executable")
+   # Create simulation target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Model" "RunSimulation.cpp"
+      MHDModelSources All_Srcs)
 
-   # Create new name for executable
-   STRING(REGEX REPLACE "Model" "State" ExecName ${ModelName})
+   # Create configuration file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Config" "WriteConfig.cpp"
+      MHDModelSources All_Srcs)
 
-   # Create list of source files
-   set(SrcsList GenerateState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
+   # Create state file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "State" "GenerateState.cpp"
+      MHDModelSources All_Srcs)
 
-   # Add executable to target list
-   add_executable(${ExecName} ${SrcsList})
-
-   # Set special properties of target
-   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
-
-   # Show message
-   message(STATUS " --> Added ${ExecName} executable")
-
-   # Create new name for executable
-   STRING(REGEX REPLACE "Model" "Visu" ExecName ${ModelName})
-
-   # Create list of source files
-   set(SrcsList VisualizeState.cpp ${GEOMHDISCC_SRC_DIR}/PhysicalModels/${ModelName}.cpp ${All_Srcs} ${MHDModelSources})
-
-   # Add executable to target list
-   add_executable(${ExecName} ${SrcsList})
-
-   # Set special properties of target
-   set_target_properties(${ExecName} PROPERTIES OUTPUT_NAME
-      ${ExecName} COMPILE_FLAGS "-DGEOMHDISCC_SPATIALSCHEME_${Scheme} -DGEOMHDISCC_RUNSIM_MODEL=${ModelName}")
-
-   # Show message
-   message(STATUS " --> Added ${ExecName} executable")
+   # Create visualization file target
+   geomhdiscc_add_executable(${ModelName} ${Scheme} "Visu" "VisualizeState.cpp"
+      MHDModelSources All_Srcs)
 endforeach(ModelFile)

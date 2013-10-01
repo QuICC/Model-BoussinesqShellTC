@@ -37,6 +37,11 @@ namespace Equations {
    {
       public:
          /**
+          * @brief Number of eigen dimensions
+          */
+         static const int EIGEN_DIMS = 2;
+
+         /**
           * @brief Create setup for matrices with minial coupling
           *
           * @param spRes   Shared resolution
@@ -47,24 +52,24 @@ namespace Equations {
          static void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
          /**
-          * @brief General implementation of linear row for equations with two "eigen" dimension
+          * @brief General implementation of linear row
           */
          template <typename TEquation> static DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of time row for equations with two "eigen" dimension
+          * @brief General implementation of time row
           */
          template <typename TEquation> static DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of boundary row for equations with two "eigen" dimension
+          * @brief General implementation of boundary row
           */
          template <typename TEquation> static DecoupledZSparse boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
          /**
-          * @brief General implementation of the boundary block for equations with two "eigen" dimensions
+          * @brief General implementation of the boundary block
           */
-         static void boundaryBlock2DEigen(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
+         static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
    };
 
    template <typename TEquation> DecoupledZSparse Equation2DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
@@ -92,7 +97,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         linearBlock(eq, compId, block, *fIt, k2D_, k3D_);
+         Equations::linearBlock(eq, compId, block, *fIt, k2D_, k3D_);
          tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
          tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
@@ -127,7 +132,7 @@ namespace Equations {
       // Create time row
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
-      timeBlock(eq, compId, block, k2D_, k3D_);
+      Equations::timeBlock(eq, compId, block, k2D_, k3D_);
       tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
       matrixRow.first += tmp;
       tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
@@ -165,7 +170,7 @@ namespace Equations {
          SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
-         boundaryBlock(eq, compId, block, *fIt, k2D_, k3D_);
+         Equations::boundaryBlock(eq, compId, block, *fIt, k2D_, k3D_);
          tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
          matrixRow.first += tmp;
          tmp = Eigen::kroneckerProduct(blockMatrix, block.second);

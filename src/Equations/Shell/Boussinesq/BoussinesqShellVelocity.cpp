@@ -44,16 +44,6 @@ namespace Equations {
    {
    }
 
-   void BoussinesqShellVelocity::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
-   {
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator compIt;
-      for(compIt = specRange.first; compIt != specRange.second; ++compIt)
-      {
-         this->initSpectralMatrices2DEigen(spBcIds, *compIt);
-      }
-   }
-
    void BoussinesqShellVelocity::setCoupling()
    {
       //
@@ -324,7 +314,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock2DEigen(eq, compId, mat, fieldId, cR);
+      EquationToolsType::boundaryBlock(eq, compId, mat, fieldId, cR);
    }
 
 }
