@@ -277,6 +277,7 @@ namespace TestSuite {
       // Loop over boundary condition ids
       for(int ibc = 21; ibc <= 23; ++ibc)
       {
+ std::cerr << " -------------- SOLVING PROBLEM IBC = " << ibc << " --------------" << std::endl;
          int nN = this->mMaxN + 1;
          int minN = 9;
          Array param(1);
@@ -314,21 +315,24 @@ namespace TestSuite {
          matQ = op.qDiff(2,0);
 
          rhs = matQ*exactRhs;
+         SparseMatrix matC = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2);
          SparseMatrix matB;
          Matrix rhsB;
          if(ibc == 21)
          {
-            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_VALUE, 2);
+            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_VALUE, 2);
             rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_VALUE, 2);
          } else if(ibc == 22)
          {
-            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_D1, 2);
+            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_D1, 2);
             rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D1, 2);
          } else if(ibc == 23)
          {
-            matB = Spectral::GalerkinChebyshev::constrain(matA, Spectral::GalerkinCondition::ZERO_D2, 2);
+            matB = Spectral::GalerkinChebyshev::constrain(matC, Spectral::GalerkinCondition::ZERO_D2, 2);
             rhsB = Spectral::GalerkinChebyshev::restrict(rhs, Spectral::GalerkinCondition::ZERO_D2, 2);
          }
+         std::cerr << matA << std::endl;
+         std::cerr << matB << std::endl;
 
          // Solve problem
          Matrix sol;

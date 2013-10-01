@@ -92,6 +92,65 @@ namespace TestSuite {
    }
 
    /**
+    * @brief Test transform of chebyshev polynomials
+    *
+    * @param ChebyshevTransformTest Test fixture ID
+    * @param Polynomials            Test ID
+    */
+   TEST_F(ChebyshevTransformTest, Polynomials)
+   {
+      // Set spectral and physical sizes
+      int nN = 8;
+      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+
+      // Create setup
+      Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, 8, nN, Transform::FftSetup::REAL));
+
+      // Create Chebyshev transform
+      Transform::ChebyshevTransformType fft;
+
+      // Initialise fft
+      fft.init(spSetup);
+
+      // Create test data storage
+      Matrix   phys = Matrix::Zero(spSetup->fwdSize(), spSetup->howmany());
+      Matrix   spec = Matrix::Zero(spSetup->bwdSize(), spSetup->howmany());
+
+      // Get chebyshev grid
+      ACoeff x = fft.meshGrid();
+
+      phys.col(0).setConstant(1.0);
+      phys.col(1) = x;
+      phys.col(2) = 2.0*x.pow(2) - 1.0;
+      phys.col(3) = 4.0*x.pow(3) - 3.0*x;
+      phys.col(4) = 8.0*x.pow(4) - 8.0*x.pow(2) + 1.0;
+      phys.col(5) = 16.0*x.pow(5) - 20.0*x.pow(3) + 5.0*x;
+      phys.col(6) = 32.0*x.pow(6) - 48.0*x.pow(4) + 18.0*x.pow(2) - 1.0;
+      phys.col(7) = 64.0*x.pow(7) - 112.0*x.pow(5) + 56.0*x.pow(3) - 7.0*x;
+
+      // Compute forward transform
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+
+      std::cerr << spec << std::endl;
+
+      // Check solution
+      for(int j = 0; j < spSetup->howmany(); ++j)
+      {
+         for(int i = 0; i < spSetup->specSize(); ++i)
+         {
+            if(i == j)
+            {
+               EXPECT_NEAR(1.0, spec(i,j), this->mError);
+            } else
+            {
+               EXPECT_NEAR(0, spec(i,j), this->mError);
+            }
+         }
+      }
+
+   }
+
+   /**
     * @brief Accuracy test for real forward transform
     *
     * @param ChebyshevTransformTest   Test fixture ID

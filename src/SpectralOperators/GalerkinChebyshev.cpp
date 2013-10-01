@@ -122,7 +122,7 @@ namespace Spectral {
 
    Matrix GalerkinChebyshev::restrict(const Matrix& spec, const GalerkinCondition::Id bcId, const int nEq)
    {
-      return spec.topRows(spec.rows()-nEq);
+      return spec.bottomRows(spec.rows()-nEq);
    }
 
    SparseMatrix GalerkinChebyshev::restrictL(const int nEq, const int cols)
@@ -160,7 +160,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 0.5;
+         rStencil.insertBack(j,j) = 0.5*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -185,7 +185,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -0.5;
+         rStencil.insertBack(j,j) = -0.5*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -210,12 +210,13 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -1.0*GalerkinChebyshev::c_1(j);
+         rStencil.insertBack(j,j) = -1.0*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
          {
-            rStencil.insertBack(j+2,j) = 1.0*GalerkinChebyshev::c_1(j);
+            //rStencil.insertBack(j+2,j) = 1.0*GalerkinChebyshev::c(j);
+            rStencil.insertBack(j+2,j) = 1.0;
          }
       }
       rStencil.finalize(); 
@@ -253,7 +254,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))/(2.0*dj*dj + 4.0*dj + 4.0);
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))/(2.0*dj*dj + 4.0*dj + 4.0)*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j > 0 && j < rStencil.rows()-2)
@@ -304,7 +305,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 1.0;
+         rStencil.insertBack(j,j) = 1.0*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -337,7 +338,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 1.0;
+         rStencil.insertBack(j,j) = 1.0*GalerkinChebyshev::c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
