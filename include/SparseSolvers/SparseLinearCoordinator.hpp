@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    /**
-    * @brief Implementation of general sparse linear solver coordinatore
+    * @brief Implementation of general sparse linear solver coordinator
     */
    class SparseLinearCoordinator: public SparseLinearCoordinatorBase
    {
