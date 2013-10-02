@@ -114,7 +114,6 @@ namespace Spectral {
 
       // Reserve space in sparse matrices
       sparse.real().reserve(lines.real().rows()*lines.real().cols());
-      sparse.imag().reserve(lines.real().rows()*lines.real().cols());
 
       // Make sparse tau matrix for real component (if required)
       if(sparse.real().size() != 0)
@@ -134,6 +133,7 @@ namespace Spectral {
       }
 
       // Make sparse tau matrix for imaginary component (if required)
+      sparse.imag().reserve(lines.imag().rows()*lines.imag().cols());
       if(sparse.imag().size() != 0)
       {
          for(int j = 0; j < sparse.imag().cols(); ++j)

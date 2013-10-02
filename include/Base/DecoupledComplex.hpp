@@ -15,9 +15,10 @@
 
 // Project includes
 //
-#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
+
+namespace Datatypes  {
 
    /**
     * @brief Store complex numbers as two independent matrices
@@ -25,6 +26,9 @@ namespace GeoMHDiSCC {
    template <typename TData> class DecoupledComplex
    {
       public:
+         /// Typedef for the Scalar type (This is NOT the internal scalar type, it is for compatibility with Eigen's matrices)
+         typedef std::complex<double> Scalar;
+
          /**
           * @brief Constructor for empty matrices
           */
@@ -129,6 +133,7 @@ namespace GeoMHDiSCC {
    {
    }
 
+}
 }
 
 #endif // DECOUPLEDCOMPLEX_HPP

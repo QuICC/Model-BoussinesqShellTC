@@ -24,6 +24,7 @@
 #include "Enums/FieldIds.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEquation.hpp"
+#include "Base/DecoupledComplexInternal.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -98,8 +99,7 @@ namespace Equations {
           * @param matIdx  Index of the given data
           * @param start   Start index for the storage
           */
-         void storeSolution(FieldComponents::Spectral::Id compId, const DecoupledZMatrix& storage, const int matIdx, const int start);
-         void storeSolution(FieldComponents::Spectral::Id compId, const MatrixZ& storage, const int matIdx, const int start);
+         template <typename TData> void storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
 
       protected:
          /**
@@ -130,8 +130,7 @@ namespace Equations {
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     */
-   void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
-   void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
 
    /**
     * @brief Transfer nonlinear spectral values from unknown to solver
@@ -141,8 +140,7 @@ namespace Equations {
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     */
-   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
-   void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+   template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
 
    /**
     * @brief Add source term
@@ -153,9 +151,201 @@ namespace Equations {
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     */
-   void addSource(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& storage, const int matIdx, const int start);
-   void addSource(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, MatrixZ& storage, const int matIdx, const int start);
+   template <typename TData> void addSource(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
 
+   template <typename TData> void IVectorEquation::storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
+   {
+      if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      {
+         int rows = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy timestep output into field
+               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(storage, k),i,j,matIdx);
+
+               // increase storage counter
+               k++;
+            }
+         }
+      } else if(this->couplingInfo(compId).indexType() == CouplingInformation::MODE)
+      {
+         // Get mode indexes
+         ArrayI mode = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = this->unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
+         for(int i = 0; i < rows; i++)
+         {
+            // Copy timestep output into field
+            this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(storage,k),i,mode(1),mode(0));
+
+            // increase storage counter
+            k++;
+         }
+      }
+   }
+
+   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      // matIdx is the index of the slowest varying direction
+      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      {
+         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+         int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+         //Safety assertion
+         assert(start >= 0);
+
+         // Copy data
+         int k = start;
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = 0; i < rows; i++)
+            {
+               // Copy field value into storage
+               Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+
+               // increase storage counter
+               k++;
+            }
+         }
+
+      // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+      {
+         //Safety assertion
+         assert(start >= 0);
+
+         // Get mode indexes
+         ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+         // Copy data
+         int k = start;
+         for(int i = 0; i < rows; i++)
+         {
+            // Copy field value into storage
+            Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)));
+
+            // increase storage counter
+            k++;
+         }
+      }
+   }
+
+   template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      // Check if a nonlinear computation took place
+      if(eq.couplingInfo(compId).hasNonlinear())
+      {
+         // simply copy values from unknown
+         copyUnknown(eq, compId, storage, matIdx, start);
+
+      // Without nonlinear computation the values have to be initialised to zero   
+      } else
+      {
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Set field to zero
+                  Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            //Safety assertion
+            assert(start >= 0);
+
+            // Get mode indexes
+            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Set field to zero
+               Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+               // increase storage counter
+               k++;
+            }
+         }
+      }
+   }
+
+   template <typename TData> void addSource(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      // Add source term if required
+      if(eq.couplingInfo(compId).hasSource())
+      {
+         // matIdx is the index of the slowest varying direction
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         {
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Copy data
+            int k = start;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Add source term
+                  Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+
+         // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+         {
+            //Safety assertion
+            assert(start >= 0);
+
+            // Get mode indexes
+            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+
+            // Copy data
+            int k = start;
+            for(int i = 0; i < rows; i++)
+            {
+               // Add source term
+               Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, mode(1), mode(0)));
+
+               // increase storage counter
+               k++;
+            }
+         }
+      }
+   }
 }
 }
 

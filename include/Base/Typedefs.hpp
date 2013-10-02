@@ -73,7 +73,7 @@ namespace GeoMHDiSCC {
    /// Typedef for a matrix of complex values
    typedef Eigen::Matrix<MHDComplex, Eigen::Dynamic, Eigen::Dynamic>   MatrixZ;
    /// Typedef for a decoupled real/imaginary complex matrix
-   typedef DecoupledComplex<Matrix> DecoupledZMatrix;
+   typedef Datatypes::DecoupledComplex<Matrix> DecoupledZMatrix;
    //@}
 
    /**
@@ -85,7 +85,7 @@ namespace GeoMHDiSCC {
    /// Typedef for a sparse matrix of complex values
    typedef Eigen::SparseMatrix<MHDComplex>   SparseMatrixZ;
    /// Typedef for a decoupled real/imaginary complex sparse matrix
-   typedef DecoupledComplex<SparseMatrix> DecoupledZSparse;
+   typedef Datatypes::DecoupledComplex<SparseMatrix> DecoupledZSparse;
    /// Typedef for the real triplets used to initialise sparse real matrices
    typedef Eigen::Triplet<MHDFloat>   Triplet;
    /// Typedef for the complex triplets used to initialise sparse complex matrices
