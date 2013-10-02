@@ -29,7 +29,6 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
-#include "SpectralOperators/BoundaryConditions.hpp"
 #include "Variables/RequirementTools.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Equations/EquationTools.hpp"

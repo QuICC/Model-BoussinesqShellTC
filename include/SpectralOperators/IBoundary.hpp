@@ -16,6 +16,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "BoundaryCondition/BoundaryCondition.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,11 +28,6 @@ namespace Spectral {
    class IBoundary
    {
       public:
-         /**
-          * @brief List of possible boundaries
-          */
-         enum Position {LEFT, RIGHT};
-
          /**
           * @brief Constructor
           *
@@ -61,21 +57,21 @@ namespace Spectral {
           *
           * @param pt   boundary point
           */
-         virtual Array value(Position pt) const = 0;
+         virtual Array value(Boundary::BCPosition pt) const = 0;
 
          /**
           * @brief Get first derivative at boundary
           *
           * @param pt   boundary point
           */
-         virtual Array firstDerivative(Position pt) const = 0;
+         virtual Array firstDerivative(Boundary::BCPosition pt) const = 0;
 
          /**
           * @brief Get second derivative at boundary
           *
           * @param pt   boundary point
           */
-         virtual Array secondDerivative(Position pt) const = 0;
+         virtual Array secondDerivative(Boundary::BCPosition pt) const = 0;
          
       protected:
 

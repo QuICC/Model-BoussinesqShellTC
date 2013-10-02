@@ -22,7 +22,6 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "SpectralOperators/BoundaryConditions.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"

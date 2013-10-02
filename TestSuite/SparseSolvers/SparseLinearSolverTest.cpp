@@ -316,8 +316,11 @@ namespace TestSuite {
          SparseMatrix  matA(nN,nN);
          SparseMatrix  matQ(nN,nN);
          SparseMatrix matG;
-         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2);
+         matT = Spectral::TauChebyshev::constrain(matA, gId, 2);
          matG = Spectral::GalerkinChebyshev::constrain(matA, gId, 2);
+
+         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
          matA = matA + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
          matQ = op.qDiff(2,0);
 

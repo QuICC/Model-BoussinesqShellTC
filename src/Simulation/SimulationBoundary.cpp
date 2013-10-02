@@ -41,7 +41,7 @@ namespace GeoMHDiSCC {
       return this->mBcs.find(eqId)->second.count(fieldId);
    }
 
-   const SimulationBoundary::BcEqMapType& SimulationBoundary::bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
+   const SimulationBoundary::DimBCVectorMap& SimulationBoundary::bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
    {
       // Safey asserts
       assert(this->mBcs.count(eqId) > 0);
@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void SimulationBoundary::initStorage(const SpectralFieldId id)
    {
       // Initialise boundary condition storage
-      this->mBcs.insert(std::make_pair(id, std::map<SpectralFieldId, SimulationBoundary::BcEqMapType>()));
+      this->mBcs.insert(std::make_pair(id, std::map<SpectralFieldId, SimulationBoundary::DimBCVectorMap>()));
    }
 
    void SimulationBoundary::initBcStorage(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId)
@@ -62,20 +62,20 @@ namespace GeoMHDiSCC {
       assert(this->mBcs.count(eqId) > 0);
 
       // Initialise boundary condition field storage
-      this->mBcs.find(eqId)->second.insert(std::make_pair(fieldId, SimulationBoundary::BcEqMapType()));
+      this->mBcs.find(eqId)->second.insert(std::make_pair(fieldId, SimulationBoundary::DimBCVectorMap()));
 
       // Initialise boundary condition storage
-      this->mBcs.find(eqId)->second.find(fieldId)->second.insert(std::make_pair(dimId, SimulationBoundary::BcMapType()));
+      this->mBcs.find(eqId)->second.find(fieldId)->second.insert(std::make_pair(dimId, Boundary::BCVector()));
    }
 
-   void SimulationBoundary::addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos)
+   void SimulationBoundary::addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Boundary::BCType bcId, Boundary::BCPosition pos)
    {
       // Safey assert
       assert(this->mBcs.count(eqId) > 0);
       assert(this->mBcs.find(eqId)->second.count(fieldId) > 0);
       assert(this->mBcs.find(eqId)->second.find(fieldId)->second.count(dimId) > 0);
 
-      this->mBcs.find(eqId)->second.find(fieldId)->second.find(dimId)->second.push_back(std::make_pair(bcId,pos));
+      this->mBcs.find(eqId)->second.find(fieldId)->second.find(dimId)->second.push_back(Boundary::BoundaryCondition(bcId,pos));
    }
 
 }

@@ -12,15 +12,17 @@
 
 // System includes
 //
+#include <map>
 
 // External includes
 //
 
 // Project includes
 //
+#include "SmartPointers/SharedPtrMacro.h"
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "SpectralOperators/BoundaryConditions.hpp"
+#include "BoundaryCondition/BoundaryCondition.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -30,11 +32,8 @@ namespace GeoMHDiSCC {
    class SimulationBoundary
    {
       public:
-         /// Typedef for the boundary conditions map storage type
-         typedef std::vector<std::pair<Spectral::BoundaryConditions::Id,Spectral::IBoundary::Position> > BcMapType;
-
-         /// Typedef for the boundary conditions map storage type
-         typedef std::map<Dimensions::Simulation::Id, BcMapType> BcEqMapType;
+         /// Typedef for a map between simulation dimension and vector of boundary conditions
+         typedef std::map<Dimensions::Simulation::Id, Boundary::BCVector> DimBCVectorMap;
 
          /**
           * @brief Constructor
@@ -67,7 +66,7 @@ namespace GeoMHDiSCC {
           * @param eqId       Physical ID for equation
           * @param fieldId    Physical ID for field
           */
-         const SimulationBoundary::BcEqMapType& bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
+         const SimulationBoundary::DimBCVectorMap& bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
 
          /**
           * @brief Initialise storage for a new equation
@@ -92,7 +91,7 @@ namespace GeoMHDiSCC {
           * @param fieldId ID of the variable
           * @param dimId   ID of the dimension
           */
-         void addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Spectral::BoundaryConditions::Id bcId, Spectral::IBoundary::Position pos);
+         void addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Boundary::BCType bcId, Boundary::BCPosition pos);
          
       protected:
 
@@ -100,7 +99,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the coupled boundary conditions
           */
-         std::map<SpectralFieldId, std::map<SpectralFieldId, SimulationBoundary::BcEqMapType> > mBcs;
+         std::map<SpectralFieldId, std::map<SpectralFieldId, SimulationBoundary::DimBCVectorMap> > mBcs;
    };
 
    /// Typedef for a shared pointer to a SimulationBoundary object

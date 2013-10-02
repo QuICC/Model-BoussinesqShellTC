@@ -166,12 +166,12 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::LEFT); 
       //    ... coupled boundary conditions
       fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       dimId = Dimensions::Simulation::SIM1D;
       spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT); 
 
       // Axial velocity equation
       //    ... boundary conditions
@@ -185,12 +185,12 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT); 
       //    ... coupled boundary conditions
       fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
       dimId = Dimensions::Simulation::SIM1D;
       spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::RIGHT); 
 
       return spBcs;
    }

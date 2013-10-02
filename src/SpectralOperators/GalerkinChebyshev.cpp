@@ -25,108 +25,68 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   SparseMatrix GalerkinChebyshev::constrain(const SparseMatrix& mat, const GalerkinCondition::Id bcId, const int nEq)
+   GalerkinChebyshev::GalerkinChebyshev(const int nN, const Boundary::BCVector& bcs, const int nEq)
+      : mN(nN), mNeq(nEq)
    {
-      SparseMatrix matR;
+      this->identifyCondition(bcs);
 
-      if(bcId == GalerkinCondition::ZERO_VALUE_LEFT)
+      this->createStencil();
+   }
+
+   GalerkinChebyshev::~GalerkinChebyshev()
+   {
+   }
+
+   void GalerkinChebyshev::identifyCondition(const Boundary::BCVector& bcs)
+   {
+      this->mBcId = ZERO_VALUE;
+   }
+
+   void GalerkinChebyshev::createStencil()
+   {
+      if(this->mBcId == ZERO_VALUE_LEFT)
       {
-         GalerkinChebyshev::zeroValueLeft(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_VALUE_RIGHT)
+         this->zeroValueLeft(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_VALUE_RIGHT)
       {
-         GalerkinChebyshev::zeroValueRight(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_VALUE)
+         this->zeroValueRight(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_VALUE)
       {
-         GalerkinChebyshev::zeroValue(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D1_LEFT)
+         this->zeroValue(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D1_LEFT)
       {
-         GalerkinChebyshev::zeroD1Left(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D1_RIGHT)
+         this->zeroD1Left(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D1_RIGHT)
       {
-         GalerkinChebyshev::zeroD1Right(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D1)
+         this->zeroD1Right(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D1)
       {
-         GalerkinChebyshev::zeroD1(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D2_LEFT)
+         this->zeroD1(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D2_LEFT)
       {
-         GalerkinChebyshev::zeroD2Left(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D2_RIGHT)
+         this->zeroD2Left(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D2_RIGHT)
       {
-         GalerkinChebyshev::zeroD2Right(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D2)
+         this->zeroD2Right(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D2)
       {
-         GalerkinChebyshev::zeroD2(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_VALUED1)
+         this->zeroD2(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_VALUED1)
       {
-         GalerkinChebyshev::zeroVD1(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_VALUED2)
+         this->zeroVD1(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_VALUED2)
       {
-         GalerkinChebyshev::zeroVD2(matR, mat.cols());
-      } else if(bcId == GalerkinCondition::ZERO_D1D2)
+         this->zeroVD2(mStencil, this->mN);
+      } else if(this->mBcId == ZERO_D1D2)
       {
-         GalerkinChebyshev::zeroD1D2(matR, mat.cols());
+         this->zeroD1D2(mStencil, this->mN);
       } else
       {
          throw Exception("Stencil has not been implemented!");
       }
-
-      return GalerkinChebyshev::restrictL(nEq, mat.cols())*mat*matR;
    }
 
-   Matrix GalerkinChebyshev::extend(const Matrix& gal, const GalerkinCondition::Id bcId, const int nEq)
-   {
-      SparseMatrix matR;
-
-      if(bcId == GalerkinCondition::ZERO_VALUE_LEFT)
-      {
-         GalerkinChebyshev::zeroValueLeft(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_VALUE_RIGHT)
-      {
-         GalerkinChebyshev::zeroValueRight(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_VALUE)
-      {
-         GalerkinChebyshev::zeroValue(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D1_LEFT)
-      {
-         GalerkinChebyshev::zeroD1Left(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D1_RIGHT)
-      {
-         GalerkinChebyshev::zeroD1Right(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D1)
-      {
-         GalerkinChebyshev::zeroD1(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D2_LEFT)
-      {
-         GalerkinChebyshev::zeroD2Left(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D2_RIGHT)
-      {
-         GalerkinChebyshev::zeroD2Right(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D2)
-      {
-         GalerkinChebyshev::zeroD2(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_VALUED1)
-      {
-         GalerkinChebyshev::zeroVD1(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_VALUED2)
-      {
-         GalerkinChebyshev::zeroVD2(matR, gal.rows()+nEq);
-      } else if(bcId == GalerkinCondition::ZERO_D1D2)
-      {
-         GalerkinChebyshev::zeroD1D2(matR, gal.rows()+nEq);
-      } else
-      {
-         throw Exception("Stencil has not been implemented!");
-      }
-
-      return matR*gal;
-   }
-
-   Matrix GalerkinChebyshev::restrict(const Matrix& spec, const GalerkinCondition::Id bcId, const int nEq)
-   {
-      return spec.bottomRows(spec.rows()-nEq);
-   }
-
-   SparseMatrix GalerkinChebyshev::restrictL(const int nEq, const int cols)
+   SparseMatrix GalerkinChebyshev::restrictL(const int nEq, const int cols) const
    {
       assert(cols > 0);
       assert(cols-nEq > 0);
@@ -147,7 +107,7 @@ namespace Spectral {
       return matL;
    }
 
-   void GalerkinChebyshev::zeroValueLeft(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroValueLeft(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS VALUE(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -173,7 +133,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroValueRight(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroValueRight(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS VALUE(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -199,7 +159,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroValue(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroValue(SparseMatrix& rStencil, const int cols) const
    {
       assert(cols > 2);
 
@@ -224,7 +184,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD1Left(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD1Left(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D1(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -252,7 +212,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD1Right(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD1Right(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D1(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -280,7 +240,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD1(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD1(SparseMatrix& rStencil, const int cols) const
    {
       assert(cols > 2);
 
@@ -307,7 +267,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD2Left(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD2Left(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D2(-1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -335,7 +295,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD2Right(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD2Right(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D2(1) STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 1);
@@ -363,7 +323,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD2(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD2(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D2 STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 2);
@@ -391,7 +351,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroVD1(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroVD1(SparseMatrix& rStencil, const int cols) const
    {
       assert(cols > 4);
 
@@ -424,7 +384,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroVD2(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroVD2(SparseMatrix& rStencil, const int cols) const
    {
       assert(cols > 4);
 
@@ -457,7 +417,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   void GalerkinChebyshev::zeroD1D2(SparseMatrix& rStencil, const int cols)
+   void GalerkinChebyshev::zeroD1D2(SparseMatrix& rStencil, const int cols) const
    {
       std::cerr << "---------- THIS D1-D2 STENCIL IS UNTESTED ------------" << std::endl;
       assert(cols > 4);
@@ -491,7 +451,7 @@ namespace Spectral {
       rStencil.finalize(); 
    }
 
-   MHDFloat GalerkinChebyshev::c(const int n)
+   MHDFloat GalerkinChebyshev::c(const int n) const
    {
       if(n == 0)
       {
@@ -511,7 +471,7 @@ namespace Spectral {
       }
    }
 
-   MHDFloat GalerkinChebyshev::c_1(const int n)
+   MHDFloat GalerkinChebyshev::c_1(const int n) const
    {
       if(n == 0)
       {

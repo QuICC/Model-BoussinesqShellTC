@@ -31,7 +31,7 @@ namespace Spectral {
    {
    }
 
-   DecoupledZMatrix BoundaryConditions::tauLines(const IBoundary& bcOp, const std::vector<std::pair<BoundaryConditions::Id,IBoundary::Position> >& bcId)
+   DecoupledZMatrix BoundaryConditions::tauLines(const IBoundary& bcOp, const Boundary::BCVector& bcId)
    {
       // Count boundary conditions
       int nBCs = bcId.size();
@@ -48,37 +48,37 @@ namespace Spectral {
       lines.setZero();
 
       // Map iterator
-      std::vector<std::pair<BoundaryConditions::Id,IBoundary::Position> >::const_iterator it;
+      Boundary::BCVector::const_iterator it;
 
       // Create boundary values
       int idx = 0;
       for(it = bcId.begin(); it != bcId.end(); ++it)
       {
-         switch(it->first)
+         switch(it->type)
          {
-            case BoundaryConditions::VALUE:
-               lines.real().col(idx) = bcOp.value(it->second);
+            case Boundary::VALUE:
+               lines.real().col(idx) = bcOp.value(it->position);
                idx++;
                hasReal = true;
                break;
-            case BoundaryConditions::FIRST_DERIVATIVE:
-               lines.real().col(idx) = bcOp.firstDerivative(it->second);
+            case Boundary::D1:
+               lines.real().col(idx) = bcOp.firstDerivative(it->position);
                idx++;
                hasReal = true;
                break;
-            case BoundaryConditions::SECOND_DERIVATIVE:
-               lines.real().col(idx) = bcOp.secondDerivative(it->second);
+            case Boundary::D2:
+               lines.real().col(idx) = bcOp.secondDerivative(it->position);
                idx++;
                hasReal = true;
                break;
-            case BoundaryConditions::BETA_SLOPE:
+            case Boundary::BETA_SLOPE:
                /// \warning Beta slope boundary conditions does not include the wave number factor
-               if(it->second == IBoundary::RIGHT)
+               if(it->position == Boundary::RIGHT)
                {
-                  lines.imag().col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->second);
-               } else //if(it->second == IBoundary::LEFT)
+                  lines.imag().col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->position);
+               } else //if(it->position == Boundary::LEFT)
                {
-                  lines.imag().col(idx) = bcOp.value(it->second);
+                  lines.imag().col(idx) = bcOp.value(it->position);
                }
                idx++;
                hasImag = true;
@@ -104,7 +104,7 @@ namespace Spectral {
       return lines;
    }
 
-   DecoupledZSparse BoundaryConditions::tauMatrix(const IBoundary& bcOp, const std::vector<std::pair<BoundaryConditions::Id,IBoundary::Position> >& bcId)
+   DecoupledZSparse BoundaryConditions::tauMatrix(const IBoundary& bcOp, const Boundary::BCVector& bcId)
    {
       // Builde the tau lines
       DecoupledZMatrix lines = BoundaryConditions::tauLines(bcOp, bcId);

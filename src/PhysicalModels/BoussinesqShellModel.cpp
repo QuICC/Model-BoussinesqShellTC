@@ -181,8 +181,8 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
       } else
       {
          throw Exception("Unknown temperature boundary conditions in configuration file");
@@ -197,8 +197,8 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
       } else
       {
          throw Exception("Unknown toroidal velocity boundary conditions in configuration file");
@@ -211,8 +211,8 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
       } else
       {
          throw Exception("Unknown toroidal velocity boundary conditions in configuration file");

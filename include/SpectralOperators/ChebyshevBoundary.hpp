@@ -17,6 +17,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "BoundaryCondition/BoundaryCondition.hpp"
 #include "SpectralOperators/IBoundary.hpp"
 
 namespace GeoMHDiSCC {
@@ -46,21 +47,21 @@ namespace Spectral {
           *
           * @param pt   boundary point
           */
-         Array value(Position pt) const;
+         Array value(Boundary::BCPosition pt) const;
 
          /**
           * @brief Get first derivative at boundary
           *
           * @param pt   boundary point
           */
-         Array firstDerivative(Position pt) const;
+         Array firstDerivative(Boundary::BCPosition pt) const;
 
          /**
           * @brief Get second derivative at boundary
           *
           * @param pt   boundary point
           */
-         Array secondDerivative(Position pt) const;
+         Array secondDerivative(Boundary::BCPosition pt) const;
          
       protected:
 

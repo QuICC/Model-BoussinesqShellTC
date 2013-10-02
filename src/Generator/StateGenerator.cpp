@@ -28,7 +28,6 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
-#include "SpectralOperators/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 

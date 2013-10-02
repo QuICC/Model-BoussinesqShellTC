@@ -23,6 +23,7 @@
 //
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralSelector.hpp"
+#include "SpectralOperators/BoundaryConditions.hpp"
 
 namespace GeoMHDiSCC {
 

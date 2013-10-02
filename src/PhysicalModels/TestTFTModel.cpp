@@ -246,16 +246,16 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
 
       // Second scalar equation Dirichlet boundary conditions
       fieldName = PhysicalNames::STREAMFUNCTION;
@@ -264,16 +264,16 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
+      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
 
       // Second scalar equation Dirichlet boundary conditions
       fieldName = PhysicalNames::VORTICITY;
@@ -282,16 +282,16 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
       fieldName = PhysicalNames::PRESSURE;
       eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::VORTICITY, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
 
       return spBcs;
    }

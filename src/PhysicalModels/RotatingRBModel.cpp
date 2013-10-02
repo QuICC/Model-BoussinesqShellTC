@@ -148,8 +148,8 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT);
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
       } else
       {
          throw Exception("Unknown temperature boundary conditions in configuration file");
@@ -162,30 +162,30 @@ namespace GeoMHDiSCC {
       dimId = Dimensions::Simulation::SIM1D;
       fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT); 
       // No-slip boundary conditions
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D1, Boundary::LEFT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D1, Boundary::RIGHT); 
       // Stress-free boundary conditions
       } else if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 1)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::SECOND_DERIVATIVE, Spectral::IBoundary::RIGHT);
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
       } else
       {
          throw Exception("Unknown streamfunction boundary conditions in configuration file");
       }
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::LEFT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::LEFT); 
       //    ... coupled boundary conditions
       fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT); 
 
       // Axial velocity equation
       //    ... boundary conditions
@@ -197,25 +197,25 @@ namespace GeoMHDiSCC {
       // No-slip boundary conditions
       if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 0)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT); 
       // Stress-free boundary conditions
       } else if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second == 1)
       {
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::LEFT); 
-         spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::FIRST_DERIVATIVE, Spectral::IBoundary::RIGHT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D1, Boundary::LEFT); 
+         spBcs->addBc(eqId, fieldId, dimId, Boundary::D1, Boundary::RIGHT); 
       } else
       {
          throw Exception("Unknown velocityz boundary conditions in configuration file");
       }
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::VALUE, Spectral::IBoundary::RIGHT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT); 
       //    ... coupled boundary conditions
       fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Spectral::BoundaryConditions::BETA_SLOPE, Spectral::IBoundary::RIGHT); 
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::RIGHT); 
 
       return spBcs;
    }

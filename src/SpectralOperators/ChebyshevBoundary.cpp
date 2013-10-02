@@ -93,9 +93,9 @@ namespace Spectral {
       return unit;
    }
 
-   Array ChebyshevBoundary::value(IBoundary::Position pt) const
+   Array ChebyshevBoundary::value(Boundary::BCPosition pt) const
    {
-      if(pt == LEFT)
+      if(pt == Boundary::LEFT)
       {
          return this->leftUnit();
       } else
@@ -104,7 +104,7 @@ namespace Spectral {
       }
    }
 
-   Array ChebyshevBoundary::firstDerivative(IBoundary::Position pt) const
+   Array ChebyshevBoundary::firstDerivative(Boundary::BCPosition pt) const
    {
       Array tau = Array::Zero(this->basisN());
       for(int i = 1; i < tau.size(); i++)
@@ -112,7 +112,7 @@ namespace Spectral {
          tau(i) = static_cast<MHDFloat>(i*i);
       }
 
-      if(pt == LEFT)
+      if(pt == Boundary::LEFT)
       {
          return tau.array()*(-1.0*this->leftUnit().array());
       }else 
@@ -121,7 +121,7 @@ namespace Spectral {
       }
    }
 
-   Array ChebyshevBoundary::secondDerivative(IBoundary::Position pt) const
+   Array ChebyshevBoundary::secondDerivative(Boundary::BCPosition pt) const
    {
       Array tau = Array::Zero(this->basisN());
 
@@ -130,7 +130,7 @@ namespace Spectral {
          tau(i) = (1.0/3.0)*static_cast<MHDFloat>(std::pow(i,4) - std::pow(i,2));
       }
 
-      if(pt == LEFT)
+      if(pt == Boundary::LEFT)
       {
          return tau.array()*this->leftUnit().array();
       } else
