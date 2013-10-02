@@ -24,6 +24,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
+#include "TypeSelectors/TimeSchemeSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,7 +33,7 @@ namespace Timestep {
    TimestepCoordinator::TimestepCoordinator()
       : SparseLinearCoordinatorBase(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
    {
-      this->mNStep = ImExRK3::STEPS;
+      this->mNStep = TimeSchemeType::STEPS;
    }
 
    TimestepCoordinator::~TimestepCoordinator()
@@ -118,10 +119,10 @@ namespace Timestep {
 
          DebuggerMacro_start("Real solver update", 0);
          // Update solvers from real equation steppers
-         SolverD_iterator   solDIt;
-         for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
+         SolverRZ_iterator   solRZIt;
+         for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
          {
-            (*solDIt)->updateSolver();
+            (*solRZIt)->updateSolver();
          }
          DebuggerMacro_stop("Real solver update t = ", 0);
 
@@ -168,11 +169,11 @@ namespace Timestep {
       SparseLinearCoordinatorBase::init(scalEq, vectEq);
    }
 
-   void TimestepCoordinator::addSolverD(const int start)
+   void TimestepCoordinator::addSolverRZ(const int start)
    {
-      SharedSparseDTimestepper spSolver(new SparseDTimestepper(start));
+      SharedSparseRZTimestepper spSolver(new SparseRZTimestepper(start));
 
-      this->mDSolvers.push_back(spSolver);
+      this->mRZSolvers.push_back(spSolver);
    }
 
    void TimestepCoordinator::addSolverZ(const int start)
@@ -188,10 +189,10 @@ namespace Timestep {
       for(int step = 0; step < this->mNStep; ++step)
       {
          // Compute timestep correction coefficient for LHS matrix
-         MHDFloat lhsCoeff = ImExRK3::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+         MHDFloat lhsCoeff = TimeSchemeType::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Compute timestep correction coefficient for RHS matrix
-         MHDFloat rhsCoeff = ImExRK3::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+         MHDFloat rhsCoeff = TimeSchemeType::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Loop over all complex timesteppers
          SolverZ_iterator   solZIt;
@@ -201,10 +202,10 @@ namespace Timestep {
          }
 
          // Loop over all real timesteppers
-         SolverD_iterator   solDIt;
-         for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solZIt)
+         SolverRZ_iterator   solRZIt;
+         for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solZIt)
          {
-            std::tr1::static_pointer_cast<SparseDTimestepper>(*solDIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
+            std::tr1::static_pointer_cast<SparseRZTimestepper>(*solRZIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
          }
       }
    }
@@ -219,15 +220,15 @@ namespace Timestep {
          std::tr1::static_pointer_cast<SparseZTimestepper>(*solZIt)->computeRHS(this->mStep);
       }
 
-      SolverD_iterator   solDIt;
-      for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
+      SolverRZ_iterator   solRZIt;
+      for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
       {
          // Compute linear solve RHS
-         std::tr1::static_pointer_cast<SparseDTimestepper>(*solDIt)->computeRHS(this->mStep);
+         std::tr1::static_pointer_cast<SparseRZTimestepper>(*solRZIt)->computeRHS(this->mStep);
       }
    }
 
-   void TimestepCoordinator::buildSolverMatrix(Solver::SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void TimestepCoordinator::buildSolverMatrix(Solver::SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Operator coefficients
       MHDFloat lhsTCoeff;
@@ -236,16 +237,16 @@ namespace Timestep {
       MHDFloat rhsLCoeff;
 
       // Set time coefficients for LHS Matrix
-      lhsTCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+      lhsTCoeff = TimeSchemeType::lhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for LHS Matrix
-      lhsLCoeff = ImExRK3::lhsL(this->mStep);
+      lhsLCoeff = TimeSchemeType::lhsL(this->mStep);
 
       // Set time coefficients for RHS Matrix
-      rhsTCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+      rhsTCoeff = TimeSchemeType::rhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for RHS Matrix
-      rhsLCoeff = -ImExRK3::rhsL(this->mStep);
+      rhsLCoeff = -TimeSchemeType::rhsL(this->mStep);
 
       // Resize LHS matrix if necessary
       if(spSolver->rLHSMatrix(matIdx).size() == 0)
@@ -254,9 +255,9 @@ namespace Timestep {
       }
 
       // Resize RHS matrix if necessary
-      if(std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rRHSMatrix(matIdx).size() == 0)
+      if(std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rRHSMatrix(matIdx).size() == 0)
       {
-         std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
@@ -268,19 +269,19 @@ namespace Timestep {
       spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.real() - lhsTCoeff*tRow.real();
 
       // Compute RHS matrix
-      std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.real() - rhsTCoeff*tRow.real();
+      std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.real() - rhsTCoeff*tRow.real();
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
       {
          // Resize time matrix if necessary
-         if(std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rTMatrix(idx).size() == 0)
+         if(std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rTMatrix(idx).size() == 0)
          {
-            std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+            std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
          }
 
          // Set time matrix
-         std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rTMatrix(idx) += tRow.real();
+         std::tr1::static_pointer_cast<SparseRZTimestepper>(spSolver)->rTMatrix(idx) += tRow.real();
       }
    }
 
@@ -293,16 +294,16 @@ namespace Timestep {
       MHDFloat rhsLCoeff;
 
       // Set time coefficients for LHS Matrix
-      lhsTCoeff = ImExRK3::lhsT(this->mStep)*1.0/this->mDt;
+      lhsTCoeff = TimeSchemeType::lhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for LHS Matrix
-      lhsLCoeff = ImExRK3::lhsL(this->mStep);
+      lhsLCoeff = TimeSchemeType::lhsL(this->mStep);
 
       // Set time coefficients for RHS Matrix
-      rhsTCoeff = ImExRK3::rhsT(this->mStep)*1.0/this->mDt;
+      rhsTCoeff = TimeSchemeType::rhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for RHS Matrix
-      rhsLCoeff = -ImExRK3::rhsL(this->mStep);
+      rhsLCoeff = -TimeSchemeType::rhsL(this->mStep);
 
       // Resize LHS matrix if necessary
       if(spSolver->rLHSMatrix(matIdx).size() == 0)

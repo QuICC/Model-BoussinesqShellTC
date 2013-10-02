@@ -20,8 +20,7 @@
 // Project includes
 //
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
-#include "SparseSolvers/SparseDTrivialSolver.hpp"
-#include "SparseSolvers/SparseZTrivialSolver.hpp"
+#include "SparseSolvers/SparseTrivialSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -32,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse trivial solver coordinatore
     */
-   class SparseTrivialCoordinator: public SparseCoordinatorBase<SharedSparseZTrivialSolver, SharedSparseDTrivialSolver>
+   class SparseTrivialCoordinator: public SparseCoordinatorBase<SharedSparseZTrivialSolver, SharedSparseRZTrivialSolver>
    {
       public:
          /**
@@ -67,7 +66,7 @@ namespace Solver {
          /**
           * @brief Create a real linear solver
           */
-         virtual void addSolverD(const int start);
+         virtual void addSolverRZ(const int start);
 
          /**
           * @brief Create a complex linear solver

@@ -20,8 +20,7 @@
 // Project includes
 //
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
-#include "SparseSolvers/SparseDLinearSolver.hpp"
-#include "SparseSolvers/SparseZLinearSolver.hpp"
+#include "SparseSolvers/SparseLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -32,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse linear solver coordinatore
     */
-   class SparseLinearCoordinatorBase: public SparseCoordinatorBase<SharedSparseZLinearSolver,SharedSparseDLinearSolver>
+   class SparseLinearCoordinatorBase: public SparseCoordinatorBase<SharedSparseZLinearSolver,SharedSparseRZLinearSolver>
    {
       public:
          /**
@@ -78,7 +77,7 @@ namespace Solver {
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
           * @brief Build the complex solver matrix

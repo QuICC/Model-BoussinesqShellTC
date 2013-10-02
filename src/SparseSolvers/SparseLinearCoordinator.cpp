@@ -52,11 +52,11 @@ namespace Solver {
       this->mStep = (this->mStep + 1) % this->mNStep;
    }
 
-   void SparseLinearCoordinator::addSolverD(const int start)
+   void SparseLinearCoordinator::addSolverRZ(const int start)
    {
-      SharedSparseDLinearSolver spSolver(new SparseDLinearSolver(start));
+      SharedSparseRZLinearSolver spSolver(new SparseRZLinearSolver(start));
 
-      this->mDSolvers.push_back(spSolver);
+      this->mRZSolvers.push_back(spSolver);
    }
 
    void SparseLinearCoordinator::addSolverZ(const int start)
@@ -66,7 +66,7 @@ namespace Solver {
       this->mZSolvers.push_back(spSolver);
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Resize LHS matrix if necessary
       if(spSolver->rLHSMatrix(matIdx).size() == 0)

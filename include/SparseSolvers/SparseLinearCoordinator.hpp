@@ -20,8 +20,7 @@
 // Project includes
 //
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
-#include "SparseSolvers/SparseDLinearSolver.hpp"
-#include "SparseSolvers/SparseZLinearSolver.hpp"
+#include "SparseSolvers/SparseLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -59,7 +58,7 @@ namespace Solver {
          /**
           * @brief Create a real linear solver
           */
-         virtual void addSolverD(const int start);
+         virtual void addSolverRZ(const int start);
 
          /**
           * @brief Create a complex linear solver
@@ -75,7 +74,7 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SharedSparseDLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex solver matrix

@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseLinearCoordinatorBase::SparseLinearCoordinatorBase()
-      : SparseCoordinatorBase<SharedSparseZLinearSolver,SharedSparseDLinearSolver>()
+      : SparseCoordinatorBase<SharedSparseZLinearSolver,SharedSparseRZLinearSolver>()
    {
    }
 
@@ -153,12 +153,12 @@ namespace Solver {
 
       DebuggerMacro_start("Linear: real init", 2);
       // Initialise solvers from real equation steppers
-      SolverD_iterator   solDIt;
-      for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
+      SolverRZ_iterator   solRZIt;
+      for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
       {
          DebuggerMacro_msg("---> real solver", 2);
 
-         (*solDIt)->initSolver();
+         (*solRZIt)->initSolver();
       }
       DebuggerMacro_stop("Linear: real init t = ", 2);
 
@@ -191,11 +191,11 @@ namespace Solver {
       } else
       {
          // Create iterator to current real solver
-         SolverD_iterator solDIt = this->mDSolvers.begin();
-         std::advance(solDIt, myIdx);
+         SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+         std::advance(solRZIt, myIdx);
 
          // Build solver matrices
-         this->buildSolverMatrices(spEq, myId, solDIt);
+         this->buildSolverMatrices(spEq, myId, solRZIt);
       }
    }
 
@@ -210,11 +210,11 @@ namespace Solver {
       }
 
       // Solve real linear systems
-      SolverD_iterator   solDIt;
-      for(solDIt = this->mDSolvers.begin(); solDIt != this->mDSolvers.end(); ++solDIt)
+      SolverRZ_iterator   solRZIt;
+      for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
       {
          // Compute linear solve RHS
-         (*solDIt)->solve(this->mStep);
+         (*solRZIt)->solve(this->mStep);
       }
    }
 

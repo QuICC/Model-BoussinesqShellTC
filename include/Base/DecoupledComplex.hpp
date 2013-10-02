@@ -64,6 +64,11 @@ namespace GeoMHDiSCC {
           * @brief Set imaginary component
           */
          TData& imag();
+
+         /**
+          * @brief Set both components to zero
+          */
+         void setZero();
          
       protected:
 
@@ -97,6 +102,12 @@ namespace GeoMHDiSCC {
    template <typename TData> inline TData& DecoupledComplex<TData>::imag()
    {
       return this->mImag;
+   }
+
+   template <typename TData> inline void DecoupledComplex<TData>::setZero()
+   {
+      this->mReal.setZero();
+      this->mImag.setZero();
    }
 
    template <typename TData> DecoupledComplex<TData>::DecoupledComplex()

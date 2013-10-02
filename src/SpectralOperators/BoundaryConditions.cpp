@@ -45,8 +45,7 @@ namespace Spectral {
 
       // Initialise tau lines matrix
       DecoupledZMatrix lines(bcOp.basisN(), nBCs);
-      lines.real().setZero();
-      lines.imag().setZero();
+      lines.setZero();
 
       // Map iterator
       std::vector<std::pair<BoundaryConditions::Id,IBoundary::Position> >::const_iterator it;
