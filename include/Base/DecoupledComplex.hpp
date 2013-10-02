@@ -26,7 +26,17 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
-          * @brief Empty constructor
+          * @brief Constructor for empty matrices
+          */
+         DecoupledComplex();
+
+         /**
+          * @brief Constructor with identical real and imaginary sizes
+          */
+         DecoupledComplex(const int rows, const int cols);
+
+         /**
+          * @brief Constructor with different real and imaginary sizes
           */
          DecoupledComplex(const int rowsR, const int colsR, const int rowsI, const int colsI);
 
@@ -89,8 +99,18 @@ namespace GeoMHDiSCC {
       return this->mImag;
    }
 
+   template <typename TData> DecoupledComplex<TData>::DecoupledComplex()
+      : mReal(), mImag()
+   {
+   }
+
+   template <typename TData> DecoupledComplex<TData>::DecoupledComplex(const int rows, const int cols)
+      : mReal(rows,rows), mImag(rows,cols)
+   {
+   }
+
    template <typename TData> DecoupledComplex<TData>::DecoupledComplex(const int rowsR, const int colsR, const int rowsI, const int colsI)
-      : mReal(rowsR,rowsI), mImag(rowsI,colsI)
+      : mReal(rowsR,rowsR), mImag(rowsI,colsI)
    {
    }
 

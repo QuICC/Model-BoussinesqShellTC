@@ -180,15 +180,15 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
+      mat.real().resize(nX*nZ,nX*nZ);
+      mat.imag().resize(nX*nZ,nX*nZ);
 
       // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
-      mat.first = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
+      mat.rela() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)

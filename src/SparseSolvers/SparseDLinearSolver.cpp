@@ -37,20 +37,20 @@ namespace Solver {
       // Set unused modes to zero
       for(int i = 0; i < this->mZeroIdx; ++i)
       {
-         this->mSolution.at(i).first.setZero();
-         this->mSolution.at(i).second.setZero();
+         this->mSolution.at(i).real().setZero();
+         this->mSolution.at(i).imag().setZero();
       }
 
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
          // Solve for the real component
-         this->mSolution.at(i).first = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).first);
+         this->mSolution.at(i).real() = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).real());
 
          // Safety assert for successful solve
          assert(this->mSolver.at(i+start)->info() == Eigen::Success);
 
          // Solve for the imaginary component
-         this->mSolution.at(i).second = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).second);
+         this->mSolution.at(i).imag() = this->mSolver.at(i+start)->solve(this->mRHSData.at(i).imag());
 
          // Safety assert for successful solve
          assert(this->mSolver.at(i+start)->info() == Eigen::Success);
@@ -114,14 +114,14 @@ namespace Solver {
       assert(cols > 0);
 
       // Add storage for RHS data
-      this->mRHSData.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mRHSData.back().first.setZero();
-      this->mRHSData.back().second.setZero();
+      this->mRHSData.push_back(DecoupledZMatrix(rows,cols));
+      this->mRHSData.back().real().setZero();
+      this->mRHSData.back().imag().setZero();
 
       // Add storage for solution
-      this->mSolution.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mSolution.back().first.setZero();
-      this->mSolution.back().second.setZero();
+      this->mSolution.push_back(DecoupledZMatrix(rows,cols));
+      this->mSolution.back().real().setZero();
+      this->mSolution.back().imag().setZero();
    }
 
    int SparseDLinearSolver::nSystem() const

@@ -157,7 +157,7 @@ namespace TestSuite {
       int nnzRhs = static_cast<int>(0.1*nx*nx);
 
       // Storage for the matrix row
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(nx*nz, nx*nz),SparseMatrix(nx*nz, nx*nz));
+      DecoupledZSparse  block(nx*nz, nx*nz);
       SparseMatrixZ  sparseLhs(nx*nz*fieldIds.size(), nx*nz*fieldIds.size());
       SparseMatrixZ  sparseRhs(nx*nz*fieldIds.size(), nx*nz*fieldIds.size());
 

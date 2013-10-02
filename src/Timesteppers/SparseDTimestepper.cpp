@@ -41,23 +41,23 @@ namespace Timestep {
       {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
-            this->mRHSOld.at(i).first = this->mRHSData.at(i).first;
-            this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first;
+            this->mRHSOld.at(i).real() = this->mRHSData.at(i).real();
+            this->mRHSData.at(i).real() = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).real() + ImExRK3::rhsN(step)*this->mRHSData.at(i).real();
 
-            this->mRHSOld.at(i).second = this->mRHSData.at(i).second;
-            this->mRHSData.at(i).second = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).second + ImExRK3::rhsN(step)*this->mRHSData.at(i).second;
+            this->mRHSOld.at(i).imag() = this->mRHSData.at(i).imag();
+            this->mRHSData.at(i).imag() = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).imag() + ImExRK3::rhsN(step)*this->mRHSData.at(i).imag();
          }
       } else
       {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
-            tmp = this->mRHSData.at(i).first;
-            this->mRHSData.at(i).first = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).first + ImExRK3::rhsN(step)*this->mRHSData.at(i).first + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).first;
-            this->mRHSOld.at(i).first = tmp;
+            tmp = this->mRHSData.at(i).real();
+            this->mRHSData.at(i).real() = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).real() + ImExRK3::rhsN(step)*this->mRHSData.at(i).real() + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).real();
+            this->mRHSOld.at(i).real() = tmp;
 
-            tmp = this->mRHSData.at(i).second;
-            this->mRHSData.at(i).second = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).second + ImExRK3::rhsN(step)*this->mRHSData.at(i).second + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).second;
-            this->mRHSOld.at(i).second = tmp;
+            tmp = this->mRHSData.at(i).imag();
+            this->mRHSData.at(i).imag() = this->mRHSMatrix.at(i+start)*this->mSolution.at(i).imag() + ImExRK3::rhsN(step)*this->mRHSData.at(i).imag() + ImExRK3::rhsNN(step)*this->mRHSOld.at(i).imag();
+            this->mRHSOld.at(i).imag() = tmp;
          }
       }
    }
@@ -172,9 +172,9 @@ namespace Timestep {
       SparseDLinearSolver::addStorage(rows,cols);
 
       // Add storage for old RHS data
-      this->mRHSOld.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mRHSOld.back().first.setZero();
-      this->mRHSOld.back().second.setZero();
+      this->mRHSOld.push_back(DecoupledZMatrix(rows,cols));
+      this->mRHSOld.back().real().setZero();
+      this->mRHSOld.back().imag().setZero();
 
       // Add storage for the time matrix
       this->mTMatrix.push_back(SparseMatrix());

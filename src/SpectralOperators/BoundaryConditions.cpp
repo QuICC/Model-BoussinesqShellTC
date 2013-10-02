@@ -44,9 +44,9 @@ namespace Spectral {
       assert(bcOp.basisN() >= nBCs);
 
       // Initialise tau lines matrix
-      DecoupledZMatrix lines(std::make_pair(Matrix(bcOp.basisN(), nBCs),Matrix(bcOp.basisN(), nBCs)));
-      lines.first.setZero();
-      lines.second.setZero();
+      DecoupledZMatrix lines(bcOp.basisN(), nBCs);
+      lines.real().setZero();
+      lines.imag().setZero();
 
       // Map iterator
       std::vector<std::pair<BoundaryConditions::Id,IBoundary::Position> >::const_iterator it;
@@ -58,17 +58,17 @@ namespace Spectral {
          switch(it->first)
          {
             case BoundaryConditions::VALUE:
-               lines.first.col(idx) = bcOp.value(it->second);
+               lines.real().col(idx) = bcOp.value(it->second);
                idx++;
                hasReal = true;
                break;
             case BoundaryConditions::FIRST_DERIVATIVE:
-               lines.first.col(idx) = bcOp.firstDerivative(it->second);
+               lines.real().col(idx) = bcOp.firstDerivative(it->second);
                idx++;
                hasReal = true;
                break;
             case BoundaryConditions::SECOND_DERIVATIVE:
-               lines.first.col(idx) = bcOp.secondDerivative(it->second);
+               lines.real().col(idx) = bcOp.secondDerivative(it->second);
                idx++;
                hasReal = true;
                break;
@@ -76,10 +76,10 @@ namespace Spectral {
                /// \warning Beta slope boundary conditions does not include the wave number factor
                if(it->second == IBoundary::RIGHT)
                {
-                  lines.second.col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->second);
+                  lines.imag().col(idx) = static_cast<MHDFloat>(-1)*bcOp.value(it->second);
                } else //if(it->second == IBoundary::LEFT)
                {
-                  lines.second.col(idx) = bcOp.value(it->second);
+                  lines.imag().col(idx) = bcOp.value(it->second);
                }
                idx++;
                hasImag = true;
@@ -93,13 +93,13 @@ namespace Spectral {
       // Clear real matrix if not conditions have been set
       if(!hasReal)
       {
-         lines.first.resize(0,0);
+         lines.real().resize(0,0);
       }
 
       // Clear imaginary matrix if not conditions have been set
       if(!hasImag)
       {
-         lines.second.resize(0,0);
+         lines.imag().resize(0,0);
       }
 
       return lines;
@@ -111,44 +111,44 @@ namespace Spectral {
       DecoupledZMatrix lines = BoundaryConditions::tauLines(bcOp, bcId);
 
       // Create sparse matrices
-      DecoupledZSparse sparse(std::make_pair(SparseMatrix(bcOp.basisN(), bcOp.basisN()),SparseMatrix(bcOp.basisN(), bcOp.basisN())));
+      DecoupledZSparse sparse(bcOp.basisN(), bcOp.basisN());
 
       // Reserve space in sparse matrices
-      sparse.first.reserve(lines.first.rows()*lines.first.cols());
-      sparse.second.reserve(lines.first.rows()*lines.first.cols());
+      sparse.real().reserve(lines.real().rows()*lines.real().cols());
+      sparse.imag().reserve(lines.real().rows()*lines.real().cols());
 
       // Make sparse tau matrix for real component (if required)
-      if(sparse.first.size() != 0)
+      if(sparse.real().size() != 0)
       {
-         for(int j = 0; j < sparse.first.cols(); ++j)
+         for(int j = 0; j < sparse.real().cols(); ++j)
          {
             // create column j
-            sparse.first.startVec(j);
+            sparse.real().startVec(j);
 
-            for(int i = 0; i < lines.first.cols(); ++i)
+            for(int i = 0; i < lines.real().cols(); ++i)
             {
-               sparse.first.insertBack(i,j) = lines.first(j,i);
+               sparse.real().insertBack(i,j) = lines.real()(j,i);
             }
          }
-         sparse.first.prune(1e-32);
-         sparse.first.finalize(); 
+         sparse.real().prune(1e-32);
+         sparse.real().finalize(); 
       }
 
       // Make sparse tau matrix for imaginary component (if required)
-      if(sparse.second.size() != 0)
+      if(sparse.imag().size() != 0)
       {
-         for(int j = 0; j < sparse.second.cols(); ++j)
+         for(int j = 0; j < sparse.imag().cols(); ++j)
          {
             // create column j
-            sparse.second.startVec(j);
+            sparse.imag().startVec(j);
 
-            for(int i = 0; i < lines.second.cols(); ++i)
+            for(int i = 0; i < lines.imag().cols(); ++i)
             {
-               sparse.second.insertBack(i,j) = lines.second(j,i);
+               sparse.imag().insertBack(i,j) = lines.imag()(j,i);
             }
          }
-         sparse.second.prune(1e-32);
-         sparse.second.finalize(); 
+         sparse.imag().prune(1e-32);
+         sparse.imag().finalize(); 
       }
 
       return sparse;

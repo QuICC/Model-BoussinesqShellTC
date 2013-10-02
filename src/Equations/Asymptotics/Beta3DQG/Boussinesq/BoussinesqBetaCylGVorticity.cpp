@@ -133,8 +133,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
+      mat.real().resize(nX*nZ,nX*nZ);
+      mat.imag().resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -143,7 +143,7 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.first = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0));
+         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0));
 
       // Unknown field
       } else
@@ -152,8 +152,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
 }

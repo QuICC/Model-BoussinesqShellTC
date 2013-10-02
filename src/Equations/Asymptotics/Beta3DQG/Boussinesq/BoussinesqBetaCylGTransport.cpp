@@ -164,8 +164,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
+      mat.real().resize(nX*nZ,nX*nZ);
+      mat.imag().resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -178,7 +178,7 @@ namespace Equations {
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
          SparseMatrix tmp = k_*spec3D.id(0);
-         mat.second = Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0));
+         mat.imag() = Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0));
 
          /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
@@ -192,7 +192,7 @@ namespace Equations {
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
          SparseMatrix tmp = (1./Pr)*spec3D.id(0);
-         mat.first = Eigen::kroneckerProduct(tmp, Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2));
+         mat.real() = Eigen::kroneckerProduct(tmp, Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2));
 
          // Unknown field
       } else
@@ -201,8 +201,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
@@ -216,15 +216,15 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nX*nZ,nX*nZ);
-      mat.second.resize(nX*nZ,nX*nZ);
+      mat.real().resize(nX*nZ,nX*nZ);
+      mat.imag().resize(nX*nZ,nX*nZ);
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      mat.first = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
+      mat.real() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)

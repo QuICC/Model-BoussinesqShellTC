@@ -62,8 +62,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::BcType bound3D(n3D);
 
       // Initialise output matrices
-      mat.first.resize(n1D*n3D,n1D*n3D);
-      mat.second.resize(n1D*n3D,n1D*n3D);
+      mat.real().resize(n1D*n3D,n1D*n3D);
+      mat.imag().resize(n1D*n3D,n1D*n3D);
 
       // Nothing to do if c1D = 0 and c3D = 0;
       if(c1D != 0 || c3D != 0)
@@ -126,22 +126,22 @@ namespace Equations {
             if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
             {
                tau = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
-               if(tau.first.nonZeros() > 0)
+               if(tau.real().nonZeros() > 0)
                {
                   if(c1D != 1.0)
                   {
-                     tau.first *= c1D;
+                     tau.real() *= c1D;
                   }
-                  mat.first = Eigen::kroneckerProduct(q3D, tau.first);
+                  mat.real() = Eigen::kroneckerProduct(q3D, tau.real());
                }
 
-               if(tau.second.nonZeros() > 0)
+               if(tau.imag().nonZeros() > 0)
                {
                   if(c1D != 1.0)
                   {
-                     tau.second *= c1D;
+                     tau.imag() *= c1D;
                   }
-                  mat.second = Eigen::kroneckerProduct(q3D, tau.second);
+                  mat.imag() = Eigen::kroneckerProduct(q3D, tau.imag());
                }
             }
 
@@ -149,32 +149,32 @@ namespace Equations {
             if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM3D) > 0)
             {
                tau = Spectral::BoundaryConditions::tauMatrix(bound3D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second);
-               if(tau.first.nonZeros() > 0)
+               if(tau.real().nonZeros() > 0)
                {
                   if(c3D != 1.0)
                   {
-                     tau.first *= c3D;
+                     tau.real() *= c3D;
                   }
                   SparseMatrix tmp;
-                  tmp = Eigen::kroneckerProduct(tau.first, q1D);
-                  mat.first += tmp;
+                  tmp = Eigen::kroneckerProduct(tau.real(), q1D);
+                  mat.real() += tmp;
                }
-               if(tau.second.nonZeros() > 0)
+               if(tau.imag().nonZeros() > 0)
                {
                   if(c3D != 1.0)
                   {
-                     tau.second *= c3D;
+                     tau.imag() *= c3D;
                   }
                   SparseMatrix tmp;
-                  tmp = Eigen::kroneckerProduct(tau.second, q1D);
-                  mat.second += tmp;
+                  tmp = Eigen::kroneckerProduct(tau.imag(), q1D);
+                  mat.imag() += tmp;
                }
             }
          }
 
          // Prune matrices for safety
-         mat.first.prune(1e-32);
-         mat.second.prune(1e-32);
+         mat.real().prune(1e-32);
+         mat.imag().prune(1e-32);
       }
    }
 }

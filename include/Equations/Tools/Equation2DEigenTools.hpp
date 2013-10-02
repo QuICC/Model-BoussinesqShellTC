@@ -83,9 +83,9 @@ namespace Equations {
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(sysN, sysN), SparseMatrix(sysN, sysN));
+      DecoupledZSparse  matrixRow(sysN, sysN);
       int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(blockN, blockN),SparseMatrix(blockN, blockN));
+      DecoupledZSparse  block(blockN, blockN);
       SparseMatrix  tmp(sysN, sysN);
 
       // Loop over all coupled fields
@@ -98,17 +98,17 @@ namespace Equations {
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
          Equations::linearBlock(eq, compId, block, *fIt, k2D_, k3D_);
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
-         matrixRow.first += tmp;
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
-         matrixRow.second += tmp;
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
+         matrixRow.real() += tmp;
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
+         matrixRow.imag() += tmp;
 
          colIdx++;
       }
 
       // Make sure matrices are in compressed format
-      matrixRow.first.makeCompressed();
-      matrixRow.second.makeCompressed();
+      matrixRow.real().makeCompressed();
+      matrixRow.imag().makeCompressed();
 
       return matrixRow;
    }
@@ -124,23 +124,23 @@ namespace Equations {
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(sysN, sysN), SparseMatrix(sysN, sysN));
+      DecoupledZSparse  matrixRow(sysN, sysN);
       int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(blockN, blockN),SparseMatrix(blockN, blockN));
+      DecoupledZSparse  block(blockN, blockN);
       SparseMatrix  tmp(sysN, sysN);
 
       // Create time row
       SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
       blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
       Equations::timeBlock(eq, compId, block, k2D_, k3D_);
-      tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
-      matrixRow.first += tmp;
-      tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
-      matrixRow.second += tmp;
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
+      matrixRow.real() += tmp;
+      tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
+      matrixRow.imag() += tmp;
 
       // Make sure matrices are in compressed format
-      matrixRow.first.makeCompressed();
-      matrixRow.second.makeCompressed();
+      matrixRow.real().makeCompressed();
+      matrixRow.imag().makeCompressed();
 
       return matrixRow;
    }
@@ -156,9 +156,9 @@ namespace Equations {
 
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow = std::make_pair(SparseMatrix(sysN, sysN), SparseMatrix(sysN, sysN));
+      DecoupledZSparse  matrixRow(sysN, sysN);
       int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block = std::make_pair(SparseMatrix(blockN, blockN),SparseMatrix(blockN, blockN));
+      DecoupledZSparse  block(blockN, blockN);
       SparseMatrix  tmp(sysN, sysN);
 
       // Loop over all coupled fields
@@ -171,17 +171,17 @@ namespace Equations {
          blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
 
          Equations::boundaryBlock(eq, compId, block, *fIt, k2D_, k3D_);
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.first);
-         matrixRow.first += tmp;
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.second);
-         matrixRow.second += tmp;
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
+         matrixRow.real() += tmp;
+         tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
+         matrixRow.imag() += tmp;
 
          colIdx++;
       }
 
       // Make sure matrices are in compressed format
-      matrixRow.first.makeCompressed();
-      matrixRow.second.makeCompressed();
+      matrixRow.real().makeCompressed();
+      matrixRow.imag().makeCompressed();
 
       return matrixRow;
    }

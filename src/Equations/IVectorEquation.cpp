@@ -87,8 +87,8 @@ namespace Equations {
          int cols = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
 
          //Safety assertion
-         assert(rows*cols+start <= storage.first.rows());
-         assert(rows*cols+start <= storage.second.rows());
+         assert(rows*cols+start <= storage.real().rows());
+         assert(rows*cols+start <= storage.imag().rows());
 
          // Copy data
          int k = start;
@@ -97,7 +97,7 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(MHDComplex(storage.first(k),storage.second(k)),i,j,matIdx);
+               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(MHDComplex(storage.real()(k),storage.imag()(k)),i,j,matIdx);
 
                // increase storage counter
                k++;
@@ -114,7 +114,7 @@ namespace Equations {
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(MHDComplex(storage.first(k),storage.second(k)),i,mode(1),mode(0));
+            this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(MHDComplex(storage.real()(k),storage.imag()(k)),i,mode(1),mode(0));
 
             // increase storage counter
             k++;
@@ -174,10 +174,10 @@ namespace Equations {
 
          //Safety assertion
          assert(start >= 0);
-         assert(start < storage.first.size());
-         assert(start < storage.second.size());
-         assert(rows*cols+start <= storage.first.rows());
-         assert(rows*cols+start <= storage.second.rows());
+         assert(start < storage.real().size());
+         assert(start < storage.imag().size());
+         assert(rows*cols+start <= storage.real().rows());
+         assert(rows*cols+start <= storage.imag().rows());
 
          // Copy data
          int k = start;
@@ -186,10 +186,10 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Copy field real value into storage
-               storage.first(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx).real();
+               storage.real()(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx).real();
 
                // Copy field imaginary value into storage
-               storage.second(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx).imag();
+               storage.imag()(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx).imag();
 
                // increase storage counter
                k++;
@@ -201,8 +201,8 @@ namespace Equations {
       {
          //Safety assertion
          assert(start >= 0);
-         assert(start < storage.first.size());
-         assert(start < storage.second.size());
+         assert(start < storage.real().size());
+         assert(start < storage.imag().size());
 
          // Get mode indexes
          ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -213,10 +213,10 @@ namespace Equations {
          for(int i = 0; i < rows; i++)
          {
             // Copy field real value into storage
-            storage.first(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)).real();
+            storage.real()(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)).real();
 
             // Copy field imaginary value into storage
-            storage.second(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)).imag();
+            storage.imag()(k) = eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)).imag();
 
             // increase storage counter
             k++;
@@ -294,10 +294,10 @@ namespace Equations {
 
             //Safety assertion
             assert(start >= 0);
-            assert(start < storage.first.size());
-            assert(start < storage.second.size());
-            assert(rows*cols+start <= storage.first.rows());
-            assert(rows*cols+start <= storage.second.rows());
+            assert(start < storage.real().size());
+            assert(start < storage.imag().size());
+            assert(rows*cols+start <= storage.real().rows());
+            assert(rows*cols+start <= storage.imag().rows());
 
             // Copy data
             int k = start;
@@ -306,10 +306,10 @@ namespace Equations {
                for(int i = 0; i < rows; i++)
                {
                   // Copy field real value into storage
-                  storage.first(k) = 0.0;
+                  storage.real()(k) = 0.0;
 
                   // Copy field imaginary value into storage
-                  storage.second(k) = 0.0;
+                  storage.imag()(k) = 0.0;
 
                   // increase storage counter
                   k++;
@@ -319,8 +319,8 @@ namespace Equations {
          {
             //Safety assertion
             assert(start >= 0);
-            assert(start < storage.first.size());
-            assert(start < storage.second.size());
+            assert(start < storage.real().size());
+            assert(start < storage.imag().size());
 
             // Get mode indexes
             ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -331,10 +331,10 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Copy field real value into storage
-               storage.first(k) = 0.0;
+               storage.real()(k) = 0.0;
 
                // Copy field imaginary value into storage
-               storage.second(k) = 0.0;
+               storage.imag()(k) = 0.0;
 
                // increase storage counter
                k++;
@@ -418,10 +418,10 @@ namespace Equations {
 
             //Safety assertion
             assert(start >= 0);
-            assert(start < storage.first.size());
-            assert(start < storage.second.size());
-            assert(rows*cols+start <= storage.first.rows());
-            assert(rows*cols+start <= storage.second.rows());
+            assert(start < storage.real().size());
+            assert(start < storage.imag().size());
+            assert(rows*cols+start <= storage.real().rows());
+            assert(rows*cols+start <= storage.imag().rows());
 
             // Copy data
             int k = start;
@@ -433,10 +433,10 @@ namespace Equations {
                   MHDComplex source = eq.sourceTerm(compId, i, j, matIdx);
 
                   // Add real part of source term
-                  storage.first(k) += source.real();
+                  storage.real()(k) += source.real();
 
                   // Add imaginary part of source term
-                  storage.second(k) += source.imag();
+                  storage.imag()(k) += source.imag();
 
                   // increase storage counter
                   k++;
@@ -448,8 +448,8 @@ namespace Equations {
          {
             //Safety assertion
             assert(start >= 0);
-            assert(start < storage.first.size());
-            assert(start < storage.second.size());
+            assert(start < storage.real().size());
+            assert(start < storage.imag().size());
 
             // Get mode indexes
             ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
@@ -463,10 +463,10 @@ namespace Equations {
                MHDComplex source = eq.sourceTerm(compId, i, mode(1), mode(0));
 
                // Add real part of source term
-               storage.first(k) += source.real();
+               storage.real()(k) += source.real();
 
                // Add imaginary part of source term
-               storage.second(k) += source.imag();
+               storage.imag()(k) += source.imag();
 
                // increase storage counter
                k++;

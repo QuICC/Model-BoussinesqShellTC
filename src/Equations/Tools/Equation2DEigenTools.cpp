@@ -59,8 +59,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(n1D);
 
       // Initialise output matrices
-      mat.first.resize(n1D,n1D);
-      mat.second.resize(n1D,n1D);
+      mat.real().resize(n1D,n1D);
+      mat.imag().resize(n1D,n1D);
 
       if(c1D != 0)
       {
@@ -77,27 +77,27 @@ namespace Equations {
             if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
             {
                mat = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
-               if(mat.first.nonZeros() > 0)
+               if(mat.real().nonZeros() > 0)
                {
                   if(c1D != 1.0)
                   {
-                     mat.first *= c1D;
+                     mat.real() *= c1D;
                   }
                }
 
-               if(mat.second.nonZeros() > 0)
+               if(mat.imag().nonZeros() > 0)
                {
                   if(c1D != 1.0)
                   {
-                     mat.second *= c1D;
+                     mat.imag() *= c1D;
                   }
                }
             }
          }
 
          // Prune matrices for safety
-         mat.first.prune(1e-32);
-         mat.second.prune(1e-32);
+         mat.real().prune(1e-32);
+         mat.imag().prune(1e-32);
       }
    }
 }

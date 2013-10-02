@@ -152,8 +152,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nZ,nZ);
-      mat.second.resize(nZ,nZ);
+      mat.real().resize(nZ,nZ);
+      mat.imag().resize(nZ,nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat kX_ = kX/2.;
@@ -167,19 +167,19 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.first = Spectral::PeriodicOperator::bilaplacian2D(kX_, kY_)*spec1D.qDiff(1,0);
+         mat.real() = Spectral::PeriodicOperator::bilaplacian2D(kX_, kY_)*spec1D.qDiff(1,0);
 
       /// - Vertical velocity : \f$ \left(D_x^{-4} \otimes I_z^{-1}\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.first = spec1D.id(1);
+         mat.real() = spec1D.id(1);
 
       /// - Temperature : \f$ i \frac{k}{2}\frac{1}{16}\frac{Ra}{Pr}\left( D_x^{-4} \otimes D_Z^{-1}\right) \f$
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.second = kY_*(1.0/16.)*(Ra/Pr)*spec1D.qDiff(1,0);
+         mat.imag() = kY_*(1.0/16.)*(Ra/Pr)*spec1D.qDiff(1,0);
 
          // Unknown field
       } else
@@ -188,8 +188,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void timeBlock(const BoussinesqPerBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
@@ -201,19 +201,19 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nZ,nZ);
-      mat.second.resize(nZ,nZ);
+      mat.real().resize(nZ,nZ);
+      mat.imag().resize(nZ,nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat kX_ = kX/2.;
       MHDFloat kY_ = kY/2.;
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      mat.first = Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.qDiff(1,0);
+      mat.real() = Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.qDiff(1,0);
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(const BoussinesqPerBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)

@@ -37,9 +37,9 @@ namespace Solver {
       assert(cols > 0);
 
       // Add storage for solution
-      this->mSolution.push_back(std::make_pair(Matrix(rows,cols),Matrix(rows,cols)));
-      this->mSolution.back().first.setZero();
-      this->mSolution.back().second.setZero();
+      this->mSolution.push_back(DecoupledZMatrix(rows,cols));
+      this->mSolution.back().real().setZero();
+      this->mSolution.back().imag().setZero();
    }
 
    int SparseDTrivialSolver::nSystem() const

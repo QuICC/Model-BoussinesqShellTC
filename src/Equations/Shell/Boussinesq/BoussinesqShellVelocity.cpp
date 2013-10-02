@@ -206,28 +206,28 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nR);
 
       // Initialise output matrices
-      mat.first.resize(nR,nR);
-      mat.second.resize(nR,nR);
+      mat.real().resize(nR,nR);
+      mat.imag().resize(nR,nR);
 
       // Toroidal component : Velocity toroidal component
       if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         mat.first = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Toroidal component: Velocity poloidal component
       } else if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         mat.first = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Poloidal component : Velocity toroidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         mat.first = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Poloidal component: Velocity poloidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         mat.first = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Unknown field
       } else
@@ -236,8 +236,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void timeBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat l, const MHDFloat m)
@@ -252,18 +252,18 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nR);
 
       // Initialise output matrices
-      mat.first.resize(nR,nR);
-      mat.second.resize(nR,nR);
+      mat.real().resize(nR,nR);
+      mat.imag().resize(nR,nR);
 
       // Time operator for toroidal component
       if(compId == FieldComponents::Spectral::ONE)
       {
-         mat.first = spec1D.qDiff(2,0);
+         mat.real() = spec1D.qDiff(2,0);
 
       // Time operator for poloidal component
       } else if(compId == FieldComponents::Spectral::TWO)
       {
-         mat.first = spec1D.qDiff(2,0);
+         mat.real() = spec1D.qDiff(2,0);
 
       } else
       {
@@ -271,8 +271,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat l, const MHDFloat m)

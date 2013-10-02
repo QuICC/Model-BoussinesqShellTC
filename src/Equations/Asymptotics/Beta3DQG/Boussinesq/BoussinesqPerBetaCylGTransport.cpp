@@ -149,8 +149,8 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nZ,nZ);
-      mat.second.resize(nZ,nZ);
+      mat.real().resize(nZ,nZ);
+      mat.imag().resize(nZ,nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat kX_ = kX/2.;
@@ -164,7 +164,7 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.second = kY_*spec1D.id(0);
+         mat.imag() = kY_*spec1D.id(0);
 
       /// - Vertical velocity : \f$ \left(D_x^{-4} \otimes I_z^{-1}\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
@@ -177,7 +177,7 @@ namespace Equations {
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.first = (1./Pr)*Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.id(0);
+         mat.real() = (1./Pr)*Spectral::PeriodicOperator::laplacian2D(kX_, kY_)*spec1D.id(0);
 
          // Unknown field
       } else
@@ -186,8 +186,8 @@ namespace Equations {
       }
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void timeBlock(const BoussinesqPerBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
@@ -199,19 +199,19 @@ namespace Equations {
       Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nZ);
 
       // Initialise output matrices
-      mat.first.resize(nZ,nZ);
-      mat.second.resize(nZ,nZ);
+      mat.real().resize(nZ,nZ);
+      mat.imag().resize(nZ,nZ);
 
       // Rescale wave number to [-1, 1]
       MHDFloat kX_ = kX/2.;
       MHDFloat kY_ = kY/2.;
 
       // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      mat.first = spec1D.id(0);
+      mat.real() = spec1D.id(0);
 
       // Prune matrices for safety
-      mat.first.prune(1e-32);
-      mat.second.prune(1e-32);
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(const BoussinesPerqBetaCylGTransport& eq, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)

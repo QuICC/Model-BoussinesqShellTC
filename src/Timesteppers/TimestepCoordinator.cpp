@@ -263,12 +263,12 @@ namespace Timestep {
       DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
 
       // Compute LHS matrix
-      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first;
+      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).real();
 
-      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.first - lhsTCoeff*tRow.first;
+      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.real() - lhsTCoeff*tRow.real();
 
       // Compute RHS matrix
-      std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.first - rhsTCoeff*tRow.first;
+      std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.real() - rhsTCoeff*tRow.real();
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
@@ -280,7 +280,7 @@ namespace Timestep {
          }
 
          // Set time matrix
-         std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rTMatrix(idx) += tRow.first;
+         std::tr1::static_pointer_cast<SparseDTimestepper>(spSolver)->rTMatrix(idx) += tRow.real();
       }
    }
 
@@ -318,17 +318,17 @@ namespace Timestep {
 
       // Add boundary row for LHS operator
       DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
-      spSolver->rLHSMatrix(matIdx) += bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+      spSolver->rLHSMatrix(matIdx) += bcRow.real().cast<MHDComplex>() + MathConstants::cI*bcRow.imag();
 
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
       DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
 
 
       // Set LHS matrix
-      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*lhsLCoeff*linRow.second - lhsTCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*lhsTCoeff*tRow.second;
+      spSolver->rLHSMatrix(matIdx) += lhsLCoeff*linRow.real().cast<MHDComplex>() + MathConstants::cI*lhsLCoeff*linRow.imag() - lhsTCoeff*tRow.real().cast<MHDComplex>() - MathConstants::cI*lhsTCoeff*tRow.imag();
 
       // Set RHS matrix
-      std::tr1::static_pointer_cast<SparseZTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.first.cast<MHDComplex>() + MathConstants::cI*rhsLCoeff*linRow.second - rhsTCoeff*tRow.first.cast<MHDComplex>() - MathConstants::cI*rhsTCoeff*tRow.second;
+      std::tr1::static_pointer_cast<SparseZTimestepper>(spSolver)->rRHSMatrix(matIdx) += rhsLCoeff*linRow.real().cast<MHDComplex>() + MathConstants::cI*rhsLCoeff*linRow.imag() - rhsTCoeff*tRow.real().cast<MHDComplex>() - MathConstants::cI*rhsTCoeff*tRow.imag();
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
@@ -340,7 +340,7 @@ namespace Timestep {
          }
 
          // Set time matrix
-         std::tr1::static_pointer_cast<SparseZTimestepper>(spSolver)->rTMatrix(idx) += tRow.first.cast<MHDComplex>() + MathConstants::cI*tRow.second;
+         std::tr1::static_pointer_cast<SparseZTimestepper>(spSolver)->rTMatrix(idx) += tRow.real().cast<MHDComplex>() + MathConstants::cI*tRow.imag();
       }
    }
 

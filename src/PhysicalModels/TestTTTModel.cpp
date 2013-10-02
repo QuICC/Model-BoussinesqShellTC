@@ -26,7 +26,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -129,20 +129,20 @@ namespace GeoMHDiSCC {
    void TestTTTModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VORTICITY);
 

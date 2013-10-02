@@ -75,7 +75,7 @@ namespace Solver {
       }
 
       // Set LHS matrix
-      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).first + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).first;
+      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).real() + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).real();
    }
 
    void SparseLinearCoordinator::buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
@@ -90,7 +90,7 @@ namespace Solver {
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
 
       // Set LHS matrix
-      spSolver->rLHSMatrix(matIdx) += linRow.first.cast<MHDComplex>() + MathConstants::cI*linRow.second + bcRow.first.cast<MHDComplex>() + MathConstants::cI*bcRow.second;
+      spSolver->rLHSMatrix(matIdx) += linRow.real().cast<MHDComplex>() + MathConstants::cI*linRow.imag() + bcRow.real().cast<MHDComplex>() + MathConstants::cI*bcRow.imag();
    }
 
 }

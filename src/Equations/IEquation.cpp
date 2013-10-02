@@ -91,10 +91,10 @@ namespace Equations {
             this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, k_);
 
             // Explicit operator requires an additional minus sign
-            tmpMat.at(i).first = -tmpMat.at(i).first;
-            tmpMat.at(i).second = -tmpMat.at(i).second;
+            tmpMat.at(i).real() = -tmpMat.at(i).real();
+            tmpMat.at(i).imag() = -tmpMat.at(i).imag();
 
-            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+            isComplex = isComplex || (tmpMat.at(i).imag().nonZeros() > 0);
          }
 
          // Create key
@@ -108,7 +108,7 @@ namespace Equations {
 
             for(int i = 0; i < nSystems; ++i)
             {
-               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).imag();
                this->mLZMatrices.find(key)->second.push_back(tmp);
             }
          } else
@@ -120,7 +120,7 @@ namespace Equations {
             {
                this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
 
-               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).real());
             }
          }
       }
@@ -179,10 +179,10 @@ namespace Equations {
             this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, k2D_, k3D_);
 
             // Explicit operator requires an additional minus sign
-            tmpMat.at(i).first = -tmpMat.at(i).first;
-            tmpMat.at(i).second = -tmpMat.at(i).second;
+            tmpMat.at(i).real() = -tmpMat.at(i).real();
+            tmpMat.at(i).imag() = -tmpMat.at(i).imag();
 
-            isComplex = isComplex || (tmpMat.at(i).second.nonZeros() > 0);
+            isComplex = isComplex || (tmpMat.at(i).imag().nonZeros() > 0);
          }
 
          // Create key
@@ -196,7 +196,7 @@ namespace Equations {
 
             for(int i = 0; i < nSystems; ++i)
             {
-               SparseMatrixZ tmp = tmpMat.at(i).first.cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).second;
+               SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).imag();
                this->mLZMatrices.find(key)->second.push_back(tmp);
             }
          } else
@@ -208,7 +208,7 @@ namespace Equations {
             {
                this->mLDMatrices.find(key)->second.push_back(SparseMatrix());
 
-               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).first);
+               this->mLDMatrices.find(key)->second.back().swap(tmpMat.at(i).real());
             }
          }
       }
@@ -269,8 +269,8 @@ namespace Equations {
          assert(op->cols() == rows);
 
          // Multiply nonlinear term by quasi-inverse
-         storage.first.block(start, 0, rows, storage.first.cols()) = (*op)*storage.first.block(start, 0, rows, storage.first.cols());
-         storage.second.block(start, 0, rows, storage.second.cols()) = (*op)*storage.second.block(start, 0, rows, storage.second.cols());
+         storage.real().block(start, 0, rows, storage.real().cols()) = (*op)*storage.real().block(start, 0, rows, storage.real().cols());
+         storage.imag().block(start, 0, rows, storage.imag().cols()) = (*op)*storage.imag().block(start, 0, rows, storage.imag().cols());
       }
    }
 
@@ -306,11 +306,11 @@ namespace Equations {
          {
             // Get number of rows and columns of block
             int rows = op->rows()*op->cols();
-            int cols = eqField.first.cols();
+            int cols = eqField.real().cols();
 
             //Safety assertion
-            assert(rows+eqStart <= eqField.first.rows());
-            assert(rows+eqStart <= eqField.second.rows());
+            assert(rows+eqStart <= eqField.real().rows());
+            assert(rows+eqStart <= eqField.imag().rows());
 
             /// \mhdBug very bad and slow implementation!
             ArrayZ   tmp(rows);
@@ -328,10 +328,10 @@ namespace Equations {
             }
 
             // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
-            eqField.first.block(eqStart, 0, rows, cols) += op->real()*tmp.real();
-            eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*tmp.imag();
-            eqField.second.block(eqStart, 0, rows, cols) += op->real()*tmp.imag();
-            eqField.second.block(eqStart, 0, rows, cols) += op->imag()*tmp.real();
+            eqField.real().block(eqStart, 0, rows, cols) += op->real()*tmp.real();
+            eqField.real().block(eqStart, 0, rows, cols) -= op->imag()*tmp.imag();
+            eqField.imag().block(eqStart, 0, rows, cols) += op->real()*tmp.imag();
+            eqField.imag().block(eqStart, 0, rows, cols) += op->imag()*tmp.real();
 
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
          {
@@ -340,18 +340,18 @@ namespace Equations {
 
             // Assert correct sizes
             assert(op->rows() == explicitField.slice(mode(0)).rows());
-            assert(eqField.first.cols() == 1);
-            assert(eqField.second.cols() == 1);
+            assert(eqField.real().cols() == 1);
+            assert(eqField.imag().cols() == 1);
 
             // Get number of rows and columns of block
             int rows = op->rows();
-            int cols = eqField.first.cols();
+            int cols = eqField.real().cols();
 
             // Apply operator to field: Re(eq) += Re(op)*Re(lin) - Im(op)*Im(lin), Im(eq) += Re(op)*Im(lin) + Im(op)*Re(lin)
-            eqField.first.block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).real();
-            eqField.first.block(eqStart, 0, rows, cols) -= op->imag()*explicitField.slice(mode(0)).col(mode(1)).imag();
-            eqField.second.block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).imag();
-            eqField.second.block(eqStart, 0, rows, cols) += op->imag()*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.real().block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.real().block(eqStart, 0, rows, cols) -= op->imag()*explicitField.slice(mode(0)).col(mode(1)).imag();
+            eqField.imag().block(eqStart, 0, rows, cols) += op->real()*explicitField.slice(mode(0)).col(mode(1)).imag();
+            eqField.imag().block(eqStart, 0, rows, cols) += op->imag()*explicitField.slice(mode(0)).col(mode(1)).real();
          }
       }
 
@@ -365,11 +365,11 @@ namespace Equations {
          {
             // Get number of rows and columns of block
             int rows = explicitField.slice(matIdx).size();
-            int cols = eqField.first.cols();
+            int cols = eqField.real().cols();
 
             //Safety assertion
-            assert(rows+eqStart <= eqField.first.rows());
-            assert(rows+eqStart <= eqField.second.rows());
+            assert(rows+eqStart <= eqField.real().rows());
+            assert(rows+eqStart <= eqField.imag().rows());
 
             /// \mhdBug very bad and slow implementation!
             ArrayZ   tmp(rows);
@@ -387,8 +387,8 @@ namespace Equations {
             }
 
             // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-            eqField.first.block(eqStart, 0, rows, cols) += (*op)*tmp.real();
-            eqField.second.block(eqStart, 0, rows, cols) += (*op)*tmp.imag();
+            eqField.real().block(eqStart, 0, rows, cols) += (*op)*tmp.real();
+            eqField.imag().block(eqStart, 0, rows, cols) += (*op)*tmp.imag();
 
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
          {
@@ -397,16 +397,16 @@ namespace Equations {
 
             // Assert correct sizes
             assert(op->rows() == explicitField.slice(mode(0)).rows());
-            assert(eqField.first.cols() == 1);
-            assert(eqField.second.cols() == 1);
+            assert(eqField.real().cols() == 1);
+            assert(eqField.imag().cols() == 1);
 
             // Get number of rows and columns of block
             int rows = op->rows();
-            int cols = eqField.first.cols();
+            int cols = eqField.real().cols();
 
             // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-            eqField.first.block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).real();
-            eqField.second.block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).imag();
+            eqField.real().block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).real();
+            eqField.imag().block(eqStart, 0, rows, cols) += (*op)*explicitField.slice(mode(0)).col(mode(1)).imag();
          }
       }
    }
