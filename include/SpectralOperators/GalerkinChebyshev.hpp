@@ -19,6 +19,7 @@
 #include "StaticAsserts/StaticAssert.hpp"
 #include "Base/Typedefs.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -242,24 +243,51 @@ namespace Spectral {
 
    template <> inline SparseMatrixZ GalerkinChebyshev::constrain<SparseMatrixZ>(const SparseMatrixZ& mat)
    {
-      SparseMatrixZ tmp = (mat*this->mZStencil).bottomRows(this->mN - this->mNeq);
+      SparseMatrixZ tmp;
+      if(this->mIsComplex)
+      {
+         tmp = (mat*this->mZStencil).bottomRows(this->mN - this->mNeq);
+      } else
+      {
+         tmp = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
+      }
+      
       return tmp;
    }
 
    template <> inline SparseMatrix GalerkinChebyshev::constrain<SparseMatrix>(const SparseMatrix& mat)
    {
-      SparseMatrix tmp = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
-      return tmp;
+      if(this->mIsComplex)
+      {
+         throw Exception("Can not apply complex stencil to real matrix");
+         return SparseMatrix();
+      } else
+      {
+         return (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
+      }
    }
 
    template <> inline Matrix GalerkinChebyshev::extend<Matrix>(const Matrix& gal)
    {
-      return this->mRStencil*gal;
+      if(this->mIsComplex)
+      {
+         throw Exception("Can not apply complex stencil to real data");
+         return Matrix();
+      } else
+      {
+         return this->mRStencil*gal;
+      }
    }
 
    template <> inline MatrixZ GalerkinChebyshev::extend<MatrixZ>(const MatrixZ& gal)
    {
-      return this->mZStencil*gal;
+      if(this->mIsComplex)
+      {
+         return this->mZStencil*gal;
+      } else
+      {
+         return this->mRStencil*gal;
+      }
    }
 
    template <typename TData> inline TData GalerkinChebyshev::restrict(const TData& spec)

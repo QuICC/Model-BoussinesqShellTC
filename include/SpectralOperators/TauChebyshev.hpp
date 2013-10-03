@@ -19,6 +19,7 @@
 #include "Base/Typedefs.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 #include "SpectralOperators/ITauBoundary.hpp"
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -132,12 +133,25 @@ namespace Spectral {
 
    template <> inline SparseMatrixZ TauChebyshev::constrain<SparseMatrixZ>(const SparseMatrixZ& mat)
    {
-      return mat + this->mZTau;
+      if(this->mIsComplex)
+      {
+         return mat + this->mZTau;
+      } else
+      {
+         return mat + this->mRTau.cast<SparseMatrixZ::Scalar>();
+      }
    }
 
    template <> inline SparseMatrix TauChebyshev::constrain<SparseMatrix>(const SparseMatrix& mat)
    {
-      return mat + this->mRTau;
+      if(this->mIsComplex)
+      {
+         throw Exception("Can not apply complex stencil to real data");
+         return SparseMatrix();
+      } else
+      {
+         return mat + this->mRTau;
+      }
    }
 
 }
