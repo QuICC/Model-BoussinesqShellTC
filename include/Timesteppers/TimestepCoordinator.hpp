@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Base/MathConstants.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "Timesteppers/SparseTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -27,6 +28,13 @@
 namespace GeoMHDiSCC {
 
 namespace Timestep {
+
+   namespace internal {
+
+      void addRow(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& blockRow);
+
+      void addRow(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& blockRow);
+   }
 
    /**
     * @brief Implementation of general timestepper structure
@@ -119,7 +127,7 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(Solver::SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+//         virtual void buildSolverMatrix(Solver::SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex solver matrix
@@ -130,7 +138,8 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(Solver::SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+//         virtual void buildSolverMatrix(Solver::SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         template <typename TStepper> void buildSolverMatrix(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
          /**
@@ -173,6 +182,98 @@ namespace Timestep {
           */
          MHDFloat mTime;
    };
+
+   template <typename TStepper> void TimestepCoordinator::buildSolverMatrix(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   {
+      // Operator coefficients
+      MHDFloat lhsTCoeff;
+      MHDFloat rhsTCoeff;
+      MHDFloat lhsLCoeff;
+      MHDFloat rhsLCoeff;
+
+      // Set time coefficients for LHS Matrix
+      lhsTCoeff = TimeSchemeType::lhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for LHS Matrix
+      lhsLCoeff = TimeSchemeType::lhsL(this->mStep);
+
+      // Set time coefficients for RHS Matrix
+      rhsTCoeff = TimeSchemeType::rhsT(this->mStep)*1.0/this->mDt;
+
+      // Set linear coefficients for RHS Matrix
+      rhsLCoeff = -TimeSchemeType::rhsL(this->mStep);
+
+      // Resize LHS matrix if necessary
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
+      {
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+      }
+
+      // Resize RHS matrix if necessary
+      if(std::tr1::static_pointer_cast<TStepper >(spSolver)->rRHSMatrix(matIdx).size() == 0)
+      {
+         std::tr1::static_pointer_cast<TStepper >(spSolver)->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+      }
+
+      // Add boundary row for LHS operator
+      internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx));
+
+      DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
+      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);
+
+      // Set LHS matrix
+      internal::addRow(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linRow);
+      internal::addRow(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, tRow);
+
+      // Set RHS matrix
+      internal::addRow(std::tr1::static_pointer_cast<TStepper >(spSolver)->rRHSMatrix(matIdx), rhsLCoeff, linRow);
+      internal::addRow(std::tr1::static_pointer_cast<TStepper >(spSolver)->rRHSMatrix(matIdx), -rhsTCoeff, tRow);
+
+      // Set time matrix for timestep updates
+      if(matIdx == idx)
+      {
+         // Resize time matrix if necessary
+         if(std::tr1::static_pointer_cast<TStepper >(spSolver)->rTMatrix(idx).size() == 0)
+         {
+            std::tr1::static_pointer_cast<TStepper >(spSolver)->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+         }
+
+         // Set time matrix
+         internal::addRow(std::tr1::static_pointer_cast<TStepper >(spSolver)->rTMatrix(idx), 1.0, tRow);
+      }
+   }
+
+   namespace internal {
+
+      inline void addRow(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& blockRow)
+      {
+         assert(blockRow.real().size() > 0);
+         assert(blockRow.imag().size() == 0);
+
+         if(c != 1.0)
+         {
+            mat += c*blockRow.real();
+         } else
+         {
+            mat += blockRow.real();
+         }
+      }
+
+      inline void addRow(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& blockRow)
+      {
+         assert(blockRow.real().size() > 0);
+         assert(blockRow.imag().size() > 0);
+         assert(blockRow.real().size() > blockRow.imag().size());
+
+         if(c != 1.0)
+         {
+            mat += c*blockRow.real().cast<MHDComplex>() + c*MathConstants::cI*blockRow.imag();
+         } else
+         {
+            mat += blockRow.real().cast<MHDComplex>() + MathConstants::cI*blockRow.imag();
+         }
+      }
+   }
 }
 }
 
