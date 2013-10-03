@@ -24,7 +24,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "Equations/IEquation.hpp"
+#include "Equations/Tools/EquationEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -37,9 +37,9 @@ namespace Equations {
    {
       public:
          /**
-          * @brief Number of eigen dimensions
+          * @brief Set eigen values
           */
-         static const int EIGEN_DIMS = 1;
+         template <typename TEquation> static std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx);
 
          /**
           * @brief Create setup for matrices with minial coupling
@@ -72,106 +72,35 @@ namespace Equations {
          static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
    };
 
+   template <typename TEquation> std::vector<MHDFloat> Equation1DEigenTools::getEigs(const TEquation& eq, const int matIdx)
+   {
+      std::vector<MHDFloat> eigs;
+
+      // Get wave number rescale to box size
+      eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)));
+
+      return eigs;
+   }
+
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      std::vector<MHDFloat> eigs = Equation1DEigenTools::getEigs(eq, matIdx);
 
-      // Storage for the matrix row
-      int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow(sysN, sysN);
-      int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block(blockN, blockN);
-      SparseMatrix  tmp(sysN, sysN);
-
-      // Loop over all coupled fields
-      int colIdx = 0;
-      CouplingInformation::FieldId_iterator fIt;
-      CouplingInformation::FieldId_range fRange = eq.couplingInfo(compId).implicitRange();
-      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-      {
-         SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
-         blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
-
-         Equations::linearBlock(eq, compId, block, *fIt, k_);
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
-         matrixRow.real() += tmp;
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
-         matrixRow.imag() += tmp;
-
-         colIdx++;
-      }
-
-      // Make sure matrices are in compressed format
-      matrixRow.real().makeCompressed();
-      matrixRow.imag().makeCompressed();
-
-      return matrixRow;
+      return EquationEigenTools::makeLinearRow(eq, compId, matIdx, eigs);
    }
 
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      std::vector<MHDFloat> eigs = Equation1DEigenTools::getEigs(eq, matIdx);
 
-      // Storage for the matrix row
-      int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow(sysN, sysN);
-      int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block(blockN, blockN);
-      SparseMatrix  tmp(sysN, sysN);
-
-      // Create time row
-      SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
-      blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex()) = 1;
-      Equations::timeBlock(eq, compId, block, k_);
-      tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
-      matrixRow.real() += tmp;
-      tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
-      matrixRow.imag() += tmp;
-
-      // Make sure matrices are in compressed format
-      matrixRow.real().makeCompressed();
-      matrixRow.imag().makeCompressed();
-
-      return matrixRow;
+      return EquationEigenTools::makeTimeRow(eq, compId, matIdx, eigs);
    }
 
    template <typename TEquation> DecoupledZSparse Equation1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      // Get wave number rescale to box size
-      MHDFloat k_ = eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx));
+      std::vector<MHDFloat> eigs = Equation1DEigenTools::getEigs(eq, matIdx);
 
-      // Storage for the matrix row
-      int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow(sysN, sysN);
-      int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block(blockN, blockN);
-      SparseMatrix  tmp(sysN, sysN);
-
-      // Loop over all coupled fields
-      int colIdx = 0;
-      CouplingInformation::FieldId_iterator fIt;
-      CouplingInformation::FieldId_range fRange = eq.couplingInfo(compId).implicitRange();
-      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-      {
-         SparseMatrix   blockMatrix(eq.couplingInfo(compId).nBlocks(),eq.couplingInfo(compId).nBlocks());
-         blockMatrix.insert(eq.couplingInfo(compId).fieldIndex(), colIdx) = 1;
-
-         Equations::boundaryBlock(eq, compId, block, *fIt, k_);
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
-         matrixRow.real() += tmp;
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
-         matrixRow.imag() += tmp;
-
-         colIdx++;
-      }
-
-      // Make sure matrices are in compressed format
-      matrixRow.real().makeCompressed();
-      matrixRow.imag().makeCompressed();
-
-      return matrixRow;
+      return EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
    }
 
 }

@@ -24,8 +24,8 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqShellTransport.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqShellVelocity.hpp"
+#include "Equations/SphericalShell/Boussinesq/BoussinesqShellTransport.hpp"
+#include "Equations/SphericalShell/Boussinesq/BoussinesqShellVelocity.hpp"
 #include "Generator/States/ShellExactScalarState.hpp"
 #include "Generator/Visualizers/FieldVisualizer.hpp"
 

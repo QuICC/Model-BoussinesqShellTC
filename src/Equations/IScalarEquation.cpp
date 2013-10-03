@@ -87,22 +87,7 @@ namespace Equations {
       // Initialise spectral matrices
       if(needInit)
       {
-         if(EquationToolsType::EIGEN_DIMS == 0)
-         {
-            this->initSpectralMatricesNoEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-         } else if(EquationToolsType::EIGEN_DIMS == 1)
-         {
-            this->initSpectralMatrices1DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-         } else if(EquationToolsType::EIGEN_DIMS == 2)
-         {
-            this->initSpectralMatrices2DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-         } else if(EquationToolsType::EIGEN_DIMS == 3)
-         {
-            this->initSpectralMatrices3DEigen(spBcIds, FieldComponents::Spectral::SCALAR);
-         } else
-         {
-            throw Exception("initSpectralMatrices: unhandled number of eigen dimensions!");
-         }
+         this->initSpectralMatricesComponent(spBcIds, FieldComponents::Spectral::SCALAR);
       }
    }
 }

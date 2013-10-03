@@ -150,6 +150,17 @@ namespace Conditions {
 
 }
 
+namespace internal {
+   /**
+    * @brief Create a small sparse matrix to select matrix block through Kronecker product
+    *
+    * @param nBlocks Number of blocks (ie. nBlocks x nBlocks matrix)
+    * @param row     Row of the required block
+    * @param col     Column of the required block
+    */
+      SparseMatrix makeBlockMatrix(const int nBlocks, const int row, const int col);
+   }
+
    /**
     * @brief Implementation of equation tools
     */

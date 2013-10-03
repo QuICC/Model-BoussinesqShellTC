@@ -77,7 +77,7 @@ namespace Equations {
          /**
           * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const;
 
       private:
    };
@@ -96,9 +96,9 @@ namespace Equations {
     *
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -106,9 +106,9 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void linearBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -116,9 +116,9 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
 }
 }

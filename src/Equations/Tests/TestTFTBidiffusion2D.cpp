@@ -100,8 +100,11 @@ namespace Equations {
       }
    }
 
-   void linearBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -115,7 +118,7 @@ namespace Equations {
       mat.imag().resize(nX*nZ,nX*nZ);
 
       // Rescale wave number to [-1, 1]
-      MHDFloat k_ = k/2.;
+      MHDFloat k = k/2.;
 
       // Setup 2D bi-diffusion
       if(fieldId.first == eq.name())
@@ -135,8 +138,11 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void timeBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -157,8 +163,11 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       int pX = 0;
       int pZ = 0;
 

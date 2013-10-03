@@ -77,9 +77,9 @@ namespace Equations {
     *
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void timeBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k);
+   void timeBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -87,9 +87,9 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void linearBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -97,9 +97,9 @@ namespace Equations {
     * @param eq      Equation to work on
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @param eigs    Wave number k
     */
-   void boundaryBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const TestTFTBidiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
 }
 }

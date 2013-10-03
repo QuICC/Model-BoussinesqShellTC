@@ -182,9 +182,9 @@ namespace Equations {
       Equations::quasiInverseBlock(*this, compId, mat);
    }
 
-   void ExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void ExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, k);
+      Equations::linearBlock(*this, compId, mat, fieldId, eigs);
    }
 
    void quasiInverseBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -204,8 +204,11 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -226,8 +229,11 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
-   {
+   void boundaryBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   {  
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       int pX = 0;
       int pZ = 0;
 

@@ -336,5 +336,18 @@ namespace Equations {
       }
    }
 
+   namespace internal {
+
+      SparseMatrix makeBlockMatrix(const int nBlocks, const int row, const int col)
+      {
+         SparseMatrix  mat(nBlocks, nBlocks);
+
+         mat.insert(row, col) = 1;
+         mat.makeCompressed();
+         
+         return mat;
+      }
+   }
+
 }
 }

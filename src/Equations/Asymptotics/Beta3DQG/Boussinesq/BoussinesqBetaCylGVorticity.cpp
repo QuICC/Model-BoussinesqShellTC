@@ -114,16 +114,19 @@ namespace Equations {
       assert(false);
    }
 
-   void BoussinesqBetaCylGVorticity::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void BoussinesqBetaCylGVorticity::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, k);
+      linearBlock(*this, compId, mat, fieldId, eigs);
    }
 
-   void linearBlock(const BoussinesqBetaCylGVorticity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const BoussinesqBetaCylGVorticity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);

@@ -170,9 +170,9 @@ namespace Equations {
       Equations::quasiInverseBlock(*this, compId, mat);
    }
 
-   void ShellExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void ShellExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, k);
+      Equations::linearBlock(*this, compId, mat, fieldId, eigs);
    }
 
    void quasiInverseBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -180,13 +180,21 @@ namespace Equations {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 2);
+      MHDFloat l = eigs.at(0);
+      MHDFloat m = eigs.at(1);
+
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 2);
+      MHDFloat l = eigs.at(0);
+      MHDFloat m = eigs.at(1);
+
       // Compute boundary block operator
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }

@@ -115,7 +115,7 @@ namespace Equations {
          /**
           * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const;
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const;
 
       private:
          /**
@@ -145,18 +145,18 @@ namespace Equations {
     *
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @parm eigs     Wave number k
     */
-   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field
     *
     * @param mat     Storage for output matrix
     * @param fieldId Physical ID of the field
-    * @param k       Wave number k
+    * @parm eigs     Wave number k
     */
-   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k);
+   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
 }
 }

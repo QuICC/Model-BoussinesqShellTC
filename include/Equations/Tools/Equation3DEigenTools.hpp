@@ -25,6 +25,7 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "Equations/IEquation.hpp"
+#include "Equations/Tools/EquationEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -37,9 +38,9 @@ namespace Equations {
    {
       public:
          /**
-          * @brief Number of eigen dimensions
+          * @brief Set eigen values
           */
-         static const int EIGEN_DIMS = 3;
+         template <typename TEquation> static std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx);
 
          /**
           * @brief Create setup for matrices with minial coupling
@@ -72,19 +73,35 @@ namespace Equations {
          static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
    };
 
-   template <typename TEquation> DecoupledZSparse Equation3DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> std::vector<MHDFloat> Equation3DEigenTools::getEigs(const TEquation& eq, const int matIdx)
    {
       throw Exception("Not yet implemented!");
+      std::vector<MHDFloat> eigs;
+
+      // Fill eigs somehow
+
+      return eigs;
+   }
+
+   template <typename TEquation> DecoupledZSparse Equation3DEigenTools::linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      std::vector<MHDFloat> eigs = Equation3DEigenTools::getEigs(eq, matIdx);
+
+      return EquationEigenTools::makeLinearRow(eq, compId, matIdx, eigs);
    }
 
    template <typename TEquation> DecoupledZSparse Equation3DEigenTools::timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      throw Exception("Not yet implemented!");
+      std::vector<MHDFloat> eigs = Equation3DEigenTools::getEigs(eq, matIdx);
+
+      return EquationEigenTools::makeTimeRow(eq, compId, matIdx, eigs);
    }
 
    template <typename TEquation> DecoupledZSparse Equation3DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      throw Exception("Not yet implemented!");
+      std::vector<MHDFloat> eigs = Equation3DEigenTools::getEigs(eq, matIdx);
+
+      return EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
    }
 
 }

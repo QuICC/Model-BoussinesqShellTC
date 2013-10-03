@@ -127,12 +127,12 @@ namespace Equations {
       quasiInverseBlock(*this, compId, mat);
    }
 
-   void BoussinesqBetaCylGTransport::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const
+   void BoussinesqBetaCylGTransport::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, k);
+      linearBlock(*this, compId, mat, fieldId, eigs);
    }
 
    void quasiInverseBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -153,8 +153,11 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void linearBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -205,8 +208,11 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k)
+   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -227,8 +233,11 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k)
+   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      assert(eigs.size() == 1);
+      MHDFloat k = eigs.at(0);
+
       /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
       int pX = 0;
       int pZ = 0;

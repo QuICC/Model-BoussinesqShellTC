@@ -126,36 +126,12 @@ namespace Equations {
          virtual void setCoupling() = 0;
 
          /**
-          * @brief Initialise the spectral equation matrices without "eigen" direction
+          * @brief Initialise the spectral equation matrices for given component
           *
           * @param spBcIds List of boundary condition IDs
           * @param compId  Spectral component
           */
-         void initSpectralMatricesNoEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
-
-         /**
-          * @brief Initialise the spectral equation matrices with a single "eigen" direction
-          *
-          * @param spBcIds List of boundary condition IDs
-          * @param compId  Spectral component
-          */
-         void initSpectralMatrices1DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
-
-         /**
-          * @brief Initialise the spectral equation matrices with two "eigen" direction
-          *
-          * @param spBcIds List of boundary condition IDs
-          * @param compId  Spectral component
-          */
-         void initSpectralMatrices2DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
-
-         /**
-          * @brief Initialise the spectral equation matrices with three "eigen" direction
-          *
-          * @param spBcIds List of boundary condition IDs
-          * @param compId  Spectral component
-          */
-         void initSpectralMatrices3DEigen(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
+         void initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
 
       private:
          /**
@@ -166,14 +142,9 @@ namespace Equations {
          virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const; //= 0;
 
          /**
-          * @brief Set the explicit linear matrix operator with a single eigen direction
+          * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k) const; //= 0;
-
-         /**
-          * @brief Set the explicit linear matrix operator with two eigen direction
-          */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k2D, const MHDFloat k3D) const; //= 0;
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const; //= 0;
 
    };
 
@@ -210,17 +181,17 @@ namespace Equations {
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const MHDFloat k); //= 0;
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs); //= 0;
 
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
 
    /**
     * @brief Dummy implementation. This should never get called!
     */
-   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat k); //= 0;
+   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
 
    namespace internal
    {
