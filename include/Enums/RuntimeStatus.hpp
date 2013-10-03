@@ -33,7 +33,7 @@ namespace GeoMHDiSCC {
          /// Keep going
          GOON = 0, 
          /// Abort simulation
-         STOP
+         STOP = 2
       };
    };
 }

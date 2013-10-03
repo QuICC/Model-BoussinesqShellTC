@@ -69,6 +69,7 @@
  *    \mhdTable{
  *       \mhdTableHeader
  *       \mhdStatus{ARPACK backend, \mhdStatTodo}
+ *       \mhdStatus{Trilinos backend, \mhdStatIdea}
  *    }   
  *
  * \section mhdSStatusSolver Sparse linear solvers
@@ -82,11 +83,12 @@
  *       \mhdStatus{SparseLU (eigen) backend, \mhdStatTodo}
  *       \mhdStatus{MKL Pardiso backend, \mhdStatTodo}
  *       \mhdStatus{Pardiso backend, \mhdStatTodo}
- *       \mhdStatus{MUMPS backend, \mhdStatTodo}
- *       \mhdStatus{PaStiX backend, \mhdStatTodo}
+ *       \mhdStatus{MUMPS backend, \mhdStatIdea}
+ *       \mhdStatus{PaStiX backend, \mhdStatIdea}
  *       \mhdStatus{SparseQR (eigen) backend, \mhdStatTodo}
  *       \mhdStatus{SPQR backend, \mhdStatTodo}
  *       \mhdStatus{BiCSTAB (eigen) backend, \mhdStatTodo}
+ *       \mhdStatus{Trilinos backend, \mhdStatIdea}
  *    }   
  *
  * \section mhdSStatusSolver Sparse nonlinear solvers

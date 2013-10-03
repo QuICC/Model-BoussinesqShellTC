@@ -25,8 +25,15 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_VALUE_LEFT= (1 << 0);
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_VALUE_RIGHT = (1 << 1);
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D1_LEFT = (1 << 2);
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D1_RIGHT = (1 << 3);
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D2_LEFT = (1 << 4);
+   const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D2_RIGHT = (1 << 5);
+
    GalerkinChebyshev::GalerkinChebyshev(const int nN, const Boundary::BCVector& bcs, const int nEq)
-      : mN(nN), mNeq(nEq)
+      : mN(nN), mNeq(nEq), mIsComplex(false), mRStencil(0,0), mZStencil(0,0)
    {
       this->identifyCondition(bcs);
 
@@ -39,47 +46,83 @@ namespace Spectral {
 
    void GalerkinChebyshev::identifyCondition(const Boundary::BCVector& bcs)
    {
-      this->mBcId = ZERO_VALUE;
+      this->mIsComplex = false;
+      this->mBcId = 0;
+
+      for(Boundary::BCVector::const_iterator it = bcs.begin(); it != bcs.end(); ++it)
+      {
+         if(it->type == Boundary::VALUE)
+         {
+            if(it->position == Boundary::LEFT)
+            {
+               this->mBcId |= ZERO_VALUE_LEFT;
+            } else
+            {
+               this->mBcId |= ZERO_VALUE_RIGHT;
+            }
+         } else if(it->type == Boundary::D1)
+         {
+            if(it->position == Boundary::LEFT)
+            {
+               this->mBcId |= ZERO_D1_LEFT;
+            } else
+            {
+               this->mBcId |= ZERO_D1_RIGHT;
+            }
+         } else if(it->type == Boundary::D2)
+         {
+            if(it->position == Boundary::LEFT)
+            {
+               this->mBcId |= ZERO_D2_LEFT;
+            } else
+            {
+               this->mBcId |= ZERO_D2_RIGHT;
+            }
+         } else
+         {
+            throw Exception("Stencil has not been implemented for given combination of boundary conditions!");
+         }
+      }
    }
 
    void GalerkinChebyshev::createStencil()
    {
       if(this->mBcId == ZERO_VALUE_LEFT)
       {
-         this->zeroValueLeft(mStencil, this->mN);
+         this->zeroValueLeft(mRStencil, this->mN);
       } else if(this->mBcId == ZERO_VALUE_RIGHT)
       {
-         this->zeroValueRight(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_VALUE)
-      {
-         this->zeroValue(mStencil, this->mN);
+         this->zeroValueRight(mRStencil, this->mN);
       } else if(this->mBcId == ZERO_D1_LEFT)
       {
-         this->zeroD1Left(mStencil, this->mN);
+         this->zeroD1Left(mRStencil, this->mN);
       } else if(this->mBcId == ZERO_D1_RIGHT)
       {
-         this->zeroD1Right(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_D1)
-      {
-         this->zeroD1(mStencil, this->mN);
+         this->zeroD1Right(mRStencil, this->mN);
       } else if(this->mBcId == ZERO_D2_LEFT)
       {
-         this->zeroD2Left(mStencil, this->mN);
+         this->zeroD2Left(mRStencil, this->mN);
       } else if(this->mBcId == ZERO_D2_RIGHT)
       {
-         this->zeroD2Right(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_D2)
+         this->zeroD2Right(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_VALUE_LEFT | ZERO_VALUE_RIGHT))
       {
-         this->zeroD2(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_VALUED1)
+         this->zeroValue(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_D1_LEFT | ZERO_D1_RIGHT))
       {
-         this->zeroVD1(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_VALUED2)
+         this->zeroD1(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_D2_LEFT | ZERO_D2_RIGHT))
       {
-         this->zeroVD2(mStencil, this->mN);
-      } else if(this->mBcId == ZERO_D1D2)
+         this->zeroD2(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_VALUE_LEFT | ZERO_VALUE_RIGHT | ZERO_D1_LEFT | ZERO_D1_RIGHT))
       {
-         this->zeroD1D2(mStencil, this->mN);
+         this->zeroVD1(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_VALUE_LEFT | ZERO_VALUE_RIGHT | ZERO_D2_LEFT | ZERO_D2_RIGHT))
+      {
+         this->zeroVD2(mRStencil, this->mN);
+      } else if(this->mBcId == (ZERO_D1_LEFT | ZERO_D1_RIGHT | ZERO_D2_LEFT | ZERO_D2_RIGHT))
+      {
+         this->zeroD1D2(mRStencil, this->mN);
       } else
       {
          throw Exception("Stencil has not been implemented!");
@@ -122,7 +165,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = 0.5*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = 0.5*this->c(j);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -148,7 +191,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -0.5*GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = -0.5*this->c(j);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -173,7 +216,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = -this->c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -201,7 +244,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = -((dj+1.0)*(dj+1.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
+         rStencil.insertBack(j,j) = -((dj+1.0)*(dj+1.0))*this->c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -229,7 +272,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+1.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+1.0))*this->c(j)/(2.0*dj*dj + 2.0*dj + 1.0);
 
          // Create sub diagonal entry for j+1
          if(j < rStencil.rows()-1)
@@ -256,7 +299,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*dj*dj + 4.0*dj + 4.0);
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0))*this->c(j)/(2.0*dj*dj + 4.0*dj + 4.0);
 
          // Create sub diagonal entry for j+2
          if(j > 0 && j < rStencil.rows()-2)
@@ -284,7 +327,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*(dj*dj + dj + 1.0));
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*this->c(j)/(2.0*(dj*dj + dj + 1.0));
 
          // Create sub diagonal entry for j+1
          if(j > 1 && j < rStencil.rows()-1)
@@ -312,7 +355,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*GalerkinChebyshev::c(j)/(2.0*(dj*dj + dj + 1.0));
+         rStencil.insertBack(j,j) = ((dj+1.0)*(dj+2.0))*this->c(j)/(2.0*(dj*dj + dj + 1.0));
 
          // Create sub diagonal entry for j+1
          if(j > 1 && j < rStencil.rows()-1)
@@ -340,7 +383,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0)*(dj+3.0))*GalerkinChebyshev::c(j)/(2.0*(dj+1.0)*(dj*dj + 2.0*dj + 6.0));
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+2.0)*(dj+3.0))*this->c(j)/(2.0*(dj+1.0)*(dj*dj + 2.0*dj + 6.0));
 
          // Create sub diagonal entry for j+2
          if(j > 1 && j < rStencil.rows()-2)
@@ -367,7 +410,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = this->c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -400,7 +443,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = GalerkinChebyshev::c(j);
+         rStencil.insertBack(j,j) = this->c(j);
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)
@@ -434,7 +477,7 @@ namespace Spectral {
          rStencil.startVec(j);
 
          // Create diagonal
-         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+3.0)*(dj+4.0)*(dj+4.0))*GalerkinChebyshev::c(j)/(4.0*(dj*dj*dj*dj + 8.0*dj*dj*dj*dj + 24.0*dj*dj + 32.0*dj + 24.0));
+         rStencil.insertBack(j,j) = ((dj+2.0)*(dj+3.0)*(dj+4.0)*(dj+4.0))*this->c(j)/(4.0*(dj*dj*dj*dj + 8.0*dj*dj*dj*dj + 24.0*dj*dj + 32.0*dj + 24.0));
 
          // Create sub diagonal entry for j+2
          if(j < rStencil.rows()-2)

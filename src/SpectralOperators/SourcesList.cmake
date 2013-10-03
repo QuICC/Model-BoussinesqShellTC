@@ -13,4 +13,6 @@ set(MHDSources
    CylindricalChebyshevBoundary.cpp
    SphericalHarmonicOperator.cpp
    GalerkinChebyshev.cpp
+   TauChebyshev.cpp
+   ITauBoundary.cpp
 )

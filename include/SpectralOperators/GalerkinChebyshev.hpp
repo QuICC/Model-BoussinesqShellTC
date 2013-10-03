@@ -9,12 +9,14 @@
 
 // System includes
 //
+#include <bitset>
 
 // External includes
 //
 
 // Project includes
 //
+#include "StaticAsserts/StaticAssert.hpp"
 #include "Base/Typedefs.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 
@@ -61,11 +63,13 @@ namespace Spectral {
           *
           * @param spec Matrix of spectral coefficients
           */
-         template <typename TData> const typename Eigen::Ref<TData>& restrict(const TData& spec);
+         template <typename TData> TData restrict(const TData& spec);
          
       protected:
 
       private:
+         typedef std::bitset<32> FlagType;
+
          /**
           * @brief Identify the boundary condition
           */
@@ -184,21 +188,15 @@ namespace Spectral {
 
          /**
           * @brief Enum for the type of boundary condition
+          * \{
           */
-         enum ConditionId {
-            ZERO_VALUE_LEFT,
-            ZERO_VALUE_RIGHT,
-            ZERO_VALUE,
-            ZERO_D1_LEFT,
-            ZERO_D1_RIGHT,
-            ZERO_D1,
-            ZERO_D2_LEFT,
-            ZERO_D2_RIGHT,
-            ZERO_D2,
-            ZERO_VALUED1,
-            ZERO_VALUED2,
-            ZERO_D1D2
-         };
+         static const FlagType ZERO_VALUE_LEFT;  
+         static const FlagType ZERO_VALUE_RIGHT;  
+         static const FlagType ZERO_D1_LEFT;  
+         static const FlagType ZERO_D1_RIGHT;  
+         static const FlagType ZERO_D2_LEFT;  
+         static const FlagType ZERO_D2_RIGHT;  
+         ///\}
 
          /**
           * @brief Size of the Tau basis
@@ -211,30 +209,63 @@ namespace Spectral {
          int mNeq;
 
          /**
-          * @brief Type of boundary condition
+          * @brief Tau lines matrix is complex?
           */
-         ConditionId mBcId;
+         bool mIsComplex;
 
          /**
-          * @brief Stencil matrix
+          * @brief Type of boundary condition
           */
-         SparseMatrix mStencil;
+         FlagType mBcId;
+
+         /**
+          * @brief Real stencil matrix
+          */
+         SparseMatrix mRStencil;
+
+         /**
+          * @brief Complex stencil matrix
+          */
+         SparseMatrixZ mZStencil;
 
    };
 
    template <typename TData> TData GalerkinChebyshev::constrain(const TData& mat)
    {
-      return GalerkinChebyshev::restrictL(this->mNeq, this->mN)*mat*this->mStencil;
+      Debug::StaticAssert<false>();
    }
 
    template <typename TData> TData GalerkinChebyshev::extend(const TData& gal)
    {
-      return this->mStencil*gal;
+      Debug::StaticAssert<false>();
    }
 
-   template <typename TData> inline const typename Eigen::Ref<TData>& GalerkinChebyshev::restrict(const TData& spec)
+   template <> inline SparseMatrixZ GalerkinChebyshev::constrain<SparseMatrixZ>(const SparseMatrixZ& mat)
    {
-      return spec.bottomRows(spec.rows()-this->mNeq);
+      SparseMatrixZ tmp = (mat*this->mZStencil).bottomRows(this->mN - this->mNeq);
+      return tmp;
+   }
+
+   template <> inline SparseMatrix GalerkinChebyshev::constrain<SparseMatrix>(const SparseMatrix& mat)
+   {
+      SparseMatrix tmp = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
+      return tmp;
+   }
+
+   template <> inline Matrix GalerkinChebyshev::extend<Matrix>(const Matrix& gal)
+   {
+      return this->mRStencil*gal;
+   }
+
+   template <> inline MatrixZ GalerkinChebyshev::extend<MatrixZ>(const MatrixZ& gal)
+   {
+      return this->mZStencil*gal;
+   }
+
+   template <typename TData> inline TData GalerkinChebyshev::restrict(const TData& spec)
+   {
+      TData tmp = spec.bottomRows(spec.rows()-this->mNeq);
+      return tmp;
    }
 
 }

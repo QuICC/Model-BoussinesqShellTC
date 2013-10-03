@@ -26,21 +26,21 @@ namespace Boundary {
     */
    enum BCType {
       /// Boundary value
-      VALUE, 
+      VALUE = 2, 
       /// First derivative boundary value
-      D1,
+      D1 = 4,
       /// First derivative boundary value
-      D2,
+      D2 = 8,
       /// Beta complex slope boundary value
-      BETA_SLOPE
+      BETA_SLOPE = 16
    };
 
    /**
    * @brief List of possible boundaries
    */
    enum BCPosition {
-      LEFT,
-      RIGHT
+      LEFT = 2,
+      RIGHT = 4
    };
 
    /**
