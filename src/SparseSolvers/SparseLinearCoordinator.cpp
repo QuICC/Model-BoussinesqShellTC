@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseLinearCoordinator::SparseLinearCoordinator()
-      : SparseLinearCoordinatorBase()
+      : SparseLinearCoordinatorBase<SparseZLinearSolver,SparseRZLinearSolver>()
    {
    }
 
@@ -52,45 +52,14 @@ namespace Solver {
       this->mStep = (this->mStep + 1) % this->mNStep;
    }
 
-   void SparseLinearCoordinator::addSolverRZ(const int start)
+   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      SharedSparseRZLinearSolver spSolver(new SparseRZLinearSolver(start));
-
-      this->mRZSolvers.push_back(spSolver);
+      this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
-   void SparseLinearCoordinator::addSolverZ(const int start)
+   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      SharedSparseZLinearSolver spSolver(new SparseZLinearSolver(start));
-
-      this->mZSolvers.push_back(spSolver);
-   }
-
-   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Resize LHS matrix if necessary
-      if(spSolver->rLHSMatrix(matIdx).size() == 0)
-      {
-         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      // Set LHS matrix
-      spSolver->rLHSMatrix(matIdx) += spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx).real() + spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx).real();
-   }
-
-   void SparseLinearCoordinator::buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
-   {
-      // Resize LHS matrix if necessary
-      if(spSolver->rLHSMatrix(matIdx).size() == 0)
-      {
-         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
-
-      DecoupledZSparse bcRow = spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx);
-      DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
-
-      // Set LHS matrix
-      spSolver->rLHSMatrix(matIdx) += linRow.real().cast<MHDComplex>() + MathConstants::cI*linRow.imag() + bcRow.real().cast<MHDComplex>() + MathConstants::cI*bcRow.imag();
+      this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
 }

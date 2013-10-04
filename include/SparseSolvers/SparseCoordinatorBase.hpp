@@ -30,14 +30,26 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse solver coordinator
     */
-   template <typename TSharedZSolver, typename TSharedRZSolver> class SparseCoordinatorBase
+   template <typename TZSolver, typename TRSolver> class SparseCoordinatorBase
    {
       public:
-         /// Typedef for an iterator to a complex linear solver
-         typedef typename std::vector<TSharedZSolver>::iterator   SolverZ_iterator;
+         /// Typedef for a shared real linear solver
+         typedef TRSolver RSolverType;
+
+         /// Typedef for a shared complex linear solver
+         typedef TZSolver ZSolverType;
+
+         /// Typedef for a shared real linear solver
+         typedef typename SharedPtrMacro<TRSolver >  SharedRSolverType;
+
+         /// Typedef for a shared complex linear solver
+         typedef typename SharedPtrMacro<TZSolver >  SharedZSolverType;
 
          /// Typedef for an iterator to a real linear solver
-         typedef typename std::vector<TSharedRZSolver>::iterator   SolverRZ_iterator;
+         typedef typename std::vector<SharedRSolverType>::iterator   SolverR_iterator;
+
+         /// Typedef for an iterator to a complex linear solver
+         typedef typename std::vector<SharedZSolverType>::iterator   SolverZ_iterator;
 
          /// Typedef for a shared scalar equation iterator
          typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquation_iterator;
@@ -96,12 +108,12 @@ namespace Solver {
          /**
           * @brief Create a real linear solver
           */
-         virtual void addSolverRZ(const int start) = 0;
+         virtual void addRSolver(const int start);
 
          /**
           * @brief Create a complex linear solver
           */
-         virtual void addSolverZ(const int start) = 0;
+         virtual void addZSolver(const int start);
 
          /**
           * @brief Get the solver input independently of solver type
@@ -160,31 +172,45 @@ namespace Solver {
          /**
           * @brief Vector of (coupled) real solvers
           */
-         std::vector<TSharedRZSolver> mRZSolvers;
+         std::vector<SharedRSolverType> mRSolvers;
 
          /**
           * @brief Vector of (coupled) complex solvers
           */
-         std::vector<TSharedZSolver> mZSolvers;
+         std::vector<SharedZSolverType> mZSolvers;
 
       private:
    };
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::SparseCoordinatorBase()
+   template <typename TZSolver, typename TRSolver> SparseCoordinatorBase<TZSolver,TRSolver>::SparseCoordinatorBase()
       : mNStep(1), mStep(0)
    {
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::~SparseCoordinatorBase()
+   template <typename TZSolver, typename TRSolver> SparseCoordinatorBase<TZSolver,TRSolver>::~SparseCoordinatorBase()
    {
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> bool SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::finishedStep() const
+   template <typename TZSolver, typename TRSolver> bool SparseCoordinatorBase<TZSolver,TRSolver>::finishedStep() const
    {
-      return this->mStep == 0;
+      return (this->mStep == 0);
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::addRSolver(const int start)
+   {
+      SparseCoordinatorBase::SharedRSolverType spSolver(new SparseCoordinatorBase::RSolverType(start));
+
+      this->mRSolvers.push_back(spSolver);
+   }
+
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::addZSolver(const int start)
+   {
+      SparseCoordinatorBase::SharedZSolverType spSolver(new SparseCoordinatorBase::ZSolverType(start));
+
+      this->mZSolvers.push_back(spSolver);
+   }
+
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // Equation is part of a complex system
       if(spEq->couplingInfo(comp).isComplex())
@@ -192,21 +218,21 @@ namespace Solver {
          // Add linear solver if system index does not yet exist
          if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mZSolvers.size()) - 1)
          {
-            this->addSolverZ(spEq->couplingInfo(comp).fieldStart());
+            this->addZSolver(spEq->couplingInfo(comp).fieldStart());
          }
 
       // Equation is part of a real system
       } else
       {
          // Add equation stepper if system index does not yet exist
-         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mRZSolvers.size()) - 1)
+         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mRSolvers.size()) - 1)
          {
-            this->addSolverRZ(spEq->couplingInfo(comp).fieldStart());
+            this->addRSolver(spEq->couplingInfo(comp).fieldStart());
          }
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::createStorage(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::createStorage(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
@@ -228,15 +254,15 @@ namespace Solver {
       } else
       {
          // Create iterator to current real solver
-         SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-         std::advance(solRZIt, myIdx);
+         SolverR_iterator solRIt = this->mRSolvers.begin();
+         std::advance(solRIt, myIdx);
 
          // setup storage and information
-         this->setupStorage(spEq, myId, solRZIt);
+         this->setupStorage(spEq, myId, solRIt);
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> template <typename TSolverIt> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::setupStorage(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
+   template <typename TZSolver, typename TRSolver> template <typename TSolverIt> void SparseCoordinatorBase<TZSolver,TRSolver>::setupStorage(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
    {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
@@ -266,7 +292,7 @@ namespace Solver {
       (*solveIt)->addInformation(id,startRow);
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Storage for identity
       SpectralFieldId myId;
@@ -298,13 +324,13 @@ namespace Solver {
          } else
          {
             // Create iterator to current real solver
-            SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-            std::advance(solRZIt, myIdx);
+            SolverR_iterator solRIt = this->mRSolvers.begin();
+            std::advance(solRIt, myIdx);
 
             // Get solver output
-            for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+            for(int i = 0; i < (*solRIt)->nSystem(); i++)
             {
-               (*scalEqIt)->storeSolution(myId.second, (*solRZIt)->solution(i), i, (*solRZIt)->startRow(myId,i));
+               (*scalEqIt)->storeSolution(myId.second, (*solRIt)->solution(i), i, (*solRIt)->startRow(myId,i));
             }
          }
       }
@@ -341,20 +367,20 @@ namespace Solver {
             } else
             {
                // Create iterator to current real solver
-               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-               std::advance(solRZIt, myIdx);
+               SolverR_iterator solRIt = this->mRSolvers.begin();
+               std::advance(solRIt, myIdx);
 
                // Get solver output for first component
-               for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+               for(int i = 0; i < (*solRIt)->nSystem(); i++)
                {
-                  (*vectEqIt)->storeSolution(myId.second, (*solRZIt)->solution(i), i, (*solRZIt)->startRow(myId,i));
+                  (*vectEqIt)->storeSolution(myId.second, (*solRIt)->solution(i), i, (*solRIt)->startRow(myId,i));
                }
             }
          }
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -386,13 +412,13 @@ namespace Solver {
          } else
          {
             // Create iterator to current real solver
-            SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-            std::advance(solRZIt, myIdx);
+            SolverR_iterator solRIt = this->mRSolvers.begin();
+            std::advance(solRIt, myIdx);
 
             // Get solver input
-            for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+            for(int i = 0; i < (*solRIt)->nSystem(); i++)
             {
-               Equations::copyUnknown(*(*scalEqIt), myId.second, (*solRZIt)->rSolution(i), i, (*solRZIt)->startRow(myId,i));
+               Equations::copyUnknown(*(*scalEqIt), myId.second, (*solRIt)->rSolution(i), i, (*solRIt)->startRow(myId,i));
             }
          }
       }
@@ -428,20 +454,20 @@ namespace Solver {
             } else
             {
                // Create iterator to current real solver
-               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-               std::advance(solRZIt, myIdx);
+               SolverR_iterator solRIt = this->mRSolvers.begin();
+               std::advance(solRIt, myIdx);
 
                // Get solver input for toroidal component
-               for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+               for(int i = 0; i < (*solRIt)->nSystem(); i++)
                {
-                  Equations::copyUnknown(*(*vectEqIt), myId.second, (*solRZIt)->rSolution(i), i, (*solRZIt)->startRow(myId,i));
+                  Equations::copyUnknown(*(*vectEqIt), myId.second, (*solRIt)->rSolution(i), i, (*solRIt)->startRow(myId,i));
                }
             }
          }
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
+   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -470,11 +496,11 @@ namespace Solver {
          } else
          {
             // Create iterator to current real solver
-            SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-            std::advance(solRZIt, myIdx);
+            SolverR_iterator solRIt = this->mRSolvers.begin();
+            std::advance(solRIt, myIdx);
 
             // Get solver input
-            this->getSolverInput(scalEqIt, myId, solRZIt, scalVar, vectVar);
+            this->getSolverInput(scalEqIt, myId, solRIt, scalVar, vectVar);
          }
       }
 
@@ -506,17 +532,17 @@ namespace Solver {
             } else
             {
                // Create iterator to current real solver
-               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
-               std::advance(solRZIt, myIdx);
+               SolverR_iterator solRIt = this->mRSolvers.begin();
+               std::advance(solRIt, myIdx);
 
                // Get solver input
-               this->getSolverInput(vectEqIt, myId, solRZIt, scalVar, vectVar);
+               this->getSolverInput(vectEqIt, myId, solRIt, scalVar, vectVar);
             }
          }
       }
    }
 
-   template <typename TSharedZSolver, typename TSharedRZSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TSharedZSolver,TSharedRZSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
+   template <typename TZSolver, typename TRSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TZSolver,TRSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Get timestep input
       for(int i = 0; i < (*solveIt)->nSystem(); i++)

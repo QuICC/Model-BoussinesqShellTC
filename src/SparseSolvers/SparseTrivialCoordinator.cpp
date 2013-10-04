@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseTrivialCoordinator::SparseTrivialCoordinator()
-      : SparseCoordinatorBase<SharedSparseZTrivialSolver, SharedSparseRZTrivialSolver>()
+      : SparseCoordinatorBase<SparseZTrivialSolver, SparseRZTrivialSolver>()
    {
    }
 
@@ -115,20 +115,6 @@ namespace Solver {
 
       // Initialise with initial state
       this->initSolution(scalEq, vectEq);
-   }
-
-   void SparseTrivialCoordinator::addSolverRZ(const int start)
-   {
-      SharedSparseRZTrivialSolver spSolver(new SparseRZTrivialSolver(start));
-
-      this->mRZSolvers.push_back(spSolver);
-   }
-
-   void SparseTrivialCoordinator::addSolverZ(const int start)
-   {
-      SharedSparseZTrivialSolver spSolver(new SparseZTrivialSolver(start));
-
-      this->mZSolvers.push_back(spSolver);
    }
 
 }

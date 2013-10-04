@@ -31,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of general sparse linear solver coordinator
     */
-   class SparseLinearCoordinator: public SparseLinearCoordinatorBase
+   class SparseLinearCoordinator: public SparseLinearCoordinatorBase<SparseZLinearSolver,SparseRZLinearSolver>
    {
       public:
          /**
@@ -56,16 +56,6 @@ namespace Solver {
 
       protected:
          /**
-          * @brief Create a real linear solver
-          */
-         virtual void addSolverRZ(const int start);
-
-         /**
-          * @brief Create a complex linear solver
-          */
-         virtual void addSolverZ(const int start);
-
-         /**
           * @brief Build the real solver matrix
           *
           * @param spSolver   Shared sparse real solver
@@ -74,7 +64,7 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SharedSparseRZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex solver matrix
@@ -85,10 +75,25 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SharedSparseZLinearSolver spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
+         template <typename TStepper> void buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
    };
+
+   template <typename TStepper> void SparseLinearCoordinator::buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   {
+      // Resize LHS matrix if necessary
+      if(spSolver->rLHSMatrix(matIdx).size() == 0)
+      {
+         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
+      }
+
+      // Set BC 
+      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx));
+      // Set linear matrix
+      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx));
+   }
 }
 }
 

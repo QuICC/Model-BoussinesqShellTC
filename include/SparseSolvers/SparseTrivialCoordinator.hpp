@@ -31,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse trivial solver coordinator
     */
-   class SparseTrivialCoordinator: public SparseCoordinatorBase<SharedSparseZTrivialSolver, SharedSparseRZTrivialSolver>
+   class SparseTrivialCoordinator: public SparseCoordinatorBase<SparseZTrivialSolver, SparseRZTrivialSolver>
    {
       public:
          /**
@@ -63,15 +63,6 @@ namespace Solver {
          void solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar);
          
       protected:
-         /**
-          * @brief Create a real linear solver
-          */
-         virtual void addSolverRZ(const int start);
-
-         /**
-          * @brief Create a complex linear solver
-          */
-         virtual void addSolverZ(const int start);
 
       private:
    };
