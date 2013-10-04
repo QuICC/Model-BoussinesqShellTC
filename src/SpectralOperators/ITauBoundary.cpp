@@ -23,8 +23,8 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   ITauBoundary::ITauBoundary(const int nN, const int nEq)
-      : mN(nN), mNeq(nEq), mIsComplex(false), mRTau(0,0), mZTau(0,0)
+   ITauBoundary::ITauBoundary(const MHDFloat c, const int nN, const int nEq)
+      : mC(c), mN(nN), mNeq(nEq), mIsComplex(false), mRTau(0,0), mZTau(0,0)
    {
    }
 
@@ -145,7 +145,7 @@ namespace Spectral {
 
             for(int i = 0; i < tmp.cols(); ++i)
             {
-               this->mZTau.insertBack(i,j) = tmp(j,i);
+               this->mZTau.insertBack(i,j) = this->mC*tmp(j,i);
             }
          }
          this->mZTau.prune(MHDComplex(1e-32,1e-32));
@@ -161,7 +161,7 @@ namespace Spectral {
 
             for(int i = 0; i < lines.real().cols(); ++i)
             {
-               this->mRTau.insertBack(i,j) = lines.real()(j,i);
+               this->mRTau.insertBack(i,j) = this->mC*lines.real()(j,i);
             }
          }
          this->mRTau.prune(1e-32);

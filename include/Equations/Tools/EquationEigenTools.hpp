@@ -50,7 +50,7 @@ namespace Equations {
          /**
           * @brief General implementation of boundary row
           */
-         template <typename TEquation> static DecoupledZSparse makeBoundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs);
+         template <typename TEquation> static void makeBoundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs);
    };
 
    template <typename TEquation> DecoupledZSparse EquationEigenTools::makeLinearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
@@ -111,37 +111,18 @@ namespace Equations {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse EquationEigenTools::makeBoundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
+   template <typename TEquation> void EquationEigenTools::makeBoundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
    {
-      // Storage for the matrix row
-      int sysN = eq.couplingInfo(compId).systemN(matIdx);
-      DecoupledZSparse  matrixRow(sysN, sysN);
-      int blockN = eq.couplingInfo(compId).blockN(matIdx);
-      DecoupledZSparse  block(blockN, blockN);
-      SparseMatrix  tmp(sysN, sysN);
-
       // Loop over all coupled fields
       int colIdx = 0;
       CouplingInformation::FieldId_iterator fIt;
       CouplingInformation::FieldId_range fRange = eq.couplingInfo(compId).implicitRange();
       for(fIt = fRange.first; fIt != fRange.second; ++fIt)
       {
-         SparseMatrix blockMatrix = internal::makeBlockMatrix(eq.couplingInfo(compId).nBlocks(), eq.couplingInfo(compId).fieldIndex(), colIdx);
-
-         Equations::boundaryBlock(eq, compId, block, *fIt, eigs);
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
-         matrixRow.real() += tmp;
-         tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
-         matrixRow.imag() += tmp;
+         Equations::boundaryBlock(eq, compId, *fIt, eigs);
 
          colIdx++;
       }
-
-      // Make sure matrices are in compressed format
-      matrixRow.real().makeCompressed();
-      matrixRow.imag().makeCompressed();
-
-      return matrixRow;
    }
 
 }

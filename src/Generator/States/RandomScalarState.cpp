@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {

@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 
@@ -128,14 +128,16 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
+   void AnnulusExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      EquationToolsType::boundaryRow(*this, compId, matIdx);
+   }
+
    DecoupledZSparse AnnulusExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::LINEARROW)
       {
          return EquationToolsType::linearRow(*this, compId, matIdx);
-      } else if(opId == IEquation::BOUNDARYROW)
-      {
-         return EquationToolsType::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -159,8 +161,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B) => out = A(i,j)*B)
       mat = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
@@ -179,8 +181,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Initialise output matrices
       mat.real().resize(nX*nZ,nX*nZ);
@@ -194,20 +196,21 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
 
-      int pX = 0;
-      int pZ = 0;
+      std::vector<MHDFloat> coeffs;
+      std::vector<Boundary::BCIndex>  bcIdx;
 
-      // Set boundary condition prefactors
-      MHDFloat cX = 1.0;
-      MHDFloat cZ = 1.0;
+      coeffs.push_back(1.0);
+      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
 
-      // Compute boundary block operator
-      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      coeffs.push_back(1.0);
+      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+
+      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

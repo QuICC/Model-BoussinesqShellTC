@@ -9,6 +9,7 @@
 
 // System includes
 //
+#include <limits>
 
 // External includes
 //
@@ -22,11 +23,13 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
+
+   const Boundary::BCIndex Equation3DEigenTools::INDEPENDENT = std::tr1::make_tuple(std::numeric_limits<int>::min(),std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
 
    void Equation3DEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
@@ -44,9 +47,15 @@ namespace Equations {
       cols.setConstant(1);
    }
 
-   void Equation3DEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
+   template <typename TEquation> void Equation3DEigenTools::storeBoundaryCondition(IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Equation3DEigenTools::BCIndex>& bcIdx)
    {
-      throw Exception("Not yet implemented!");
+      assert(coeffs.size() == isEigsDependent.size());
+      assert(coeffs.size() == 0);
    }
+
+//   void Equation3DEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
+//   {
+//      throw Exception("Not yet implemented!");
+//   }
 }
 }

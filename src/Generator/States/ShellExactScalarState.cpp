@@ -22,7 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 
@@ -151,12 +151,14 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
+   void ShellExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      EquationToolsType::boundaryRow(*this, compId, matIdx);
+   }
+
    DecoupledZSparse ShellExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::LINEARROW)
-      {
-         throw Exception("Operators for 2D eigen directions not implemented yet");
-      } else if(opId == IEquation::BOUNDARYROW)
       {
          throw Exception("Operators for 2D eigen directions not implemented yet");
       } else
@@ -189,14 +191,20 @@ namespace Equations {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void boundaryBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
+      throw Exception("Operators for 2D eigen directions not implemented yet");
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
       MHDFloat m = eigs.at(1);
 
-      // Compute boundary block operator
-      throw Exception("Operators for 2D eigen directions not implemented yet");
+      std::vector<MHDFloat> coeffs;
+      std::vector<Boundary::BCIndex>  bcIdx;
+
+      coeffs.push_back(1.0);
+      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+
+      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

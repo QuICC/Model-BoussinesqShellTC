@@ -42,9 +42,6 @@ set(MHDTestSources
    Variables/FieldRequirement.cpp
    Variables/RequirementTools.cpp
    SpectralOperators/IOperator.cpp
-   SpectralOperators/IBoundary.cpp
-   SpectralOperators/BoundaryConditions.cpp
-   SpectralOperators/ChebyshevBoundary.cpp
    SpectralOperators/ChebyshevOperator.cpp
    Equations/CouplingInformation.cpp
    Equations/EquationData.cpp

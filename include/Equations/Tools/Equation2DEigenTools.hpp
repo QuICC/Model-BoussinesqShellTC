@@ -13,6 +13,7 @@
 
 // System includes
 //
+#include<vector>
 
 // External includes
 //
@@ -24,6 +25,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/BoundaryMethodSelector.hpp"
 #include "Equations/IEquation.hpp"
 #include "Equations/Tools/EquationEigenTools.hpp"
 
@@ -37,6 +39,9 @@ namespace Equations {
    class Equation2DEigenTools
    {
       public:
+         /// Flag to specify index independent boundary conditions
+         static const Boundary::BCIndex INDEPENDENT;
+
          /**
           * @brief Set eigen values
           */
@@ -65,12 +70,14 @@ namespace Equations {
          /**
           * @brief General implementation of boundary row
           */
-         template <typename TEquation> static DecoupledZSparse boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+         template <typename TEquation> static void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
-         /**
-          * @brief General implementation of the boundary block
-          */
-         static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
+         template <typename TEquation> static void storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx);
+
+//         /**
+//          * @brief General implementation of the boundary block
+//          */
+//         static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
    };
 
    template <typename TEquation> std::vector<MHDFloat> Equation2DEigenTools::getEigs(const TEquation& eq, const int matIdx)
@@ -102,11 +109,27 @@ namespace Equations {
       return EquationEigenTools::makeTimeRow(eq, compId, matIdx, eigs);
    }
 
-   template <typename TEquation> DecoupledZSparse Equation2DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> void Equation2DEigenTools::boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       std::vector<MHDFloat> eigs = Equation2DEigenTools::getEigs(eq, matIdx);
 
-      return EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
+      EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
+   }
+
+   template <typename TEquation> void Equation2DEigenTools::storeBoundaryCondition(IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx)
+   {
+      assert(coeffs.size() == bcIdx.size());
+      assert(coeffs.size() == 1);
+
+      SpectralFieldId eqId = std::make_pair(eq.name(), compId);
+
+      int nEq1D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM1D)->second.size();
+
+      int nI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+      Boundary::BCVector bcs1D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second;
+
+      eq.setBoundaryCondition(Dimensions::Simulation::SIM1D, fieldId, bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0)));
    }
 
 }

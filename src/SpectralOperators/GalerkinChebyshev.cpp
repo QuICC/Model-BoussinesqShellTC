@@ -32,9 +32,14 @@ namespace Spectral {
    const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D2_LEFT = (1 << 4);
    const GalerkinChebyshev::FlagType GalerkinChebyshev::ZERO_D2_RIGHT = (1 << 5);
 
-   GalerkinChebyshev::GalerkinChebyshev(const int nN, const Boundary::BCVector& bcs, const int nEq)
+   GalerkinChebyshev::GalerkinChebyshev(const MHDFloat c, const int nN, const Boundary::BCVector& bcs, const int nEq)
       : mN(nN), mNeq(nEq), mIsComplex(false), mRStencil(0,0), mZStencil(0,0)
    {
+      if(c != 1.0)
+      {
+         throw Exception("Galerkin boundary conditions do not (yet) support prefactors");
+      }
+
       this->identifyCondition(bcs);
 
       this->createStencil();

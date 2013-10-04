@@ -24,8 +24,8 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   TauChebyshev::TauChebyshev(const int nN, const Boundary::BCVector& bcs, const int nEq)
-      : ITauBoundary(nN, nEq)
+   TauChebyshev::TauChebyshev(const MHDFloat c, const int nN, const Boundary::BCVector& bcs, const int nEq)
+      : ITauBoundary(c, nN, nEq)
    {
       this->createTauMatrix(bcs);
    }

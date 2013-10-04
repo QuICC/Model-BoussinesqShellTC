@@ -26,6 +26,8 @@
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/BoundaryMethodSelector.hpp"
+#include "TypeSelectors/BCIndexSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
@@ -60,7 +62,7 @@ namespace Equations {
          enum OperatorRowId {
             TIMEROW = 0,
             LINEARROW,
-            BOUNDARYROW};
+         };
 
          /**
           * @brief Simple constructor
@@ -81,6 +83,13 @@ namespace Equations {
           * @brief Initialise the equation
           */
          virtual void init();
+
+         /**
+          * @brief Initialise the boundary condition objects
+          *
+          * It has only a dummy implementation and should never get called!
+          */
+         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx); //= 0;
 
          /**
           * @brief Generic operator row dispatcher
@@ -113,6 +122,16 @@ namespace Equations {
           * @param spBcIds   List of boundary condition IDs
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
+
+         /**
+          * @brief Set the boundary condition for a given dimension 
+          *
+          * @tparam TId       Simulation dimension ID
+          * @param fieldId    Field Id
+          * @param idx        Boundary condition index
+          * @param bcOp       Boundary condition operator
+          */
+         template <Dimensions::Simulation::Id TId> void setBoundaryCondition(const SpectralFieldId fieldId, const Boundary::BCIndex& idx, const typename Boundary::MethodSelector<TId>::Type& bcOp);
          
       protected:
          /**

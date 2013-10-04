@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -102,6 +102,11 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
+   void BoussinesqBetaCylGTransport::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      EquationToolsType::boundaryRow(*this, compId, matIdx);
+   }
+
    DecoupledZSparse BoussinesqBetaCylGTransport::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::TIMEROW)
@@ -110,9 +115,6 @@ namespace Equations {
       } else if(opId == IEquation::LINEARROW)
       {
          return EquationToolsType::linearRow(*this, compId, matIdx);
-      } else if(opId == IEquation::BOUNDARYROW)
-      {
-         return EquationToolsType::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -142,8 +144,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       /// - Transport equation: \f$ \left( D_x^{-2} \otimes I_Z\right) \f$
       // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
@@ -163,8 +165,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Initialise output matrices
       mat.real().resize(nX*nZ,nX*nZ);
@@ -218,8 +220,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Initialise output matrices
       mat.real().resize(nX*nZ,nX*nZ);
@@ -233,38 +235,40 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
 
-      /// <b>Boundary operators for the transport equation</b>: \f$\left(BC_x \otimes I_Z\right)\f$
-      int pX = 0;
-      int pZ = 0;
-
-      MHDFloat cX;
-      MHDFloat cZ;
+      std::vector<MHDFloat> coeffs;
+      std::vector<Boundary::BCIndex>  bcIdx;
 
       // Boundary condition for the streamfunction
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Set boundary condition prefactors
-         cX = 0.0;
-         cZ = 0.0;
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
 
       // Boundary condition for the vertical velocity
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
-         // Set boundary condition prefactors
-         cX = 0.0;
-         cZ = 0.0;
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
 
       // Boundary condition for the temperature
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
-         // Set boundary condition prefactors
-         cX = 1.0;
-         cZ = 0.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
 
       // Unknown field
       } else
@@ -272,8 +276,7 @@ namespace Equations {
          throw Exception("Unknown field ID for boundary operator!");
       }
 
-      // Compute boundary block operator
-      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

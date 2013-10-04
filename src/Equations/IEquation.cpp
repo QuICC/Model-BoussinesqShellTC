@@ -143,6 +143,11 @@ namespace Equations {
       return MHDComplex();
    }
 
+   void IEquation::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      throw Exception("createBoundaries: dummy implementation was called!");
+   }
+
    DecoupledZSparse  IEquation::operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const
    {
       throw Exception("operatorRow: dummy implementation was called!");

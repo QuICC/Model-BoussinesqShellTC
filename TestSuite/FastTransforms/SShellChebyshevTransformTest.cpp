@@ -1,6 +1,6 @@
 /** 
- * @file CylindricalChebyshevTransformTest.cpp
- * @brief Implementation of test cases for cylindrical Chebyshev transform
+ * @file SShellChebyshevTransformTest.cpp
+ * @brief Implementation of test cases for spherical Chebyshev transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -14,21 +14,21 @@ namespace GeoMHDiSCC {
 namespace TestSuite {
 
    /**
-    * @brief Test fixture for the cylindrical Chebyshev transform implementation
+    * @brief Test fixture for the spherical Chebyshev transform implementation
     */
-   class CylindricalChebyshevTransformTest : public ::testing::Test {
+   class SShellChebyshevTransformTest : public ::testing::Test {
       public:
 
       protected:
          /**
           * @brief Constructor
           */
-         CylindricalChebyshevTransformTest();
+         SShellChebyshevTransformTest();
 
          /**
           * @brief Destructor
           */
-         virtual ~CylindricalChebyshevTransformTest();
+         virtual ~SShellChebyshevTransformTest();
 
          /**
           * @brief Do Set-up work before each test
@@ -56,22 +56,22 @@ namespace TestSuite {
          double mError;
    };
 
-   CylindricalChebyshevTransformTest::CylindricalChebyshevTransformTest()
+   SShellChebyshevTransformTest::SShellChebyshevTransformTest()
       : mMaxN(512), mHowmany(100), mError(1e-10)
    {
    }
 
-   CylindricalChebyshevTransformTest::~CylindricalChebyshevTransformTest()
+   SShellChebyshevTransformTest::~SShellChebyshevTransformTest()
    {
    }
 
    /**
     * @brief Test the mesh grid 
     *
-    * @param CylindricalChebyshevTransformTest Test fixture ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
     * @param MeshGrid                              Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, MeshGrid)
+   TEST_F(SShellChebyshevTransformTest, MeshGrid)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -80,8 +80,8 @@ namespace TestSuite {
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
-      // Create cylindrical Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      // Create spherical Chebyshev transform
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -95,10 +95,10 @@ namespace TestSuite {
    /**
     * @brief Accuracy test for a real forward transform 
     *
-    * @param CylindricalChebyshevTransformTest Test fixture ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
     * @param ForwardRealAccuracy                   Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, ForwardRealAccuracy)
+   TEST_F(SShellChebyshevTransformTest, ForwardRealAccuracy)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -107,8 +107,8 @@ namespace TestSuite {
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
-      // Create cylindrical Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      // Create spherical Chebyshev transform
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -134,7 +134,7 @@ namespace TestSuite {
       }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::CylindricalChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::SShellChebyshevTransformType::IntegratorType::INTG);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -156,12 +156,12 @@ namespace TestSuite {
    }
 
    /**
-    * @brief Accuracy test for a real backward transform 
+    * @brief Accuracy test for a real backward transform
     *
-    * @param CylindricalChebyshevTransformTest Test fixture ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
     * @param BackwardRealAccuracy                  Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, BackwardRealAccuracy)
+   TEST_F(SShellChebyshevTransformTest, BackwardRealAccuracy)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -170,8 +170,8 @@ namespace TestSuite {
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
-      // Create cylindrical Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      // Create spherical Chebyshev transform
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -192,7 +192,7 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::CylindricalChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::SShellChebyshevTransformType::ProjectorType::PROJ);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
@@ -221,10 +221,10 @@ namespace TestSuite {
    /**
     * @brief Accuracy test for real backward-forward transform loop
     *
-    * @param CylindricalChebyshevTransformTest   Test fixture ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
     * @param BackwardRealAccuracy         Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, BackwardRealLoop)
+   TEST_F(SShellChebyshevTransformTest, BackwardRealLoop)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -234,7 +234,7 @@ namespace TestSuite {
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -254,10 +254,10 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::CylindricalChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::SShellChebyshevTransformType::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::CylindricalChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::SShellChebyshevTransformType::IntegratorType::INTG);
 
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -275,10 +275,10 @@ namespace TestSuite {
    /**
     * @brief Accuracy test for a complex forward transform 
     *
-    * @param CylindricalChebyshevTransformTest Test fixture ID
-    * @param ForwardComplexAccuracy                Test ID
+    * @param SShellChebyshevTransformTest
+    * @param ForwardComplexAccuracy
     */
-   TEST_F(CylindricalChebyshevTransformTest, ForwardComplexAccuracy)
+   TEST_F(SShellChebyshevTransformTest, ForwardComplexAccuracy)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -287,8 +287,8 @@ namespace TestSuite {
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
-      // Create cylindrical Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      // Create spherical Chebyshev transform
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -316,7 +316,7 @@ namespace TestSuite {
       phys.col(0).imag().setZero();
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::CylindricalChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::SShellChebyshevTransformType::IntegratorType::INTG);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -351,10 +351,10 @@ namespace TestSuite {
    /**
     * @brief Accuracy test for a complex backward transform 
     *
-    * @param CylindricalChebyshevTransformTest    Test fixture ID
-    * @param BackwardComplexAccuracy                  Test ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
+    * @param BackwardComplexAccuracy               Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, BackwardComplexAccuracy)
+   TEST_F(SShellChebyshevTransformTest, BackwardComplexAccuracy)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -363,8 +363,8 @@ namespace TestSuite {
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
-      // Create cylindrical Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      // Create spherical Chebyshev transform
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -404,7 +404,7 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::CylindricalChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::SShellChebyshevTransformType::ProjectorType::PROJ);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
@@ -442,10 +442,10 @@ namespace TestSuite {
    /**
     * @brief Accuracy test for a complex backward-forward transform  loop
     *
-    * @param CylindricalChebyshevTransformTest   Test fixture ID
+    * @param SShellChebyshevTransformTest   Test fixture ID
     * @param BackwardComplexAccuracy      Test ID
     */
-   TEST_F(CylindricalChebyshevTransformTest, BackwardComplexLoop)
+   TEST_F(SShellChebyshevTransformTest, BackwardComplexLoop)
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
@@ -455,7 +455,7 @@ namespace TestSuite {
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
-      Transform::CylindricalChebyshevTransformType fft;
+      Transform::SShellChebyshevTransformType fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -469,10 +469,10 @@ namespace TestSuite {
       spec.block(0,0,spSetup->specSize(),spSetup->howmany()).setConstant(MHDComplex(1.0,1.0));
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::CylindricalChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::SShellChebyshevTransformType::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::CylindricalChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::SShellChebyshevTransformType::IntegratorType::INTG);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
@@ -510,26 +510,6 @@ namespace TestSuite {
  * @param argv Arguments
  */
 int main(int argc, char **argv) {
-   // Initilise framework
-   GeoMHDiSCC::FrameworkMacro::init();
-
-   // Set nCpu for serial run
-   int nCpu = 1;
-
-   // Set ID and nCpu in MPI case
-   #ifdef GEOMHDISCC_MPI
-      // Get MPI size
-      MPI_Comm_size(MPI_COMM_WORLD, &nCpu);
-   #endif //GEOMHDISCC_MPI
-
-   // Setup framework
-   GeoMHDiSCC::FrameworkMacro::setup(nCpu);
-
    ::testing::InitGoogleTest(&argc, argv);
-   int status = RUN_ALL_TESTS();
-
-   // Finalise framework
-   GeoMHDiSCC::FrameworkMacro::finalize();
-
-   return status;
+   return RUN_ALL_TESTS();
 }

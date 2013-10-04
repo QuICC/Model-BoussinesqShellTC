@@ -21,7 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 #include "SpectralOperators/SphericalHarmonicOperator.hpp"
 
@@ -173,7 +173,7 @@ namespace Equations {
       int nR = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operator
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nR);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
       // Set quasi-inverse for toroidal component
       if(compId == FieldComponents::Spectral::ONE)
@@ -207,7 +207,7 @@ namespace Equations {
       int nR = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operator
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nR);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
       // Initialise output matrices
       mat.real().resize(nR,nR);
@@ -257,7 +257,7 @@ namespace Equations {
       int nR = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operator
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nR);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
       // Initialise output matrices
       mat.real().resize(nR,nR);

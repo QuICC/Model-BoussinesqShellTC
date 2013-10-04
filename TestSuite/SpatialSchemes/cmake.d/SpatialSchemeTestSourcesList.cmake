@@ -59,9 +59,6 @@ set(MHDTestSources
    Timers/SerialTimer.cpp
    Simulation/SimulationBoundary.cpp
    SpectralOperators/IOperator.cpp
-   SpectralOperators/IBoundary.cpp
-   SpectralOperators/BoundaryConditions.cpp
-   SpectralOperators/ChebyshevBoundary.cpp
    SpectralOperators/ChebyshevOperator.cpp
    Communicators/Converters/NoIndexConv.cpp
    Communicators/Converters/SHIndexConv.cpp

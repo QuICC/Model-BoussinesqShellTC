@@ -13,6 +13,7 @@
 
 // System includes
 //
+#include<vector>
 
 // External includes
 //
@@ -24,6 +25,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/BoundaryMethodSelector.hpp"
 #include "Equations/Tools/EquationEigenTools.hpp"
 
 namespace GeoMHDiSCC {
@@ -36,6 +38,9 @@ namespace Equations {
    class Equation1DEigenTools
    {
       public:
+         /// Flag to specify index independent boundary conditions
+         static const Boundary::BCIndex INDEPENDENT;
+
          /**
           * @brief Set eigen values
           */
@@ -64,12 +69,14 @@ namespace Equations {
          /**
           * @brief General implementation of boundary row
           */
-         template <typename TEquation> static DecoupledZSparse boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+         template <typename TEquation> static void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
-         /**
-          * @brief General implementation of the boundary block
-          */
-         static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
+         template <typename TEquation> static void storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx);
+//
+//         /**
+//          * @brief General implementation of the boundary block
+//          */
+//         static void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D);
    };
 
    template <typename TEquation> std::vector<MHDFloat> Equation1DEigenTools::getEigs(const TEquation& eq, const int matIdx)
@@ -96,11 +103,31 @@ namespace Equations {
       return EquationEigenTools::makeTimeRow(eq, compId, matIdx, eigs);
    }
 
-   template <typename TEquation> DecoupledZSparse Equation1DEigenTools::boundaryRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> void Equation1DEigenTools::boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
    {
       std::vector<MHDFloat> eigs = Equation1DEigenTools::getEigs(eq, matIdx);
 
-      return EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
+      EquationEigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
+   }
+
+   template <typename TEquation> void Equation1DEigenTools::storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx)
+   {
+      assert(coeffs.size() == bcIdx.size());
+      assert(coeffs.size() == 2);
+
+      SpectralFieldId eqId = std::make_pair(eq.name(), compId);
+
+      int nEq1D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM3D)->second.size();
+      int nEq3D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM3D)->second.size();
+
+      int nI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      int nK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      Boundary::BCVector bcs1D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second;
+      Boundary::BCVector bcs3D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second;
+
+      eq.template setBoundaryCondition<Dimensions::Simulation::SIM1D>(fieldId, bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0), nI, bcs1D, nEq1D));
+      eq.template setBoundaryCondition<Dimensions::Simulation::SIM3D>(fieldId, bcIdx.at(1), Boundary::MethodSelector<Dimensions::Simulation::SIM3D>::Type(coeffs.at(1), nK, bcs3D, nEq3D));
    }
 
 }

@@ -1,11 +1,11 @@
 /**
- * @file CylindricalChebyshevFftwTransform.hpp
+ * @file CShellChebyshevFftwTransform.hpp
  * @brief Implementation of the FFTW transform for a Chebyshev expansion for a cylindrical radius  
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef CYLINDRICALCHEBYSHEVFFTWTRANSFORM_HPP
-#define CYLINDRICALCHEBYSHEVFFTWTRANSFORM_HPP
+#ifndef CSHELLCHEBYSHEVFFTWTRANSFORM_HPP
+#define CSHELLCHEBYSHEVFFTWTRANSFORM_HPP
 
 // Debug includes
 //
@@ -30,16 +30,16 @@
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
-#include "SpectralOperators/CylindricalChebyshevOperator.hpp"
+#include "SpectralOperators/CShellChebyshevOperator.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    /**
-    * @brief Simple struct holding details about CylindricalChebyshevFFT transform
+    * @brief Simple struct holding details about CShellChebyshevFFT transform
     */
-   struct CylindricalChebyshevFftIds {
+   struct CShellChebyshevFftIds {
 
       /**
        * @brief Simple struct holding the projector IDs
@@ -64,7 +64,7 @@ namespace Transform {
    /**
     * @brief Implementation of the FFTW transform for a Chebyshev expansion for a cylindrical radius
     */ 
-   class CylindricalChebyshevFftwTransform
+   class CShellChebyshevFftwTransform
    {
       public:
          /// Typedef for the configuration class
@@ -74,10 +74,10 @@ namespace Transform {
          typedef SharedFftSetup SharedSetupType;
 
          /// Typedef for the Projector type
-         typedef CylindricalChebyshevFftIds::Projectors ProjectorType;
+         typedef CShellChebyshevFftIds::Projectors ProjectorType;
 
          /// Typedef for the Integrator type
-         typedef CylindricalChebyshevFftIds::Integrators IntegratorType;
+         typedef CShellChebyshevFftIds::Integrators IntegratorType;
 
          /**
           * @brief Generate a physical grid
@@ -87,12 +87,12 @@ namespace Transform {
          /**
           * @brief Very basic constructor
           */
-         CylindricalChebyshevFftwTransform();
+         CShellChebyshevFftwTransform();
 
          /**
           * @brief Destroy the FFTW plans
           */
-         ~CylindricalChebyshevFftwTransform();
+         ~CShellChebyshevFftwTransform();
 
          /**
           * @brief Initialise the FFT computations (plans, etc)
@@ -226,7 +226,7 @@ namespace Transform {
          MHDFloat mRRatio;
    };
 
-   template <Arithmetics::Id TOperation> void CylindricalChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CylindricalChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void CShellChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -249,7 +249,7 @@ namespace Transform {
       rChebVal *= this->mspSetup->scale();
    }
 
-   template <Arithmetics::Id TOperation> void CylindricalChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, CylindricalChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void CShellChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, CShellChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -270,9 +270,9 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute first derivative
-      if(projector == CylindricalChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == CShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::CylindricalChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::CShellChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize());
@@ -291,7 +291,7 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   template <Arithmetics::Id TOperation> void CylindricalChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, CylindricalChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <Arithmetics::Id TOperation> void CShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, CShellChebyshevFftwTransform::IntegratorType::Id integrator)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -322,7 +322,7 @@ namespace Transform {
       rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
    }
 
-   template <Arithmetics::Id TOperation> void CylindricalChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, CylindricalChebyshevFftwTransform::ProjectorType::Id projector)
+   template <Arithmetics::Id TOperation> void CShellChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, CShellChebyshevFftwTransform::ProjectorType::Id projector)
    {
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
@@ -343,9 +343,9 @@ namespace Transform {
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
       // Compute first derivative of real part
-      if(projector == CylindricalChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == CShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::CylindricalChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::CShellChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Compute derivative
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).real();
@@ -365,9 +365,9 @@ namespace Transform {
       rPhysVal.real() = this->mTmpOut;
 
       // Compute first derivative of imaginary part
-      if(projector == CylindricalChebyshevFftwTransform::ProjectorType::DIFF)
+      if(projector == CShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::CylindricalChebyshevOperator  spec(this->mspSetup->specSize());
+         Spectral::CShellChebyshevOperator  spec(this->mspSetup->specSize());
 
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).imag();
@@ -390,4 +390,4 @@ namespace Transform {
 }
 }
 
-#endif // CYLINDRICALCHEBYSHEVFFTWTRANSFORM_HPP
+#endif // CSHELLCHEBYSHEVFFTWTRANSFORM_HPP

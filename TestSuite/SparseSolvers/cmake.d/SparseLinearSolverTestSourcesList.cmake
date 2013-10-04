@@ -10,9 +10,6 @@ set(MHDTestSources
    BoundaryCondition/BoundaryCondition.cpp
    SpectralOperators/IOperator.cpp
    SpectralOperators/ChebyshevOperator.cpp
-   SpectralOperators/IBoundary.cpp
-   SpectralOperators/ChebyshevBoundary.cpp
-   SpectralOperators/BoundaryConditions.cpp
    SpectralOperators/PeriodicOperator.cpp
    SpectralOperators/GalerkinChebyshev.cpp
    SpectralOperators/TauChebyshev.cpp

@@ -9,6 +9,7 @@
 
 // System includes
 //
+#include <limits>
 
 // External includes
 //
@@ -22,11 +23,13 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
+
+   const Boundary::BCIndex EquationNoEigenTools::INDEPENDENT = std::numeric_limits<int>::min();
 
    void EquationNoEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
@@ -46,9 +49,9 @@ namespace Equations {
       cols.setConstant(1);
    }
 
-   void EquationNoEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
-   {
-      throw Exception("Not yet implemented!");
-   }
+//   void EquationNoEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
+//   {
+//      throw Exception("Not yet implemented!");
+//   }
 }
 }

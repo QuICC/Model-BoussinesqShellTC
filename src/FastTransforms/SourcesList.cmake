@@ -4,6 +4,6 @@ set(MHDSources
    FftwTools.cpp
    FftwTransform.cpp
    ChebyshevFftwTransform.cpp
-   SphericalChebyshevFftwTransform.cpp
-   CylindricalChebyshevFftwTransform.cpp
+   SShellChebyshevFftwTransform.cpp
+   CShellChebyshevFftwTransform.cpp
 )

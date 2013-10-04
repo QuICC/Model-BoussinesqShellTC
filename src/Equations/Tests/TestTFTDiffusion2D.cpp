@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
-#include "TypeSelectors/SpectralSelector.hpp"
+#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationToolsSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -110,8 +110,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Initialise output matrices
       mat.real().resize(nX*nZ,nX*nZ);
@@ -147,8 +147,8 @@ namespace Equations {
       int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM1D>::OpType spec1D(nX);
-      Spectral::SpectralSelector<Dimensions::Simulation::SIM3D>::OpType spec3D(nZ);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       // Initialise output matrices
       mat.real().resize(nX*nZ,nX*nZ);

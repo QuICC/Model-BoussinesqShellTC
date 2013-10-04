@@ -86,8 +86,6 @@ namespace Equations {
          /**
           * @brief Initialise the spectral equation matrices
           *
-          * It has only a semi-dummy implementation
-          *
           * @param spBcIds   List of boundary condition IDs
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);

@@ -34,11 +34,12 @@ namespace Spectral {
          /**
           * @brief Constructor
           *
+          * @param c    Boundary condition prefactor
           * @param nN   Size of the Tau basis
           * @param bcs  Vector of boundary conditions
           * @param nEq  Number of equations (only independent of BC for coupled systems)
           */
-         TauChebyshev(const int nN, const Boundary::BCVector& bcs, const int nEq);
+         TauChebyshev(const MHDFloat c, const int nN, const Boundary::BCVector& bcs, const int nEq);
 
          /**
           * @brief Empty Destructor
@@ -46,11 +47,18 @@ namespace Spectral {
          ~TauChebyshev();
 
          /**
-          * @brief Constrain matrix with boundary conditions
+          * @brief Constrain matrix with boundary conditions at system block level
           *
           * @param mat  Matrix operator to constrain
           */
-         template <typename TData> TData constrain(const TData& mat);
+         template <typename TData> TData constrainBlock(const TData& mat);
+
+         /**
+          * @brief Constrain matrix with boundary conditions at system row level
+          *
+          * @param mat  Matrix operator to constrain
+          */
+         template <typename TData> TData constrainRow(const TData& mat);
 
          /**
           * @brief Extend Galerkin basis coefficients to tau expansion 
@@ -126,12 +134,17 @@ namespace Spectral {
       return spec;
    }
 
-   template <typename TData> TData TauChebyshev::constrain(const TData& mat)
+   template <typename TData> TData TauChebyshev::constrainBlock(const TData& mat)
    {
       Debug::StaticAssert<false>();
    }
 
-   template <> inline SparseMatrixZ TauChebyshev::constrain<SparseMatrixZ>(const SparseMatrixZ& mat)
+   template <typename TData> TData TauChebyshev::constrainRow(const TData& mat)
+   {
+      Debug::StaticAssert<false>();
+   }
+
+   template <> inline SparseMatrixZ TauChebyshev::constrainBlock<SparseMatrixZ>(const SparseMatrixZ& mat)
    {
       if(this->mIsComplex)
       {
@@ -142,7 +155,7 @@ namespace Spectral {
       }
    }
 
-   template <> inline SparseMatrix TauChebyshev::constrain<SparseMatrix>(const SparseMatrix& mat)
+   template <> inline SparseMatrix TauChebyshev::constrainBlock<SparseMatrix>(const SparseMatrix& mat)
    {
       if(this->mIsComplex)
       {

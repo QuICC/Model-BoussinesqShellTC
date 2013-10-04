@@ -83,14 +83,15 @@ namespace Solver {
 
    template <typename TStepper> void SparseLinearCoordinator::buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
+      // Create Boundaries
+      spEq->createBoundaries(comp, idx);
+
       // Resize LHS matrix if necessary
       if(spSolver->rLHSMatrix(matIdx).size() == 0)
       {
          spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
 
-      // Set BC 
-      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx));
       // Set linear matrix
       Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx));
    }

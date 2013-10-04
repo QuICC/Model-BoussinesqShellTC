@@ -17,7 +17,6 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "SpectralOperators/IBoundary.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 
 namespace GeoMHDiSCC {
@@ -32,8 +31,12 @@ namespace Spectral {
       public:
          /**
           * @brief Constructor
+          *
+          * @param c    Boundary condition prefactor
+          * @param nN   Size of the Tau basis
+          * @param nEq  Number of equations to remove (only independent of BC for coupled systems)
           */
-         ITauBoundary(const int nN, const int nEq);
+         ITauBoundary(const MHDFloat c, const int nN, const int nEq);
 
          /**
           * @brief Empty Destructor
@@ -77,6 +80,11 @@ namespace Spectral {
           * @param pt   boundary point
           */
          virtual Array secondDerivative(Boundary::BCPosition pt) const = 0;
+
+         /**
+          * @brief Storage for the prefactor
+          */
+         MHDFloat mC;
 
          /**
           * @brief Size of the Tau basis

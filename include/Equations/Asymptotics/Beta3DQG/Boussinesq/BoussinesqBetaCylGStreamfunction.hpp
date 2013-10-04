@@ -54,6 +54,11 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
          /**
+          * @brief Initialise the boundary condition objects
+          */
+         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx);
+
+         /**
           * @brief Generic operator row dispatcher
           */
          virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
@@ -113,11 +118,11 @@ namespace Equations {
     * @brief Get the boundary condition matrix block on given field
     *
     * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
+    * @param compId  Component ID
     * @param fieldId Physical ID of the field
     * @param eigs    Wave number k
     */
-   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void boundaryBlock(BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
 }
 }

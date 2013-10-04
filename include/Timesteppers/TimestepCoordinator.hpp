@@ -169,6 +169,9 @@ namespace Timestep {
 
    template <typename TStepper> void TimestepCoordinator::buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
+      // Create Boundaries
+      spEq->createBoundaries(comp, idx);
+
       // Operator coefficients
       MHDFloat lhsTCoeff;
       MHDFloat rhsTCoeff;
@@ -198,9 +201,6 @@ namespace Timestep {
       {
          spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
       }
-
-      // Add boundary row for LHS operator
-      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), 1.0, spEq->operatorRow(Equations::IEquation::BOUNDARYROW, comp, idx));
 
       DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx);
       DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx);

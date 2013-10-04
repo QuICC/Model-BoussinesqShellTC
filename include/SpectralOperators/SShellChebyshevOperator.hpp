@@ -1,11 +1,11 @@
 /** 
- * @file CylindricalChebyshevOperator.hpp
- * @brief Implementation of the spectral operators for the chebyshev basis for a cylindrical radius
+ * @file SShellChebyshevOperator.hpp
+ * @brief Implementation of the spectral operators for the chebyshev basis for a spherical shell radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef CYLINDRICALCHEBYSHEVOPERATOR_HPP
-#define CYLINDRICALCHEBYSHEVOPERATOR_HPP
+#ifndef SSHELLCHEBYSHEVOPERATOR_HPP
+#define SSHELLCHEBYSHEVOPERATOR_HPP
 
 // System includes
 //
@@ -23,9 +23,9 @@ namespace GeoMHDiSCC {
 namespace Spectral {
 
    /**
-    * @brief Implementation of the spectral operators for the chebyshev basis for a cylindrical radius
+    * @brief Implementation of the spectral operators for the chebyshev basis for a spherical shell radius
     */
-   class CylindricalChebyshevOperator: public IOperator
+   class SShellChebyshevOperator: public IOperator
    {
       public:
          /**
@@ -33,12 +33,12 @@ namespace Spectral {
           *
           * @param basisN   Size of the spectral basis
           */
-         CylindricalChebyshevOperator(const int basisN);
+         SShellChebyshevOperator(const int basisN);
 
          /**
           * @brief Empty Destructor
           */
-         ~CylindricalChebyshevOperator();
+         ~SShellChebyshevOperator();
 
          /**
           * @brief Get the derivative operator of order p
@@ -91,4 +91,4 @@ namespace Spectral {
 }
 }
 
-#endif // CYLINDRICALCHEBYSHEVOPERATOR_HPP
+#endif // SSHELLCHEBYSHEVOPERATOR_HPP

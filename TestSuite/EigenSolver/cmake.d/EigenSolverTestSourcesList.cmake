@@ -2,10 +2,7 @@
 set(MHDTestSources
    IoTools/Formatter.cpp
    Base/MathConstants.cpp
-   SpectralOperators/IBoundary.cpp
-   SpectralOperators/BoundaryConditions.cpp
    SpectralOperators/IOperator.cpp
-   SpectralOperators/ChebyshevBoundary.cpp
    SpectralOperators/ChebyshevOperator.cpp
    SpectralOperators/PeriodicOperator.cpp
    Simulation/SimulationBoundary.cpp
