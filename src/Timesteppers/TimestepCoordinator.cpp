@@ -32,7 +32,7 @@ namespace Timestep {
    TimestepCoordinator::TimestepCoordinator()
       : SparseLinearCoordinatorBase<SparseZTimestepper,SparseRZTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
    {
-      this->mNStep = TimeSchemeType::STEPS;
+      this->mNStep = IntegratorSelector::STEPS;
    }
 
    TimestepCoordinator::~TimestepCoordinator()
@@ -174,10 +174,10 @@ namespace Timestep {
       for(int step = 0; step < this->mNStep; ++step)
       {
          // Compute timestep correction coefficient for LHS matrix
-         MHDFloat lhsCoeff = TimeSchemeType::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+         MHDFloat lhsCoeff = IntegratorSelector::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Compute timestep correction coefficient for RHS matrix
-         MHDFloat rhsCoeff = TimeSchemeType::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+         MHDFloat rhsCoeff = IntegratorSelector::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Loop over all complex timesteppers
          SolverZ_iterator   solZIt;

@@ -19,7 +19,7 @@ message(STATUS "***********************************************")
 
 #
 # Choose the type of memory usage setup the code is using.
-# Possible options are: BigMem, LowMem
+# Possible options are: High, Limited
 #
 set(GEOMHDISCC_MEMORYUSAGES "High" "Limited")
 
@@ -89,6 +89,40 @@ if(groupTest)
       geomhdiscc_add_definition(GEOMHDISCC_TRANSGROUPER)
    endif(GEOMHDISCC_MPI)
 endif(groupTest)
+
+
+###################################################
+#------------- BOUNDARY CONDITIONS ---------------#
+###################################################
+
+#
+# Choose the type of boundray method the code is using.
+# Possible options are: Galerkin, Tau
+#
+set(GEOMHDISCC_BOUNDARYMETHODS "Galerkin" "Tau")
+
+geomhdiscc_provide_choice(GEOMHDISCC_BOUNDARYMETHODS "Boundary method" GEOMHDISCC_BOUNDARYMETHOD boundaryTest)
+
+if(boundaryTest)
+   geomhdiscc_add_definition(GEOMHDISCC_BOUNDARYMETHOD)
+endif(boundaryTest)
+
+
+###################################################
+#--------------- TIME INTEGRATORS ----------------#
+###################################################
+
+#
+# Choose the type of time integration the code is using.
+# Possible options are: ImExRK3
+#
+set(GEOMHDISCC_TIMESTEPPERS "ImExRK3")
+
+geomhdiscc_provide_choice(GEOMHDISCC_TIMESTEPPERS "Time integrator" GEOMHDISCC_TIMESTEPPER timeTest)
+
+if(timeTest)
+   geomhdiscc_add_definition(GEOMHDISCC_TIMESTEPPER)
+endif(timeTest)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#

@@ -78,8 +78,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -117,7 +117,7 @@ namespace TestSuite {
       dims(0) = dim1D; dims(1) = dim2D; dims(2) = dim3D;
 
       // Initialise the load splitter with spatial scheme
-      splitter.init<Schemes::SpatialType>(dims);
+      splitter.init<Schemes::SpatialSelector>(dims);
 
       // Get best splitting
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
@@ -126,7 +126,7 @@ namespace TestSuite {
       SharedResolution spRes = best.first;
 
       // Set additional options on final resolution object
-      Schemes::SpatialType::tuneResolution(spRes);
+      Schemes::SpatialSelector::tuneResolution(spRes);
 
       return spRes;
    }
@@ -146,8 +146,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -206,8 +206,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -266,8 +266,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -326,8 +326,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -386,8 +386,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -452,8 +452,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);
@@ -518,8 +518,8 @@ namespace TestSuite {
       Datatypes::SharedScalarVariableType   spScalar(new Datatypes::ScalarVariableType(spRes));
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileReader   state("0000", type, isRegular);

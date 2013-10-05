@@ -121,19 +121,19 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nR = Transform::FftToolsType::dealiasCosFft(this->mI+1);
+      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1);
       // Check for optimised FFT sizes
-      nR = Transform::FftToolsType::optimizeFft(nR);
+      nR = Transform::Fft::ToolsSelector::optimizeFft(nR);
 
       // Get mixed dealiased FFT size
-      int nTh = Transform::FftToolsType::dealiasMixedFft(this->mJ+1);
+      int nTh = Transform::Fft::ToolsSelector::dealiasMixedFft(this->mJ+1);
       // Check for optimised FFT sizes
-      nTh = Transform::FftToolsType::optimizeFft(nTh);
+      nTh = Transform::Fft::ToolsSelector::optimizeFft(nTh);
 
       // Get standard dealiased FFT size
-      int nZ = Transform::FftToolsType::dealiasCosFft(this->mK+1);
+      int nZ = Transform::Fft::ToolsSelector::dealiasCosFft(this->mK+1);
       // Check for optimised FFT sizes
-      nZ = Transform::FftToolsType::optimizeFft(nZ);
+      nZ = Transform::Fft::ToolsSelector::optimizeFft(nZ);
 
       //
       // Initialise first transform

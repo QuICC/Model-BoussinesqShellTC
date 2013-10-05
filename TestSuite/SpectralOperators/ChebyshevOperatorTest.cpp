@@ -153,7 +153,7 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
@@ -235,7 +235,7 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
@@ -317,7 +317,7 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
@@ -402,7 +402,7 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));

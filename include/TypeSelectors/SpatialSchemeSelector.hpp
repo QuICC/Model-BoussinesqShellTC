@@ -30,7 +30,7 @@
       namespace Schemes {
 
          /// Typedef for the TTT spatial scheme
-         typedef TTTScheme SpatialType;
+         typedef TTTScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TTT
@@ -46,7 +46,7 @@
       namespace Schemes {
 
          /// Typedef for the TFT spatial scheme
-         typedef TFTScheme SpatialType;
+         typedef TFTScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TFT
@@ -61,7 +61,7 @@
       namespace Schemes {
 
          /// Typedef for the TFF spatial scheme
-         typedef TFFScheme SpatialType;
+         typedef TFFScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_TFF
@@ -76,7 +76,7 @@
       namespace Schemes {
 
          /// Typedef for the FFF spatial scheme
-         typedef FFFScheme SpatialType;
+         typedef FFFScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_FFF
@@ -91,7 +91,7 @@
       namespace Schemes {
 
          /// Typedef for the CFT spatial scheme
-         typedef CFTScheme SpatialType;
+         typedef CFTScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_CFT
@@ -106,7 +106,7 @@
       namespace Schemes {
 
          /// Typedef for the SLF spatial scheme
-         typedef SLFScheme SpatialType;
+         typedef SLFScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_SLF
@@ -121,7 +121,7 @@
       namespace Schemes {
 
          /// Typedef for the WFT spatial scheme
-         typedef WFTScheme SpatialType;
+         typedef WFTScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WFT
@@ -136,7 +136,7 @@
       namespace Schemes {
 
          /// Typedef for the WLF spatial scheme
-         typedef WLFScheme SpatialType;
+         typedef WLFScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WLF

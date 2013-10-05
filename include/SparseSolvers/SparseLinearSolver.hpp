@@ -28,7 +28,7 @@ namespace Solver {
 
    namespace internal
    {
-      template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSolverSelector<TOperator>::SolverType > solver, const TData& rhs);
+      template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSelector<TOperator>::Type > solver, const TData& rhs);
    }
 
    /**
@@ -133,7 +133,7 @@ namespace Solver {
          /**
           * @brief Create sparse solvers
           */
-         std::vector<SharedPtrMacro<typename SparseSolverSelector<TOperator>::SolverType > >  mSolver;
+         std::vector<SharedPtrMacro<typename SparseSelector<TOperator>::Type > >  mSolver;
 
       private:
    };
@@ -183,7 +183,7 @@ namespace Solver {
       this->mSolver.reserve(this->mLHSMatrix.size());
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         SharedPtrMacro<typename SparseSolverSelector<TOperator>::SolverType >  solver(new typename SparseSolverSelector<TOperator>::SolverType());
+         SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
 
          this->mSolver.push_back(solver);
       }
@@ -269,7 +269,7 @@ namespace Solver {
 
    namespace internal
    {
-   template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSolverSelector<TOperator>::SolverType > solver, const TData& rhs)
+   template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSelector<TOperator>::Type > solver, const TData& rhs)
    {
       rSolution = solver->solve(rhs);
 
@@ -277,7 +277,7 @@ namespace Solver {
       assert(solver->info() == Eigen::Success);
    }
 
-   template <> inline void solveWrapper<SparseMatrix,DecoupledZMatrix>(DecoupledZMatrix& rSolution, SharedPtrMacro<SparseSolverSelector<SparseMatrix>::SolverType > solver, const DecoupledZMatrix& rhs)
+   template <> inline void solveWrapper<SparseMatrix,DecoupledZMatrix>(DecoupledZMatrix& rSolution, SharedPtrMacro<SparseSelector<SparseMatrix>::Type > solver, const DecoupledZMatrix& rhs)
    {
       rSolution.real() = solver->solve(rhs.real());
 

@@ -179,16 +179,16 @@ namespace Timestep {
       MHDFloat rhsLCoeff;
 
       // Set time coefficients for LHS Matrix
-      lhsTCoeff = TimeSchemeType::lhsT(this->mStep)*1.0/this->mDt;
+      lhsTCoeff = IntegratorSelector::lhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for LHS Matrix
-      lhsLCoeff = TimeSchemeType::lhsL(this->mStep);
+      lhsLCoeff = IntegratorSelector::lhsL(this->mStep);
 
       // Set time coefficients for RHS Matrix
-      rhsTCoeff = TimeSchemeType::rhsT(this->mStep)*1.0/this->mDt;
+      rhsTCoeff = IntegratorSelector::rhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for RHS Matrix
-      rhsLCoeff = -TimeSchemeType::rhsL(this->mStep);
+      rhsLCoeff = -IntegratorSelector::rhsL(this->mStep);
 
       // Resize LHS matrix if necessary
       if(spSolver->rLHSMatrix(matIdx).size() == 0)

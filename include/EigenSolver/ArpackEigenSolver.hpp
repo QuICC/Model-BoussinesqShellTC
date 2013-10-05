@@ -128,7 +128,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Sparse linear solver
           */
-         SparseSolverSelector<SparseMatrixZ>::SolverType mSolver;
+         Solver::SparseSelector<SparseMatrixZ>::Type mSolver;
 
          /**
           * @defgroup ARPACKMem Work memory for ARPACK

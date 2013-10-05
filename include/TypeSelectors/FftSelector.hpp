@@ -33,20 +33,23 @@
 
       namespace Transform {
 
-         /// Typedef for FFTW's FFT tools implementation
-         typedef FftwTools FftToolsType;
+         namespace Fft {
 
-         /// Typedef for FFTW's FFT implementation
-         typedef FftwTransform FftTransformType;
+            /// Typedef for FFTW's FFT tools implementation
+            typedef FftwTools ToolsSelector;
 
-         /// Typedef for FFTW's Chebyshev FFT implementation
-         typedef ChebyshevFftwTransform ChebyshevTransformType;
+            /// Typedef for FFTW's FFT implementation
+            typedef FftwTransform FftSelector;
 
-         /// Typedef for FFTW's cylindrical shell Chebyshev FFT implementation
-         typedef CShellChebyshevFftwTransform CShellChebyshevTransformType;
+            /// Typedef for FFTW's Chebyshev FFT implementation
+            typedef ChebyshevFftwTransform ChebyshevSelector;
 
-         /// Typedef for FFTW's spherical shell Chebyshev FFT implementation
-         typedef SShellChebyshevFftwTransform SShellChebyshevTransformType;
+            /// Typedef for FFTW's cylindrical shell Chebyshev FFT implementation
+            typedef CShellChebyshevFftwTransform CShellChebyshevSelector;
+
+            /// Typedef for FFTW's spherical shell Chebyshev FFT implementation
+            typedef SShellChebyshevFftwTransform SShellChebyshevSelector;
+         }
       }
    }
 #endif //GEOMHDISCC_FFT_FFTW

@@ -75,13 +75,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasMixedFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -101,13 +101,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasMixedFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -133,7 +133,7 @@ namespace TestSuite {
       }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Check solution
       EXPECT_NEAR(1.0, spec(0,0).real(), this->mError);
@@ -165,13 +165,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasMixedFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
 
       // Create FFF transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -192,7 +192,7 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::PROJ);
 
       // Get phi grid
       Array phi = fft.meshGrid();
@@ -226,13 +226,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasMixedFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -255,10 +255,10 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Compute derivative projection transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::DIFF);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::DIFF);
 
       // Check the solution
       for(int i = 0; i < spSetup->howmany(); ++i)
@@ -289,13 +289,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasMixedFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasMixedFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::MIXED));
 
       // Create FFF transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -310,10 +310,10 @@ namespace TestSuite {
       spec.row(0).imag().setConstant(0.0);
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -348,13 +348,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -382,7 +382,7 @@ namespace TestSuite {
       phys.col(0).imag().setZero();
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Check solution
       EXPECT_NEAR(1.0, spec(0,0).real(), this->mError);
@@ -414,13 +414,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -441,7 +441,7 @@ namespace TestSuite {
       }
       
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::PROJ);
 
       // Get phi grid
       Array phi = fft.meshGrid();
@@ -483,13 +483,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -508,10 +508,10 @@ namespace TestSuite {
       spec.block(spSetup->bwdSize()-spSetup->specSize(), 0, spSetup->specSize(),spSetup->howmany()).setConstant(MHDComplex(1.0,1.0));
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -545,13 +545,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPLEX));
 
       // Create FFT transform
-      Transform::FftTransformType fft;
+      Transform::Fft::FftSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -579,10 +579,10 @@ namespace TestSuite {
       phys.col(0).imag().setZero();
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::FftTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::FftSelector::IntegratorType::INTG);
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::FftTransformType::ProjectorType::DIFF);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::FftSelector::ProjectorType::DIFF);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)

@@ -75,9 +75,9 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nX = Transform::FftToolsType::dealiasMixedFft(this->mI+1);
+      int nX = Transform::Fft::ToolsSelector::dealiasMixedFft(this->mI+1);
       // Check for optimised FFT sizes
-      nX = Transform::FftToolsType::optimizeFft(nX);
+      nX = Transform::Fft::ToolsSelector::optimizeFft(nX);
 
       //
       // Initialise first transform

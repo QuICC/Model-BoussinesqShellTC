@@ -38,30 +38,30 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
             {
                /// Typedef for the spectral boundary operator
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
          }
       }
@@ -78,11 +78,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
@@ -91,11 +91,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
          }
       }
@@ -112,11 +112,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
@@ -165,11 +165,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinCShellChebyshev  Type;
                #else
                   typedef  Spectral::TauCShellChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
@@ -178,11 +178,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
          }
       }
@@ -199,11 +199,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinSShellChebyshev  Type;
                #else
                   typedef  Spectral::TauSShellChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
@@ -228,11 +228,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinCylindricalChebyshev  Type;
                #else
                   typedef  Spectral::TauCylindricalChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
@@ -241,11 +241,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinChebyshev  Type;
                #else
                   typedef  Spectral::TauChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
          }
       }
@@ -262,11 +262,11 @@ namespace GeoMHDiSCC {
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
             {
-               #ifdef GEOMHDISCC_BOUNDARY_GALERKIN
+               #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
                   typedef  Spectral::GalerkinSphericalChebyshev  Type;
                #else
                   typedef  Spectral::TauSphericalChebyshev  Type;
-               #endif //GEOMHDISCC_BOUNDARY_GALERKIN
+               #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
             };
 
             template <> struct MethodSelector<Dimensions::Simulation::SIM2D>

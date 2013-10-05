@@ -98,7 +98,7 @@ namespace TestSuite {
    void SparseLinearSolverTest::solveProblem(Matrix& sol, const Matrix& rhs, const SparseMatrix& matA)
    {
       // Create solver
-      SparseSolverSelector<SparseMatrix>::SolverType   solver;
+      Solver::SparseSelector<SparseMatrix>::Type   solver;
 
       solver.compute(matA);
 
@@ -111,7 +111,7 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
@@ -183,7 +183,7 @@ namespace TestSuite {
       rhs.setLinSpaced(8,0.,7.);
 
       // Create solver
-      SparseSolverSelector<SparseMatrix>::SolverType   solver;
+      Solver::SparseSelector<SparseMatrix>::Type   solver;
 
       // Compute factorisation
       solver.compute(matA);
@@ -245,7 +245,7 @@ namespace TestSuite {
       rhs.setConstant(MHDComplex(1.0, 1.0));
 
       // Create solver
-      SparseSolverSelector<SparseMatrixZ>::SolverType   solver;
+      Solver::SparseSelector<SparseMatrixZ>::Type   solver;
 
       // Compute factorisation
       solver.compute(matA);

@@ -13,13 +13,15 @@
    #include <Eigen/SuperLUSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the SuperLU version. 
-       */
-      template <typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::SuperLU<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the SuperLU version. 
+          */
+         template <typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::SuperLU<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_SUPERLU
 
@@ -29,13 +31,15 @@
    #include <Eigen/UmfPackSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
-       */
-      template <typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::UmfPackLU<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
+          */
+         template <typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::UmfPackLU<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_UMFPACK
 
@@ -47,16 +51,18 @@
    //#include <Eigen/MetisSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
-       */
-      template <typename TMatrix> struct SparseSolverSelector
-      {
-         //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > SolverType;
-         //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > SolverType;
-         typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > SolverType;
-         //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
+          */
+         template <typename TMatrix> struct SparseSelector
+         {
+            //typedef Eigen::SparseLU<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseLU<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseLU<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseLU<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_SPARSELU
 
@@ -66,13 +72,15 @@
    #include <Eigen/KentLUSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the KentLU version. 
-       */
-      template <typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::KentLU<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the KentLU version. 
+          */
+         template <typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::KentLU<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_KENTLU
 
@@ -84,16 +92,18 @@
    //#include <Eigen/MetisSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the SparseQR version. 
-       */
-      template<typename TMatrix> struct SparseSolverSelector
-      {
-         //typedef Eigen::SparseQR<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > SolverType;
-         //typedef Eigen::SparseQR<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > SolverType;
-         typedef Eigen::SparseQR<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > SolverType;
-         //typedef Eigen::SparseQR<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the SparseQR version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            //typedef Eigen::SparseQR<TMatrix, Eigen::NaturalOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseQR<TMatrix, Eigen::AMDOrdering<typename TMatrix::Index> > Type;
+            typedef Eigen::SparseQR<TMatrix, Eigen::COLAMDOrdering<typename TMatrix::Index> > Type;
+            //typedef Eigen::SparseQR<TMatrix, Eigen::MetisOrdering<typename TMatrix::Index> > Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_SPARSEQR
 
@@ -103,13 +113,15 @@
    #include <Eigen/SPQRSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the SuiteSparseQR version. 
-       */
-      template<typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::SPQR<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the SuiteSparseQR version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::SPQR<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_SPQR
 
@@ -119,13 +131,15 @@
    #include "../External/Interfaces/PardisoLU.hpp"
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
-       */
-      template<typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::PardisoLU<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::PardisoLU<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_PARDISO
 
@@ -135,13 +149,15 @@
    #include <Eigen/PardisoSupport>
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
-       */
-      template<typename TMatrix> struct SparseSolverSelector
-      {
-         typedef Eigen::PardisoLU<TMatrix> SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::PardisoLU<TMatrix> Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_MKLPARDISO
 
@@ -151,15 +167,17 @@
    #include <Eigen/IterativeLinearSolvers>   
 
    namespace GeoMHDiSCC {
-      /**
-       * @brief Selector for the different implementations of the sparse solvers. Sets up the BiCGSTAB version. 
-       */
-      template<typename TMatrix> struct SparseSolverSelector
-      {
-         //typedef Eigen::BiCGSTAB<TMatrix, Eigen::IdentityPreconditioner<typename TMatrix::Scalar> > SolverType;
-         typedef Eigen::BiCGSTAB<TMatrix, Eigen::DiagonalPreconditioner<typename TMatrix::Scalar> > SolverType;
-         //typedef Eigen::BiCGSTAB<TMatrix, Eigen::IncompleteLUT<typename TMatrix::Scalar> > SolverType;
-      };
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the BiCGSTAB version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            //typedef Eigen::BiCGSTAB<TMatrix, Eigen::IdentityPreconditioner<typename TMatrix::Scalar> > Type;
+            typedef Eigen::BiCGSTAB<TMatrix, Eigen::DiagonalPreconditioner<typename TMatrix::Scalar> > Type;
+            //typedef Eigen::BiCGSTAB<TMatrix, Eigen::IncompleteLUT<typename TMatrix::Scalar> > Type;
+         };
+      }
    }
 #endif //GEOMHDISCC_SPLINALG_BICGSTAB
 

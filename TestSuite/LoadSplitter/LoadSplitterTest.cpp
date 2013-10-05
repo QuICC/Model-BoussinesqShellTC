@@ -75,13 +75,13 @@ namespace TestSuite {
          dims(0) = 64; dims(1) = 64; dims(2) = 64;
 
          // Initialise the load splitter with spatial scheme
-         splitter.init<Schemes::SpatialType>(dims);
+         splitter.init<Schemes::SpatialSelector>(dims);
 
          // Show the 5 best splittings' description
          splitter.showSplittings(5);
 
          // Create GXL graph format file
-         IoXml::GxlWriter gxl(Schemes::SpatialType::type() + "_transpose_graph");
+         IoXml::GxlWriter gxl(Schemes::SpatialSelector::type() + "_transpose_graph");
 
          // Initialise and write graph for resolution
          gxl.init();

@@ -75,13 +75,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise FFT
       fft.init(spSetup);
@@ -101,13 +101,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = 8;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, 8, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -129,7 +129,7 @@ namespace TestSuite {
       phys.col(7) = 64.0*x.pow(7) - 112.0*x.pow(5) + 56.0*x.pow(3) - 7.0*x;
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       std::cerr << spec << std::endl;
 
@@ -160,13 +160,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -192,7 +192,7 @@ namespace TestSuite {
       }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -223,13 +223,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -250,7 +250,7 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::PROJ);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
@@ -286,13 +286,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -318,10 +318,10 @@ namespace TestSuite {
       }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Compute backward derivative transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::DIFF);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::DIFF);
 
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -362,13 +362,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::REAL));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -388,10 +388,10 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Check the solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -416,13 +416,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -450,7 +450,7 @@ namespace TestSuite {
       phys.col(0).imag().setZero();
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -492,13 +492,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -538,7 +538,7 @@ namespace TestSuite {
       }
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::PROJ);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();
@@ -583,13 +583,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -616,10 +616,10 @@ namespace TestSuite {
       }
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Compute backward derivative transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::DIFF);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::DIFF);
 
       // Check solution
       for(int j = 0; j < spSetup->howmany(); ++j)
@@ -667,13 +667,13 @@ namespace TestSuite {
    {
       // Set spectral and physical sizes
       int nN = this->mMaxN + 1;
-      int xN = Transform::FftToolsType::dealiasCosFft(nN);
+      int xN = Transform::Fft::ToolsSelector::dealiasCosFft(nN);
 
       // Create setup
       Transform::SharedFftSetup spSetup(new Transform::FftSetup(xN, this->mHowmany, nN, Transform::FftSetup::COMPONENT));
 
       // Create Chebyshev transform
-      Transform::ChebyshevTransformType fft;
+      Transform::Fft::ChebyshevSelector fft;
 
       // Initialise fft
       fft.init(spSetup);
@@ -687,10 +687,10 @@ namespace TestSuite {
       spec.block(0,0,spSetup->specSize(),spSetup->howmany()).setConstant(MHDComplex(1.0,1.0));
 
       // Compute backward transform
-      fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevTransformType::ProjectorType::PROJ);
+      fft.project<Arithmetics::SET>(phys, spec, Transform::Fft::ChebyshevSelector::ProjectorType::PROJ);
 
       // Compute forward transform
-      fft.integrate<Arithmetics::SET>(spec, phys, Transform::ChebyshevTransformType::IntegratorType::INTG);
+      fft.integrate<Arithmetics::SET>(spec, phys, Transform::Fft::ChebyshevSelector::IntegratorType::INTG);
 
       // Get chebyshev grid
       Array x = fft.meshGrid();

@@ -166,9 +166,9 @@ namespace Schemes {
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
 
       // Get standard dealiased FFT size
-      int nPh = Transform::FftToolsType::dealiasMixedFft(this->mM+1);
+      int nPh = Transform::Fft::ToolsSelector::dealiasMixedFft(this->mM+1);
       // Check for optimised FFT sizes
-      nPh = Transform::FftToolsType::optimizeFft(nPh);
+      nPh = Transform::Fft::ToolsSelector::optimizeFft(nPh);
 
       //
       // Initialise first transform

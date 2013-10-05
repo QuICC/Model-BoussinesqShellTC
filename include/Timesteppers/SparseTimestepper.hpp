@@ -144,7 +144,7 @@ namespace Timestep {
 
       TData tmp;
 
-      if(TimeSchemeType::rhsNN(step) == 0.0)
+      if(IntegratorSelector::rhsNN(step) == 0.0)
       {
          for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
          {
@@ -281,22 +281,22 @@ namespace Timestep {
       template <typename TOperator,typename TData> inline void computeRHSNoMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, TData& rOld)
       {
          rOld = rRHS;
-         rRHS = mat*sol + TimeSchemeType::rhsN(step)*rRHS;
+         rRHS = mat*sol + IntegratorSelector::rhsN(step)*rRHS;
       }
 
       template <> inline void computeRHSNoMemory<SparseMatrix,DecoupledZMatrix>(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol, DecoupledZMatrix& rOld)
       {
          rOld.real() = rRHS.real();
-         rRHS.real() = mat*sol.real() + TimeSchemeType::rhsN(step)*rRHS.real();
+         rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(step)*rRHS.real();
 
          rOld.imag() = rRHS.imag();
-         rRHS.imag() = mat*sol.imag() + TimeSchemeType::rhsN(step)*rRHS.imag();
+         rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(step)*rRHS.imag();
       }
 
       template <typename TOperator,typename TData> inline void computeRHSMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, TData& rOld, TData& rTmp)
       {
          rTmp = rRHS;
-         rRHS = mat*sol + TimeSchemeType::rhsN(step)*rRHS + TimeSchemeType::rhsNN(step)*rOld;
+         rRHS = mat*sol + IntegratorSelector::rhsN(step)*rRHS + IntegratorSelector::rhsNN(step)*rOld;
          rOld = rTmp;
       }
 
@@ -304,11 +304,11 @@ namespace Timestep {
       {
          // rTmp is only a temporary variable, using only real reduces memory usage
          rTmp.real() = rRHS.real();
-         rRHS.real() = mat*sol.real() + TimeSchemeType::rhsN(step)*rRHS.real() + TimeSchemeType::rhsNN(step)*rOld.real();
+         rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(step)*rRHS.real() + IntegratorSelector::rhsNN(step)*rOld.real();
          rOld.real() = rTmp.real();
 
          rTmp.real() = rRHS.imag();
-         rRHS.imag() = mat*sol.imag() + TimeSchemeType::rhsN(step)*rRHS.imag() + TimeSchemeType::rhsNN(step)*rOld.imag();
+         rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(step)*rRHS.imag() + IntegratorSelector::rhsNN(step)*rOld.imag();
          rOld.imag() = rTmp.real();
       }
    }

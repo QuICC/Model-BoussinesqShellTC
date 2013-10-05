@@ -82,7 +82,7 @@ namespace TestSuite {
       dims(0) = this->mFile1D; dims(1) = this->mFile2D; dims(2) = this->mFile3D;
 
       // Initialise the load splitter with spatial scheme
-      splitter.init<Schemes::SpatialType>(dims);
+      splitter.init<Schemes::SpatialSelector>(dims);
 
       // Get best splitting
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
@@ -91,7 +91,7 @@ namespace TestSuite {
       this->mspRes = best.first;
 
       // Set additional options on final resolution object
-      Schemes::SpatialType::tuneResolution(this->mspRes);
+      Schemes::SpatialSelector::tuneResolution(this->mspRes);
    }
 
 //   void StateFileWriterTest::TearDown()
@@ -123,8 +123,8 @@ namespace TestSuite {
       }
 
       // Set type string
-      std::string type = Schemes::SpatialType::type();
-      bool isRegular = Schemes::SpatialType::isRegular();
+      std::string type = Schemes::SpatialSelector::type();
+      bool isRegular = Schemes::SpatialSelector::isRegular();
 
       // Create state file
       IoVariable::StateFileWriter   state(type, isRegular);

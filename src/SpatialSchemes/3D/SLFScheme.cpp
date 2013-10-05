@@ -142,17 +142,17 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nR = Transform::FftToolsType::dealiasCosFft(this->mI+1);
+      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1);
       // Check for optimised FFT sizes
-      nR = Transform::FftToolsType::optimizeFft(nR);
+      nR = Transform::Fft::ToolsSelector::optimizeFft(nR);
 
       // Get dealiased associated Legendre transform size
       int nTh = Transform::PolynomialTools::dealias(this->mL+1);
 
       // Get standard dealiased FFT size
-      int nPh = Transform::FftToolsType::dealiasMixedFft(this->mM+1);
+      int nPh = Transform::Fft::ToolsSelector::dealiasMixedFft(this->mM+1);
       // Check for optimised FFT sizes
-      nPh = Transform::FftToolsType::optimizeFft(nPh);
+      nPh = Transform::Fft::ToolsSelector::optimizeFft(nPh);
 
       //
       // Initialise first transform

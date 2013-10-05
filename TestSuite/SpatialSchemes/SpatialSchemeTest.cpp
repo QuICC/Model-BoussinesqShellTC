@@ -140,7 +140,7 @@ namespace TestSuite {
       dims(0) = this->mMax1D; dims(1) = this->mMax2D; dims(2) = this->mMax3D;
 
       // Initialise the load splitter with spatial scheme
-      splitter.init<Schemes::SpatialType>(dims);
+      splitter.init<Schemes::SpatialSelector>(dims);
 
       // Get best splitting
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
@@ -149,7 +149,7 @@ namespace TestSuite {
       this->mspRes = best.first;
 
       // Set additional options on final resolution object
-      Schemes::SpatialType::tuneResolution(this->mspRes);
+      Schemes::SpatialSelector::tuneResolution(this->mspRes);
 
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);

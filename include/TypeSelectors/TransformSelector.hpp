@@ -41,19 +41,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
          }
       }
@@ -68,19 +68,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
          }
       }
@@ -95,19 +95,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
          }
       }
@@ -122,19 +122,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
          }
       }
@@ -149,19 +149,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef CylindricalChebyshevTransformType Type;
+               typedef Fft::CShellChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
          }
       }
@@ -178,7 +178,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef SphericalChebyshevTransformType Type;
+               typedef Fft::SShellChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -190,7 +190,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
          }
       }
@@ -205,19 +205,19 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef CylindricalChebyshevTransformType Type;
+               typedef Fft::CylindricalChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the second transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef ChebyshevTransformType Type;
+               typedef Fft::ChebyshevSelector Type;
             };
          }
       }
@@ -232,7 +232,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef SphericalChebyshevTransformType Type;
+               typedef Fft::SphericalChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -244,7 +244,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA3D>
             {
                /// Typedef for the third transform
-               typedef FftTransformType Type;
+               typedef Fft::FftSelector Type;
             };
          }
       }
