@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 #include "SpectralOperators/SphericalHarmonicOperator.hpp"
 
 namespace GeoMHDiSCC {
@@ -135,13 +135,13 @@ namespace Equations {
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return EquationToolsType::timeRow(*this, compId, matIdx);
+         return EigenSelector::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else if(opId == IEquation::BOUNDARYROW)
       {
-         return EquationToolsType::boundaryRow(*this, compId, matIdx);
+         return EigenSelector::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -326,7 +326,7 @@ namespace Equations {
       }
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock(eq, compId, mat, fieldId, cR);
+      EigenSelector::boundaryBlock(eq, compId, mat, fieldId, cR);
    }
 
 }

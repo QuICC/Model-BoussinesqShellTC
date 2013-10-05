@@ -87,7 +87,7 @@ namespace TestSuite {
       fft.init(spSetup);
 
       EXPECT_EQ(xN, fft.meshGrid().size());
-      EXPECT_LT(fft.meshGrid()(xN-1), 2.0*MathConstants::PI);
+      EXPECT_LT(fft.meshGrid()(xN-1), 2.0*Math::PI);
       EXPECT_GE(fft.meshGrid()(0), 0);
    }
 

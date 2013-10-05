@@ -32,7 +32,7 @@ namespace Transform {
       // Create Chebyshev grid
       for(int k = 0; k < size; k++)
       {
-         grid(k) = std::cos((MathConstants::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
+         grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
 
          grid(k) = std::sqrt((grid(k)+1.)/2);
       }
@@ -95,7 +95,7 @@ namespace Transform {
       this->mGrid = WorlandTransform::generateGrid(this->mspSetup->fwdSize());
 
       // Set the weights
-      this->mWeights.setConstant(MathConstants::PI/this->mspSetup->fwdSize());
+      this->mWeights.setConstant(Math::PI/this->mspSetup->fwdSize());
    }
 
    void WorlandTransform::initProjector()

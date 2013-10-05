@@ -4,7 +4,6 @@ set(MHDTestDefList "TTT" "TFT" "TFF" "FFF" "CFT" "WFT" "SLF" "WLF")
 
 # Create list of sources for test case
 set(MHDTestSources
-   Base/MathConstants.cpp
    Enums/DimensionTools.cpp
    IoTools/Formatter.cpp
    Resolutions/Resolution.cpp
@@ -68,12 +67,12 @@ set(MHDTestSources
 function(geomhdiscc_append_test condition srcs)
    if(${condition} STREQUAL "TFT")
       set(${srcs}
-         Equations/Tools/Equation1DEigenTools.cpp
+         Equations/Tools/EquationEigen1DTools.cpp
          PARENT_SCOPE)
    endif(${condition} STREQUAL "TFT")
    if(${condition} STREQUAL "TFF")
       set(${srcs}
-         Equations/Tools/Equation2DEigenTools.cpp
+         Equations/Tools/EquationEigen2DTools.cpp
          PARENT_SCOPE)
    endif(${condition} STREQUAL "TFF")
 endfunction(geomhdiscc_append_test condition srcs)

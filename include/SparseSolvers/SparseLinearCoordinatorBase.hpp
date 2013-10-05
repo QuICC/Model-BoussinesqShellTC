@@ -339,10 +339,10 @@ namespace Solver {
 
          if(c != 1.0)
          {
-            mat += c*blockRow.real().cast<MHDComplex>() + c*MathConstants::cI*blockRow.imag();
+            mat += c*blockRow.real().cast<MHDComplex>() + c*Math::cI*blockRow.imag();
          } else
          {
-            mat += blockRow.real().cast<MHDComplex>() + MathConstants::cI*blockRow.imag();
+            mat += blockRow.real().cast<MHDComplex>() + Math::cI*blockRow.imag();
          }
       }
    }

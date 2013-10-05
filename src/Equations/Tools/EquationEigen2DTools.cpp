@@ -1,5 +1,5 @@
 /** 
- * @file Equation2DEigenTools.cpp
+ * @file EquationEigen2DTools.cpp
  * @brief Source of the tools for schemes with two eigen direction
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Tools/Equation2DEigenTools.hpp"
+#include "Equations/Tools/EquationEigen2DTools.hpp"
 
 // Project includes
 //
@@ -29,9 +29,11 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   const Boundary::BCIndex Equation2DEigenTools::INDEPENDENT = std::make_pair(std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
+namespace Eigen2D {
 
-   void Equation2DEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
+   const Boundary::BCIndex INDEPENDENT = std::make_pair(std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
+
+   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
       int nI = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM);
@@ -47,7 +49,7 @@ namespace Equations {
       cols.setConstant(1);
    }
 
-//   void Equation2DEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
+//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
 //   {
 //      // Get 1D dimension
 //      int n1D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -103,5 +105,6 @@ namespace Equations {
 //         mat.imag().prune(1e-32);
 //      }
 //   }
+}
 }
 }

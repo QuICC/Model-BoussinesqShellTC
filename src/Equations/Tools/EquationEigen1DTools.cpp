@@ -1,5 +1,5 @@
 /** 
- * @file Equation1DEigenTools.cpp
+ * @file EquationEigen1DTools.cpp
  * @brief Source of the tools for schemes with a single eigen direction
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Tools/Equation1DEigenTools.hpp"
+#include "Equations/Tools/EquationEigen1DTools.hpp"
 
 // Project includes
 //
@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   const Boundary::BCIndex Equation1DEigenTools::INDEPENDENT = std::numeric_limits<int>::min();
+namespace Eigen1D {
 
-   void Equation1DEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
+   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
       int nI = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM);
@@ -47,7 +47,7 @@ namespace Equations {
       cols.setConstant(1);
    }
 
-//   void Equation1DEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
+//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
 //   {
 //      // Get 1D and 3D dimensions
 //      int n1D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -180,5 +180,6 @@ namespace Equations {
 //         mat.imag().prune(1e-32);
 //      }
 //   }
+}
 }
 }

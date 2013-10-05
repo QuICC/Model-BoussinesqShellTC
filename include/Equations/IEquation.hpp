@@ -27,7 +27,6 @@
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/BoundaryMethodSelector.hpp"
-#include "TypeSelectors/BCIndexSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
@@ -131,7 +130,7 @@ namespace Equations {
           * @param idx        Boundary condition index
           * @param bcOp       Boundary condition operator
           */
-         template <Dimensions::Simulation::Id TId> void setBoundaryCondition(const SpectralFieldId fieldId, const Boundary::BCIndex& idx, const typename Boundary::MethodSelector<TId>::Type& bcOp);
+         template <Dimensions::Simulation::Id TId> void setBoundaryCondition(const int& idx, const typename Boundary::MethodSelector<TId>::Type& bcOp);
          
       protected:
          /**

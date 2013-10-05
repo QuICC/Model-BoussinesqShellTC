@@ -24,7 +24,7 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -72,7 +72,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
@@ -111,17 +111,17 @@ namespace Equations {
 
    void BoussinesqBetaCylGStreamfunction::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      EquationToolsType::boundaryRow(*this, compId, matIdx);
+      EigenSelector::boundaryRow(*this, compId, matIdx);
    }
 
    DecoupledZSparse BoussinesqBetaCylGStreamfunction::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return EquationToolsType::timeRow(*this, compId, matIdx);
+         return EigenSelector::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -263,28 +263,28 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
-         coeffs.push_back(k_*std::tan((MathConstants::PI/180.)*chi)/Gamma);
+         coeffs.push_back(k_*std::tan((Math::PI/180.)*chi)/Gamma);
          bcIdx.push_back(Boundary::BCIndex(k));
 
       // Boundary condition prefactors for the vertical velocity
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
       // Boundary condition prefactors for the temperature
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
       // Unknown field
       } else
@@ -292,7 +292,7 @@ namespace Equations {
          throw Exception("Unknown field ID for boundary operator!");
       }
 
-      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
+      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

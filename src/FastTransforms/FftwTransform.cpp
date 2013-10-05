@@ -32,7 +32,7 @@ namespace Transform {
       // Create equispaced FFT grid
       for(int k = 0; k < size; k++)
       {
-         grid(k) = 2.0*MathConstants::PI*static_cast<MHDFloat>(k)/static_cast<MHDFloat>(size);
+         grid(k) = 2.0*Math::PI*static_cast<MHDFloat>(k)/static_cast<MHDFloat>(size);
       }
 
       return grid;

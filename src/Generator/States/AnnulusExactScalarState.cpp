@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -75,7 +75,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
@@ -101,7 +101,7 @@ namespace Equations {
          {
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               Array funcZ = 2.*(5.*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
+               Array funcZ = 2.*(5.*(Math::PI/2)*(1+zGrid.array())).array().sin();
                Array funcR = 1 + rGrid.array() + rGrid.array().pow(3);
                MHDFloat funcTh = std::cos(thGrid(iTh));
 
@@ -130,14 +130,14 @@ namespace Equations {
 
    void AnnulusExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      EquationToolsType::boundaryRow(*this, compId, matIdx);
+      EigenSelector::boundaryRow(*this, compId, matIdx);
    }
 
    DecoupledZSparse AnnulusExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -205,12 +205,12 @@ namespace Equations {
       std::vector<Boundary::BCIndex>  bcIdx;
 
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
-      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
+      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

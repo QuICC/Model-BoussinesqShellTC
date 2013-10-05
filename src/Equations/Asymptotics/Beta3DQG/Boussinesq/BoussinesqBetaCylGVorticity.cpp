@@ -23,7 +23,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -66,7 +66,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
@@ -98,7 +98,7 @@ namespace Equations {
    {
       if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");

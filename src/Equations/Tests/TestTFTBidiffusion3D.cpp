@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "SpectralOperators/PeriodicOperator.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -70,7 +70,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
@@ -87,13 +87,13 @@ namespace Equations {
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return EquationToolsType::timeRow(*this, compId, matIdx);
+         return EigenSelector::timeRow(*this, compId, matIdx);
       } else if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else if(opId == IEquation::BOUNDARYROW)
       {
-         return EquationToolsType::boundaryRow(*this, compId, matIdx);
+         return EigenSelector::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -176,7 +176,7 @@ namespace Equations {
       MHDFloat cZ = 1.0;
 
       // Compute boundary block operator
-      EquationToolsType::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      EigenSelector::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
    }
 
 }

@@ -1,7 +1,6 @@
 # Create list of sources for test case
 set(MHDTestSources
    IoTools/Formatter.cpp
-   Base/MathConstants.cpp
    Resolutions/TransformSetup.cpp
    FastTransforms/FftSetup.cpp
    SpectralOperators/IOperator.cpp

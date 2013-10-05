@@ -6,5 +6,8 @@ set(MHDSources
    IVectorEquation.cpp
    EquationData.cpp
    EquationParameters.cpp
-   EquationTools.cpp
+)
+
+set(MHDSrcSubDirs
+   Tools
 )

@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/EquationTools.hpp"
+#include "Equations/Tools/EquationTools.hpp"
 
 // Project includes
 //
@@ -24,81 +24,9 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   namespace Sorters {
+namespace Tools {
 
-      bool EquationType::operator()(SharedIScalarEquation eqA, SharedIScalarEquation eqB)
-      {
-         return computeEquationType(eqA) < computeEquationType(eqB);
-      }
-
-      bool EquationType::operator()(SharedIVectorEquation eqA, SharedIVectorEquation eqB)
-      {
-         return computeEquationType(eqA) < computeEquationType(eqB);
-      }
-
-      int EquationType::computeEquationType(SharedIScalarEquation eqA)
-      {
-         return static_cast<int>(eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType());
-      }
-
-      int EquationType::computeEquationType(SharedIVectorEquation eqA)
-      { 
-         return static_cast<int>(eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType());
-      }
-   }
-
-   namespace Conditions {
-
-      bool IsPrognostic::operator()(SharedIScalarEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == CouplingInformation::PROGNOSTIC;
-      }
-
-      bool IsPrognostic::operator()(SharedIVectorEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == CouplingInformation::PROGNOSTIC;
-      }
-
-      bool IsDiagnostic::operator()(SharedIScalarEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == CouplingInformation::DIAGNOSTIC;
-      }
-
-      bool IsDiagnostic::operator()(SharedIVectorEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == CouplingInformation::DIAGNOSTIC;
-      }
-
-      bool IsTrivial::operator()(SharedIScalarEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == CouplingInformation::TRIVIAL;
-      }
-
-      bool IsTrivial::operator()(SharedIVectorEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == CouplingInformation::TRIVIAL;
-      }
-
-      bool IsWrapper::operator()(SharedIScalarEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::SCALAR).equationType() == CouplingInformation::WRAPPER;
-      }
-
-      bool IsWrapper::operator()(SharedIVectorEquation eqA)
-      {
-         return eqA->couplingInfo(FieldComponents::Spectral::ONE).equationType() == CouplingInformation::WRAPPER;
-      }
-   }
-
-   EquationTools::EquationTools()
-   {
-   }
-
-   EquationTools::~EquationTools()
-   {
-   }
-
-   void EquationTools::identifySolver(const std::pair<std::vector<SharedIScalarEquation>::iterator,std::vector<SharedIScalarEquation>::iterator>& scalarRange, const std::pair<std::vector<SharedIVectorEquation>::iterator,std::vector<SharedIVectorEquation>::iterator>& vectorRange)
+   void identifySolver(const std::pair<std::vector<SharedIScalarEquation>::iterator,std::vector<SharedIScalarEquation>::iterator>& scalarRange, const std::pair<std::vector<SharedIVectorEquation>::iterator,std::vector<SharedIVectorEquation>::iterator>& vectorRange)
    {
       // Iterators for scalar equations
       std::vector<SharedIScalarEquation>::iterator  scalEqIt;
@@ -336,18 +264,15 @@ namespace Equations {
       }
    }
 
-   namespace internal {
+   SparseMatrix makeBlockMatrix(const int nBlocks, const int row, const int col)
+   {
+      SparseMatrix  mat(nBlocks, nBlocks);
 
-      SparseMatrix makeBlockMatrix(const int nBlocks, const int row, const int col)
-      {
-         SparseMatrix  mat(nBlocks, nBlocks);
-
-         mat.insert(row, col) = 1;
-         mat.makeCompressed();
-         
-         return mat;
-      }
+      mat.insert(row, col) = 1;
+      mat.makeCompressed();
+      
+      return mat;
    }
-
+}
 }
 }

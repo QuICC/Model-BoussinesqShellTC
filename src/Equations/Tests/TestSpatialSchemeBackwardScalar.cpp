@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -74,7 +74,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields

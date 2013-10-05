@@ -29,9 +29,9 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   const Boundary::BCIndex EquationNoEigenTools::INDEPENDENT = std::numeric_limits<int>::min();
+namespace NoEigen {
 
-   void EquationNoEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
+   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
       int nI = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM);
@@ -49,9 +49,10 @@ namespace Equations {
       cols.setConstant(1);
    }
 
-//   void EquationNoEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
+//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
 //   {
 //      throw Exception("Not yet implemented!");
 //   }
+}
 }
 }

@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 

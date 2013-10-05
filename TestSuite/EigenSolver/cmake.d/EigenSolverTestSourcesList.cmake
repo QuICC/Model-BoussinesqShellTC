@@ -1,7 +1,6 @@
 # Create list of sources for test case
 set(MHDTestSources
    IoTools/Formatter.cpp
-   Base/MathConstants.cpp
    SpectralOperators/IOperator.cpp
    SpectralOperators/ChebyshevOperator.cpp
    SpectralOperators/PeriodicOperator.cpp

@@ -31,7 +31,7 @@
 #include "IoTools/Formatter.hpp"
 #include "Variables/RequirementTools.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
-#include "Equations/EquationTools.hpp"
+#include "Equations/Tools/EquationTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -391,14 +391,14 @@ namespace GeoMHDiSCC {
    void SimulationBase::sortEquations()
    {
       // Sort scalar equations
-      Equations::EquationTools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange);
+      Equations::Tools::sortByType(this->mScalarEquations, this->mScalarPrognosticRange, this->mScalarDiagnosticRange, this->mScalarTrivialRange);
 
       // Sort vector equations
-      Equations::EquationTools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange);
+      Equations::Tools::sortByType(this->mVectorEquations, this->mVectorPrognosticRange, this->mVectorDiagnosticRange, this->mVectorTrivialRange);
 
       // Identifiy the solver indexes by analysing the coupling between the equations
-      Equations::EquationTools::identifySolver(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
-      Equations::EquationTools::identifySolver(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
-      Equations::EquationTools::identifySolver(this->mScalarTrivialRange, this->mVectorTrivialRange);
+      Equations::Tools::identifySolver(this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      Equations::Tools::identifySolver(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
+      Equations::Tools::identifySolver(this->mScalarTrivialRange, this->mVectorTrivialRange);
    }
 }

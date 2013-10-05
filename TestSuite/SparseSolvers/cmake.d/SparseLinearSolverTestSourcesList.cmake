@@ -3,7 +3,6 @@ set(MHDTestBackendFlag  GEOMHDISCC_SPLINALG)
 
 # Create list of sources for test case
 set(MHDTestSources
-   Base/MathConstants.cpp
    IoTools/Formatter.cpp
    Resolutions/TransformSetup.cpp
    FastTransforms/FftSetup.cpp

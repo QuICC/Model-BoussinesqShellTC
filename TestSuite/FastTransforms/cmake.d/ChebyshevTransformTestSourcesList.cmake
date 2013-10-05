@@ -4,7 +4,6 @@ set(MHDTestBackendFlag GEOMHDISCC_FFT)
 # Create list of sources
 set(MHDTestSources
    IoTools/Formatter.cpp
-   Base/MathConstants.cpp
    Resolutions/TransformSetup.cpp
    FastTransforms/FftSetup.cpp
    SpectralOperators/IOperator.cpp

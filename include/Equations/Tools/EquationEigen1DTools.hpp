@@ -1,11 +1,11 @@
 /**
- * @file EquationNoEigenTools.hpp
- * @brief Implementation of some tools for schemes with no eigen direction 
+ * @file EquationEigen1DTools.hpp
+ * @brief Implementation of some tools for schemes with a single eigen direction 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef EQUATIONNOEIGENTOOLS_HPP
-#define EQUATIONNOEIGENTOOLS_HPP
+#ifndef EQUATIONEIGEN1DTOOLS_HPP
+#define EQUATIONEIGEN1DTOOLS_HPP
 
 // Configuration includes
 //
@@ -26,7 +26,6 @@
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/BoundaryMethodSelector.hpp"
-#include "Equations/IEquation.hpp"
 #include "Equations/Tools/EquationEigenTools.hpp"
 
 namespace GeoMHDiSCC {
@@ -34,9 +33,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
 /**
- * @brief Tools for equations with no eigen direction
+ * @brief Tools for equations with a single eigen direction
  */
-namespace NoEigen {
+namespace Eigen1D {
 
    /// Flag to specify index independent boundary conditions
    const Boundary::BCIndex INDEPENDENT = std::numeric_limits<int>::min();
@@ -85,8 +84,10 @@ namespace NoEigen {
 
    template <typename TEquation> std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx)
    {
-      throw Exception("Not yet implemented!");
       std::vector<MHDFloat> eigs;
+
+      // Get wave number rescale to box size
+      eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)));
 
       return eigs;
    }
@@ -112,31 +113,28 @@ namespace NoEigen {
       EigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
    }
 
-   template <typename TEquation> void storeBoundaryCondition(IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx)
+   template <typename TEquation> void storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(coeffs.size() == bcIdx.size());
-      assert(coeffs.size() == 3);
+      assert(coeffs.size() == 2);
 
       SpectralFieldId eqId = std::make_pair(eq.name(), compId);
 
-      int nEq1D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM1D)->second.size();
-      int nEq2D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM2D)->second.size();
+      int nEq1D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM3D)->second.size();
       int nEq3D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM3D)->second.size();
 
       int nI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
-      int nJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      int nK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       Boundary::BCVector bcs1D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second;
-      Boundary::BCVector bcs2D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM2D)->second;
       Boundary::BCVector bcs3D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second;
 
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM1D, fieldId, bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0), nI, bcs1D, nEq1D));
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM2D, fieldId, bcIdx.at(1), Boundary::MethodSelector<Dimensions::Simulation::SIM2D>::Type(coeffs.at(1), nJ, bcs2D, nEq2D));
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM3D, fieldId, bcIdx.at(2), Boundary::MethodSelector<Dimensions::Simulation::SIM3D>::Type(coeffs.at(2), nK, bcs3D, nEq3D));
+      eq.template setBoundaryCondition<Dimensions::Simulation::SIM1D>(fieldId, bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0), nI, bcs1D, nEq1D));
+      eq.template setBoundaryCondition<Dimensions::Simulation::SIM3D>(fieldId, bcIdx.at(1), Boundary::MethodSelector<Dimensions::Simulation::SIM3D>::Type(coeffs.at(1), nK, bcs3D, nEq3D));
    }
 
 }
 }
+}
 
-#endif // EQUATIONNOEIGENTOOLS_HPP
+#endif // EQUATIONEIGEN1DTOOLS_HPP

@@ -1,5 +1,5 @@
 /** 
- * @file Equation3DEigenTools.cpp
+ * @file EquationEigen3DTools.cpp
  * @brief Source of the tools for schemes with three eigen direction
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -18,7 +18,7 @@
 
 // Class include
 //
-#include "Equations/Tools/Equation3DEigenTools.hpp"
+#include "Equations/Tools/EquationEigen3DTools.hpp"
 
 // Project includes
 //
@@ -29,9 +29,11 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   const Boundary::BCIndex Equation3DEigenTools::INDEPENDENT = std::tr1::make_tuple(std::numeric_limits<int>::min(),std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
+namespace Eigen3D {
 
-   void Equation3DEigenTools::makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
+   const Boundary::BCIndex INDEPENDENT = std::tr1::make_tuple(std::numeric_limits<int>::min(),std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
+
+   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
       int nI = spRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM);
@@ -46,16 +48,5 @@ namespace Equations {
       cols.resize(nMat);
       cols.setConstant(1);
    }
-
-   template <typename TEquation> void Equation3DEigenTools::storeBoundaryCondition(IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Equation3DEigenTools::BCIndex>& bcIdx)
-   {
-      assert(coeffs.size() == isEigsDependent.size());
-      assert(coeffs.size() == 0);
-   }
-
-//   void Equation3DEigenTools::boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
-//   {
-//      throw Exception("Not yet implemented!");
-//   }
 }
 }

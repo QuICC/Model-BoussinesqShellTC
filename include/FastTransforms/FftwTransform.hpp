@@ -263,7 +263,7 @@ namespace Transform {
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         ArrayZ factor = Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
 
          // Rescale results
          this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
@@ -333,8 +333,8 @@ namespace Transform {
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = MathConstants::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
-         ArrayZ rfactor = -MathConstants::cI*static_cast<MHDFloat>(this->mspSetup->specSize()) + factor.array();
+         ArrayZ factor = Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+         ArrayZ rfactor = -Math::cI*static_cast<MHDFloat>(this->mspSetup->specSize()) + factor.array();
          rfactor(0) = 0;
 
          // compute derivative

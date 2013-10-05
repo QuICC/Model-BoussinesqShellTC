@@ -4,7 +4,6 @@ set(MHDTestSources
    SpectralOperators/IOperator.cpp
    SpectralOperators/ChebyshevOperator.cpp
    SpectralOperators/PeriodicOperator.cpp
-   Base/MathConstants.cpp
    FastTransforms/FftSetup.cpp
    FastTransforms/FftwTools.cpp
    FastTransforms/FftwLibrary.cpp

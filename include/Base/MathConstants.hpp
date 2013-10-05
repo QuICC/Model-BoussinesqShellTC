@@ -19,36 +19,19 @@
 
 namespace GeoMHDiSCC {
 
+namespace Math {
+
    /**
-    * @brief Contains some useful math constants
+    * @brief The constant \f$\pi\f$
     */
-   class MathConstants
-   {
-      public:
-         /**
-          * @brief The constant \f$\pi\f$
-          */
-         static const MHDFloat PI;
+   const MHDFloat PI = std::acos(-1);
 
-         /**
-          * @brief Pure imaginary value I
-          */
-         static const MHDComplex cI;
-         
-      protected:
+   /**
+    * @brief Pure imaginary value I
+    */
+   const MHDComplex cI = MHDComplex(0.0, 1.0);
 
-      private:
-         /**
-          * @brief Empty constructor
-          */
-         MathConstants();
-
-         /**
-          * @brief Empty Destructor
-          */
-         ~MathConstants();
-   };
-
+}
 }
 
 #endif // MATHCONSTANTS_HPP

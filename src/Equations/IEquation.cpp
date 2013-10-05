@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 #include <iostream>
 namespace GeoMHDiSCC {
@@ -77,7 +77,7 @@ namespace Equations {
          // Create matrices
          for(int i = 0; i < nSystems; ++i)
          {
-            std::vector<MHDFloat> eigs = EquationToolsType::getEigs(*this, i);
+            std::vector<MHDFloat> eigs = EigenSelector::getEigs(*this, i);
 
             // Get linear block
             tmpMat.push_back(DecoupledZSparse());
@@ -101,7 +101,7 @@ namespace Equations {
 
             for(int i = 0; i < nSystems; ++i)
             {
-               SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + MathConstants::cI*tmpMat.at(i).imag();
+               SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + Math::cI*tmpMat.at(i).imag();
                this->mLZMatrices.find(key)->second.push_back(tmp);
             }
          } else

@@ -97,7 +97,7 @@ namespace Transform {
       this->mThGrid = this->mXGrid.array().acos();
 
       // Normalise weights by 2*pi
-      this->mWeights.array() *= 2*MathConstants::PI;
+      this->mWeights.array() *= 2*Math::PI;
    }
 
    void AssociatedLegendreTransform::initProjector()

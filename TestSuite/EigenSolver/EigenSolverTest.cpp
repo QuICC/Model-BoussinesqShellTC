@@ -198,13 +198,13 @@ namespace TestSuite {
                Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
                sparseLhs += tmp.cast<MHDComplex>();
                Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
-               sparseLhs += MathConstants::cI*tmp;
+               sparseLhs += Math::cI*tmp;
 
                Equations::Beta3DQGSystem::boundaryBlock(block, *rowIt, *colIt, spBcs, nx, nz, k_, Ra, Pr, Gamma, chi);
                Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
                sparseLhs += tmp.cast<MHDComplex>();
                Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
-               sparseLhs += MathConstants::cI*tmp;
+               sparseLhs += Math::cI*tmp;
 
                if(*rowIt == *colIt)
                {
@@ -212,7 +212,7 @@ namespace TestSuite {
                   Eigen::kroneckerProduct(blockMatrix, block.first, tmp);
                   sparseRhs += tmp.cast<MHDComplex>();
                   Eigen::kroneckerProduct(blockMatrix, block.second, tmp);
-                  sparseRhs += MathConstants::cI*tmp;
+                  sparseRhs += Math::cI*tmp;
                }
 
                ++colIdx;

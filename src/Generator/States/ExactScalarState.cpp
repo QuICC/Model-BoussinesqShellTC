@@ -23,7 +23,7 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
-#include "TypeSelectors/EquationToolsSelector.hpp"
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -84,7 +84,7 @@ namespace Equations {
       int nMat;
       ArrayI blockNs;
       ArrayI rhsCols;
-      EquationToolsType::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
+      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
       infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
 
       // Sort implicit fields
@@ -113,8 +113,8 @@ namespace Equations {
          {
             for(int iY = 0; iY < nY; ++iY)
             {
-               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().sin();
-               Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
+               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(Math::PI/2)*(1+zGrid.array())).array().sin();
+               Array sinX = this->mSineA(0)*(this->mSineN(0)*(Math::PI/2)*(1+xGrid.array())).array().sin();
                MHDFloat yVal = std::cos(yGrid(iY));
                //MHDFloat yVal = 1.0;
 
@@ -135,8 +135,8 @@ namespace Equations {
          {
             for(int iY = 0; iY < nY; ++iY)
             {
-               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(MathConstants::PI/2)*(1+zGrid.array())).array().cos();
-               Array sinX = this->mSineA(0)*(this->mSineN(0)*(MathConstants::PI/2)*(1+xGrid.array())).array().sin();
+               Array sinZ = this->mSineA(1)*(this->mSineN(1)*(Math::PI/2)*(1+zGrid.array())).array().cos();
+               Array sinX = this->mSineA(0)*(this->mSineN(0)*(Math::PI/2)*(1+xGrid.array())).array().sin();
                MHDFloat yVal = std::cos(yGrid(iY));
                //MHDFloat yVal = 1.0;
 
@@ -165,14 +165,14 @@ namespace Equations {
 
    void ExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      EquationToolsType::boundaryRow(*this, compId, matIdx);
+      EigenSelector::boundaryRow(*this, compId, matIdx);
    }
 
    DecoupledZSparse ExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
    {
       if(opId == IEquation::LINEARROW)
       {
-         return EquationToolsType::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -240,12 +240,12 @@ namespace Equations {
       std::vector<Boundary::BCIndex>  bcIdx;
 
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EquationToolsType::INDEPENDENT));
+      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
 
-      EquationToolsType::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
+      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }
