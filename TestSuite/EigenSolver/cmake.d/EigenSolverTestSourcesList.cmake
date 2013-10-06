@@ -3,7 +3,7 @@ set(MHDTestSources
    IoTools/Formatter.cpp
    SpectralOperators/IOperator.cpp
    SpectralOperators/ChebyshevOperator.cpp
-   SpectralOperators/PeriodicOperator.cpp
+   SpectralOperators/Tools/SpectralBoxTools.cpp
    Simulation/SimulationBoundary.cpp
    Equations/CouplingInformation.cpp
    EigenSolver/ArpackEigenSolver.cpp

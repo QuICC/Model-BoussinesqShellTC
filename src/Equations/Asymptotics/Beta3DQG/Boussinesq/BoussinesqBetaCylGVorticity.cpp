@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
@@ -135,9 +135,8 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
+      EigenSelector::KZSum blocks;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -145,8 +144,9 @@ namespace Equations {
       /// - Streamfunction: \f$ \zeta = \nabla^2 \psi\f$
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0));
+         std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::laplacian2D(spec1D, k_, 0);
+         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         blocks.push_back(kProduct);
 
       // Unknown field
       } else
@@ -154,9 +154,7 @@ namespace Equations {
          throw Exception("Unknown field ID for linear operator!");
       }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
 }

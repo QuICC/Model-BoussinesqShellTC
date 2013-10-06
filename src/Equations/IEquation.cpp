@@ -158,7 +158,7 @@ namespace Equations {
       throw Exception("quasiInverseBlock: dummy implementation called!");
    }
 
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& k)
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k)
    {
       throw Exception("timeBlock: dummy implementation called!");
    }
@@ -168,7 +168,7 @@ namespace Equations {
       throw Exception("linearBlock: dummy implementation called!");
    }
 
-   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k)
+   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       throw Exception("boundaryBlock: dummy implementation called!");
    }

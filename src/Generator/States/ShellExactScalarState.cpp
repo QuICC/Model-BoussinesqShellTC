@@ -191,20 +191,15 @@ namespace Equations {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void boundaryBlock(ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       throw Exception("Operators for 2D eigen directions not implemented yet");
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
       MHDFloat m = eigs.at(1);
 
-      std::vector<MHDFloat> coeffs;
-      std::vector<Boundary::BCIndex>  bcIdx;
-
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
-
-      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
+      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
    }
 
 }

@@ -23,6 +23,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Base/KroneckerTypedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/BoundaryMethodSelector.hpp"
@@ -38,8 +39,10 @@ namespace Equations {
  */
 namespace Eigen3D {
 
-   /// Flag to specify index independent boundary conditions
-   const Boundary::BCIndex INDEPENDENT;
+   typedef KronEigen3DRProduct KRProduct;
+   typedef KronEigen3DZProduct KZProduct;
+   typedef KronEigen3DRSum KRSum;
+   typedef KronEigen3DZSum KZSum;
 
    /**
     * @brief Set eigen values
@@ -56,6 +59,16 @@ namespace Eigen3D {
     */
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
+   void computeKProduct(SparseMatrix& mat, const KRProduct& block);
+
+   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);
+
+   void computeKSum(SparseMatrix& mat, const KRSum& blocks);
+
+   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
+
+   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx);
+
    /**
     * @brief General implementation of linear row
     */
@@ -71,7 +84,6 @@ namespace Eigen3D {
     */
    template <typename TEquation> void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
-   template <typename TEquation> void storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx);
 //
 //   /**
 //    * @brief General implementation of the boundary block

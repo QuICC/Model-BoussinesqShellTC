@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
@@ -104,7 +104,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGTransport::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
    {
-      EigenSelector::boundaryRow(*this, compId, matIdx);
+      //EigenSelector::boundaryRow(*this, compId, matIdx);
    }
 
    DecoupledZSparse BoussinesqBetaCylGTransport::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
@@ -147,12 +147,15 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      /// - Transport equation: \f$ \left( D_x^{-2} \otimes I_Z\right) \f$
-      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      mat = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
+      EigenSelector::KRSum blocks;
+      EigenSelector::KRProduct kProduct(SparseMatrix(nX*nZ,nX*nZ),SparseMatrix(nX*nZ,nX*nZ));
 
-      // Prune matrices for safety
-      mat.prune(1e-32);
+      /// - Transport equation: \f$ \left( D_x^{-2} \otimes I_Z\right) \f$
+      std::tr1::get<0>(kProduct) = spec1D.qDiff(2,0);
+      std::tr1::get<1>(kProduct) = spec3D.id(0);
+      blocks.push_back(kProduct);
+
+      EigenSelector::computeKSum(mat, blocks);
    }
 
    void linearBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
@@ -168,9 +171,8 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
+      EigenSelector::KZSum blocks;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -181,36 +183,32 @@ namespace Equations {
       /// - Streamfunction : \f$ i \frac{k}{2} \left(D_x^{-2} \otimes I_Z\right) \f$
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         SparseMatrix tmp = k_*spec3D.id(0);
-         mat.imag() = Eigen::kroneckerProduct(tmp, spec1D.qDiff(2,0));
+         std::tr1::get<0>(kProduct).imag() = spec1D.qDiff(2,0);
+         std::tr1::get<1>(kProduct).imag() = k_*spec3D.id(0);
+         blocks.push_back(kProduct);
 
-         /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
+      /// - Vertical velocity : \f$ \left(0_x \otimes 0_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          //
          // Nothing to do for an empty sparse matrix
          //
 
-         /// - Temperature : \f$ \frac{1}{Pr}\left(D_x^{-2}\nabla_\perp^{2} \otimes I_Z\right) \f$
+      /// - Temperature : \f$ \frac{1}{Pr}\left(D_x^{-2}\nabla_\perp^{2} \otimes I_Z\right) \f$
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         SparseMatrix tmp = (1./Pr)*spec3D.id(0);
-         mat.real() = Eigen::kroneckerProduct(tmp, Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2));
+         std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
+         std::tr1::get<1>(kProduct).real() = (1./Pr)*spec3D.id(0);
+         blocks.push_back(kProduct);
 
          // Unknown field
       } else
       {
          throw Exception("Unknown field ID for linear operator!");
       }
-
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
    }
 
-   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -223,60 +221,59 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
+      EigenSelector::KZSum blocks;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
-      // Set time matrix (kronecker(A,B,out) => out = A(i,j)*B)
-      mat.real() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
+      if(fieldId.first == PhysicalNames::TEMPERATURE)
+      {
+         std::tr1::get<0>(kProduct).real() = spec1D.qDiff(2,0);
+         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         blocks.push_back(kProduct);
+      } else
+      {
+         throw Exception("Multiple field in time integration not implemented yet!");
+      }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void boundaryBlock(BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(const BoussinesqBetaCylGTransport& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
-
-      std::vector<MHDFloat> coeffs;
-      std::vector<Boundary::BCIndex>  bcIdx;
 
       // Boundary condition for the streamfunction
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Boundary condition for the vertical velocity
       } else if(fieldId.first == PhysicalNames::VELOCITYZ)
       {
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Boundary condition for the temperature
       } else if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
          coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field
       } else
       {
          throw Exception("Unknown field ID for boundary operator!");
       }
-
-      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
    }
 
 }

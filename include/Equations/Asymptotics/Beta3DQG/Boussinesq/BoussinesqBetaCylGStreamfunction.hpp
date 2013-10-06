@@ -102,7 +102,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eigs    Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs);
+   void timeBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -122,7 +122,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Wave number k
     */
-   void boundaryBlock(BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void boundaryBlock(const BoussinesqBetaCylGStreamfunction& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }

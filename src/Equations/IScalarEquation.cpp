@@ -90,5 +90,21 @@ namespace Equations {
          this->initSpectralMatricesComponent(spBcIds, FieldComponents::Spectral::SCALAR);
       }
    }
+
+   const Boundary::CoordinatorSelector& IScalarEquation::bcCoord(FieldComponents::Spectral::Id compId) const
+   {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      return this->mBcCoord;
+   }
+
+   Boundary::CoordinatorSelector& IScalarEquation::rBcCoord(FieldComponents::Spectral::Id compId)
+   {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      return this->mBcCoord;
+   }
 }
 }

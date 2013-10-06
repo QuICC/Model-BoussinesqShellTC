@@ -123,14 +123,18 @@ namespace Equations {
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
 
          /**
-          * @brief Set the boundary condition for a given dimension 
+          * @brief Get the boundary condition coordinator
           *
-          * @tparam TId       Simulation dimension ID
-          * @param fieldId    Field Id
-          * @param idx        Boundary condition index
-          * @param bcOp       Boundary condition operator
+          * @param compId  Component ID
           */
-         template <Dimensions::Simulation::Id TId> void setBoundaryCondition(const int& idx, const typename Boundary::MethodSelector<TId>::Type& bcOp);
+         virtual const Boundary::CoordinatorSelector& bcCoord(FieldComponents::Spectral::Id compId) const = 0;
+
+         /**
+          * @brief Set the boundary condition coordinator
+          *
+          * @param compId  Component ID
+          */
+         virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId) = 0;
          
       protected:
          /**
@@ -199,7 +203,7 @@ namespace Equations {
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs); //= 0;
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
 
    /**
     * @brief Dummy implementation: This should never be called!
@@ -209,7 +213,7 @@ namespace Equations {
    /**
     * @brief Dummy implementation. This should never get called!
     */
-   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
+   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx); //= 0;
 
    namespace internal
    {

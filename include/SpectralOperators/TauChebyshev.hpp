@@ -155,6 +155,21 @@ namespace Spectral {
       }
    }
 
+   template <> inline DecoupledZSparse TauChebyshev::constrainBlock<DecoupledZSparse>(const DecoupledZSparse& mat)
+   {
+      DecoupledZSparse tmp;
+      if(this->mIsComplex)
+      {
+         tmp.real() = mat.real() + this->mZTau.real();
+         tmp.imag() = mat.imag() + this->mZTau.imag();
+      } else
+      {
+         tmp.real() = mat.real() + this->mRTau;
+         tmp.imag() = mat.imag();
+      }
+      return tmp;
+   }
+
    template <> inline SparseMatrix TauChebyshev::constrainBlock<SparseMatrix>(const SparseMatrix& mat)
    {
       if(this->mIsComplex)

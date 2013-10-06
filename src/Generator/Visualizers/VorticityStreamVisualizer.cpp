@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
@@ -136,7 +136,7 @@ namespace Equations {
       if(fieldId.first == PhysicalNames::STREAMFUNCTION)
       {
          // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::laplacian2D(spec1D, k_, 0));
+         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::BoxTools::laplacian2D(spec1D, k_, 0));
 
       // Unknown field
       } else

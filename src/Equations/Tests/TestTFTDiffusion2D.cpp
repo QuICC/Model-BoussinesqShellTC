@@ -21,7 +21,8 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "Enums/NonDimensional.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
@@ -63,7 +64,7 @@ namespace Equations {
       // Set source flags: NO source term
       infoIt.first->second.setSource(false);
 
-      // Equation is coupled to temperature equation (self)
+      // Equation is coupled to itself
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
@@ -79,8 +80,13 @@ namespace Equations {
 
    void TestTFTDiffusion2D::setRequirements()
    {
-      // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
+   }
+
+   void TestTFTDiffusion2D::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
+   {
+      //EigenSelector::boundaryRow(*this, compId, matIdx);
    }
 
    DecoupledZSparse TestTFTDiffusion2D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
@@ -91,9 +97,6 @@ namespace Equations {
       } else if(opId == IEquation::LINEARROW)
       {
          return EigenSelector::linearRow(*this, compId, matIdx);
-      } else if(opId == IEquation::BOUNDARYROW)
-      {
-         return EigenSelector::boundaryRow(*this, compId, matIdx);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -113,9 +116,8 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
+      EigenSelector::KZSum blocks;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
       // Rescale wave number to [-1, 1]
       MHDFloat k_ = k/2.;
@@ -123,8 +125,9 @@ namespace Equations {
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::PeriodicOperator::qLaplacian2D(spec1D, k_, 2));
+         std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
+         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         blocks.push_back(kProduct);
 
       // Unknown field
       } else
@@ -132,12 +135,10 @@ namespace Equations {
          throw Exception("Unknown field ID for linear operator!");
       }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void timeBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -150,32 +151,40 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
       Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
+      EigenSelector::KZSum blocks;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
-      // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-      mat.real() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.qDiff(2,0));
+      if(fieldId.first == eq.name())
+      {
+         std::tr1::get<0>(kProduct).real() = spec1D.qDiff(2,0);
+         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         blocks.push_back(kProduct);
+      } else
+      {
+         throw Exception("Multiple field in time integration not implemented yet!");
+      }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void boundaryBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
 
-      int pX = 0;
-      int pZ = 0;
+      if(fieldId.first == eq.name())
+      {
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
-      // Set boundary condition prefactors
-      MHDFloat cX = 1.0;
-      MHDFloat cZ = 0.0;
+         coeffs.push_back(0.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
-      // Compute boundary block operator
-      EigenSelector::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, pX, pZ, cX, cZ);
+      // Unknown field
+      } else
+      {
+         throw Exception("Unknown field ID for boundary operator!");
+      }
    }
 
 }

@@ -147,7 +147,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @parm eigs     Wave number k
     */
-   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }

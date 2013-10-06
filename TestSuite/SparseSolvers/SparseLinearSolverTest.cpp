@@ -12,7 +12,7 @@
 #include "SpectralOperators/ChebyshevOperator.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "TypeSelectors/FftSelector.hpp"
 #include "SpectralOperators/TauChebyshev.hpp"
 #include "SpectralOperators/GalerkinChebyshev.hpp"
@@ -308,7 +308,7 @@ namespace TestSuite {
          // Create matrix
          Spectral::ChebyshevOperator   op(nN);
          SparseMatrix  matA(nN,nN);
-         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2);
+         matA = Spectral::BoxTools::qLaplacian2D(op, param(0), 2);
          Spectral::TauChebyshev tauBc(matA.rows(), bcs, 2);
          Spectral::GalerkinChebyshev galBc(matA.rows(), bcs, 2);
 
@@ -355,7 +355,7 @@ namespace TestSuite {
 //
 //         // Test minimal resolution for Tau
 //         op = Spectral::ChebyshevOperator(minN);
-//         matA = Spectral::PeriodicOperator::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+//         matA = Spectral::BoxTools::qLaplacian2D(op, param(0), 2) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
 //         matQ = op.qDiff(2,0);
 //         rhs = matQ*exactRhs.block(0,0,minN, exactRhs.cols());
 //         this->solveProblem(sol, rhs, matA);
@@ -415,7 +415,7 @@ namespace TestSuite {
 //            ids.push_back(std::make_pair(Boundary::D2, Boundary::LEFT));
 //            ids.push_back(std::make_pair(Boundary::D2, Boundary::RIGHT));
 //         }
-//         matA = Spectral::PeriodicOperator::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+//         matA = Spectral::BoxTools::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
 //         matQ = op.qDiff(4,0);
 //
 //         // Solve
@@ -435,7 +435,7 @@ namespace TestSuite {
 //
 //         // Test minimal resolution
 //         op = Spectral::ChebyshevOperator(minN);
-//         matA = Spectral::PeriodicOperator::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
+//         matA = Spectral::BoxTools::qBilaplacian2D(op, param(0), 4) + Spectral::BoundaryConditions::tauMatrix(bc, ids).first;
 //         matQ = op.qDiff(4,0);
 //         rhs = matQ*exactRhs.block(0,0,minN, exactRhs.cols());
 //         this->solveProblem(sol, rhs, matA);

@@ -175,23 +175,24 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
+      EigenSelector::KRSum blocks;
+
       // Set quasi-inverse for toroidal component
       if(compId == FieldComponents::Spectral::ONE)
       {
-         mat = spec1D.qDiff(2,0);
+         blocks = spec1D.qDiff(2,0);
 
       // Set quasi-inverse for poloidal component
       } else if(compId == FieldComponents::Spectral::TWO)
       {
-         mat = spec1D.qDiff(2,0);
+         blocks = spec1D.qDiff(2,0);
 
       } else
       {
          throw Exception("Unknown equation component ID for quasi-inverse operator!");
       }
 
-      // Prune matrices for safety
-      mat.prune(1e-32);
+      EigenSelector::computeKSum(mat, blocks);
    }
 
    void linearBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
@@ -209,29 +210,27 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
-      // Initialise output matrices
-      mat.real().resize(nR,nR);
-      mat.imag().resize(nR,nR);
+      EigenSelector::KZSum blocks;
 
       // Toroidal component : Velocity toroidal component
       if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Toroidal component: Velocity poloidal component
       } else if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Poloidal component : Velocity toroidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Poloidal component: Velocity poloidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Unknown field
       } else
@@ -239,12 +238,10 @@ namespace Equations {
          throw Exception("Unknown field ID and component ID combination for linear operator!");
       }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void timeBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
@@ -259,31 +256,27 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
-      // Initialise output matrices
-      mat.real().resize(nR,nR);
-      mat.imag().resize(nR,nR);
+      EigenSelector::KZSum blocks;
 
       // Time operator for toroidal component
       if(compId == FieldComponents::Spectral::ONE)
       {
-         mat.real() = spec1D.qDiff(2,0);
+         blocks.real() = spec1D.qDiff(2,0);
 
       // Time operator for poloidal component
       } else if(compId == FieldComponents::Spectral::TWO)
       {
-         mat.real() = spec1D.qDiff(2,0);
+         blocks.real() = spec1D.qDiff(2,0);
 
       } else
       {
          throw Exception("Unknown field ID and component ID combination for time operator!");
       }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void boundaryBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
@@ -292,41 +285,35 @@ namespace Equations {
       //Safety assert
       assert(std::find(eq.spectralRange().first, eq.spectralRange().second, compId) != eq.spectralRange().second); 
 
-      // Storage for the boundary condition constant factor
-      MHDFloat cR;
-
       // Toroidal component: Boundary condition for the velocity toroidal component
       if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Toroidal component: Boundary condition for the velocity poloidal component
       } else if(compId == FieldComponents::Spectral::ONE && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Poloidal component: Boundary condition for the velocity toroidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Poloidal component: Boundary condition for the velocity poloidal component
       } else if(compId == FieldComponents::Spectral::TWO && fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field
       } else
       {
          throw Exception("Unknown field ID and component ID combination for boundary condition operator!");
       }
-
-      // Compute boundary block operator
-      EigenSelector::boundaryBlock(eq, compId, mat, fieldId, cR);
    }
 
 }

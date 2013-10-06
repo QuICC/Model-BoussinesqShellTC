@@ -31,8 +31,6 @@ namespace Equations {
 
 namespace Eigen2D {
 
-   const Boundary::BCIndex INDEPENDENT = std::make_pair(std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
-
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
@@ -47,6 +45,27 @@ namespace Eigen2D {
       blocks.setConstant(nI);
       cols.resize(nMat);
       cols.setConstant(1);
+   }
+
+   void computeKProduct(SparseMatrix& mat, const KRProduct& block)
+   {
+      mat = block;
+   }
+
+   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block)
+   {
+      mat.real() = block.real();
+      mat.imag() = block.imag();
+   }
+
+   void computeKSum(SparseMatrix& mat, const KRSum& blocks)
+   {
+      computeKProduct(mat, blocks);
+   }
+
+   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks)
+   {
+      computeKProduct(mat, blocks);
    }
 
 //   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)

@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of test mode equation for the TFT scheme
+    * @brief Implementation of test model equation for the TFT scheme
     */
    class TestTFTModel
    {

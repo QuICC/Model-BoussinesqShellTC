@@ -8,7 +8,7 @@
 
 #include "Framework/FrameworkMacro.h"
 #include "SpectralOperators/ChebyshevOperator.hpp"
-#include "SpectralOperators/PeriodicOperator.hpp"
+#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
 #include "FastTransforms/ChebyshevFftwTransform.hpp"
 #include "FastTransforms/FftwTools.hpp"
 
@@ -152,7 +152,7 @@ namespace TestSuite {
 
       // Compute first derivative
       int m = 4;
-      spec.topRows(nN) = Spectral::PeriodicOperator::laplacian2D(op,m,0)*spec.topRows(nN);
+      spec.topRows(nN) = Spectral::BoxTools::laplacian2D(op,m,0)*spec.topRows(nN);
 
       // Compute backward transform
       fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);
@@ -228,7 +228,7 @@ namespace TestSuite {
 
       // Compute first derivative
       int m = 4;
-      spec.topRows(nN) = Spectral::PeriodicOperator::bilaplacian2D(op,m,0)*spec.topRows(nN);
+      spec.topRows(nN) = Spectral::BoxTools::bilaplacian2D(op,m,0)*spec.topRows(nN);
 
       // Compute backward transform
       fft.project<Arithmetics::SET>(phys, spec, Transform::ChebyshevFftwTransform::ProjectorType::PROJ);

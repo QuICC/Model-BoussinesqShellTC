@@ -138,11 +138,12 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
-      // Set quasi-inverse
-      mat = spec1D.qDiff(2,0);
+      EigenSelector::KRSum blocks;
 
-      // Prune matrices for safety
-      mat.prune(1e-32);
+      // Set quasi-inverse
+      blocks = spec1D.qDiff(2,0);
+
+      EigenSelector::computeKSum(mat, blocks);
    }
 
    void linearBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
@@ -160,24 +161,22 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
-      // Initialise output matrices
-      mat.real().resize(nR,nR);
-      mat.imag().resize(nR,nR);
+      EigenSelector::KZSum blocks;
 
       // Temperature
       if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Velocity toroidal component
       } else if(fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Velocity poloidal component
       } else if(fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         mat.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
+         blocks.real() = Spectral::SphericalHarmonicOperator::qLaplacian(spec1D, l, m, 2);
 
       // Unknown field
       } else
@@ -185,12 +184,10 @@ namespace Equations {
          throw Exception("Unknown field ID and component ID combination for linear operator!");
       }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void timeBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
    {
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
@@ -205,20 +202,20 @@ namespace Equations {
       // Create spectral operator
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
 
-      // Initialise output matrices
-      mat.real().resize(nR,nR);
-      mat.imag().resize(nR,nR);
+      EigenSelector::KZSum blocks;
 
-      // Time operator
-      mat.real() = spec1D.qDiff(2,0);
+      if(fieldId.first == PhysicalNames::TEMPERATURE)
+      {
+         blocks.real() = spec1D.qDiff(2,0);
+      } else
+      {
+         throw Exception("Multiple field in time integration not implemented yet!");
+      }
 
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
-
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
    }
 
-   void boundaryBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
@@ -227,35 +224,29 @@ namespace Equations {
       //Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR); 
 
-      // Storage for the boundary condition constant factor
-      MHDFloat cR;
-
       // Boundary condition for the temperature
       if(fieldId.first == PhysicalNames::TEMPERATURE)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Boundary condition for the velocity toroidal component
       } else if(fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::ONE)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Boundary condition for the velocity poloidal component
       } else if(fieldId.first == PhysicalNames::VELOCITY && fieldId.second == FieldComponents::Spectral::TWO)
       {
-         // Set boundary condition prefactors
-         cR = 1.0;
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field
       } else
       {
          throw Exception("Unknown field ID and component ID combination for boundary condition operator!");
       }
-
-      // Compute boundary block operator
-      EigenSelector::boundaryBlock(eq, FieldComponents::Spectral::SCALAR, mat, fieldId, cR);
    }
 
 }

@@ -96,10 +96,13 @@ namespace EigenTools {
       DecoupledZSparse  block(blockN, blockN);
       SparseMatrix  tmp(sysN, sysN);
 
+      // Do only generate equation variable time matrix (for now)
+      SpectralFieldId fieldId = std::make_pair(eq.name(), compId);
+
       // Create time row
       SparseMatrix blockMatrix = Tools::makeBlockMatrix(eq.couplingInfo(compId).nBlocks(), eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex());
 
-      Equations::timeBlock(eq, compId, block, eigs);
+      Equations::timeBlock(eq, compId, block, fieldId, eigs);
       tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
       matrixRow.real() += tmp;
       tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());

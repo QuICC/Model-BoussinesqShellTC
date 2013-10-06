@@ -31,8 +31,6 @@ namespace Equations {
 
 namespace Eigen3D {
 
-   const Boundary::BCIndex INDEPENDENT = std::tr1::make_tuple(std::numeric_limits<int>::min(),std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
-
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols)
    {
       // Get 1D dimension (fast)
@@ -47,6 +45,29 @@ namespace Eigen3D {
       blocks.setConstant(1);
       cols.resize(nMat);
       cols.setConstant(1);
+   }
+
+   void computeKProduct(SparseMatrix& mat, const KRProduct& block)
+   {
+      mat.resize(1,1);
+      mat(0,0) = block;
+   }
+
+   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block)
+   {
+      mat.resize(1,1);
+      mat(0,0).real() = block.real();
+      mat(0,0).imag() = block.imag();
+   }
+
+   void computeKSum(SparseMatrix& mat, const KRSum& blocks)
+   {
+      computeKProduct(mat, blocks);
+   }
+
+   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks)
+   {
+      computeKProduct(mat, blocks);
    }
 }
 }

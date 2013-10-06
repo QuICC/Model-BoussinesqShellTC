@@ -196,21 +196,16 @@ namespace Equations {
       mat.imag().prune(1e-32);
    }
 
-   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
 
-      std::vector<MHDFloat> coeffs;
-      std::vector<Boundary::BCIndex>  bcIdx;
+      coeffs.push_back(1.0);
+      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
-
-      coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(EigenSelector::INDEPENDENT));
-
-      EigenSelector::storeBoundaryCondition(eq, compId, fieldId, coeffs, bcIdx);
+      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
    }
 
 }

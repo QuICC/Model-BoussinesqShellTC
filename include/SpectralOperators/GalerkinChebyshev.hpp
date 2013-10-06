@@ -18,6 +18,7 @@
 //
 #include "StaticAsserts/StaticAssert.hpp"
 #include "Base/Typedefs.hpp"
+#include "Base/MathConstants.hpp"
 #include "BoundaryCondition/BoundaryCondition.hpp"
 #include "Exceptions/Exception.hpp"
 
@@ -266,6 +267,24 @@ namespace Spectral {
       }
       
       return tmp;
+   }
+
+   template <> inline DecoupledZSparse GalerkinChebyshev::constrainBlock<DecoupledZSparse>(const DecoupledZSparse& mat)
+   {
+      SparseMatrixZ tmpIn = mat.real().cast<MHDComplex>() + Math::cI*mat.imag();
+      SparseMatrixZ tmp;
+      if(this->mIsComplex)
+      {
+         tmp = (tmpIn*this->mZStencil).bottomRows(this->mN - this->mNeq);
+      } else
+      {
+         tmp = (tmpIn*this->mRStencil).bottomRows(this->mN - this->mNeq);
+      }
+      DecoupledZSparse tmpOut;
+      tmpOut.real() = tmp.real();
+      tmpOut.imag() = tmp.imag();
+      
+      return tmpOut;
    }
 
    template <> inline SparseMatrix GalerkinChebyshev::constrainBlock<SparseMatrix>(const SparseMatrix& mat)

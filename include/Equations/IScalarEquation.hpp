@@ -89,6 +89,20 @@ namespace Equations {
           * @param spBcIds   List of boundary condition IDs
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
+
+         /**
+          * @brief Get the boundary condition coordinator
+          *
+          * @param compId  Component ID
+          */
+         virtual const Boundary::CoordinatorSelector& bcCoord(FieldComponents::Spectral::Id compId) const;
+
+         /**
+          * @brief Get the boundary condition coordinator
+          *
+          * @param compId  Component ID
+          */
+         virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId);
          
       protected:
          /**
@@ -101,6 +115,11 @@ namespace Equations {
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedScalarVariableType mspUnknown;
+
+         /**
+          * @brief Boundary condition coordinator
+          */
+         Boundary::CoordinatorSelector mBcCoord;
    };
 
    /// Typedef for a shared IScalarEquation

@@ -23,6 +23,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Base/KroneckerTypedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/BoundaryMethodSelector.hpp"
@@ -38,8 +39,10 @@ namespace Equations {
  */
 namespace NoEigen {
 
-   /// Flag to specify index independent boundary conditions
-   const Boundary::BCIndex INDEPENDENT = std::numeric_limits<int>::min();
+   typedef KronNoEigenRProduct KRProduct;
+   typedef KronNoEigenZProduct KZProduct;
+   typedef KronNoEigenRSum KRSum;
+   typedef KronNoEigenZSum KZSum;
 
    /**
     * @brief Set eigen values
@@ -56,6 +59,16 @@ namespace NoEigen {
     */
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
+   void computeKProduct(SparseMatrix& mat, const KRProduct& block);
+
+   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);
+
+   void computeKSum(SparseMatrix& mat, const KRSum& blocks);
+
+   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
+
+   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx);
+
    /**
     * @brief General implementation of linear row
     */
@@ -71,7 +84,6 @@ namespace NoEigen {
     */
    template <typename TEquation> void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
 
-   template <typename TEquation> void storeBoundaryCondition(TEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx);
 //
 //   /**
 //    * @brief General implementation of the boundary block
@@ -131,9 +143,9 @@ namespace NoEigen {
       Boundary::BCVector bcs2D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM2D)->second;
       Boundary::BCVector bcs3D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM3D)->second;
 
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM1D, fieldId, bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0), nI, bcs1D, nEq1D));
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM2D, fieldId, bcIdx.at(1), Boundary::MethodSelector<Dimensions::Simulation::SIM2D>::Type(coeffs.at(1), nJ, bcs2D, nEq2D));
-      eq.setBoundaryCondition(Dimensions::Simulation::SIM3D, fieldId, bcIdx.at(2), Boundary::MethodSelector<Dimensions::Simulation::SIM3D>::Type(coeffs.at(2), nK, bcs3D, nEq3D));
+      eq.rBcCoord(compId).add1D(bcIdx.at(0), Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type(coeffs.at(0), nI, bcs1D, nEq1D));
+      eq.rBcCoord(compId).add2D(bcIdx.at(1), Boundary::MethodSelector<Dimensions::Simulation::SIM2D>::Type(coeffs.at(1), nI, bcs2D, nEq2D));
+      eq.rBcCoord(compId).add3D(bcIdx.at(2), Boundary::MethodSelector<Dimensions::Simulation::SIM3D>::Type(coeffs.at(2), nI, bcs3D, nEq3D));
    }
 
 }
