@@ -20,10 +20,13 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "BoundaryCondition/BoundaryCondition.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "Equations/Tests/TestTTTDiffusion2D.hpp"
+#include "Equations/Tests/TestTTTDiffusion3D.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -35,14 +38,14 @@ namespace GeoMHDiSCC {
       // Create storage
       std::vector<PhysicalNames::Id> ids;
 
-      // Add first scalar
-      ids.push_back(PhysicalNames::TEMPERATURE);
-
-      // Add first scalar
+      // Add second scalar
       ids.push_back(PhysicalNames::STREAMFUNCTION);
 
+      // Add third scalar
+      ids.push_back(PhysicalNames::VELOCITYZ);
+
       // Add first scalar
-      ids.push_back(PhysicalNames::VORTICITY);
+      ids.push_back(PhysicalNames::TEMPERATURE);
 
       return ids;
    }
@@ -85,6 +88,21 @@ namespace GeoMHDiSCC {
 
    void TestTTTModel::addEquations(SharedSimulation spSim)
    {
+      Equations::SharedTestTTTDiffusion2D   spD2D;
+
+      // Add first scalar test equation
+      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>();
+      spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
+
+      Equations::SharedTestTTTDiffusion3D   spD3D;
+
+      // Add second scalar test equation
+      spD3D = spSim->addScalarEquation<Equations::TestTTTDiffusion3D>();
+      spD3D->setIdentity(PhysicalNames::VELOCITYZ);
+
+      // Add third scalar test equation
+      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>();
+      spD2D->setIdentity(PhysicalNames::TEMPERATURE);
    }
 
    void TestTTTModel::addStates(SharedStateGenerator spGen)
@@ -93,36 +111,29 @@ namespace GeoMHDiSCC {
       Equations::SharedRandomScalarState spRand;
       Equations::SharedExactScalarState spExact;
 
-      // Add second scalar random initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
-      spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::ExactScalarState::SINE);
-      spExact->setSineOptions(10, 5, 5, 2);
-
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::ExactScalarState::SINE);
+      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
-      spExact->setIdentity(PhysicalNames::VORTICITY);
-      spExact->setStateType(Equations::ExactScalarState::SINE);
+      spExact->setIdentity(PhysicalNames::VELOCITYZ);
+      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
-      spExact->setIdentity(PhysicalNames::PRESSURE);
-      spExact->setStateType(Equations::ExactScalarState::SINE);
+      spExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::VORTICITY);
-      spOut->expect(PhysicalNames::PRESSURE);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addOutputFile(spOut);
    }
 
@@ -134,37 +145,37 @@ namespace GeoMHDiSCC {
       // Add first field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
-
-      // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VORTICITY);
+      spField->setIdentity(PhysicalNames::VELOCITYZ);
+
+      // Add third field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::VORTICITY);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spVis->addOutputFile(spOut);
    }
 
    void TestTTTModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
-      // Create and add initial state file to IO
+      // Create input state file for visualisation
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected fields
-      spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
-      spIn->expect(PhysicalNames::VORTICITY);
+      spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::VELOCITYZ);
 
-      // Set simulation state
+      // Set state for visualization generator
       spVis->setInitialState(spIn);
    }
 
@@ -204,8 +215,22 @@ namespace GeoMHDiSCC {
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
 
+      // Second scalar equation Dirichlet boundary conditions
+      PhysicalNames::Id fieldName = PhysicalNames::STREAMFUNCTION;
+      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
+      spBcs->initStorage(eqId);
+      dimId = Dimensions::Simulation::SIM1D;
+      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+      dimId = Dimensions::Simulation::SIM3D;
+      spBcs->initBcStorage(eqId, fieldId, dimId);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
+      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
+
       // First scalar equation Dirichlet boundary conditions
-      PhysicalNames::Id fieldName = PhysicalNames::TEMPERATURE;
+      fieldName = PhysicalNames::TEMPERATURE;
       eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
@@ -213,17 +238,13 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
 
       // Second scalar equation Dirichlet boundary conditions
-      fieldName = PhysicalNames::STREAMFUNCTION;
+      fieldName = PhysicalNames::VELOCITYZ;
       eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
       spBcs->initStorage(eqId);
       dimId = Dimensions::Simulation::SIM1D;
@@ -231,32 +252,10 @@ namespace GeoMHDiSCC {
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
       dimId = Dimensions::Simulation::SIM3D;
       spBcs->initBcStorage(eqId, fieldId, dimId);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
       spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
-      //spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
-
-      // Second scalar equation Dirichlet boundary conditions
-      fieldName = PhysicalNames::VORTICITY;
-      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      fieldName = PhysicalNames::PRESSURE;
-      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::VORTICITY, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::D2, Boundary::RIGHT);
 
       return spBcs;
    }

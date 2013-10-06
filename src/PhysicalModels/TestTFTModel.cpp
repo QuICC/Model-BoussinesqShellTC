@@ -26,10 +26,10 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Tests/TestTFTDiffusion2D.hpp"
+#include "Equations/Tests/TestTFTDiffusion3D.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -94,11 +94,13 @@ namespace GeoMHDiSCC {
       spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
       spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
 
-      // Add first scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
-      spD2D->setIdentity(PhysicalNames::VELOCITYZ);
+      Equations::SharedTestTFTDiffusion3D   spD3D;
 
-      // Add first scalar test equation
+      // Add second scalar test equation
+      spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      spD3D->setIdentity(PhysicalNames::VELOCITYZ);
+
+      // Add third scalar test equation
       spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
       spD2D->setIdentity(PhysicalNames::TEMPERATURE);
    }
@@ -109,19 +111,19 @@ namespace GeoMHDiSCC {
       Equations::SharedRandomScalarState spRand;
       Equations::SharedExactScalarState spExact;
 
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
-      // Add second scalar random initial state generator
+      // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
@@ -150,28 +152,22 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
-      // Add second field visualization
+      // Add third field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
-      
-      // Add vorticity field visualization
-      Equations::SharedVorticityStreamVisualizer spVort;
-      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>();
-      spVort->setFields(true, false);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spOut->expect(PhysicalNames::VORTICITY);
       spVis->addOutputFile(spOut);
    }
 
    void TestTFTModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
-      // Create and add initial state file to IO
+      // Create input state file for visualisation
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected fields
@@ -179,7 +175,7 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITYZ);
 
-      // Set simulation state
+      // Set state for visualization generator
       spVis->setInitialState(spIn);
    }
 
