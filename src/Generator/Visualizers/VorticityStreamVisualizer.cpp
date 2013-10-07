@@ -93,11 +93,11 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
-   DecoupledZSparse VorticityStreamVisualizer::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse VorticityStreamVisualizer::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
    {
       if(opId == IEquation::LINEARROW)
       {
-         return EigenSelector::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -109,10 +109,10 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, eigs);
+      linearBlock(*this, compId, mat, fieldId, eigs, false);
    }
 
-   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);

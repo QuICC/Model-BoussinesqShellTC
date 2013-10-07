@@ -24,12 +24,22 @@ namespace GeoMHDiSCC {
 namespace Spectral {
 
    ITauBoundary::ITauBoundary(const MHDFloat c, const int nN, const int nEq)
-      : mC(c), mN(nN), mNeq(nEq), mIsComplex(false), mRTau(0,0), mZTau(0,0)
+      : mC(c), mN(nN), mNeq(nEq), mNbc(-1), mIsComplex(false), mRTau(0,0), mZTau(0,0)
    {
    }
 
    ITauBoundary::~ITauBoundary()
    {
+   }
+
+   int ITauBoundary::nN() const
+   {
+      return this->mN;
+   }
+
+   int ITauBoundary::nBc() const
+   {
+      return this->mNbc;
    }
 
    DecoupledZMatrix ITauBoundary::tauLines(const Boundary::BCVector& bcs) const
@@ -112,6 +122,7 @@ namespace Spectral {
    {
       // Builde the tau lines
       DecoupledZMatrix lines = ITauBoundary::tauLines(bcs);
+      this->mNbc = std::max(lines.real().cols(), lines.imag().cols());
 
       // Create sparse matrices
       if(lines.imag().size() != 0)

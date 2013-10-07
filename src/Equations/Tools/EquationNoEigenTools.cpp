@@ -51,15 +51,22 @@ namespace NoEigen {
 
    void computeKProduct(SparseMatrix& mat, const KRProduct& block)
    {
+      assert(std::tr1::get<0>(block).size() > 0);
+      assert(std::tr1::get<1>(block).size() > 0);
+      assert(std::tr1::get<2>(block).size() > 0);
+
       SparseMatrix tmp = Eigen::kroneckerProduct(std::tr1::get<2>(block), std::tr1::get<0>(block));
       mat = Eigen::kroneckerProduct(std::tr1::get<1>(block), tmp);
    }
 
    void computeKProduct(DecoupledZSparse& mat, const KZProduct& block)
    {
-      assert(std::tr1::get<0>(block).imag().nonZeros() == 0);
-      assert(std::tr1::get<1>(block).imag().nonZeros() == 0);
-      assert(std::tr1::get<2>(block).imag().nonZeros() == 0);
+      assert(std::tr1::get<0>(block).real().size() > 0);
+      assert(std::tr1::get<1>(block).real().size() > 0);
+      assert(std::tr1::get<2>(block).real().size() > 0);
+      assert(std::tr1::get<0>(block).real().size() == std::tr1::get<0>(block).imag().size());
+      assert(std::tr1::get<1>(block).real().size() == std::tr1::get<1>(block).imag().size());
+      assert(std::tr1::get<2>(block).real().size() == std::tr1::get<2>(block).imag().size());
 
       SparseMatrix tmp = Eigen::kroneckerProduct(std::tr1::get<2>(block).real(), std::tr1::get<0>(block).real());
       mat.real() = Eigen::kroneckerProduct(std::tr1::get<1>(block).real(), tmp);

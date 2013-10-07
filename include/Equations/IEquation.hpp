@@ -84,18 +84,11 @@ namespace Equations {
          virtual void init();
 
          /**
-          * @brief Initialise the boundary condition objects
-          *
-          * It has only a dummy implementation and should never get called!
-          */
-         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx); //= 0;
-
-         /**
           * @brief Generic operator row dispatcher
           *
           * It has only a dummy implementation and should never get called
           */
-         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const; //= 0;
+         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const; //= 0;
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -203,12 +196,12 @@ namespace Equations {
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary); //= 0;
 
    /**
     * @brief Dummy implementation: This should never be called!
     */
-   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs); //= 0;
+   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary); //= 0;
 
    /**
     * @brief Dummy implementation. This should never get called!

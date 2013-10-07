@@ -128,16 +128,11 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
-   void AnnulusExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      EigenSelector::boundaryRow(*this, compId, matIdx);
-   }
-
-   DecoupledZSparse AnnulusExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse AnnulusExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
    {
       if(opId == IEquation::LINEARROW)
       {
-         return EigenSelector::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -151,7 +146,7 @@ namespace Equations {
 
    void AnnulusExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, eigs);
+      Equations::linearBlock(*this, compId, mat, fieldId, eigs, false);
    }
 
    void quasiInverseBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -171,7 +166,7 @@ namespace Equations {
       mat.prune(1e-32);
    }
 
-   void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);

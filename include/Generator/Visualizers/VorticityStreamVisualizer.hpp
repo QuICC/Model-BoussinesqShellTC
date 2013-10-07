@@ -53,7 +53,7 @@ namespace Equations {
          /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
          
       protected:
          /**
@@ -94,7 +94,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Wave number k
     */
-   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
 }
 }

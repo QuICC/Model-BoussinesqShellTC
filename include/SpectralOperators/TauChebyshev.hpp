@@ -47,18 +47,18 @@ namespace Spectral {
          ~TauChebyshev();
 
          /**
-          * @brief Constrain matrix with boundary conditions at system block level
+          * @brief Constrain matrix with boundary conditions on block of Kronecker product
           *
           * @param mat  Matrix operator to constrain
           */
-         template <typename TData> TData constrainBlock(const TData& mat);
+         template <typename TData> void constrainKronBlock(TData& mat);
 
          /**
-          * @brief Constrain matrix with boundary conditions at system row level
+          * @brief Constrain matrix with boundary conditions on a kronecker product
           *
           * @param mat  Matrix operator to constrain
           */
-         template <typename TData> TData constrainRow(const TData& mat);
+         template <typename TData> bool constrainKronProduct(TData& mat);
 
          /**
           * @brief Extend Galerkin basis coefficients to tau expansion 
@@ -134,52 +134,56 @@ namespace Spectral {
       return spec;
    }
 
-   template <typename TData> TData TauChebyshev::constrainBlock(const TData& mat)
+   template <typename TData> void TauChebyshev::constrainKronBlock(TData& mat)
    {
-      Debug::StaticAssert<false>();
    }
 
-   template <typename TData> TData TauChebyshev::constrainRow(const TData& mat)
+   template <typename TData> bool TauChebyshev::constrainKronProduct(TData& mat)
    {
       Debug::StaticAssert<false>();
+
+      return true;
    }
 
-   template <> inline SparseMatrixZ TauChebyshev::constrainBlock<SparseMatrixZ>(const SparseMatrixZ& mat)
+   template <> inline bool TauChebyshev::constrainKronProduct<SparseMatrixZ>(SparseMatrixZ& mat)
    {
       if(this->mIsComplex)
       {
-         return mat + this->mZTau;
+         mat =  this->mZTau;
       } else
       {
-         return mat + this->mRTau.cast<SparseMatrixZ::Scalar>();
+         mat = this->mRTau.cast<SparseMatrixZ::Scalar>();
       }
+
+      return true;
    }
 
-   template <> inline DecoupledZSparse TauChebyshev::constrainBlock<DecoupledZSparse>(const DecoupledZSparse& mat)
+   template <> inline bool TauChebyshev::constrainKronProduct<DecoupledZSparse>(DecoupledZSparse& mat)
    {
-      DecoupledZSparse tmp;
       if(this->mIsComplex)
       {
-         tmp.real() = mat.real() + this->mZTau.real();
-         tmp.imag() = mat.imag() + this->mZTau.imag();
+         mat.real() = this->mZTau.real();
+         mat.imag() = this->mZTau.imag();
       } else
       {
-         tmp.real() = mat.real() + this->mRTau;
-         tmp.imag() = mat.imag();
+         mat.real() = this->mRTau;
+         mat.imag().resize(this->mRTau.rows(),this->mRTau.cols());
       }
-      return tmp;
+
+      return true;
    }
 
-   template <> inline SparseMatrix TauChebyshev::constrainBlock<SparseMatrix>(const SparseMatrix& mat)
+   template <> inline bool TauChebyshev::constrainKronProduct<SparseMatrix>(SparseMatrix& mat)
    {
       if(this->mIsComplex)
       {
          throw Exception("Can not apply complex stencil to real data");
-         return SparseMatrix();
       } else
       {
-         return mat + this->mRTau;
+         mat = this->mRTau;
       }
+
+      return true;
    }
 
 }

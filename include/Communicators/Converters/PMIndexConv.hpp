@@ -20,7 +20,6 @@
 //
 #include "Resolutions/TransformResolution.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {

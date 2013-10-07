@@ -72,14 +72,9 @@ namespace Equations {
          virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
-          * @brief Initialise the boundary condition objects
-          */
-         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx);
-
-         /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
          /**
           * @brief Set the unknown name and requirements
@@ -137,7 +132,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @parm eigs     Wave number k
     */
-   void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the boundary condition matrix block for an equation on given field

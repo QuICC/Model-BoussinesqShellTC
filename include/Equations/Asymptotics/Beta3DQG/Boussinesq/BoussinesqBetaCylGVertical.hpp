@@ -54,14 +54,9 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
          /**
-          * @brief Initialise the boundary condition objects
-          */
-         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx);
-
-         /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
          
       protected:
          /**
@@ -102,7 +97,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eigs    Wave number k
     */
-   void timeBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void timeBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -112,7 +107,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Wave number k
     */
-   void linearBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the boundary condition matrix block on given field

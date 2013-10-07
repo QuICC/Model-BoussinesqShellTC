@@ -42,6 +42,16 @@ namespace Spectral {
           * @brief Empty Destructor
           */
          ~ITauBoundary();
+
+         /**
+          * @brief Size of the constained operator
+          */
+         int nN() const;
+
+         /**
+          * @brief Number of boundary rows
+          */
+         int nBc() const;
          
       protected:
          /**
@@ -95,6 +105,11 @@ namespace Spectral {
           * @brief Number of equations
           */
          int mNeq;
+
+         /**
+          * @brief Number of boundrary rows
+          */
+         int mNbc;
 
          /**
           * @brief Tau lines matrix is complex?

@@ -48,18 +48,28 @@ namespace Spectral {
          ~GalerkinChebyshev();
 
          /**
-          * @brief Constrain matrix with boundary conditions at system block level
-          *
-          * @param mat  Matrix operator to constrain
+          * @brief Size of the constained operator
           */
-         template <typename TData> TData constrainBlock(const TData& mat);
+         int nN() const;
 
          /**
-          * @brief Constrain matrix with boundary conditions at system row level
+          * @brief Number of boundary rows
+          */
+         int nBc() const;
+
+         /**
+          * @brief Constrain matrix with boundary conditions on block of Kronecker Product
           *
           * @param mat  Matrix operator to constrain
           */
-         template <typename TData> TData constrainRow(const TData& mat);
+         template <typename TData> void constrainKronBlock(TData& mat);
+
+         /**
+          * @brief Constrain matrix with boundary conditions on a kronecker product
+          *
+          * @param mat  Matrix operator to constrain
+          */
+         template <typename TData> bool constrainKronProduct(TData& mat);
 
          /**
           * @brief Extend Galerkin basis coefficients to tau expansion 
@@ -240,14 +250,14 @@ namespace Spectral {
 
    };
 
-   template <typename TData> TData GalerkinChebyshev::constrainBlock(const TData& mat)
+   template <typename TData> void GalerkinChebyshev::constrainKronBlock(TData& mat)
    {
       Debug::StaticAssert<false>();
    }
 
-   template <typename TData> TData GalerkinChebyshev::constrainRow(const TData& mat)
+   template <typename TData> bool GalerkinChebyshev::constrainKronProduct(TData& mat)
    {
-      Debug::StaticAssert<false>();
+      return false;
    }
 
    template <typename TData> TData GalerkinChebyshev::extend(const TData& gal)
@@ -255,21 +265,18 @@ namespace Spectral {
       Debug::StaticAssert<false>();
    }
 
-   template <> inline SparseMatrixZ GalerkinChebyshev::constrainBlock<SparseMatrixZ>(const SparseMatrixZ& mat)
+   template <> inline void GalerkinChebyshev::constrainKronBlock<SparseMatrixZ>(SparseMatrixZ& mat)
    {
-      SparseMatrixZ tmp;
       if(this->mIsComplex)
       {
-         tmp = (mat*this->mZStencil).bottomRows(this->mN - this->mNeq);
+         mat = (mat*this->mZStencil).bottomRows(this->mN - this->mNeq);
       } else
       {
-         tmp = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
+         mat = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
       }
-      
-      return tmp;
    }
 
-   template <> inline DecoupledZSparse GalerkinChebyshev::constrainBlock<DecoupledZSparse>(const DecoupledZSparse& mat)
+   template <> inline void GalerkinChebyshev::constrainKronBlock<DecoupledZSparse>(DecoupledZSparse& mat)
    {
       SparseMatrixZ tmpIn = mat.real().cast<MHDComplex>() + Math::cI*mat.imag();
       SparseMatrixZ tmp;
@@ -280,22 +287,18 @@ namespace Spectral {
       {
          tmp = (tmpIn*this->mRStencil).bottomRows(this->mN - this->mNeq);
       }
-      DecoupledZSparse tmpOut;
-      tmpOut.real() = tmp.real();
-      tmpOut.imag() = tmp.imag();
-      
-      return tmpOut;
+      mat.real() = tmp.real();
+      mat.imag() = tmp.imag();
    }
 
-   template <> inline SparseMatrix GalerkinChebyshev::constrainBlock<SparseMatrix>(const SparseMatrix& mat)
+   template <> inline void GalerkinChebyshev::constrainKronBlock<SparseMatrix>(SparseMatrix& mat)
    {
       if(this->mIsComplex)
       {
          throw Exception("Can not apply complex stencil to real matrix");
-         return SparseMatrix();
       } else
       {
-         return (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
+         mat = (mat*this->mRStencil).bottomRows(this->mN - this->mNeq);
       }
    }
 

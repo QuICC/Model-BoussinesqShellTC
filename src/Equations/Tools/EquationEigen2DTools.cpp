@@ -49,11 +49,16 @@ namespace Eigen2D {
 
    void computeKProduct(SparseMatrix& mat, const KRProduct& block)
    {
+      assert(block.size() > 0);
+
       mat = block;
    }
 
    void computeKProduct(DecoupledZSparse& mat, const KZProduct& block)
    {
+      assert(block.real().size() > 0);
+      assert(block.real().size() == block.imag().size());
+
       mat.real() = block.real();
       mat.imag() = block.imag();
    }

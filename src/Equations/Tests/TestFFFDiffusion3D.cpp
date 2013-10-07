@@ -84,26 +84,21 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
-   void TestFFFDiffusion3D::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      //EigenSelector::boundaryRow(*this, compId, matIdx);
-   }
-
-   DecoupledZSparse TestFFFDiffusion3D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse TestFFFDiffusion3D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return EigenSelector::timeRow(*this, compId, matIdx);
+         return EigenSelector::timeRow(*this, compId, matIdx, hasBoundary);
       } else if(opId == IEquation::LINEARROW)
       {
-         return EigenSelector::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
       } else
       {
          throw Exception("Unknown operator row ID");
       }
    }
 
-   void linearBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void linearBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -135,10 +130,10 @@ namespace Equations {
          throw Exception("Unknown field ID for linear operator!");
       }
 
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
    }
 
-   void timeBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -164,7 +159,7 @@ namespace Equations {
          throw Exception("Multiple field in time integration not implemented yet!");
       }
 
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
    }
 
    void boundaryBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)

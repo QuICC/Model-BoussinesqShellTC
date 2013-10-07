@@ -49,6 +49,16 @@ namespace Spectral {
    {
    }
 
+   int GalerkinChebyshev::nN() const
+   {
+      return this->mN - this->mNeq;
+   }
+
+   int GalerkinChebyshev::nBc() const
+   {
+      return 0;
+   }
+
    void GalerkinChebyshev::identifyCondition(const Boundary::BCVector& bcs)
    {
       this->mIsComplex = false;

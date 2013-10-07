@@ -38,23 +38,18 @@ namespace EigenTools {
    /**
     * @brief General implementation of linear row
     */
-   template <typename TEquation> static DecoupledZSparse makeLinearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs);
+   template <typename TEquation> static DecoupledZSparse makeLinearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief General implementation of time row
     */
-   template <typename TEquation> static DecoupledZSparse makeTimeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs);
-
-   /**
-    * @brief General implementation of boundary row
-    */
-   template <typename TEquation> static void makeBoundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs);
+   template <typename TEquation> static DecoupledZSparse makeTimeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
 //
 // Implementation follows
 //
 
-   template <typename TEquation> DecoupledZSparse makeLinearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
+   template <typename TEquation> DecoupledZSparse makeLinearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -71,7 +66,7 @@ namespace EigenTools {
       {
          SparseMatrix blockMatrix = Tools::makeBlockMatrix(eq.couplingInfo(compId).nBlocks(), eq.couplingInfo(compId).fieldIndex(), colIdx);
 
-         Equations::linearBlock(eq, compId, block, *fIt, eigs);
+         Equations::linearBlock(eq, compId, block, *fIt, eigs, hasBoundary);
          tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
          matrixRow.real() += tmp;
          tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
@@ -87,7 +82,7 @@ namespace EigenTools {
       return matrixRow;
    }
 
-   template <typename TEquation> DecoupledZSparse makeTimeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
+   template <typename TEquation> DecoupledZSparse makeTimeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       // Storage for the matrix row
       int sysN = eq.couplingInfo(compId).systemN(matIdx);
@@ -102,7 +97,7 @@ namespace EigenTools {
       // Create time row
       SparseMatrix blockMatrix = Tools::makeBlockMatrix(eq.couplingInfo(compId).nBlocks(), eq.couplingInfo(compId).fieldIndex(), eq.couplingInfo(compId).fieldIndex());
 
-      Equations::timeBlock(eq, compId, block, fieldId, eigs);
+      Equations::timeBlock(eq, compId, block, fieldId, eigs, hasBoundary);
       tmp = Eigen::kroneckerProduct(blockMatrix, block.real());
       matrixRow.real() += tmp;
       tmp = Eigen::kroneckerProduct(blockMatrix, block.imag());
@@ -113,20 +108,6 @@ namespace EigenTools {
       matrixRow.imag().makeCompressed();
 
       return matrixRow;
-   }
-
-   template <typename TEquation> void makeBoundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const std::vector<MHDFloat>& eigs)
-   {
-      // Loop over all coupled fields
-      int colIdx = 0;
-      CouplingInformation::FieldId_iterator fIt;
-      CouplingInformation::FieldId_range fRange = eq.couplingInfo(compId).implicitRange();
-      for(fIt = fRange.first; fIt != fRange.second; ++fIt)
-      {
-         Equations::boundaryBlock(eq, compId, *fIt, eigs);
-
-         colIdx++;
-      }
    }
 
 }

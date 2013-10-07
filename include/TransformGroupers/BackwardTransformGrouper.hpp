@@ -68,6 +68,16 @@ namespace Transform {
 
       protected:
          /**
+          * @brief Setup grouped first exchange communication
+          */
+         void setupGrouped1DCommunication(TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped second exchange communication
+          */
+         void setupGrouped2DCommunication(TransformCoordinatorType& coord);
+
+         /**
           * @brief Storage for the size of the grouped communication for the first exchange
           */
          int mGroupedPacks1D;
@@ -97,7 +107,7 @@ namespace Transform {
       //
 
       // Setup the 1D grouped first exchange communication
-      TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+      this->setupGrouped1DCommunication(coord);
 
       //
       // Compute first step of backward transform
@@ -123,7 +133,7 @@ namespace Transform {
       TConfigurator::initiate1DCommunication(coord);
 
       // Setup the grouped second exchange communication
-      TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
+      this->setupGrouped2DCommunication(coord);
 
       //
       // Compute intermediate step
@@ -162,6 +172,22 @@ namespace Transform {
       {
          // Compute last step of transform for vector fields
          TConfigurator::lastStep(vectIt->first, *(vectIt->second), coord);
+      }
+   }
+
+   template <typename TConfigurator> void BackwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
+   {
+      if(this->mGroupedPacks1D > 0)
+      {
+         TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+      }
+   }
+
+   template <typename TConfigurator> void BackwardTransformGrouper<TConfigurator>::setupGrouped2DCommunication(TransformCoordinatorType& coord)
+   {
+      if(this->mGroupedPacks2D > 0)
+      {
+         TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
       }
    }
 

@@ -51,14 +51,9 @@ namespace Equations {
          void setIdentity(const PhysicalNames::Id name);
 
          /**
-          * @brief Initialise the boundary condition objects
-          */
-         virtual void createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx);
-
-         /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
       protected:
          /**
@@ -84,7 +79,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @parm eigs     Wave number k
     */
-   void timeBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void timeBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -94,7 +89,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @parm eigs     Wave number k
     */
-   void linearBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the boundary condition matrix block on given field

@@ -22,7 +22,6 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -143,12 +142,7 @@ namespace Equations {
       return MHDComplex();
    }
 
-   void IEquation::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      throw Exception("createBoundaries: dummy implementation was called!");
-   }
-
-   DecoupledZSparse  IEquation::operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const
+   DecoupledZSparse  IEquation::operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
    {
       throw Exception("operatorRow: dummy implementation was called!");
    }
@@ -158,12 +152,12 @@ namespace Equations {
       throw Exception("quasiInverseBlock: dummy implementation called!");
    }
 
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k)
+   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       throw Exception("timeBlock: dummy implementation called!");
    }
 
-   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k)
+   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       throw Exception("linearBlock: dummy implementation called!");
    }

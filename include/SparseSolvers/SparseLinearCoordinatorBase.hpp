@@ -320,7 +320,7 @@ namespace Solver {
       inline void addRow(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& blockRow)
       {
          assert(blockRow.real().size() > 0);
-         assert(blockRow.imag().size() == 0);
+         assert(blockRow.imag().size() == 0 || blockRow.imag().nonZeros() == 0);
 
          if(c != 1.0)
          {
@@ -335,7 +335,7 @@ namespace Solver {
       {
          assert(blockRow.real().size() > 0);
          assert(blockRow.imag().size() > 0);
-         assert(blockRow.real().size() > blockRow.imag().size());
+         assert(blockRow.real().size() == blockRow.imag().size());
 
          if(c != 1.0)
          {

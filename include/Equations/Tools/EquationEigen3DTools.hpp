@@ -67,29 +67,17 @@ namespace Eigen3D {
 
    void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
 
-   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx);
+   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx, const int hasBoundary);
 
    /**
     * @brief General implementation of linear row
     */
-   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
+   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const hasBoundary);
 
    /**
     * @brief General implementation of time row
     */
-   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
-
-   /**
-    * @brief General implementation of boundary row
-    */
-   template <typename TEquation> void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx);
-
-//
-//   /**
-//    * @brief General implementation of the boundary block
-//    */
-//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D);
-
+   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const hasBoundary);
 
 //
 // Implementation follows
@@ -105,31 +93,18 @@ namespace Eigen3D {
       return eigs;
    }
 
-   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary)
    {
       std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
 
-      return EigenTools::makeLinearRow(eq, compId, matIdx, eigs);
+      return EigenTools::makeLinearRow(eq, compId, matIdx, eigs, hasBoundary);
    }
 
-   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
+   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary)
    {
       std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
 
-      return EigenTools::makeTimeRow(eq, compId, matIdx, eigs);
-   }
-
-   template <typename TEquation> void boundaryRow(TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
-
-      EigenTools::makeBoundaryRow(eq, compId, matIdx, eigs);
-   }
-
-   template <typename TEquation> void storeBoundaryCondition(IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& coeffs, const std::vector<Boundary::BCIndex>& bcIdx)
-   {
-      assert(coeffs.size() == bcIdx.size());
-      assert(coeffs.size() == 0);
+      return EigenTools::makeTimeRow(eq, compId, matIdx, eigs, hasBoundary);
    }
 
 }

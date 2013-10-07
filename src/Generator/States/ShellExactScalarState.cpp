@@ -151,12 +151,7 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
-   void ShellExactScalarState::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      EigenSelector::boundaryRow(*this, compId, matIdx);
-   }
-
-   DecoupledZSparse ShellExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse ShellExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
    {
       if(opId == IEquation::LINEARROW)
       {
@@ -174,7 +169,7 @@ namespace Equations {
 
    void ShellExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, eigs);
+      Equations::linearBlock(*this, compId, mat, fieldId, eigs, false);
    }
 
    void quasiInverseBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -182,7 +177,7 @@ namespace Equations {
       throw Exception("Operators for 2D eigen directions not implemented yet");
    }
 
-   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);

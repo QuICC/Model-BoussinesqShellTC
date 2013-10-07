@@ -100,19 +100,14 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
    }
 
-   void BoussinesqBetaCylGVertical::createBoundaries(FieldComponents::Spectral::Id compId, const int matIdx)
-   {
-      //EigenSelector::boundaryRow(*this, compId, matIdx);
-   }
-
-   DecoupledZSparse BoussinesqBetaCylGVertical::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const
+   DecoupledZSparse BoussinesqBetaCylGVertical::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
    {
       if(opId == IEquation::TIMEROW)
       { 
-         return EigenSelector::timeRow(*this, compId, matIdx);
+         return EigenSelector::timeRow(*this, compId, matIdx, hasBoundary);
       } else if(opId == IEquation::LINEARROW)
       {
-         return EigenSelector::linearRow(*this, compId, matIdx);
+         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -132,7 +127,7 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, eigs);
+      linearBlock(*this, compId, mat, fieldId, eigs, false);
    }
 
    void quasiInverseBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
@@ -155,7 +150,7 @@ namespace Equations {
       EigenSelector::computeKSum(mat, blocks);
    }
 
-   void linearBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void linearBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -203,9 +198,11 @@ namespace Equations {
       {
          throw Exception("Unknown field ID for linear operator!");
       }
+
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
    }
 
-   void timeBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs)
+   void timeBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
       MHDFloat k = eigs.at(0);
@@ -231,7 +228,7 @@ namespace Equations {
          throw Exception("Multiple field in time integration not implemented yet!");
       }
 
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs);
+      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
    }
 
    void boundaryBlock(const BoussinesqBetaCylGVertical& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)

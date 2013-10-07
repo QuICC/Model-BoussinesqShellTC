@@ -68,6 +68,16 @@ namespace Transform {
 
       protected:
          /**
+          * @brief Setup grouped first exchange communication
+          */
+         void setupGrouped1DCommunication(TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped second exchange communication
+          */
+         void setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+
+         /**
           * @brief Storage for the size of the grouped first exchange communication
           */
          int mGroupedPacks1D;
@@ -92,7 +102,7 @@ namespace Transform {
       //
       
       // Setup the grouped first exchange communication
-      TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+      this->setupGrouped1DCommunication(coord);
 
       //
       // Compute first step of backward transform
@@ -125,7 +135,7 @@ namespace Transform {
       for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
       {
          // Setup the second exchange communication step
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(scalIt->first), coord);
+         this->setupGrouped2DCommunication(scalIt->first, coord);
          // Compute second step of transform for scalar fields
          TConfigurator::secondStep(scalIt->first, *(scalIt->second), coord);
          // Initiate the second exchnage communication
@@ -139,7 +149,7 @@ namespace Transform {
       for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
       {
          // Setup the second exchange communication step
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(vectIt->first), coord);
+         this->setupGrouped2DCommunication(vectIt->first, coord);
          // Compute second step of transform for vector fields
          TConfigurator::secondStep(vectIt->first, *(vectIt->second), coord);
          // Initiate the second exchange communication
@@ -147,6 +157,22 @@ namespace Transform {
 
          // Compute last step of transform for vector fields
          TConfigurator::lastStep(vectIt->first, *(vectIt->second), coord);
+      }
+   }
+
+   template <typename TConfigurator> void BackwardSingle1DGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
+   {
+      if(this->mGroupedPacks1D > 0)
+      {
+         TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+      }
+   }
+
+   template <typename TConfigurator> void BackwardSingle1DGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   {
+      if(this->mNamedPacks2D.count(id) == 1)
+      {
+         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
       }
    }
 
