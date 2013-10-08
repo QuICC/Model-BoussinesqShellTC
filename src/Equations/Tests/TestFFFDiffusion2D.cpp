@@ -101,22 +101,17 @@ namespace Equations {
    void linearBlock(const TestFFFDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 3);
-      MHDFloat k = eigs.at(0);
-      MHDFloat l = eigs.at(1);
-      MHDFloat m = eigs.at(2);
+      MHDFloat k_ = eigs.at(0)/2.0;
+      MHDFloat l_ = eigs.at(1)/2.0;
+      MHDFloat m_ = eigs.at(2)/2.0;
 
       EigenSelector::KZSum blocks;
       EigenSelector::KZProduct kProduct;
 
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = k/2.;
-      MHDFloat l_ = l/2.;
-      MHDFloat m_ = m/2.;
-
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         kProduct.real() = Spectral::BoxTools::qLaplacian2D(k_, l_, 2);
+         kProduct.real() = Spectral::BoxTools::qLaplacian2D(k_, l_);
          blocks.push_back(kProduct);
 
       // Unknown field
@@ -131,16 +126,13 @@ namespace Equations {
    void timeBlock(const TestFFFDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 3);
-      MHDFloat k = eigs.at(0);
-      MHDFloat l = eigs.at(1);
-      MHDFloat m = eigs.at(2);
 
       EigenSelector::KZSum blocks;
       EigenSelector::KZProduct kProduct;
 
       if(fieldId.first == eq.name())
       {
-         kProduct = 1.0;
+         kProduct.real() = 1.0;
          blocks.push_back(kProduct);
       } else
       {
@@ -152,22 +144,9 @@ namespace Equations {
 
    void boundaryBlock(const TestFFFDiffusion2D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      assert(eigs.size() == 3);
 
-      if(fieldId.first == eq.name())
-      {
-         coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-         coeffs.push_back(0.0);
-         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-      // Unknown field
-      } else
-      {
-         throw Exception("Unknown field ID for boundary operator!");
-      }
+      throw Exception("There are not boundary conditions to impose!");
    }
 
 }

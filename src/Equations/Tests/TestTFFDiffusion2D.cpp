@@ -132,9 +132,6 @@ namespace Equations {
    void timeBlock(const TestTFFDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 2);
-      // Rescale wave numbers to [-1,1]
-      MHDFloat k_ = eigs.at(0)/2.0;
-      MHDFloat m_ = eigs.at(1)/2.0;
 
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -160,16 +157,10 @@ namespace Equations {
    void boundaryBlock(const TestTFFDiffusion2D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 2);
-      // Rescale wave numbers to [-1,1]
-      MHDFloat k_ = eigs.at(0)/2.0;
-      MHDFloat m_ = eigs.at(1)/2.0;
 
       if(fieldId.first == eq.name())
       {
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-         coeffs.push_back(0.0);
          bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field

@@ -100,28 +100,24 @@ namespace Equations {
 
    void linearBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      assert(eigs.size() == 2);
+      // Rescale wave number to [-1, 1]
+      MHDFloat k_ = eigs.at(0)/2.0;
+      MHDFloat m_ = eigs.at(1)/2.0;
 
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
-
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = k/2.;
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX,nX));
 
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
-         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         kProduct.real() = Spectral::BoxTools::qLaplacian3D(spec1D, k_, m_, 2);
          blocks.push_back(kProduct);
 
       // Unknown field
@@ -135,24 +131,20 @@ namespace Equations {
 
    void timeBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      assert(eigs.size() == 2);
 
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Create spectral operators
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
+      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX,nX));
 
       if(fieldId.first == eq.name())
       {
-         std::tr1::get<0>(kProduct).real() = spec1D.qDiff(2,0);
-         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
+         kProduct.real() = spec1D.qDiff(2,0);
          blocks.push_back(kProduct);
       } else
       {
@@ -164,15 +156,11 @@ namespace Equations {
 
    void boundaryBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      assert(eigs.size() == 2);
 
       if(fieldId.first == eq.name())
       {
          coeffs.push_back(1.0);
-         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-         coeffs.push_back(0.0);
          bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field

@@ -134,8 +134,6 @@ namespace Equations {
    void timeBlock(const TestTFTDiffusion2D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = eigs.at(0)/2.0;
 
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);

@@ -118,9 +118,7 @@ namespace Equations {
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         //std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
-         //std::tr1::get<1>(kProduct).real() = spec3D.id(0);
-         //blocks.push_back(kProduct);
+         blocks = Spectral::BoxTools::qLaplacian2D(spec1D, spec2D, spec3D,2,2,2);
 
       // Unknown field
       } else
@@ -150,9 +148,10 @@ namespace Equations {
 
       if(fieldId.first == eq.name())
       {
-         //std::tr1::get<0>(kProduct).real() = spec1D.qDiff(2,0);
-         //std::tr1::get<1>(kProduct).real() = spec3D.id(0);
-         //blocks.push_back(kProduct);
+         std::tr1::get<0>(kProduct).real() = spec1D.qDiff(2,0);
+         std::tr1::get<1>(kProduct).real() = spec2D.qDiff(2,0);
+         std::tr1::get<2>(kProduct).real() = spec3D.id(0);
+         blocks.push_back(kProduct);
       } else
       {
          throw Exception("Multiple field in time integration not implemented yet!");
@@ -163,15 +162,17 @@ namespace Equations {
 
    void boundaryBlock(const TestTTTDiffusion2D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      assert(eigs.size() == 0);
 
       if(fieldId.first == eq.name())
       {
          coeffs.push_back(1.0);
          bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
-         coeffs.push_back(0.0);
+         coeffs.push_back(1.0);
+         bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
+
+         coeffs.push_back(1.0);
          bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
 
       // Unknown field
