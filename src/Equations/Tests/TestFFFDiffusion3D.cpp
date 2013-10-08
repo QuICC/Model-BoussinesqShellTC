@@ -107,13 +107,11 @@ namespace Equations {
       MHDFloat m_ = eigs.at(2)/2.0;
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct;
 
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         kProduct.real() = Spectral::BoxTools::qLaplacian3D(k_, l_, m_);
-         blocks.push_back(kProduct);
+         blocks.real() = Spectral::BoxTools::qLaplacian3D(k_, l_, m_);
 
       // Unknown field
       } else
@@ -129,12 +127,10 @@ namespace Equations {
       assert(eigs.size() == 3);
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
 
       if(fieldId.first == eq.name())
       {
-         kProduct.real() = 1.0;
-         blocks.push_back(kProduct);
+         blocks.real() = 1.0;
       } else
       {
          throw Exception("Multiple field in time integration not implemented yet!");

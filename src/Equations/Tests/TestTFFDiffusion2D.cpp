@@ -112,13 +112,11 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(nX,nX);
 
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         kProduct.real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
-         blocks.push_back(kProduct);
+         blocks.real() = Spectral::BoxTools::qLaplacian2D(spec1D, k_, 2);
 
       // Unknown field
       } else
@@ -140,12 +138,10 @@ namespace Equations {
       Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
 
       EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(nX,nX);
 
       if(fieldId.first == eq.name())
       {
-         kProduct.real() = spec1D.qDiff(2,0);
-         blocks.push_back(kProduct);
+         blocks.real() = spec1D.qDiff(2,0);
       } else
       {
          throw Exception("Multiple field in time integration not implemented yet!");
