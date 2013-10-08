@@ -118,7 +118,8 @@ namespace Equations {
       // Setup 3D diffusion
       if(fieldId.first == eq.name())
       {
-         blocks = Spectral::BoxTools::qLaplacian2D(spec1D, spec3D, k_, 2);
+         EigenSelector::KZSum tmp = Spectral::BoxTools::qLaplacian2D(spec1D, spec3D, k_, 2);
+         std::insert(blocks.end(), tmp.begin(), tmp.end()); 
 
       // Unknown field
       } else
