@@ -3,8 +3,8 @@ set(MHDSources
    UnitOperator.cpp
    IOperator.cpp
    ChebyshevOperator.cpp
-   SShellChebyshevOperator.cpp
-   CShellChebyshevOperator.cpp
+   ShellChebyshevOperator.cpp
+   AnnulusChebyshevOperator.cpp
    SphericalHarmonicOperator.cpp
    GalerkinChebyshev.cpp
    TauChebyshev.cpp

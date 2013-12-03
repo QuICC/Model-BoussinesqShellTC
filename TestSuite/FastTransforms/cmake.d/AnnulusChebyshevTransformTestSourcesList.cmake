@@ -6,7 +6,7 @@ set(MHDTestSources
    IoTools/Formatter.cpp
    FastTransforms/FftSetup.cpp
    SpectralOperators/IOperator.cpp
-   SpectralOperators/SShellChebyshevOperator.cpp
+   SpectralOperators/AnnulusChebyshevOperator.cpp
 )
 
 # Add FFTW backend files
@@ -14,7 +14,8 @@ if(GEOMHDISCC_FFT STREQUAL "FFTW")
    list(APPEND MHDTestSources 
       FastTransforms/FftwTools.cpp
       FastTransforms/FftwLibrary.cpp
-      FastTransforms/SShellChebyshevFftwTransform.cpp
+      FastTransforms/ChebyshevFftwTransform.cpp
+      FastTransforms/AnnulusChebyshevFftwTransform.cpp
    )
 endif(GEOMHDISCC_FFT STREQUAL "FFTW")
 

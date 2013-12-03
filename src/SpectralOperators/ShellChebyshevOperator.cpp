@@ -1,5 +1,5 @@
 /** 
- * @file SShellChebyshevOperator.cpp
+ * @file ShellChebyshevOperator.cpp
  * @brief Source of the implementation of the spectral operator for the Chebyshev basis for a spherical shell radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "SpectralOperators/SShellChebyshevOperator.hpp"
+#include "SpectralOperators/ShellChebyshevOperator.hpp"
 
 // Project includes
 //
@@ -22,16 +22,16 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   SShellChebyshevOperator::SShellChebyshevOperator(const int basisN)
+   ShellChebyshevOperator::ShellChebyshevOperator(const int basisN)
       : IOperator(basisN)
    {
    }
 
-   SShellChebyshevOperator::~SShellChebyshevOperator()
+   ShellChebyshevOperator::~ShellChebyshevOperator()
    {
    }
 
-   SparseMatrix SShellChebyshevOperator::diff(const int nBC, const int q) const
+   SparseMatrix ShellChebyshevOperator::diff(const int nBC, const int q) const
    {
       // Check that requested order is possible
       assert(q > 0);
@@ -58,7 +58,7 @@ namespace Spectral {
       }
    }
 
-   SparseMatrix SShellChebyshevOperator::qDiff(const int p, const int q) const
+   SparseMatrix ShellChebyshevOperator::qDiff(const int p, const int q) const
    {
       // Check that requested order is possible
       assert(p > 0);
@@ -127,7 +127,7 @@ namespace Spectral {
       }
    }
 
-   MHDFloat SShellChebyshevOperator::c(const int n) const
+   MHDFloat ShellChebyshevOperator::c(const int n) const
    {
       if(n == 0)
       {
@@ -147,7 +147,7 @@ namespace Spectral {
       }
    }
 
-   MHDFloat SShellChebyshevOperator::c_1(const int n) const
+   MHDFloat ShellChebyshevOperator::c_1(const int n) const
    {
       if(n == 0)
       {
@@ -167,7 +167,7 @@ namespace Spectral {
       }
    }
 
-   void SShellChebyshevOperator::buildDerivative(SparseMatrix& mat) const
+   void ShellChebyshevOperator::buildDerivative(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
       mat.reserve(2*mat.cols()-1);
@@ -187,7 +187,7 @@ namespace Spectral {
       mat.finalize(); 
    }
 
-   void SShellChebyshevOperator::buildInverse(SparseMatrix& mat) const
+   void ShellChebyshevOperator::buildInverse(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
       mat.reserve(2*mat.cols()-1);

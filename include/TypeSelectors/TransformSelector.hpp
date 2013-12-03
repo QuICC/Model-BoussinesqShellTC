@@ -149,7 +149,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef Fft::CShellChebyshevSelector Type;
+               typedef Fft::AnnulusChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>
@@ -178,7 +178,7 @@ namespace GeoMHDiSCC {
             template<> struct TransformSelector<Dimensions::Transform::TRA1D>
             {
                /// Typedef for the first transform
-               typedef Fft::SShellChebyshevSelector Type;
+               typedef Fft::ShellChebyshevSelector Type;
             };
 
             template<> struct TransformSelector<Dimensions::Transform::TRA2D>

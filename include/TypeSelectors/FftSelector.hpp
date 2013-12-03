@@ -26,8 +26,8 @@
    #include "FastTransforms/FftwTools.hpp"
    #include "FastTransforms/FftwTransform.hpp"
    #include "FastTransforms/ChebyshevFftwTransform.hpp"
-   #include "FastTransforms/CShellChebyshevFftwTransform.hpp"
-   #include "FastTransforms/SShellChebyshevFftwTransform.hpp"
+   #include "FastTransforms/AnnulusChebyshevFftwTransform.hpp"
+   #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
 
    namespace GeoMHDiSCC {
 
@@ -45,10 +45,10 @@
             typedef ChebyshevFftwTransform ChebyshevSelector;
 
             /// Typedef for FFTW's cylindrical shell Chebyshev FFT implementation
-            typedef CShellChebyshevFftwTransform CShellChebyshevSelector;
+            typedef AnnulusChebyshevFftwTransform AnnulusChebyshevSelector;
 
             /// Typedef for FFTW's spherical shell Chebyshev FFT implementation
-            typedef SShellChebyshevFftwTransform SShellChebyshevSelector;
+            typedef ShellChebyshevFftwTransform ShellChebyshevSelector;
          }
       }
    }

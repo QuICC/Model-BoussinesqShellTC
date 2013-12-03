@@ -1,6 +1,6 @@
 /** 
- * @file CShellChebyshevFftwTransform.cpp
- * @brief Source of the implementation of the Chebyshev FFTW transform for a cylindrical shell radius
+ * @file ShellChebyshevFftwTransform.cpp
+ * @brief Source of the implementation of the Chebyshev FFTW transform for a spherical shell radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "FastTransforms/CShellChebyshevFftwTransform.hpp"
+#include "FastTransforms/ShellChebyshevFftwTransform.hpp"
 
 // Project includes
 //
@@ -25,7 +25,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   Array CShellChebyshevFftwTransform::generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio)
+   Array ShellChebyshevFftwTransform::generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio)
    {
       if(gapWidth > 0 && rRatio >= 0)
       {
@@ -47,18 +47,18 @@ namespace Transform {
       }
    }
 
-   CShellChebyshevFftwTransform::CShellChebyshevFftwTransform()
+   ShellChebyshevFftwTransform::ShellChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL), mGapWidth(-1), mRRatio(-1)
    {
    }
 
-   CShellChebyshevFftwTransform::~CShellChebyshevFftwTransform()
+   ShellChebyshevFftwTransform::~ShellChebyshevFftwTransform()
    {
       // Cleanup memory used by FFTW
       FftwLibrary::cleanupFft();
    }
 
-   void CShellChebyshevFftwTransform::init(CShellChebyshevFftwTransform::SharedSetupType spSetup)
+   void ShellChebyshevFftwTransform::init(ShellChebyshevFftwTransform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
@@ -73,26 +73,26 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
-   void CShellChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void ShellChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
    {
       list.insert(NonDimensional::GAPWIDTH);
 
       list.insert(NonDimensional::RRATIO);
    }
 
-   void CShellChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void ShellChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
    {
       this->mGapWidth = options.find(NonDimensional::GAPWIDTH)->second;
 
       this->mRRatio = options.find(NonDimensional::RRATIO)->second;
    }
 
-   Array CShellChebyshevFftwTransform::meshGrid() const
+   Array ShellChebyshevFftwTransform::meshGrid() const
    {
-      return CShellChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize(), this->mGapWidth, this->mRRatio);
+      return ShellChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize(), this->mGapWidth, this->mRRatio);
    }
 
-   void CShellChebyshevFftwTransform::initFft()
+   void ShellChebyshevFftwTransform::initFft()
    {  
       /// \mhdBug implement strided tranforms for complex <-> complex case if possible
 
@@ -122,7 +122,7 @@ namespace Transform {
       this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
    }
 
-   void CShellChebyshevFftwTransform::cleanupFft()
+   void ShellChebyshevFftwTransform::cleanupFft()
    {
       // Detroy forward plan
       if(this->mFPlan)
@@ -144,7 +144,7 @@ namespace Transform {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   MHDFloat CShellChebyshevFftwTransform::requiredStorage() const
+   MHDFloat ShellChebyshevFftwTransform::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

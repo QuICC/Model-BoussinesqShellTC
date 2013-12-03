@@ -130,14 +130,14 @@ namespace GeoMHDiSCC {
    #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
 
       #include "SpectralOperators/ChebyshevOperator.hpp"
-      #include "SpectralOperators/CShellChebyshevOperator.hpp"
+      #include "SpectralOperators/AnnulusChebyshevOperator.hpp"
 
       namespace GeoMHDiSCC {
          namespace Spectral {
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
             {
-               typedef  CShellChebyshevOperator  Type;
+               typedef  AnnulusChebyshevOperator  Type;
             };
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>
@@ -155,14 +155,14 @@ namespace GeoMHDiSCC {
    // Configure code to use SLF scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
 
-      #include "SpectralOperators/SShellChebyshevOperator.hpp"
+      #include "SpectralOperators/ShellChebyshevOperator.hpp"
 
       namespace GeoMHDiSCC {
          namespace Spectral {
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
             {
-               typedef  SShellChebyshevOperator  Type;
+               typedef  ShellChebyshevOperator  Type;
             };
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>

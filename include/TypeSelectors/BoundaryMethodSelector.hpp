@@ -192,8 +192,8 @@ namespace GeoMHDiSCC {
 // Configure code to use CFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
 
-   #include "SpectralOperators/TauCShellChebyshev.hpp"
-   #include "SpectralOperators/GalerkinCShellChebyshev.hpp"
+   #include "SpectralOperators/TauAnnulusChebyshev.hpp"
+   #include "SpectralOperators/GalerkinAnnulusChebyshev.hpp"
 
    namespace GeoMHDiSCC {
 
@@ -202,9 +202,9 @@ namespace GeoMHDiSCC {
          template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
          {
             #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
-               typedef  Spectral::GalerkinCShellChebyshev  Type;
+               typedef  Spectral::GalerkinAnnulusChebyshev  Type;
             #else
-               typedef  Spectral::TauCShellChebyshev  Type;
+               typedef  Spectral::TauAnnulusChebyshev  Type;
             #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
          };
 
@@ -227,8 +227,8 @@ namespace GeoMHDiSCC {
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
 
-   #include "SpectralOperators/TauSShellChebyshev.hpp"
-   #include "SpectralOperators/GalerkinSShellChebyshev.hpp"
+   #include "SpectralOperators/TauShellChebyshev.hpp"
+   #include "SpectralOperators/GalerkinShellChebyshev.hpp"
 
    namespace GeoMHDiSCC {
 
@@ -237,9 +237,9 @@ namespace GeoMHDiSCC {
          template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
          {
             #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
-               typedef  Spectral::GalerkinSShellChebyshev  Type;
+               typedef  Spectral::GalerkinShellChebyshev  Type;
             #else
-               typedef  Spectral::TauSShellChebyshev  Type;
+               typedef  Spectral::TauShellChebyshev  Type;
             #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
          };
 
