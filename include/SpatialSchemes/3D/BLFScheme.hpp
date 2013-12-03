@@ -1,11 +1,11 @@
 /** 
- * @file SLFScheme.hpp
- * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+ * @file BLFScheme.hpp
+ * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SLFSCHEME_HPP
-#define SLFSCHEME_HPP
+#ifndef BLFSCHEME_HPP
+#define BLFSCHEME_HPP
 
 // Configuration includes
 //
@@ -31,9 +31,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+    * @brief Implementation of the sphere (ball) Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
     */
-   class SLFScheme: public IRegularSHScheme
+   class BLFScheme: public IRegularSHScheme
    {
       public:
          /**
@@ -46,12 +46,12 @@ namespace Schemes {
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit SLFScheme(const ArrayI& dim);
+         explicit BLFScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~SLFScheme(); 
+         virtual ~BLFScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -104,4 +104,4 @@ namespace Schemes {
 }
 }
 
-#endif // SLFSCHEME_HPP
+#endif // BLFSCHEME_HPP

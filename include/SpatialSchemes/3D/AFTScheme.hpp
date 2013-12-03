@@ -1,11 +1,11 @@
 /** 
- * @file SLFScheme.hpp
- * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+ * @file AFTScheme.hpp
+ * @brief Implementation of the annulus Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SLFSCHEME_HPP
-#define SLFSCHEME_HPP
+#ifndef AFTSCHEME_HPP
+#define AFTSCHEME_HPP
 
 // Configuration includes
 //
@@ -22,18 +22,17 @@
 #include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
+#include "SpatialSchemes/3D/IRegular3DScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
-#include "PolynomialTransforms/PolySetup.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
 
    /**
-    * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+    * @brief Implementation of annulus Chebyshev(FFT) + Fourier + Chebyshev(FFT) scheme
     */
-   class SLFScheme: public IRegularSHScheme
+   class AFTScheme: public IRegular3DScheme
    {
       public:
          /**
@@ -46,12 +45,12 @@ namespace Schemes {
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit SLFScheme(const ArrayI& dim);
+         explicit AFTScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~SLFScheme(); 
+         virtual ~AFTScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -93,7 +92,7 @@ namespace Schemes {
          /**
           * @brief Construct setup object for second transform
           */
-         Transform::SharedPolySetup  spSetup2D(SharedResolution spRes) const;
+         Transform::SharedFftSetup  spSetup2D(SharedResolution spRes) const;
 
          /**
           * @brief Construct setup object for third transform
@@ -104,4 +103,4 @@ namespace Schemes {
 }
 }
 
-#endif // SLFSCHEME_HPP
+#endif // AFTSCHEME_HPP

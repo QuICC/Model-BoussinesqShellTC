@@ -22,7 +22,7 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/WFTScheme.hpp"
+#include "SpatialSchemes/3D/CFTScheme.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
          static const int DIMENSION = 3;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::WFTScheme SchemeType;
+         typedef Schemes::CFTScheme SchemeType;
 
          /**
           * @brief Get vector of names for the boundary conditions

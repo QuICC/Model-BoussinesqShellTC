@@ -5,7 +5,9 @@ set(MHDSources
    TFFScheme.cpp
    FFFScheme.cpp
    CFTScheme.cpp
+   AFTScheme.cpp
    WFTScheme.cpp
+   BLFScheme.cpp
    SLFScheme.cpp
    WLFScheme.cpp
    IRegular3DScheme.cpp
