@@ -24,7 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderTransport.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVelocity.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,6 +37,9 @@ namespace GeoMHDiSCC {
 
       // Add temperature
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add temperature
+      ids.push_back(PhysicalNames::VELOCITY);
 
       return ids;
    }
@@ -65,38 +70,31 @@ namespace GeoMHDiSCC {
 
    void BoussinesqCylinderModel::addEquations(SharedSimulation spSim)
    {
-      throw Exception("Not implemented yet!");
+      // Add transport equation
+      spSim->addScalarEquation<Equations::BoussinesqCylinderTransport>();
+      
+      // Add Navier-Stokes equation
+      spSim->addVectorEquation<Equations::BoussinesqCylinderVelocity>();
    }
 
    void BoussinesqCylinderModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      //Equations::SharedCylinderExactScalarState spExact;
-
-      // Add initial state generator
-      //spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-      //spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      //spExact->setStateType(Equations::AnnulusExactScalarState::CONSTANT);
-
-      // Add output file
-      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      //spOut->expect(PhysicalNames::TEMPERATURE);
-      spGen->addOutputFile(spOut);
+      throw Exception("Not implemented yet!");
    }
 
    void BoussinesqCylinderModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      //spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
-      //spField->setFields(true, false);
-      //spField->setIdentity(PhysicalNames::TEMPERATURE);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      //spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spVis->addOutputFile(spOut);
    }
 
@@ -106,7 +104,7 @@ namespace GeoMHDiSCC {
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
 
       // Set expected fields
-      //spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::TEMPERATURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -147,6 +145,8 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
+
+      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

@@ -101,6 +101,27 @@ namespace Equations {
           */
          template <typename TData> void storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start);
 
+         /**
+          * @brief Initialise the spectral equation matrices
+          *
+          * @param spBcIds   List of boundary condition IDs
+          */
+         virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
+
+         /**
+          * @brief Get the boundary condition coordinator
+          *
+          * @param compId  Component ID
+          */
+         virtual const Boundary::CoordinatorSelector& bcCoord(FieldComponents::Spectral::Id compId) const;
+
+         /**
+          * @brief Get the boundary condition coordinator
+          *
+          * @param compId  Component ID
+          */
+         virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId);
+
       protected:
          /**
           * @brief Set the unknown variable
@@ -117,6 +138,11 @@ namespace Equations {
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedVectorVariableType mspUnknown;
+
+         /**
+          * @brief Boundary condition coordinator
+          */
+         std::map<FieldComponents::Spectral::Id, Boundary::CoordinatorSelector> mBcCoord;
    };
 
    /// Typedef for a shared IVectorEquation

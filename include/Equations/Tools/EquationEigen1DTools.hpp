@@ -59,6 +59,8 @@ namespace Eigen1D {
     */
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
+   void makeComplex(KZSum &zBlock, const KRSum& rBlock);
+
    void computeKProduct(SparseMatrix& mat, const KRProduct& block);
 
    void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);

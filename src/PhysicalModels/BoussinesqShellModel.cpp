@@ -24,10 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/SphericalShell/Boussinesq/BoussinesqShellTransport.hpp"
-#include "Equations/SphericalShell/Boussinesq/BoussinesqShellVelocity.hpp"
-#include "Generator/States/ShellExactScalarState.hpp"
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqShellTransport.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqShellVelocity.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -86,35 +85,16 @@ namespace GeoMHDiSCC {
 
    void BoussinesqShellModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedShellExactScalarState spExact;
-
-      // Add initial state generator
-      spExact = spGen->addScalarEquation<Equations::ShellExactScalarState>();
-      spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::ShellExactScalarState::HARMONIC);
-      std::vector<std::tr1::tuple<int,int,MHDComplex> >  modes;
-      //modes.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
-      //modes.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-      //modes.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-      modes.push_back(std::tr1::make_tuple(6,3,MHDComplex(1,0)));
-      //modes.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-      //modes.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-      spExact->setHarmonicOptions(modes);
-
-      // Add output file
-      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
-      spGen->addOutputFile(spOut);
+      throw Exception("Not implemented yet!");
    }
 
    void BoussinesqShellModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 

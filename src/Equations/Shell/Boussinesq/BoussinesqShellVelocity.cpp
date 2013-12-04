@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/SphericalShell/Boussinesq/BoussinesqShellVelocity.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqShellVelocity.hpp"
 
 // Project includes
 //

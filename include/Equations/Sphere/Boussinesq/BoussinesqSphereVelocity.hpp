@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqShellTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq spherical shell model 
+ * @file BoussinesqSphereVelocity.hpp
+ * @brief Implementation of the Navier-Stokes equation for the Boussinesq sphere model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSHELLTRANSPORT_HPP
-#define BOUSSINESQSHELLTRANSPORT_HPP
+#ifndef BOUSSINESQSPHEREVELOCITY_HPP
+#define BOUSSINESQSPHEREVELOCITY_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for the Boussinesq spherical shell model 
+    * @brief Implementation of the Navier-Stokes equation for the Boussinesq sphere model 
     */
-   class BoussinesqShellTransport: public IScalarEquation
+   class BoussinesqSphereVelocity: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqShellTransport(SharedEquationParameters spEqParams);
+         BoussinesqSphereVelocity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqShellTransport();
+         virtual ~BoussinesqSphereVelocity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -56,7 +56,7 @@ namespace Equations {
          /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const;
 
       protected:
          /**
@@ -89,7 +89,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eqId    Physical ID of the equation
     */
-   void quasiInverseBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
+   void quasiInverseBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
 
    /**
     * @brief Get the time matrix block
@@ -98,7 +98,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eigs    Harmonic degree l and harmonic order m
     */
-   void timeBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void timeBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -108,7 +108,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Harmonic degree l and harmonic order m
     */
-   void linearBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
 
    /**
     * @brief Get the boundary condition matrix block on given field
@@ -118,9 +118,9 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Harmonic degree l and harmonic order m
     */
-   void boundaryBlock(const BoussinesqShellTransport& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
+   void boundaryBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }
 
-#endif // BOUSSINESQSHELLTRANSPORT_HPP
+#endif // BOUSSINESQSPHEREVELOCITY_HPP

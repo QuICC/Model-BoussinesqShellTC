@@ -24,8 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Generator/States/AnnulusExactScalarState.hpp"
-#include "Generator/Visualizers/FieldVisualizer.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusTransport.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVelocity.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -36,6 +37,9 @@ namespace GeoMHDiSCC {
 
       // Add temperature
       ids.push_back(PhysicalNames::TEMPERATURE);
+
+      // Add temperature
+      ids.push_back(PhysicalNames::VELOCITY);
 
       return ids;
    }
@@ -72,32 +76,25 @@ namespace GeoMHDiSCC {
 
    void BoussinesqAnnulusModel::addEquations(SharedSimulation spSim)
    {
-      throw Exception("addEquations not implemented yet!");
+      // Add transport equation
+      spSim->addScalarEquation<Equations::BoussinesqAnnulusTransport>();
+      
+      // Add Navier-Stokes equation
+      spSim->addVectorEquation<Equations::BoussinesqAnnulusVelocity>();
    }
 
    void BoussinesqAnnulusModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedAnnulusExactScalarState spExact;
-
-      // Add initial state generator
-      spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-      spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::AnnulusExactScalarState::CONSTANT);
-
-      // Add output file
-      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
-      spGen->addOutputFile(spOut);
+      throw Exception("Not implemented yet!");
    }
 
    void BoussinesqAnnulusModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::FieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
@@ -154,6 +151,8 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
+
+      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

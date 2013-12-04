@@ -24,6 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "Equations/Sphere/Boussinesq/BoussinesqSphereTransport.hpp"
+#include "Equations/Sphere/Boussinesq/BoussinesqSphereVelocity.hpp"
+#include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -67,7 +70,11 @@ namespace GeoMHDiSCC {
 
    void BoussinesqSphereModel::addEquations(SharedSimulation spSim)
    {
-      throw Exception("Not implemented yet!");
+      // Add transport equation
+      spSim->addScalarEquation<Equations::BoussinesqSphereTransport>();
+      
+      // Add Navier-Stokes equation
+      spSim->addVectorEquation<Equations::BoussinesqSphereVelocity>();
    }
 
    void BoussinesqSphereModel::addStates(SharedStateGenerator spGen)
@@ -77,12 +84,30 @@ namespace GeoMHDiSCC {
 
    void BoussinesqSphereModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to basic field visualizer
+      Equations::SharedScalarFieldVisualizer spField;
+
+      // Add first field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add output file
+      IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spVis->addOutputFile(spOut);
    }
 
    void BoussinesqSphereModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
-      throw Exception("Not implemented yet!");
+      // Create and add initial state file to IO
+      IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
+
+      // Set expected fields
+      spIn->expect(PhysicalNames::TEMPERATURE);
+
+      // Set simulation state
+      spVis->setInitialState(spIn);
    }
 
    void BoussinesqSphereModel::addAsciiOutputFiles(SharedSimulation spSim)

@@ -1,6 +1,6 @@
 /** 
- * @file AnnulusChebyshevOperator.cpp
- * @brief Source of the implementation of the spectral operator for the Chebyshev basis for an annulus radius
+ * @file SphereChebyshevOperator.cpp
+ * @brief Source of the implementation of the spectral operator for the Chebyshev basis for a sphere radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "SpectralOperators/AnnulusChebyshevOperator.hpp"
+#include "SpectralOperators/SphereChebyshevOperator.hpp"
 
 // Project includes
 //
@@ -22,16 +22,16 @@ namespace GeoMHDiSCC {
 
 namespace Spectral {
 
-   AnnulusChebyshevOperator::AnnulusChebyshevOperator(const int basisN)
+   SphereChebyshevOperator::SphereChebyshevOperator(const int basisN)
       : IOperator(basisN)
    {
    }
 
-   AnnulusChebyshevOperator::~AnnulusChebyshevOperator()
+   SphereChebyshevOperator::~SphereChebyshevOperator()
    {
    }
 
-   SparseMatrix AnnulusChebyshevOperator::diff(const int nBC, const int q) const
+   SparseMatrix SphereChebyshevOperator::diff(const int nBC, const int q) const
    {
       // Check that requested order is possible
       assert(q > 0);
@@ -58,7 +58,7 @@ namespace Spectral {
       }
    }
 
-   SparseMatrix AnnulusChebyshevOperator::qDiff(const int p, const int q) const
+   SparseMatrix SphereChebyshevOperator::qDiff(const int p, const int q) const
    {
       // Check that requested order is possible
       assert(p > 0);
@@ -127,7 +127,7 @@ namespace Spectral {
       }
    }
 
-   MHDFloat AnnulusChebyshevOperator::c(const int n) const
+   MHDFloat SphereChebyshevOperator::c(const int n) const
    {
       if(n == 0)
       {
@@ -147,7 +147,7 @@ namespace Spectral {
       }
    }
 
-   MHDFloat AnnulusChebyshevOperator::c_1(const int n) const
+   MHDFloat SphereChebyshevOperator::c_1(const int n) const
    {
       if(n == 0)
       {
@@ -167,7 +167,7 @@ namespace Spectral {
       }
    }
 
-   void AnnulusChebyshevOperator::buildDerivative(SparseMatrix& mat) const
+   void SphereChebyshevOperator::buildDerivative(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
       mat.reserve(2*mat.cols()-1);
@@ -187,7 +187,7 @@ namespace Spectral {
       mat.finalize(); 
    }
 
-   void AnnulusChebyshevOperator::buildInverse(SparseMatrix& mat) const
+   void SphereChebyshevOperator::buildInverse(SparseMatrix& mat) const
    {
       // Reserve the expected number of nonzero elements
       mat.reserve(2*mat.cols()-1);

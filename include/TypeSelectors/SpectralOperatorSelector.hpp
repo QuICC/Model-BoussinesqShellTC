@@ -130,6 +130,32 @@ namespace GeoMHDiSCC {
    #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
 
       #include "SpectralOperators/ChebyshevOperator.hpp"
+      #include "SpectralOperators/CylinderChebyshevOperator.hpp"
+
+      namespace GeoMHDiSCC {
+         namespace Spectral {
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
+            {
+               typedef  CylinderChebyshevOperator  Type;
+            };
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>
+            {
+            };
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM3D>
+            {
+               typedef  ChebyshevOperator  Type;
+            };
+         }
+      }
+   #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+
+   // Configure code to use AFT scheme
+   #ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+
+      #include "SpectralOperators/ChebyshevOperator.hpp"
       #include "SpectralOperators/AnnulusChebyshevOperator.hpp"
 
       namespace GeoMHDiSCC {
@@ -150,7 +176,31 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_CFT
+   #endif //GEOMHDISCC_SPATIALSCHEME_AFT
+
+   // Configure code to use BLF scheme
+   #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+
+      #include "SpectralOperators/SphereChebyshevOperator.hpp"
+
+      namespace GeoMHDiSCC {
+         namespace Spectral {
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
+            {
+               typedef  SphereChebyshevOperator  Type;
+            };
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>
+            {
+            };
+
+            template <> struct OperatorSelector<Dimensions::Simulation::SIM3D>
+            {
+            };
+         }
+      }
+   #endif //GEOMHDISCC_SPATIALSCHEME_BLF
 
    // Configure code to use SLF scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
@@ -180,14 +230,14 @@ namespace GeoMHDiSCC {
    #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
 
       #include "SpectralOperators/ChebyshevOperator.hpp"
-      #include "SpectralOperators/CylindricalChebyshevOperator.hpp"
+      #include "SpectralOperators/CylinderWorlandOperator.hpp"
 
       namespace GeoMHDiSCC {
          namespace Spectral {
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
             {
-               typedef  CylindricalChebyshevOperator  Type;
+               typedef  CylinderWorlandOperator  Type;
             };
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>
@@ -205,14 +255,14 @@ namespace GeoMHDiSCC {
    // Configure code to use WLF scheme
    #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
 
-      #include "SpectralOperators/SphericalChebyshevOperator.hpp"
+      #include "SpectralOperators/SphereWorlandOperator.hpp"
 
       namespace GeoMHDiSCC {
          namespace Spectral {
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM1D>
             {
-               typedef  SphericalChebyshevOperator  Type;
+               typedef  SphereWorlandOperator  Type;
             };
 
             template <> struct OperatorSelector<Dimensions::Simulation::SIM2D>

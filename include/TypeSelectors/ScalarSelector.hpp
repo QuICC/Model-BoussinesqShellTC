@@ -150,6 +150,54 @@ namespace GeoMHDiSCC {
          };
       #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
+      // Configure code to use AFT scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+   
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_AFT
+
+      // Configure code to use BLF scheme
+      #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+         template<> struct ScalarSelector<Dimensions::Transform::TRA1D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
+         {
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
+
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+
+         template<> struct ScalarSelector<Dimensions::Transform::TRA3D>
+         {
+            typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
+   
+            typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
+         };
+      #endif //GEOMHDISCC_SPATIALSCHEME_BLF
+
       // Configure code to use SLF scheme
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
          template<> struct ScalarSelector<Dimensions::Transform::TRA1D>

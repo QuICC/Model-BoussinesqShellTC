@@ -1,6 +1,6 @@
 /**
  * @file ShellChebyshevFftwTransform.hpp
- * @brief Implementation of the FFTW transform for a Chebyshev expansion for a spherical shell radius 
+ * @brief Implementation of the FFTW transform for a Chebyshev expansion for a shell radius 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 

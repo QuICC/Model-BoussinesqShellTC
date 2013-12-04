@@ -89,6 +89,34 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
+// Configure code to use AFT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+
+   #include "Equations/Tools/EquationEigen1DTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = Eigen1D;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_AFT
+
+// Configure code to use BLF scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+
+   #include "Equations/Tools/EquationEigen2DTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = Eigen2D;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_BLF
+
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
 

@@ -96,6 +96,36 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_CFT
 
+// Configure code to use AFT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+   // CFT includes
+   #include "SpatialSchemes/3D/AFTScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the CFT spatial scheme
+         typedef AFTScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_AFT
+
+// Configure code to use BLF scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+   // SLF includes
+   #include "SpatialSchemes/3D/BLFScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the SLF spatial scheme
+         typedef BLFScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_BLF
+
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
    // SLF includes

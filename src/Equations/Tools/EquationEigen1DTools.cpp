@@ -47,6 +47,19 @@ namespace Eigen1D {
       cols.setConstant(1);
    }
 
+   void makeComplex(KZSum& zBlock, const KRSum& rBlock)
+   {
+      DecoupledZSparse  bL;
+      DecoupledZSparse  bR;
+
+      for(KRSum::const_iterator it = rBlock.begin(); it != rBlock.end(); ++it)
+      {
+         bL.real() = std::tr1::get<0>(*it);
+         bR.real() = std::tr1::get<1>(*it);
+         zBlock.push_back(std::tr1::make_tuple(bL, bR));
+      }
+   }
+
    void computeKProduct(SparseMatrix& mat, const KRProduct& block)
    {
       assert(std::tr1::get<0>(block).size() > 0);

@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -77,6 +78,37 @@ namespace Equations {
 
       // Copy values over into unknown
       this->rUnknown().rDom(0).rPerturbation().rComp(compId).setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+   }
+
+   void IVectorEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)
+   {
+      // Store the boundary condition list
+      this->mspBcIds = spBcIds;
+
+      for(SpectralComponent_iterator it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
+      {
+         // Make sure it is safe to do nothing
+         bool needInit = this->couplingInfo(*it).hasQuasiInverse();
+
+         CouplingInformation::FieldId_range fRange = this->couplingInfo(*it).explicitRange();
+         needInit = needInit && (fRange.first == fRange.second);
+
+         // Initialise spectral matrices
+         if(needInit)
+         {
+            this->initSpectralMatricesComponent(spBcIds, *it);
+         }
+      }
+   }
+
+   const Boundary::CoordinatorSelector& IVectorEquation::bcCoord(FieldComponents::Spectral::Id compId) const
+   {
+      return this->mBcCoord.at(compId);
+   }
+
+   Boundary::CoordinatorSelector& IVectorEquation::rBcCoord(FieldComponents::Spectral::Id compId)
+   {
+      return this->mBcCoord.at(compId);
    }
 }
 }

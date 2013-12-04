@@ -192,6 +192,52 @@ namespace GeoMHDiSCC {
 // Configure code to use CFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_CFT
 
+   #include "SpectralOperators/TauChebyshev.hpp"
+   #include "SpectralOperators/GalerkinChebyshev.hpp"
+   #include "SpectralOperators/TauCylinderChebyshev.hpp"
+   #include "SpectralOperators/GalerkinCylinderChebyshev.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Boundary {
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
+         {
+            #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+               typedef  Spectral::GalerkinCylinderChebyshev  Type;
+            #else
+               typedef  Spectral::TauCylinderChebyshev  Type;
+            #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+         };
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
+         {
+            #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+               typedef  Spectral::GalerkinChebyshev  Type;
+            #else
+               typedef  Spectral::TauChebyshev  Type;
+            #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+         };
+
+         typedef MHDFloat   BCIndex;
+
+         typedef BoundaryCoordinator<BCIndex, MethodSelector<Dimensions::Simulation::SIM1D>::Type, int, MethodSelector<Dimensions::Simulation::SIM3D>::Type> CoordinatorSelector;
+
+         /// Flag to specify index independent boundary conditions
+         const BCIndex INDEPENDENT = std::numeric_limits<MHDFloat>::min();
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_CFT
+
+// Configure code to use AFT scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_AFT
+
+   #include "SpectralOperators/TauChebyshev.hpp"
+   #include "SpectralOperators/GalerkinChebyshev.hpp"
    #include "SpectralOperators/TauAnnulusChebyshev.hpp"
    #include "SpectralOperators/GalerkinAnnulusChebyshev.hpp"
 
@@ -220,9 +266,53 @@ namespace GeoMHDiSCC {
                typedef  Spectral::TauChebyshev  Type;
             #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
          };
+
+         typedef MHDFloat   BCIndex;
+
+         typedef BoundaryCoordinator<BCIndex, MethodSelector<Dimensions::Simulation::SIM1D>::Type, int, MethodSelector<Dimensions::Simulation::SIM3D>::Type> CoordinatorSelector;
+
+         /// Flag to specify index independent boundary conditions
+         const BCIndex INDEPENDENT = std::numeric_limits<MHDFloat>::min();
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_CFT
+#endif //GEOMHDISCC_SPATIALSCHEME_AFT
+
+// Configure code to use BLF scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+
+   #include "SpectralOperators/TauSphereChebyshev.hpp"
+   #include "SpectralOperators/GalerkinSphereChebyshev.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Boundary {
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
+         {
+            #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+               typedef  Spectral::GalerkinSphereChebyshev  Type;
+            #else
+               typedef  Spectral::TauSphereChebyshev  Type;
+            #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+         };
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM2D>
+         {
+         };
+
+         template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
+         {
+         };
+
+         typedef std::tr1::tuple<MHDFloat,MHDFloat>   BCIndex;
+
+         typedef BoundaryCoordinator<BCIndex, MethodSelector<Dimensions::Simulation::SIM1D>::Type, int, int> CoordinatorSelector;
+
+         /// Flag to specify index independent boundary conditions
+         const BCIndex INDEPENDENT;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_BLF
 
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
@@ -250,6 +340,13 @@ namespace GeoMHDiSCC {
          template <> struct MethodSelector<Dimensions::Simulation::SIM3D>
          {
          };
+
+         typedef std::tr1::tuple<MHDFloat,MHDFloat>   BCIndex;
+
+         typedef BoundaryCoordinator<BCIndex, MethodSelector<Dimensions::Simulation::SIM1D>::Type, int, int> CoordinatorSelector;
+
+         /// Flag to specify index independent boundary conditions
+         const BCIndex INDEPENDENT;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_SLF
@@ -257,8 +354,8 @@ namespace GeoMHDiSCC {
 // Configure code to use WFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WFT
 
-   #include "SpectralOperators/TauCylindricalChebyshev.hpp"
-   #include "SpectralOperators/GalerkinCylindricalChebyshev.hpp"
+   #include "SpectralOperators/TauCylinderWorland.hpp"
+   #include "SpectralOperators/GalerkinCylinderWorland.hpp"
 
    namespace GeoMHDiSCC {
 
@@ -267,9 +364,9 @@ namespace GeoMHDiSCC {
          template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
          {
             #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
-               typedef  Spectral::GalerkinCylindricalChebyshev  Type;
+               typedef  Spectral::GalerkinCylinderWorland  Type;
             #else
-               typedef  Spectral::TauCylindricalChebyshev  Type;
+               typedef  Spectral::TauCylinderWorland  Type;
             #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
          };
 
@@ -292,8 +389,8 @@ namespace GeoMHDiSCC {
 // Configure code to use WLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
 
-   #include "SpectralOperators/TauSphericalChebyshev.hpp"
-   #include "SpectralOperators/GalerkinSphericalChebyshev.hpp"
+   #include "SpectralOperators/TauSphereWorland.hpp"
+   #include "SpectralOperators/GalerkinSphereWorland.hpp"
 
    namespace GeoMHDiSCC {
 
@@ -302,9 +399,9 @@ namespace GeoMHDiSCC {
          template <> struct MethodSelector<Dimensions::Simulation::SIM1D>
          {
             #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
-               typedef  Spectral::GalerkinSphericalChebyshev  Type;
+               typedef  Spectral::GalerkinSphereWorland  Type;
             #else
-               typedef  Spectral::TauSphericalChebyshev  Type;
+               typedef  Spectral::TauSphereWorland  Type;
             #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
          };
 
