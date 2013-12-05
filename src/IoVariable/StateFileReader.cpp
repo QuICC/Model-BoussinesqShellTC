@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    StateFileReader::StateFileReader(std::string name, std::string type, const bool isRegular)
-      : IVariableHdf5Reader(StateFileTags::BASENAME + name, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::TRANSFORM, isRegular), mTime(-1.0), mTimestep(-1.0)
+      : IVariableHdf5Reader(StateFileTags::BASENAME + name, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, isRegular), mTime(-1.0), mTimestep(-1.0)
    {
    }
 

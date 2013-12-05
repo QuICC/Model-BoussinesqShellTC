@@ -67,7 +67,7 @@ namespace Eigen2D {
 
    void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
 
-   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx, const int hasBoundary);
+   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& eigs, const int hasBoundary);
 
    /**
     * @brief General implementation of linear row
@@ -110,6 +110,34 @@ namespace Eigen2D {
       std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
 
       return EigenTools::makeTimeRow(eq, compId, matIdx, eigs, hasBoundary);
+   }
+
+   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& eigs, const int hasBoundary)
+   {
+      // Get boundary information
+      std::vector<MHDFloat> coeffs;
+      std::vector<Boundary::BCIndex> bcIdx;
+      Equations::boundaryBlock(eq, compId, fieldId, eigs, coeffs, bcIdx);
+
+      assert(coeffs.size() == bcIdx.size());
+      assert(coeffs.size() == 1);
+
+      SpectralFieldId eqId = std::make_pair(eq.name(), compId);
+      int nEq1D = eq.bcIds().bcs(eqId,eqId).find(Dimensions::Simulation::SIM1D)->second.size();
+
+      int nI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+      Boundary::BCVector bcs1D = eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second;
+
+      Boundary::MethodSelector<Dimensions::Simulation::SIM1D>::Type bcOp1D(coeffs.at(0), nI, bcs1D, nEq1D);
+
+      bcOp1D.constrainKronBlock(blocks);
+
+      if(hasBoundary)
+      {
+      }
+
+      computeKSum(mat, blocks);
    }
 
 }

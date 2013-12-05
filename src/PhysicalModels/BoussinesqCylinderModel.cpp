@@ -26,7 +26,10 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Cylinder/Boussinesq/BoussinesqCylinderTransport.hpp"
 #include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVelocity.hpp"
+#include "Generator/States/CylinderExactScalarState.hpp"
+#include "Generator/States/CylinderExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -79,7 +82,25 @@ namespace GeoMHDiSCC {
 
    void BoussinesqCylinderModel::addStates(SharedStateGenerator spGen)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to equation
+      Equations::SharedCylinderExactScalarState spSExact;
+      Equations::SharedCylinderExactVectorState spVExact;
+
+      // Add temperature initial state generator
+      spSExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
+      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spSExact->setStateType(Equations::CylinderExactScalarState::CONSTANT);
+
+      // Add temperature initial state generator
+      spVExact = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
+      spVExact->setIdentity(PhysicalNames::VELOCITY);
+      spVExact->setStateType(Equations::CylinderExactVectorState::CONSTANT);
+
+      // Add output file
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
+      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqCylinderModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -145,8 +166,6 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
-
-      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

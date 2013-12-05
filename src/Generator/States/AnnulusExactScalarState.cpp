@@ -72,7 +72,7 @@ namespace Equations {
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
-      int nMat;
+      int nMat = 0;
       ArrayI blockNs;
       ArrayI rhsCols;
       EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
@@ -169,7 +169,7 @@ namespace Equations {
    void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
    {
       assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      MHDFloat m = eigs.at(0);
 
       // Get X and Z dimensions
       int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -184,7 +184,7 @@ namespace Equations {
       mat.imag().resize(nX*nZ,nX*nZ);
 
       // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
-      mat.rela() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
+      mat.real() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
 
       // Prune matrices for safety
       mat.real().prune(1e-32);
@@ -194,7 +194,7 @@ namespace Equations {
    void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
       assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
+      MHDFloat m = eigs.at(0);
 
       coeffs.push_back(1.0);
       bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));

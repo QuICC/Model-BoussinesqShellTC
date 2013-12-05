@@ -26,7 +26,10 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqShellTransport.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqShellVelocity.hpp"
+#include "Generator/States/ShellExactScalarState.hpp"
+#include "Generator/States/ShellExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -85,22 +88,50 @@ namespace GeoMHDiSCC {
 
    void BoussinesqShellModel::addStates(SharedStateGenerator spGen)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to equation
+      Equations::SharedShellExactScalarState spSExact;
+      Equations::SharedShellExactVectorState spVExact;
+
+      // Add temperature initial state generator
+      spSExact = spGen->addScalarEquation<Equations::ShellExactScalarState>();
+      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spSExact->setStateType(Equations::ShellExactScalarState::HARMONIC);
+      std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
+      tSH.push_back(std::tr1::make_tuple(23,9,MHDComplex(1,1)));
+      spSExact->setHarmonicOptions(tSH);
+
+      // Add temperature initial state generator
+      spVExact = spGen->addVectorEquation<Equations::ShellExactVectorState>();
+      spVExact->setIdentity(PhysicalNames::VELOCITY);
+      spVExact->setStateType(Equations::ShellExactVectorState::CONSTANT);
+
+      // Add output file
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
+      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqShellModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spSField;
+      Equations::SharedVectorFieldVisualizer spVField;
 
-      // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      // Add temperature field visualization
+      spSField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spSField->setFields(true, false);
+      spSField->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add velocity field visualization
+      spVField = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVField->setFields(true, false);
+      spVField->setIdentity(PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
       spVis->addOutputFile(spOut);
    }
 

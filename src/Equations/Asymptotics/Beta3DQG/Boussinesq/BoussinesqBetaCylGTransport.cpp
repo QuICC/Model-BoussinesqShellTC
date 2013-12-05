@@ -68,7 +68,7 @@ namespace Equations {
       //infoIt.first->second.addExplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
-      int nMat;
+      int nMat = 0;
       ArrayI blockNs;
       ArrayI rhsCols;
       EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);

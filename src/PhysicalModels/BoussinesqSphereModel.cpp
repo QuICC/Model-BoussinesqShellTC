@@ -26,7 +26,10 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Sphere/Boussinesq/BoussinesqSphereTransport.hpp"
 #include "Equations/Sphere/Boussinesq/BoussinesqSphereVelocity.hpp"
+#include "Generator/States/SphereExactScalarState.hpp"
+#include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -38,7 +41,7 @@ namespace GeoMHDiSCC {
       // Add temperature
       ids.push_back(PhysicalNames::TEMPERATURE);
 
-      // Add temperature
+      // Add velocity
       ids.push_back(PhysicalNames::VELOCITY);
 
       return ids;
@@ -79,7 +82,25 @@ namespace GeoMHDiSCC {
 
    void BoussinesqSphereModel::addStates(SharedStateGenerator spGen)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to equation
+      Equations::SharedSphereExactScalarState spSExact;
+      Equations::SharedSphereExactVectorState spVExact;
+
+      // Add temperature initial state generator
+      spSExact = spGen->addScalarEquation<Equations::SphereExactScalarState>();
+      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spSExact->setStateType(Equations::SphereExactScalarState::CONSTANT);
+
+      // Add temperature initial state generator
+      spVExact = spGen->addVectorEquation<Equations::SphereExactVectorState>();
+      spVExact->setIdentity(PhysicalNames::VELOCITY);
+      spVExact->setStateType(Equations::SphereExactVectorState::CONSTANT);
+
+      // Add output file
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
+      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqSphereModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -145,8 +166,6 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
-
-      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

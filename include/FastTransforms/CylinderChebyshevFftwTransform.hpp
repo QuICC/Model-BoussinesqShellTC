@@ -82,7 +82,7 @@ namespace Transform {
          /**
           * @brief Generate a physical grid
           */
-         static Array generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio); 
+         static Array generateGrid(const int size); 
 
          /**
           * @brief Very basic constructor
@@ -214,16 +214,6 @@ namespace Transform {
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
-
-         /**
-          * @brief Storage for the gap width (R_o - R_i)
-          */
-         MHDFloat mGapWidth;
-
-         /**
-          * @brief Storage for the ratio of the radii (R_i / R_o)
-          */
-         MHDFloat mRRatio;
    };
 
    template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator)

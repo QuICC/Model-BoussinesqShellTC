@@ -66,7 +66,7 @@ namespace Equations {
       infoIt.first->second.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
-      int nMat;
+      int nMat = 0;
       ArrayI blockNs;
       ArrayI rhsCols;
       EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);

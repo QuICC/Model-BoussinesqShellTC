@@ -1,6 +1,6 @@
 /** 
  * @file AnnulusChebyshevFftwTransform.cpp
- * @brief Source of the implementation of the Chebyshev FFTW transform for a cylindrical shell radius
+ * @brief Source of the implementation of the Chebyshev FFTW transform for an annulus radius
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 

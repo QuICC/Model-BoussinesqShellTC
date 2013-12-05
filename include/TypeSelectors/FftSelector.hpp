@@ -47,7 +47,7 @@
             typedef ChebyshevFftwTransform ChebyshevSelector;
 
             /// Typedef for FFTW's cylinder Chebyshev FFT implementation
-            typedef AnnulusChebyshevFftwTransform CylinderChebyshevSelector;
+            typedef CylinderChebyshevFftwTransform CylinderChebyshevSelector;
 
             /// Typedef for FFTW's annulus Chebyshev FFT implementation
             typedef AnnulusChebyshevFftwTransform AnnulusChebyshevSelector;

@@ -56,7 +56,7 @@ namespace Equations {
          /**
           * @brief Generic operator row dispatcher
           */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx) const;
+         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const;
 
       protected:
          /**
@@ -98,7 +98,7 @@ namespace Equations {
     * @param mat     Storage for output matrix
     * @param eigs    Harmonic degree l and harmonic order m
     */
-   void timeBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void timeBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the linear matrix block on given field
@@ -108,7 +108,7 @@ namespace Equations {
     * @param fieldId Physical ID of the field
     * @param eigs    Harmonic degree l and harmonic order m
     */
-   void linearBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs);
+   void linearBlock(const BoussinesqShellVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
    /**
     * @brief Get the boundary condition matrix block on given field

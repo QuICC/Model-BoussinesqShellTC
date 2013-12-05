@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    StateFileWriter::StateFileWriter(std::string type, const bool isRegular)
-      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::TRANSFORM, isRegular)
+      : IVariableHdf5NWriter(StateFileTags::BASENAME, StateFileTags::EXTENSION, StateFileTags::HEADER, type, StateFileTags::VERSION, Dimensions::Space::SPECTRAL, isRegular)
    {
    }
 

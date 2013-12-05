@@ -26,7 +26,10 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Annulus/Boussinesq/BoussinesqAnnulusTransport.hpp"
 #include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVelocity.hpp"
+#include "Generator/States/AnnulusExactScalarState.hpp"
+#include "Generator/States/AnnulusExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -85,7 +88,25 @@ namespace GeoMHDiSCC {
 
    void BoussinesqAnnulusModel::addStates(SharedStateGenerator spGen)
    {
-      throw Exception("Not implemented yet!");
+      // Shared pointer to equation
+      Equations::SharedAnnulusExactScalarState spSExact;
+      Equations::SharedAnnulusExactVectorState spVExact;
+
+      // Add temperature initial state generator
+      spSExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
+      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spSExact->setStateType(Equations::AnnulusExactScalarState::CONSTANT);
+
+      // Add temperature initial state generator
+      spVExact = spGen->addVectorEquation<Equations::AnnulusExactVectorState>();
+      spVExact->setIdentity(PhysicalNames::VELOCITY);
+      spVExact->setStateType(Equations::AnnulusExactVectorState::CONSTANT);
+
+      // Add output file
+      IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
+      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
+      spGen->addOutputFile(spOut);
    }
 
    void BoussinesqAnnulusModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -151,8 +172,6 @@ namespace GeoMHDiSCC {
       // Create equation and field keys
       SpectralFieldId eqId;
       SpectralFieldId fieldId;
-
-      throw Exception("Not implemented yet!");
 
       return spBcs;
    }

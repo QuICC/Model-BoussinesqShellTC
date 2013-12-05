@@ -80,9 +80,17 @@ def main(argv):
          print >>out_file, xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D}
       elif scheme in ('CFT'):
          if fId == sId:
+            cylinderXYZ(h5_file)
+         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'cylinder_grid'}
+      elif scheme in ('AFT'):
+         if fId == sId:
             annulusXYZ(h5_file)
             annulusWedgeXYZ(h5_file)
          print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'annulus_grid'}
+      elif scheme in ('BLF'):
+         if fId == sId:
+            sphereXYZ(h5_file)
+         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'sphere_grid'}
       elif scheme in ('SLF'):
          if fId == sId:
             shellXYZ(h5_file)
@@ -114,6 +122,24 @@ def boxXYZ(h5_file):
    mesh = grid_file.create_group('mesh')
    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
    dset[:,:] = box
+   grid_file.close()
+
+def cylinderXYZ(h5_file):
+   g_r = h5_file['mesh']['grid_x']
+   g_th = h5_file['mesh']['grid_y']
+   g_z = h5_file['mesh']['grid_z']
+   size = g_r.size*g_th.size*g_z.size
+   annulus = np.zeros([size,3])
+   i = 0
+   for pr in np.nditer(g_r):
+      for pth in np.nditer(g_th):
+         for pz in np.nditer(g_z):
+            annulus[i,:] = [pz, pr*cos(pth), pr*sin(pth)]
+            i = i + 1
+   grid_file = h5py.File('cylinder_grid.hdf5', 'w')
+   mesh = grid_file.create_group('mesh')
+   dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+   dset[:,:] = annulus
    grid_file.close()
 
 def annulusXYZ(h5_file):
@@ -153,6 +179,24 @@ def annulusWedgeXYZ(h5_file):
    grid_file = h5py.File('annulus_grid.hdf5','r+')
    dset = grid_file['mesh'].create_dataset('grid_wedge', (size, 3), '=f8')
    dset[:,:] = annulus
+   grid_file.close()
+
+def sphereXYZ(h5_file):
+   g_r = h5_file['mesh']['grid_x']
+   g_th = h5_file['mesh']['grid_y']
+   g_ph = h5_file['mesh']['grid_z']
+   size = g_r.size*g_th.size*g_ph.size
+   shell = np.zeros([size,3])
+   i = 0
+   for pr in np.nditer(g_r):
+      for pth in np.nditer(g_th):
+         for pph in np.nditer(g_ph):
+            shell[i,:] = [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
+            i = i + 1
+   grid_file = h5py.File('sphere_grid.hdf5', 'w')
+   mesh = grid_file.create_group('mesh')
+   dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+   dset[:,:] = shell
    grid_file.close()
 
 def shellXYZ(h5_file):

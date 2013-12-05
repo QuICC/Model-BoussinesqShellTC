@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
        * @brief Specialialised IndexConverterSelector for the second transform
        */
       // Configure index converter on spherical harmonics basis
-   #if defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
       #include "Communicators/Converters/SHIndexConv.hpp"
 
       namespace GeoMHDiSCC {
@@ -67,7 +67,7 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #else //GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_WLF
+   #else
 
       namespace GeoMHDiSCC {
          namespace Parallel {
@@ -79,6 +79,6 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_WLF
+   #endif //GEOMHDISCC_SPATIALSCHEME_BLF || GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_WLF
 
 #endif // INDEXCONVERTERSELCTOR_HPP

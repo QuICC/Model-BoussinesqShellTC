@@ -74,11 +74,14 @@ namespace Equations {
       // Set source flags: has source term
       infoIt.first->second.setSource(false);
 
+      // Set index type: use MODE
+      infoIt.first->second.setIndexType(CouplingInformation::MODE);
+
       // Equation is coupled to itself
       infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
 
       // Set mininal matrix coupling
-      int nMat;
+      int nMat = 0;
       ArrayI blockNs;
       ArrayI rhsCols;
       EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
@@ -155,7 +158,7 @@ namespace Equations {
    {
       if(opId == IEquation::LINEARROW)
       {
-         throw Exception("Operators for 2D eigen directions not implemented yet");
+         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
       } else
       {
          throw Exception("Unknown operator row ID");
@@ -173,8 +176,18 @@ namespace Equations {
    }
 
    void quasiInverseBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
-   {
-      throw Exception("Operators for 2D eigen directions not implemented yet");
+   { 
+      // Get X and Z dimensions
+      int nR = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+      // Create spectral operators
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
+
+      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B) => out = A(i,j)*B)
+      mat = spec1D.id(0);
+
+      // Prune matrices for safety
+      mat.prune(1e-32);
    }
 
    void linearBlock(const ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
@@ -183,12 +196,26 @@ namespace Equations {
       MHDFloat l = eigs.at(0);
       MHDFloat m = eigs.at(1);
 
-      throw Exception("Operators for 2D eigen directions not implemented yet");
+      // Get X and Z dimensions
+      int nR = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+      // Create spectral operators
+      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nR);
+
+      // Initialise output matrices
+      mat.real().resize(nR,nR);
+      mat.imag().resize(nR,nR);
+
+      // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
+      mat.real() = spec1D.id(0);
+
+      // Prune matrices for safety
+      mat.real().prune(1e-32);
+      mat.imag().prune(1e-32);
    }
 
    void boundaryBlock(ShellExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
    {
-      throw Exception("Operators for 2D eigen directions not implemented yet");
       assert(eigs.size() == 2);
       MHDFloat l = eigs.at(0);
       MHDFloat m = eigs.at(1);

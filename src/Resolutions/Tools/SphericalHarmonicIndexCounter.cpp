@@ -17,6 +17,7 @@
 // Project includes
 //
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
    SphericalHarmonicIndexCounter::SphericalHarmonicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
