@@ -28,7 +28,6 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TypeSelectors/BoundaryMethodSelector.hpp"
 #include "Equations/IEquation.hpp"
-#include "Equations/Tools/EquationEigenTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -67,18 +66,6 @@ namespace Eigen3D {
 
    void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
 
-   template <typename TEquation> void constrainBlock(TEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, KZSum& blocks, const std::vector<MHDFloat>& bcIdx, const int hasBoundary);
-
-   /**
-    * @brief General implementation of linear row
-    */
-   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const hasBoundary);
-
-   /**
-    * @brief General implementation of time row
-    */
-   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const hasBoundary);
-
 //
 // Implementation follows
 //
@@ -91,20 +78,6 @@ namespace Eigen3D {
       // Fill eigs somehow
 
       return eigs;
-   }
-
-   template <typename TEquation> DecoupledZSparse linearRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary)
-   {
-      std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
-
-      return EigenTools::makeLinearRow(eq, compId, matIdx, eigs, hasBoundary);
-   }
-
-   template <typename TEquation> DecoupledZSparse timeRow(const TEquation& eq, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary)
-   {
-      std::vector<MHDFloat> eigs = getEigs(eq, matIdx);
-
-      return EigenTools::makeTimeRow(eq, compId, matIdx, eigs, hasBoundary);
    }
 
 }

@@ -104,11 +104,6 @@ namespace NoEigen {
          }
       }
    }
-
-//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int p1D, const int p3D, const MHDFloat c1D, const MHDFloat c3D)
-//   {
-//      throw Exception("Not yet implemented!");
-//   }
 }
 }
 }

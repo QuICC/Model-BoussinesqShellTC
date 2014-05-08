@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   VectorFieldVisualizer::VectorFieldVisualizer(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams), mViewField(true), mViewGradient(false)
+   VectorFieldVisualizer::VectorFieldVisualizer(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IVectorEquation(pyName, spEqParams), mViewField(true), mViewGradient(false)
    {
    }
 

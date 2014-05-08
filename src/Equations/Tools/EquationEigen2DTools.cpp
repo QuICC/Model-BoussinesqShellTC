@@ -73,62 +73,6 @@ namespace Eigen2D {
       computeKProduct(mat, blocks);
    }
 
-//   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const MHDFloat c1D)
-//   {
-//      // Get 1D dimension
-//      int n1D = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-//
-//      // Create equation ID
-//      SpectralFieldId eqId = std::make_pair(eq.name(), compId);
-//
-//      // Create spectral operators
-//      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(n1D);
-//
-//      // Create spectral boundary operators
-//      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::BcType bound1D(n1D);
-//
-//      // Initialise output matrices
-//      mat.real().resize(n1D,n1D);
-//      mat.imag().resize(n1D,n1D);
-//
-//      if(c1D != 0)
-//      {
-//         // Safety check to abort early
-//         if(!eq.bcIds().hasEquation(eqId))
-//         {
-//            throw Exception("Missing condition(s) for boundary operator!");
-//         }
-//
-//         // Set boundary conditions on fieldId
-//         if(eq.bcIds().hasField(eqId,fieldId))
-//         {
-//            // Set 1D boundary conditions
-//            if(eq.bcIds().bcs(eqId,fieldId).count(Dimensions::Simulation::SIM1D) > 0)
-//            {
-//               mat = Spectral::BoundaryConditions::tauMatrix(bound1D, eq.bcIds().bcs(eqId,fieldId).find(Dimensions::Simulation::SIM1D)->second);
-//               if(mat.real().nonZeros() > 0)
-//               {
-//                  if(c1D != 1.0)
-//                  {
-//                     mat.real() *= c1D;
-//                  }
-//               }
-//
-//               if(mat.imag().nonZeros() > 0)
-//               {
-//                  if(c1D != 1.0)
-//                  {
-//                     mat.imag() *= c1D;
-//                  }
-//               }
-//            }
-//         }
-//
-//         // Prune matrices for safety
-//         mat.real().prune(1e-32);
-//         mat.imag().prune(1e-32);
-//      }
-//   }
 }
 }
 }

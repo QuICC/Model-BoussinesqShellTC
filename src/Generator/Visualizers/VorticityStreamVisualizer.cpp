@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   VorticityStreamVisualizer::VorticityStreamVisualizer(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false)
+   VorticityStreamVisualizer::VorticityStreamVisualizer(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName,spEqParams), mViewField(true), mViewGradient(false)
    {
    }
 
@@ -93,60 +93,12 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
-   DecoupledZSparse VorticityStreamVisualizer::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
-   {
-      if(opId == IEquation::LINEARROW)
-      {
-         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
    void VorticityStreamVisualizer::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, eigs, false);
-   }
-
-   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
-
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
-
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = k/2.;
-
-      /// - Streamfunction: \f$ \zeta = \nabla^2 \psi\f$
-      if(fieldId.first == PhysicalNames::STREAMFUNCTION)
-      {
-         // Build linear operator (kronecker(A,B,out) => out = A(i,j)*B)
-         mat.real() = Eigen::kroneckerProduct(spec3D.id(0), Spectral::BoxTools::laplacian2D(spec1D, k_, 0));
-
-      // Unknown field
-      } else
-      {
-         throw Exception("Unknown field ID for linear operator!");
-      }
-
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
+      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
    }
 
 }

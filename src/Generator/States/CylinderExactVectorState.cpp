@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   CylinderExactVectorState::CylinderExactVectorState(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
+   CylinderExactVectorState::CylinderExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IVectorEquation(pyName,spEqParams), mTypeId(CONSTANT)
    {
    }
 
@@ -128,79 +128,14 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(false, true, false, false));
    }
 
-   DecoupledZSparse CylinderExactVectorState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
-   {
-      if(opId == IEquation::LINEARROW)
-      {
-         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
    void CylinderExactVectorState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
-      Equations::quasiInverseBlock(*this, compId, mat);
+      // PythonGenerator(mat, QI, fieldId, compId, res, params, eigs, bcs)
    }
 
    void CylinderExactVectorState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, eigs, false);
-   }
-
-   void quasiInverseBlock(const CylinderExactVectorState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
-   {
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      // Set quasi-inverse operator of streamfunction equation multiplication matrix (kronecker(A,B) => out = A(i,j)*B)
-      mat = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
-
-      // Prune matrices for safety
-      mat.prune(1e-32);
-   }
-
-   void linearBlock(const CylinderExactVectorState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 1);
-      MHDFloat m = eigs.at(0);
-
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      // Initialise output matrices
-      mat.real().resize(nX*nZ,nX*nZ);
-      mat.imag().resize(nX*nZ,nX*nZ);
-
-      // Build linear operator (kronecker(A,B) => out = A(i,j)*B)
-      mat.real() = Eigen::kroneckerProduct(spec3D.id(0), spec1D.id(0));
-
-      // Prune matrices for safety
-      mat.real().prune(1e-32);
-      mat.imag().prune(1e-32);
-   }
-
-   void boundaryBlock(CylinderExactVectorState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
-   {
-      assert(eigs.size() == 1);
-      MHDFloat m = eigs.at(0);
-
-      coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-      coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
+      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
    }
 
 }

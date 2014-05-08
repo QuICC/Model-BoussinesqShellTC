@@ -36,10 +36,10 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
+          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
-          * @paarm name       Name of the field
           */
-         RandomScalarState(SharedEquationParameters spEqParams);
+         RandomScalarState(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

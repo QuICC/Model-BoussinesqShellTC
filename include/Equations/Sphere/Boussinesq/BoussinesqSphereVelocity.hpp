@@ -53,11 +53,6 @@ namespace Equations {
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const;
-
       protected:
          /**
           * @brief Set variable requirements
@@ -81,44 +76,6 @@ namespace Equations {
 
       private:
    };
-
-   /**
-    * @brief Get the quasi-inverse matrix operator
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param eqId    Physical ID of the equation
-    */
-   void quasiInverseBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
-
-   /**
-    * @brief Get the time matrix block
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param eigs    Harmonic degree l and harmonic order m
-    */
-   void timeBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
-
-   /**
-    * @brief Get the linear matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param eigs    Harmonic degree l and harmonic order m
-    */
-   void linearBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
-
-   /**
-    * @brief Get the boundary condition matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param eigs    Harmonic degree l and harmonic order m
-    */
-   void boundaryBlock(const BoussinesqSphereVelocity& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }

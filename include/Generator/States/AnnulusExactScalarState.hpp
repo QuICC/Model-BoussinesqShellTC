@@ -43,10 +43,10 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
+          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
-          * @paarm name       Name of the field
           */
-         AnnulusExactScalarState(SharedEquationParameters spEqParams);
+         AnnulusExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -70,11 +70,6 @@ namespace Equations {
           * @param k       Slowest index
           */
          virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
-
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
          /**
           * @brief Set the unknown name and requirements
@@ -116,33 +111,6 @@ namespace Equations {
 
    /// Typedef for a shared AnnulusExactScalarState
    typedef SharedPtrMacro<AnnulusExactScalarState> SharedAnnulusExactScalarState;
-
-   /**
-    * @brief Get the quasi-inverse matrix operator
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    */
-   void quasiInverseBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat);
-
-   /**
-    * @brief Get the linear matrix block for an equation on given field
-    *
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @parm eigs     Wave number k
-    */
-   void linearBlock(const AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
-
-   /**
-    * @brief Get the boundary condition matrix block for an equation on given field
-    *
-    * @param eq      Equation to work on
-    * @param compId  Component ID
-    * @param fieldId Physical ID of the field
-    * @parm eigs     Wave number k
-    */
-   void boundaryBlock(AnnulusExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }

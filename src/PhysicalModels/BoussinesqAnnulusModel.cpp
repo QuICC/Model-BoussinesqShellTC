@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string BoussinesqAnnulusModel::PYNAME = "boussinesq_annulus_model.py";
+
    std::vector<PhysicalNames::Id> BoussinesqAnnulusModel::fieldIds()
    {
       // Create storage
@@ -80,10 +82,10 @@ namespace GeoMHDiSCC {
    void BoussinesqAnnulusModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqAnnulusTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqAnnulusTransport>(BoussinesqAnnulusModel::PYNAME);
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVelocity>();
+      spSim->addVectorEquation<Equations::BoussinesqAnnulusVelocity>(BoussinesqAnnulusModel::PYNAME);
    }
 
    void BoussinesqAnnulusModel::addStates(SharedStateGenerator spGen)

@@ -102,6 +102,7 @@ namespace Solver {
    template <typename TData> SparseTrivialSolver<TData>::SparseTrivialSolver(const int start)
       : SparseSolverBase(start)
    {
+      this->setInitialized();
    }
 
    template <typename TData> SparseTrivialSolver<TData>::~SparseTrivialSolver()

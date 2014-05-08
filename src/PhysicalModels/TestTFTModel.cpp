@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string TestTFTModel::PYNAME = "test_tft_model.py";
+
    std::vector<PhysicalNames::Id> TestTFTModel::fieldIds()
    {
       // Create storage
@@ -91,17 +93,17 @@ namespace GeoMHDiSCC {
       Equations::SharedTestTFTDiffusion2D   spD2D;
 
       // Add first scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
+      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>(TestTFTModel::PYNAME);
       spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       Equations::SharedTestTFTDiffusion3D   spD3D;
 
       // Add second scalar test equation
-      spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>();
+      spD3D = spSim->addScalarEquation<Equations::TestTFTDiffusion3D>(TestTFTModel::PYNAME);
       spD3D->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>();
+      spD2D = spSim->addScalarEquation<Equations::TestTFTDiffusion2D>(TestTFTModel::PYNAME);
       spD2D->setIdentity(PhysicalNames::TEMPERATURE);
    }
 
@@ -112,19 +114,19 @@ namespace GeoMHDiSCC {
       Equations::SharedExactScalarState spExact;
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>();
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
@@ -143,17 +145,17 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 

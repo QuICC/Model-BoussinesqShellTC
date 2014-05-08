@@ -30,6 +30,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string RayleighBenardModel::PYNAME = "rayleigh_benard_model.py";
+
    std::vector<PhysicalNames::Id> RayleighBenardModel::fieldIds()
    {
       // Create storage
@@ -86,13 +88,13 @@ namespace GeoMHDiSCC {
    void RayleighBenardModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::RayleighBenardTransport>();
+      spSim->addScalarEquation<Equations::RayleighBenardTransport>(RayleighBenardModel::PYNAME);
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::RayleighBenardStreamfunction>();
+      spSim->addScalarEquation<Equations::RayleighBenardStreamfunction>(RayleighBenardModel::PYNAME);
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::RayleighBenardVertical>();
+      spSim->addScalarEquation<Equations::RayleighBenardVertical>(RayleighBenardModel::PYNAME);
    }
 
    void RayleighBenardModel::addAsciiOutputFiles(SharedSimulation spSim)

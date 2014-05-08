@@ -45,8 +45,10 @@ namespace Equations {
 
          /**
           * @brief Constructor
+          *
+          * @param pyName Python script name
           */
-         TestSpatialSchemeBackwardScalar();
+         TestSpatialSchemeBackwardScalar(const std::string& pyName);
 
          /**
           * @brief Destructor

@@ -56,17 +56,20 @@ namespace Equations {
    {
       public:
          /**
-          * @brief Enum for the different types of operator rows
+          * @brief Enum for the different types of model operators
           */
-         enum OperatorRowId {
-            TIMEROW = 0,
-            LINEARROW,
+         enum ModelOperatorId {
+            TIMEOPERATOR = 0,
+            LINEAROPERATOR,
          };
 
          /**
           * @brief Simple constructor
+          *
+          * \param pyName     Python script name
+          * \param spEqParams Shared equation parameters
           */
-         explicit IEquation(SharedEquationParameters spEqParams);
+         explicit IEquation(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -84,11 +87,9 @@ namespace Equations {
          virtual void init();
 
          /**
-          * @brief Generic operator row dispatcher
-          *
-          * It has only a dummy implementation and should never get called
+          * @brief Generic model operator dispatcher to python scripts
           */
-         virtual DecoupledZSparse  operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const; //= 0;
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperatorId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -187,26 +188,6 @@ namespace Equations {
     * @param matIdx     System index
     */
    template <typename TData> void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx);
-
-   /**
-    * @brief Dummy implementation: This should never be called!
-    */
-   void quasiInverseBlock(const IEquation& eq, SparseMatrix& mat); //= 0;
-
-   /**
-    * @brief Dummy implementation: This should never be called!
-    */
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary); //= 0;
-
-   /**
-    * @brief Dummy implementation: This should never be called!
-    */
-   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary); //= 0;
-
-   /**
-    * @brief Dummy implementation. This should never get called!
-    */
-   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx); //= 0;
 
    namespace internal
    {

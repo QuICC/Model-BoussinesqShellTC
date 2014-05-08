@@ -26,8 +26,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IEquation::IEquation(SharedEquationParameters spEqParams)
-      : EquationData(spEqParams)
+   IEquation::IEquation(const std::string& pyName, SharedEquationParameters spEqParams)
+      : EquationData(pyName, spEqParams)
    {
    }
 
@@ -142,29 +142,17 @@ namespace Equations {
       return MHDComplex();
    }
 
-   DecoupledZSparse  IEquation::operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
+   void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperatorId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
    {
-      throw Exception("operatorRow: dummy implementation was called!");
-   }
+      // Get resolution
+      
+      // Get the eigen direction values
+      std::vector<MHDFloat> eigs = EigenSelector::getEigs(*this, matIdx);
 
-   void quasiInverseBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
-   {
-      throw Exception("quasiInverseBlock: dummy implementation called!");
-   }
+      // Get equation parameters
+      
+      // Get boundary conditions
 
-   void timeBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      throw Exception("timeBlock: dummy implementation called!");
-   }
-
-   void linearBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      throw Exception("linearBlock: dummy implementation called!");
-   }
-
-   void boundaryBlock(const IEquation& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& k, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
-   {
-      throw Exception("boundaryBlock: dummy implementation called!");
    }
 }
 }

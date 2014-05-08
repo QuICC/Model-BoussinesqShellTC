@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestSpatialSchemeBackwardScalar::TestSpatialSchemeBackwardScalar()
-      : IScalarEquation(SharedEquationParameters(new EquationParameters())), mTypeId(CONSTANT)
+   TestSpatialSchemeBackwardScalar::TestSpatialSchemeBackwardScalar(const std::string& pyName)
+      : IScalarEquation(SharedEquationParameters(pyName, new EquationParameters())), mTypeId(CONSTANT)
    {
    }
 

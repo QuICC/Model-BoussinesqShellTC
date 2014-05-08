@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   ScalarFieldVisualizer::ScalarFieldVisualizer(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false)
+   ScalarFieldVisualizer::ScalarFieldVisualizer(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName, spEqParams), mViewField(true), mViewGradient(false)
    {
    }
 

@@ -40,8 +40,11 @@ namespace Equations {
       public:
          /**
           * @brief Simple constructor
+          *
+          * \param pyName     Python script name
+          * \param spEqParams Shared equation parameters
           */
-         explicit EquationData(SharedEquationParameters spEqParams);
+         explicit EquationData(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -52,6 +55,11 @@ namespace Equations {
           * @brief Get name ID of the unknown
           */
          PhysicalNames::Id name() const;
+
+         /**
+          * @brief Get python script name
+          */
+         const std::string& pyName() const;
 
          /**
           * @brief Get scalar variable
@@ -212,6 +220,11 @@ namespace Equations {
          SharedSimulationBoundary mspBcIds;
 
       private:
+         /**
+          * @brief Python script name
+          */
+         std::string mPyName;
+
          /**
           * @brief Storage for smart equation parameters
           */

@@ -30,6 +30,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string BoussinesqBetaSphGModel::PYNAME = "boussinesq_beta_sphg_model.py";
+
    std::vector<PhysicalNames::Id> BoussinesqBetaSphGModel::fieldIds()
    {
       // Create storage

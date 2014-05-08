@@ -30,6 +30,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string RotatingRBModel::PYNAME = "rotation_rb_model.py";
+
    std::vector<PhysicalNames::Id> RotatingRBModel::fieldIds()
    {
       // Create storage
@@ -86,13 +88,13 @@ namespace GeoMHDiSCC {
    void RotatingRBModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::RotatingRBTransport>();
+      spSim->addScalarEquation<Equations::RotatingRBTransport>(RotatingRBModel::PYNAME);
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::RotatingRBStreamfunction>();
+      spSim->addScalarEquation<Equations::RotatingRBStreamfunction>((RotatingRBModel::PYNAME);
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::RotatingRBVertical>();
+      spSim->addScalarEquation<Equations::RotatingRBVertical>((RotatingRBModel::PYNAME);
    }
 
    void RotatingRBModel::addAsciiOutputFiles(SharedSimulation spSim)

@@ -94,17 +94,6 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
-   DecoupledZSparse BoussinesqBetaCylGVorticity::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
-   {
-      if(opId == IEquation::LINEARROW)
-      {
-         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
    void BoussinesqBetaCylGVorticity::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
       // Safety assert
@@ -119,42 +108,7 @@ namespace Equations {
       // Safety assert
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      linearBlock(*this, compId, mat, fieldId, eigs, false);
-   }
-
-   void linearBlock(const BoussinesqBetaCylGVorticity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
-
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
-
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = k/2.;
-
-      /// - Streamfunction: \f$ \zeta = \nabla^2 \psi\f$
-      if(fieldId.first == PhysicalNames::STREAMFUNCTION)
-      {
-         std::tr1::get<0>(kProduct).real() = Spectral::BoxTools::laplacian2D(spec1D, k_, 0);
-         std::tr1::get<1>(kProduct).real() = spec3D.id(0);
-         blocks.push_back(kProduct);
-
-      // Unknown field
-      } else
-      {
-         throw Exception("Unknown field ID for linear operator!");
-      }
-
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
+      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
    }
 
 }

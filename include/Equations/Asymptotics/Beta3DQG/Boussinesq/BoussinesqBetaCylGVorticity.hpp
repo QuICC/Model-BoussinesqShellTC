@@ -52,11 +52,6 @@ namespace Equations {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
          
       protected:
          /**
@@ -81,16 +76,6 @@ namespace Equations {
 
       private:
    };
-
-   /**
-    * @brief Get the linear matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param eigs    Wave number k
-    */
-   void linearBlock(const BoussinesqBetaCylGVorticity& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
 }
 }

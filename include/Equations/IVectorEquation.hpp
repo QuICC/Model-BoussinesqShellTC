@@ -45,9 +45,10 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
+          * \param pyName     Python script name
           * \param spEqParams Shared equation parameters
           */
-         explicit IVectorEquation(SharedEquationParameters spEqParams);
+         explicit IVectorEquation(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

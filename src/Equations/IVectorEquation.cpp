@@ -25,8 +25,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams)
-      : IEquation(spEqParams)
+   IVectorEquation::IVectorEquation(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IEquation(pyName, spEqParams)
    {
    }
 

@@ -37,9 +37,10 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
+          * \param pyName     Python script name
           * \param spEqParams Shared equation parameters
           */
-         explicit IScalarEquation(SharedEquationParameters spEqParams);
+         explicit IScalarEquation(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

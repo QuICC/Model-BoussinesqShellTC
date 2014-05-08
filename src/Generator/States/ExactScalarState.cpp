@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   ExactScalarState::ExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CONSTANT), mSineA(2), mSineN(2)
+   ExactScalarState::ExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName, spEqParams), mTypeId(CONSTANT), mSineA(2), mSineN(2)
    {
    }
 
@@ -163,80 +163,12 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }
 
-   DecoupledZSparse ExactScalarState::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
-   {
-      if(opId == IEquation::LINEARROW)
-      {
-         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
    void ExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
    {
-      Equations::quasiInverseBlock(*this, compId, mat);
    }
 
    void ExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      Equations::linearBlock(*this, compId, mat, fieldId, eigs, false);
-   }
-
-   void quasiInverseBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, SparseMatrix& mat)
-   {
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      EigenSelector::KRSum blocks;
-      EigenSelector::KRProduct kProduct(SparseMatrix(nX*nZ,nX*nZ),SparseMatrix(nX*nZ,nX*nZ));
-
-      std::tr1::get<0>(kProduct) = spec1D.id(0);
-      std::tr1::get<1>(kProduct) = spec3D.id(0);
-      blocks.push_back(kProduct);
-
-      EigenSelector::computeKSum(mat, blocks);
-   }
-
-   void linearBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
-
-      // Get X and Z dimensions
-      int nX = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      int nZ = eq.unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
-
-      // Create spectral operators
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM1D>::Type spec1D(nX);
-      Spectral::OperatorSelector<Dimensions::Simulation::SIM3D>::Type spec3D(nZ);
-
-      EigenSelector::KZSum blocks;
-      EigenSelector::KZProduct kProduct(DecoupledZSparse(nX*nZ,nX*nZ),DecoupledZSparse(nX*nZ,nX*nZ));
-
-      std::tr1::get<0>(kProduct).real() = spec1D.id(0);
-      std::tr1::get<1>(kProduct).real() = spec3D.id(0);
-      blocks.push_back(kProduct);
-
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
-   }
-
-   void boundaryBlock(const ExactScalarState& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
-   {  
-      assert(eigs.size() == 1);
-      MHDFloat k = eigs.at(0);
-
-      coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
-
-      coeffs.push_back(1.0);
-      bcIdx.push_back(Boundary::BCIndex(Boundary::INDEPENDENT));
    }
 
 }

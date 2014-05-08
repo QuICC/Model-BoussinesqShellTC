@@ -35,6 +35,9 @@ namespace GeoMHDiSCC {
          /// Typedef for the spatial scheme used
          static const int DIMENSION = 3;
 
+         /// Python script name
+         static const std::string PYNAME;
+
          /// Typedef for the spatial scheme used
          typedef Schemes::TFFScheme SchemeType;
 

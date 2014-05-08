@@ -188,41 +188,36 @@ namespace Timestep {
       rhsLCoeff = -IntegratorSelector::rhsL(this->mStep);
 
       // Resize LHS matrix if necessary
-      if(spSolver->rLHSMatrix(matIdx).size() == 0)
-      {
-         spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
+      spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
       // Resize RHS matrix if necessary
-      if(spSolver->rRHSMatrix(matIdx).size() == 0)
-      {
-         spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-      }
+      spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
-      DecoupledZSparse linRow = spEq->operatorRow(Equations::IEquation::LINEARROW, comp, idx, false);
-      DecoupledZSparse tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx, true);
+      // Compute linear operator through python generator
+      //DecoupledZSparse linOp;
+      //PythonGenerator::createMatrix(linOp, spEq, comp, idx);
+      //DecoupledZSparse timeOp;
+      //PythonGenerator::createMatrix(timeOp, spEq, comp, idx, true);
 
       // Set LHS matrix
-      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linRow);
-      Solver::internal::addRow(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, tRow);
+      //spSolver->rLHSMatrix(matIdx) = lhsLCoeff*linOp - lhsTCoeff*timeOp;
 
       // Set RHS matrix
-      tRow = spEq->operatorRow(Equations::IEquation::TIMEROW, comp, idx, false);
-      Solver::internal::addRow(spSolver->rRHSMatrix(matIdx), rhsLCoeff, linRow);
-      Solver::internal::addRow(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, tRow);
+      //PythonGenerator::createMatrix(timeOp, spEq, comp, idx,false);
+      //spSolver->rRHSMatrix(matIdx) = rhsLCoeff*linOp - rhsTCoeff*timeOp;
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
       {
          // Resize time matrix if necessary
-         if(spSolver->rTMatrix(idx).size() == 0)
-         {
-            spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
-         }
+         spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
          // Set time matrix
-         Solver::internal::addRow(spSolver->rTMatrix(idx), 1.0, tRow);
+         //PythonGenerator::createMatrix(spSolver->rTMatrix(idx), spEq, comp, idx);
       }
+      
+      // Solver is initialized
+      spSolver->setInitialized();
    }
 }
 }

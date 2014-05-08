@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string BoussinesqCylinderModel::PYNAME = "boussinesq_cylinder_model.py";
+
    std::vector<PhysicalNames::Id> BoussinesqCylinderModel::fieldIds()
    {
       // Create storage
@@ -74,10 +76,10 @@ namespace GeoMHDiSCC {
    void BoussinesqCylinderModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqCylinderTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqCylinderTransport>(BoussinesqCylinderModel::PYNAME);
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqCylinderVelocity>();
+      spSim->addVectorEquation<Equations::BoussinesqCylinderVelocity>(BoussinesqCylinderModel::PYNAME);
    }
 
    void BoussinesqCylinderModel::addStates(SharedStateGenerator spGen)

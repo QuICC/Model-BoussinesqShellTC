@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   RandomScalarState::RandomScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mMin(-10), mMax(10), mXRatio(1e3), mYRatio(1e3), mZRatio(1e3)
+   RandomScalarState::RandomScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName, spEqParams), mMin(-10), mMax(10), mXRatio(1e3), mYRatio(1e3), mZRatio(1e3)
    {
    }
 

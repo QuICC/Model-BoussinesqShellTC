@@ -289,7 +289,7 @@ namespace Solver {
       }
 
       // Store storage information
-      (*solveIt)->addInformation(id,startRow);
+      (*solveIt)->addInformation(id,startRow,spEq->pyName());
    }
 
    template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)

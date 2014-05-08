@@ -36,9 +36,10 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param pyName     Python script name
+          * @param spEqParams Shared equation parameters
           */
-         VorticityStreamVisualizer(SharedEquationParameters spEqParams);
+         VorticityStreamVisualizer(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
@@ -49,11 +50,6 @@ namespace Equations {
           * @brief Set which fields to output
           */
          void setFields(const bool viewField, const bool viewGradient);
-
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
          
       protected:
          /**
@@ -85,16 +81,6 @@ namespace Equations {
 
    /// Typedef for a shared VorticityStreamVisualizer
    typedef SharedPtrMacro<VorticityStreamVisualizer> SharedVorticityStreamVisualizer;
-
-   /**
-    * @brief Get the linear matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @param eigs    Wave number k
-    */
-   void linearBlock(const VorticityStreamVisualizer& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
 
 }
 }

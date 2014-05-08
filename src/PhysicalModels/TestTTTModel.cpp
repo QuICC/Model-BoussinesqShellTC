@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string TestTTTModel::PYNAME = "test_ttt_model.py";
+
    std::vector<PhysicalNames::Id> TestTTTModel::fieldIds()
    {
       // Create storage
@@ -91,17 +93,17 @@ namespace GeoMHDiSCC {
       Equations::SharedTestTTTDiffusion2D   spD2D;
 
       // Add first scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>();
+      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>(TestTTTModel::PYNAME);
       spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       Equations::SharedTestTTTDiffusion3D   spD3D;
 
       // Add second scalar test equation
-      spD3D = spSim->addScalarEquation<Equations::TestTTTDiffusion3D>();
+      spD3D = spSim->addScalarEquation<Equations::TestTTTDiffusion3D>(TestTTTModel::PYNAME);
       spD3D->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>();
+      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>(TestTTTModel::PYNAME);
       spD2D->setIdentity(PhysicalNames::TEMPERATURE);
    }
 

@@ -111,17 +111,21 @@ namespace Solver {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
 
-      // start index for matrices
-      int start = this->mStep*nSystems;
-
-      // Reserve storage for matrice and initialise vectors
-      (*solveIt)->initMatrices(this->mNStep*nSystems);
-
-      // Build the solver matrices
-      for(int i = 0; i < nSystems; i++)
+      // Loop over all substeps of solver
+      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
       {
-         // Build LHS solver matrix
-         this->buildSolverMatrix(*solveIt, start+i, spEq, id.second, i);
+         // start index for matrices
+         int start = this->mStep*nSystems;
+
+         // Reserve storage for matrices and initialise vectors
+         (*solveIt)->initMatrices(this->mNStep*nSystems);
+
+         // Build the solver matrices
+         for(int i = 0; i < nSystems; i++)
+         {
+            // Build LHS solver matrix
+            this->buildSolverMatrix(*solveIt, start+i, spEq, id.second, i);
+         }
       }
    }
 
@@ -172,7 +176,7 @@ namespace Solver {
       //
 
       DebuggerMacro_start("Linear: create storage", 2);
-      // Loop over all substeps of timestepper
+      // Loop over all substeps of solver
       for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
       {
          // Loop over all scalar equations
@@ -205,30 +209,26 @@ namespace Solver {
       //
 
       DebuggerMacro_start("Linear: create operators", 2);
-      // Loop over all substeps of timestepper
-      for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
+      // Loop over all scalar equations
+      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
-         // Loop over all scalar equations
-         for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
+         DebuggerMacro_msg("---> scalar operators", 2);
+
+         // Create (coupled) matrices
+         this->createMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
+      }
+
+      // Loop over all vector equations
+      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      {
+         DebuggerMacro_msg("---> vector operators", 2);
+
+         // Create (coupled) matrices
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            DebuggerMacro_msg("---> scalar operators", 2);
-
-            // Create (coupled) matrices
-            this->createMatrices((*scalEqIt), FieldComponents::Spectral::SCALAR);
-         }
-
-         // Loop over all vector equations
-         for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
-         {
-            DebuggerMacro_msg("---> vector operators", 2);
-
-            // Create (coupled) matrices
-            Equations::IVectorEquation::SpectralComponent_iterator compIt;
-            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
-            {
-               this->createMatrices((*vectEqIt), *compIt);
-            }
+            this->createMatrices((*vectEqIt), *compIt);
          }
       }
       DebuggerMacro_stop("Linear: create operators t = ", 2);
@@ -271,7 +271,7 @@ namespace Solver {
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
 
-      // Index of the current field
+      // Get solver index
       int myIdx = spEq->couplingInfo(myId.second).solverIndex();
 
       // Complex matrices in linear solve
@@ -282,7 +282,10 @@ namespace Solver {
          std::advance(solZIt, myIdx);
 
          // Build solver matrices
-         this->buildSolverMatrices(spEq, myId, solZIt);
+         if(! (*solZIt)->isInitialized())
+         {
+            this->buildSolverMatrices(spEq, myId, solZIt);
+         }
 
       // Real matrices in linear solve
       } else
@@ -292,7 +295,10 @@ namespace Solver {
          std::advance(solRIt, myIdx);
 
          // Build solver matrices
-         this->buildSolverMatrices(spEq, myId, solRIt);
+         if(! (*solRIt)->isInitialized())
+         {
+            this->buildSolverMatrices(spEq, myId, solRIt);
+         }
       }
    }
 

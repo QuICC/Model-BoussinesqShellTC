@@ -56,7 +56,7 @@ namespace Solver {
          /**
           * @brief Add storage information 
           */
-         void addInformation(const SpectralFieldId& id, const ArrayI& startRow);
+         void addInformation(const SpectralFieldId& id, const ArrayI& startRow, const std::string& pyName);
 
          /**
           * @brief Get start row 
@@ -67,12 +67,27 @@ namespace Solver {
           * @brief Range of stored fields
           */
          FieldId_range fieldRange() const;
+
+         /**
+          * @brief Is operator initialized?
+          */
+         bool isInitialized() const;
+
+         /**
+          * @brief Set operator to initialized
+          */
+         void setInitialized();
          
       protected:
          /**
           * @brief Starting index
           */
          int mZeroIdx;
+
+         /**
+          * @brief Python generator name
+          */
+         std::string mPyName;
 
          /**
           * @brief Storage for the field Ids
@@ -83,6 +98,11 @@ namespace Solver {
           * @brief Storage for the storage information
           */
          std::map<SpectralFieldId, ArrayI> mInformation;
+
+         /**
+          * @brief Flag for operator initialization
+          */
+         bool mIsInitialized;
 
       private:
    };

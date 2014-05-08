@@ -36,9 +36,10 @@ namespace Equations {
          /**
           * @brief Constructor
           *
+          * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         TestTFFDiffusion3D(SharedEquationParameters spEqParams);
+         TestTFFDiffusion3D(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor
@@ -49,11 +50,6 @@ namespace Equations {
           * @brief Set the unknown name and requirements
           */
          void setIdentity(const PhysicalNames::Id name);
-
-         /**
-          * @brief Generic operator row dispatcher
-          */
-         virtual DecoupledZSparse operatorRow(const OperatorRowId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
       protected:
          /**
@@ -71,34 +67,6 @@ namespace Equations {
 
    /// Typedef for a shared TestTFFDiffusion3D
    typedef SharedPtrMacro<TestTFFDiffusion3D> SharedTestTFFDiffusion3D;
-
-   /**
-    * @brief Get the time matrix block
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @parm eigs     Wave number k
-    */
-   void timeBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
-
-   /**
-    * @brief Get the linear matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param mat     Storage for output matrix
-    * @param fieldId Physical ID of the field
-    * @parm eigs     Wave number k
-    */
-   void linearBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary);
-
-   /**
-    * @brief Get the boundary condition matrix block on given field
-    *
-    * @param eq      Equation to work on
-    * @param fieldId Physical ID of the field
-    * @parm eigs     Wave number k
-    */
-   void boundaryBlock(const TestTFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx);
 
 }
 }

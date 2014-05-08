@@ -33,6 +33,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string BoussinesqShellModel::PYNAME = "boussinesq_shell_model.py";
+
    std::vector<PhysicalNames::Id> BoussinesqShellModel::fieldIds()
    {
       // Create storage
@@ -80,10 +82,10 @@ namespace GeoMHDiSCC {
    void BoussinesqShellModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqShellTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqShellTransport>(BoussinesqShellModel::PYNAME);
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqShellVelocity>();
+      spSim->addVectorEquation<Equations::BoussinesqShellVelocity>(BoussinesqShellModel::PYNAME);
    }
 
    void BoussinesqShellModel::addStates(SharedStateGenerator spGen)

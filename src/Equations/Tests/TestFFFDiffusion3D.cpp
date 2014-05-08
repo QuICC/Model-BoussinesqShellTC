@@ -30,8 +30,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestFFFDiffusion3D::TestFFFDiffusion3D(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+   TestFFFDiffusion3D::TestFFFDiffusion3D(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName, spEqParams)
    {
    }
 
@@ -82,68 +82,6 @@ namespace Equations {
    {
       // Add requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
-   }
-
-   DecoupledZSparse TestFFFDiffusion3D::operatorRow(const IEquation::OperatorRowId opId, FieldComponents::Spectral::Id compId, const int matIdx, const bool hasBoundary) const
-   {
-      if(opId == IEquation::TIMEROW)
-      { 
-         return EigenSelector::timeRow(*this, compId, matIdx, hasBoundary);
-      } else if(opId == IEquation::LINEARROW)
-      {
-         return EigenSelector::linearRow(*this, compId, matIdx, hasBoundary);
-      } else
-      {
-         throw Exception("Unknown operator row ID");
-      }
-   }
-
-   void linearBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 3);
-      // Rescale wave number to [-1, 1]
-      MHDFloat k_ = eigs.at(0)/2.0;
-      MHDFloat l_ = eigs.at(1)/2.0;
-      MHDFloat m_ = eigs.at(2)/2.0;
-
-      EigenSelector::KZSum blocks;
-
-      // Setup 3D diffusion
-      if(fieldId.first == eq.name())
-      {
-         blocks.real() = Spectral::BoxTools::qLaplacian3D(k_, l_, m_);
-
-      // Unknown field
-      } else
-      {
-         throw Exception("Unknown field ID for linear operator!");
-      }
-
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
-   }
-
-   void timeBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, const bool hasBoundary)
-   {
-      assert(eigs.size() == 3);
-
-      EigenSelector::KZSum blocks;
-
-      if(fieldId.first == eq.name())
-      {
-         blocks.real() = 1.0;
-      } else
-      {
-         throw Exception("Multiple field in time integration not implemented yet!");
-      }
-
-      EigenSelector::constrainBlock(eq, compId, mat, fieldId, blocks, eigs, hasBoundary);
-   }
-
-   void boundaryBlock(const TestFFFDiffusion3D& eq, FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs, std::vector<MHDFloat>& coeffs, std::vector<Boundary::BCIndex>& bcIdx)
-   {
-      assert(eigs.size() == 3);
-
-      throw Exception("There are not boundary conditions to impose!");
    }
 
 }

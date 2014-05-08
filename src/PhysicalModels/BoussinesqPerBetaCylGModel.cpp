@@ -30,6 +30,8 @@
 
 namespace GeoMHDiSCC {
 
+   const std::string BoussinesqPerBetaCylGModel::PYNAME = "boussinesq_perbeta_cylg_model.py";
+
    std::vector<PhysicalNames::Id> BoussinesqPerBetaCylGModel::fieldIds()
    {
       // Create storage
@@ -86,13 +88,13 @@ namespace GeoMHDiSCC {
    void BoussinesqPerBetaCylGModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGTransport>(BoussinesqPerBetaCylGModel::PYNAME);
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGStreamfunction>();
+      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGStreamfunction>(BoussinesqPerBetaCylGModel::PYNAME);
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGVertical>();
+      spSim->addScalarEquation<Equations::BoussinesqPerBetaCylGVertical>(BoussinesqPerBetaCylGModel::PYNAME);
    }
 
    void BoussinesqPerBetaPerCylGModel::addStates(SharedStateGenerator spGen)
