@@ -21,6 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
+#include "Enums/ModelOperator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,6 +36,11 @@ namespace IoTools {
        * @brief Convert tag to nondimensional parameter ID
        */
       static NonDimensional::Id toNd(const std::string& id);
+
+      /**
+       * @brief Convert string to model operator ID
+       */
+      static ModelOperator::Id toModOp(const std::string& id);
 
       private:
          /**

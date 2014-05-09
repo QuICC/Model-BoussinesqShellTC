@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Enums/ModelOperator.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "SparseSolvers/SparseLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -83,11 +84,13 @@ namespace Solver {
 
    template <typename TStepper> void SparseLinearCoordinator::buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      // Resize LHS matrix
+      // Resize operator matrix
       spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
       // Get model operator
-      //spEq->buildModelMatrix(spSolver->rLHSMatrix(matIdx), Equations::IEquation::IMPLICIT_LINEAR, comp, idx, true);
+      DecoupledZSparse  linOp;
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, true);
+      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), 1.0, linOp); 
       
       // Solver is initialized
       spSolver->setInitialized();

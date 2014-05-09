@@ -1,7 +1,7 @@
 """Module provides the functions to generate the Boussinesq rotating convection model matrices in a sphere"""
 
 import numpy as np
-import scipy.sparse as sp
+import scipy.sparse as spsp
 
 all_fields = [("velocity","toroidal"), ("velocity","toroidal"), ("temperature","scalar")]
 implicit_fields = [("velocity","toroidal"), ("velocity","toroidal"), ("temperature","scalar")]
@@ -11,13 +11,13 @@ def qi(res, eq_params, eigs, field, bcs):
    """Create the quasi-inverse operator"""
 
    if field[0] == 'velocity' and field[1] == 'toroidal':
-      mat = sp.identity(res[0])
+      mat = spsp.identity(res[0])
 
    elif field[0] == 'velocity' and field[1] == 'poloidal':
-      mat = sp.identity(res[0])
+      mat = spsp.identity(res[0])
 
    elif field[0] == 'temperature' and field[1] == 'scalar':
-      mat = sp.identity(res[0])
+      mat = spsp.identity(res[0])
 
    return mat
 
@@ -25,14 +25,14 @@ def qi(res, eq_params, eigs, field, bcs):
 def time(res, eq_params, eigs, bcs):
    """Create the time derivative operator"""
    
-   tor_time = sp.identity(res[0])
-   pol_time = sp.identity(res[0])
-   temp_time = sp.identity(res[0])
+   tor_time = spsp.identity(res[0])
+   pol_time = spsp.identity(res[0])
+   temp_time = spsp.identity(res[0])
 
-   return sp.block_diag((tor_time,pol_time,temp_time))
+   return spsp.block_diag((tor_time,pol_time,temp_time))
 
 
-def linear(res, eq_params, eigs, bcs):
+def implicit_linear(res, eq_params, eigs, bcs):
    """Create the implicit linear operator"""
 
    tmp = [[0]*len(implicit_fields)]*len(implicit_fields)
@@ -40,10 +40,10 @@ def linear(res, eq_params, eigs, bcs):
       for c,field_col in enumerate(implicit_fields):
          tmp[r][c] = block(res, eq_params, eigs, field_row, field_col)
 
-   return sp.bmat(tmp)
+   return spsp.bmat(tmp)
 
 
-def explicit(res, eq_params, eigs, field_row, field_col, bcs):
+def explicit_linear(res, eq_params, eigs, field_row, field_col, bcs):
    """Create the explicit linear operator"""
 
    return -block(res, eq_params, eigs, field_row, field_col)
@@ -54,27 +54,27 @@ def block(res, eq_params, eigs, field_row, field_col, bcs):
 
    if field_row[0] == 'velocity' and field_row[1] == 'toroidal':
       if field_col[0] == 'velocity' and field_col[1] == 'toroidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'velocity' and field_col[1] == 'poloidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'temperature' and field_col[1] == 'scalar':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
 
    elif field_row[0] == 'velocity' and field_row[1] == 'poloidal':
       if field_col[0] == 'velocity' and field_col[1] == 'toroidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'velocity' and field_col[1] == 'poloidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'temperature' and field_col[1] == 'scalar':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
 
    elif field_row[0] == 'temperature' and field_row[1] == 'scalar':
       if field_col[0] == 'velocity' and field_col[1] == 'toroidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'velocity' and field_col[1] == 'poloidal':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
       elif field_col[0] == 'temperature' and field_col[1] == 'scalar':
-         mat = sp.identity(res[0])
+         mat = spsp.identity(res[0])
 
    return mat
 

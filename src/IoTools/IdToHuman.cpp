@@ -182,5 +182,22 @@ namespace IoTools {
       }
    }
 
+   std::string IdToHuman::toString(const ModelOperator::Id id)
+   {
+      switch(id)
+      {
+         case ModelOperator::QI:
+            return "qi";
+         case ModelOperator::TIME:
+            return "time";
+         case ModelOperator::IMPLICIT_LINEAR:
+            return "implicit_linear";
+         case ModelOperator::EXPLICIT_LINEAR:
+            return "explicit_linear";
+         default:
+            throw Exception("Unknown ID to string conversion requested");
+      }
+   }
+
 }
 }

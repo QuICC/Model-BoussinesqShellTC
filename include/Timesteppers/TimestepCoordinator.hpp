@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
+#include "Enums/ModelOperator.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "Timesteppers/SparseTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -194,27 +195,21 @@ namespace Timestep {
       spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
       // Compute model's linear operator
-      DecoupledZSparse linOp;
-      //spEq->buildModelMatrix(linOp, Equations::IEquation::IMPLICIT_LINEAR, comp, idx, false);
+      DecoupledZSparse  linOp;
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, false);
 
       // Compute model's time operator
-      DecoupledZSparse timeOp;
-      //spEq->buildModelMatrix(timeOp, Equations::IEquation::TIME, comp, idx, true);
+      DecoupledZSparse  timeOp;
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, true);
 
       // Set LHS matrix
-      //spSolver->rLHSMatrix(matIdx).real() = lhsLCoeff*linOp.real() - lhsTCoeff*timeOp.real();
-      if(linOp.imag().cols() != 0)
-      {   
-         //spSolver->rLHSMatrix(matIdx).imag() = lhsLCoeff*linOp.imag() - lhsTCoeff*timeOp.imag();
-      }
+      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linOp); 
+      Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, timeOp); 
 
       // Set RHS matrix
-      //spEq->buildModelMatrix(timeOp, Equations::IEquation::TIME, comp, idx, false);
-      //spSolver->rRHSMatrix(matIdx).real() = rhsLCoeff*linOp.real() - rhsTCoeff*timeOp.real();
-      if(linOp.imag().cols() != 0)
-      {   
-         //spSolver->rRHSMatrix(matIdx).imag() = rhsLCoeff*linOp.imag() - rhsTCoeff*timeOp.imag();
-      }
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, false);
+      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), rhsLCoeff, linOp); 
+      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, timeOp); 
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
@@ -223,7 +218,8 @@ namespace Timestep {
          spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
          // Set time matrix
-         //spEq->buildModelMatrix(spSolver->rTMatrix(idx), Equations::IEquation::TIME, comp, idx, false);
+         spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, false);
+         Solver::internal::addOperators(spSolver->rTMatrix(idx), 1.0, timeOp); 
       }
       
       // Solver is initialized

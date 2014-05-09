@@ -22,6 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/ModelOperator.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
@@ -56,16 +57,6 @@ namespace Equations {
    {
       public:
          /**
-          * @brief Enum for the different types of model operators
-          */
-         enum ModelOperatorId {
-            QI = 0,
-            TIME,
-            IMPLICIT_LINEAR,
-            EXPLICIT_LINEAR,
-         };
-
-         /**
           * @brief Simple constructor
           *
           * \param pyName     Python script name
@@ -91,7 +82,7 @@ namespace Equations {
          /**
           * @brief Generic model operator dispatcher to python scripts
           */
-         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperatorId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -154,15 +145,13 @@ namespace Equations {
       private:
          /**
           * @brief Set the quasi inverse matrix operator
-          *
-          * It has only a dummy implementation and should never get called!
           */
-         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const; //= 0;
+         void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const;
 
          /**
           * @brief Set the explicit linear matrix operator
           */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const; //= 0;
+         void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const;
 
    };
 

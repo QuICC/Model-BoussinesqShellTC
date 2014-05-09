@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef NONDIMESIONAL_HPP
-#define NONDIMESIONAL_HPP
+#ifndef NONDIMENSIONAL_HPP
+#define NONDIMENSIONAL_HPP
 
 // Configuration includes
 //
@@ -55,4 +55,4 @@ namespace GeoMHDiSCC {
       };
 }
 
-#endif // NONDIMESIONAL_HPP
+#endif // NONDIMENSIONAL_HPP

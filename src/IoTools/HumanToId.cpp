@@ -65,6 +65,26 @@ namespace IoTools {
          throw Exception("Unknown string to ID conversion requested");
       }
    }
+
+   ModelOperator::Id HumanToId::toModOp(const std::string& id)
+   {
+      if(id == IdToHuman::toString(ModelOperator::QI))
+      {
+         return ModelOperator::QI;
+      } else if(id == IdToHuman::toString(ModelOperator::TIME))
+      {
+         return ModelOperator::TIME;
+      } else if(id == IdToHuman::toString(ModelOperator::IMPLICIT_LINEAR))
+      {
+         return ModelOperator::IMPLICIT_LINEAR;
+      } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
+      {
+         return ModelOperator::EXPLICIT_LINEAR;
+      } else
+      {
+         throw Exception("Unknown string to ID conversion requested");
+      }
+   }
 }
 
 }

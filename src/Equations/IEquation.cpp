@@ -121,12 +121,26 @@ namespace Equations {
 
    void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat) const
    {
-      throw Exception("setQuasiInverse: dummy implementation was called!");
+      // Initialise Python interpreter
+      PythonWrapper::init();
+
+      // Load model module
+      PythonWrapper::import(this->pyName());
+
+      // Finalise Python interpreter
+      PythonWrapper::finalize();
    }
 
    void IEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
    {
-      throw Exception("setExplicitLinearBlock: dummy implementation was called!");
+      // Initialise Python interpreter
+      PythonWrapper::init();
+
+      // Load model module
+      PythonWrapper::import(this->pyName());
+
+      // Finalise Python interpreter
+      PythonWrapper::finalize();
    }
 
    void IEquation::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -143,7 +157,7 @@ namespace Equations {
       return MHDComplex();
    }
 
-   void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperatorId opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
+   void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
    {
       // Get resolution
       

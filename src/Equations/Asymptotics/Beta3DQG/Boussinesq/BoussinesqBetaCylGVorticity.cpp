@@ -94,22 +94,5 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
-   void BoussinesqBetaCylGVorticity::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-      // Safety assert
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      // Quasi inverse is not required without nonlinear computations
-      assert(false);
-   }
-
-   void BoussinesqBetaCylGVorticity::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      // Safety assert
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

@@ -93,21 +93,5 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
    }
 
-   void BoussinesqShellTransport::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-      //Safety assert
-      assert(compId == FieldComponents::Spectral::SCALAR); 
-
-      // PythonGenerator(mat, qI, fieldId, compId, res, params, eigs, bcs)
-   }
-
-   void BoussinesqShellTransport::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      //Safety assert
-      assert(compId == FieldComponents::Spectral::SCALAR); 
-
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

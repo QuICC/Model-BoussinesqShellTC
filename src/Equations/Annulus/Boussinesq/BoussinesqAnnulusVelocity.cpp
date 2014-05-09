@@ -131,21 +131,5 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, false, false));
    }
 
-   void BoussinesqAnnulusVelocity::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-      //Safety assert
-      assert(std::find(this->mSpectralIds.begin(), this->mSpectralIds.end(), compId) != this->mSpectralIds.end()); 
-
-      // PythonGenerator(mat, QI, fieldId, compId, res, params, eigs, bcs)
-   }
-
-   void BoussinesqAnnulusVelocity::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      //Safety assert
-      assert(std::find(this->mSpectralIds.begin(), this->mSpectralIds.end(), compId) != this->mSpectralIds.end()); 
-
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

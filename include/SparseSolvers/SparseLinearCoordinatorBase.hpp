@@ -36,9 +36,9 @@ namespace Solver {
 
    namespace internal {
 
-      void addRow(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& blockRow);
+      void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
-      void addRow(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& blockRow);
+      void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
    }
 
    /**
@@ -323,32 +323,32 @@ namespace Solver {
 
    namespace internal {
 
-      inline void addRow(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& blockRow)
+      inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
       {
-         assert(blockRow.real().size() > 0);
-         assert(blockRow.imag().size() == 0 || blockRow.imag().nonZeros() == 0);
+         assert(decMat.real().size() > 0);
+         assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
 
          if(c != 1.0)
          {
-            mat += c*blockRow.real();
+            mat += c*decMat.real();
          } else
          {
-            mat += blockRow.real();
+            mat += decMat.real();
          }
       }
 
-      inline void addRow(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& blockRow)
+      inline void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat)
       {
-         assert(blockRow.real().size() > 0);
-         assert(blockRow.imag().size() > 0);
-         assert(blockRow.real().size() == blockRow.imag().size());
+         assert(decMat.real().size() > 0);
+         assert(decMat.imag().size() > 0);
+         assert(decMat.real().size() == decMat.imag().size());
 
          if(c != 1.0)
          {
-            mat += c*blockRow.real().cast<MHDComplex>() + c*Math::cI*blockRow.imag();
+            mat += c*decMat.real().cast<MHDComplex>() + c*Math::cI*decMat.imag();
          } else
          {
-            mat += blockRow.real().cast<MHDComplex>() + Math::cI*blockRow.imag();
+            mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
          }
       }
    }
