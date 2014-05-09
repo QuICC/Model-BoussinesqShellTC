@@ -21,6 +21,7 @@
 //
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
+#include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -152,7 +153,16 @@ namespace Equations {
       // Get equation parameters
       
       // Get boundary conditions
+      
 
+      // Initialise Python interpreter
+      PythonWrapper::init();
+
+      // Load model module
+      PythonWrapper::import(this->pyName());
+
+      // Finalise Python interpreter
+      PythonWrapper::finalize();
    }
 }
 }

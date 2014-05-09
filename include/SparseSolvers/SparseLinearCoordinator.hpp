@@ -86,8 +86,8 @@ namespace Solver {
       // Resize LHS matrix
       spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
-      // Compute matrix through python script
-      //PythonGenerator::createMatrix(spSolver->rLHSMatrix(matIdx), spEq, comp, idx);
+      // Get model operator
+      //spEq->buildModelMatrix(spSolver->rLHSMatrix(matIdx), Equations::IEquation::IMPLICIT_LINEAR, comp, idx, true);
       
       // Solver is initialized
       spSolver->setInitialized();

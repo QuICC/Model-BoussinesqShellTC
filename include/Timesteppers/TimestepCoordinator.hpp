@@ -193,18 +193,28 @@ namespace Timestep {
       // Resize RHS matrix if necessary
       spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
-      // Compute linear operator through python generator
-      //DecoupledZSparse linOp;
-      //PythonGenerator::createMatrix(linOp, spEq, comp, idx);
-      //DecoupledZSparse timeOp;
-      //PythonGenerator::createMatrix(timeOp, spEq, comp, idx, true);
+      // Compute model's linear operator
+      DecoupledZSparse linOp;
+      //spEq->buildModelMatrix(linOp, Equations::IEquation::IMPLICIT_LINEAR, comp, idx, false);
+
+      // Compute model's time operator
+      DecoupledZSparse timeOp;
+      //spEq->buildModelMatrix(timeOp, Equations::IEquation::TIME, comp, idx, true);
 
       // Set LHS matrix
-      //spSolver->rLHSMatrix(matIdx) = lhsLCoeff*linOp - lhsTCoeff*timeOp;
+      //spSolver->rLHSMatrix(matIdx).real() = lhsLCoeff*linOp.real() - lhsTCoeff*timeOp.real();
+      if(linOp.imag().cols() != 0)
+      {   
+         //spSolver->rLHSMatrix(matIdx).imag() = lhsLCoeff*linOp.imag() - lhsTCoeff*timeOp.imag();
+      }
 
       // Set RHS matrix
-      //PythonGenerator::createMatrix(timeOp, spEq, comp, idx,false);
-      //spSolver->rRHSMatrix(matIdx) = rhsLCoeff*linOp - rhsTCoeff*timeOp;
+      //spEq->buildModelMatrix(timeOp, Equations::IEquation::TIME, comp, idx, false);
+      //spSolver->rRHSMatrix(matIdx).real() = rhsLCoeff*linOp.real() - rhsTCoeff*timeOp.real();
+      if(linOp.imag().cols() != 0)
+      {   
+         //spSolver->rRHSMatrix(matIdx).imag() = rhsLCoeff*linOp.imag() - rhsTCoeff*timeOp.imag();
+      }
 
       // Set time matrix for timestep updates
       if(matIdx == idx)
@@ -213,7 +223,7 @@ namespace Timestep {
          spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
          // Set time matrix
-         //PythonGenerator::createMatrix(spSolver->rTMatrix(idx), spEq, comp, idx);
+         //spEq->buildModelMatrix(spSolver->rTMatrix(idx), Equations::IEquation::TIME, comp, idx, false);
       }
       
       // Solver is initialized

@@ -91,5 +91,11 @@ set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)
+# Find python headers and library
+find_package(PythonLibs REQUIRED)
+
+message(STATUS ${PYTHON_INCLUDE_DIRS})
+
+set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARIES} PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIRS} PARENT_SCOPE)
+

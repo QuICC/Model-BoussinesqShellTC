@@ -39,7 +39,7 @@ namespace Equations {
           * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         TestTFFDiffusion2D(const std::string& pyNameSharedEquationParameters spEqParams);
+         TestTFFDiffusion2D(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor

@@ -80,5 +80,6 @@ namespace NoEigen {
 
 }
 }
+}
 
 #endif // EQUATIONNOEIGENTOOLS_HPP

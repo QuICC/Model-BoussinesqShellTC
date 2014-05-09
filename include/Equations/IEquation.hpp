@@ -59,8 +59,10 @@ namespace Equations {
           * @brief Enum for the different types of model operators
           */
          enum ModelOperatorId {
-            TIMEOPERATOR = 0,
-            LINEAROPERATOR,
+            QI = 0,
+            TIME,
+            IMPLICIT_LINEAR,
+            EXPLICIT_LINEAR,
          };
 
          /**

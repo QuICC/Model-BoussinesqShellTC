@@ -53,6 +53,7 @@ set(MHDAllSrcDirs
    LoadSplitter
    PolynomialTransforms
    Profiler
+   Python
    Quadratures
    Resolutions
    Simulation
