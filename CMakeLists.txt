@@ -49,6 +49,9 @@ if(platformTest)
    # Base setup
    include(cmake.d/setup/Framework.cmake)
 
+   # Python setup
+   include(cmake.d/setup/Python.cmake)
+
    # Debug setup
    include(cmake.d/setup/Debug.cmake)
 

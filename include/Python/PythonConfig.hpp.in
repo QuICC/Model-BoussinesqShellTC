@@ -1,0 +1,21 @@
+/**
+ * @file PythonConfig.hpp
+ * @brief Small configuration for to handle Python interpreter settings
+ * @author Philippe Marti \<philippe.marti@colorado.edu\>
+ */
+
+#ifndef PYTHONCONFIG_HPP
+#define PYTHONCONFIG_HPP
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+
+#define GEOMHDISCC_PYTHON_DIR "@GEOMHDISCC_PYTHON_DIR@"
+
+#endif // PYTHONCONFIG_HPP

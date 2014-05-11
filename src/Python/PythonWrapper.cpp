@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Python/PythonConfig.hpp"
 #include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
@@ -34,7 +35,7 @@ namespace GeoMHDiSCC {
 
       // Setup the search path
       PyObject* sysPath = PySys_GetObject((char*)"path");
-      PyList_Append(sysPath, PyUnicode_FromString("."));
+      PyList_Append(sysPath, PyUnicode_FromString(GEOMHDISCC_PYTHON_DIR));
    }
 
    void PythonWrapper::import(const std::string& module)

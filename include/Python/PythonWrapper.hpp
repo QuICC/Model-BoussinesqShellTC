@@ -17,7 +17,6 @@
 
 // Project includes
 //
-#include "Framework/FrameworkBase.hpp"
 
 namespace GeoMHDiSCC {
 
