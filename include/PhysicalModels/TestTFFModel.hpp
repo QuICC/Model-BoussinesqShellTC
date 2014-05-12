@@ -99,13 +99,6 @@ namespace GeoMHDiSCC {
          static void addHdf5OutputFiles(SharedSimulation spSim);
 
          /**
-          * @brief Set the boundary conditions
-          *
-          * @param bcIds Boundary condition IDs
-          */
-         static SharedSimulationBoundary createBoundary(const std::map<std::string, int>& bcIds);
-
-         /**
           * @brief Set the initial state
           *
           * @param spSim   Shared simulation object

@@ -108,23 +108,6 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spState);
    }
 
-   SharedSimulationBoundary BoussinesqBetaSphGModel::createBoundary(const std::map<std::string,int>& bcIds)
-   {
-      // Create shared simulation boundary
-      SharedSimulationBoundary  spBcs(new SimulationBoundary());
-
-      // Storage for the dimension ID
-      Dimensions::Simulation::Id dimId;
-
-      // Create equation and field keys
-      SpectralFieldId eqId;
-      SpectralFieldId fieldId;
-
-      throw Exception("Not implemented yet!");
-
-      return spBcs;
-   }
-
    void BoussinesqBetaSphGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

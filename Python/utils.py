@@ -27,7 +27,7 @@ def build_diag_matrix(fields, func, func_args):
 
    tmp = [0]*len(fields)
    for r,field_row in enumerate(fields):
-      args = func_args + (field_row)
+      args = func_args + (field_row,)
       tmp[r] = func(*args)
    
    return spsp.block_diag(tmp)

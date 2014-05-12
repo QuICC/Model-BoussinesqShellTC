@@ -43,37 +43,7 @@ namespace Equations {
 
    void BoussinesqBetaCylGVertical::setCoupling()
    {
-      // Initialise coupling information
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-
-      // General setup: prognostic equation, complex solver, start from m = 0
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 0);
-
-      // set nonlinear flags: has nonlinear term, has quasi-inverse
-      infoIt.first->second.setNonlinear(true, true);
-
-      // Set source flags: NO source term
-      infoIt.first->second.setSource(false);
-
-      // Equation is coupled to vertical velocity equation (self)
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
-
-      // Equation is coupled to streamfunction equation
-      infoIt.first->second.addImplicitField(PhysicalNames::STREAMFUNCTION,FieldComponents::Spectral::SCALAR);
-
-      infoIt.first->second.addImplicitField(PhysicalNames::TEMPERATURE,FieldComponents::Spectral::SCALAR);
-
-      // Set mininal matrix coupling
-      int nMat = 0;
-      ArrayI blockNs;
-      ArrayI rhsCols;
-      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
    void BoussinesqBetaCylGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

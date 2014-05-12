@@ -85,6 +85,64 @@ namespace IoTools {
          throw Exception("Unknown string to ID conversion requested");
       }
    }
+
+   PhysicalNames::Id HumanToId::toPhys(const std::string& id)
+   {
+      if(id == IdToHuman::toTag(PhysicalNames::DENSITY))
+      {
+         return PhysicalNames::DENSITY;
+      } else if(id == IdToHuman::toTag(PhysicalNames::CODENSITY))
+      {
+         return PhysicalNames::CODENSITY;
+      } else if(id == IdToHuman::toTag(PhysicalNames::PRESSURE))
+      {
+         return PhysicalNames::PRESSURE;
+      } else if(id == IdToHuman::toTag(PhysicalNames::TEMPERATURE))
+      {
+         return PhysicalNames::TEMPERATURE;
+      } else if(id == IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))
+      {
+         return PhysicalNames::STREAMFUNCTION;
+      } else if(id == IdToHuman::toTag(PhysicalNames::VELOCITYZ))
+      {
+         return PhysicalNames::VELOCITYZ;
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
+      {
+         return PhysicalNames::VORTICITYZ;
+      } else if(id == IdToHuman::toTag(PhysicalNames::MAGNETIC))
+      {
+         return PhysicalNames::MAGNETIC;
+      } else if(id == IdToHuman::toTag(PhysicalNames::VELOCITY))
+      {
+         return PhysicalNames::VELOCITY;
+      } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITY))
+      {
+         return PhysicalNames::VORTICITY;
+      } else
+      {
+         throw Exception("Unknown string to ID conversion requested");
+      }
+   }
+
+   FieldComponents::Spectral::Id HumanToId::toComp(const std::string& id)
+   {
+      if(id == IdToHuman::toTag(FieldComponents::Spectral::ONE))
+      {
+         return FieldComponents::Spectral::ONE;
+      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::TWO))
+      {
+         return FieldComponents::Spectral::TWO;
+      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::THREE))
+      {
+         return FieldComponents::Spectral::THREE;
+      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::SCALAR))
+      {
+         return FieldComponents::Spectral::SCALAR;
+      } else
+      {
+         throw Exception("Unknown string to ID conversion requested");
+      }
+   }
 }
 
 }

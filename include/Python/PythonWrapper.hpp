@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/FieldIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -61,6 +62,21 @@ namespace GeoMHDiSCC {
           * @brief Make a dictironary
           */
          static PyObject* makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val);
+
+         /**
+          * @brief Make a dictironary
+          */
+         static PyObject* makeDict(const std::map<std::string,int>& map);
+
+         /**
+          * @brief Get data from list
+          */
+         static void getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList);
+
+         /**
+          * @brief Fill sparse matrix with data from Python call
+          */
+         static void fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat);
 
          /**
           * @brief Fill sparse matrix with data from Python call

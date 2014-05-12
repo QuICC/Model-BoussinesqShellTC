@@ -136,67 +136,6 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spState);
    }
 
-   SharedSimulationBoundary BoussinesqPerBetaCylGModel::createBoundary(const std::map<std::string,int>& bcIds)
-   {
-      // Create shared simulation boundary
-      SharedSimulationBoundary  spBcs(new SimulationBoundary());
-
-      // Storage for the dimension ID
-      Dimensions::Simulation::Id dimId;
-
-      // Create equation and field keys
-      SpectralFieldId eqId;
-      SpectralFieldId fieldId;
-
-      // Temperature equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::TEMPERATURE, FieldComponents::Spectral::SCALAR);
-      // No boundary condition in periodic radius case
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second != -1)
-      {
-         throw Exception("Unknown temperature boundary conditions in configuration file");
-      }
-
-      // Streamfunction equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second != -1)
-      {
-         throw Exception("Unknown streamfunction boundary conditions in configuration file");
-      }
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::LEFT); 
-      //    ... coupled boundary conditions
-      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      dimId = Dimensions::Simulation::SIM1D;
-      spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT); 
-
-      // Axial velocity equation
-      //    ... boundary conditions
-      eqId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      // No-slip boundary conditions
-      if(bcIds.find(IoTools::IdToHuman::toTag(eqId.first))->second != -1)
-      {
-         throw Exception("Unknown velocityz boundary conditions in configuration file");
-      }
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(PhysicalNames::VELOCITYZ, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT); 
-      //    ... coupled boundary conditions
-      fieldId = std::make_pair(PhysicalNames::STREAMFUNCTION, FieldComponents::Spectral::SCALAR);
-      dimId = Dimensions::Simulation::SIM1D;
-      spBcs->initBcStorage(eqId, fieldId, dimId); 
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::BETA_SLOPE, Boundary::RIGHT); 
-
-      return spBcs;
-   }
-
    void BoussinesqPerBetaCylGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

@@ -389,7 +389,10 @@ namespace GeoMHDiSCC {
 
    template <typename TModel> SharedSimulationBoundary SimulationBase::createBoundary()
    {
-      return TModel::createBoundary(this->mSimIoCtrl.configBoundary());
+      // Create shared simulation boundary
+      SharedSimulationBoundary  spBcs(new SimulationBoundary(this->mSimIoCtrl.configBoundary()));
+
+      return spBcs;
    }
 
    template <int DIMENSION> void SimulationBase::setConfiguration(const std::string& type, const std::vector<bool>& isPeriodicBox, const std::vector<std::string>& bcNames, const std::vector<std::string>& ndNames)

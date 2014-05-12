@@ -21,6 +21,7 @@
 //
 #include "Python/PythonConfig.hpp"
 #include "Exceptions/Exception.hpp"
+#include "IoTools/HumanToId.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -135,6 +136,80 @@ namespace GeoMHDiSCC {
       }
 
       return pDict;
+   }
+
+   PyObject* PythonWrapper::makeDict(const std::map<std::string, int>& map)
+   {
+      PyObject *pDict, *pKey, *pValue;
+
+      pDict = PyDict_New();
+      std::map<std::string,int>::const_iterator mapIt;
+      for(mapIt = map.begin(); mapIt != map.end(); ++mapIt)
+      {
+         pKey = PyUnicode_FromString(mapIt->first.c_str());
+         pValue = PyLong_FromLong(mapIt->second);
+         PyDict_SetItem(pDict, pKey, pValue);
+      }
+
+      return pDict;
+   }
+
+   void PythonWrapper::getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList)
+   {
+      PyObject *pValue, *pTmp, *pTmp2;
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pValue = PyList_GetItem(pList, i);
+
+         pTmp = PyTuple_GetItem(pValue,0);
+         pTmp2 = PyUnicode_AsASCIIString(pTmp);
+         PhysicalNames::Id phys = IoTools::HumanToId::toPhys(std::string(PyBytes_AsString(pTmp2)));
+
+         pTmp = PyTuple_GetItem(pValue,1);
+         pTmp2 = PyUnicode_AsASCIIString(pTmp);
+         FieldComponents::Spectral::Id comp = IoTools::HumanToId::toComp(std::string(PyBytes_AsString(pTmp2)));
+
+         rList.push_back(std::make_pair(phys, comp));
+      }
+   }
+
+   void PythonWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat) 
+   {
+      PyObject *pArgs, *pValue, *pTmp;
+
+      // Get matrix size
+      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
+      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
+      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+
+      // Convert Python matrix into triplets
+      pArgs = PyTuple_New(1);
+      PyTuple_SetItem(pArgs, 0, pPyMat);
+      PythonWrapper::setFunction((char *)"triplets");
+      pValue = PythonWrapper::callFunction(pArgs);
+      Py_DECREF(pArgs);
+
+      long int len = PyList_Size(pValue);
+      std::vector<Triplet> triplets;
+      triplets.reserve(len);
+      long int row;
+      long int col;
+      MHDFloat val;
+      for(int i = 0; i < len; i++)
+      {
+         pTmp = PyList_GetItem(pValue, i);
+         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
+         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
+         val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
+         triplets.push_back(Triplet(row,col,val));
+      }
+      Py_DECREF(pValue);
+
+      // Build matrix
+      rMatrix.resize(rows,cols);
+      rMatrix.setFromTriplets(triplets.begin(), triplets.end());
    }
 
    void PythonWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat) 

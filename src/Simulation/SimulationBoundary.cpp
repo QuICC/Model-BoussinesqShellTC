@@ -17,65 +17,43 @@
 
 // Project includes
 //
+#include "IoTools/HumanToId.hpp"
+#include "IoTools/IdToHuman.hpp"
 
 namespace GeoMHDiSCC {
 
-   SimulationBoundary::SimulationBoundary()
+   SimulationBoundary::SimulationBoundary(const std::map<std::string,int>& bcIds)
    {
+      this->convert(bcIds);
    }
 
    SimulationBoundary::~SimulationBoundary()
    {
    }
 
-   bool SimulationBoundary::hasEquation(const SpectralFieldId eqId) const
+   void SimulationBoundary::convert(const std::map<std::string,int>& bcIds)
    {
-      return this->mBcs.count(eqId);
+      std::map<std::string,int>::const_iterator mapIt;
+
+      for(mapIt = bcIds.begin(); mapIt != bcIds.end(); ++mapIt)
+      {
+         this->mBcs.insert(std::make_pair(IoTools::HumanToId::toPhys(mapIt->first),mapIt->second));
+      }
+
    }
 
-   bool SimulationBoundary::hasField(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
+   std::map<std::string,int>  SimulationBoundary::getTagMap() const
    {
-      // Safey assert
-      assert(this->mBcs.count(eqId) > 0);
+      std::map<std::string,int>  tagMap;
 
-      return this->mBcs.find(eqId)->second.count(fieldId);
-   }
+      std::map<PhysicalNames::Id,int>::const_iterator mapIt;
 
-   const SimulationBoundary::DimBCVectorMap& SimulationBoundary::bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const
-   {
-      // Safey asserts
-      assert(this->mBcs.count(eqId) > 0);
-      assert(this->mBcs.find(eqId)->second.count(fieldId) > 0);
+      for(mapIt = this->mBcs.begin(); mapIt != this->mBcs.end(); ++mapIt)
+      {
+         tagMap.insert(std::make_pair(IoTools::IdToHuman::toTag(mapIt->first),mapIt->second));
+      }
 
-      return this->mBcs.find(eqId)->second.find(fieldId)->second;
-   }
-
-   void SimulationBoundary::initStorage(const SpectralFieldId id)
-   {
-      // Initialise boundary condition storage
-      this->mBcs.insert(std::make_pair(id, std::map<SpectralFieldId, SimulationBoundary::DimBCVectorMap>()));
-   }
-
-   void SimulationBoundary::initBcStorage(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId)
-   {
-      // Safey assert
-      assert(this->mBcs.count(eqId) > 0);
-
-      // Initialise boundary condition field storage
-      this->mBcs.find(eqId)->second.insert(std::make_pair(fieldId, SimulationBoundary::DimBCVectorMap()));
-
-      // Initialise boundary condition storage
-      this->mBcs.find(eqId)->second.find(fieldId)->second.insert(std::make_pair(dimId, Boundary::BCVector()));
-   }
-
-   void SimulationBoundary::addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Boundary::BCType bcId, Boundary::BCPosition pos)
-   {
-      // Safey assert
-      assert(this->mBcs.count(eqId) > 0);
-      assert(this->mBcs.find(eqId)->second.count(fieldId) > 0);
-      assert(this->mBcs.find(eqId)->second.find(fieldId)->second.count(dimId) > 0);
-
-      this->mBcs.find(eqId)->second.find(fieldId)->second.find(dimId)->second.push_back(Boundary::BoundaryCondition(bcId,pos));
+      return tagMap;
    }
 
 }

@@ -154,15 +154,5 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
-   void ShellExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-      // PythonGenerator(mat, QI, fieldId, compId, res, params, eigs, bcs)
-   }
-
-   void ShellExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

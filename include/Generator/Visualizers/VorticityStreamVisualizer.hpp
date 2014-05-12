@@ -62,11 +62,6 @@ namespace Equations {
           */
          virtual void setCoupling();
 
-         /**
-          * @brief Set the explicit linear matrix operator
-          */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const;
-
       private:
          /**
           * @brief Storage for output field flag

@@ -112,6 +112,21 @@ namespace Equations {
          
       protected:
          /**
+          * @brief Set the quasi inverse matrix operator
+          */
+         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;
+
+         /**
+          * @brief Set the explicit linear matrix operator
+          */
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const;
+
+         /**
+          * @brief Build coupling information from Python scripts
+          */
+         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource);
+
+         /**
           * @brief Set the unknown variable
           */
          Datatypes::ScalarVariableType& rUnknown();

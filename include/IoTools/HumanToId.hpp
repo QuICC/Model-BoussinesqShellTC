@@ -42,6 +42,16 @@ namespace IoTools {
        */
       static ModelOperator::Id toModOp(const std::string& id);
 
+      /**
+       * @brief Convert string to physical name ID
+       */
+      static PhysicalNames::Id toPhys(const std::string& id);
+
+      /**
+       * @brief Convert string to field component ID
+       */
+      static FieldComponents::Spectral::Id toComp(const std::string& id);
+
       private:
          /**
           * @brief Constructor

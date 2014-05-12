@@ -146,12 +146,12 @@ namespace Equations {
          /**
           * @brief Set the quasi inverse matrix operator
           */
-         void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat) const;
+         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const; // = 0;
 
          /**
           * @brief Set the explicit linear matrix operator
           */
-         void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const;
+         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const; // = 0;
 
    };
 

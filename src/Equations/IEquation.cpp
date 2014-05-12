@@ -58,7 +58,7 @@ namespace Equations {
          {
             qIt->second.push_back(SparseMatrix());
 
-            this->setQuasiInverse(compId, qIt->second.back());
+            this->setQuasiInverse(compId, qIt->second.back(), i);
          }
       }
 
@@ -77,11 +77,9 @@ namespace Equations {
          // Create matrices
          for(int i = 0; i < nSystems; ++i)
          {
-            std::vector<MHDFloat> eigs = EigenSelector::getEigs(*this, i);
-
             // Get linear block
             tmpMat.push_back(DecoupledZSparse());
-            this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, eigs);
+            this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, i);
 
             // Explicit operator requires an additional minus sign
             tmpMat.at(i).real() = -tmpMat.at(i).real();
@@ -119,28 +117,16 @@ namespace Equations {
       }
    }
 
-   void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat) const
+   void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Finalise Python interpreter
-      PythonWrapper::finalize();
+      // This implementation should never get called!
+      throw Exception("Called dummy implementation of setQuasiInverse!");
    }
 
-   void IEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
+   void IEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Finalise Python interpreter
-      PythonWrapper::finalize();
+      // This implementation should never get called!
+      throw Exception("Called dummy implementation of setExplicitLinearBlock!");
    }
 
    void IEquation::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

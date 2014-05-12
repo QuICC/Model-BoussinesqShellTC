@@ -93,13 +93,5 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
-   void VorticityStreamVisualizer::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      // Safety assert
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

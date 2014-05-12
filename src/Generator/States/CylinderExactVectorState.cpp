@@ -128,15 +128,5 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(false, true, false, false));
    }
 
-   void CylinderExactVectorState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-      // PythonGenerator(mat, QI, fieldId, compId, res, params, eigs, bcs)
-   }
-
-   void CylinderExactVectorState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-      // PythonGenerator(mat, EXPLICIT, fieldId, compId, res, params, eigs, bcs)
-   }
-
 }
 }

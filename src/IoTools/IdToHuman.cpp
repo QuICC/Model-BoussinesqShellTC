@@ -31,6 +31,8 @@ namespace IoTools {
    {
       switch(id)
       {
+         case PhysicalNames::DENSITY:
+            return "Density";
          case PhysicalNames::CODENSITY:
             return "Codensity";
          case PhysicalNames::PRESSURE:
@@ -60,6 +62,8 @@ namespace IoTools {
    {
       switch(id)
       {
+         case PhysicalNames::DENSITY:
+            return "density";
          case PhysicalNames::CODENSITY:
             return "codensity";
          case PhysicalNames::PRESSURE:

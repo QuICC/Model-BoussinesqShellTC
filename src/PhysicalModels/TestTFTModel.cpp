@@ -205,63 +205,6 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spState);
    }
 
-   SharedSimulationBoundary TestTFTModel::createBoundary(const std::map<std::string,int>& bcIds)
-   {
-      // Create shared simulation boundary
-      SharedSimulationBoundary  spBcs(new SimulationBoundary());
-
-      // Storage for the dimension ID
-      Dimensions::Simulation::Id dimId;
-
-      // Create equation and field keys
-      SpectralFieldId eqId;
-      SpectralFieldId fieldId;
-
-      // Second scalar equation Dirichlet boundary conditions
-      PhysicalNames::Id fieldName = PhysicalNames::STREAMFUNCTION;
-      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-
-      // First scalar equation Dirichlet boundary conditions
-      fieldName = PhysicalNames::TEMPERATURE;
-      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-
-      // Second scalar equation Dirichlet boundary conditions
-      fieldName = PhysicalNames::VELOCITYZ;
-      eqId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initStorage(eqId);
-      dimId = Dimensions::Simulation::SIM1D;
-      fieldId = std::make_pair(fieldName, FieldComponents::Spectral::SCALAR);
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-      dimId = Dimensions::Simulation::SIM3D;
-      spBcs->initBcStorage(eqId, fieldId, dimId);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::LEFT);
-      spBcs->addBc(eqId, fieldId, dimId, Boundary::VALUE, Boundary::RIGHT);
-
-      return spBcs;
-   }
-
    void TestTFTModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator

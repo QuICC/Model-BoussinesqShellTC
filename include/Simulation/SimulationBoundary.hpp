@@ -20,9 +20,7 @@
 // Project includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
-#include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
-#include "BoundaryCondition/BoundaryCondition.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,13 +30,10 @@ namespace GeoMHDiSCC {
    class SimulationBoundary
    {
       public:
-         /// Typedef for a map between simulation dimension and vector of boundary conditions
-         typedef std::map<Dimensions::Simulation::Id, Boundary::BCVector> DimBCVectorMap;
-
          /**
           * @brief Constructor
           */
-         SimulationBoundary();
+         SimulationBoundary(const std::map<std::string,int>& bcIds);
 
          /**
           * @brief Destructor
@@ -46,60 +41,24 @@ namespace GeoMHDiSCC {
          ~SimulationBoundary();
 
          /**
-          * @brief Check if boundary condition for equation exist
-          *
-          * @param eqId    Physical ID for equation
+          * @brief Get tag map
           */
-         bool hasEquation(const SpectralFieldId eqId) const;
-
-         /**
-          * @brief Check if boundary condition for field in given equation exist
-          *
-          * @param eqId       Physical ID for equation
-          * @param fieldId    Physical ID for field
-          */
-         bool hasField(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
-
-         /**
-          * @brief Get boundary conditions for specific equation
-          *
-          * @param eqId       Physical ID for equation
-          * @param fieldId    Physical ID for field
-          */
-         const SimulationBoundary::DimBCVectorMap& bcs(const SpectralFieldId eqId, const SpectralFieldId fieldId) const;
-
-         /**
-          * @brief Initialise storage for a new equation
-          *
-          * @param id ID of the equation
-          */
-         void initStorage(const SpectralFieldId id);
-
-         /**
-          * @brief Initialise storage for a new boundary condition component
-          *
-          * @param eqId    ID of the equation
-          * @param fieldId ID of the variable
-          * @param dimId   ID of the dimension
-          */
-         void initBcStorage(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId);
-
-         /**
-          * @brief Add boundary condition
-          *
-          * @param eqId    ID of the equation
-          * @param fieldId ID of the variable
-          * @param dimId   ID of the dimension
-          */
-         void addBc(const SpectralFieldId eqId, const SpectralFieldId fieldId, const Dimensions::Simulation::Id dimId, Boundary::BCType bcId, Boundary::BCPosition pos);
+         std::map<std::string,int> getTagMap() const;
          
       protected:
 
       private:
          /**
-          * @brief Storage for the coupled boundary conditions
+          * @brief Convert tag map to ID map
+          *
+          * @param bcIds   Tag map
           */
-         std::map<SpectralFieldId, std::map<SpectralFieldId, SimulationBoundary::DimBCVectorMap> > mBcs;
+         void convert(const std::map<std::string,int>& bcIds);
+
+         /**
+          * @brief Storage for the boundary conditions
+          */
+         std::map<PhysicalNames::Id, int> mBcs;
    };
 
    /// Typedef for a shared pointer to a SimulationBoundary object

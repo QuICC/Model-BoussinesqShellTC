@@ -163,13 +163,5 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }
 
-   void ExactScalarState::setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix& mat) const
-   {
-   }
-
-   void ExactScalarState::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const std::vector<MHDFloat>& eigs) const
-   {
-   }
-
 }
 }

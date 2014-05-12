@@ -32,6 +32,8 @@ namespace GeoMHDiSCC {
        */
       enum Id {
          /// Codensity field
+         DENSITY,
+         /// Codensity field
          CODENSITY,
          /// Pressure field
          PRESSURE,
