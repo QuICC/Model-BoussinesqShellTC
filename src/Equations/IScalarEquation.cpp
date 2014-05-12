@@ -9,6 +9,8 @@
 
 // System includes
 //
+#include <Python.h>
+#include <iostream>
 
 // External includes
 //
@@ -21,6 +23,8 @@
 //
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
+#include "IoTools/IdToHuman.hpp"
+#include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -105,6 +109,57 @@ namespace Equations {
       assert(compId == FieldComponents::Spectral::SCALAR);
 
       return this->mBcCoord;
+   }
+
+   void  IScalarEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
+   {
+      std::cerr << "CALLING PYTHON FOR SCALAR" << std::endl;
+
+      // Initialise Python interpreter
+      PythonWrapper::init();
+
+      // Load model module
+      PythonWrapper::import(this->pyName());
+
+      // Prepare Python call arguments
+      PyObject *pArgs, *pTmp, *pValue;
+      pArgs = PyTuple_New(4);
+
+      // Get resolution
+      pValue = PythonWrapper::makeTuple(this->unknown().dom(0).spRes()->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      PyTuple_SetItem(pArgs, 0, pValue);
+
+      // Get the eigen direction values
+      pValue = PythonWrapper::makeTuple(EigenSelector::getEigs(*this, matIdx));
+      PyTuple_SetItem(pArgs, 1, pValue);
+
+      // Get equation parameters
+      std::vector<std::string> eq_names = this->eqParams().names();
+      std::vector<NonDimensional::Id> eq_ids = this->eqParams().ids();
+      std::vector<MHDFloat> eq_vals;
+      for(unsigned int i = 0; i < eq_names.size(); i++)
+      {
+         eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
+      }
+      pValue = PythonWrapper::makeDict(eq_names, eq_vals);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // Get boundary conditions
+      pTmp = PyTuple_New(1);
+      pValue = PyLong_FromLong(1);
+      PyTuple_SetItem(pTmp, 0, pValue);
+      PyTuple_SetItem(pArgs, 3, pTmp);
+
+      // Call model operator Python routine
+      PythonWrapper::setFunction(IoTools::IdToHuman::toString(opId));
+      pValue = PythonWrapper::callFunction(pArgs);
+      Py_DECREF(pArgs);
+
+      // Convert Python matrix into triplets
+      PythonWrapper::fillMatrix(rModelMatrix, pValue);
+
+      // Finalise Python interpreter
+      PythonWrapper::cleanup();
    }
 }
 }

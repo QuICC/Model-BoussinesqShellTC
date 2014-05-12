@@ -30,7 +30,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RayleighBenardModel::PYNAME = "rayleigh_benard_model.py";
+   const std::string RayleighBenardModel::PYNAME = "rayleigh_benard_model";
 
    std::vector<PhysicalNames::Id> RayleighBenardModel::fieldIds()
    {

@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqFPlaneModel::PYNAME = "boussinesq_fplane_model.py";
+   const std::string BoussinesqFPlaneModel::PYNAME = "boussinesq_fplane_model";
 
    std::vector<PhysicalNames::Id> BoussinesqFPlaneModel::fieldIds()
    {

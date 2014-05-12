@@ -30,7 +30,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RotatingRBModel::PYNAME = "rotation_rb_model.py";
+   const std::string RotatingRBModel::PYNAME = "rotation_rb_model";
 
    std::vector<PhysicalNames::Id> RotatingRBModel::fieldIds()
    {

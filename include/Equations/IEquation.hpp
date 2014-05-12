@@ -82,7 +82,7 @@ namespace Equations {
          /**
           * @brief Generic model operator dispatcher to python scripts
           */
-         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const; // = 0;
 
          /**
           * @brief Compute the nonlinear interaction term

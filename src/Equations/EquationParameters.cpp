@@ -36,7 +36,7 @@ namespace Equations {
       return this->mND.at(name);
    }
 
-   std::vector<NonDimensional::Id> EquationParameters::ids()
+   std::vector<NonDimensional::Id> EquationParameters::ids() const
    {
       // Storage for the IDs
       std::vector<NonDimensional::Id> ids;
@@ -50,7 +50,7 @@ namespace Equations {
       return ids;
    }
 
-   std::vector<std::string> EquationParameters::names()
+   std::vector<std::string> EquationParameters::names() const
    {
       // Storage for the names
       std::vector<std::string> names;

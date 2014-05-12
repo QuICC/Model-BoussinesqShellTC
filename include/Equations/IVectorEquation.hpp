@@ -123,6 +123,11 @@ namespace Equations {
           */
          virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId);
 
+         /**
+          * @brief Generic model operator dispatcher to python scripts
+          */
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
+
       protected:
          /**
           * @brief Set the unknown variable

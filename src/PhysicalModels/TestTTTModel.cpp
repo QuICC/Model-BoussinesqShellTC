@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string TestTTTModel::PYNAME = "test_ttt_model.py";
+   const std::string TestTTTModel::PYNAME = "test_ttt_model";
 
    std::vector<PhysicalNames::Id> TestTTTModel::fieldIds()
    {

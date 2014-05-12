@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqCylinderModel::PYNAME = "boussinesq_cylinder_model.py";
+   const std::string BoussinesqCylinderModel::PYNAME = "boussinesq_cylinder_model";
 
    std::vector<PhysicalNames::Id> BoussinesqCylinderModel::fieldIds()
    {

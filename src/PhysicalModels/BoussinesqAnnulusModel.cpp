@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqAnnulusModel::PYNAME = "boussinesq_annulus_model.py";
+   const std::string BoussinesqAnnulusModel::PYNAME = "boussinesq_annulus_model";
 
    std::vector<PhysicalNames::Id> BoussinesqAnnulusModel::fieldIds()
    {

@@ -159,24 +159,8 @@ namespace Equations {
 
    void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
    {
-      // Get resolution
-      
-      // Get the eigen direction values
-      std::vector<MHDFloat> eigs = EigenSelector::getEigs(*this, matIdx);
-
-      // Get equation parameters
-      
-      // Get boundary conditions
-      
-
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Finalise Python interpreter
-      PythonWrapper::finalize();
+      // This implementation should never get called!
+      throw Exception("Called dummy implementation of buildModelMatrix!");
    }
 }
 }

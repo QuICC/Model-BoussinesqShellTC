@@ -30,7 +30,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string AnelasticFPlaneModel::PYNAME = "anelastic_fplane_model.py";
+   const std::string AnelasticFPlaneModel::PYNAME = "anelastic_fplane_model";
 
    std::vector<PhysicalNames::Id> AnelasticFPlaneModel::fieldIds()
    {

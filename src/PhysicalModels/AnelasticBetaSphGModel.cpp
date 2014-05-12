@@ -30,7 +30,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string AnelasticBetaSphGModel::PYNAME = "anelastic_beta_sphg_model.py";
+   const std::string AnelasticBetaSphGModel::PYNAME = "anelastic_beta_sphg_model";
 
    std::vector<PhysicalNames::Id> AnelasticBetaSphGModel::fieldIds()
    {

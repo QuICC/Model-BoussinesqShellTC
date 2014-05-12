@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -40,6 +41,36 @@ namespace GeoMHDiSCC {
           * @brief Set the python function object
           */
          static void setFunction(const std::string& func);
+
+         /**
+          * @brief Call the python function object with arguments
+          */
+         static PyObject* callFunction(PyObject* pArgs);
+
+         /**
+          * @brief Make a tuple from integer array
+          */
+         static PyObject* makeTuple(const ArrayI& val);
+
+         /**
+          * @brief Make a tuple from vector of double
+          */
+         static PyObject* makeTuple(const std::vector<MHDFloat>& val);
+
+         /**
+          * @brief Make a dictironary
+          */
+         static PyObject* makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val);
+
+         /**
+          * @brief Fill sparse matrix with data from Python call
+          */
+         static void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
+  
+         /**
+          * @brief Cleanup wrapper without finalize
+          */
+         static void cleanup();
   
          /**
           * @brief Finalise the Python interpreter

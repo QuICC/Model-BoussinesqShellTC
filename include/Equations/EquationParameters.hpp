@@ -46,12 +46,12 @@ namespace Equations {
          /**
           * @brief Get the IDs of the equation parameters
           */
-         std::vector<NonDimensional::Id>  ids();
+         std::vector<NonDimensional::Id>  ids() const;
 
          /**
           * @brief Get the names of the equation parameters
           */
-         std::vector<std::string>  names();
+         std::vector<std::string>  names() const;
 
          /**
           * @brief Initialise the values from given parameters

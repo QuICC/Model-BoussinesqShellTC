@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string TestFFFModel::PYNAME = "test_fff_model.py";
+   const std::string TestFFFModel::PYNAME = "test_fff_model";
 
    std::vector<PhysicalNames::Id> TestFFFModel::fieldIds()
    {

@@ -7,7 +7,7 @@ all_fields = [("velocity","toroidal"), ("velocity","toroidal"), ("temperature","
 implicit_fields = [("velocity","toroidal"), ("velocity","toroidal"), ("temperature","scalar")]
 explicit_fields = []
 
-def qi(res, eq_params, eigs, field, bcs):
+def qi(res, eq_params, eigs, field):
    """Create the quasi-inverse operator"""
 
    if field[0] == 'velocity' and field[1] == 'toroidal':
@@ -22,7 +22,7 @@ def qi(res, eq_params, eigs, field, bcs):
    return mat
 
 
-def time(res, eq_params, eigs, bcs):
+def time(res, eq_params, eigs):
    """Create the time derivative operator"""
    
    tor_time = spsp.identity(res[0])
@@ -32,7 +32,7 @@ def time(res, eq_params, eigs, bcs):
    return spsp.block_diag((tor_time,pol_time,temp_time))
 
 
-def implicit_linear(res, eq_params, eigs, bcs):
+def implicit_linear(res, eq_params, eigs):
    """Create the implicit linear operator"""
 
    tmp = [[0]*len(implicit_fields)]*len(implicit_fields)
@@ -43,13 +43,13 @@ def implicit_linear(res, eq_params, eigs, bcs):
    return spsp.bmat(tmp)
 
 
-def explicit_linear(res, eq_params, eigs, field_row, field_col, bcs):
+def explicit_linear(res, eq_params, eigs, field_row, field_col):
    """Create the explicit linear operator"""
 
    return -block(res, eq_params, eigs, field_row, field_col)
 
 
-def block(res, eq_params, eigs, field_row, field_col, bcs):
+def block(res, eq_params, eigs, field_row, field_col):
    """Create matrix block for field"""
 
    if field_row[0] == 'velocity' and field_row[1] == 'toroidal':

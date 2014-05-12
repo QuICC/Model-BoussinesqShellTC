@@ -33,7 +33,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqSphereModel::PYNAME = "boussinesq_sphere_model.py";
+   const std::string BoussinesqSphereModel::PYNAME = "boussinesq_sphere_model";
 
    std::vector<PhysicalNames::Id> BoussinesqSphereModel::fieldIds()
    {
