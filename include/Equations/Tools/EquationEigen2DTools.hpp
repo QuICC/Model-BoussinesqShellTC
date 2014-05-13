@@ -58,6 +58,13 @@ namespace Eigen2D {
     */
    void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
+   /**
+    * @brief Compute the number of matrix operators for field coupling
+    *
+    * @param spRes   Shared resolution
+    */
+   int fieldCouplingNMat(const SharedResolution spRes);
+
    void computeKProduct(SparseMatrix& mat, const KRProduct& block);
 
    void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);

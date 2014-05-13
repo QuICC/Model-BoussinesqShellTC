@@ -47,6 +47,11 @@ namespace Eigen1D {
       cols.setConstant(1);
    }
 
+   int fieldCouplingNMat(const SharedResolution spRes)
+   {
+      return spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+   }
+
    void makeComplex(KZSum& zBlock, const KRSum& rBlock)
    {
       DecoupledZSparse  bL;

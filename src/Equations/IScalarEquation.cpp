@@ -154,6 +154,17 @@ namespace Equations {
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exFields;
       PythonWrapper::getList(exFields, pTmp);
 
+      // Get geometric coupling flag
+      pTmp = PyTuple_GetItem(pValue, 3);
+      bool hasGeometricCoupling = PyObject_IsTrue(pTmp);
+
+      // Get block information
+      pArgs = PyTuple_GetItem(pValue, 4);
+      pTmp = PyTuple_GetItem(pArgs, 0);
+      int blockSize = PyLong_AsLong(pTmp);
+      pTmp = PyTuple_GetItem(pArgs, 1);
+      int rhsSize = PyLong_AsLong(pTmp);
+
       // Finalise Python interpreter
       PythonWrapper::cleanup();
 
@@ -184,12 +195,21 @@ namespace Equations {
          infoIt.first->second.addExplicitField(fIt->first, fIt->second);
       }
 
-      // Set mininal matrix coupling
-      int nMat = 0;
-      ArrayI blockNs;
-      ArrayI rhsCols;
-      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
+      // Set geometric coupling information
+      if(hasGeometricCoupling)
+      {
+         throw Exception("Geometric coupling is not yet implemented!");
+
+      // Set field coupling information
+      } else
+      {
+         int nMat = EigenSelector::fieldCouplingNMat(this->unknown().dom(0).spRes());
+         ArrayI blockNs(nMat);
+         blockNs.setConstant(blockSize);
+         ArrayI rhsCols(nMat);
+         rhsCols.setConstant(rhsSize);
+         infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
+      }
 
       // Sort implicit fields
       infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);

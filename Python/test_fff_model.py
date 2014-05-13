@@ -29,11 +29,18 @@ def explicit_fields(field_row):
 def equation_info(res, field_row):
    """Provide description of the system of equation"""
 
+   # Matrix operator is real
    is_complex = False
+   # Implicit field coupling
    im_fields = implicit_fields(field_row)
+   # Additional explicit linear fields
    ex_fields = explicit_fields(field_row)
+   # Equation doesn't have geometric coupling
+   has_geometric_coupling = False
+   # Rows per equation block and number of rhs
+   block_info = (1, 1)
 
-   return (is_complex,im_fields,ex_fields)
+   return (is_complex,im_fields,ex_fields,has_geometric_coupling, block_info)
 
 
 def qi(res, eigs, bcs, field_row):

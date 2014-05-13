@@ -49,6 +49,13 @@ namespace Eigen1D {
    template <typename TEquation> std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx);
 
    /**
+    * @brief Compute the number of matrix operators for field coupling
+    *
+    * @param spRes   Shared resolution
+    */
+   int fieldCouplingNMat(const SharedResolution spRes);
+
+   /**
     * @brief Create setup for matrices with minial coupling
     *
     * @param spRes   Shared resolution

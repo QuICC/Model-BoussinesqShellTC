@@ -188,7 +188,7 @@ namespace Timestep {
 
          // Loop over all real timesteppers
          SolverR_iterator   solRIt;
-         for(solRIt = this->mRSolvers.begin(); solRIt != this->mRSolvers.end(); ++solZIt)
+         for(solRIt = this->mRSolvers.begin(); solRIt != this->mRSolvers.end(); ++solRIt)
          {
             (*solRIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
          }

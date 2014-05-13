@@ -49,6 +49,11 @@ namespace NoEigen {
       cols.setConstant(1);
    }
 
+   int fieldCouplingNMat(const SharedResolution spRes)
+   {
+      return 1;
+   }
+
    void computeKProduct(SparseMatrix& mat, const KRProduct& block)
    {
       assert(std::tr1::get<0>(block).size() > 0);

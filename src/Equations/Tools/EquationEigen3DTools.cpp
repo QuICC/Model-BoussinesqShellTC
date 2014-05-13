@@ -47,6 +47,18 @@ namespace Eigen3D {
       cols.setConstant(1);
    }
 
+   int fieldCouplingNMat(const SharedResolution spRes)
+   {
+      int nMat = 0;
+
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++i)
+      {
+         nMat += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i,j);
+      }
+
+      return nMat;
+   }
+
    void computeKProduct(SparseMatrix& mat, const KRProduct& block)
    {
       mat.resize(1,1);
