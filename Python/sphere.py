@@ -5,6 +5,12 @@ import scipy.sparse as spsp
 import utils
 
 
+def zblk(nr):
+   """Create a block of zeros"""
+
+   return spsp.coo_matrix((nr,nr))
+
+
 def i2x2(n, l, m):
    """Create operator for 2nd integral of x^2 T_n(x)."""
 

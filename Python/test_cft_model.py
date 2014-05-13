@@ -3,13 +3,14 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
+import cylinder
 
 def all_fields():
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def implicit_fields(field_row):
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def explicit_fields(field_row):
@@ -32,14 +33,14 @@ def qi(res, eigs, bcs, field_row):
    print(bcs)
    print(field_row)
 
-   if field_row == ("streamfunction",""):
-      mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      mat = cylinder.i2j2x2(res[0],res[2],eigs[0])
 
-   elif field_row == ("velocityz",""):
-      mat = spsp.identity(res[0]*res[2])
+   elif field_row == ("velocity","pol"):
+      mat = cylinder.i4j4x4(res[0],res[2],eigs[0])
 
    elif field_row == ("temperature",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = cylinder.i2j2x2(res[0],res[2],eigs[0])
 
    return mat
 

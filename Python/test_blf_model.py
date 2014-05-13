@@ -3,13 +3,14 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
+import sphere
 
 def all_fields():
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def implicit_fields(field_row):
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def explicit_fields(field_row):
@@ -32,14 +33,14 @@ def qi(res, eigs, bcs, field_row):
    print(bcs)
    print(field_row)
 
-   if field_row == ("streamfunction",""):
-      mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      mat = sphere.i2x2(res[0],eigs[0],eigs[1])
 
-   elif field_row == ("velocityz",""):
-      mat = spsp.identity(res[0]*res[2])
+   elif field_row == ("velocity","pol"):
+      mat = sphere.i4x4(res[0],eigs[0],eigs[1])
 
    elif field_row == ("temperature",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = sphere.i2x2(res[0],eigs[0],eigs[1])
 
    return mat
 

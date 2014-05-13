@@ -3,13 +3,14 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
+import annulus
 
 def all_fields():
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def implicit_fields(field_row):
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
 
 def explicit_fields(field_row):
@@ -32,14 +33,14 @@ def qi(res, eigs, bcs, field_row):
    print(bcs)
    print(field_row)
 
-   if field_row == ("streamfunction",""):
-      mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      mat = annulus.i2j2x2(res[0],res[2],eigs[0])
 
-   elif field_row == ("velocityz",""):
-      mat = spsp.identity(res[0]*res[2])
+   elif field_row == ("velocity","pol"):
+      mat = annulus.i4j4x4(res[0],res[2],eigs[0])
 
    elif field_row == ("temperature",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = annulus.i2j2x2(res[0],res[2],eigs[0])
 
    return mat
 
@@ -47,14 +48,49 @@ def qi(res, eigs, bcs, field_row):
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
    """Create matrix block for field"""
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      if field_col == ("velocity","tor"):
+         mat = annulus.i2j2x2lapl(res[0],res[2],eigs[0])
+
+      elif field_col == ("velocity","pol"):
+         mat = annulus.zblk(res[0],res[2])
+
+      elif field_col == ("temperature",""):
+         mat = annulus.zblk(res[0],res[2])
+
+   elif field_row == ("velocity","pol"):
+      if field_col == ("velocity","tor"):
+         mat = annulus.zblk(res[0],res[2])
+
+      elif field_col == ("velocity","pol"):
+         mat = annulus.i4j4x4lapl2(res[0],res[2],eigs[0])
+
+      elif field_col == ("temperature",""):
+         mat = annulus.zblk(res[0],res[2])
+
+   elif field_row == ("temperature",""):
+      if field_col == ("velocity","tor"):
+         mat = annulus.zblk(res[0],res[2])
+
+      elif field_col == ("velocity","pol"):
+         mat = annulus.zblk(res[0],res[2])
+
+      elif field_col == ("temperature",""):
+         mat = annulus.i2j2x2lapl(res[0],res[2],eigs[0])
 
    return mat
 
 
 def time_block(res, eq_params, eigs, bcs, field_row):
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      mat = annulus.i2j2x2(res[0],res[2],eigs[0])
+
+   elif field_row == ("velocity","pol"):
+      mat = annulus.i4j4x4lapl(res[0],res[2],eigs[0])
+
+   elif field_row == ("temperature",""):
+      mat = annulus.i2j2x2(res[0],res[2],eigs[0])
 
    return mat
 

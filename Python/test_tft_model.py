@@ -3,6 +3,7 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
+import cartesian
 
 def all_fields():
    return [("streamfunction",""), ("velocityz",""), ("temperature","")]
