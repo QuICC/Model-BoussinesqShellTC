@@ -17,6 +17,8 @@ def explicit_fields(field_row):
    return []
 
 def equation_info(res, field_row):
+   """Provide description of the system of equation"""
+
    is_complex = False
    im_fields = implicit_fields(field_row)
    ex_fields = explicit_fields(field_row)
@@ -34,28 +36,64 @@ def qi(res, eigs, bcs, field_row):
    print(field_row)
 
    if field_row == ("streamfunction",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = cartesian.i2(res[0])
 
    elif field_row == ("velocityz",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = cartesian.i4(res[0])
 
    elif field_row == ("temperature",""):
-      mat = spsp.identity(res[0]*res[2])
+      mat = cartesian.i2(res[0])
 
    return mat
 
 
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
-   """Create matrix block for field"""
+   """Create matrix block linear operator"""
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("streamfunction",""):
+      if field_row == ("streamfunction",""):
+         mat = cartesian.i2lapl(res[0],eigs[0],eigs[1])
+
+      elif field_row == ("velocityz",""):
+         mat = cartesian.zblk(res[0])
+
+      elif field_row == ("temperature",""):
+         mat = cartesian.zblk(res[0])
+
+   elif field_row == ("velocityz",""):
+      if field_row == ("streamfunction",""):
+         mat = cartesian.zblk(res[0])
+
+      elif field_row == ("velocityz",""):
+         mat = cartesian.i4lapl2(res[0],eigs[0],eigs[1])
+
+      elif field_row == ("temperature",""):
+         mat = cartesian.zblk(res[0])
+
+   elif field_row == ("temperature",""):
+      if field_row == ("streamfunction",""):
+         mat = cartesian.zblk(res[0])
+
+      elif field_row == ("velocityz",""):
+         mat = cartesian.zblk(res[0])
+
+      elif field_row == ("temperature",""):
+         mat = cartesian.i2lapl(res[0],eigs[0],eigs[1])
 
    return mat
 
 
 def time_block(res, eq_params, eigs, bcs, field_row):
+   """Create matrix block of time operator"""
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("streamfunction",""):
+      mat = cartesian.i2(res[0],eigs[0],eigs[1])
+
+   elif field_row == ("velocityz",""):
+      mat = cartesian.i4lapl(res[0],eigs[0],eigs[1])
+
+   elif field_row == ("temperature",""):
+      mat = cartesian.i2(res[0],eigs[0],eigs[1])
 
    return mat
 

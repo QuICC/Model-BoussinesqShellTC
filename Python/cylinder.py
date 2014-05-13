@@ -9,31 +9,31 @@ def zblk(nr,nz):
    return spsp.coo_matrix((nr*nz,nr*nz))
 
 
-def i2j2x2(nr, nz, m, parity):
+def i2j2x2(nr, nz, m):
    """Create operator for 2nd integral of x^2 T_n(x).""" 
 
    return spsp.identity(nr*nz)
 
 
-def i2j2x2lapl(nr, nz, m, parity):
+def i2j2x2lapl(nr, nz, m):
    """Create operator for 2nd integral of x^2 Laplacian T_n(x).""" 
 
    return spsp.identity(nr*nz)
 
 
-def i4j4x4(nr, nz, m, parity):
+def i4j4x4(nr, nz, m):
    """Create operator for 4th integral of x^4 T_n(x).""" 
 
    return spsp.identity(nr*nz)
 
 
-def i4j4x4lapl(nr, nz, m, parity):
+def i4j4x4lapl(nr, nz, m):
    """Create operator for 4th integral of x^4 Laplacian T_n(x).""" 
 
    return spsp.identity(nr*nz)
 
 
-def i4j4x4lapl2(nr, nz, m, parity):
+def i4j4x4lapl2(nr, nz, m):
    """Create operator for 4th integral of x^4 Laplacian^2 T_n(x).""" 
 
    return spsp.identity(nr*nz)

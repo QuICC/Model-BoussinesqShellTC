@@ -17,6 +17,8 @@ def explicit_fields(field_row):
    return []
 
 def equation_info(res, field_row):
+   """Provide description of the system of equation"""
+
    is_complex = False
    im_fields = implicit_fields(field_row)
    ex_fields = explicit_fields(field_row)
@@ -46,16 +48,52 @@ def qi(res, eigs, bcs, field_row):
 
 
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
-   """Create matrix block for field"""
+   """Create matrix block of linear operator"""
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      if field_col == ("velocity","tor"):
+         mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1])
+
+      elif field_col == ("velocity","pol"):
+         mat = sphere.zblk(res[0],eigs[0])
+
+      elif field_col == ("temperature",""):
+         mat = sphere.zblk(res[0],eigs[0])
+
+   elif field_row == ("velocity","pol"):
+      if field_col == ("velocity","tor"):
+         mat = sphere.zblk(res[0],eigs[0])
+
+      elif field_col == ("velocity","pol"):
+         mat = sphere.i4x4lapl2(res[0],eigs[0],eigs[1])
+
+      elif field_col == ("temperature",""):
+         mat = sphere.zblk(res[0],eigs[0])
+
+   elif field_row == ("temperature",""):
+      if field_col == ("velocity","tor"):
+         mat = sphere.zblk(res[0],eigs[0])
+
+      elif field_col == ("velocity","pol"):
+         mat = sphere.zblk(res[0],eigs[0])
+
+      elif field_col == ("temperature",""):
+         mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1])
 
    return mat
 
 
 def time_block(res, eq_params, eigs, bcs, field_row):
+   """Create matrix block of time operator"""
 
-   mat = spsp.identity(res[0]*res[2])
+   if field_row == ("velocity","tor"):
+      mat = sphere.i2x2(res[0],eigs[0],eigs[1])
+
+   elif field_row == ("velocity","pol"):
+      mat = sphere.i4x4lapl(res[0],eigs[0],eigs[1])
+
+   elif field_row == ("temperature",""):
+      mat = sphere.i2x2(res[0],eigs[0],eigs[1])
 
    return mat
 

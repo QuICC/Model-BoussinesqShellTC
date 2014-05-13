@@ -17,6 +17,8 @@ def explicit_fields(field_row):
    return []
 
 def equation_info(res, field_row):
+   """Provide description of the system of equation"""
+
    is_complex = False
    im_fields = implicit_fields(field_row)
    ex_fields = explicit_fields(field_row)
@@ -46,7 +48,7 @@ def qi(res, eigs, bcs, field_row):
 
 
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
-   """Create matrix block for field"""
+   """Create matrix block of linear operator"""
 
    if field_row == ("velocity","tor"):
       if field_col == ("velocity","tor"):
@@ -82,6 +84,7 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
 
 
 def time_block(res, eq_params, eigs, bcs, field_row):
+   """Create matrix block of time operator"""
 
    if field_row == ("velocity","tor"):
       mat = annulus.i2j2x2(res[0],res[2],eigs[0])

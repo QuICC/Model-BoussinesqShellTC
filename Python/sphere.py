@@ -11,11 +11,11 @@ def zblk(nr):
    return spsp.coo_matrix((nr,nr))
 
 
-def i2x2(n, l, m):
+def i2x2(nr, l, m):
    """Create operator for 2nd integral of x^2 T_n(x)."""
 
    parity = l%2
-   ns = np.arange(parity, 2*n, 2)
+   ns = np.arange(parity, 2*nr, 2)
    offsets = np.arange(-2,3)
    nzrow = 1
 
@@ -45,11 +45,11 @@ def i2x2(n, l, m):
    return spsp.diags(diags, offsets)
 
 
-def i2x2lapl(n, l, m):
+def i2x2lapl(nr, l, m):
    """Create operator for 2nd integral of x^2 Laplacian T_n(x).""" 
 
    parity = l%2
-   ns = np.arange(parity, 2*n, 2)
+   ns = np.arange(parity, 2*nr, 2)
    offsets = np.arange(-1,2)
    nzrow = 1
    
@@ -71,11 +71,11 @@ def i2x2lapl(n, l, m):
    return spsp.diags(diags, offsets)
 
 
-def i4x4(n, l, m):
+def i4x4(nr, l, m):
    """Create operator for 4th integral of x^4 T_n(x).""" 
    
    parity = l%2
-   ns = np.arange(parity, 2*n, 2)
+   ns = np.arange(parity, 2*nr, 2)
    offsets = np.arange(-4,5)
    nzrow = 3
    
@@ -121,11 +121,11 @@ def i4x4(n, l, m):
    return spsp.diags(diags, offsets)
 
 
-def i4x4lapl(n, l, m):
+def i4x4lapl(nr, l, m):
    """Create operator for 4th integral of x^4 Laplacian T_n(x).""" 
 
    parity = l%2
-   ns = np.arange(parity, 2*n, 2)
+   ns = np.arange(parity, 2*nr, 2)
    offsets = np.arange(-3,4)
    nzrow = 3
    
@@ -163,11 +163,11 @@ def i4x4lapl(n, l, m):
    return spsp.diags(diags, offsets)
 
 
-def i4x4lapl2(n, l, m):
+def i4x4lapl2(nr, l, m):
    """Create operator for 4th integral of x^4 Laplacian^2 T_n(x).""" 
    
    parity = l%2
-   ns = np.arange(parity, 2*n, 2)
+   ns = np.arange(parity, 2*nr, 2)
    offsets = np.arange(-2,3)
    nzrow = 3
    
@@ -197,12 +197,12 @@ def i4x4lapl2(n, l, m):
    return spsp.diags(diags, offsets)
 
 
-def block_diag(n, nl, m, op):
+def block_diag(nr, nl, m, op):
    """Create a block diagonal matrix of operator."""
 
-   B = op(n,m,m)
+   B = op(nr,m,m)
    for l in np.arange(m+1,nl-1):
-      A = op(n,l,m)
+      A = op(nr,l,m)
       B = spsp.block_diag((B,A))
 
    return B

@@ -12,6 +12,12 @@ def zblk(nx,ny,nz):
    return spsp.coo_matrix((nx*nx*nz,nx*ny*nz))
 
 
+def id(nx, ny, nz):
+   """Create an identity block"""
+
+   return spsp.identity(nx*ny*nz)
+
+
 def i2j2k2(nx, ny, nz):
    """Create operator for 2nd integral in x,y,z of T_n(x)T_n(y)T_n(z)"""
 
@@ -44,40 +50,46 @@ def i4j4k4lapl2(nx, ny, nz):
 ##################################################
 # 2D Cartesian box with single periodic direction
 
-def zblk(nx,ny):
+def zblk(nx,nz):
    """Create a block of zeros"""
 
-   return spsp.coo_matrix((nx*nx,nx*ny))
+   return spsp.coo_matrix((nx*nx,nx*nz))
 
 
-def i2j2(nx, ny, k):
+def id(nx, nz):
+   """Create an identity block"""
+
+   return spsp.identity(nx*nz)
+
+
+def i2j2(nx, nz, k):
    """Create operator for 2nd integral in x,z of T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*ny)
+   return spsp.identity(nx*nz)
 
 
-def i2j2lapl(nx, ny, k):
+def i2j2lapl(nx, nz, k):
    """Create operator for 2nd integral in x,z of Laplacian T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*ny)
+   return spsp.identity(nx*nz)
 
 
-def i4j4(nx, ny, k):
+def i4j4(nx, nz, k):
    """Create operator for 4th integral in x,z of T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*ny)
+   return spsp.identity(nx*nz)
 
 
-def i4j4lapl(nx, ny, k):
+def i4j4lapl(nx, nz, k):
    """Create operator for 4th integral in x,z of Laplacian T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*ny)
+   return spsp.identity(nx*nz)
 
 
-def i4j4lapl2(nx, ny, k):
+def i4j4lapl2(nx, nz, k):
    """Create operator for 4th integral in x,z of Laplacian^2 T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*ny)
+   return spsp.identity(nx*nz)
 
 
 ##################################################
@@ -87,6 +99,12 @@ def zblk(nx):
    """Create a block of zeros"""
 
    return spsp.coo_matrix((nx,nx))
+
+
+def id(nx):
+   """Create an identity block"""
+
+   return spsp.identity(nx)
 
 
 def i2(nx, k, l):
@@ -117,3 +135,23 @@ def i4lapl2(nx, k, l):
    """Create operator for 4th integral in x of Laplacian^2 T_n(x)"""
 
    return spsp.identity(nx)
+
+##################################################
+# Triply periodic cartesian box
+
+def id():
+   """Create an identity block"""
+
+   return spsp.identity(1)
+
+
+def lapl(k, l, m):
+   """Create operator for triply periodic Laplacian"""
+
+   return spsp.identity(1)
+
+
+def lapl2(k, l, m):
+   """Create operator for triply periodic Laplacian^2"""
+
+   return spsp.identity(1)
