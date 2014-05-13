@@ -30,48 +30,11 @@
 #include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
    const std::string BoussinesqSphereModel::PYNAME = "boussinesq_sphere_model";
-
-   std::vector<PhysicalNames::Id> BoussinesqSphereModel::fieldIds()
-   {
-      // Create storage
-      std::vector<PhysicalNames::Id> ids;
-
-      // Add temperature
-      ids.push_back(PhysicalNames::TEMPERATURE);
-
-      // Add velocity
-      ids.push_back(PhysicalNames::VELOCITY);
-
-      return ids;
-   }
-
-   std::vector<NonDimensional::Id> BoussinesqSphereModel::paramIds()
-   {
-      // Create storage
-      std::vector<NonDimensional::Id> ids;
-
-      return ids;
-   }
-
-   std::vector<bool> BoussinesqSphereModel::isPeriodicBox()
-   {
-      std::vector<bool> box;
-
-      // X direction is not periodic box
-      box.push_back(false);
-
-      // Y direction is periodic box
-      box.push_back(false);
-
-      // Z direction is not periodic box
-      box.push_back(false);
-
-      return box;
-   }
 
    void BoussinesqSphereModel::addEquations(SharedSimulation spSim)
    {
@@ -146,7 +109,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqSphereModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqSphereModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -161,7 +124,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqSphereModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqSphereModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

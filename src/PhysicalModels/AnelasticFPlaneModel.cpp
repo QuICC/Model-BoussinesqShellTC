@@ -27,42 +27,11 @@
 #include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneStreamfunction.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneVertical.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneTransport.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
    const std::string AnelasticFPlaneModel::PYNAME = "anelastic_fplane_model";
-
-   std::vector<PhysicalNames::Id> AnelasticFPlaneModel::fieldIds()
-   {
-      // Create storage
-      std::vector<PhysicalNames::Id> ids;
-
-      return ids;
-   }
-
-   std::vector<NonDimensional::Id> AnelasticFPlaneModel::paramIds()
-   {
-      // Create storage
-      std::vector<NonDimensional::Id> ids;
-
-      return ids;
-   }
-
-   std::vector<bool> AnelasticFPlaneModel::isPeriodicBox()
-   {
-      std::vector<bool> box;
-
-      // X direction is not periodic box
-      box.push_back(false);
-
-      // Y direction is periodic box
-      box.push_back(true);
-
-      // Z direction is not periodic box
-      box.push_back(true);
-
-      return box;
-   }
 
    void AnelasticFPlaneModel::addEquations(SharedSimulation spSim)
    {
@@ -97,7 +66,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlaneModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticFPlaneModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -112,7 +81,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticFPlaneModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticFPlaneModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

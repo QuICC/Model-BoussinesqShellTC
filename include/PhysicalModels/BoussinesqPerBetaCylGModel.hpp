@@ -42,21 +42,6 @@ namespace GeoMHDiSCC {
          typedef Schemes::TFFScheme SchemeType;
 
          /**
-          * @brief Get vector of field IDs for the boundary conditions
-          */
-         static std::vector<PhysicalNames::Id> fieldIds();
-
-         /**
-          * @brief Get vector of the nondimensional parameters IDs
-          */
-         static std::vector<NonDimensional::Id> paramIds();
-
-         /**
-          * @brief Get vector of bools about periodic box
-          */
-         static std::vector<bool> isPeriodicBox();
-
-         /**
           * @brief Add the required equations
           *
           * @param spSim   Shared simulation object

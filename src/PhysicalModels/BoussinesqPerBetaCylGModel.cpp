@@ -27,63 +27,11 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqPerBetaCylGStreamfunction.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqPerBetaCylGVertical.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqPerBetaCylGTransport.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
    const std::string BoussinesqPerBetaCylGModel::PYNAME = "boussinesq_perbeta_cylg_model";
-
-   std::vector<PhysicalNames::Id> BoussinesqPerBetaCylGModel::fieldIds()
-   {
-      // Create storage
-      std::vector<PhysicalNames::Id> ids;
-
-      // Add streamfunction
-      ids.push_back(PhysicalNames::STREAMFUNCTION);
-
-      // Add axial velocity
-      ids.push_back(PhysicalNames::VELOCITYZ);
-
-      // Add temperature
-      ids.push_back(PhysicalNames::TEMPERATURE);
-
-      return ids;
-   }
-
-   std::vector<NonDimensional::Id> BoussinesqPerBetaCylGModel::paramIds()
-   {
-      // Create storage
-      std::vector<NonDimensional::Id> ids;
-
-      // Add Prandtl number
-      ids.push_back(NonDimensional::PRANDTL);
-
-      // Add Rayleigh number
-      ids.push_back(NonDimensional::RAYLEIGH);
-
-      // Add gamma
-      ids.push_back(NonDimensional::GAMMA);
-
-      // Add chi
-      ids.push_back(NonDimensional::CHI);
-
-      return ids;
-   }
-
-   std::vector<bool> BoussinesqPerBetaCylGModel::isPeriodicBox()
-   {
-      std::vector<bool> box;
-
-      // X direction is periodic box
-      box.push_back(true);
-
-      // Y direction is periodic box
-      box.push_back(true);
-
-      // Z direction is not periodic box
-      box.push_back(false);
-
-      return box;
-   }
 
    void BoussinesqPerBetaCylGModel::addEquations(SharedSimulation spSim)
    {
@@ -125,7 +73,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqPerBetaCylGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqPerBetaCylGModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -140,7 +88,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = BoussinesqPerBetaCylGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqPerBetaCylGModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

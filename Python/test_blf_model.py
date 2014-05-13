@@ -5,8 +5,17 @@ import utils
 from utils import triplets
 import sphere
 
+
+def nondimensional_parameters():
+   return ["prandtl", "rayleigh"]
+
+
+def periodicity():
+   return [False, False, False]
+
+
 def all_fields():
-   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+   return ["velocity", "temperature"]
 
 
 def implicit_fields(field_row):
@@ -15,6 +24,7 @@ def implicit_fields(field_row):
 
 def explicit_fields(field_row):
    return []
+
 
 def equation_info(res, field_row):
    """Provide description of the system of equation"""

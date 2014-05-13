@@ -27,42 +27,11 @@
 #include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGStreamfunction.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGVertical.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGTransport.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
    const std::string AnelasticBetaSphGModel::PYNAME = "anelastic_beta_sphg_model";
-
-   std::vector<PhysicalNames::Id> AnelasticBetaSphGModel::fieldIds()
-   {
-      // Create storage
-      std::vector<PhysicalNames::Id> ids;
-
-      return ids;
-   }
-
-   std::vector<NonDimensional::Id> AnelasticBetaSphGModel::paramIds()
-   {
-      // Create storage
-      std::vector<NonDimensional::Id> ids;
-
-      return ids;
-   }
-
-   std::vector<bool> AnelasticBetaSphGModel::isPeriodicBox()
-   {
-      std::vector<bool> box;
-
-      // X direction is not periodic box
-      box.push_back(false);
-
-      // Y direction is periodic box
-      box.push_back(true);
-
-      // Z direction is not periodic box
-      box.push_back(false);
-
-      return box;
-   }
 
    void AnelasticBetaSphGModel::addEquations(SharedSimulation spSim)
    {
@@ -97,7 +66,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticBetaSphGModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -112,7 +81,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = AnelasticBetaSphGModel::fieldIds();
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticBetaSphGModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

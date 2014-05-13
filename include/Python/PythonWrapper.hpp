@@ -19,6 +19,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/NonDimensional.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -44,6 +45,11 @@ namespace GeoMHDiSCC {
          static void setFunction(const std::string& func);
 
          /**
+          * @brief Call the python function object
+          */
+         static PyObject* callFunction();
+
+         /**
           * @brief Call the python function object with arguments
           */
          static PyObject* callFunction(PyObject* pArgs);
@@ -67,6 +73,21 @@ namespace GeoMHDiSCC {
           * @brief Make a dictironary
           */
          static PyObject* makeDict(const std::map<std::string,int>& map);
+
+         /**
+          * @brief Get data from list
+          */
+         static void getList(std::vector<bool> &rList, PyObject *pList);
+
+         /**
+          * @brief Get data from list
+          */
+         static void getList(std::vector<NonDimensional::Id> &rList, PyObject *pList);
+
+         /**
+          * @brief Get data from list
+          */
+         static void getList(std::vector<PhysicalNames::Id> &rList, PyObject *pList);
 
          /**
           * @brief Get data from list

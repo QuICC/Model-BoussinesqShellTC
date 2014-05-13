@@ -86,6 +86,15 @@ namespace GeoMHDiSCC {
       }
    }
 
+   PyObject* PythonWrapper::callFunction()
+   {
+      PyObject *pValue;
+
+      pValue = PyObject_CallObject(PythonWrapper::mpFunc, NULL);
+
+      return pValue;
+   }
+
    PyObject* PythonWrapper::callFunction(PyObject* pArgs)
    {
       PyObject *pValue;
@@ -152,6 +161,53 @@ namespace GeoMHDiSCC {
       }
 
       return pDict;
+   }
+
+   void PythonWrapper::getList(std::vector<bool> &rList, PyObject *pList)
+   {
+      PyObject *pValue;
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pValue = PyList_GetItem(pList, i);
+
+         bool isPeriodic = PyObject_IsTrue(pValue);
+
+         rList.push_back(isPeriodic);
+      }
+   }
+
+   void PythonWrapper::getList(std::vector<NonDimensional::Id> &rList, PyObject *pList)
+   {
+      PyObject *pValue, *pTmp;
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pValue = PyList_GetItem(pList, i);
+
+         pTmp = PyUnicode_AsASCIIString(pValue);
+         NonDimensional::Id nd = IoTools::HumanToId::toNd(std::string(PyBytes_AsString(pTmp)));
+
+         rList.push_back(nd);
+      }
+   }
+
+   void PythonWrapper::getList(std::vector<PhysicalNames::Id> &rList, PyObject *pList)
+   {
+      PyObject *pValue, *pTmp;
+
+      long int len = PyList_Size(pList);
+      for(int i = 0; i < len; ++i)
+      {
+         pValue = PyList_GetItem(pList, i);
+
+         pTmp = PyUnicode_AsASCIIString(pValue);
+         PhysicalNames::Id phys = IoTools::HumanToId::toPhys(std::string(PyBytes_AsString(pTmp)));
+
+         rList.push_back(phys);
+      }
    }
 
    void PythonWrapper::getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList)

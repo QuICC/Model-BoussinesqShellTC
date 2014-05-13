@@ -5,8 +5,17 @@ import utils
 from utils import triplets
 import cartesian
 
+
+def nondimensional_parameters():
+   return ["prandtl", "rayleigh", "gamma", "chi"]
+
+
+def periodicity():
+   return [True, True, True]
+
+
 def all_fields():
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   return ["streamfunction", "velocityz", "temperature"]
 
 
 def implicit_fields(field_row):
@@ -15,6 +24,7 @@ def implicit_fields(field_row):
 
 def explicit_fields(field_row):
    return []
+
 
 def equation_info(res, field_row):
    """Provide description of the system of equation"""
