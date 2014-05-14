@@ -25,8 +25,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Tests/TestFFFDiffusion2D.hpp"
-#include "Equations/Tests/TestFFFDiffusion3D.hpp"
+#include "Equations/Tests/TestLinearScalar.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -38,21 +37,19 @@ namespace GeoMHDiSCC {
 
    void TestFFFModel::addEquations(SharedSimulation spSim)
    {
-      Equations::SharedTestFFFDiffusion2D   spD2D;
+      Equations::SharedTestLinearScalar   spLin;
 
       // Add first scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestFFFDiffusion2D>(TestFFFModel::PYNAME);
-      spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
-
-      Equations::SharedTestFFFDiffusion3D   spD3D;
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second scalar test equation
-      spD3D = spSim->addScalarEquation<Equations::TestFFFDiffusion3D>(TestFFFModel::PYNAME);
-      spD3D->setIdentity(PhysicalNames::VELOCITYZ);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestFFFDiffusion2D>(TestFFFModel::PYNAME);
-      spD2D->setIdentity(PhysicalNames::TEMPERATURE);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::TEMPERATURE);
    }
 
    void TestFFFModel::addStates(SharedStateGenerator spGen)

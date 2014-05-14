@@ -25,8 +25,7 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Tests/TestTTTDiffusion2D.hpp"
-#include "Equations/Tests/TestTTTDiffusion3D.hpp"
+#include "Equations/Tests/TestLinearScalar.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -38,21 +37,19 @@ namespace GeoMHDiSCC {
 
    void TestTTTModel::addEquations(SharedSimulation spSim)
    {
-      Equations::SharedTestTTTDiffusion2D   spD2D;
+      Equations::SharedTestLinearScalar   spLin;
 
       // Add first scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>(TestTTTModel::PYNAME);
-      spD2D->setIdentity(PhysicalNames::STREAMFUNCTION);
-
-      Equations::SharedTestTTTDiffusion3D   spD3D;
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestTTTModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second scalar test equation
-      spD3D = spSim->addScalarEquation<Equations::TestTTTDiffusion3D>(TestTTTModel::PYNAME);
-      spD3D->setIdentity(PhysicalNames::VELOCITYZ);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestTTTModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third scalar test equation
-      spD2D = spSim->addScalarEquation<Equations::TestTTTDiffusion2D>(TestTTTModel::PYNAME);
-      spD2D->setIdentity(PhysicalNames::TEMPERATURE);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestTTTModel::PYNAME);
+      spLin->setIdentity(PhysicalNames::TEMPERATURE);
    }
 
    void TestTTTModel::addStates(SharedStateGenerator spGen)

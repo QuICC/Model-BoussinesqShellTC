@@ -7,7 +7,10 @@
 #
 INSTALL(FILES 
    Python/annulus.py
-   Python/cartesian.py 
+   Python/cartesian_0d.py 
+   Python/cartesian_1d.py 
+   Python/cartesian_2d.py 
+   Python/cartesian_3d.py 
    Python/cylinder.py 
    Python/generate_recurrence.py 
    Python/shell.py 
