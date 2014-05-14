@@ -237,7 +237,7 @@ namespace Solver {
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
 
-      // Index of the current field
+      // Index of solver
       int myIdx = spEq->couplingInfo(myId.second).solverIndex();
 
       // Complex matrices in linear solve
@@ -281,7 +281,7 @@ namespace Solver {
          }
       }
 
-      // Build the solver matrices
+      // Gather information about the solver matrices
       for(int i = 0; i < nSystems; i++)
       {
          // Store the start row

@@ -2,26 +2,32 @@ import sympy
 import symbolic
 
 print("################################################")
-print("################ Cartesian box #################")
+print("################ Cartesian 1D ##################")
 print("################################################")
 
 print("i1:")
-t = {0:1}
-r = symbolic.spectral_integral(1,t,False)
+terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
 
 print("i2:")
-t = {0:1}
-r = symbolic.spectral_integral(2,t,False)
+terms = [{'q':2, 'p':0, 'd':0, 'c':1}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
 
 print("i4:")
-t = {0:1}
-r = symbolic.spectral_integral(4,t,False)
+terms = [{'q':4, 'p':0, 'd':0, 'c':1}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
@@ -93,14 +99,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i2x2lapl:")
 l = sympy.Symbol('l')
@@ -111,14 +117,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4:")
 terms = [{'q':4, 'p':4, 'd':0, 'c':1}]
@@ -128,14 +134,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4lapl:")
 l = sympy.Symbol('l')
@@ -146,14 +152,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4lapl2:")
 l = sympy.Symbol('l')
@@ -164,14 +170,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("################################################")
 print("################### Annulus ####################")
@@ -240,14 +246,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i2x2lapl:")
 m = sympy.Symbol('m')
@@ -258,14 +264,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4:")
 terms = [{'q':4, 'p':4, 'd':0, 'c':1}]
@@ -275,14 +281,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4lapl:")
 m = sympy.Symbol('m')
@@ -293,14 +299,14 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")
 
 print("i4x4lapl2:")
 m = sympy.Symbol('m')
@@ -311,11 +317,11 @@ print("   General:")
 for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
-print("   Even:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
-print("\n")
-print("   Odd:")
-for k,rec in sorted(r.items()):
-   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
-print("\n")
+#print("   Even:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n)))
+#print("\n")
+#print("   Odd:")
+#for k,rec in sorted(r.items()):
+#   print("\t" + str(k/2) + ": \t" + str(rec.subs(n,2*n+1)))
+#print("\n")

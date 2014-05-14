@@ -55,11 +55,15 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Do operations required during the main loop
+          *
+          * \callgraph
           */
          virtual void mainRun();
 
          /**
           * @brief Do operations required just after finishing the time integration
+          *
+          * \callgraph
           */
          virtual void postRun();
 

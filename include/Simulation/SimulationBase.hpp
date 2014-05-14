@@ -1,5 +1,5 @@
 /** 
- * @file Simulation.hpp
+ * @file SimulationBase.hpp
  * @brief High level implementation of a base for the simulations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
