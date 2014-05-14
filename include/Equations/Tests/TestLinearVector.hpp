@@ -1,11 +1,11 @@
 /**
- * @file TestLinearScalar.hpp
- * @brief Implementation of the scalar linear test equation
+ * @file TestLinearVector.hpp
+ * @brief Implementation of the vector linear test equation
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef TESTLINEARSCALAR_HPP
-#define TESTLINEARSCALAR_HPP
+#ifndef TESTLINEARVECTOR_HPP
+#define TESTLINEARVECTOR_HPP
 
 // Configuration includes
 //
@@ -20,16 +20,16 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the scalar linear test equation
+    * @brief Implementation of the vector linear test equation
     */
-   class TestLinearScalar: public IScalarEquation
+   class TestLinearVector: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         TestLinearScalar(const std::string& pyName, SharedEquationParameters spEqParams);
+         TestLinearVector(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor
           */
-         virtual ~TestLinearScalar();
+         virtual ~TestLinearVector();
 
          /**
           * @brief Set the unknown name and requirements
@@ -64,10 +64,10 @@ namespace Equations {
       private:
    };
 
-   /// Typedef for a shared TestLinearScalar
-   typedef SharedPtrMacro<TestLinearScalar> SharedTestLinearScalar;
+   /// Typedef for a shared TestLinearVector
+   typedef SharedPtrMacro<TestLinearVector> SharedTestLinearVector;
 
 }
 }
 
-#endif // TESTLINEARSCALAR_HPP
+#endif // TESTLINEARVECTOR_HPP

@@ -182,6 +182,10 @@ namespace Equations {
       // Set source flags: has source term?
       infoIt.first->second.setSource(hasSource);
 
+      // Set index type: SLOWEST or MODE
+      /// \mhdBug Always sets indexType to SLOWEST
+      infoIt.first->second.setIndexType(CouplingInformation::SLOWEST);
+
       // Create implicit field coupling
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >::const_iterator fIt;
       for(fIt = imFields.begin(); fIt != imFields.end(); ++fIt)
