@@ -65,32 +65,7 @@ namespace Equations {
 
    void RandomScalarState::setCoupling()
    {
-      // Initialise coupling information
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::SCALAR,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::SCALAR);
-
-      // General setup: first complex solver, complex solver, start from m = 0
-      infoIt.first->second.setGeneral(CouplingInformation::TRIVIAL, false, 0);
-
-      // Set nonlinear flags: NO nonlinear term, NO quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
-
-      // Set source flags: has source term
-      infoIt.first->second.setSource(true);
-
-      // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::SCALAR);
-
-      // Set mininal matrix coupling
-      int nMat = 0;
-      ArrayI blockNs;
-      ArrayI rhsCols;
-      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, true);
    }
 
    MHDComplex RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const

@@ -58,34 +58,10 @@ namespace Equations {
    void CylinderExactVectorState::setCoupling()
    {
       SpectralComponent_range specRange = this->spectralRange();
-      for(SpectralComponent_iterator it = specRange.first; it != specRange.second; ++it)
+      SpectralComponent_iterator specIt;
+      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
       {
-         // Initialise coupling information
-         std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-         infoIt = this->mCouplingInfos.insert(std::make_pair(*it,CouplingInformation()));
-         SpectralFieldId eqId = std::make_pair(this->name(), *it);
-
-         // General setup: first complex solver, complex solver, start from m = 0
-         infoIt.first->second.setGeneral(CouplingInformation::TRIVIAL, false, 0);
-
-         // Set nonlinear flags: NO nonlinear term, NO quasi-inverse
-         infoIt.first->second.setNonlinear(true, false);
-
-         // Set source flags: has source term
-         infoIt.first->second.setSource(false);
-
-         // Equation is coupled to itself
-         infoIt.first->second.addImplicitField(eqId.first, *it);
-
-         // Set mininal matrix coupling
-         int nMat = 0;
-         ArrayI blockNs;
-         ArrayI rhsCols;
-         EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-         infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-
-         // Sort implicit fields
-         infoIt.first->second.sortImplicitFields(eqId.first, *it);
+         this->defineCoupling(*specIt, CouplingInformation::TRIVIAL, 0, true, false, false);
       }
    }
 

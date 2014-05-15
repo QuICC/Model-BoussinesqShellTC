@@ -53,7 +53,7 @@
    namespace GeoMHDiSCC {
       namespace Solver {
          /**
-          * @brief Selector for the different implementations of the sparse solvers. Sets up the UmfPack version. 
+          * @brief Selector for the different implementations of the sparse solvers. Sets up Eigen's SparseLU version. 
           */
          template <typename TMatrix> struct SparseSelector
          {
@@ -151,7 +151,7 @@
    namespace GeoMHDiSCC {
       namespace Solver {
          /**
-          * @brief Selector for the different implementations of the sparse solvers. Sets up the Pardiso version. 
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the MKL Pardiso version. 
           */
          template<typename TMatrix> struct SparseSelector
          {
