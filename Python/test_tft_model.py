@@ -3,7 +3,7 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
-import cartesian
+import cartesian_2d as c2d
 
 
 def nondimensional_parameters():
@@ -53,13 +53,13 @@ def qi(res, eigs, bcs, field_row):
    print(field_row)
 
    if field_row == ("streamfunction",""):
-      mat = cartesian.i2j2(res[0],res[2])
+      mat = c2d.i2j2(res[0],res[2])
 
    elif field_row == ("velocityz",""):
-      mat = cartesian.i4j4(res[0],res[2])
+      mat = c2d.i4j4(res[0],res[2])
 
    elif field_row == ("temperature",""):
-      mat = cartesian.i2j2(res[0],res[2])
+      mat = c2d.i2j2(res[0],res[2])
 
    return mat
 
@@ -69,33 +69,33 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
 
    if field_row == ("streamfunction",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.i2j2lapl(res[0],res[2],eigs[0])
+         mat = c2d.i2j2lapl(res[0],res[2],eigs[0])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
    elif field_row == ("velocityz",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.i4j4lapl2(res[0],res[2],eigs[0])
+         mat = c2d.i4j4lapl2(res[0],res[2],eigs[0])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
    elif field_row == ("temperature",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.zblk(res[0],res[2])
+         mat = c2d.zblk(res[0],res[2])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.i2j2lapl(res[0],res[2],eigs[0])
+         mat = c2d.i2j2lapl(res[0],res[2],eigs[0])
 
    return mat
 
@@ -104,13 +104,13 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    """Create matrix block of time operator"""
 
    if field_row == ("streamfunction",""):
-      mat = cartesian.i2j2(res[0],res[2],eigs[0])
+      mat = c2d.i2j2(res[0],res[2],eigs[0])
 
    elif field_row == ("velocityz",""):
-      mat = cartesian.i4j4lapl(res[0],res[2],eigs[0])
+      mat = c2d.i4j4lapl(res[0],res[2],eigs[0])
 
    elif field_row == ("temperature",""):
-      mat = cartesian.i2j2(res[0],res[2],eigs[0])
+      mat = c2d.i2j2(res[0],res[2],eigs[0])
 
    return mat
 

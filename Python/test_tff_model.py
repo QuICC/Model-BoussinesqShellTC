@@ -3,7 +3,7 @@
 import scipy.sparse as spsp
 import utils
 from utils import triplets
-import cartesian
+import cartesian_1d as c1d
 
 
 def nondimensional_parameters():
@@ -53,13 +53,13 @@ def qi(res, eigs, bcs, field_row):
    print(field_row)
 
    if field_row == ("streamfunction",""):
-      mat = cartesian.i2(res[0])
+      mat = c1d.i2(res[0])
 
    elif field_row == ("velocityz",""):
-      mat = cartesian.i4(res[0])
+      mat = c1d.i4(res[0])
 
    elif field_row == ("temperature",""):
-      mat = cartesian.i2(res[0])
+      mat = c1d.i2(res[0])
 
    return mat
 
@@ -69,33 +69,33 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
 
    if field_row == ("streamfunction",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.i2lapl(res[0],eigs[0],eigs[1])
+         mat = c1d.i2lapl(res[0],eigs[0],eigs[1])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
    elif field_row == ("velocityz",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.i4lapl2(res[0],eigs[0],eigs[1])
+         mat = c1d.i4lapl2(res[0],eigs[0],eigs[1])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
    elif field_row == ("temperature",""):
       if field_row == ("streamfunction",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
       elif field_row == ("velocityz",""):
-         mat = cartesian.zblk(res[0])
+         mat = c1d.zblk(res[0])
 
       elif field_row == ("temperature",""):
-         mat = cartesian.i2lapl(res[0],eigs[0],eigs[1])
+         mat = c1d.i2lapl(res[0],eigs[0],eigs[1])
 
    return mat
 
@@ -104,13 +104,13 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    """Create matrix block of time operator"""
 
    if field_row == ("streamfunction",""):
-      mat = cartesian.i2(res[0],eigs[0],eigs[1])
+      mat = c1d.i2(res[0],eigs[0],eigs[1])
 
    elif field_row == ("velocityz",""):
-      mat = cartesian.i4lapl(res[0],eigs[0],eigs[1])
+      mat = c1d.i4lapl(res[0],eigs[0],eigs[1])
 
    elif field_row == ("temperature",""):
-      mat = cartesian.i2(res[0],eigs[0],eigs[1])
+      mat = c1d.i2(res[0],eigs[0],eigs[1])
 
    return mat
 
