@@ -23,8 +23,77 @@ for k,rec in sorted(r.items()):
    print("\t" + str(k) + ": \t" + str(rec))
 print("\n")
 
+print("i2lapl:")
+k, l = sympy.symbols('k l')
+terms = [{'q':2, 'p':0, 'd':2, 'c':1},{'q':2, 'p':0, 'd':0, 'c':-k**2},{'q':2, 'p':0, 'd':0, 'c':-l**2}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i2laplh:")
+k = sympy.Symbol('k')
+terms = [{'q':2, 'p':0, 'd':2, 'c':1},{'q':2, 'p':0, 'd':0, 'c':-k**2}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
 print("i4:")
 terms = [{'q':4, 'p':0, 'd':0, 'c':1}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i4d2:")
+terms = [{'q':4, 'p':0, 'd':2, 'c':1}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i4lapl:")
+k, l = sympy.symbols('k l')
+terms = [{'q':4, 'p':0, 'd':2, 'c':1},{'q':4, 'p':0, 'd':0, 'c':-k**2},{'q':4, 'p':0, 'd':0, 'c':-l**2}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i4laplh:")
+k = sympy.Symbol('k')
+terms = [{'q':4, 'p':0, 'd':2, 'c':1},{'q':4, 'p':0, 'd':0, 'c':-k**2}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i4lapl2:")
+k, l = sympy.symbols('k l')
+terms = [{'q':4, 'p':0, 'd':4, 'c':1},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':0, 'c':l**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2},{'q':4, 'p':0, 'd':2, 'c':-2*l**2},{'q':4, 'p':0, 'd':0, 'c':2*k**2*l**2}]
+r = symbolic.build_recurrence(terms, {0:1})
+n = sympy.Symbol('n')
+print("   General:")
+for k,rec in sorted(r.items()):
+   print("\t" + str(k) + ": \t" + str(rec))
+print("\n")
+
+print("i4lapl2h:")
+k = sympy.Symbol('k')
+terms = [{'q':4, 'p':0, 'd':4, 'c':1},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2}]
 r = symbolic.build_recurrence(terms, {0:1})
 n = sympy.Symbol('n')
 print("   General:")

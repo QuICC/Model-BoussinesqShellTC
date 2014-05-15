@@ -11,9 +11,9 @@ def zblk(nx, nz):
 
 
 def i2j2d2d2(nx, nz):
-   """Create a quasi identity block"""
+   """Create a quasi identity block of order 2,2"""
 
-   return spsp.kron(c1d.i2d2(nz), c1d.i2d2(nx))
+   return qid(nx,nz,2,2)
 
 
 def i2j2(nx, nz):
@@ -37,10 +37,16 @@ def i4j4(nx, nz):
 def i4j4lapl(nx, nz, k):
    """Create operator for 4th integral in x,z of Laplacian T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*nz)
+   return spsp.kron(c1d.i4(nz), c1d.i4laplh(nx,k)) + spsp.kron(c1d.i4d2(nz), c1d,i4(nx))
 
 
 def i4j4lapl2(nx, nz, k):
    """Create operator for 4th integral in x,z of Laplacian^2 T_n(x)T_n(z)"""
 
-   return spsp.identity(nx*nz)
+   return spsp.kron(c1d.i4(nz), c1d.i4lapl2h(nx,k)) + 2*spsp.kron(c1d.i4d2(nz), c1d.i4laplh(nx,k)) + spsp.kron(c1d.i4d4(nz), c1d.i4(nx))
+
+
+def qid(nx, nz, qx, qz):
+   """Create a quasi identity block order qx in x in qz in z"""
+
+   return spsp.kron(c1d.qid(nz,qz), c1d.qid(nx,qx))

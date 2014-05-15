@@ -11,12 +11,9 @@ def zblk(nx):
 
 
 def i2d2(nx):
-   """Create a quasi identity block"""
+   """Create a quasi identity block of order 2"""
 
-   offsets = [0]
-   diags = [[0,0] + [1]*(nx-2)]
-
-   return spsp.diags(diags, offsets)
+   return qid(nx,2)
 
 
 def i1(nx):
@@ -49,15 +46,15 @@ def i2(nx):
 
    # Generate 2nd subdiagonal
    def d_2(n):
-      return 1/(4*n*(n - 1))
+      return 1.0/(4*n*(n - 1))
 
    # Generate main diagonal
    def d0(n):
-      return -1/(2*(n - 1)*(n + 1))
+      return -1.0/(2*(n - 1)*(n + 1))
 
    # Generate 2nd superdiagonal
    def d2(n):
-      return 1/(4*n*(n + 1))
+      return 1.0/(4*n*(n + 1))
 
    ds = [d_2, d0, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -124,28 +121,59 @@ def i4(nx):
    
    # Generate 4th subdiagonal
    def d_4(n):
-      return 1/(16*n*(n - 3)*(n - 2)*(n - 1))
+      return 1.0/(16*n*(n - 3)*(n - 2)*(n - 1))
 
    # Generate 2nd subdiagonal
    def d_2(n):
-      return -1/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+      return -1.0/(4*n*(n - 3)*(n - 1)*(n + 1)) 
 
    # Generate main diagonal
    def d0(n):
-      return 3/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+      return 3.0/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
 
    # Generate 2nd superdiagonal
    def d2(n):
-      return -1/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+      return -1.0/(4*n*(n - 1)*(n + 1)*(n + 3)) 
 
    # Generate 4th superdiagonal
    def d4(n):
-      return 1/(16*n*(n + 1)*(n + 2)*(n + 3))
+      return 1.0/(16*n*(n + 1)*(n + 2)*(n + 3))
 
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
    return spsp.diags(diags, offsets)
+
+
+def i4d2(nx):
+   """Create operator for 4th integral in x of D_x^2 T_n(x)"""
+
+   ns = np.arange(0, nx, 1)
+   offsets = np.arange(-2,3,2)
+   nzrow = 3
+
+   # Generate 2nd subdiagonal
+   def d_2(n):
+      return 1.0/(4*n*(n - 1))
+
+   # Generate main diagonal
+   def d0(n):
+      return -1.0/(2*(n - 1)*(n + 1))
+
+   # Generate 2nd superdiagonal
+   def d2(n):
+      return 1.0/(4*n*(n + 1))
+
+   ds = [d_2, d0, d2]
+   diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+   return spsp.diags(diags, offsets)
+
+
+def i4d4(nx):
+   """Create a quasi identity block of order 4"""
+
+   return qid(nx,4)
 
 
 def i4lapl(nx, k, l):
@@ -174,6 +202,39 @@ def i4lapl(nx, k, l):
    # Generate 4th superdiagonal
    def d4(n):
       return -(k**2 + l**2)/(16*n*(n + 1)*(n + 2)*(n + 3))
+
+   ds = [d_4, d_2, d0, d2, d4]
+   diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+   return spsp.diags(diags, offsets)
+
+
+def i4laplh(nx, k):
+   """Create operator for 4th integral in x of horizontal Laplacian T_n(x)"""
+
+   ns = np.arange(0, nx, 1)
+   offsets = np.arange(-4,5,2)
+   nzrow = 3
+   
+   # Generate 4th subdiagonal
+   def d_4(n):
+      return -k**2/(16*n*(n - 3)*(n - 2)*(n - 1))
+
+   # Generate 2nd subdiagonal
+   def d_2(n):
+      return (k**2 + n**2 - 2*n - 3)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+
+   # Generate main diagonal
+   def d0(n):
+      return -(3*k**2 + 4*n**2 - 16)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+
+   # Generate 2nd superdiagonal
+   def d2(n):
+      return (k**2 + n**2 + 2*n - 3)/(4*n*(n - 1)*(n + 1)*(n + 3))
+
+   # Generate 4th superdiagonal
+   def d4(n):
+      return -k**2/(16*n*(n + 1)*(n + 2)*(n + 3))
 
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -213,3 +274,44 @@ def i4lapl2(nx, k, l):
 
    return spsp.diags(diags, offsets)
 
+
+def i4lapl2h(nx, k):
+   """Create operator for 4th integral in x of horizontal Laplacian^2 T_n(x)"""
+
+   ns = np.arange(0, nx, 1)
+   offsets = np.arange(-4,5,2)
+   nzrow = 3
+
+   # Generate 4th subdiagonal
+   def d_4(n):
+      return k**4/(16*n*(n - 3)*(n - 2)*(n - 1))
+
+   # Generate 2nd subdiagonal
+   def d_2(n):
+      return -k**2*(k**2 + 2*n**2 - 4*n - 6)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+
+   # Generate main diagonal
+   def d0(n):
+      return (3*k**4 + 8*k**2*n**2 - 32*k**2 + 8*n**4 - 40*n**2 + 32)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+
+   # Generate 2nd superdiagonal
+   def d2(n):
+      return -k**2*(k**2 + 2*n**2 + 4*n - 6)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+
+   # Generate 4th superdiagonal
+   def d4(n):
+      return k**4/(16*n*(n + 1)*(n + 2)*(n + 3))
+
+   ds = [d_4, d_2, d0, d2, d4]
+   diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+   return spsp.diags(diags, offsets)
+
+
+def qid(nx, q):
+   """Create a quasi identity block of order q"""
+
+   offsets = [0]
+   diags = [[0]*q + [1]*(nx-q)]
+
+   return spsp.diags(diags, offsets)
