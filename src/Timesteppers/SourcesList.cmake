@@ -2,4 +2,6 @@
 set(MHDSources
    ImExRK3.cpp
    TimestepCoordinator.cpp
+   TimestepRCoordinatorBase.cpp
+   TimestepZCoordinatorBase.cpp
 )

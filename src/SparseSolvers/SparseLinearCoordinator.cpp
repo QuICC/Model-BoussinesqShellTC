@@ -28,41 +28,38 @@ namespace GeoMHDiSCC {
 
 namespace Solver {
 
-   SparseLinearCoordinator::SparseLinearCoordinator()
-      : SparseLinearCoordinatorBase<SparseLinearSolver>()
+   SparseLinearCoordinator<false>::SparseLinearCoordinator()
+      : SparseLinearCoordinatorImpl()
    {
    }
 
-   SparseLinearCoordinator::~SparseLinearCoordinator()
+   SparseLinearCoordinator<false>::~SparseLinearCoordinator()
    {
    }
 
-   void SparseLinearCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
-   {
-      // Update the equation input to the timestepper
-      this->getInput(scalEq, vectEq, scalVar, vectVar);
-
-      // Solve all the linear systems
-      this->solveSystems();
-      
-      // Transfer timestep output back to equations
-      this->transferOutput(scalEq, vectEq);
-
-      // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % this->mNStep;
-   }
-
-   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator<false>::buildSolverMatrix(SparseLinearCoordinator<false>::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+
+
+
+   SparseLinearCoordinator<true>::SparseLinearCoordinator()
+      : SparseLinearCoordinatorImpl()
+   {
+   }
+
+   SparseLinearCoordinator<true>::~SparseLinearCoordinator()
+   {
+   }
+
+   void SparseLinearCoordinator<true>::buildSolverMatrix(SparseLinearCoordinator<true>::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
-   void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   void SparseLinearCoordinator<true>::buildSolverMatrix(SparseLinearCoordinator<true>::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }

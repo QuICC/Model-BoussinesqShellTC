@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseTrivialCoordinator::SparseTrivialCoordinator()
-      : SparseCoordinatorBase<SparseTrivialSolver>()
+      : SparseCoordinatorBase<SparseTrivialSolver,Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX>()
    {
    }
 
