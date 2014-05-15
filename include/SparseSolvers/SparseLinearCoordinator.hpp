@@ -32,7 +32,7 @@ namespace Solver {
    /**
     * @brief Implementation of general sparse linear solver coordinator
     */
-   class SparseLinearCoordinator: public SparseLinearCoordinatorBase<SparseZLinearSolver,SparseRZLinearSolver>
+   class SparseLinearCoordinator: public SparseLinearCoordinatorBase<SparseLinearSolver>
    {
       public:
          /**
@@ -57,7 +57,7 @@ namespace Solver {
 
       protected:
          /**
-          * @brief Build the real solver matrix
+          * @brief Build the real operator, real field solver matrix
           *
           * @param spSolver   Shared sparse real solver
           * @param matIdx     Index of the solver matrix
@@ -65,10 +65,10 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
-          * @brief Build the complex solver matrix
+          * @brief Build the real operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
           * @param matIdx     Index of the solver matrix
@@ -76,7 +76,18 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+         /**
+          * @brief Build the complex operator, complex field solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
          template <typename TStepper> void buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);

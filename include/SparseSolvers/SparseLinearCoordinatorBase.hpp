@@ -26,6 +26,7 @@
 // Project includes
 //
 #include "Base/MathConstants.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
@@ -44,7 +45,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse linear solver coordinator
     */
-   template <typename TZSolver, typename TRSolver> class SparseLinearCoordinatorBase: public SparseCoordinatorBase<TZSolver,TRSolver>
+   template <template <class,class> class TSolver> class SparseLinearCoordinatorBase: public SparseCoordinatorBase<TSolver>
    {
       public:
          /**
@@ -63,7 +64,7 @@ namespace Solver {
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::ScalarEquation_range& scalEq, const typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::VectorEquation_range& vectEq);
+         void init(const typename SparseLinearCoordinatorBase<TSolver>::ScalarEquation_range& scalEq, const typename SparseLinearCoordinatorBase<TSolver>::VectorEquation_range& vectEq);
          
       protected:
          /**
@@ -82,7 +83,7 @@ namespace Solver {
          void solveSystems();
 
          /**
-          * @brief Build the real solver matrix
+          * @brief Build the real operator, real field solver matrix
           *
           * @param spSolver   Shared sparse real solver
           * @param matIdx     Index of the solver matrix
@@ -90,10 +91,10 @@ namespace Solver {
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SharedRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
          /**
-          * @brief Build the complex solver matrix
+          * @brief Build the real operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
           * @param matIdx     Index of the solver matrix
@@ -101,12 +102,23 @@ namespace Solver {
           * @param comp    Field component
           * @param idx     Matrix index
           */
-         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase<TSolver>::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
+
+         /**
+          * @brief Build the complex operator, complex field solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq    Shared pointer to equation
+          * @param comp    Field component
+          * @param idx     Matrix index
+          */
+         virtual void buildSolverMatrix(typename SparseLinearCoordinatorBase::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) = 0;
 
       private:
    };
 
-   template <typename TZSolver, typename TRSolver> template <typename TSolverIt> void SparseLinearCoordinatorBase<TZSolver,TRSolver>::buildSolverMatrices(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
+   template <template <class,class> class TSolver> template <typename TSolverIt> void SparseLinearCoordinatorBase<TSolver>::buildSolverMatrices(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
    {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
@@ -129,16 +141,16 @@ namespace Solver {
       }
    }
 
-   template <typename TZSolver, typename TRSolver> SparseLinearCoordinatorBase<TZSolver,TRSolver>::SparseLinearCoordinatorBase()
-      : SparseCoordinatorBase<TZSolver,TRSolver>()
+   template <template <class,class> class TSolver> SparseLinearCoordinatorBase<TSolver>::SparseLinearCoordinatorBase()
+      : SparseCoordinatorBase<TSolver>()
    {
    }
 
-   template <typename TZSolver, typename TRSolver> SparseLinearCoordinatorBase<TZSolver,TRSolver>::~SparseLinearCoordinatorBase()
+   template <template <class,class> class TSolver> SparseLinearCoordinatorBase<TSolver>::~SparseLinearCoordinatorBase()
    {
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseLinearCoordinatorBase<TZSolver,TRSolver>::init(const typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::ScalarEquation_range& scalEq, const typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::VectorEquation_range& vectEq)
+   template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::init(const typename SparseLinearCoordinatorBase<TSolver>::ScalarEquation_range& scalEq, const typename SparseLinearCoordinatorBase<TSolver>::VectorEquation_range& vectEq)
    {
       //
       // Create real/complex solvers
@@ -237,27 +249,38 @@ namespace Solver {
       // Initialise the solvers and the initial state
       //
 
-      DebuggerMacro_start("Linear: complex init", 2);
+      DebuggerMacro_start("Linear: complex operator, complex field init", 2);
       // Initialise solvers from complex equation steppers
-      typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverZ_iterator   solZIt;
-      for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
+      typename SparseLinearCoordinatorBase<TSolver>::SolverZZ_iterator   solZIt;
+      for(solZIt = this->mZZSolvers.begin(); solZIt != this->mZZSolvers.end(); ++solZIt)
       {
-         DebuggerMacro_msg("---> complex solver", 2);
+         DebuggerMacro_msg("---> complex operator, complex field solver", 2);
 
          (*solZIt)->initSolver();
       }
-      DebuggerMacro_stop("Linear: complex init t = ", 2);
+      DebuggerMacro_stop("Linear: complex operator, complex field init t = ", 2);
 
-      DebuggerMacro_start("Linear: real init", 2);
+      DebuggerMacro_start("Linear: real operator, real field init", 2);
       // Initialise solvers from real equation steppers
-      typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverR_iterator   solRIt;
-      for(solRIt = this->mRSolvers.begin(); solRIt != this->mRSolvers.end(); ++solRIt)
+      typename SparseLinearCoordinatorBase<TSolver>::SolverRR_iterator   solRRIt;
+      for(solRRIt = this->mRRSolvers.begin(); solRRIt != this->mRRSolvers.end(); ++solRRIt)
       {
-         DebuggerMacro_msg("---> real solver", 2);
+         DebuggerMacro_msg("---> real operator, real field solver", 2);
 
-         (*solRIt)->initSolver();
+         (*solRRIt)->initSolver();
       }
-      DebuggerMacro_stop("Linear: real init t = ", 2);
+      DebuggerMacro_stop("Linear: real operator, real field init t = ", 2);
+
+      DebuggerMacro_start("Linear: real operator, complex field init", 2);
+      // Initialise solvers from real equation steppers
+      typename SparseLinearCoordinatorBase<TSolver>::SolverRZ_iterator   solRZIt;
+      for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
+      {
+         DebuggerMacro_msg("---> real operator, complex field solver", 2);
+
+         (*solRZIt)->initSolver();
+      }
+      DebuggerMacro_stop("Linear: real operator, complex field init t = ", 2);
 
       // Reset the step index
       this->mStep = 0;
@@ -266,7 +289,7 @@ namespace Solver {
       this->initSolution(scalEq, vectEq);
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseLinearCoordinatorBase<TZSolver,TRSolver>::createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
@@ -274,11 +297,11 @@ namespace Solver {
       // Get solver index
       int myIdx = spEq->couplingInfo(myId.second).solverIndex();
 
-      // Complex matrices in linear solve
+      // System operator is complex
       if(spEq->couplingInfo(myId.second).isComplex())
       {
          // Create iterator to current complex solver
-         typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverZ_iterator solZIt = this->mZSolvers.begin();
+         typename SparseLinearCoordinatorBase<TSolver>::SolverZZ_iterator solZIt = this->mZZSolvers.begin();
          std::advance(solZIt, myIdx);
 
          // Build solver matrices
@@ -287,37 +310,62 @@ namespace Solver {
             this->buildSolverMatrices(spEq, myId, solZIt);
          }
 
-      // Real matrices in linear solve
+      // System operator is real
       } else
       {
-         // Create iterator to current real solver
-         typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverR_iterator solRIt = this->mRSolvers.begin();
-         std::advance(solRIt, myIdx);
-
-         // Build solver matrices
-         if(! (*solRIt)->isInitialized())
+         // Field is complex
+         if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
          {
-            this->buildSolverMatrices(spEq, myId, solRIt);
+            // Create iterator to current complex field solver
+            typename SparseLinearCoordinatorBase<TSolver>::SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+            std::advance(solRZIt, myIdx);
+
+            // Build solver matrices
+            if(! (*solRZIt)->isInitialized())
+            {
+               this->buildSolverMatrices(spEq, myId, solRZIt);
+            }
+
+         // Field is real
+         } else
+         {
+            // Create iterator to current real field solver
+            typename SparseLinearCoordinatorBase<TSolver>::SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+            std::advance(solRRIt, myIdx);
+
+            // Build solver matrices
+            if(! (*solRRIt)->isInitialized())
+            {
+               this->buildSolverMatrices(spEq, myId, solRRIt);
+            }
          }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseLinearCoordinatorBase<TZSolver,TRSolver>::solveSystems()
+   template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::solveSystems()
    {
-      // Solve complex linear systems
-      typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverZ_iterator   solZIt;
-      for(solZIt = this->mZSolvers.begin(); solZIt != this->mZSolvers.end(); ++solZIt)
+      // Solve complex operator, complex field linear systems
+      typename SparseLinearCoordinatorBase<TSolver>::SolverZZ_iterator   solZIt;
+      for(solZIt = this->mZZSolvers.begin(); solZIt != this->mZZSolvers.end(); ++solZIt)
       {
          // Compute linear solve RHS
          (*solZIt)->solve(this->mStep);
       }
 
-      // Solve real linear systems
-      typename SparseLinearCoordinatorBase<TZSolver,TRSolver>::SolverR_iterator   solRIt;
-      for(solRIt = this->mRSolvers.begin(); solRIt != this->mRSolvers.end(); ++solRIt)
+      // Solve real operator, real field linear systems
+      typename SparseLinearCoordinatorBase<TSolver>::SolverRR_iterator   solRRIt;
+      for(solRRIt = this->mRRSolvers.begin(); solRRIt != this->mRRSolvers.end(); ++solRRIt)
       {
          // Compute linear solve RHS
-         (*solRIt)->solve(this->mStep);
+         (*solRRIt)->solve(this->mStep);
+      }
+
+      // Solve real operator, complex field linear systems
+      typename SparseLinearCoordinatorBase<TSolver>::SolverRZ_iterator   solRZIt;
+      for(solRZIt = this->mRZSolvers.begin(); solRZIt != this->mRZSolvers.end(); ++solRZIt)
+      {
+         // Compute linear solve RHS
+         (*solRZIt)->solve(this->mStep);
       }
    }
 

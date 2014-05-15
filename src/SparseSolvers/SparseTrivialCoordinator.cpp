@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseTrivialCoordinator::SparseTrivialCoordinator()
-      : SparseCoordinatorBase<SparseZTrivialSolver, SparseRZTrivialSolver>()
+      : SparseCoordinatorBase<SparseTrivialSolver>()
    {
    }
 

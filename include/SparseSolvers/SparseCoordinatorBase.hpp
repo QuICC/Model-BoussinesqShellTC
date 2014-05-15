@@ -19,9 +19,12 @@
 
 // Project includes
 //
-#include "SparseSolvers/SparseLinearSolver.hpp"
+#include "Base/Typedefs.hpp"
+#include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+
+#include <iostream>
 
 namespace GeoMHDiSCC {
 
@@ -30,26 +33,35 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse solver coordinator
     */
-   template <typename TZSolver, typename TRSolver> class SparseCoordinatorBase
+   template <template <class,class> class TSolver> class SparseCoordinatorBase
    {
       public:
-         /// Typedef for a shared real linear solver
-         typedef TRSolver RSolverType;
+         /// Typedef for a real operator, real field linear solver
+         typedef TSolver<SparseMatrix,Matrix> RRSolverType;
 
-         /// Typedef for a shared complex linear solver
-         typedef TZSolver ZSolverType;
+         /// Typedef for a real operator, complex field linear solver
+         typedef TSolver<SparseMatrix,DecoupledZMatrix> RZSolverType;
 
-         /// Typedef for a shared real linear solver
-         typedef typename SharedPtrMacro<TRSolver >  SharedRSolverType;
+         /// Typedef for a complex operator, complex field linear solver
+         typedef TSolver<SparseMatrixZ,MatrixZ> ZZSolverType;
 
-         /// Typedef for a shared complex linear solver
-         typedef typename SharedPtrMacro<TZSolver >  SharedZSolverType;
+         /// Typedef for a shared real operator, real field linear solver
+         typedef typename SharedPtrMacro<RRSolverType >  SharedRRSolverType;
 
-         /// Typedef for an iterator to a real linear solver
-         typedef typename std::vector<SharedRSolverType>::iterator   SolverR_iterator;
+         /// Typedef for a shared real operator, complex field linear solver
+         typedef typename SharedPtrMacro<RZSolverType >  SharedRZSolverType;
 
-         /// Typedef for an iterator to a complex linear solver
-         typedef typename std::vector<SharedZSolverType>::iterator   SolverZ_iterator;
+         /// Typedef for a shared complex operator, complex field linear solver
+         typedef typename SharedPtrMacro<ZZSolverType >  SharedZZSolverType;
+
+         /// Typedef for an iterator to a real operator, real field linear solver
+         typedef typename std::vector<SharedRRSolverType>::iterator   SolverRR_iterator;
+
+         /// Typedef for an iterator to a real operator, complex field linear solver
+         typedef typename std::vector<SharedRZSolverType>::iterator   SolverRZ_iterator;
+
+         /// Typedef for an iterator to a complex operator, complex field linear solver
+         typedef typename std::vector<SharedZZSolverType>::iterator   SolverZZ_iterator;
 
          /// Typedef for a shared scalar equation iterator
          typedef std::vector<Equations::SharedIScalarEquation>::iterator   ScalarEquation_iterator;
@@ -106,14 +118,19 @@ namespace Solver {
          
       protected:
          /**
-          * @brief Create a real linear solver
+          * @brief Create a real operator, real field linear solver
           */
-         virtual void addRSolver(const int start);
+         virtual void addRRSolver(const int start);
 
          /**
-          * @brief Create a complex linear solver
+          * @brief Create a real operator, complex field linear solver
           */
-         virtual void addZSolver(const int start);
+         virtual void addRZSolver(const int start);
+
+         /**
+          * @brief Create a complex operator, complex field linear solver
+          */
+         virtual void addZZSolver(const int start);
 
          /**
           * @brief Get the solver input independently of solver type
@@ -170,69 +187,94 @@ namespace Solver {
          int   mStep;
 
          /**
-          * @brief Vector of (coupled) real solvers
+          * @brief Vector of (coupled) real operator, real field solvers
           */
-         std::vector<SharedRSolverType> mRSolvers;
+         std::vector<SharedRRSolverType> mRRSolvers;
 
          /**
-          * @brief Vector of (coupled) complex solvers
+          * @brief Vector of (coupled) real operator, complex field solvers
           */
-         std::vector<SharedZSolverType> mZSolvers;
+         std::vector<SharedRZSolverType> mRZSolvers;
+
+         /**
+          * @brief Vector of (coupled) complex operator, complex field solvers
+          */
+         std::vector<SharedZZSolverType> mZZSolvers;
 
       private:
    };
 
-   template <typename TZSolver, typename TRSolver> SparseCoordinatorBase<TZSolver,TRSolver>::SparseCoordinatorBase()
+   template <template <class,class> class TSolver> SparseCoordinatorBase<TSolver>::SparseCoordinatorBase()
       : mNStep(1), mStep(0)
    {
    }
 
-   template <typename TZSolver, typename TRSolver> SparseCoordinatorBase<TZSolver,TRSolver>::~SparseCoordinatorBase()
+   template <template <class,class> class TSolver> SparseCoordinatorBase<TSolver>::~SparseCoordinatorBase()
    {
    }
 
-   template <typename TZSolver, typename TRSolver> bool SparseCoordinatorBase<TZSolver,TRSolver>::finishedStep() const
+   template <template <class,class> class TSolver> bool SparseCoordinatorBase<TSolver>::finishedStep() const
    {
       return (this->mStep == 0);
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::addRSolver(const int start)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::addRRSolver(const int start)
    {
-      SparseCoordinatorBase::SharedRSolverType spSolver(new SparseCoordinatorBase::RSolverType(start));
+      SparseCoordinatorBase::SharedRRSolverType spSolver(new SparseCoordinatorBase::RRSolverType(start));
 
-      this->mRSolvers.push_back(spSolver);
+      this->mRRSolvers.push_back(spSolver);
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::addZSolver(const int start)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::addRZSolver(const int start)
    {
-      SparseCoordinatorBase::SharedZSolverType spSolver(new SparseCoordinatorBase::ZSolverType(start));
+      SparseCoordinatorBase::SharedRZSolverType spSolver(new SparseCoordinatorBase::RZSolverType(start));
 
-      this->mZSolvers.push_back(spSolver);
+      this->mRZSolvers.push_back(spSolver);
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::addZZSolver(const int start)
    {
-      // Equation is part of a complex system
+      SparseCoordinatorBase::SharedZZSolverType spSolver(new SparseCoordinatorBase::ZZSolverType(start));
+
+      this->mZZSolvers.push_back(spSolver);
+   }
+
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   {
+      // System has a complex operator
       if(spEq->couplingInfo(comp).isComplex())
       {
-         // Add linear solver if system index does not yet exist
-         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mZSolvers.size()) - 1)
+         // Add solver if system index does not yet exist
+         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mZZSolvers.size()) - 1)
          {
-            this->addZSolver(spEq->couplingInfo(comp).fieldStart());
+            this->addZZSolver(spEq->couplingInfo(comp).fieldStart());
          }
 
-      // Equation is part of a real system
+      // System has a real operator
       } else
       {
-         // Add equation stepper if system index does not yet exist
-         if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mRSolvers.size()) - 1)
+         // Field is complex
+         if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
          {
-            this->addRSolver(spEq->couplingInfo(comp).fieldStart());
+            // Add solver if system index does not yet exist
+            if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mRZSolvers.size()) - 1)
+            {
+               this->addRZSolver(spEq->couplingInfo(comp).fieldStart());
+            }
+
+         // Field is real
+         } else
+         {
+            // Add solver if system index does not yet exist
+            if(spEq->couplingInfo(comp).solverIndex() > static_cast<int>(this->mRRSolvers.size()) - 1)
+            {
+               this->addRRSolver(spEq->couplingInfo(comp).fieldStart());
+            }
          }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::createStorage(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::createStorage(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
@@ -240,29 +282,43 @@ namespace Solver {
       // Index of solver
       int myIdx = spEq->couplingInfo(myId.second).solverIndex();
 
-      // Complex matrices in linear solve
+      // System has a complex operator
       if(spEq->couplingInfo(myId.second).isComplex())
       {
          // Create iterator to current complex solver
-         SolverZ_iterator solZIt = this->mZSolvers.begin();
+         SolverZZ_iterator solZIt = this->mZZSolvers.begin();
          std::advance(solZIt, myIdx);
 
          // setup storage and information
          this->setupStorage(spEq, myId, solZIt);
 
-      // Real matrices in linear solve
+      // System has a real operator
       } else
       {
-         // Create iterator to current real solver
-         SolverR_iterator solRIt = this->mRSolvers.begin();
-         std::advance(solRIt, myIdx);
+         // Field is complex
+         if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
+         {
+            // Create iterator to current real field solver
+            SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+            std::advance(solRZIt, myIdx);
 
-         // setup storage and information
-         this->setupStorage(spEq, myId, solRIt);
+            // setup storage and information
+            this->setupStorage(spEq, myId, solRZIt);
+
+         // Field is real
+         } else
+         {
+            // Create iterator to current real field solver
+            SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+            std::advance(solRRIt, myIdx);
+
+            // setup storage and information
+            this->setupStorage(spEq, myId, solRRIt);
+         }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> template <typename TSolverIt> void SparseCoordinatorBase<TZSolver,TRSolver>::setupStorage(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
+   template <template <class,class> class TSolver> template <typename TSolverIt> void SparseCoordinatorBase<TSolver>::setupStorage(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt)
    {
       // Number of linear systems
       int nSystems = spEq->couplingInfo(id.second).nSystems();
@@ -292,7 +348,7 @@ namespace Solver {
       (*solveIt)->addInformation(id,startRow,spEq->pyName());
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Storage for identity
       SpectralFieldId myId;
@@ -307,11 +363,11 @@ namespace Solver {
          // Get index of solver
          int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
 
-         // Linear solve matrices are complex
+         // System operator is complex
          if((*scalEqIt)->couplingInfo(myId.second).isComplex())
          {
             // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
+            SolverZZ_iterator solZIt = this->mZZSolvers.begin();
             std::advance(solZIt, myIdx);
 
             // Get solver output
@@ -320,17 +376,34 @@ namespace Solver {
                (*scalEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
             }
 
-         // Linear solve matrices are real
+         // System operator is real real
          } else
          {
-            // Create iterator to current real solver
-            SolverR_iterator solRIt = this->mRSolvers.begin();
-            std::advance(solRIt, myIdx);
-
-            // Get solver output
-            for(int i = 0; i < (*solRIt)->nSystem(); i++)
+            // Field is complex
+            if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
             {
-               (*scalEqIt)->storeSolution(myId.second, (*solRIt)->solution(i), i, (*solRIt)->startRow(myId,i));
+               // Create iterator to current complex field solver
+               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+               std::advance(solRZIt, myIdx);
+
+               // Get solver output
+               for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+               {
+                  (*scalEqIt)->storeSolution(myId.second, (*solRZIt)->solution(i), i, (*solRZIt)->startRow(myId,i));
+               }
+
+            // Field is real
+            } else
+            {
+               // Create iterator to current real field solver
+               SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+               std::advance(solRRIt, myIdx);
+
+               // Get solver output
+               for(int i = 0; i < (*solRRIt)->nSystem(); i++)
+               {
+                  (*scalEqIt)->storeSolution(myId.second, (*solRRIt)->solution(i), i, (*solRRIt)->startRow(myId,i));
+               }
             }
          }
       }
@@ -350,11 +423,11 @@ namespace Solver {
             // Get index of solver
             int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
 
-            // Linear solve matrices are complex
+            // System operator is complex
             if((*vectEqIt)->couplingInfo(myId.second).isComplex())
             {
                // Create iterator to current complex solver
-               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               SolverZZ_iterator solZIt = this->mZZSolvers.begin();
                std::advance(solZIt, myIdx);
 
                // Get solver output for first component
@@ -363,24 +436,41 @@ namespace Solver {
                   (*vectEqIt)->storeSolution(myId.second, (*solZIt)->solution(i), i, (*solZIt)->startRow(myId,i));
                }
 
-               // Linear solve matrices are real
+            // System operator is real
             } else
             {
-               // Create iterator to current real solver
-               SolverR_iterator solRIt = this->mRSolvers.begin();
-               std::advance(solRIt, myIdx);
-
-               // Get solver output for first component
-               for(int i = 0; i < (*solRIt)->nSystem(); i++)
+               // Field is complex
+               if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
                {
-                  (*vectEqIt)->storeSolution(myId.second, (*solRIt)->solution(i), i, (*solRIt)->startRow(myId,i));
+                  // Create iterator to current complex field solver
+                  SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+                  std::advance(solRZIt, myIdx);
+
+                  // Get solver output for first component
+                  for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+                  {
+                     (*vectEqIt)->storeSolution(myId.second, (*solRZIt)->solution(i), i, (*solRZIt)->startRow(myId,i));
+                  }
+
+               // Field is real
+               } else
+               {
+                  // Create iterator to current real field solver
+                  SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+                  std::advance(solRRIt, myIdx);
+
+                  // Get solver output for first component
+                  for(int i = 0; i < (*solRRIt)->nSystem(); i++)
+                  {
+                     (*vectEqIt)->storeSolution(myId.second, (*solRRIt)->solution(i), i, (*solRRIt)->startRow(myId,i));
+                  }
                }
             }
          }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -395,11 +485,11 @@ namespace Solver {
          // Get index of solver
          int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
 
-         // Linear solve matrices are complex
+         // System operator is complex
          if((*scalEqIt)->couplingInfo(myId.second).isComplex())
          {
             // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
+            SolverZZ_iterator solZIt = this->mZZSolvers.begin();
             std::advance(solZIt, myIdx);
 
             // Get solver input
@@ -408,17 +498,34 @@ namespace Solver {
                Equations::copyUnknown(*(*scalEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
             }
 
-         // Linear solve matrices are real
+         // System operator is real
          } else
          {
-            // Create iterator to current real solver
-            SolverR_iterator solRIt = this->mRSolvers.begin();
-            std::advance(solRIt, myIdx);
-
-            // Get solver input
-            for(int i = 0; i < (*solRIt)->nSystem(); i++)
+            // Field is complex
+            if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
             {
-               Equations::copyUnknown(*(*scalEqIt), myId.second, (*solRIt)->rSolution(i), i, (*solRIt)->startRow(myId,i));
+               // Create iterator to current complex field solver
+               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+               std::advance(solRZIt, myIdx);
+
+               // Get solver input
+               for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+               {
+                  Equations::copyUnknown(*(*scalEqIt), myId.second, (*solRZIt)->rSolution(i), i, (*solRZIt)->startRow(myId,i));
+               }
+
+            // Field is real
+            } else
+            {
+               // Create iterator to current real filed solver
+               SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+               std::advance(solRRIt, myIdx);
+
+               // Get solver input
+               for(int i = 0; i < (*solRRIt)->nSystem(); i++)
+               {
+                  Equations::copyUnknown(*(*scalEqIt), myId.second, (*solRRIt)->rSolution(i), i, (*solRRIt)->startRow(myId,i));
+               }
             }
          }
       }
@@ -437,11 +544,11 @@ namespace Solver {
             // Get index of solver
             int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
 
-            // Linear solve matrices are complex
+            // System operator is complex
             if((*vectEqIt)->couplingInfo(myId.second).isComplex())
             {
-               // Create iterator to current complex solver
-               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               // Create iterator to current complex field solver
+               SolverZZ_iterator solZIt = this->mZZSolvers.begin();
                std::advance(solZIt, myIdx);
 
                // Get solver input for toroidal component
@@ -450,24 +557,41 @@ namespace Solver {
                   Equations::copyUnknown(*(*vectEqIt), myId.second, (*solZIt)->rSolution(i), i, (*solZIt)->startRow(myId,i));
                }
 
-               // Linear solve matrices are real
+            // System operator is real
             } else
             {
-               // Create iterator to current real solver
-               SolverR_iterator solRIt = this->mRSolvers.begin();
-               std::advance(solRIt, myIdx);
-
-               // Get solver input for toroidal component
-               for(int i = 0; i < (*solRIt)->nSystem(); i++)
+               // Field is complex
+               if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
                {
-                  Equations::copyUnknown(*(*vectEqIt), myId.second, (*solRIt)->rSolution(i), i, (*solRIt)->startRow(myId,i));
+                  // Create iterator to current complex field solver
+                  SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+                  std::advance(solRZIt, myIdx);
+
+                  // Get solver input for toroidal component
+                  for(int i = 0; i < (*solRZIt)->nSystem(); i++)
+                  {
+                     Equations::copyUnknown(*(*vectEqIt), myId.second, (*solRZIt)->rSolution(i), i, (*solRZIt)->startRow(myId,i));
+                  }
+
+               // Field is real
+               } else
+               {
+                  // Create iterator to current real field solver
+                  SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+                  std::advance(solRRIt, myIdx);
+
+                  // Get solver input for toroidal component
+                  for(int i = 0; i < (*solRRIt)->nSystem(); i++)
+                  {
+                     Equations::copyUnknown(*(*vectEqIt), myId.second, (*solRRIt)->rSolution(i), i, (*solRRIt)->startRow(myId,i));
+                  }
                }
             }
          }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> void SparseCoordinatorBase<TZSolver,TRSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -482,25 +606,39 @@ namespace Solver {
          // Get index of solver
          int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
 
-         // Linear solve matrices are complex
+         // System operator is complex
          if((*scalEqIt)->couplingInfo(myId.second).isComplex())
          {
-            // Create iterator to current complex solver
-            SolverZ_iterator solZIt = this->mZSolvers.begin();
+            // Create iterator to current complex field solver
+            SolverZZ_iterator solZIt = this->mZZSolvers.begin();
             std::advance(solZIt, myIdx);
 
             // Get solver input
             this->getSolverInput(scalEqIt, myId, solZIt, scalVar, vectVar);
 
-         // Linear solve matrices are real
+         // System operator is real
          } else
          {
-            // Create iterator to current real solver
-            SolverR_iterator solRIt = this->mRSolvers.begin();
-            std::advance(solRIt, myIdx);
+            // Field is complex
+            if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
+            {
+               // Create iterator to current complex field solver
+               SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+               std::advance(solRZIt, myIdx);
 
-            // Get solver input
-            this->getSolverInput(scalEqIt, myId, solRIt, scalVar, vectVar);
+               // Get solver input
+               this->getSolverInput(scalEqIt, myId, solRZIt, scalVar, vectVar);
+
+            // Field is real
+            } else
+            {
+               // Create iterator to current real field solver
+               SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+               std::advance(solRRIt, myIdx);
+
+               // Get solver input
+               this->getSolverInput(scalEqIt, myId, solRRIt, scalVar, vectVar);
+            }
          }
       }
 
@@ -521,28 +659,42 @@ namespace Solver {
             // Linear solve matrices are complex
             if((*vectEqIt)->couplingInfo(myId.second).isComplex())
             {
-               // Create iterator to current complex solver
-               SolverZ_iterator solZIt = this->mZSolvers.begin();
+               // Create iterator to current complex field solver
+               SolverZZ_iterator solZIt = this->mZZSolvers.begin();
                std::advance(solZIt, myIdx);
 
                // Get solver input
                this->getSolverInput(vectEqIt, myId, solZIt, scalVar, vectVar);
 
-               // Linear solve matrices are real
+            // Linear solve matrices are real
             } else
             {
-               // Create iterator to current real solver
-               SolverR_iterator solRIt = this->mRSolvers.begin();
-               std::advance(solRIt, myIdx);
+               // Field is complex
+               if(Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX)
+               {
+                  // Create iterator to current complex field solver
+                  SolverRZ_iterator solRZIt = this->mRZSolvers.begin();
+                  std::advance(solRZIt, myIdx);
 
-               // Get solver input
-               this->getSolverInput(vectEqIt, myId, solRIt, scalVar, vectVar);
+                  // Get solver input
+                  this->getSolverInput(vectEqIt, myId, solRZIt, scalVar, vectVar);
+
+               // Field is real
+               } else
+               {
+                  // Create iterator to current real field solver
+                  SolverRR_iterator solRRIt = this->mRRSolvers.begin();
+                  std::advance(solRRIt, myIdx);
+
+                  // Get solver input
+                  this->getSolverInput(vectEqIt, myId, solRRIt, scalVar, vectVar);
+               }
             }
          }
       }
    }
 
-   template <typename TZSolver, typename TRSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TZSolver,TRSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
+   template <template <class,class> class TSolver> template <typename TEquationIt, typename TSolverIt> void SparseCoordinatorBase<TSolver>::getSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Get timestep input
       for(int i = 0; i < (*solveIt)->nSystem(); i++)

@@ -138,19 +138,6 @@ namespace Solver {
       private:
    };
 
-   /// Typedef for a real data real matrix solver
-   typedef SparseLinearSolver<SparseMatrix,Matrix> SparseRLinearSolver;
-   /// Typedef for a shared real data real matrix solver
-   typedef SharedPtrMacro<SparseRLinearSolver> SharedSparseRLinearSolver;
-   /// Typedef for a complex data real matrix solver
-   typedef SparseLinearSolver<SparseMatrix,DecoupledZMatrix> SparseRZLinearSolver;
-   /// Typedef for a shared real data real matrix solver
-   typedef SharedPtrMacro<SparseRZLinearSolver> SharedSparseRZLinearSolver;
-   /// Typedef for a complex data complex matrix solver
-   typedef SparseLinearSolver<SparseMatrixZ,MatrixZ> SparseZLinearSolver;
-   /// Typedef for a shared real data real matrix solver
-   typedef SharedPtrMacro<SparseZLinearSolver> SharedSparseZLinearSolver;
-
    template <typename TOperator,typename TData> SparseLinearSolver<TOperator,TData>::SparseLinearSolver(const int start)
       : SparseSolverBase(start)
    {

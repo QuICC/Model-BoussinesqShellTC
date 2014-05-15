@@ -28,7 +28,7 @@ namespace Solver {
    /**
     * @brief Implementation of a templated (coupled) trivial solver structure
     */
-   template <typename TData> class SparseTrivialSolver: public SparseSolverBase
+   template <typename TOperator,typename TData> class SparseTrivialSolver: public SparseSolverBase
    {
       public:
          /**
@@ -86,30 +86,17 @@ namespace Solver {
       private:
    };
 
-   /// Typedef for a real data real matrix trivial solver
-   typedef SparseTrivialSolver<Matrix> SparseRTrivialSolver;
-   /// Typedef for a shared real data real matrix trivial solver
-   typedef SharedPtrMacro<SparseRTrivialSolver> SharedSparseRTrivialSolver;
-   /// Typedef for a complex data real matrix trivial solver
-   typedef SparseTrivialSolver<DecoupledZMatrix> SparseRZTrivialSolver;
-   /// Typedef for a shared real data real matrix trivial solver
-   typedef SharedPtrMacro<SparseRZTrivialSolver> SharedSparseRZTrivialSolver;
-   /// Typedef for a complex data complex matrix trivial solver
-   typedef SparseTrivialSolver<MatrixZ> SparseZTrivialSolver;
-   /// Typedef for a shared real data real matrix trivial solver
-   typedef SharedPtrMacro<SparseZTrivialSolver> SharedSparseZTrivialSolver;
-
-   template <typename TData> SparseTrivialSolver<TData>::SparseTrivialSolver(const int start)
+   template <typename TOperator,typename TData> SparseTrivialSolver<TOperator,TData>::SparseTrivialSolver(const int start)
       : SparseSolverBase(start)
    {
       this->setInitialized();
    }
 
-   template <typename TData> SparseTrivialSolver<TData>::~SparseTrivialSolver()
+   template <typename TOperator,typename TData> SparseTrivialSolver<TOperator,TData>::~SparseTrivialSolver()
    {
    }
 
-   template <typename TData> void SparseTrivialSolver<TData>::addStorage(const int rows, const int cols)
+   template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
       assert(rows > 0);
@@ -120,22 +107,22 @@ namespace Solver {
       this->mSolution.back().setZero();
    }
 
-   template <typename TData> int SparseTrivialSolver<TData>::nSystem() const
+   template <typename TOperator,typename TData> int SparseTrivialSolver<TOperator,TData>::nSystem() const
    {
       return this->mSolution.size();
    }
 
-   template <typename TData> const TData& SparseTrivialSolver<TData>::solution(const int idx) const
+   template <typename TOperator,typename TData> const TData& SparseTrivialSolver<TOperator,TData>::solution(const int idx) const
    {
       return this->mSolution.at(idx);
    }
 
-   template <typename TData> TData& SparseTrivialSolver<TData>::rSolution(const int idx)
+   template <typename TOperator,typename TData> TData& SparseTrivialSolver<TOperator,TData>::rSolution(const int idx)
    {
       return this->mSolution.at(idx);
    }
 
-   template <typename TData> TData& SparseTrivialSolver<TData>::rRHSData(const int idx)
+   template <typename TOperator,typename TData> TData& SparseTrivialSolver<TOperator,TData>::rRHSData(const int idx)
    {
       // WARNING: this is the same as rSolution. It's used to simplify some implementations
       return this->mSolution.at(idx);

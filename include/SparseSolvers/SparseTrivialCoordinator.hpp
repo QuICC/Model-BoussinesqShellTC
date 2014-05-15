@@ -31,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse trivial solver coordinator
     */
-   class SparseTrivialCoordinator: public SparseCoordinatorBase<SparseZTrivialSolver, SparseRZTrivialSolver>
+   class SparseTrivialCoordinator: public SparseCoordinatorBase<SparseTrivialSolver>
    {
       public:
          /**

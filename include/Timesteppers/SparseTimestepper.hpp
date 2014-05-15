@@ -116,19 +116,6 @@ namespace Timestep {
       private:
    };
 
-   /// Typedef for a real data real matrix timestepper
-   typedef SparseTimestepper<SparseMatrix,Matrix> SparseRTimestepper;
-   /// Typedef for a shared real data real matrix timestepper
-   typedef SharedPtrMacro<SparseRTimestepper> SharedSparseRTimestepper;
-   /// Typedef for a complex data real matrix timestepper
-   typedef SparseTimestepper<SparseMatrix,DecoupledZMatrix> SparseRZTimestepper;
-   /// Typedef for a shared real data real matrix timestepper
-   typedef SharedPtrMacro<SparseRZTimestepper> SharedSparseRZTimestepper;
-   /// Typedef for a complex data complex matrix timestepper
-   typedef SparseTimestepper<SparseMatrixZ,MatrixZ> SparseZTimestepper;
-   /// Typedef for a shared real data real matrix timestepper
-   typedef SharedPtrMacro<SparseZTimestepper> SharedSparseZTimestepper;
-
    template <typename TOperator,typename TData> SparseTimestepper<TOperator,TData>::SparseTimestepper(const int start)
       : Solver::SparseLinearSolver<TOperator,TData>(start)
    {
