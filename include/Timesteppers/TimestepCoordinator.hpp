@@ -22,7 +22,7 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/ModelOperator.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
-#include "Timesteppers/TimestepCoordinatorBase.hpp"
+#include "Timesteppers/SparseTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -33,7 +33,7 @@ namespace Timestep {
    /**
     * @brief Implementation of general timestepper structure
     */
-   class TimestepCoordinator: public TimestepCoordinatorBase<Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX>
+   class TimestepCoordinator: public Solver::SparseLinearCoordinatorBase<SparseTimestepper>
    {
       public:
          /// Typedef for a shared scalar equation iterator
@@ -102,6 +102,38 @@ namespace Timestep {
          MHDFloat timestep() const;
          
       protected:
+         /**
+          * @brief Build the real operator, real field solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+         /**
+          * @brief Build the real operator, complex field solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+         /**
+          * @brief Build the complex operator, complex field solver matrix
+          *
+          * @param spSolver   Shared sparse real solver
+          * @param matIdx     Index of the solver matrix
+          * @param spEq       Shared pointer to equation
+          * @param comp       Field component
+          * @param idx        Matrix index
+          */
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
          /**
@@ -113,6 +145,11 @@ namespace Timestep {
           * @brief Update time dependence
           */
          void updateMatrices();
+
+         /**
+          * @brief Compute the RHS of all linear systems
+          */
+         void computeRHS();
 
          /**
           * @brief Maximum timestep jump per step (See Soederlind)

@@ -244,7 +244,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Linear solver coordinator
           */
-         Solver::SparseLinearCoordinatorType mLinearCoordinator;
+         Solver::SparseLinearCoordinator mLinearCoordinator;
 
          /**
           * @brief Simulation IO control

@@ -19,7 +19,6 @@
 
 // Project includes
 //
-#include "TypeSelectors/ScalarSelector.hpp"
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
 #include "SparseSolvers/SparseTrivialSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -32,7 +31,7 @@ namespace Solver {
    /**
     * @brief Implementation of the base for a general sparse trivial solver coordinator
     */
-   class SparseTrivialCoordinator: public SparseCoordinatorBase<SparseTrivialSolver,Datatypes::ScalarSelector<Dimensions::Transform::TRA1D>::FIELD_IS_COMPLEX>
+   class SparseTrivialCoordinator: public SparseCoordinatorBase<SparseTrivialSolver>
    {
       public:
          /**
