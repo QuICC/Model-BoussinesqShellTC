@@ -58,7 +58,7 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator<false>::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
    };
@@ -89,7 +89,7 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator<true>::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex operator, complex field solver matrix
@@ -100,7 +100,7 @@ namespace Solver {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(SparseLinearCoordinator<true>::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(SparseLinearCoordinator::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
    };
