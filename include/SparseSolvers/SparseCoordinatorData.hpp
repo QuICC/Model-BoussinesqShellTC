@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "TypeSelectors/SparseSolverDataSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 
@@ -35,13 +36,11 @@ namespace Solver {
    template <template <class,class> class TSolver> class SparseCoordinatorData
    {
       public:
-         /// Typedef for a real operator, real field linear solver
-//         typedef TSolver<SparseMatrix,Matrix> RealSolverType;
          /// Typedef for a real operator solver
-         typedef TSolver<SparseMatrix,DecoupledZMatrix> RealSolverType;
+         typedef typename SparseSolverDataSelector<TSolver>::RealSolverType RealSolverType;
 
          /// Typedef for a complex operator solver
-         typedef TSolver<SparseMatrixZ,MatrixZ> ComplexSolverType;
+         typedef typename SparseSolverDataSelector<TSolver>::ComplexSolverType ComplexSolverType;
 
          /// Typedef for a shared real operator solver
          typedef typename SharedPtrMacro<RealSolverType >  SharedRealSolverType;
