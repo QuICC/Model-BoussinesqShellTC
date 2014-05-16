@@ -103,17 +103,6 @@ namespace Timestep {
          
       protected:
          /**
-          * @brief Build the real operator, real field solver matrix
-          *
-          * @param spSolver   Shared sparse real solver
-          * @param matIdx     Index of the solver matrix
-          * @param spEq       Shared pointer to equation
-          * @param comp       Field component
-          * @param idx        Matrix index
-          */
-         virtual void buildSolverMatrix(TimestepCoordinator::SharedRRSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
-
-         /**
           * @brief Build the real operator, complex field solver matrix
           *
           * @param spSolver   Shared sparse real solver
@@ -122,7 +111,7 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(TimestepCoordinator::SharedRZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
          /**
           * @brief Build the complex operator, complex field solver matrix
@@ -133,7 +122,7 @@ namespace Timestep {
           * @param comp       Field component
           * @param idx        Matrix index
           */
-         virtual void buildSolverMatrix(TimestepCoordinator::SharedZZSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         virtual void buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
          /**

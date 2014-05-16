@@ -37,8 +37,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDFloat, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = false;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -63,8 +61,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -89,8 +85,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -115,8 +109,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -141,8 +133,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -167,8 +157,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -193,8 +181,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -219,8 +205,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -245,8 +229,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
@@ -271,8 +253,6 @@ namespace GeoMHDiSCC {
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> FwdType;
 
             typedef  FlatScalarField<MHDComplex, Dimensions::THREED> BwdType;
-
-            static const bool FIELD_IS_COMPLEX = true;
          };
 
          template<> struct ScalarSelector<Dimensions::Transform::TRA2D>
