@@ -179,6 +179,7 @@ namespace Equations {
     * @param matIdx     System index
     */
    template <typename TData> void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx);
+   template <typename TOperator,typename TData> void computeExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx);
 
    namespace internal
    {
@@ -253,81 +254,61 @@ namespace Equations {
       // Compute with complex linear operator
       if(eq.hasExplicitZLinear(compId, fieldId))
       {
-         // Create pointer to sparse operator
-         const SparseMatrixZ * op = &eq.explicitZLinear(compId, fieldId, matIdx);
-
-         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
-         {
-            /// \mhdBug very bad and slow implementation!
-            Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->rows());
-            int k = 0;
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
-            {
-               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
-               {
-                  // Copy slice into flat array
-                  tmp(k) = explicitField.point(i,j,matIdx);
-
-                  // increase storage counter
-                  k++;
-               }
-            }
-
-            // Apply operator to field
-            internal::addExplicitWrapper(eqField, eqStart, *op, tmp);
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
-         {
-            // Get mode indexes
-            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-
-            // Assert correct sizes
-            assert(op->rows() == explicitField.slice(mode(0)).rows());
-
-            // Apply operator to field
-            internal::addExplicitWrapper(eqField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
-         }
+         computeExplicitLinear<SparseMatrixZ>(eq, compId, eqField,  eqStart, fieldId, explicitField, matIdx);
       }
 
       // Compute with real linear operator
       if(eq.hasExplicitDLinear(compId, fieldId))
       {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.explicitDLinear(compId, fieldId, matIdx);
-
-         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
-         {
-            /// \mhdBug very bad and slow implementation!
-            Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->rows());
-            int k = 0;
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
-            {
-               for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
-               {
-                  // Copy slice into flat array
-                  tmp(k) = explicitField.point(i,j,matIdx);
-
-                  // increase storage counter
-                  k++;
-               }
-            }
-
-            // Apply operator to field
-            internal::addExplicitWrapper(eqField, eqStart, *op, tmp);
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
-         {
-            // Get mode indexes
-            ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-
-            // Assert correct sizes
-            assert(op->rows() == explicitField.slice(mode(0)).rows());
-
-            // Apply operator to field: Re(eq) += op*Re(lin), Im(eq) += op*Im(lin)
-            internal::addExplicitWrapper(eqField, eqStart, *op, (*op)*explicitField.slice(mode(0)).col(mode(1)));
-         }
+         computeExplicitLinear<SparseMatrix>(eq, compId, eqField,  eqStart, fieldId, explicitField, matIdx);
       }
    }
+
+   template <typename TOperator,typename TData> void computeExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx)
+   {
+      // Create pointer to sparse operator
+      const TOperator * op = &eq.explicitLinear<TOperator>(compId, fieldId, matIdx);
+
+      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      {
+         /// \mhdBug very bad and slow implementation!
+         Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->rows());
+         int k = 0;
+         for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+         {
+            for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+            {
+               // Copy slice into flat array
+               tmp(k) = explicitField.point(i,j,matIdx);
+
+               // increase storage counter
+               k++;
+            }
+         }
+
+         // Apply operator to field
+         internal::addExplicitWrapper(eqField, eqStart, *op, tmp);
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+      {
+         // Get mode indexes
+         ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+
+         // Assert correct sizes
+         assert(op->rows() == explicitField.slice(mode(0)).rows());
+
+         // Apply operator to field
+         internal::addExplicitWrapper(eqField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+      }
+   }
+
+   //
+   // Dummy specialization
+   //
+
+   template <> inline void computeExplicitLinear<SparseMatrixZ,Matrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, Matrix& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx) {};
+
+
    
 }
 }

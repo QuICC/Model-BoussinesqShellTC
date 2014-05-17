@@ -115,7 +115,7 @@ namespace Equations {
       return (this->mLZMatrices.count(key) > 0);
    }
 
-   const SparseMatrix& EquationData::explicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   template <> const SparseMatrix& EquationData::explicitLinear<SparseMatrix>(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
    {
       // Make key
       std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
@@ -126,7 +126,7 @@ namespace Equations {
       return this->mLDMatrices.find(key)->second.at(j);
    }
 
-   const SparseMatrixZ& EquationData::explicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   template <> const SparseMatrixZ& EquationData::explicitLinear<SparseMatrixZ>(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
    {
       // Make key
       std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);

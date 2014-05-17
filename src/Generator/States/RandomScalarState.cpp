@@ -87,20 +87,14 @@ namespace Equations {
          MHDFloat aY = exp(-static_cast<MHDFloat>(iY)*log(this->mYRatio)/static_cast<MHDFloat>(nY));
          MHDFloat aZ = exp(-static_cast<MHDFloat>(iZ)*log(this->mZRatio)/static_cast<MHDFloat>(nZ));
 
-         MHDComplex val;
-         val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
-         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) != 0)
-         {
-            val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
-         } else
-         {
-            val.imag() = 0.0;
-         }
+         Datatypes::SpectralScalarType::PointType val;
+
+         this->makeRandom(val, iX, iZ, iY);
 
          return val*aX*aY*aZ;
       } else
       {
-         return Datatypes::SpectralScalarType::PointType(0,0);
+         return Datatypes::SpectralScalarType::PointType(0);
       }
    }
 
@@ -108,6 +102,24 @@ namespace Equations {
    {
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
+   }
+
+   void RandomScalarState::makeRandom(MHDFloat& val, const int iX, const int iZ, const int iY) const
+   {
+      val = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+   }
+
+   void RandomScalarState::makeRandom(MHDComplex& val, const int iX, const int iZ, const int iY) const
+   {
+      val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+
+      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) != 0)
+      {
+         val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+      } else
+      {
+         val.imag() = 0.0;
+      }
    }
 
 }

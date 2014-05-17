@@ -117,7 +117,7 @@ namespace Equations {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      return Datatypes::SpectralScalarType::PointType(0,0);
+      return Datatypes::SpectralScalarType::PointType(0);
     }
 
    void ShellExactScalarState::setRequirements()

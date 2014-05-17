@@ -116,22 +116,13 @@ namespace Equations {
          bool hasExplicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
 
          /**
-          * @brief Get the explicit linear matrices (real sparse operators)
+          * @brief Get the explicit linear matrices
           *
           * @param compId  Field component ID
           * @param fieldId Spectral field ID
           * @param j       Matrix index
           */
-         const SparseMatrix& explicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
-
-         /**
-          * @brief Get the explicit linear matrices (complex sparse operators)
-          *
-          * @param compId  Field component ID
-          * @param fieldId Spectral field ID
-          * @param j       Matrix index
-          */
-         const SparseMatrixZ& explicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
+         template <typename TOperator> const TOperator& explicitLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the coupling information

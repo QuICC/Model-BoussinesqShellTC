@@ -126,9 +126,9 @@ namespace Timestep {
 
       private:
          /**
-          * @brief Small wrapper for a generic implementation of the solver matrix construction
+          * @brief Compute the timestep operator coefficients
           */
-         template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+         void computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT);
 
          /**
           * @brief Update time dependence
@@ -171,26 +171,13 @@ namespace Timestep {
          MHDFloat mTime;
    };
 
-   template <typename TStepper> void TimestepCoordinator::buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   /**
+    * @brief Small wrapper for a generic implementation of the solver matrix construction
+    */
+   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff);
+
+   template <typename TStepper> void buildSolverMatrixWrapper(typename SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff)
    {
-      // Operator coefficients
-      MHDFloat lhsTCoeff;
-      MHDFloat rhsTCoeff;
-      MHDFloat lhsLCoeff;
-      MHDFloat rhsLCoeff;
-
-      // Set time coefficients for LHS Matrix
-      lhsTCoeff = IntegratorSelector::lhsT(this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for LHS Matrix
-      lhsLCoeff = IntegratorSelector::lhsL(this->mStep);
-
-      // Set time coefficients for RHS Matrix
-      rhsTCoeff = IntegratorSelector::rhsT(this->mStep)*1.0/this->mDt;
-
-      // Set linear coefficients for RHS Matrix
-      rhsLCoeff = -IntegratorSelector::rhsL(this->mStep);
-
       // Resize LHS matrix if necessary
       spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
@@ -228,6 +215,13 @@ namespace Timestep {
       // Solver is initialized
       spSolver->setInitialized();
    }
+
+   // 
+   // Dummy solver specialization
+   //
+
+   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(typename SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff) {};
+
 }
 }
 

@@ -77,6 +77,16 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * Generate Random value
+          */
+         void makeRandom(MHDFloat& val, const int iX, const int iZ, const int iY) const;
+
+         /**
+          * Generate Random value
+          */
+         void makeRandom(MHDComplex& val, const int iX, const int iZ, const int iY) const;
+
       private:
          /**
           * @brief Minimum value in coefficient range
