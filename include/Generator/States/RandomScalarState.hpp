@@ -54,7 +54,7 @@ namespace Equations {
           * @param iZ      Index for the Z direction
           * @param iY      Index for the Y direction
           */
-         virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const;
+         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const;
 
          /**
           * @brief Set the unknown name and requirements

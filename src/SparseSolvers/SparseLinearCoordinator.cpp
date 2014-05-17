@@ -54,12 +54,12 @@ namespace Solver {
 
    void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
+      buildLinearSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
    void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
-      this->buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
+      buildLinearSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx);
    }
 
 }

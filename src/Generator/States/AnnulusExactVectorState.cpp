@@ -93,7 +93,7 @@ namespace Equations {
       }
    }
 
-    MHDComplex AnnulusExactVectorState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+    Datatypes::SpectralScalarType::PointType AnnulusExactVectorState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
     {
       return MHDComplex(0,0);
     }

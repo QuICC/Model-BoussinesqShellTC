@@ -100,7 +100,7 @@ namespace Equations {
           * @param j       Second index
           * @param k       Slowest index
           */
-         virtual MHDComplex sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
+         virtual Datatypes::SpectralScalarType::PointType sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const;
 
          /**
           * @brief Initialise the spectral equation matrices

@@ -23,8 +23,9 @@
 #include "TypeSelectors/SparseSolverDataSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-
-#include <iostream>
+#include "SparseSolvers/SparseLinearSolver.hpp"
+#include "SparseSolvers/SparseTrivialSolver.hpp"
+#include "Timesteppers/SparseTimestepper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -130,7 +131,7 @@ namespace Solver {
    /**
     * @brief Generic implementation to store the solver solution
     */
-   template <template <class,class> class TSol,typename TSolverIt, typename TEquation> void storeSolverSolution(SparseCoordinatorData<TSol>& coord, TEquation spEq, const int idx, SpectralFieldId);
+   template <template <class,class> class TSol,typename TSolverIt, typename TEquationIt> void storeSolverSolution(SparseCoordinatorData<TSol>& coord, TEquationIt eqIt, const int idx, SpectralFieldId);
 
    /**
     * @brief Generic implementation to initialise the solvers
@@ -160,17 +161,17 @@ namespace Solver {
    /**
     * @brief Generic implementation to initialise the solver solution
     */
-   template <template <class,class> class TSol,typename TSolverIt,typename TEquation> void initSolverSolution(SparseCoordinatorData<TSol>& coord, TEquation spEq, const int idx, SpectralFieldId id);
+   template <template <class,class> class TSol,typename TSolverIt,typename TEquationIt> void initSolverSolution(SparseCoordinatorData<TSol>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id);
 
    /**
     * @brief Generic implementation to get the solver input
     */
-   template <template <class,class> class TSol,typename TSolverIt,typename TEquation> void getSolverInput(SparseCoordinatorData<TSol>& coord, TEquation spEq, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar);
+   template <template <class,class> class TSol,typename TSolverIt,typename TEquationIt> void getSolverInput(SparseCoordinatorData<TSol>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSol>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSol>::VectorVariable_map& vectVar);
 
    /**
     * @brief Compute the solver input independently of solver type
     */
-   template <typename TEquationIt, typename TSolverIt> void computeSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar);
+   template <typename TSolverIt,typename TEquationIt> void computeSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar);
 
    /**
     * @brief Setup the storage and related information independently of solver type
@@ -245,7 +246,7 @@ namespace Solver {
       setupStorage(spEq, id, solIt);
    }
 
-   template <template <class,class> class TSolver,typename TSolverIt,typename TEquation> void storeSolverSolution(SparseCoordinatorData<TSolver>& coord, TEquation spEq, const int idx, SpectralFieldId id)
+   template <template <class,class> class TSolver,typename TSolverIt,typename TEquationIt> void storeSolverSolution(SparseCoordinatorData<TSolver>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id)
    {
       // Create iterator to current solver
       TSolverIt solIt;
@@ -255,7 +256,7 @@ namespace Solver {
       // Get solver output
       for(int i = 0; i < (*solIt)->nSystem(); i++)
       {
-         (*spEq)->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
+         (*eqIt)->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
       }
    }
 
@@ -332,7 +333,7 @@ namespace Solver {
       }
    }
 
-   template <template <class,class> class TSolver,typename TSolverIt,typename TEquation> void initSolverSolution(SparseCoordinatorData<TSolver>& coord, TEquation spEq, const int idx, SpectralFieldId id)
+   template <template <class,class> class TSolver,typename TSolverIt,typename TEquationIt> void initSolverSolution(SparseCoordinatorData<TSolver>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id)
    {
       // Create iterator to current solver
       TSolverIt solIt;
@@ -342,11 +343,11 @@ namespace Solver {
       // Get solver input
       for(int i = 0; i < (*solIt)->nSystem(); i++)
       {
-         Equations::copyUnknown(*(*spEq), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+         Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
       }
    }
 
-   template <template <class,class> class TSolver,typename TSolverIt,typename TEquation> void getSolverInput(SparseCoordinatorData<TSolver>& coord, TEquation spEq, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
+   template <template <class,class> class TSolver,typename TSolverIt,typename TEquationIt> void getSolverInput(SparseCoordinatorData<TSolver>& coord, TEquationIt eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
    {
       // Create iterator to current complex field solver
       TSolverIt solIt;
@@ -354,14 +355,14 @@ namespace Solver {
       std::advance(solIt, idx);
 
       // Get solver input
-      computeSolverInput(spEq, id, solIt, scalVar, vectVar);
+      computeSolverInput(eqIt, id, solIt, scalVar, vectVar);
    }
 
    //
    //
    //
 
-   template <typename TEquationIt, typename TSolverIt> void computeSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar)
+   template <typename TSolverIt,typename TEquationIt> void computeSolverInput(const TEquationIt eqIt, const SpectralFieldId id, const TSolverIt solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar)
    {
       // Get timestep input
       for(int i = 0; i < (*solveIt)->nSystem(); i++)
@@ -419,6 +420,88 @@ namespace Solver {
       // Store storage information
       (*solveIt)->addInformation(id,startRow,spEq->pyName());
    }
+
+   //
+   // Dummy solver specializations
+   //
+
+
+   // Solver independent
+
+   template <> inline void setupStorage<ComplexDummy_iterator>(Equations::SharedIEquation spEq, const SpectralFieldId id, const ComplexDummy_iterator solveIt) {};
+
+   template <> inline void computeSolverInput<ComplexDummy_iterator,std::vector<Equations::SharedIScalarEquation>::const_iterator>(const std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const SpectralFieldId id, const ComplexDummy_iterator solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar) {};
+   template <> inline void computeSolverInput<ComplexDummy_iterator,std::vector<Equations::SharedIVectorEquation>::const_iterator>(const std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const SpectralFieldId id, const ComplexDummy_iterator solveIt, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalVar, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectVar) {};
+
+   // SparseLinearSolver
+
+   template <> inline void setupSolverStorage<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord) {};
+
+   template <> inline void updateSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord) {};
+
+   template <> inline void solveSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const int step) {};
+
+   template <> inline void computeRHSSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const int step) {};
+
+   template <> inline void updateTimeMatrixSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+
+   template <> inline void storeSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+   template <> inline void storeSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+   template <> inline void initSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+
+   template <> inline void getSolverInput<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<SparseLinearSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<SparseLinearSolver>::VectorVariable_map& vectVar) {};
+   template <> inline void getSolverInput<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<SparseLinearSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<SparseLinearSolver>::VectorVariable_map& vectVar) {};
+
+   // SparseTrivialSolver
+
+   template <> inline void setupSolverStorage<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord) {};
+
+   template <> inline void updateSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord) {};
+
+   template <> inline void solveSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const int step) {};
+
+   template <> inline void computeRHSSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const int step) {};
+
+   template <> inline void updateTimeMatrixSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+
+   template <> inline void storeSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+   template <> inline void storeSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+   template <> inline void initSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+
+   template <> inline void getSolverInput<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<SparseTrivialSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<SparseTrivialSolver>::VectorVariable_map& vectVar) {};
+   template <> inline void getSolverInput<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<SparseTrivialSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<SparseTrivialSolver>::VectorVariable_map& vectVar) {};
+
+   // SparseTimestepper
+
+   template <> inline void setupSolverStorage<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord) {};
+
+   template <> inline void updateSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord) {};
+
+   template <> inline void solveSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const int step) {};
+
+   template <> inline void computeRHSSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const int step) {};
+
+   template <> inline void updateTimeMatrixSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+
+   template <> inline void storeSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+   template <> inline void storeSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
+
+   template <> inline void initSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+   template <> inline void initSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id) {};
+
+   template <> inline void getSolverInput<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<Timestep::SparseTimestepper>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<Timestep::SparseTimestepper>::VectorVariable_map& vectVar) {};
+   template <> inline void getSolverInput<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<Timestep::SparseTimestepper>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<Timestep::SparseTimestepper>::VectorVariable_map& vectVar) {};
+
 
 }
 }

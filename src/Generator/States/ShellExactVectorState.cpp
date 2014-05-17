@@ -134,9 +134,9 @@ namespace Equations {
       }
    }
 
-    MHDComplex ShellExactVectorState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+    Datatypes::SpectralScalarType::PointType ShellExactVectorState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
     {
-      return MHDComplex(0,0);
+      return Datatypes::SpectralScalarType::PointType(0,0);
     }
 
    void ShellExactVectorState::setRequirements()

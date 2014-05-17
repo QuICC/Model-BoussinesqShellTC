@@ -79,13 +79,14 @@ namespace Solver {
          virtual void buildSolverMatrix(SparseLinearCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
-         /**
-          * @brief Generic implementation to build solver matrices
-          */
-         template <typename TStepper> void buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
    };
 
-   template <typename TStepper> void SparseLinearCoordinator::buildSolverMatrixWrapper(SharedPtrMacro<TStepper > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
+   /**
+    * @brief Generic implementation to build solver matrices
+    */
+   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
+
+   template <typename TSolver> void buildLinearSolverMatrixWrapper(SharedPtrMacro<TSolver > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Resize operator matrix
       spSolver->rLHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
@@ -98,6 +99,12 @@ namespace Solver {
       // Solver is initialized
       spSolver->setInitialized();
    }
+
+   //
+   // Dummy solver specialization
+   //
+   
+   template <> inline void buildLinearSolverMatrixWrapper<SparseDummySolverComplexType>(SharedPtrMacro<SparseDummySolverComplexType > spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx) {};
 }
 }
 

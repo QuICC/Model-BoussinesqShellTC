@@ -342,6 +342,16 @@ namespace Solver {
          coord.buildSolverMatrices(spEq, id, solIt);
       }
    }
+
+   //
+   // Dummy solver specializations
+   //
+   
+   // SparseLinearSolver
+   template <> inline void buildSolverMatricesSolver<SparseLinearSolver,ComplexDummy_iterator>(SparseLinearCoordinatorBase<SparseLinearSolver>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId id) {};
+
+   // SparseTimestepper
+   template <> inline void buildSolverMatricesSolver<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseLinearCoordinatorBase<Timestep::SparseTimestepper>& coord, Equations::SharedIEquation spEq, const int idx, SpectralFieldId id) {};
 }
 }
 

@@ -68,7 +68,7 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, true);
    }
 
-   MHDComplex RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -100,7 +100,7 @@ namespace Equations {
          return val*aX*aY*aZ;
       } else
       {
-         return MHDComplex(0,0);
+         return Datatypes::SpectralScalarType::PointType(0,0);
       }
    }
 

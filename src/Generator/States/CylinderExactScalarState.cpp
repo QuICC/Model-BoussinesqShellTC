@@ -89,12 +89,12 @@ namespace Equations {
       }
    }
 
-    MHDComplex CylinderExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+    Datatypes::SpectralScalarType::PointType CylinderExactScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
     {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      return MHDComplex(0,0);
+      return Datatypes::SpectralScalarType::PointType(0,0);
     }
 
    void CylinderExactScalarState::setRequirements()

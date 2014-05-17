@@ -135,12 +135,12 @@ namespace Equations {
       throw Exception("Activated nonlinear term without implementation!");
    }
 
-   MHDComplex IEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
+   Datatypes::SpectralScalarType::PointType IEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
    {
       // This implementation should never get called!
       throw Exception("Activated source term without implementation!");
 
-      return MHDComplex();
+      return Datatypes::SpectralScalarType::PointType();
    }
 
    void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const

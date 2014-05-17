@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "SparseSolvers/SparseDummySolver.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,7 +33,7 @@ namespace GeoMHDiSCC {
                typedef TSolver<SparseMatrix,Matrix>  RealSolverType;
 
                /// Typedef for a complex operator solver
-               typedef DummySolver<SparseMatrixZ,MatrixZ>  ComplexSolverType;
+               typedef SparseDummySolver<SparseMatrixZ,MatrixZ>  ComplexSolverType;
          };
 
       #else
