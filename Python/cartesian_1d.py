@@ -1,5 +1,6 @@
 """Module provides functions to generate sparse operators in a cartesian box with two periodic directions."""
 
+import numpy as np
 import scipy.sparse as spsp
 import utils
 
@@ -25,11 +26,11 @@ def i1(nx):
 
    # Generate 1st subdiagonal
    def d_1(n):
-      return -1.0/(2*n)
+      return 1.0/(2*n)
 
    # Generate 1st superdiagonal
    def d1(n):
-      return 1.0/(2*n)
+      return -1.0/(2*n)
 
    ds = [d_1, d1]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
