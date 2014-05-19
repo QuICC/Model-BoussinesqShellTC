@@ -8,11 +8,14 @@
 INSTALL(FILES 
    Python/accuracy_cartesian_1d.py
    Python/accuracy_cartesian_2d.py
+   Python/accuracy_cartesian_3d.py
    Python/annulus.py
    Python/cartesian_0d.py 
    Python/cartesian_1d.py 
    Python/cartesian_2d.py 
    Python/cartesian_3d.py 
+   Python/cartesian_boundary_1d.py 
+   Python/cartesian_boundary_2d.py 
    Python/chebyshev_tools.py
    Python/cylinder.py 
    Python/generate_recurrence.py 

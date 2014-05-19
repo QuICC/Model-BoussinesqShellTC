@@ -1,11 +1,11 @@
-"""Check accuracy of operations for cartesian 2D operators"""
+"""Check accuracy of operations for cartesian 3D operators"""
 
 from __future__ import division
 
 import numpy as np
 import sympy
 import chebyshev_tools as ct
-import cartesian_2d as c2d
+import cartesian_3d as c3d
 import scipy.sparse as spsp
 
 x = sympy.Symbol('x')
@@ -30,15 +30,17 @@ def test_forward(op, res_expr, sol_expr, grid, q):
 
 
 nx = 20
+ny = 20
 nz = 20
 xg = ct.grid(nx)
+yg = ct.grid(ny)
 zg = ct.grid(nz)
 
 #
 # Accuracy tests: zblk
 #
 print("zblk:")
-A = c2d.zblk(nx,nz)
+A = c3d.zblk(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz,1)])
 #ssolx = 0
@@ -48,8 +50,8 @@ A = c2d.zblk(nx,nz)
 #
 # Accuracy tests: i2j2d2d2
 #
-print("i2j2d2d2:")
-A = c2d.i2j2d2d2(nx,nz)
+print("i2j2k2d2d2d2:")
+A = c3d.i2j2k2d2d2d2(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz,1)])
 #ssolx = sympy.integrate(sympy.diff(sphysx,x,x),x,x)
@@ -59,8 +61,8 @@ A = c2d.i2j2d2d2(nx,nz)
 #
 # Accuracy tests: i2j2
 #
-print("i2j2:")
-A = c2d.i2j2(nx,nz)
+print("i2j2k2:")
+A = c3d.i2j2k2(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz-1,1)])
 #ssolx = sympy.integrate(sphysx,x,x)
@@ -70,9 +72,9 @@ A = c2d.i2j2(nx,nz)
 #
 # Accuracy tests: i2j2lapl
 #
-print("i2j2lapl:")
+print("i2j2k2lapl:")
 k = np.random.ranf()*nx
-A = c2d.i2j2lapl(nx,nz, k)
+A = c3d.i2j2k2lapl(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz-2,1)])
 #ssol = sympy.integrate((sympy.diff(sphysx,x,x)*sphysz).expand(),x,x,z,z) + sympy.integrate((sympy.diff(sphysz,z,z)*sphysx).expand(),x,x,z,z) - k**2*sympy.integrate((sphysx*sphysz).expand(),x,x,z,z)
@@ -81,8 +83,8 @@ A = c2d.i2j2lapl(nx,nz, k)
 #
 # Accuracy tests: i4j4
 #
-print("i4j4:")
-A = c2d.i4j4(nx,nz)
+print("i4j4k4:")
+A = c3d.i4j4k4(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz,1)])
 #ssolx = sympy.integrate(sphysx,x,x,x,x)
@@ -92,9 +94,9 @@ A = c2d.i4j4(nx,nz)
 #
 # Accuracy tests: i4j4lapl
 #
-print("i4j4lapl:")
+print("i4j4k4lapl:")
 k = np.random.ranf()*nx
-A = c2d.i4j4lapl(nx,nz, k)
+A = c3d.i4j4k4lapl(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz,1)])
 #ssol = sympy.simplify((sympy.diff(sphysx,x,x)*sphysz) + (sympy.diff(sphysz,z,z)*sphysx) - k**2*(sphysx*sphysz))
@@ -105,9 +107,9 @@ A = c2d.i4j4lapl(nx,nz, k)
 #
 # Accuracy tests: i4j4lapl2
 #
-print("i4j4lapl2:")
+print("i4j4k4lapl2:")
 k = np.random.ranf()*nx
-A = c2d.i4j4lapl2(nx,nz, k)
+A = c3d.i4j4k4lapl2(nx,ny,nz)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz-4,1)])
 #ssol = sympy.integrate(sympy.diff(sphysx,x,x,x,x)*sphysz ,x,x,x,x,z,z,z,z) + sympy.integrate(sympy.diff(sphysz,z,z,z,z)*sphysx ,x,x,x,x,z,z,z,z) + k**4*sympy.integrate(sphysx*sphysz ,x,x,x,x,z,z,z,z) - k**2*sympy.integrate(sympy.diff(sphysx, x,x)*sphysz ,x,x,x,x,z,z,z,z) - k**2*sympy.integrate(sympy.diff(sphysz, z,z)*sphysx ,x,x,x,x,z,z,z,z) + sympy.integrate(sympy.diff(sphysx, x,x)*sympy.diff(sphysz, z,z) ,x,x,x,x,z,z,z,z)
@@ -117,7 +119,7 @@ A = c2d.i4j4lapl2(nx,nz, k)
 # Accuracy tests: qid
 #
 print("qid:")
-A = c2d.qid(nx,nz, 3,3)
+A = c3d.qid(nx,ny,nz, 3,3,3)
 #sphysx = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 #sphysz = np.sum([np.random.ranf()*z**i for i in np.arange(0,nz,1)])
 #ssol = sphysx*sphysz

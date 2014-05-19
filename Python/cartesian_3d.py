@@ -6,65 +6,92 @@ import scipy.sparse as spsp
 import cartesian_1d as c1d
 import cartesian_2d as c2d
 
+def convert_bc(bc):
+   """Convert boundary dictionary into x, y and z kronecker product boundaries"""
 
-def zblk(nx,ny,nz):
+   if bc['x'][0] < 0:
+      bcx = bc['x']
+   else:
+      bcx = [0]
+
+   if bc['y'][0] < 0:
+      bcy = bc['y']
+   else:
+      bcy = [0]
+
+   if bc['z'][0] < 0:
+      bcz = bc['z']
+   else:
+      bcz = [0]
+
+   return (bcx, bcy, bcz)
+
+
+def zblk(nx, ny, nz, qx, qy, qz, bc):
    """Create a block of zeros"""
 
-   return spsp.coo_matrix((nx*nx*nz,nx*ny*nz))
+   bcx, bcy, bcz = convert_bc(bc)
+   return spsp.kron(c1d.zblk(ny,qy,bcy),spsp.kron(c1d.zblk(nz,qz,bcz),c1d.zblk(nx,qx,bcx)))
 
 
-def i2j2k2d2d2d2(nx, ny, nz):
+def i2j2k2d2d2d2(nx, ny, nz, bc):
    """Create a quasi identity block of order 2,2,2"""
 
-   return qid(nx,ny,nz,2,2,2)
+   return qid(nx,ny,nz,2,2,2,bc)
 
 
-def i2j2k2(nx, ny, nz):
+def i2j2k2(nx, ny, nz, bc):
    """Create operator for 2nd integral in x,y,z of T_n(x)T_n(y)T_n(z)"""
 
-   return spsp.kron(c1d.i2(ny), c2d.i2j2(nx,nz))
+   bcx, bcy, bcz = convert_bc(bc)
+   return spsp.kron(c1d.i2(ny,bcy), c2d.i2j2(nx,nz,{'x':bcx,'z':bcz}))
 
 
-def i2j2k2lapl(nx, ny, nz):
+def i2j2k2lapl(nx, ny, nz, bc):
    """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T_n(y)T_n(z)"""
 
-   op = spsp.kron(c1d.i2(ny),spsp.kron(c1d.i2(nz),c1d.i2d2(nx)))
-   op = op + spsp.kron(c1d.i2d2(ny),spsp.kron(c1d.i2(nz),c1d.i2(nx)))
-   op = op + spsp.kron(c1d.i2(ny),spsp.kron(c1d.i2d2(nz),c1d.i2(nx)))
+   bcx, bcy, bcz = convert_bc(bc)
+   op = spsp.kron(c1d.i2(ny,bcy),spsp.kron(c1d.i2(nz,bcz),c1d.i2d2(nx,bcx)))
+   op = op + spsp.kron(c1d.i2d2(ny,bcy),spsp.kron(c1d.i2(nz,bcz),c1d.i2(nx,bcx)))
+   op = op + spsp.kron(c1d.i2(ny,bcy),spsp.kron(c1d.i2d2(nz,bcz),c1d.i2(nx,bcx)))
 
    return  op
 
 
-def i4j4k4(nx, ny, nz):
+def i4j4k4(nx, ny, nz, bc):
    """Create operator for 4th integral in x,y,z of T_n(x)T_n(y)T_n(z)"""
 
-   return spsp.kron(c1d.i4(ny), c2d.i4j4(nx,nz))
+   bcx, bcy, bcz = convert_bc(bc)
+   return spsp.kron(c1d.i4(ny,bcy), c2d.i4j4(nx,nz,{'x':bcx,'z':bcz}))
 
 
-def i4j4k4lapl(nx, ny, nz):
+def i4j4k4lapl(nx, ny, nz, bc):
    """Create operator for 4th integral in x,y,z of Laplacian T_n(x)T_n(y)T_n(z)"""
 
-   op = spsp.kron(c1d.i4(ny),spsp.kron(c1d.i4(nz),c1d.i4d2(nx)))
-   op = op + spsp.kron(c1d.i4d2(ny),spsp.kron(c1d.i4(nz),c1d.i4(nx)))
-   op = op + spsp.kron(c1d.i4(ny),spsp.kron(c1d.i4d2(nz),c1d.i4(nx)))
+   bcx, bcy, bcz = convert_bc(bc)
+   op = spsp.kron(c1d.i4(ny,bcy),spsp.kron(c1d.i4(nz,bcz),c1d.i4d2(nx,bcx)))
+   op = op + spsp.kron(c1d.i4d2(ny,bcy),spsp.kron(c1d.i4(nz,bcz),c1d.i4(nx,bcx)))
+   op = op + spsp.kron(c1d.i4(ny,bcy),spsp.kron(c1d.i4d2(nz,bcz),c1d.i4(nx,bcx)))
 
    return  op
 
 
-def i4j4k4lapl2(nx, ny, nz):
+def i4j4k4lapl2(nx, ny, nz, bc):
    """Create operator for 4th integral in x,y,z of Laplacian^2 T_n(x)T_n(y)T_n(z)"""
 
-   op = spsp.kron(c1d.i4(ny),spsp.kron(c1d.i4(nz),c1d.i4d4(nx)))
-   op = op + spsp.kron(c1d.i4d4(ny),spsp.kron(c1d.i4(nz),c1d.i4(nx)))
-   op = op + spsp.kron(c1d.i4(ny),spsp.kron(c1d.i4d4(nz),c1d.i4(nx)))
-   op = op + 2*spsp.kron(c1d.i4d2(ny),spsp.kron(c1d.i4(nz),c1d.i4d2(nx)))
-   op = op + 2*spsp.kron(c1d.i4d2(ny),spsp.kron(c1d.i4d2(nz),c1d.i4(nx)))
-   op = op + 2*spsp.kron(c1d.i4(ny),spsp.kron(c1d.i4d2(nz),c1d.i4d2(nx)))
+   bcx, bcy, bcz = convert_bc(bc)
+   op = spsp.kron(c1d.i4(ny,bcy),spsp.kron(c1d.i4(nz,bcz),c1d.i4d4(nx,bcx)))
+   op = op + spsp.kron(c1d.i4d4(ny,bcy),spsp.kron(c1d.i4(nz,bcz),c1d.i4(nx,bcx)))
+   op = op + spsp.kron(c1d.i4(ny,bcy),spsp.kron(c1d.i4d4(nz,bcz),c1d.i4(nx,bcx)))
+   op = op + 2*spsp.kron(c1d.i4d2(ny,bcy),spsp.kron(c1d.i4(nz,bcz),c1d.i4d2(nx,bcx)))
+   op = op + 2*spsp.kron(c1d.i4d2(ny,bcy),spsp.kron(c1d.i4d2(nz,bcz),c1d.i4(nx,bcx)))
+   op = op + 2*spsp.kron(c1d.i4(ny,bcy),spsp.kron(c1d.i4d2(nz,bcz),c1d.i4d2(nx,bcx)))
 
    return  op
 
 
-def qid(nx, ny, nz, qx, qy, qz):
+def qid(nx, ny, nz, qx, qy, qz, bc):
    """Create a quasi identity block order qx,qy,qz"""
 
-   return spsp.kron(c1d.qid(ny,qy), c2d.qid(nx,nz,qx,qz))
+   bcx, bcy, bcz = convert_bc(bc)
+   return spsp.kron(c1d.qid(ny,qy,bcy), c2d.qid(nx,nz,qx,qz,{'x':bcx,'z':bcz}))

@@ -5,21 +5,23 @@ from __future__ import division
 import numpy as np
 import scipy.sparse as spsp
 import utils
+import cartesian_boundary_1d as c1dbc
 
 
-def zblk(nx):
+def zblk(nx, q, bc):
    """Create a block of zeros"""
 
-   return spsp.coo_matrix((nx,nx))
+   mat = spsp.coo_matrix((nx,nx))
+   return c1dbc.constrain(mat,bc,q)
 
 
-def i2d2(nx):
+def i2d2(nx, bc):
    """Create a quasi identity block of order 2"""
 
-   return qid(nx,2)
+   return qid(nx,2, bc)
 
 
-def i1(nx):
+def i1(nx, bc):
    """Create operator for 1st integral in x of T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -37,10 +39,11 @@ def i1(nx):
    ds = [d_1, d1]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 1)
 
 
-def i2(nx):
+def i2(nx, bc):
    """Create operator for 2nd integral in x of T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -62,10 +65,11 @@ def i2(nx):
    ds = [d_2, d0, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 2)
 
 
-def i2lapl(nx, k, l):
+def i2lapl(nx, k, l, bc):
    """Create operator for 2nd integral in x of Laplacian T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -87,10 +91,11 @@ def i2lapl(nx, k, l):
    ds = [d_2, d0, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 2)
 
 
-def i2laplh(nx, k):
+def i2laplh(nx, k, bc):
    """Create operator for 2nd integral in x of horizontal Laplacian T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -112,10 +117,11 @@ def i2laplh(nx, k):
    ds = [d_2, d0, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 2)
 
 
-def i4(nx):
+def i4(nx, bc):
    """Create operator for 4th integral in x of T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -145,10 +151,11 @@ def i4(nx):
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def i4d2(nx):
+def i4d2(nx, bc):
    """Create operator for 4th integral in x of D_x^2 T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -170,16 +177,17 @@ def i4d2(nx):
    ds = [d_2, d0, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def i4d4(nx):
+def i4d4(nx, bc):
    """Create a quasi identity block of order 4"""
 
-   return qid(nx,4)
+   return qid(nx,4, bc)
 
 
-def i4lapl(nx, k, l):
+def i4lapl(nx, k, l, bc):
    """Create operator for 4th integral in x of Laplacian T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -209,10 +217,11 @@ def i4lapl(nx, k, l):
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def i4laplh(nx, k):
+def i4laplh(nx, k, bc):
    """Create operator for 4th integral in x of horizontal Laplacian T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -242,10 +251,11 @@ def i4laplh(nx, k):
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def i4lapl2(nx, k, l):
+def i4lapl2(nx, k, l, bc):
    """Create operator for 4th integral in x of Laplacian^2 T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -275,10 +285,11 @@ def i4lapl2(nx, k, l):
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def i4lapl2h(nx, k):
+def i4lapl2h(nx, k, bc):
    """Create operator for 4th integral in x of horizontal Laplacian^2 T_n(x)"""
 
    ns = np.arange(0, nx, 1)
@@ -308,13 +319,15 @@ def i4lapl2h(nx, k):
    ds = [d_4, d_2, d0, d2, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, 4)
 
 
-def qid(nx, q):
+def qid(nx, q, bc):
    """Create a quasi identity block of order q"""
 
    offsets = [0]
    diags = [[0]*q + [1]*(nx-q)]
 
-   return spsp.diags(diags, offsets)
+   mat = spsp.diags(diags, offsets)
+   return c1dbc.constrain(mat, bc, q)

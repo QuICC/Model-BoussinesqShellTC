@@ -17,20 +17,22 @@ def build_diagonals(ns, nzrow, ds, offsets):
 
 def build_block_matrix(fields, func, func_args):
 
-   tmp = [[0]*len(fields)]*len(fields)
-   for r,field_row in enumerate(fields):
-      for c,field_col in enumerate(fields):
+   tmp = []
+   for field_row in fields:
+      row = []
+      for field_col in fields:
          args = func_args + (field_row,field_col)
-         tmp[r][c] = func(*args)
+         row.append(func(*args))
+      tmp.append(row)
 
    return spsp.bmat(tmp)
 
 def build_diag_matrix(fields, func, func_args):
 
-   tmp = [0]*len(fields)
-   for r,field_row in enumerate(fields):
+   tmp = []
+   for field_row in fields:
       args = func_args + (field_row,)
-      tmp[r] = func(*args)
+      tmp.append(func(*args))
    
    return spsp.block_diag(tmp)
 

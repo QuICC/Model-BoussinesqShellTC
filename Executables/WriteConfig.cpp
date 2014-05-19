@@ -24,6 +24,7 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "IoConfig/ConfigurationWriter.hpp"
@@ -46,13 +47,13 @@ int run()
    std::string type = PModel::SchemeType::type();
 
    // Box periodicity
-   std::vector<bool> isPeriodicBox = PModel::isPeriodicBox();
+   std::vector<bool> isPeriodicBox = GeoMHDiSCC::PhysicalModelBase::isPeriodicBox(PModel::PYNAME);
 
    // Create configuration writer
    GeoMHDiSCC::IoConfig::ConfigurationWriter writer(dim, isPeriodicBox, type);
 
    // Create list of field ID strings for boundary conditions
-   std::vector<GeoMHDiSCC::PhysicalNames::Id> fields = PModel::fieldIds();
+   std::vector<GeoMHDiSCC::PhysicalNames::Id> fields = GeoMHDiSCC::PhysicalModelBase::fieldIds(PModel::PYNAME);
    std::vector<GeoMHDiSCC::PhysicalNames::Id>::iterator fIt;
    std::vector<std::string>   bcNames;
    for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
@@ -61,7 +62,7 @@ int run()
    }
 
    // Create list of nondimensional ID strings for physical parameters
-   std::vector<GeoMHDiSCC::NonDimensional::Id> params = PModel::paramIds();
+   std::vector<GeoMHDiSCC::NonDimensional::Id> params = GeoMHDiSCC::PhysicalModelBase::paramIds(PModel::PYNAME);
    std::vector<GeoMHDiSCC::NonDimensional::Id>::iterator pIt;
    std::vector<std::string>   ndNames;
    for(pIt = params.begin(); pIt != params.end(); ++pIt)
