@@ -7,6 +7,7 @@
 #
 INSTALL(FILES 
    Python/accuracy_cartesian_1d.py
+   Python/accuracy_cartesian_2d.py
    Python/annulus.py
    Python/cartesian_0d.py 
    Python/cartesian_1d.py 

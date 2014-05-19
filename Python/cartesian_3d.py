@@ -1,5 +1,7 @@
 """Module provides functions to generate sparse operators in a cartesian box."""
 
+from __future__ import division
+
 import scipy.sparse as spsp
 import cartesian_1d as c1d
 import cartesian_2d as c2d

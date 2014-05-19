@@ -125,7 +125,10 @@ def time(res, eq_params, eigs, bcs, field_row):
    print(bcs)
    print(field_row)
    
-   return utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   print("BUILD DONE")
+
+   return mat
 
 
 def implicit_linear(res, eq_params, eigs, bcs, field_row):
@@ -138,7 +141,10 @@ def implicit_linear(res, eq_params, eigs, bcs, field_row):
    print(bcs)
    print(field_row)
 
-   return utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   print("BUILD DONE")
+
+   return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
@@ -152,4 +158,7 @@ def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    print(field_row)
    print(field_col)
 
-   return -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
+   print("BUILD DONE")
+
+   return mat

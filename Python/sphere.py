@@ -1,5 +1,7 @@
 """Module provides functions to generate sparse operators in a sphere."""
 
+from __future__ import division
+
 import numpy as np
 import scipy.sparse as spsp
 import utils

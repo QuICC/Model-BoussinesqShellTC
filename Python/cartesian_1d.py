@@ -1,5 +1,7 @@
 """Module provides functions to generate sparse operators in a cartesian box with two periodic directions."""
 
+from __future__ import division
+
 import numpy as np
 import scipy.sparse as spsp
 import utils

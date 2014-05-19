@@ -1,5 +1,7 @@
 """Module provides functions to generate sparse operators in a cylinder."""
 
+from __future__ import division
+
 import scipy.sparse as spsp
 
 

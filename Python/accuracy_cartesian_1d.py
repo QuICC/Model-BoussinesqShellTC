@@ -1,3 +1,7 @@
+"""Check accuracy of operations for cartesian 1D operators"""
+
+from __future__ import division
+
 import numpy as np
 import sympy
 import chebyshev_tools as ct
@@ -17,8 +21,6 @@ def test_forward(op, res_expr, sol_expr, grid, q):
    t = x_to_phys(sol_expr,grid)
    sol = ct.tocheb(t)
    err = np.abs(rhs - sol)
-   print(sol)
-   print(rhs)
    print(err)
    print(np.max(err[q:]))
 
@@ -40,7 +42,6 @@ ssol = 0
 #
 print("i2d2:")
 A = c1d.i2d2(nx)
-#A = spsp.identity(nx)
 sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
 ssol = sympy.integrate(sympy.diff(sphys,x,x),x,x)
 test_forward(A, sphys, ssol, xg, 2)

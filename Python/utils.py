@@ -1,5 +1,7 @@
 """Module provides generic functions for the sparse chebyshev representation."""
 
+from __future__ import division
+
 import scipy.sparse as spsp
 
 def build_diagonals(ns, nzrow, ds, offsets):
