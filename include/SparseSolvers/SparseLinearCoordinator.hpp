@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Enums/ModelOperator.hpp"
+#include "Enums/ModelOperatorBoundary.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "SparseSolvers/SparseLinearSolver.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -93,7 +94,7 @@ namespace Solver {
 
       // Get model operator
       DecoupledZSparse  linOp;
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, true);
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::HAS_BC);
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), 1.0, linOp); 
 
       // Solver is initialized

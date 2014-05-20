@@ -23,6 +23,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/ModelOperator.hpp"
+#include "Enums/ModelOperatorBoundary.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
@@ -82,7 +83,7 @@ namespace Equations {
          /**
           * @brief Generic model operator dispatcher to python scripts
           */
-         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const; // = 0;
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const; // = 0;
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -141,6 +142,26 @@ namespace Equations {
           * @param compId  Spectral component
           */
          void initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId);
+
+         /**
+          * \brief Implementation of the coupling definition to python scripts
+          */
+         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes);
+
+         /**
+          * @brief Implementation of model operator dispatcher to python scripts
+          */
+         void dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
+
+         /**
+          * @brief Implementation of the the quasi inverse matrix operator dispatch to python scripts
+          */
+         void dispatchQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
+
+         /**
+          * @brief Implementation of the explicit linear matrix operator dispatch to python scripts
+          */
+         void dispatchExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
       private:
          /**

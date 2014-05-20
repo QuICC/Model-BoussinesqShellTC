@@ -22,6 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/ModelOperatorBoundary.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEquation.hpp"
 #include "Base/DecoupledComplexInternal.hpp"
@@ -126,7 +127,7 @@ namespace Equations {
          /**
           * @brief Generic model operator dispatcher to python scripts
           */
-         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const;
+         virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const;
 
       protected:
          /**

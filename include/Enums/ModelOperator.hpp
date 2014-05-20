@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
        */
       struct ModelOperator {
          /**
-          * @brief Enums of the different nondimensional factors
+          * @brief Enums of the different model operators
           */
          enum Id {
             /// Quasi inverse operator

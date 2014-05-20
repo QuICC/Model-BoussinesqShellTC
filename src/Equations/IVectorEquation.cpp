@@ -21,8 +21,6 @@
 // Project includes
 //
 #include "TypeSelectors/EquationEigenSelector.hpp"
-#include "IoTools/IdToHuman.hpp"
-#include "Python/PythonWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
@@ -117,275 +115,22 @@ namespace Equations {
 
    void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource)
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Prepare Python call arguments
-      PyObject *pArgs, *pTmp, *pValue;
-      pArgs = PyTuple_New(2);
-
-      // Get resolution
-      pValue = PythonWrapper::makeTuple(this->unknown().dom(0).spRes()->sim()->dimensions(Dimensions::Space::SPECTRAL));
-      PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Get field
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 1, pTmp);
-
-      // Call model operator Python routine
-      PythonWrapper::setFunction((char *)"equation_info");
-      pValue = PythonWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      // Get Complex solver flag
-      pTmp = PyTuple_GetItem(pValue, 0);
-      bool isComplex = PyObject_IsTrue(pTmp);
-
-      // Get Implicit fields
-      pTmp = PyTuple_GetItem(pValue, 1);
-      std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  imFields;
-      PythonWrapper::getList(imFields, pTmp);
-
-      // Get Explicit fields
-      pTmp = PyTuple_GetItem(pValue, 2);
-      std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exFields;
-      PythonWrapper::getList(exFields, pTmp);
-
-      // Get geometric coupling flag
-      pTmp = PyTuple_GetItem(pValue, 3);
-      bool hasGeometricCoupling = PyObject_IsTrue(pTmp);
-
-      // Get block information
-      pArgs = PyTuple_GetItem(pValue, 4);
-      pTmp = PyTuple_GetItem(pArgs, 0);
-      int blockSize = PyLong_AsLong(pTmp);
-      pTmp = PyTuple_GetItem(pArgs, 1);
-      int rhsSize = PyLong_AsLong(pTmp);
-
-      // Finalise Python interpreter
-      PythonWrapper::cleanup();
-
-      // Initialise coupling information
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(comp,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), comp);
-
-      // General setup: equation type? real/complex solver? start from m = ?
-      infoIt.first->second.setGeneral(eqType, isComplex, iZero);
-
-      // Set nonlinear flags: has nonlinear term? has quasi-inverse?
-      infoIt.first->second.setNonlinear(hasNL, hasQI);
-
-      // Set source flags: has source term?
-      infoIt.first->second.setSource(hasSource);
-
-      // Set index type: SLOWEST or MODE
-      /// \mhdBug Always sets indexType to SLOWEST
-      infoIt.first->second.setIndexType(CouplingInformation::SLOWEST);
-
-      // Create implicit field coupling
-      std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >::const_iterator fIt;
-      for(fIt = imFields.begin(); fIt != imFields.end(); ++fIt)
-      {
-         infoIt.first->second.addImplicitField(fIt->first, fIt->second);
-      }
-
-      // Create explicit field
-      for(fIt = exFields.begin(); fIt != exFields.end(); ++fIt)
-      {
-         infoIt.first->second.addExplicitField(fIt->first, fIt->second);
-      }
-
-      // Set geometric coupling information
-      if(hasGeometricCoupling)
-      {
-         throw Exception("Geometric coupling is not yet implemented!");
-
-      // Set field coupling information
-      } else
-      {
-         int nMat = EigenSelector::fieldCouplingNMat(this->unknown().dom(0).spRes());
-         ArrayI blockNs(nMat);
-         blockNs.setConstant(blockSize);
-         ArrayI rhsCols(nMat);
-         rhsCols.setConstant(rhsSize);
-         infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-      }
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
+      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasQI, hasSource, this->unknown().dom(0).spRes());
    }
 
-   void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const bool hasBoundary) const
+   void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Prepare Python call arguments
-      PyObject *pArgs, *pTmp, *pValue;
-      pArgs = PyTuple_New(5);
-
-      // Get resolution
-      pValue = PythonWrapper::makeTuple(this->unknown().dom(0).spRes()->sim()->dimensions(Dimensions::Space::SPECTRAL));
-      PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Get equation parameters
-      std::vector<std::string> eq_names = this->eqParams().names();
-      std::vector<NonDimensional::Id> eq_ids = this->eqParams().ids();
-      std::vector<MHDFloat> eq_vals;
-      for(unsigned int i = 0; i < eq_names.size(); i++)
-      {
-         eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
-      }
-      pValue = PythonWrapper::makeDict(eq_names, eq_vals);
-      PyTuple_SetItem(pArgs, 1, pValue);
-
-      // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(EigenSelector::getEigs(*this, matIdx));
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // Get boundary condition
-      std::map<std::string,int> bcMap = this->bcIds().getTagMap();
-      pValue = PythonWrapper::makeDict(bcMap);
-      PyTuple_SetItem(pArgs, 3, pValue);
-
-      // Get field
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 4, pTmp);
-
-      // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(opId));
-      pValue = PythonWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(rModelMatrix, pValue);
-
-      // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      this->dispatchModelMatrix(rModelMatrix, opId, comp, matIdx, bcType, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 
    void IVectorEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Prepare Python call arguments
-      PyObject *pArgs, *pTmp, *pValue;
-      pArgs = PyTuple_New(4);
-
-      // Get resolution
-      pValue = PythonWrapper::makeTuple(this->unknown().dom(0).spRes()->sim()->dimensions(Dimensions::Space::SPECTRAL));
-      PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(EigenSelector::getEigs(*this, matIdx));
-      PyTuple_SetItem(pArgs, 1, pValue);
-
-      // Get boundary conditions
-      std::map<std::string,int> bcMap = this->bcIds().getTagMap();
-      pValue = PythonWrapper::makeDict(bcMap);
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // Get field
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 3, pTmp);
-
-      // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(ModelOperator::QI));
-      pValue = PythonWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(mat, pValue);
-
-      // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      this->dispatchQuasiInverse(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 
    void IVectorEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
-      // Prepare Python call arguments
-      PyObject *pArgs, *pTmp, *pValue;
-      pArgs = PyTuple_New(6);
-
-      // Get resolution
-      pValue = PythonWrapper::makeTuple(this->unknown().dom(0).spRes()->sim()->dimensions(Dimensions::Space::SPECTRAL));
-      PyTuple_SetItem(pArgs, 0, pValue);
-
-      // Get equation parameters
-      std::vector<std::string> eq_names = this->eqParams().names();
-      std::vector<NonDimensional::Id> eq_ids = this->eqParams().ids();
-      std::vector<MHDFloat> eq_vals;
-      for(unsigned int i = 0; i < eq_names.size(); i++)
-      {
-         eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
-      }
-      pValue = PythonWrapper::makeDict(eq_names, eq_vals);
-      PyTuple_SetItem(pArgs, 1, pValue);
-
-      // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(EigenSelector::getEigs(*this, matIdx));
-      PyTuple_SetItem(pArgs, 2, pValue);
-
-      // Get boundary conditions
-      std::map<std::string,int> bcMap = this->bcIds().getTagMap();
-      pValue = PythonWrapper::makeDict(bcMap);
-      PyTuple_SetItem(pArgs, 3, pValue);
-
-      // Get field row
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(compId).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 4, pTmp);
-
-      // Get field col
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(fieldId.first).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(fieldId.second).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 5, pTmp);
-
-      // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR));
-      pValue = PythonWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(mat, pValue);
-
-      // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      this->dispatchExplicitLinearBlock(compId, mat, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 }
 }

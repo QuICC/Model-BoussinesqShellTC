@@ -21,6 +21,7 @@
 //
 #include "Base/MathConstants.hpp"
 #include "Enums/ModelOperator.hpp"
+#include "Enums/ModelOperatorBoundary.hpp"
 #include "SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "Timesteppers/SparseTimestepper.hpp"
 #include "Equations/IScalarEquation.hpp"
@@ -184,20 +185,21 @@ namespace Timestep {
       // Resize RHS matrix if necessary
       spSolver->rRHSMatrix(matIdx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
-      // Compute model's linear operator
       DecoupledZSparse  linOp;
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, false);
-
-      // Compute model's time operator
       DecoupledZSparse  timeOp;
-      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, true);
+
+      // Compute model's linear operator
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::HAS_BC);
+      // Compute model's time operator
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::NO_TAU);
 
       // Set LHS matrix
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linOp); 
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, timeOp); 
 
       // Set RHS matrix
-      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, false);
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::NO_BC);
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::NO_BC);
       Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), rhsLCoeff, linOp); 
       Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, timeOp); 
 
@@ -208,7 +210,6 @@ namespace Timestep {
          spSolver->rTMatrix(idx).resize(spEq->couplingInfo(comp).systemN(idx), spEq->couplingInfo(comp).systemN(idx));
 
          // Set time matrix
-         spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, false);
          Solver::internal::addOperators(spSolver->rTMatrix(idx), 1.0, timeOp); 
       }
       
