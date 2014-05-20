@@ -25,12 +25,12 @@ def constrain(mat, nx, nz, bc, eq_zrows_x, eq_zrows_z):
 
    bc_mat = mat
    if bc['x'][0] > 0:
-      bid = qid(nx,0,[0])
+      bid = spsp.lil_matrix((nx,nx))
       bid = c1dbc.constrain(bid, bc['x'], 0)
       bc_mat = bc_mat + spsp.kron(qid(nz,0,bc['z']), bid)
 
    if bc['z'][0] > 0:
-      bid = qid(nz,0,[0])
+      bid = spsp.lil_matrix((nz,nz))
       bid = c1dbc.constrain(bid, bc['z'], 0)
       bc_mat = bc_mat + spsp.kron(bid, qid(nx,eq_zrows_x,bc['x']))
   

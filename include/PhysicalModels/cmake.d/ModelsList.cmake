@@ -2,8 +2,7 @@ set(MHDPhysicalModels
    AnelasticBetaSphGModel.hpp
    AnelasticFPlaneModel.hpp
    BoussinesqAnnulusModel.hpp
-   BoussinesqBetaCylGModel.hpp
-   BoussinesqBetaSphGModel.hpp
+   BoussinesqBeta3DQGModel.hpp
    BoussinesqCylinderModel.hpp
    BoussinesqFPlaneModel.hpp
    BoussinesqPerBetaCylGModel.hpp

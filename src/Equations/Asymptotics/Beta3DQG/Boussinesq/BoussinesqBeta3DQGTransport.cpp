@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqBetaCylGTransport.cpp
- * @brief Source of the implementation of the transport equation in the 3DQG beta model
+ * @file BoussinesqBeta3DQGTransport.cpp
+ * @brief Source of the implementation of the transport equation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,38 +15,36 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
 
 // Project includes
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
-#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
-#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqBetaCylGTransport::BoussinesqBetaCylGTransport(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+   BoussinesqBeta3DQGTransport::BoussinesqBeta3DQGTransport(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName,spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBetaCylGTransport::~BoussinesqBetaCylGTransport()
+   BoussinesqBeta3DQGTransport::~BoussinesqBeta3DQGTransport()
    {
    }
 
-   void BoussinesqBetaCylGTransport::setCoupling()
+   void BoussinesqBeta3DQGTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
-   void BoussinesqBetaCylGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqBeta3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -58,13 +56,13 @@ namespace Equations {
       Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqBetaCylGTransport::setRequirements()
+   void BoussinesqBeta3DQGTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, true));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));

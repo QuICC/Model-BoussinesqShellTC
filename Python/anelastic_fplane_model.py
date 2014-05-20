@@ -1,9 +1,9 @@
-"""Module provides the functions to generate the test model for the TFT scheme"""
+"""Module provides the functions to generate the Anelastic F-Plane model"""
 
 import scipy.sparse as spsp
 import utils
 from utils import triplets
-import cartesian_2d as c2d
+import cartesian_1d as c1d
 
 
 def nondimensional_parameters():
@@ -11,11 +11,11 @@ def nondimensional_parameters():
 
 
 def periodicity():
-   return [False, True, False]
+   return [False, True, True]
 
 
 def all_fields():
-   return ["streamfunction", "velocityz", "temperature"]
+   return ["streamfunction","velocityz""temperature"]
 
 
 def implicit_fields(field_row):
@@ -38,7 +38,7 @@ def equation_info(res, field_row):
    # Equation doesn't have geometric coupling
    has_geometric_coupling = False
    # Rows per equation block and number of rhs
-   block_info = (res[0]*res[2], 1)
+   block_info = (res[0], 1)
 
    return (is_complex,im_fields,ex_fields,has_geometric_coupling, block_info)
 
@@ -47,9 +47,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
    """Convert simulation input boundary conditions to ID"""
 
    use_tau_boundary = True
-
    # Impose no boundary conditions
-   no_bc = {'x':[0],'z':[0]}
+   no_bc = [0]
    if bcs["bcType"] == 2:
       bc = no_bc
    else:
@@ -60,9 +59,9 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
          bc = None
          if bcs[field_col[0]] == 0:
             bc_field = {}
-            bc_field[("streamfunction","")] = {'x':[40],'z':[40]}
-            bc_field[("velocityz","")] = {'x':[20],'z':[20]}
-            bc_field[("temperature","")] = {'x':[20],'z':[20]}
+            bc_field[("streamfunction","")] = [40]
+            bc_field[("velocityz","")] = [20]
+            bc_field[("temperature","")] = [20]
             if field_col == field_row:
                bc = bc_field[field_col]
 
@@ -70,10 +69,7 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
             if use_tau_boundary:
                bc = no_bc
             else:
-               bc = {}
-               for k,v in bc_field[field_col]:
-                  bc[k] = v
-                  bc[k][0] = -v[0]
+               bc = -bc_field[field_col]
    
    return bc
 
@@ -81,53 +77,51 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
 def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
-   print("CALLING QI OPERATOR")
-
    if field_row == ("streamfunction",""):
-      mat = c2d.i4j4(res[0],res[2], {'x':[0], 'z':[0]})
+      mat = c1d.i2(res[0], [0])
 
    elif field_row == ("velocityz",""):
-      mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
+      mat = c1d.i4(res[0], [0])
 
    elif field_row == ("temperature",""):
-      mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
+      mat = c1d.i2(res[0], [0])
 
    return mat
 
 
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
-   """Create matrix block of linear operator"""
+   """Create matrix block linear operator"""
 
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_col)
    if field_row == ("streamfunction",""):
-      if field_col == ("streamfunction",""):
-         mat = c2d.i4j4lapl2(res[0],res[2],eigs[0], bc)
+      if field_row == ("streamfunction",""):
+         mat = c1d.i4lapl2(res[0],eigs[0],eigs[1], bc)
 
-      elif field_col == ("velocityz",""):
-         mat = c2d.zblk(res[0],res[2],4,4, bc)
+      elif field_row == ("velocityz",""):
+         mat = c1d.zblk(res[0],4, bc)
 
-      elif field_col == ("temperature",""):
-         mat = c2d.zblk(res[0],res[2],4,4, bc)
+      elif field_row == ("temperature",""):
+         mat = c1d.zblk(res[0],4, bc)
 
    elif field_row == ("velocityz",""):
-      if field_col == ("streamfunction",""):
-         mat = c2d.zblk(res[0],res[2],2,2, bc)
+      if field_row == ("streamfunction",""):
+         mat = c1d.zblk(res[0],2, bc)
 
-      elif field_col == ("velocityz",""):
-         mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
+      elif field_row == ("velocityz",""):
+         mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
 
-      elif field_col == ("temperature",""):
-         mat = c2d.zblk(res[0],res[2],2,2, bc)
+      elif field_row == ("temperature",""):
+         mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("temperature",""):
-      if field_col == ("streamfunction",""):
-         mat = c2d.zblk(res[0],res[2],2,2, bc)
+      if field_row == ("streamfunction",""):
+         mat = c1d.zblk(res[0],2, bc)
 
-      elif field_col == ("velocityz",""):
-         mat = c2d.zblk(res[0],res[2],2,2, bc)
+      elif field_row == ("velocityz",""):
+         mat = c1d.zblk(res[0],2, bc)
 
-      elif field_col == ("temperature",""):
-         mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
+      elif field_row == ("temperature",""):
+         mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
 
    return mat
 
@@ -137,13 +131,13 @@ def time_block(res, eq_params, eigs, bcs, field_row):
 
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_row)
    if field_row == ("streamfunction",""):
-      mat = c2d.i4j4lapl(res[0],res[2],eigs[0], bc)
+      mat = c1d.i4lapl(res[0],eigs[0],eigs[1], bc)
 
    elif field_row == ("velocityz",""):
-      mat = c2d.i2j2(res[0],res[2], bc)
+      mat = c1d.i2(res[0], bc)
 
    elif field_row == ("temperature",""):
-      mat = c2d.i2j2(res[0],res[2], bc)
+      mat = c1d.i2(res[0], bc)
 
    return mat
 
@@ -151,25 +145,16 @@ def time_block(res, eq_params, eigs, bcs, field_row):
 def time(res, eq_params, eigs, bcs, field_row):
    """Create the time derivative operator"""
 
-   print("CALLING TIME OPERATOR")
-   
-   mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
-   return mat
+   return utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
 
 
 def implicit_linear(res, eq_params, eigs, bcs, field_row):
    """Create the implicit linear operator"""
 
-   print("CALLING IMPLICIT OPERATOR")
-
-   mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
-   return mat
+   return utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   print("CALLING EXPLICIT OPERATOR")
-
-   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
-   return mat
+   return -linear_block(res, eq_params, eigs, field_row, field_col)

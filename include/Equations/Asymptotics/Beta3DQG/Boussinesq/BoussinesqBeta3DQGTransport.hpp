@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBetaCylGTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity 
+ * @file BoussinesqBeta3DQGTransport.hpp
+ * @brief Implementation of the transport equation for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETACYLGTRANSPORT_HPP
-#define BOUSSINESQBETACYLGTRANSPORT_HPP
+#ifndef BOUSSINESQBETA3DQGTRANSPORT_HPP
+#define BOUSSINESQBETA3DQGTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,22 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the transport equation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBetaCylGTransport: public IScalarEquation
+   class BoussinesqBeta3DQGTransport: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param pyName        Python script name
+          * @param spEqParams    Shared equation parameters
           */
-         BoussinesqBetaCylGTransport(SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGTransport(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGTransport();
+         virtual ~BoussinesqBeta3DQGTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +71,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETACYLGTRANSPORT_HPP
+#endif // BOUSSINESQBETA3DQGTRANSPORT_HPP

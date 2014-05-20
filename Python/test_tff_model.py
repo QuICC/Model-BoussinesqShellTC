@@ -46,30 +46,30 @@ def equation_info(res, field_row):
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
    """Convert simulation input boundary conditions to ID"""
 
-   if field_col == ("streamfunction",""):
-      if bcs[field_col] == 0:
-         if field_row == ("streamfunction",""):
-            bc = [40]
-         elif field_row == ("velocityz",""):
-            bc = [0]
-         elif field_row == ("temperature",""):
-            bc = [0]
-   elif field_col == ("velocityz",""):
-      if bcs[field_col] == 0:
-         if field_row == ("streamfunction",""):
-            bc = [0]
-         elif field_row == ("velocityz",""):
-            bc = [20]
-         elif field_row == ("temperature",""):
-            bc = [0]
-   elif field_col == ("temperature",""):
-      if bcs[field_col] == 0:
-         if field_row == ("streamfunction",""):
-            bc = [0]
-         elif field_row == ("velocityz",""):
-            bc = [0]
-         elif field_row == ("temperature",""):
-            bc = [20]
+   use_tau_boundary = True
+   # Impose no boundary conditions
+   no_bc = [0]
+   if bcs["bcType"] == 2:
+      bc = no_bc
+   else:
+      # Impose no boundary conditions
+      if bcs["bcType"] == 1 and use_tau_boundary:
+         bc = no_bc
+      else: #bcType == 0 or Galerkin boundary
+         bc = None
+         if bcs[field_col[0]] == 0:
+            bc_field = {}
+            bc_field[("streamfunction","")] = [40]
+            bc_field[("velocityz","")] = [20]
+            bc_field[("temperature","")] = [20]
+            if field_col == field_row:
+               bc = bc_field[field_col]
+
+         if bc is None:
+            if use_tau_boundary:
+               bc = no_bc
+            else:
+               bc = -bc_field[field_col]
    
    return bc
 
@@ -78,10 +78,6 @@ def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
    print("CALLING QI OPERATOR")
-   print(res)
-   print(eigs)
-   print(bcs)
-   print(field_row)
 
    if field_row == ("streamfunction",""):
       mat = c1d.i2(res[0], [0])
@@ -104,27 +100,27 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
          mat = c1d.i4lapl2(res[0],eigs[0],eigs[1], bc)
 
       elif field_row == ("velocityz",""):
-         mat = c1d.zblk(res[0], bc)
+         mat = c1d.zblk(res[0],4, bc)
 
       elif field_row == ("temperature",""):
-         mat = c1d.zblk(res[0], bc)
+         mat = c1d.zblk(res[0],4, bc)
 
    elif field_row == ("velocityz",""):
       if field_row == ("streamfunction",""):
-         mat = c1d.zblk(res[0], bc)
+         mat = c1d.zblk(res[0],2, bc)
 
       elif field_row == ("velocityz",""):
          mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
 
       elif field_row == ("temperature",""):
-         mat = c1d.zblk(res[0] ,bc)
+         mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("temperature",""):
       if field_row == ("streamfunction",""):
-         mat = c1d.zblk(res[0], bc)
+         mat = c1d.zblk(res[0],2, bc)
 
       elif field_row == ("velocityz",""):
-         mat = c1d.zblk(res[0], bc)
+         mat = c1d.zblk(res[0],2, bc)
 
       elif field_row == ("temperature",""):
          mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
@@ -152,11 +148,6 @@ def time(res, eq_params, eigs, bcs, field_row):
    """Create the time derivative operator"""
 
    print("CALLING TIME OPERATOR")
-   print(res)
-   print(eq_params)
-   print(eigs)
-   print(bcs)
-   print(field_row)
    
    return utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
 
@@ -165,11 +156,6 @@ def implicit_linear(res, eq_params, eigs, bcs, field_row):
    """Create the implicit linear operator"""
 
    print("CALLING IMPLICIT OPERATOR")
-   print(res)
-   print(eq_params)
-   print(eigs)
-   print(bcs)
-   print(field_row)
 
    return utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
 
@@ -178,11 +164,5 @@ def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
    print("CALLING EXPLICIT OPERATOR")
-   print(res)
-   print(eq_params)
-   print(eigs)
-   print(bcs)
-   print(field_row)
-   print(field_col)
 
    return -linear_block(res, eq_params, eigs, field_row, field_col)

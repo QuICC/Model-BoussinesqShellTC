@@ -21,8 +21,6 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "SpectralOperators/Tools/SpectralBoxTools.hpp"
-#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -50,12 +48,7 @@ namespace Equations {
 
    void VorticityStreamVisualizer::setCoupling()
    {
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator specIt;
-      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
-      {
-         this->defineCoupling(*specIt, CouplingInformation::WRAPPER, 0, false, false, false);
-      }
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, false, false, false);
    }
 
    void VorticityStreamVisualizer::setRequirements()

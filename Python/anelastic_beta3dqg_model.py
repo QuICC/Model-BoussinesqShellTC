@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the test model for the TFT scheme"""
+"""Module provides the functions to generate the Anelastic Beta 3DQG model"""
 
 import scipy.sparse as spsp
 import utils
@@ -81,8 +81,6 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
 def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
-   print("CALLING QI OPERATOR")
-
    if field_row == ("streamfunction",""):
       mat = c2d.i4j4(res[0],res[2], {'x':[0], 'z':[0]})
 
@@ -151,8 +149,6 @@ def time_block(res, eq_params, eigs, bcs, field_row):
 def time(res, eq_params, eigs, bcs, field_row):
    """Create the time derivative operator"""
 
-   print("CALLING TIME OPERATOR")
-   
    mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
    return mat
 
@@ -160,16 +156,12 @@ def time(res, eq_params, eigs, bcs, field_row):
 def implicit_linear(res, eq_params, eigs, bcs, field_row):
    """Create the implicit linear operator"""
 
-   print("CALLING IMPLICIT OPERATOR")
-
    mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
    return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
-
-   print("CALLING EXPLICIT OPERATOR")
 
    mat = -linear_block(res, eq_params, eigs, field_row, field_col)
    return mat

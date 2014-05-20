@@ -313,15 +313,12 @@ namespace GeoMHDiSCC {
 
       // Build matrix
       rMatrix.real().resize(rows,cols);
+      rMatrix.imag().resize(rows,cols);
       rMatrix.real().setFromTriplets(realTriplets.begin(), realTriplets.end());
 
       if(imagTriplets.size() > 0)
       {
-         rMatrix.imag().resize(rows,cols);
          rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
-      } else
-      {
-         rMatrix.imag().resize(0,0);
       }
    }
 

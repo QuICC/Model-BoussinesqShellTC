@@ -20,6 +20,7 @@
 //
 #include "Generator/StateGenerator.hpp"
 #include "IoTools/IdToHuman.hpp"
+#include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 

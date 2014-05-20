@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBetaCylGVorticity.hpp
- * @brief Implementation of the voriticity computation for the Boussinesq beta model with cylindrical gravity 
+ * @file BoussinesqBeta3DQGVertical.hpp
+ * @brief Implementation of the vertical velocity equation for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETACYLGVORTICITY_HPP
-#define BOUSSINESQBETACYLGVORTICITY_HPP
+#ifndef BOUSSINESQBETA3DQGVERTICAL_HPP
+#define BOUSSINESQBETA3DQGVERTICAL_HPP
 
 // Configuration includes
 //
@@ -28,22 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the voriticity computation for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the vertical velocity equation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBetaCylGVorticity: public IScalarEquation
+   class BoussinesqBeta3DQGVertical: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param pyName     Python script name
+          * @param spEqParams Shared equation parameters
           */
-         BoussinesqBetaCylGVorticity(SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGVertical(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGVorticity();
+         virtual ~BoussinesqBeta3DQGVertical();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +71,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETACYLGVORTICITY_HPP
+#endif // BOUSSINESQBETA3DQGVERTICAL_HPP

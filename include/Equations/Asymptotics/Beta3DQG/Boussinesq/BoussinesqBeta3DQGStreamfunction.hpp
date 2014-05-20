@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBetaCylGVertical.hpp
- * @brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity 
+ * @file BoussinesqBeta3DQGStreamfunction.hpp
+ * @brief Implementation of the streamfunction equation for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETACYLGVERTICAL_HPP
-#define BOUSSINESQBETACYLGVERTICAL_HPP
+#ifndef BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP
+#define BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP
 
 // Configuration includes
 //
@@ -28,22 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the vertical velocity equation for the Boussinesq beta model with cylindrical gravity
+    * @brief Implementation of the streamfunction equation for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBetaCylGVertical: public IScalarEquation
+   class BoussinesqBeta3DQGStreamfunction: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param pyName     Python script name
+          * @param spEqParams Shared equation parameters
           */
-         BoussinesqBetaCylGVertical(SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGStreamfunction(const std::string& pyName, SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBetaCylGVertical();
+         virtual ~BoussinesqBeta3DQGStreamfunction();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +71,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETACYLGVERTICAL_HPP
+#endif // BOUSSINESQBETA3DQGSTREAMFUNCTION_HPP

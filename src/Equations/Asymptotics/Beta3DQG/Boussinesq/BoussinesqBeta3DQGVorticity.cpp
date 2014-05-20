@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqBetaCylGVorticity.cpp
- * @brief Source of the implementation of the vorticity computation in the 3DQG beta model
+ * @file BoussinesqBeta3DQGVorticity.cpp
+ * @brief Source of the implementation of the vorticity computation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBetaCylGVorticity.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticity.hpp"
 
 // Project includes
 //
@@ -29,32 +29,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqBetaCylGVorticity::BoussinesqBetaCylGVorticity(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams)
+   BoussinesqBeta3DQGVorticity::BoussinesqBeta3DQGVorticity(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IScalarEquation(pyName,spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBetaCylGVorticity::~BoussinesqBetaCylGVorticity()
+   BoussinesqBeta3DQGVorticity::~BoussinesqBeta3DQGVorticity()
    {
    }
 
-   void BoussinesqBetaCylGVorticity::setCoupling()
+   void BoussinesqBeta3DQGVorticity::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, false);
    }
 
-   void BoussinesqBetaCylGVorticity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
-   {
-      // Assert on scalar component is used
-      assert(id == FieldComponents::Physical::SCALAR);
-
-      // Doesn't require a nonlinear computation
-      assert(false);
-   }
-
-   void BoussinesqBetaCylGVorticity::setRequirements()
+   void BoussinesqBeta3DQGVorticity::setRequirements()
    {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITY);

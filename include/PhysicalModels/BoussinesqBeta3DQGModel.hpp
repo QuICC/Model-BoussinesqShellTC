@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqBetaCylGModel.hpp
- * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity
+ * @file BoussinesqBeta3DQGModel.hpp
+ * @brief Implementation of the Boussinesq beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETACYLGMODEL_HPP
-#define BOUSSINESQBETACYLGMODEL_HPP
+#ifndef BOUSSINESQBETA3DQGMODEL_HPP
+#define BOUSSINESQBETA3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -27,9 +27,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity
+    * @brief Implementation of the Boussinesq beta 3DQG model
     */
-   class BoussinesqBetaCylGModel
+   class BoussinesqBeta3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -96,14 +96,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqBetaCylGModel();
+         BoussinesqBeta3DQGModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqBetaCylGModel();
+         ~BoussinesqBeta3DQGModel();
    };
 
 }
 
-#endif // BOUSSINESQBETACYLGMODEL_HPP
+#endif // BOUSSINESQBETA3DQGMODEL_HPP
