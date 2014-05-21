@@ -41,14 +41,14 @@ namespace GeoMHDiSCC {
 
    void BoussinesqBeta3DQGModel::addEquations(SharedSimulation spSim)
    {
-      // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>(BoussinesqBeta3DQGModel::PYNAME);
-      
       // Add streamfunction equation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>(BoussinesqBeta3DQGModel::PYNAME);
       
       // Add vertical velocity equation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVertical>(BoussinesqBeta3DQGModel::PYNAME);
+      
+      // Add transport equation
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>(BoussinesqBeta3DQGModel::PYNAME);
       
       // Add vorticity computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticity>(BoussinesqBeta3DQGModel::PYNAME);
@@ -102,23 +102,23 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add transport field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add vorticity field visualization
       Equations::SharedVorticityStreamVisualizer spVort;
-      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>("");
+      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
       spVort->setFields(true, true);
 
       // Add output file

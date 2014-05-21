@@ -84,9 +84,9 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
                bc = bc_field[field_col]
          elif bcs[field_col[0]] == 1:
             bc_field = {}
-            bc_field[("streamfunction","")] = {'x':[41],'z':[10, 1j*k*np.tan(chi*np.pi/180)/G]}
+            bc_field[("streamfunction","")] = {'x':[41],'z':[10, -1j*k*np.tan(chi*np.pi/180)/G]}
             bc_field[("velocityz","")] = {'x':[21],'z':[11]}
-            bc_field[("temperature","")] = {'x':[21],'z':[0]}
+            bc_field[("temperature","")] = {'x':[20],'z':[0]}
             if field_col == field_row:
                bc = bc_field[field_col]
 
@@ -139,11 +139,11 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
          mat = c2d.i4j1d0d1(res[0],res[2], bc)
 
       elif field_col == ("temperature",""):
-         mat = 1j*k*(Ra/Pr)*c2d.i4j1(res[0],res[2], bc)
+         mat = c2d.i4j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
 
    elif field_row == ("velocityz",""):
       if field_col == ("streamfunction",""):
-         mat = (-1/G**2)*c2d.i2j1d0d1(res[0],res[2], bc)
+         mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1/G**2))
 
       elif field_col == ("velocityz",""):
          mat = c2d.i2j1laplh(res[0],res[2],k, bc)
@@ -153,13 +153,13 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
 
    elif field_row == ("temperature",""):
       if field_col == ("streamfunction",""):
-         mat = 1j*k*c2d.i2j0(res[0],res[2], bc)
+         mat = c2d.i2j0(res[0],res[2], bc, 1j*k)
 
       elif field_col == ("velocityz",""):
          mat = c2d.zblk(res[0],res[2],2,2, bc)
 
       elif field_col == ("temperature",""):
-         mat = (1/Pr)*c2d.i2j0laplh(res[0],res[2],k, bc)
+         mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
 
    return mat
 

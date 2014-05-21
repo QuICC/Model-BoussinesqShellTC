@@ -57,10 +57,10 @@ def tau_value(nx, pos, coeffs = None):
    
    cond = []
    if pos >= 0:
-      cond.append([c]*nx)
+      cond.append([c*norm_c(i) for i in np.arange(0,nx)])
 
    if pos <= 0:
-      cond.append([c*(-1.0)**i for i in np.arange(0,nx)])
+      cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nx)])
 
    return np.array(cond)
 
@@ -145,3 +145,10 @@ def apply_galerkin(mat, bc, eq_zero_rows):
    """Apply a Galerkin stencil on the matrix"""
 
    return mat
+
+def norm_c(n):
+   """Compute the chebyshev normalisation c factor"""
+   if n > 0:
+      return 2
+   else:
+      return 1
