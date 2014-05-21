@@ -16,6 +16,7 @@ def constrain(mat, bc, eq_zrows):
 
    return bc_mat
 
+
 def apply_tau(mat, bc):
    """Add Tau lines to the matrix"""
 
@@ -35,11 +36,16 @@ def apply_tau(mat, bc):
       cond = tau_value_diff(mat.shape[0], 0, bc[1:])
    elif bc[0] == 41:
       cond = tau_value_diff2(mat.shape[0], 0, bc[1:])
+   
+   if cond.dtype == 'complex_':
+      bc_mat = mat.astype('complex_')
+   else:
+      bc_mat = mat
 
-   bc_mat = mat
    bc_mat[0:cond.shape[0],:] = cond
 
    return bc_mat
+
 
 def tau_value(nx, pos, coeffs = None):
    """Create the boundary value tau line(s)"""
@@ -48,15 +54,16 @@ def tau_value(nx, pos, coeffs = None):
       c = 1.0
    else:
       c = coeffs[0]
-
+   
    cond = []
    if pos >= 0:
       cond.append([c]*nx)
 
    if pos <= 0:
-      cond.append([(-1.0)**i*c for i in np.arange(0,nx)])
+      cond.append([c*(-1.0)**i for i in np.arange(0,nx)])
 
    return np.array(cond)
+
 
 def tau_diff(nx, pos, coeffs = None):
    """Create the first derivative tau line(s)"""
@@ -75,6 +82,7 @@ def tau_diff(nx, pos, coeffs = None):
 
    return np.array(cond)
 
+
 def tau_diff2(nx, pos, coeffs = None):
    """Create the second deriviative tau line(s)"""
 
@@ -92,6 +100,7 @@ def tau_diff2(nx, pos, coeffs = None):
 
    return np.array(cond)
 
+
 def tau_value_diff(nx, pos, coeffs = None):
    """Create the no penetration and no-slip tau line(s)"""
 
@@ -102,14 +111,15 @@ def tau_value_diff(nx, pos, coeffs = None):
 
    cond = []
    if pos >= 0:
-      cond.append(tau_value(nx,1,coeffs)[0])
-      cond.append(tau_diff(nx,1,coeffs)[0])
+      cond.append(list(tau_value(nx,1,coeffs)[0]))
+      cond.append(list(tau_diff(nx,1,coeffs)[0]))
 
    if pos <= 0:
-      cond.append(tau_value(nx,-1,coeffs)[0])
-      cond.append(tau_diff(nx,-1,coeffs)[0])
+      cond.append(list(tau_value(nx,-1,coeffs)[0]))
+      cond.append(list(tau_diff(nx,-1,coeffs)[0]))
 
    return np.array(cond)
+
 
 def tau_value_diff2(nx, pos, coeffs = None):
    """Create the no penetration and no-slip tau line(s)"""
@@ -121,14 +131,15 @@ def tau_value_diff2(nx, pos, coeffs = None):
 
    cond = []
    if pos >= 0:
-      cond.append(tau_value(nx,1,coeffs)[0])
-      cond.append(tau_diff2(nx,1,coeffs)[0])
+      cond.append(list(tau_value(nx,1,coeffs)[0]))
+      cond.append(list(tau_diff2(nx,1,coeffs)[0]))
 
    if pos <= 0:
-      cond.append(tau_value(nx,-1,coeffs)[0])
-      cond.append(tau_diff2(nx,-1,coeffs)[0])
+      cond.append(list(tau_value(nx,-1,coeffs)[0]))
+      cond.append(list(tau_diff2(nx,-1,coeffs)[0]))
 
    return np.array(cond)
+
 
 def apply_galerkin(mat, bc, eq_zero_rows):
    """Apply a Galerkin stencil on the matrix"""

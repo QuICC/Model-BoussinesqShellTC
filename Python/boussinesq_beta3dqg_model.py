@@ -1,5 +1,6 @@
 """Module provides the functions to generate the Boussinesq Beta 3DQG model"""
 
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
