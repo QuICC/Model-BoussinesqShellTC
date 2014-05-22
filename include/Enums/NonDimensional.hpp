@@ -47,6 +47,8 @@ namespace GeoMHDiSCC {
             CHI,
             /// Topographic ratio
             GAMMA,
+            /// Theta angle
+            THETA,
             /// Gap width R_o - R_i
             GAPWIDTH,
             /// Radii ratio R_i/R_o

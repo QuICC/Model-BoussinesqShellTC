@@ -15,6 +15,12 @@ def zblk(nx, q, bc):
    return c1dbc.constrain(mat,bc,q)
 
 
+def i1d1(nx, bc, coeff = 1.0):
+   """Create a quasi identity block of order 1"""
+
+   return qid(nx,1, bc, coeff)
+
+
 def i2d2(nx, bc, coeff = 1.0):
    """Create a quasi identity block of order 2"""
 

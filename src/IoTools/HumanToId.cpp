@@ -54,6 +54,9 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(NonDimensional::GAMMA))
       {
          return NonDimensional::GAMMA;
+      } else if(id == IdToHuman::toTag(NonDimensional::THETA))
+      {
+         return NonDimensional::THETA;
       } else if(id == IdToHuman::toTag(NonDimensional::GAPWIDTH))
       {
          return NonDimensional::GAPWIDTH;
@@ -100,6 +103,9 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::TEMPERATURE))
       {
          return PhysicalNames::TEMPERATURE;
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEANTEMPERATURE))
+      {
+         return PhysicalNames::MEANTEMPERATURE;
       } else if(id == IdToHuman::toTag(PhysicalNames::STREAMFUNCTION))
       {
          return PhysicalNames::STREAMFUNCTION;

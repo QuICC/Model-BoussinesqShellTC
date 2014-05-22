@@ -38,9 +38,9 @@ def apply_tau(mat, bc):
       cond = tau_value_diff2(mat.shape[0], 0, bc[1:])
    
    if cond.dtype == 'complex_':
-      bc_mat = mat.astype('complex_')
+      bc_mat = mat.astype('complex_').tolil()
    else:
-      bc_mat = mat
+      bc_mat = mat.tolil()
 
    bc_mat[0:cond.shape[0],:] = cond
 

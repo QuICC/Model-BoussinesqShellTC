@@ -12,7 +12,7 @@ INSTALL(FILES
    Python/accuracy_cartesian_2d.py
    Python/accuracy_cartesian_3d.py
    Python/boussinesq_beta3dqg_model.py
-   Python/boussinesq_fplane_model.py
+   Python/boussinesq_fplane3dqg_model.py
    Python/annulus.py
    Python/cartesian_0d.py 
    Python/cartesian_1d.py 

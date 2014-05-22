@@ -165,8 +165,12 @@ namespace Equations {
       pTmp = PyTuple_GetItem(pValue, 3);
       bool hasGeometricCoupling = PyObject_IsTrue(pTmp);
 
+      // Get geometric coupling flag
+      pTmp = PyTuple_GetItem(pValue, 4);
+      int indexMode = PyLong_AsLong(pTmp);
+
       // Get block information
-      pArgs = PyTuple_GetItem(pValue, 4);
+      pArgs = PyTuple_GetItem(pValue, 5);
       pTmp = PyTuple_GetItem(pArgs, 0);
       int blockSize = PyLong_AsLong(pTmp);
       pTmp = PyTuple_GetItem(pArgs, 1);
@@ -190,8 +194,7 @@ namespace Equations {
       infoIt.first->second.setSource(hasSource);
 
       // Set index type: SLOWEST or MODE
-      /// \mhdBug Always sets indexType to SLOWEST
-      infoIt.first->second.setIndexType(CouplingInformation::SLOWEST);
+      infoIt.first->second.setIndexType(static_cast<CouplingInformation::IndexType>(indexMode));
 
       // Create implicit field coupling
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >::const_iterator fIt;

@@ -112,7 +112,7 @@ namespace Schemes {
       //
       ArrayI traSize(3);
       traSize(0) = this->mI + 1;
-      traSize(1) = 2*(this->mJ + 1);
+      traSize(1) = this->mJ + 1;
       traSize(2) = this->mK + 1;
       this->setTransformSpace(traSize);
 

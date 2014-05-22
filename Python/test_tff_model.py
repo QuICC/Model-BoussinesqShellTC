@@ -15,7 +15,7 @@ def periodicity():
 
 
 def all_fields():
-   return ["streamfunction","velocityz""temperature"]
+   return ["streamfunction", "velocityz", "temperature"]
 
 
 def implicit_fields(field_row):
@@ -31,12 +31,17 @@ def equation_info(res, field_row):
 
    # Matrix operator is real
    is_complex = False
+
    # Implicit field coupling
    im_fields = implicit_fields(field_row)
    # Additional explicit linear fields
    ex_fields = explicit_fields(field_row)
+
    # Equation doesn't have geometric coupling
    has_geometric_coupling = False
+   # Index mode: SLOWEST = 0, MODE = 1
+   index_mode = 1
+
    # Rows per equation block and number of rhs
    block_info = (res[0], 1)
 

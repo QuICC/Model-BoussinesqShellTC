@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqFPlaneModel.hpp
- * @brief Implementation of the Boussinesq f-plane 3DQG model
+ * @file BoussinesqFPlane3DQGModel.hpp
+ * @brief Implementation of the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANEMODEL_HPP
-#define BOUSSINESQFPLANEMODEL_HPP
+#ifndef BOUSSINESQFPLANE3DQGMODEL_HPP
+#define BOUSSINESQFPLANE3DQGMODEL_HPP
 
 // Configuration includes
 //
@@ -27,9 +27,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq f-plane 3DQG model
+    * @brief Implementation of the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlaneModel
+   class BoussinesqFPlane3DQGModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -96,14 +96,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqFPlaneModel();
+         BoussinesqFPlane3DQGModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqFPlaneModel();
+         ~BoussinesqFPlane3DQGModel();
    };
 
 }
 
-#endif // BOUSSINESQFPLANEMODEL_HPP
+#endif // BOUSSINESQFPLANE3DQGMODEL_HPP

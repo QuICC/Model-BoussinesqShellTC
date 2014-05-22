@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqBeta3DQGModel.cpp
- * @brief Source of the Boussinesq Beta 3DQG model
+ * @file BoussinesqFPlane3DQGModel.cpp
+ * @brief Source of the Boussinesq F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,46 +15,48 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqBeta3DQGModel.hpp"
+#include "PhysicalModels/BoussinesqFPlane3DQGModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "BoundaryCondition/BoundaryCondition.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVertical.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticity.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVertical.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/ExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqBeta3DQGModel::PYNAME = "boussinesq_beta3dqg_model";
+   const std::string BoussinesqFPlane3DQGModel::PYNAME = "boussinesq_fplane3dqg_model";
 
-   void BoussinesqBeta3DQGModel::addEquations(SharedSimulation spSim)
+   void BoussinesqFPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGStreamfunction>(BoussinesqFPlane3DQGModel::PYNAME);
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVertical>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVertical>(BoussinesqFPlane3DQGModel::PYNAME);
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGTransport>(BoussinesqFPlane3DQGModel::PYNAME);
       
       // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticity>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVorticity>(BoussinesqFPlane3DQGModel::PYNAME);
+      
+      // Add mean heat computation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGMeanHeat>(BoussinesqFPlane3DQGModel::PYNAME);
    }
 
-   void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
       Equations::SharedRandomScalarState spRand;
@@ -62,31 +64,21 @@ namespace GeoMHDiSCC {
       Equations::SharedExactScalarState spExact;
 
       // Add transport initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spRand->setIdentity(PhysicalNames::TEMPERATURE);
       spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
       
       // Add streamfunction initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(1.0, 3, 1.0, 7.0);
       
       // Add vertical velocity initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINESINE);
       spExact->setSineOptions(1.0, 3, 1.0, 6.0);
-      
-//      // Add streamfunction initial state generation equation
-//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-//      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
-//      
-//      // Add vertical velocity initial state generation equation
-//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-//      spRand->setIdentity(PhysicalNames::VELOCITYZ);
-//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -96,41 +88,41 @@ namespace GeoMHDiSCC {
       spGen->addOutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqFPlane3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add transport field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqFPlane3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqFPlane3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqFPlane3DQGModel::PYNAME);
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
-      // Add vorticity field visualization
-      Equations::SharedVorticityStreamVisualizer spVort;
-      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
-      spVort->setFields(true, true);
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqFPlane3DQGModel::PYNAME);
+      spField->setFields(true, true);
+      spField->setIdentity(PhysicalNames::MEANTEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::VORTICITY);
+      spOut->expect(PhysicalNames::MEANTEMPERATURE);
       spVis->addOutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqFPlane3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -139,12 +131,13 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
       spIn->expect(PhysicalNames::VELOCITYZ);
+      spIn->expect(PhysicalNames::MEANTEMPERATURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqBeta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -153,11 +146,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqBeta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqBeta3DQGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqFPlane3DQGModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -165,14 +158,18 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+
+      // Add mean temperature to ouput file
+      spState->expect(PhysicalNames::MEANTEMPERATURE);
+
       spSim->addOutputFile(spState);
    }
 
-   void BoussinesqBeta3DQGModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqBeta3DQGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqFPlane3DQGModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

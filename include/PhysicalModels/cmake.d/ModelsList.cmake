@@ -4,7 +4,7 @@ set(MHDPhysicalModels
    BoussinesqAnnulusModel.hpp
    BoussinesqBeta3DQGModel.hpp
    BoussinesqCylinderModel.hpp
-   BoussinesqFPlaneModel.hpp
+   BoussinesqFPlane3DQGModel.hpp
    BoussinesqPerBetaCylGModel.hpp
    BoussinesqShellModel.hpp
    BoussinesqSphereModel.hpp

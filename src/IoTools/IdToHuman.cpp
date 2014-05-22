@@ -177,6 +177,8 @@ namespace IoTools {
             return "chi";
          case NonDimensional::GAMMA:
             return "gamma";
+         case NonDimensional::THETA:
+            return "theta";
          case NonDimensional::GAPWIDTH:
             return "gapwidth";
          case NonDimensional::RRATIO:

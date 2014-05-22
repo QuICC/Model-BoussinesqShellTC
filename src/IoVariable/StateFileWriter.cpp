@@ -83,7 +83,6 @@ namespace IoVariable {
       // Storage for the field information
       std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo = Datatypes::FieldTools::createInfo(scalar);
 
-
       // Check for data regularity
       if(this->mIsRegular)
       {

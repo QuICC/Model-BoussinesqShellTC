@@ -59,19 +59,19 @@ namespace GeoMHDiSCC {
       Equations::SharedExactScalarState spExact;
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
       spExact->setSineOptions(10, 5, 5, 2);

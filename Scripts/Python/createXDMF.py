@@ -73,7 +73,7 @@ def main(argv):
    for fId in range(sId, sId+snapshots):
       current = basename+str(fId).zfill(4)+'.hdf5'
       h5_file = h5py.File(current, 'r')
-      if scheme in ('TFT'):
+      if scheme in ('TFT','TFF'):
          #if fId == sId:
          #   boxXYZ(h5_file)
          #print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}
