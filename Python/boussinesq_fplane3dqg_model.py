@@ -5,7 +5,6 @@ import utils
 from utils import triplets
 import cartesian_1d as c1d
 import numpy as np
-import scipy.io as io
 
 
 def nondimensional_parameters():
@@ -226,7 +225,6 @@ def time(res, eq_params, eigs, bcs, field_row):
    """Create the time derivative operator"""
 
    mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
-   io.mmwrite("matrix_time_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + "_" + str(eigs[1]) + ".mtx", mat)
    return mat
 
 
@@ -234,7 +232,6 @@ def implicit_linear(res, eq_params, eigs, bcs, field_row):
    """Create the implicit linear operator"""
 
    mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
-   io.mmwrite("matrix_linear_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + "_" + str(eigs[1]) + ".mtx", mat)
    return mat
 
 
@@ -242,5 +239,4 @@ def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
    mat = -linear_block(res, eq_params, eigs, field_row, field_col)
-   io.mmwrite("matrix_explicit_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + "_" + str(eigs[1]) + ".mtx", mat)
    return mat

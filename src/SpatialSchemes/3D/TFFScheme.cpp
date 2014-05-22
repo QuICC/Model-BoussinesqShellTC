@@ -110,6 +110,7 @@ namespace Schemes {
       //
       // Set transform space sizes
       //
+      /// \mhdBug possible aliasing issue, check for correct dealiased FFT 
       ArrayI traSize(3);
       traSize(0) = this->mI + 1;
       traSize(1) = this->mJ + 1;
