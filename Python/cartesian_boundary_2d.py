@@ -41,12 +41,12 @@ def constrain(mat, nx, nz, bc, eq_zrows_x, eq_zrows_z):
    if bc['x'][0] > 0:
       bcMat = spsp.lil_matrix((nx,nx))
       bcMat = c1dbc.constrain(bcMat, bc['x'], 0)
-      bc_mat = bc_mat + spsp.kron(bid(nz,0,bc['z']), bcMat)
+      bc_mat = bc_mat + spsp.kron(bid(nz,eq_zrows_z,bc['z']), bcMat)
 
    if bc['z'][0] > 0:
       bcMat = spsp.lil_matrix((nz,nz))
       bcMat = c1dbc.constrain(bcMat, bc['z'], 0)
-      bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,eq_zrows_x,bc['x']))
+      bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,0,bc['x']))
   
    return bc_mat
 
