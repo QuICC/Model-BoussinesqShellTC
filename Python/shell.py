@@ -10,7 +10,7 @@ import utils
 def zblk(nr):
    """Create a block of zeros"""
 
-   return spsp.coo_matrix((nr,nr))
+   return spsp.lil_matrix((nr,nr))
 
 
 def i2x2(nr, l, m, a, b):

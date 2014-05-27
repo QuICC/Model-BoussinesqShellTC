@@ -76,11 +76,13 @@ namespace Diagnostics {
                if(j > 0 && j < mesh.at(i).size() - 1)
                {
                   this->mMeshSpacings.back()(j) = std::min(std::abs(mesh.at(i)(j) - mesh.at(i)(j-1)), std::abs(mesh.at(i)(j) - mesh.at(i)(j+1)));
-                  // Get left endpoint grid spacing
+
+               // Get left endpoint grid spacing
                } else if(j > 0)
                {
                   this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j-1));
-                  // Get right endpoint grid spacing
+
+               // Get right endpoint grid spacing
                } else
                {
                   this->mMeshSpacings.back()(j) = std::abs(mesh.at(i)(j) - mesh.at(i)(j+1));
@@ -129,9 +131,11 @@ namespace Diagnostics {
          this->mCfl = this->mcCourant*this->mMeshSpacings.at(0).minCoeff()/this->mspVelocityWrapper->one().data().array().abs().maxCoeff();
          DebuggerMacro_showValue("Raw CFL Dx = ", 2, this->mMeshSpacings.at(0).minCoeff());
          DebuggerMacro_showValue("Raw CFL Vx = ", 2, this->mspVelocityWrapper->one().data().array().abs().maxCoeff());
+
          this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(1).minCoeff()/this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
          DebuggerMacro_showValue("Raw CFL Dy = ", 2, this->mMeshSpacings.at(1).minCoeff());
          DebuggerMacro_showValue("Raw CFL Vy = ", 2, this->mspVelocityWrapper->two().data().array().abs().maxCoeff());
+
          this->mCfl = std::min(this->mCfl, this->mcCourant*this->mMeshSpacings.at(2).minCoeff()/this->mspVelocityWrapper->three().data().array().abs().maxCoeff());
          DebuggerMacro_showValue("Raw CFL Dz = ", 2, this->mMeshSpacings.at(2).minCoeff());
          DebuggerMacro_showValue("Raw CFL Vz = ", 2, this->mspVelocityWrapper->three().data().array().abs().maxCoeff());

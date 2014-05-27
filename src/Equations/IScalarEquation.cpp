@@ -23,7 +23,6 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {

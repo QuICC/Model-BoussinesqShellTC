@@ -59,26 +59,25 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
-      Equations::SharedRandomScalarState spRand;
-      // Shared pointer to equation
       Equations::SharedExactScalarState spExact;
 
       // Add transport initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
-      spRand->setIdentity(PhysicalNames::TEMPERATURE);
-      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
+      spExact->setIdentity(PhysicalNames::TEMPERATURE);
+      spExact->setStateType(Equations::ExactScalarState::SINESINE);
+      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
       
       // Add streamfunction initial state generation equation
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
-      spExact->setSineOptions(1.0, 3, 1.0, 7.0);
+      spExact->setStateType(Equations::ExactScalarState::SINESINE);
+      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
       
       // Add vertical velocity initial state generation equation
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 3, 1.0, 6.0);
+      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

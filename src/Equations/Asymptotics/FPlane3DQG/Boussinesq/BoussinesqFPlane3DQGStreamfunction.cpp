@@ -41,7 +41,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGStreamfunction::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
    }
 
    void BoussinesqFPlane3DQGStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -54,7 +54,7 @@ namespace Equations {
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
       MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));
-      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITYZ).dom(0).grad(), 1.0/eta3, FieldComponents::Physical::TWO, FieldComponents::Physical::THREE);
+      Physical::StreamAdvection::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITY).dom(0).grad(), 1.0/eta3, FieldComponents::Physical::TWO, FieldComponents::Physical::THREE);
    }
 
    void BoussinesqFPlane3DQGStreamfunction::setRequirements()
@@ -66,10 +66,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
-
-      // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, false, false));
+      this->mRequirements.addField(PhysicalNames::VORTICITY, FieldRequirement(true, true, false, true));
    }
 
 }

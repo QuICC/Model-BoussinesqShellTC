@@ -120,7 +120,7 @@ namespace Datatypes  {
    }
 
    template <typename TData> DecoupledComplex<TData>::DecoupledComplex(const int rows, const int cols)
-      : mReal(rows,rows), mImag(rows,cols)
+      : mReal(rows,cols), mImag(rows,cols)
    {
    }
 

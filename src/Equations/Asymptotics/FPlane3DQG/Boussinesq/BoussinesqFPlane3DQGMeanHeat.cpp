@@ -25,7 +25,6 @@
 #include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -43,7 +42,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, false, false, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, true);
    }
 
    void BoussinesqFPlane3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -85,16 +84,13 @@ namespace Equations {
       this->setName(PhysicalNames::MEANTEMPERATURE);
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, false, true));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
-
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));
    }
 
 }

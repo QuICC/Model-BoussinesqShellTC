@@ -52,9 +52,6 @@ namespace Equations {
 
       // Set vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VORTICITY, FieldRequirement(true, true, true, true));
-
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));
    }
 
 }

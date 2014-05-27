@@ -11,7 +11,7 @@ import cartesian_boundary_1d as c1dbc
 def zblk(nx, q, bc):
    """Create a block of zeros"""
 
-   mat = spsp.coo_matrix((nx,nx))
+   mat = spsp.lil_matrix((nx,nx))
    return c1dbc.constrain(mat,bc,q)
 
 

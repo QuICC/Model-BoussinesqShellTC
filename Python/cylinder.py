@@ -8,7 +8,7 @@ import scipy.sparse as spsp
 def zblk(nr,nz):
    """Create a block of zeros"""
 
-   return spsp.coo_matrix((nr*nz,nr*nz))
+   return spsp.lil_matrix((nr*nz,nr*nz))
 
 
 def i2j2x2(nr, nz, m):

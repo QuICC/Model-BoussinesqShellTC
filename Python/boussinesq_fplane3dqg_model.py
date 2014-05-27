@@ -129,13 +129,10 @@ def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
    if field_row == ("streamfunction",""):
-      mat = c1d.i4(res[0], [0])
+      mat = c1d.i1(res[0], [0])
 
    elif field_row == ("velocityz",""):
-      mat = c1d.i4(res[0], [0])
-
-   elif field_row == ("temperature",""):
-      mat = c1d.i2(res[0], [0])
+      mat = c1d.i1(res[0], [0])
 
    elif field_row == ("meantemperature",""):
       if eigs[0] == 0 and eigs[1] == 0:
@@ -143,14 +140,14 @@ def qi(res, eigs, bcs, field_row):
          stat[0,::2] = [n/(n**2-1) - 1/(n-1) for n in np.arange(0,res[0],2)]
          tmp = c1d.zblk(res[0],0, [0])
          tmp[::2,0] = 1
-         mat = c1d.i2(res[0], [0])*(c1d.qid(res[0],0,[0]) - tmp*stat)
+         mat = c1d.i1(res[0], [0])*(c1d.qid(res[0],0,[0]) - tmp*stat)
       else:
          mat = c1d.zblk(res[0],0, [0])
 
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
    """Create matrix block linear operator"""
 
    Pr = eq_params['prandtl']
@@ -183,12 +180,16 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
 
    elif field_row == ("temperature",""):
       if field_col == ("streamfunction",""):
-         #mat = c1d.zblk(res[0],0, bc)
-         mat = c1d.qid(res[0],0, bc, -1j*kx*eta2)
+         if linearize:
+            mat = c1d.qid(res[0],0, bc, -1j*kx*eta2)
+         else:
+            mat = c1d.zblk(res[0],0, bc)
 
       elif field_col == ("velocityz",""):
-         #mat = c1d.zblk(res[0],0, bc)
-         mat = c1d.qid(res[0],0, bc, eta3)
+         if linearize:
+            mat = c1d.qid(res[0],0, bc, eta3)
+         else:
+            mat = c1d.zblk(res[0],0, bc)
 
       elif field_col == ("temperature",""):
          mat = c1d.qid(res[0],0, bc, -(1/Pr)*(kx**2 + (1/eta3**2)*ky**2))

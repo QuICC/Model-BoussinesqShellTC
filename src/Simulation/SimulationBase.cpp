@@ -263,6 +263,7 @@ namespace GeoMHDiSCC {
    {
       // Debug statement
       DebuggerMacro_enter("computeNonlinear",2);
+      DebuggerMacro_start("computeNonlinear",3);
 
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
@@ -273,6 +274,7 @@ namespace GeoMHDiSCC {
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mTransformCoordinator);
 
       // Debug statement
+      DebuggerMacro_stop("computeNonlinear t = ",3);
       DebuggerMacro_leave("computeNonlinear",2);
    }
 
