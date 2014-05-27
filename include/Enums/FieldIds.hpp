@@ -32,27 +32,33 @@ namespace GeoMHDiSCC {
        */
       enum Id {
          /// Codensity field
-         DENSITY,
-         /// Codensity field
          CODENSITY,
+         /// Density field
+         DENSITY,
+         /// Entropy field
+         ENTROPY,
+         /// Magnetic field
+         MAGNETIC,
+         /// Mean temperature field
+         MEANTEMPERATURE,
          /// Pressure field
          PRESSURE,
          /// Temperature field
          TEMPERATURE,
-         /// Mean temperature field
-         MEANTEMPERATURE,
          /// Streamfunction field
          STREAMFUNCTION,
-         /// Axial velocity field
-         VELOCITYZ,
-         /// Axial vorticity field
-         VORTICITYZ,
-         /// Magnetic field
-         MAGNETIC,
          /// Velocity field
          VELOCITY, 
+         /// X velocity field
+         VELOCITYX,
+         /// Y velocity field
+         VELOCITYY,
+         /// Z velocity field
+         VELOCITYZ,
          /// Vorticity field
-         VORTICITY
+         VORTICITY,
+         /// Axial vorticity field
+         VORTICITYZ,
       };
    };
 

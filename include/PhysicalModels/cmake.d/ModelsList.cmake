@@ -1,13 +1,12 @@
 set(MHDPhysicalModels 
-   AnelasticBetaSphGModel.hpp
    AnelasticFPlaneModel.hpp
    BoussinesqAnnulusModel.hpp
    BoussinesqBeta3DQGModel.hpp
    BoussinesqCylinderModel.hpp
    BoussinesqFPlane3DQGModel.hpp
-   BoussinesqPerBetaCylGModel.hpp
    BoussinesqShellModel.hpp
    BoussinesqSphereModel.hpp
+   CompressibleFPlaneModel.hpp
    RayleighBenardModel.hpp
    RotatingRBModel.hpp
    )

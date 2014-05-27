@@ -53,9 +53,9 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      MHDFloat eta2 = std::sin(eq.eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = std::cos(eq.eqParams().nd(NonDimensional::THETA));
-      rNLComp.setData((-eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() + eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::MEANTEMPERATURE).dom(0).grad().comp(FieldComponents::Physical::ONE).data().array());
+      MHDFloat eta2 = std::sin(this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));
+      rNLComp.setData(((-eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() + eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::MEANTEMPERATURE).dom(0).grad().comp(FieldComponents::Physical::ONE).data().array()).matrix());
    }
 
    void BoussinesqFPlane3DQGTransport::setRequirements()

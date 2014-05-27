@@ -1,6 +1,6 @@
 /** 
  * @file AnelasticFPlaneModel.cpp
- * @brief Source of the anelastic f-plane 3DQG physical model
+ * @brief Source of the anelastic F-plane physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -24,9 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneVertical.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Anelastic/AnelasticFPlaneTransport.hpp"
+#include "Equations/FPlane/Anelastic/AnelasticFPlaneStreamfunction.hpp"
+#include "Equations/FPlane/Anelastic/AnelasticFPlaneVertical.hpp"
+#include "Equations/FPlane/Anelastic/AnelasticFPlaneTransport.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {

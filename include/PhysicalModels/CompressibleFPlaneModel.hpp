@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqPerBetaCylGModel.hpp
- * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity with periodic radius
+ * @file CompressibleFPlaneModel.hpp
+ * @brief Implementation of the compressible F-plane model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQPERBETACYLGMODEL_HPP
-#define BOUSSINESQPERBETACYLGMODEL_HPP
+#ifndef COMPRESSIBLEFPLANEMODEL_HPP
+#define COMPRESSIBLEFPLANEMODEL_HPP
 
 // Configuration includes
 //
@@ -27,9 +27,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq beta 3DQG model with cylindrical gravity with periodic radius
+    * @brief Implementation of the compressible F-plane model
     */
-   class BoussinesqPerBetaCylGModel
+   class CompressibleFPlaneModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -96,14 +96,14 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqPerBetaCylGModel();
+         CompressibleFPlaneModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqPerBetaCylGModel();
+         ~CompressibleFPlaneModel();
    };
 
 }
 
-#endif // BOUSSINESQPERBETACYLGMODEL_HPP
+#endif // COMPRESSIBLEFPLANEMODEL_HPP

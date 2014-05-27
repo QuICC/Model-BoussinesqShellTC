@@ -1,6 +1,6 @@
 /** 
  * @file AnelasticFPlaneModel.hpp
- * @brief Implementation of the anelastic f-plane 3DQG model
+ * @brief Implementation of the anelastic F-plane model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the anelastic f-plane 3DQG model
+    * @brief Implementation of the anelastic F-plane model
     */
    class AnelasticFPlaneModel
    {

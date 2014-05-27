@@ -55,9 +55,9 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi)\theta\f$
       ///
-      MHDFloat eta2 = std::sin(eq.eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = std::cos(eq.eqParams().nd(NonDimensional::THETA));
-      rNLComp.setData((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array());
+      MHDFloat eta2 = std::sin(this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));
+      rNLComp.setData(((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqFPlane3DQGMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const

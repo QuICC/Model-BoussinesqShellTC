@@ -31,30 +31,50 @@ namespace IoTools {
    {
       switch(id)
       {
-         case PhysicalNames::DENSITY:
-            return "Density";
          case PhysicalNames::CODENSITY:
             return "Codensity";
-         case PhysicalNames::PRESSURE:
-            return "Pressure";
-         case PhysicalNames::TEMPERATURE:
-            return "Temperature";
-         case PhysicalNames::MEANTEMPERATURE:
-            return "Mean temperature";
-         case PhysicalNames::STREAMFUNCTION:
-            return "Streamfunction";
-         case PhysicalNames::VELOCITYZ:
-            return "VelocityZ";
-         case PhysicalNames::VORTICITYZ:
-            return "VorticityZ";
-         case PhysicalNames::VELOCITY:
-            return "Velocity";
+
+         case PhysicalNames::DENSITY:
+            return "Density";
+
+         case PhysicalNames::ENTROPY:
+            return "Entropy";
+
          case PhysicalNames::MAGNETIC:
             return "Magnetic";
+
+         case PhysicalNames::MEANTEMPERATURE:
+            return "Mean temperature";
+
+         case PhysicalNames::PRESSURE:
+            return "Pressure";
+
+         case PhysicalNames::STREAMFUNCTION:
+            return "Streamfunction";
+
+         case PhysicalNames::TEMPERATURE:
+            return "Temperature";
+
+         case PhysicalNames::VELOCITY:
+            return "Velocity";
+
+         case PhysicalNames::VELOCITYX:
+            return "VelocityX";
+
+         case PhysicalNames::VELOCITYY:
+            return "VelocityY";
+
+         case PhysicalNames::VELOCITYZ:
+            return "VelocityZ";
+
          case PhysicalNames::VORTICITY:
             return "Vorticity";
+
+         case PhysicalNames::VORTICITYZ:
+            return "VorticityZ";
+
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to string conversion requested (PhysicalNames)");
       }
    }
 
@@ -62,30 +82,50 @@ namespace IoTools {
    {
       switch(id)
       {
-         case PhysicalNames::DENSITY:
-            return "density";
          case PhysicalNames::CODENSITY:
             return "codensity";
-         case PhysicalNames::PRESSURE:
-            return "pressure";
-         case PhysicalNames::TEMPERATURE:
-            return "temperature";
-         case PhysicalNames::MEANTEMPERATURE:
-            return "meantemperature";
-         case PhysicalNames::STREAMFUNCTION:
-            return "streamfunction";
-         case PhysicalNames::VELOCITYZ:
-            return "velocityz";
-         case PhysicalNames::VORTICITYZ:
-            return "vorticityz";
-         case PhysicalNames::VELOCITY:
-            return "velocity";
+
+         case PhysicalNames::DENSITY:
+            return "density";
+
+         case PhysicalNames::ENTROPY:
+            return "entropy";
+
          case PhysicalNames::MAGNETIC:
             return "magnetic";
+
+         case PhysicalNames::MEANTEMPERATURE:
+            return "meantemperature";
+
+         case PhysicalNames::PRESSURE:
+            return "pressure";
+
+         case PhysicalNames::STREAMFUNCTION:
+            return "streamfunction";
+
+         case PhysicalNames::TEMPERATURE:
+            return "temperature";
+
+         case PhysicalNames::VELOCITY:
+            return "velocity";
+
+         case PhysicalNames::VELOCITYX:
+            return "velocityx";
+
+         case PhysicalNames::VELOCITYY:
+            return "velocityy";
+
+         case PhysicalNames::VELOCITYZ:
+            return "velocityz";
+
          case PhysicalNames::VORTICITY:
             return "vorticity";
+
+         case PhysicalNames::VORTICITYZ:
+            return "vorticityz";
+
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to tag conversion requested (PhysicalNames)");
       }
    }
 
@@ -102,7 +142,7 @@ namespace IoTools {
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to string conversion requested (FieldComponents::Physical)");
       }
    }
 
@@ -119,7 +159,7 @@ namespace IoTools {
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to tag conversion requested (FieldComponents::Physical)");
       }
    }
 
@@ -136,7 +176,7 @@ namespace IoTools {
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to string conversion requested (FieldComponents::Spectral)");
       }
    }
 
@@ -153,7 +193,7 @@ namespace IoTools {
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to tag conversion requested (FieldComponents::Spectral)");
       }
    }
 
@@ -161,30 +201,47 @@ namespace IoTools {
    {
       switch(id)
       {
-         case NonDimensional::EKMAN:
-            return "ekman";
-         case NonDimensional::ROBERTS:
-            return "roberts";
-         case NonDimensional::RAYLEIGH:
-            return "rayleigh";
-         case NonDimensional::MAGEKMAN:
-            return "magnetic_ekman";
-         case NonDimensional::PRANDTL:
-            return "prandtl";
-         case NonDimensional::MAGPRANDTL:
-            return "magnetic_prandtl";
          case NonDimensional::CHI:
             return "chi";
+
+         case NonDimensional::EKMAN:
+            return "ekman";
+
          case NonDimensional::GAMMA:
             return "gamma";
-         case NonDimensional::THETA:
-            return "theta";
+
          case NonDimensional::GAPWIDTH:
             return "gapwidth";
+
+         case NonDimensional::MAGEKMAN:
+            return "magnetic_ekman";
+
+         case NonDimensional::MAGPRANDTL:
+            return "magnetic_prandtl";
+
+         case NonDimensional::PRANDTL:
+            return "prandtl";
+
+         case NonDimensional::RAYLEIGH:
+            return "rayleigh";
+
+         case NonDimensional::ROBERTS:
+            return "roberts";
+
+         case NonDimensional::ROSSBY:
+            return "rossby";
+
          case NonDimensional::RRATIO:
             return "rratio";
+
+         case NonDimensional::TAYLOR:
+            return "taylor";
+
+         case NonDimensional::THETA:
+            return "theta";
+
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }
    }
 
@@ -201,7 +258,7 @@ namespace IoTools {
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";
          default:
-            throw Exception("Unknown ID to string conversion requested");
+            throw Exception("Unknown ID to string conversion requested (ModelOperator)");
       }
    }
 

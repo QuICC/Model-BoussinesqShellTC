@@ -1,6 +1,6 @@
 /** 
- * @file AnelasticBetaSphGModel.cpp
- * @brief Source of the anelastic beta 3DQG model with spherical gravity
+ * @file CompressibleFPlaneModel.cpp
+ * @brief Source of the compressible F-plane physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/AnelasticBetaSphGModel.hpp"
+#include "PhysicalModels/CompressibleFPlaneModel.hpp"
 
 // Project includes
 //
@@ -24,36 +24,36 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGVertical.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Anelastic/AnelasticBetaSphGTransport.hpp"
+#include "Equations/FPlane/Compressible/CompressibleFPlaneStreamfunction.hpp"
+#include "Equations/FPlane/Compressible/CompressibleFPlaneVertical.hpp"
+#include "Equations/FPlane/Compressible/CompressibleFPlaneTransport.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string AnelasticBetaSphGModel::PYNAME = "anelastic_beta_sphg_model";
+   const std::string CompressibleFPlaneModel::PYNAME = "anelastic_fplane_model";
 
-   void AnelasticBetaSphGModel::addEquations(SharedSimulation spSim)
+   void CompressibleFPlaneModel::addEquations(SharedSimulation spSim)
    {
       throw Exception("Not implemented yet!");
    }
 
-   void AnelasticBetaSphGModel::addStates(SharedStateGenerator spGen)
+   void CompressibleFPlaneModel::addStates(SharedStateGenerator spGen)
    {
       throw Exception("Not implemented yet!");
    }
 
-   void AnelasticBetaSphGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void CompressibleFPlaneModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       throw Exception("Not implemented yet!");
    }
 
-   void AnelasticBetaSphGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void CompressibleFPlaneModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       throw Exception("Not implemented yet!");
    }
 
-   void AnelasticBetaSphGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void CompressibleFPlaneModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -62,11 +62,11 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void AnelasticBetaSphGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void CompressibleFPlaneModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticBetaSphGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(CompressibleFPlaneModel::PYNAME);
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -77,11 +77,11 @@ namespace GeoMHDiSCC {
       spSim->addOutputFile(spState);
    }
 
-   void AnelasticBetaSphGModel::setInitialState(SharedSimulation spSim)
+   void CompressibleFPlaneModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticBetaSphGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(CompressibleFPlaneModel::PYNAME);
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqSphereVelocity::BoussinesqSphereVelocity(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams)
+   BoussinesqSphereVelocity::BoussinesqSphereVelocity(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IVectorEquation(pyName, spEqParams)
    {
       // Vector equation has two components, ie Toroidal/Poloidal
       this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
@@ -46,66 +46,9 @@ namespace Equations {
 
    void BoussinesqSphereVelocity::setCoupling()
    {
-      //
-      // Initialise  toroidal coupling information
-      //
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::ONE,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::ONE);
+      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 0, false, false, false);
 
-      // General setup: prognostic equation, real solver, start from l = 1
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 1);
-
-      // Set nonlinear flags: has NO nonlinear term, has NO quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
-
-      // Set source flags: NO source term
-      infoIt.first->second.setSource(false);
-
-      // Set index type: use MODE
-      infoIt.first->second.setIndexType(CouplingInformation::MODE);
-
-      // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::ONE);
-
-      // Set mininal matrix coupling
-      int nMat = 0;
-      ArrayI blockNs;
-      ArrayI rhsCols;
-      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::ONE);
-
-      //
-      // Initialise  poloidal coupling information
-      //
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::TWO,CouplingInformation()));
-      eqId = std::make_pair(this->name(), FieldComponents::Spectral::TWO);
-
-      // General setup: prognostic equation, real solver, start from l = 1
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 1);
-
-      // Set nonlinear flags: has NO nonlinear term, has NO quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
-
-      // Set source flags: NO source term
-      infoIt.first->second.setSource(false);
-
-      // Set index type: use MODE
-      infoIt.first->second.setIndexType(CouplingInformation::MODE);
-
-      // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::TWO);
-
-      // Set mininal matrix coupling
-      nMat = 0;
-      EigenSelector::makeMinimalCoupling(this->unknown().dom(0).spRes(), nMat, blockNs, rhsCols);
-      infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
-
-      // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::TWO);
+      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 0, false, false, false);
    }
 
    void BoussinesqSphereVelocity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

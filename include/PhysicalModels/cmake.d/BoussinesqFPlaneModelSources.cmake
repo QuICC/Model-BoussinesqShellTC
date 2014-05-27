@@ -1,0 +1,9 @@
+set(MHDModelSources
+   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneStreamfunction.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/FPlane/Boussinesq/BoussinesqFPlaneVertical.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ExactScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+)

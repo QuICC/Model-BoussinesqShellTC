@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqAnnulusVelocity::BoussinesqAnnulusVelocity(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams)
+   BoussinesqAnnulusVelocity::BoussinesqAnnulusVelocity(const std::string& pyName, SharedEquationParameters spEqParams)
+      : IVectorEquation(pyname,spEqParams)
    {
       // Vector equation has two components, ie Toroidal/Poloidal
       this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
@@ -46,75 +46,9 @@ namespace Equations {
 
    void BoussinesqAnnulusVelocity::setCoupling()
    {
-      //
-      // Initialise  toroidal coupling information
-      //
-      std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::ONE,CouplingInformation()));
-      SpectralFieldId eqId = std::make_pair(this->name(), FieldComponents::Spectral::ONE);
+      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 0, false, false, false);
 
-      // General setup: prognostic equation, real solver, start from l = 1
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 1);
-
-      // Set nonlinear flags: has NO nonlinear term, has NO quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
-
-      // Set source flags: NO source term
-      infoIt.first->second.setSource(false);
-
-      // Set index type: use MODE
-      infoIt.first->second.setIndexType(CouplingInformation::MODE);
-
-      // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::ONE);
-
-      //
-      // Initialise  poloidal coupling information
-      //
-      infoIt = this->mCouplingInfos.insert(std::make_pair(FieldComponents::Spectral::TWO,CouplingInformation()));
-      eqId = std::make_pair(this->name(), FieldComponents::Spectral::TWO);
-
-      // General setup: prognostic equation, real solver, start from l = 1
-      infoIt.first->second.setGeneral(CouplingInformation::PROGNOSTIC, true, 1);
-
-      // Set nonlinear flags: has NO nonlinear term, has NO quasi-inverse
-      infoIt.first->second.setNonlinear(false, false);
-
-      // Set source flags: NO source term
-      infoIt.first->second.setSource(false);
-
-      // Set index type: use MODE
-      infoIt.first->second.setIndexType(CouplingInformation::MODE);
-
-      // Equation is coupled to itself
-      infoIt.first->second.addImplicitField(eqId.first, FieldComponents::Spectral::TWO);
-
-      //
-      // Initialise common dimensional settings
-      //
-      
-      // Get radial dimension
-      int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get latitudinal dimension
-      int nL = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator specIt;
-      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
-      {
-         // Set sizes of blocks and matrices
-         ArrayI blockNs(nL);
-         blockNs.setConstant(nR);
-         ArrayI rhsCols(nL);
-         for(int i = 0; i < rhsCols.size(); i++)
-         {
-            rhsCols(i) = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
-         }
-         this->mCouplingInfos.find(*specIt)->second.setSizes(nL, blockNs, rhsCols);
-
-         // Sort implicit fields
-         this->mCouplingInfos.find(*specIt)->second.sortImplicitFields(eqId.first, *specIt);
-      }
+      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 0, false, false, false);
    }
 
    void BoussinesqAnnulusVelocity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
