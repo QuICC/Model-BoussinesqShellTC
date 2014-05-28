@@ -52,7 +52,7 @@ namespace Equations {
 
       /// 
       /// Computation of the jacobian:
-      ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi)\theta\f$
+      ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi\right)\theta\f$
       ///
       MHDFloat eta2 = std::sin(this->eqParams().nd(NonDimensional::THETA));
       MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));

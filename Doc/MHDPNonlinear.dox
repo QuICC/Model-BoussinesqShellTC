@@ -1,17 +1,5 @@
 /** \page mhdPNonlinear Nonlinear simulations
  *
- *    - <em>Reduced Boussinesq Rayleigh-Bénard</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *
- *    - <em>Reduced Boussinesq rotating Rayleigh-Bénard</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *
  *    - \subpage mhdPNLBoussinesqBeta3DQG <em>(Work in progress)</em>
  *
  *       \mhdTable{
@@ -33,55 +21,67 @@
  *          \mhdStatus{Mean heat equation, \mhdStatTodo}
  *       }
  *
- *    - <em>Anelastic F-plane</em>
+ *    - \subpage mhdPNLBoussinesqFPlane <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPNLAnelasticFPlane <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPNLCompressibleFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - <em>Boussinesq cylinder</em>
+ *    - \subpage mhdPNLBoussinesqCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - <em>Boussinesq annulus</em>
+ *    - \subpage mhdPNLBoussinesqAnnulus <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *
- *    - <em>Boussinesq sphere</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *          
- *    - <em>Boussinesq spherical shell</em>
+ *    - \subpage mhdPNLBoussinesqSphere <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - <em>Anelastic cylinder</em>
+ *    - \subpage mhdPNLBoussinesqShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - <em>Anelastic annulus</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *
- *    - <em>Anelastic sphere</em>
+ *    - \subpage mhdPNLAnelasticCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - <em>Anelastic shell</em>
+ *    - \subpage mhdPNLAnelasticAnnulus <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPNLAnelasticSphere <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - \subpage mhdPNLAnelasticShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}

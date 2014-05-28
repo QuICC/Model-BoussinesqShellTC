@@ -200,18 +200,18 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    return mat
 
 
-def time(res, eq_params, eigs, bcs, field_row):
+def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
-   mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
    io.mmwrite("matrix_time_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + ".mtx", mat)
    return mat
 
 
-def implicit_linear(res, eq_params, eigs, bcs, field_row):
+def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
-   mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
    io.mmwrite("matrix_linear_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + ".mtx",mat)
    return mat
 

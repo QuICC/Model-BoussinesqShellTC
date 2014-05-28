@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
           */
          enum Id {
             /// Chi
-            CHI,
+            CHI = 0,
             /// Ekman number
             EKMAN,
             /// Gamma

@@ -161,16 +161,16 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    return mat
 
 
-def time(res, eq_params, eigs, bcs, field_row):
+def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
-   return utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   return utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
 
 
-def implicit_linear(res, eq_params, eigs, bcs, field_row):
+def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
-   return utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   return utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):

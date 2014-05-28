@@ -238,7 +238,7 @@ namespace Equations {
       PythonWrapper::import(this->pyName());
 
       // Prepare Python call arguments
-      PyObject *pArgs, *pTmp, *pValue;
+      PyObject *pArgs, *pTmp, *pValue, *pList;
       pArgs = PyTuple_New(5);
 
       // Get resolution
@@ -266,13 +266,20 @@ namespace Equations {
       pValue = PythonWrapper::makeDict(bcMap);
       PyTuple_SetItem(pArgs, 3, pValue);
 
-      // Get field
-      pTmp = PyTuple_New(2);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
-      PyTuple_SetItem(pTmp, 0, pValue);
-      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
-      PyTuple_SetItem(pTmp, 1, pValue);
-      PyTuple_SetItem(pArgs, 4, pTmp);
+      // Get list of implicit fields
+      CouplingInformation::FieldId_range impRange = this->couplingInfo(comp).implicitRange();
+      pList = PyList_New(0);
+      for(CouplingInformation::FieldId_iterator fIt = impRange.first; fIt != impRange.second; ++fIt)
+      {
+         pTmp = PyTuple_New(2);
+         pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(fIt->first).c_str());
+         PyTuple_SetItem(pTmp, 0, pValue);
+         pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(fIt->second).c_str());
+         PyTuple_SetItem(pTmp, 1, pValue);
+
+         PyList_Append(pList, pTmp);
+      }
+      PyTuple_SetItem(pArgs, 4, pList);
 
       // Call model operator Python routine
       PythonWrapper::setFunction(IoTools::IdToHuman::toString(opId));

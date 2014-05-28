@@ -32,7 +32,7 @@ namespace GeoMHDiSCC {
        */
       enum Id {
          /// Codensity field
-         CODENSITY,
+         CODENSITY = 0,
          /// Density field
          DENSITY,
          /// Entropy field
