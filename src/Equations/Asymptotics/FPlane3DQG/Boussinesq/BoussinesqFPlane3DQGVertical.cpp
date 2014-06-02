@@ -49,11 +49,13 @@ namespace Equations {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
+      // Get parameters
+      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+
       /// 
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
-      MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));
       Physical::StreamAdvection::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3, FieldComponents::Physical::TWO, FieldComponents::Physical::THREE);
    }
 

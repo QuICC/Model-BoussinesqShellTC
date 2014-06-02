@@ -50,12 +50,14 @@ namespace Equations {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
+      // Get paramters
+      MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+
       /// 
       /// Computation of the jacobian:
       ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi\right)\theta\f$
       ///
-      MHDFloat eta2 = std::sin(this->eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = std::cos(this->eqParams().nd(NonDimensional::THETA));
       rNLComp.setData(((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 

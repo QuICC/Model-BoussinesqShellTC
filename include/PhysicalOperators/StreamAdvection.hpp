@@ -71,14 +71,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.setData(-c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.setData(-c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
                                                                               
-         rS.addData(c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.addData(c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       } else
       {
-         rS.setData(-(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.setData(-(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
 
-         rS.addData((dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.addData((dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       }
    }
 
@@ -86,14 +86,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.subData(c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.subData(c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
 
-         rS.addData(c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.addData(c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       } else
       {
-         rS.subData((dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.subData((dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
 
-         rS.addData((dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.addData((dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       }
    }
 
@@ -101,14 +101,14 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.addData(c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.addData(c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
 
-         rS.subData(c*(dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.subData(c*(dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       } else
       {
-         rS.addData((dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
+         rS.addData((dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
 
-         rS.subData((dPsi.comp(compX).data().array()*w.comp(compY).data().array()).matrix());
+         rS.subData((dPsi.comp(compY).data().array()*w.comp(compX).data().array()).matrix());
       }
    }
 }

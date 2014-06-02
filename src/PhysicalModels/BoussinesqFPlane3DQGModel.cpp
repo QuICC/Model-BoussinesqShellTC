@@ -65,19 +65,19 @@ namespace GeoMHDiSCC {
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
+      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
       
       // Add streamfunction initial state generation equation
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
+      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
       
       // Add vertical velocity initial state generation equation
       spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-6, 1.0, 1e-6);
+      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
