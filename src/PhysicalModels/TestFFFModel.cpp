@@ -27,7 +27,7 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Tests/TestLinearScalar.hpp"
 #include "Generator/States/RandomScalarState.hpp"
-#include "Generator/States/ExactScalarState.hpp"
+#include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
@@ -56,25 +56,25 @@ namespace GeoMHDiSCC {
    {
       // Shared pointer to equation
       Equations::SharedRandomScalarState spRand;
-      Equations::SharedExactScalarState spExact;
+      Equations::SharedCartesianExactScalarState spExact;
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
-      spExact->setSineOptions(10, 5, 5, 2);
+      spExact->setStateType(Equations::CartesianExactScalarState::SINSINCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
-      spExact->setSineOptions(10, 5, 5, 2);
+      spExact->setStateType(Equations::CartesianExactScalarState::COSSINCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>("");
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::ExactScalarState::SINECOSINE);
-      spExact->setSineOptions(10, 5, 5, 2);
+      spExact->setStateType(Equations::CartesianExactScalarState::SINCOSCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -90,17 +90,17 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>("");
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 

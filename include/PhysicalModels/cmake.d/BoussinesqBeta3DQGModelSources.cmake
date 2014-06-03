@@ -4,7 +4,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVertical.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ExactScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VorticityStreamVisualizer.cpp

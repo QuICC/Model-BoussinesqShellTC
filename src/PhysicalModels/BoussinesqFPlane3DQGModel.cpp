@@ -30,7 +30,7 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVertical.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
-#include "Generator/States/ExactScalarState.hpp"
+#include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
@@ -59,25 +59,25 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
-      Equations::SharedExactScalarState spExact;
+      Equations::SharedCartesianExactScalarState spExact;
 
       // Add transport initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 0.0);
       
       // Add streamfunction initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 0.0);
       
       // Add vertical velocity initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::ExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::ExactScalarState::SINESINE);
-      spExact->setSineOptions(1.0, 1e-3, 1.0, 1e-3);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 0.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

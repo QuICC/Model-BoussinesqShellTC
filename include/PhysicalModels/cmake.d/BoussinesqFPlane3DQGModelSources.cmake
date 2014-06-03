@@ -5,7 +5,7 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVertical.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/ExactScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
 )

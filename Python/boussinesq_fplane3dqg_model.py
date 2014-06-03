@@ -147,7 +147,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
    """Create matrix block linear operator"""
 
    Pr = eq_params['prandtl']
