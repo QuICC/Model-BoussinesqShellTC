@@ -26,6 +26,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
+#include "Enums/DimensionTools.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
@@ -152,9 +153,9 @@ namespace Parallel {
    {
       // Store the shared pointer to the transform resolution
       this->mspTRes = spRes->cpu()->dim(id);
-
+      
       // Create index converter
-      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(this->mspTRes));
+      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(this->mspTRes, spRes->cpu()->dim(Dimensions::jump(id,1))));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

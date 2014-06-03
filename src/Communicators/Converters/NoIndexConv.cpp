@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Parallel {
 
-   NoIndexConv::NoIndexConv(SharedCTransformResolution spTRes)
+   NoIndexConv::NoIndexConv(SharedCTransformResolution spTReFwd, SharedCTransformResolution spTResBwd)
    {
    }
 

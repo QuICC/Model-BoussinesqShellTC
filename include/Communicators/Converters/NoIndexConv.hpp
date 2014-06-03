@@ -33,9 +33,10 @@ namespace Parallel {
          /**
           * @brief Constructor
           *
-          * @param spTRes  Shared transform resolution
+          * @param spTResFwd  Shared transform resolution on forward side
+          * @param spTResBwd  Shared transform resolution on backward side
           */
-         NoIndexConv(SharedCTransformResolution spTRes);
+         NoIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd);
 
          /**
           * @brief Destructor 

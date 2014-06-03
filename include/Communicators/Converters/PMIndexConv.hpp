@@ -33,9 +33,10 @@ namespace Parallel {
          /**
           * @brief Constructor
           *
-          * @param spTRes  Shared transform resolution
+          * @param spTResFwd  Shared transform resolution on forward side
+          * @param spTResBwd  Shared transform resolution on backward side
           */
-         PMIndexConv(SharedCTransformResolution spTRes);
+         PMIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd);
 
          /**
           * @brief Destructor 
@@ -150,21 +151,26 @@ namespace Parallel {
 
       private:
          /**
-          * @brief Shared transform resolution 
+          * @brief Shared transform resolution on forward side
           */
-         SharedCTransformResolution mspTRes;
+         SharedCTransformResolution mspTResFwd;
+
+         /**
+          * @brief Shared transform resolution backward side
+          */
+         SharedCTransformResolution mspTResBwd;
    };
 
    inline int PMIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      int sN = this->mspTRes->dim<Dimensions::Data::DAT3D>()/2;
+      int sN = this->mspTResFwd->dim<Dimensions::Data::DAT3D>();
 
-      if(idxK < sN)
+      if(idxK < sN/2)
       {
          return idxK;
       } else
       {
-         return sN + idxK;
+         return this->mspTResBwd->dim<Dimensions::Data::DATB1D>() - sN + idxK;
       }
    }
 
