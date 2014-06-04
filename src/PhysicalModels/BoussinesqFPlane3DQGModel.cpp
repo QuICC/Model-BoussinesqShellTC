@@ -65,19 +65,19 @@ namespace GeoMHDiSCC {
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 14.0);
       
       // Add streamfunction initial state generation equation
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-      spExact->setModeOptions(1e0, 2.0, 1e0, 1.0, 1e0, 1.0);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 14.0, 1e0, 1.0);
       
       // Add vertical velocity initial state generation equation
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSSIN);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 2.0);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 14.0, 1e0, 14.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

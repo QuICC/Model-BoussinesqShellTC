@@ -136,11 +136,7 @@ def qi(res, eigs, bcs, field_row):
 
    elif field_row == ("meantemperature",""):
       if eigs[0] == 0 and eigs[1] == 0:
-         stat = c1d.zblk(res[0],0, [0])
-         stat[0,::2] = [n/(n**2-1) - 1/(n-1) for n in np.arange(0,res[0],2)]
-         tmp = c1d.zblk(res[0],0, [0])
-         tmp[:,0] = 1
-         mat = c1d.i1(res[0], [0])*(c1d.qid(res[0],0,[0]) - tmp*stat)
+         mat = c1d.i1(res[0], [0])*(c1d.qid(res[0],0,[0]) - c1d.avg(res[0]))
       else:
          mat = c1d.zblk(res[0],0, [0])
 

@@ -337,3 +337,13 @@ def qid(nx, q, bc, coeff = 1.0):
 
    mat = coeff*spsp.diags(diags, offsets)
    return c1dbc.constrain(mat, bc, q)
+
+def avg(nx):
+   """Compute the average of the expansion"""
+
+   mat = zblk(nx,0, [0])
+   mat[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
+   mat[0,0] = mat[0,0]/2
+
+   return mat
+
