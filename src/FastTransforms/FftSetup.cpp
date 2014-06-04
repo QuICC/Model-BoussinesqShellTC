@@ -72,7 +72,7 @@ namespace Transform {
    {
       if(this->mType == FftSetup::COMPLEX)
       {
-         return this->mBwdSize - 2*this->mSpecSize;
+         return this->mBwdSize - this->mSpecSize;
       } else
       {
          return this->mBwdSize - this->mSpecSize;

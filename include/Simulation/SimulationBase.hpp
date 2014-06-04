@@ -365,6 +365,9 @@ namespace GeoMHDiSCC {
       // Extract dimensions from configuration file
       ArrayI dim = this->mSimIoCtrl.configDimension();
 
+      // Let spatial scheme interpret the configuration file dimensions
+      TScheme::interpretConfigDimensions(dim);
+
       // Initialise the load splitter
       splitter.init<TScheme>(dim);
 

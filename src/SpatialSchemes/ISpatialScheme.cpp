@@ -22,6 +22,10 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
+   void ISpatialScheme::interpretConfigDimensions(ArrayI& rDim)
+   {
+   }
+
    void ISpatialScheme::tuneResolution(SharedResolution spRes)
    {
       SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));

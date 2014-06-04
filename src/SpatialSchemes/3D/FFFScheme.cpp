@@ -21,6 +21,12 @@
 namespace GeoMHDiSCC {
 
 namespace Schemes {
+
+   void FFFScheme::interpretConfigDimensions(ArrayI& rDim)
+   {
+      rDim(0) = 2*rDim(0);
+      rDim(1) = 2*rDim(1);
+   }
    
    std::string FFFScheme::type()
    {

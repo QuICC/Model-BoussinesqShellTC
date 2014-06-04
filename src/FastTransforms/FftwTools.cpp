@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   const MHDFloat FftwTools::STD_DEALIASING = 3.0;
+   const MHDFloat FftwTools::STD_DEALIASING = 3.0/2.0;
 
    const MHDFloat FftwTools::COS_DEALIASING = 3.0/2.0;
 

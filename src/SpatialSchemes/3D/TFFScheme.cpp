@@ -21,6 +21,11 @@
 namespace GeoMHDiSCC {
 
 namespace Schemes {
+
+   void TFFScheme::interpretConfigDimensions(ArrayI& rDim)
+   {
+      rDim(1) = 2*rDim(1);
+   }
    
    std::string TFFScheme::type()
    {

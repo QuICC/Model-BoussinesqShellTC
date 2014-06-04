@@ -165,7 +165,7 @@ namespace Parallel {
    {
       int sN = this->mspTResFwd->dim<Dimensions::Data::DAT3D>();
 
-      if(idxK < sN/2)
+      if(idxK < sN/2 + (sN % 2))
       {
          return idxK;
       } else

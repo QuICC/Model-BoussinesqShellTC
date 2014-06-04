@@ -321,7 +321,6 @@ namespace Transform {
       assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
 
       // assert right sizes for input  matrix
-      assert(fftVal.rows() % 2 == 0);
       assert(fftVal.rows() == this->mspSetup->bwdSize());
       assert(fftVal.cols() == this->mspSetup->howmany());
 
@@ -329,28 +328,31 @@ namespace Transform {
       assert(rPhysVal.rows() == this->mspSetup->fwdSize());
       assert(rPhysVal.cols() == this->mspSetup->howmany());
 
+      // Get size of positive and negative frequency parts
+      int negN = this->mspSetup->specSize()/2;
+      int posN = negN + (this->mspSetup->specSize()%2);
+
       // Compute first derivative
       if(projector == FftwTransform::ProjectorType::DIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
-         ArrayZ rfactor = -Math::cI*static_cast<MHDFloat>(this->mspSetup->specSize()) + factor.array();
-         rfactor(0) = 0;
+         ArrayZ factor = Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
 
-         // compute derivative
-         this->mTmpZIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
-         this->mTmpZIn.bottomRows(this->mspSetup->specSize()) = rfactor.asDiagonal()*fftVal.bottomRows(this->mspSetup->specSize());
+         // Split positive and negative frequencies and compute derivative
+         this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
 
       // Compute simple projection
       } else
       {
-         // Rescale results
-         this->mTmpZIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
-         this->mTmpZIn.bottomRows(this->mspSetup->specSize()) = fftVal.bottomRows(this->mspSetup->specSize());
+         // Split positive and negative frequencies
+         this->mTmpZIn.topRows(posN) = fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = fftVal.bottomRows(negN);
       }
 
       // Set the padded values to zero
-      this->mTmpZIn.block(this->mspSetup->specSize(), 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
+      this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
       // Do transform
       fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));

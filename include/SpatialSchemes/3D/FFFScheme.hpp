@@ -36,6 +36,11 @@ namespace Schemes {
    {
       public:
          /**
+          * @brief Interpret the configuration dimensions
+          */
+         static void interpretConfigDimensions(ArrayI& rDim);
+
+         /**
           * @brief Get type string for the scheme
           */
          static std::string type();
