@@ -3,12 +3,33 @@
 from __future__ import division
 
 import scipy.sparse as spsp
+import cartesian_1d as c1d
+import cylinder_radius as rad
+import cylindrical_boundary as cylbc
+
+
+def convert_bc(bc):
+   """Convert boundary dictionary into r and z kronecker product boundaries"""
+
+   if bc['r'][0] < 0:
+      bcr = bc['r']
+   else:
+      bcr = [0]
+
+   if bc['z'][0] < 0:
+      bcz = bc['z']
+   else:
+      bcz = [0]
+
+   return (bcr, bcz)
 
 
 def zblk(nr,nz):
    """Create a block of zeros"""
 
-   return spsp.lil_matrix((nr*nz,nr*nz))
+   bcr, bcz = convert_bc(bc)
+   mat = spsp.kron(c1d.zblk(nz,qz,bcz),rad.zblk(nr,qr,bcr))
+   return cylbc.constrain(mat, nr, nz, bc, qr, qz)
 
 
 def i2j2x2(nr, nz, m):

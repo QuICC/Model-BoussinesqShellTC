@@ -1,11 +1,11 @@
-"""Module provides functions to generate sparse operators in a spherical shell."""
+"""Module provides functions to generate sparse operators in an annulus radius."""
 
 from __future__ import division
 
 import numpy as np
 import scipy.sparse as spsp
 import utils
-import spherical_boundary as sphbc
+import cylindrical_radius_boundary as cylbc
 
 
 def zblk(nr):

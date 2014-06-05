@@ -7,6 +7,7 @@
 #
 INSTALL(FILES 
    Python/annulus.py
+   Python/annulus_radius.py
    Python/cartesian_0d.py 
    Python/cartesian_1d.py 
    Python/cartesian_2d.py 
@@ -15,8 +16,12 @@ INSTALL(FILES
    Python/cartesian_boundary_2d.py 
    Python/chebyshev_tools.py
    Python/cylinder.py 
+   Python/cylinder_radius.py 
+   Python/cylindrical_boundary.py 
+   Python/cylindrical_radius_boundary.py 
    Python/shell.py 
    Python/sphere.py 
+   Python/spherical_boundary.py 
    Python/symbolic.py 
    Python/utils.py 
    Python/anelastic_fplane_model.py

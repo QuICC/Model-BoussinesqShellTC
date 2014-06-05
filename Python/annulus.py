@@ -5,7 +5,8 @@ from __future__ import division
 import scipy.sparse as spsp
 import cartesian_1d as c1d
 import annulus_radius as rad
-import cylinder_boundary as cylbc
+import cylindrical_boundary as cylbc
+
 
 def convert_bc(bc):
    """Convert boundary dictionary into r and z kronecker product boundaries"""
