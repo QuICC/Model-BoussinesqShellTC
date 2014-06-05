@@ -1,10 +1,12 @@
 """Module provides the functions to generate the ???? model"""
 
+from __future__ import division
+
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
 import cartesian_1d as c1d
-import numpy as np
 
 
 def nondimensional_parameters():
@@ -79,7 +81,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
    """Create matrix block linear operator"""
 
    return mat

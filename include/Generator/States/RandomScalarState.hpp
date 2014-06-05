@@ -64,7 +64,7 @@ namespace Equations {
          /**
           * @brief Set spectrum variables
           */
-         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat xRatio, const MHDFloat yRatio, const MHDFloat zRatio);
+         void setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D);
 
       protected:
          /**
@@ -80,12 +80,12 @@ namespace Equations {
          /**
           * Generate Random value
           */
-         void makeRandom(MHDFloat& val, const int iX, const int iZ, const int iY) const;
+         void makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D) const;
 
          /**
           * Generate Random value
           */
-         void makeRandom(MHDComplex& val, const int iX, const int iZ, const int iY) const;
+         void makeRandom(MHDComplex& val, const int i1D, const int i3D, const int i2D) const;
 
       private:
          /**
@@ -99,19 +99,19 @@ namespace Equations {
          MHDFloat mMax;
 
          /**
-          * @brief Ratio between first and last coefficient in X direction
+          * @brief Ratio between first and last coefficient in first direction
           */
-         MHDFloat mXRatio;
+         MHDFloat mRatio1D;
 
          /**
-          * @brief Ratio between first and last coefficient in Y direction
+          * @brief Ratio between first and last coefficient in second direction
           */
-         MHDFloat mYRatio;
+         MHDFloat mRatio2D;
 
          /**
-          * @brief Ratio between first and last coefficient in Z direction
+          * @brief Ratio between first and last coefficient in third direction
           */
-         MHDFloat mZRatio;
+         MHDFloat mRatio3D;
    };
 
    /// Typedef for a shared RandomScalarState

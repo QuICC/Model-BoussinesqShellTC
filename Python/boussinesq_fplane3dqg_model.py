@@ -1,10 +1,12 @@
 """Module provides the functions to generate the Boussinesq F-Plane 3DQG model"""
 
+from __future__ import division
+
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
 import cartesian_1d as c1d
-import numpy as np
 
 
 def nondimensional_parameters():
@@ -117,10 +119,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
             if use_tau_boundary:
                bc = no_bc
             else:
-               bc = {}
-               for k,v in bc_field[field_col]:
-                  bc[k] = v
-                  bc[k][0] = -v[0]
+               bc = bc_field[field_col]
+               bc[0] = -bc[0]
    
    return bc
 

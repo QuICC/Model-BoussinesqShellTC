@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    RandomScalarState::RandomScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName, spEqParams), mMin(-10), mMax(10), mXRatio(1e3), mYRatio(1e3), mZRatio(1e3)
+      : IScalarEquation(pyName, spEqParams), mMin(-10), mMax(10), mRatio1D(1e3), mRatio2D(1e3), mRatio3D(1e3)
    {
    }
 
@@ -46,9 +46,9 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat xRatio, const MHDFloat yRatio, const MHDFloat zRatio)
+   void RandomScalarState::setSpectrum(const MHDFloat min, const MHDFloat max, const MHDFloat ratio1D, const MHDFloat ratio2D, const MHDFloat ratio3D)
    {
-      if(max <= min || xRatio < 1 || yRatio < 1 || zRatio < 1)
+      if(max <= min || ratio1D < 1 || ratio2D < 1 || ratio3D < 1)
       {
          throw Exception("Incompatible spectrum properties requested!");
       }
@@ -58,9 +58,9 @@ namespace Equations {
       this->mMax = max;
 
       // Set spectrum ratios
-      this->mXRatio = xRatio;
-      this->mYRatio = yRatio;
-      this->mZRatio = zRatio;
+      this->mRatio1D = ratio1D;
+      this->mRatio2D = ratio2D;
+      this->mRatio3D = ratio3D;
    }
 
    void RandomScalarState::setCoupling()
@@ -68,30 +68,30 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, true);
    }
 
-   Datatypes::SpectralScalarType::PointType RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
+   Datatypes::SpectralScalarType::PointType RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i1D, const int i3D, const int i2D) const
    {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Spectral::SCALAR);
 
-      // Get X dimension
-      int nX = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      // Get Y dimension
-      int nY = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-      // Get Z dimension
-      int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      // Get first dimension
+      int n1D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      // Get second dimension
+      int n2D = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      // Get third dimension
+      int n3D = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
-      if(iX < nX-4 && iZ < nZ - 4 && iY < nY - 4)
+      if(i1D < n1D-4 && i3D < n3D - 4 && i2D < n2D - 4)
       {
          // Compute scaling factors
-         MHDFloat aX = exp(-static_cast<MHDFloat>(iX)*log(this->mXRatio)/static_cast<MHDFloat>(nX));
-         MHDFloat aY = exp(-static_cast<MHDFloat>(iY)*log(this->mYRatio)/static_cast<MHDFloat>(nY));
-         MHDFloat aZ = exp(-static_cast<MHDFloat>(iZ)*log(this->mZRatio)/static_cast<MHDFloat>(nZ));
+         MHDFloat a1D = exp(-static_cast<MHDFloat>(i1D)*log(this->mRatio1D)/static_cast<MHDFloat>(n1D));
+         MHDFloat a2D = exp(-static_cast<MHDFloat>(i2D)*log(this->mRatio2D)/static_cast<MHDFloat>(n2D));
+         MHDFloat a3D = exp(-static_cast<MHDFloat>(i3D)*log(this->mRatio3D)/static_cast<MHDFloat>(n3D));
 
          Datatypes::SpectralScalarType::PointType val;
 
-         this->makeRandom(val, iX, iZ, iY);
+         this->makeRandom(val, i1D, i3D, i2D);
 
-         return val*aX*aY*aZ;
+         return val*a1D*a2D*a3D;
       } else
       {
          return Datatypes::SpectralScalarType::PointType(0);
@@ -104,16 +104,16 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }
 
-   void RandomScalarState::makeRandom(MHDFloat& val, const int iX, const int iZ, const int iY) const
+   void RandomScalarState::makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D) const
    {
       val = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
    }
 
-   void RandomScalarState::makeRandom(MHDComplex& val, const int iX, const int iZ, const int iY) const
+   void RandomScalarState::makeRandom(MHDComplex& val, const int i1D, const int i3D, const int i2D) const
    {
       val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
 
-      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(iY) != 0)
+      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D) != 0)
       {
          val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
       } else

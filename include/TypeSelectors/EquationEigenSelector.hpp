@@ -106,13 +106,13 @@
 // Configure code to use BLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
 
-   #include "Equations/Tools/EquationEigen2DTools.hpp"
+   #include "Equations/Tools/EquationEigenSHTools.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Equations {
 
-         namespace EigenSelector = Eigen2D;
+         namespace EigenSelector = EigenSH;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_BLF
@@ -120,13 +120,13 @@
 // Configure code to use SLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_SLF
 
-   #include "Equations/Tools/EquationEigen2DTools.hpp"
+   #include "Equations/Tools/EquationEigenSHTools.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Equations {
 
-         namespace EigenSelector = Eigen2D;
+         namespace EigenSelector = EigenSH;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_SLF
@@ -148,13 +148,13 @@
 // Configure code to use WLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WLF
 
-   #include "Equations/Tools/EquationEigen2DTools.hpp"
+   #include "Equations/Tools/EquationEigenSHTools.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Equations {
 
-         namespace EigenSelector = Eigen2D;
+         namespace EigenSelector = EigenSH;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_WLF

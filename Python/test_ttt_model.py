@@ -1,5 +1,8 @@
 """Module provides the functions to generate the test model for the TTT scheme"""
 
+from __future__ import division
+
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
@@ -7,22 +10,32 @@ import cartesian_3d as c3d
 
 
 def nondimensional_parameters():
+   """Get the list of nondimensional parameters"""
+
    return ["prandtl", "rayleigh", "gamma", "chi"]
 
 
 def periodicity():
+   """Get the domain periodicity"""
+
    return [False, False, False]
 
 
 def all_fields():
+   """Get the list of fields that need a configuration entry"""
+
    return ["streamfunction", "velocityz", "temperature"]
 
 
 def implicit_fields(field_row):
+   """Get the list of coupled fields in solve"""
+
    return [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
 
 def explicit_fields(field_row):
+   """Get the list of fields with explicit linear dependence"""
+
    return []
 
 
@@ -45,7 +58,7 @@ def equation_info(res, field_row):
    # Rows per equation block and number of rhs
    block_info = (res[0]*res[1]*res[2], 1)
 
-   return (is_complex,im_fields,ex_fields,has_geometric_coupling, block_info)
+   return (is_complex,im_fields,ex_fields,has_geometric_coupling,index_mode,block_info)
 
 
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
@@ -85,8 +98,6 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
 def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
-   print("CALLING QI OPERATOR")
-
    if field_row == ("streamfunction",""):
       mat = c3d.i2j2k2(res[0],res[1],res[2], {'x':[0], 'y':[0], 'z':[0]})
 
@@ -99,7 +110,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
    """Create matrix block of linear operator"""
 
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -152,25 +163,22 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    return mat
 
 
-def time(res, eq_params, eigs, bcs, field_row):
+def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
-   print("CALLING TIME OPERATOR")
-   
-   return utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
+   return mat
 
 
-def implicit_linear(res, eq_params, eigs, bcs, field_row):
+def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
-   print("CALLING IMPLICIT OPERATOR")
-
-   return utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
+   return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   print("CALLING EXPLICIT OPERATOR")
-
-   return -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
+   return mat

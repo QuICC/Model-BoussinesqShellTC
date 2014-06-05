@@ -1,11 +1,11 @@
 /**
- * @file EquationEigen2DTools.hpp
- * @brief Implementation of some tools for schemes with two eigen direction 
+ * @file EquationEigenSHTools.hpp
+ * @brief Implementation of some tools for schemes with spherical harmonics expansions 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef EQUATIONEIGEN2DTOOLS_HPP
-#define EQUATIONEIGEN2DTOOLS_HPP
+#ifndef EQUATIONEIGENSHTOOLS_HPP
+#define EQUATIONEIGENSHTOOLS_HPP
 
 // Configuration includes
 //
@@ -34,9 +34,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
 /**
- * @brief Tools for equations with two eigen directions
+ * @brief Tools for equations with spherical harmonic expansions
  */
-namespace Eigen2D {
+namespace EigenSH {
 
    /**
     * @brief Set eigen values
@@ -61,19 +61,11 @@ namespace Eigen2D {
       // Get mode indexes
       ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
 
-      int sN = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+      // l
+      eigs.push_back(static_cast<MHDFloat>(mode(0)));
 
-      // k2D_
-      if(mode(0) < sN/2 + (sN % 2))
-      {
-         eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(mode(0)));
-      } else
-      {
-         eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM2D)*static_cast<MHDFloat>(mode(0) - sN));
-      }
-
-      // k3D_
-      eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*static_cast<MHDFloat>(mode(1)));
+      // m
+      eigs.push_back(static_cast<MHDFloat>(mode(1)));
 
       return eigs;
    }
@@ -82,4 +74,4 @@ namespace Eigen2D {
 }
 }
 
-#endif // EQUATIONEIGEN2DTOOLS_HPP
+#endif // EQUATIONEIGENSHTOOLS_HPP

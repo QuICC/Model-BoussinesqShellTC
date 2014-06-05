@@ -38,11 +38,6 @@ namespace Equations {
  */
 namespace Eigen1D {
 
-   typedef KronEigen1DRProduct KRProduct;
-   typedef KronEigen1DZProduct KZProduct;
-   typedef KronEigen1DRSum KRSum;
-   typedef KronEigen1DZSum KZSum;
-
    /**
     * @brief Set eigen values
     */
@@ -54,26 +49,6 @@ namespace Eigen1D {
     * @param spRes   Shared resolution
     */
    int fieldCouplingNMat(const SharedResolution spRes);
-
-   /**
-    * @brief Create setup for matrices with minial coupling
-    *
-    * @param spRes   Shared resolution
-    * @param nMat    Number of matrices
-    * @param blocks  Size of the blocks
-    * @param cols    Number of right-hand sides
-    */
-   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
-
-   void makeComplex(KZSum &zBlock, const KRSum& rBlock);
-
-   void computeKProduct(SparseMatrix& mat, const KRProduct& block);
-
-   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);
-
-   void computeKSum(SparseMatrix& mat, const KRSum& blocks);
-
-   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
 
 //
 // Implementation follows

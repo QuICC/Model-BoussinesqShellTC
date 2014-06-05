@@ -1,6 +1,6 @@
 /** 
- * @file EquationEigen3DTools.cpp
- * @brief Source of the tools for schemes with three eigen direction
+ * @file EquationEigenSHTools.cpp
+ * @brief Source of the tools for schemes with spherical harmonic expansions
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -9,7 +9,6 @@
 
 // System includes
 //
-#include <limits>
 
 // External includes
 //
@@ -17,16 +16,17 @@
 
 // Class include
 //
-#include "Equations/Tools/EquationEigen3DTools.hpp"
+#include "Equations/Tools/EquationEigenSHTools.hpp"
 
 // Project includes
 //
+#include "Base/MathConstants.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-namespace Eigen3D {
+namespace Eigen2D {
 
    int fieldCouplingNMat(const SharedResolution spRes)
    {
@@ -34,11 +34,12 @@ namespace Eigen3D {
 
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++i)
       {
-         nMat += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i)*spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i,j);
+         nMat += spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
       }
 
       return nMat;
    }
 
+}
 }
 }

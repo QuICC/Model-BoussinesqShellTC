@@ -1,5 +1,8 @@
 """Module provides the functions to generate the test model for the TFT scheme"""
 
+from __future__ import division
+
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
@@ -7,22 +10,32 @@ import cartesian_2d as c2d
 
 
 def nondimensional_parameters():
+   """Get the list of nondimensional parameters"""
+
    return ["prandtl", "rayleigh", "gamma", "chi"]
 
 
 def periodicity():
+   """Get the domain periodicity"""
+
    return [False, True, False]
 
 
 def all_fields():
+   """Get the list of fields that need a configuration entry"""
+
    return ["streamfunction", "velocityz", "temperature"]
 
 
 def implicit_fields(field_row):
+   """Get the list of coupled fields in solve"""
+
    return [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
 
 def explicit_fields(field_row):
+   """Get the list of fields with explicit linear dependence"""
+
    return []
 
 
@@ -86,8 +99,6 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
 def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
-   print("CALLING QI OPERATOR")
-
    if field_row == ("streamfunction",""):
       mat = c2d.i4j4(res[0],res[2], {'x':[0], 'z':[0]})
 
@@ -100,7 +111,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
    """Create matrix block of linear operator"""
 
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -156,8 +167,6 @@ def time_block(res, eq_params, eigs, bcs, field_row):
 def time(res, eq_params, eigs, bcs, field_row):
    """Create the time derivative operator"""
 
-   print("CALLING TIME OPERATOR")
-   
    mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
    return mat
 
@@ -165,16 +174,12 @@ def time(res, eq_params, eigs, bcs, field_row):
 def implicit_linear(res, eq_params, eigs, bcs, field_row):
    """Create the implicit linear operator"""
 
-   print("CALLING IMPLICIT OPERATOR")
-
    mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
    return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
-
-   print("CALLING EXPLICIT OPERATOR")
 
    mat = -linear_block(res, eq_params, eigs, field_row, field_col)
    return mat

@@ -18,15 +18,12 @@
 // External includes
 //
 #include <Eigen/Sparse>
-#include <Eigen/KroneckerProduct>
 
 // Project includes
 //
 #include "Base/Typedefs.hpp"
-#include "Base/KroneckerTypedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/BoundaryMethodSelector.hpp"
 #include "Equations/IEquation.hpp"
 
 namespace GeoMHDiSCC {
@@ -38,25 +35,10 @@ namespace Equations {
  */
 namespace NoEigen {
 
-   typedef KronNoEigenRProduct KRProduct;
-   typedef KronNoEigenZProduct KZProduct;
-   typedef KronNoEigenRSum KRSum;
-   typedef KronNoEigenZSum KZSum;
-
    /**
     * @brief Set eigen values
     */
    template <typename TEquation> std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx);
-
-   /**
-    * @brief Create setup for matrices with minial coupling
-    *
-    * @param spRes   Shared resolution
-    * @param nMat    Number of matrices
-    * @param blocks  Size of the blocks
-    * @param cols    Number of right-hand sides
-    */
-   void makeMinimalCoupling(const SharedResolution spRes, int& nMat, ArrayI& blocks, ArrayI& cols);
 
    /**
     * @brief Compute the number of matrix operators for field coupling
@@ -64,14 +46,6 @@ namespace NoEigen {
     * @param spRes   Shared resolution
     */
    int fieldCouplingNMat(const SharedResolution spRes);
-
-   void computeKProduct(SparseMatrix& mat, const KRProduct& block);
-
-   void computeKProduct(DecoupledZSparse& mat, const KZProduct& block);
-
-   void computeKSum(SparseMatrix& mat, const KRSum& blocks);
-
-   void computeKSum(DecoupledZSparse& mat, const KZSum& blocks);
 
 //
 // Implementation follows
