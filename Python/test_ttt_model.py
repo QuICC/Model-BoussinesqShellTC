@@ -30,7 +30,15 @@ def all_fields():
 def implicit_fields(field_row):
    """Get the list of coupled fields in solve"""
 
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   # Solve as splitted equations
+   if True:
+      fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+   # Solve as coupled equations
+   else:
+      fields = [field_row]
+
+   return fields
 
 
 def explicit_fields(field_row):
@@ -58,7 +66,7 @@ def equation_info(res, field_row):
    # Rows per equation block and number of rhs
    block_info = (res[0]*res[1]*res[2], 1)
 
-   return (is_complex,im_fields,ex_fields,has_geometric_coupling,index_mode,block_info)
+   return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode,block_info)
 
 
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
@@ -75,7 +83,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
          bc = no_bc
       else: #bcType == 0 or Galerkin boundary
          bc = None
-         if bcs[field_col[0]] == 0:
+         bcId = bcs.get(field_col[0], -1)
+         if bcId == 0:
             bc_field = {}
             bc_field[("streamfunction","")] = {'x':[40],'y':[40],'z':[40]}
             bc_field[("velocityz","")] = {'x':[20],'y':[20],'z':[20]}

@@ -76,7 +76,7 @@ def equation_info(res, field_row):
    # Rows per equation block and number of rhs
    block_info = (res[0], 1)
 
-   return (is_complex,im_fields,ex_fields,has_geometric_coupling, index_mode, block_info)
+   return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
 
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
@@ -143,7 +143,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
    """Create matrix block linear operator"""
 
    Pr = eq_params['prandtl']

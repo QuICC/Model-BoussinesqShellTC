@@ -30,7 +30,15 @@ def all_fields():
 def implicit_fields(field_row):
    """Get the list of coupled fields in solve"""
 
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   # Solve as splitted equations
+   if True:
+      fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+   # Solve as coupled equations
+   else:
+      fields = [field_row]
+
+   return fields
 
 
 def explicit_fields(field_row):

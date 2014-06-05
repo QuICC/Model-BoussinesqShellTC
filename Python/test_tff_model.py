@@ -30,7 +30,15 @@ def all_fields():
 def implicit_fields(field_row):
    """Get the list of coupled fields in solve"""
 
-   return [("streamfunction",""), ("velocityz",""), ("temperature","")]
+   # Solve as splitted equations
+   if False:
+      fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+   # Solve as coupled equations
+   else:
+      fields = [field_row]
+
+   return fields
 
 
 def explicit_fields(field_row):
@@ -58,13 +66,14 @@ def equation_info(res, field_row):
    # Rows per equation block and number of rhs
    block_info = (res[0], 1)
 
-   return (is_complex,im_fields,ex_fields,has_geometric_coupling, block_info)
+   return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
 
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
    """Convert simulation input boundary conditions to ID"""
 
    use_tau_boundary = True
+
    # Impose no boundary conditions
    no_bc = [0]
    if bcs["bcType"] == 2:
@@ -75,7 +84,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
          bc = no_bc
       else: #bcType == 0 or Galerkin boundary
          bc = None
-         if bcs[field_col[0]] == 0:
+         bcId = bcs.get(field_col[0], -1)
+         if bcId == 0:
             bc_field = {}
             bc_field[("streamfunction","")] = [40]
             bc_field[("velocityz","")] = [20]
@@ -97,10 +107,10 @@ def qi(res, eigs, bcs, field_row):
    """Create the quasi-inverse operator"""
 
    if field_row == ("streamfunction",""):
-      mat = c1d.i2(res[0], [0])
+      mat = c1d.i4(res[0], [0])
 
    elif field_row == ("velocityz",""):
-      mat = c1d.i4(res[0], [0])
+      mat = c1d.i2(res[0], [0])
 
    elif field_row == ("temperature",""):
       mat = c1d.i2(res[0], [0])
@@ -111,36 +121,39 @@ def qi(res, eigs, bcs, field_row):
 def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
    """Create matrix block linear operator"""
 
+   kx = eigs[0]
+   ky = eigs[1]
+
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_col)
    if field_row == ("streamfunction",""):
-      if field_row == ("streamfunction",""):
-         mat = c1d.i4lapl2(res[0],eigs[0],eigs[1], bc)
+      if field_col == ("streamfunction",""):
+         mat = c1d.i4lapl2(res[0],kx,ky, bc)
 
-      elif field_row == ("velocityz",""):
+      elif field_col == ("velocityz",""):
          mat = c1d.zblk(res[0],4, bc)
 
-      elif field_row == ("temperature",""):
+      elif field_col == ("temperature",""):
          mat = c1d.zblk(res[0],4, bc)
 
    elif field_row == ("velocityz",""):
-      if field_row == ("streamfunction",""):
+      if field_col == ("streamfunction",""):
          mat = c1d.zblk(res[0],2, bc)
 
-      elif field_row == ("velocityz",""):
-         mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
+      elif field_col == ("velocityz",""):
+         mat = c1d.i2lapl(res[0],kx,ky, bc)
 
-      elif field_row == ("temperature",""):
+      elif field_col == ("temperature",""):
          mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("temperature",""):
-      if field_row == ("streamfunction",""):
+      if field_col == ("streamfunction",""):
          mat = c1d.zblk(res[0],2, bc)
 
-      elif field_row == ("velocityz",""):
+      elif field_col == ("velocityz",""):
          mat = c1d.zblk(res[0],2, bc)
 
-      elif field_row == ("temperature",""):
-         mat = c1d.i2lapl(res[0],eigs[0],eigs[1], bc)
+      elif field_col == ("temperature",""):
+         mat = c1d.i2lapl(res[0],kx,ky, bc)
 
    return mat
 
@@ -148,9 +161,12 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Fa
 def time_block(res, eq_params, eigs, bcs, field_row):
    """Create matrix block of time operator"""
 
+   kx = eigs[0]
+   ky = eigs[1]
+
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_row)
    if field_row == ("streamfunction",""):
-      mat = c1d.i4lapl(res[0],eigs[0],eigs[1], bc)
+      mat = c1d.i4lapl(res[0],kx,ky, bc)
 
    elif field_row == ("velocityz",""):
       mat = c1d.i2(res[0], bc)
@@ -161,14 +177,14 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    return mat
 
 
-def time(res, eq_params, eigs, bcs, field_row):
+def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
    mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
    return mat
 
 
-def implicit_linear(res, eq_params, eigs, bcs, field_row):
+def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
    mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))

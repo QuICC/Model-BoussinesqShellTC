@@ -30,7 +30,15 @@ def all_fields():
 def implicit_fields(field_row):
    """Get the list of coupled fields in solve"""
 
-   return [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+   # Solve as splitted equations
+   if False:
+      fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+
+   # Solve as coupled equations
+   else:
+      fields = [field_row]
+
+   return fields
 
 
 def explicit_fields(field_row):
@@ -76,7 +84,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
          bc = no_bc
       else: #bcType == 0 or Galerkin boundary
          bc = None
-         if bcs[field_col[0]] == 0:
+         bcId = bcs.get(field_col[0], -1)
+         if bcId == 0:
             bc_field = {}
             bc_field[("velocity","tor")] = {'r':[20],'z':[20]}
             bc_field[("velocity","pol")] = {'r':[40],'z':[40]}
@@ -164,17 +173,17 @@ def time_block(res, eq_params, eigs, bcs, field_row):
    return mat
 
 
-def time(res, eq_params, eigs, bcs, field_row):
+def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
-   mat = utils.build_diag_matrix(implicit_fields(field_row), time_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
    return mat
 
 
-def implicit_linear(res, eq_params, eigs, bcs, field_row):
+def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
-   mat = utils.build_block_matrix(implicit_fields(field_row), linear_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
    return mat
 
 

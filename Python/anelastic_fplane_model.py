@@ -58,7 +58,7 @@ def equation_info(res, field_row):
    # Rows per equation block and number of rhs
    block_info = (res[0], 1)
 
-   return (is_complex,im_fields,ex_fields,has_geometric_coupling, index_mode, block_info)
+   return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
 
 def convert_bc(eq_params, eigs, bcs, field_row, field_col):
@@ -76,7 +76,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
          bc = no_bc
       else: #bcType == 0 or Galerkin boundary
          bc = None
-         if bcs[field_col[0]] == 0:
+         bcId = bcs.get(field_col[0], -1)
+         if bcId == 0:
             bc_field = {}
             bc_field[("streamfunction","")] = [40]
             bc_field[("velocityz","")] = [20]
