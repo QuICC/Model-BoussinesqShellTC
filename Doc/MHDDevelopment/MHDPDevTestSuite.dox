@@ -8,6 +8,42 @@
  *       <tr>\mhdStatPass<td>Component tests are implemented and pass</td></tr>
  *    }   
  *
+ * \section mhdSTSPython Python
+ *
+ *    \mhdTable{
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref cartesian_0d.py "Periodic box",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_1d.py "Cartesian geometry 1D",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_2d.py "Cartesian geometry 2D",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_3d.py "Cartesian geometry 3D",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_boundary_1d.py "Cartesian boundary 1D",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_boundary_2d.py "Cartesian boundary 2D",\mhdStatNI}
+ *       \mhdStatus{\ref cartesian_boundary_3d.py "Cartesian boundary 3D",\mhdStatNI}
+ *       \mhdStatus{\ref annulus_radius.py "Annulus radius",\mhdStatNI}
+ *       \mhdStatus{\ref annulus.py "Annulus",\mhdStatNI}
+ *       \mhdStatus{\ref cylinder_radius.py "Cylinder radius",\mhdStatNI}
+ *       \mhdStatus{\ref cylinder.py "Cylinder",\mhdStatNI}
+ *       \mhdStatus{\ref cylindrical_radius_boundary.py "Cylindrical radius boundary",\mhdStatNI}
+ *       \mhdStatus{\ref cylindrical_boundary.py "Cylindrical boundary",\mhdStatNI}
+ *       \mhdStatus{\ref sphere.py "Sphere",\mhdStatNI}
+ *       \mhdStatus{\ref shell.py "Spherical shell",\mhdStatNI}
+ *       \mhdStatus{\ref spherical_radius_boundary.py "Spherical radius boundary",\mhdStatNI}
+ *       \mhdStatus{\ref spherical_boundary.py "Spherical boundary",\mhdStatNI}
+ *       \mhdStatus{\ref test_fff_model.py "FFF test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_tff_model.py "TFF test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_tft_model.py "TFT test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_ttt_model.py "TTT test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_aft_model.py "AFT test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_cft_model.py "CFT test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_slf_model.py "SLF test model",\mhdStatNI}
+ *       \mhdStatus{\ref test_blf_model.py "BLF test model",\mhdStatNI}
+ *       \mhdStatus{\ref anelastic_fplane_model.py "Anelastic F-plane model",\mhdStatNI}
+ *       \mhdStatus{\ref boussinesq_fplane_model.py "Boussinesq F-plane model",\mhdStatNI}
+ *       \mhdStatus{\ref boussinesq_beta3dqg_model.py "Boussinesq Beta 3DQG model",\mhdStatNI}
+ *       \mhdStatus{\ref boussinesq_fplane3dqg_model.py "Boussinesq F-Plane 3DQG model",\mhdStatNI}
+ *       \mhdStatus{\ref compressible_fplane_model.py "Compresisible F-plane model",\mhdStatNI}
+ *       }
+ *
  * \section mhdSTSBase Base
  *
  *    \mhdTable{
