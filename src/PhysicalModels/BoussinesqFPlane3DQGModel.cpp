@@ -68,19 +68,19 @@ namespace GeoMHDiSCC {
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-         spExact->setModeOptions(1e-1, 1.0, 1e-1, 1.0, 1e-1, 2.0);
+         spExact->setModeOptions(1e-1, 1.0, 1e-1, 0.0, 1e-1, 15.0);
 
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-         spExact->setModeOptions(1e-1, 1.0, 1e-1, 1.0, 1e-1, 2.0);
+         spExact->setModeOptions(1e-1, 1.0, 1e-1, 15.0, 1e-1, 0.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-         spExact->setModeOptions(1e-1, 1.0, 1e-1, 1.0, 1e-1, 2.0);
+         spExact->setModeOptions(1e-1, 1.0, 1e-1, 15.0, 1e-1, 15.0);
 
       // Generate random spectrum
       } else
