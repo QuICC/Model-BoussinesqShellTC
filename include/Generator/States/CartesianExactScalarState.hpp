@@ -45,6 +45,8 @@ namespace Equations {
             POLYSINSIN,       // Polynomial, Sine, Sine
             POLYSINCOS,       // Polynomial, Sine, Cosine
             POLYCOSSIN,       // Polynomial, Cosine, Sine
+            PSINCOSSIN,       // Sine(Polynomial), Cosine, Sine
+            PCOSCOSSIN,       // CosinePolynomial), Cosine, Sine
             COSCOSCOS = 40,   // Cosine, Cosine, Cosine
             SINSINSIN,        // Sine, Sine, Sine
             COSCOSSIN,        // Cosine, Cosine, Sine

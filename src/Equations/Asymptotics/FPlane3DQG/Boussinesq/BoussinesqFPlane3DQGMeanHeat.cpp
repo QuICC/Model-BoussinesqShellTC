@@ -87,6 +87,9 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, false, true));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+
+      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?

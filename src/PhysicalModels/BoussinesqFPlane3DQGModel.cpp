@@ -59,7 +59,7 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
@@ -67,20 +67,20 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-         spExact->setModeOptions(1e-1, 1.0, 1e-1, 0.0, 1e-1, 3.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::PSINCOSSIN);
+         spExact->setModeOptions(1e-1, 2.0, 1e-1, 2.0, 1e-1, 2.0);
 
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-         spExact->setModeOptions(1e-1, 2.0, 1e-1, 3.0, 1e-1, 0.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::PCOSCOSSIN);
+         spExact->setModeOptions(1e-1, 2.0, 1e-1, 2.0, 1e-1, 2.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-         spExact->setModeOptions(1e-1, 3.0, 1e-1, 3.0, 1e-1, 3.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::PSINCOSSIN);
+         spExact->setModeOptions(1e-1, 2.0, 1e-1, 2.0, 1e-1, 2.0);
 
       // Generate random spectrum
       } else

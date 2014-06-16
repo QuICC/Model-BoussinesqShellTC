@@ -165,6 +165,18 @@ namespace Equations {
                         valK = this->poly(0,k_);
                         valJ = this->cos(1,j_);
                         valI = this->sin(2,i_);
+
+                     } else if(this->mTypeId == PSINCOSSIN)
+                     {
+                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->cos(1,j_);
+                        valI = this->sin(2,i_);
+
+                     } else if(this->mTypeId == PCOSCOSSIN)
+                     {
+                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->cos(1,j_);
+                        valI = this->sin(2,i_);
                      } else
                      {
                         throw Exception("Unknown exact state");
