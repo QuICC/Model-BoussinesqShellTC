@@ -49,8 +49,8 @@ namespace Equations {
       assert(id == FieldComponents::Physical::SCALAR);
 
       // Get paramters
-      MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta2 = 0*std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta3 = 0*std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
 
       /// 
       /// Computation of the jacobian:

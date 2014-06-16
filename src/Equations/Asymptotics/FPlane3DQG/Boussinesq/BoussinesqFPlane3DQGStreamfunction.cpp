@@ -56,7 +56,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITY).dom(0).grad(), 1.0/eta3);
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::VORTICITY).dom(0).grad(), 0.0/eta3);
    }
 
    void BoussinesqFPlane3DQGStreamfunction::setRequirements()
