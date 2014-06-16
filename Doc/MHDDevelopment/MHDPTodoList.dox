@@ -1,5 +1,7 @@
 /** \page mhdPDevTodoList Global ToDo list
  *
+ * \mhdTodo Need additional "Tranposition layer" to remove dealiasing modes from solver, also required for geometric coupling. Should have a (nearly) NOOP implementation for poylnomial transforms.
+ *
  * \mhdTodo Test stride FFT for chebyshev complex -> complex (should avoir copy of data and temporary storage)
  *
  * \mhdTodo Implement a coupled storage data type (i.e. the storage required for the complex solves to avoid copies/temporary storage)

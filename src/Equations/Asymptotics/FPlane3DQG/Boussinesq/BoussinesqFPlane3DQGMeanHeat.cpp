@@ -56,7 +56,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi\right)\theta\f$
       ///
-      rNLComp.setData(((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
+      rNLComp.setData(((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqFPlane3DQGMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
