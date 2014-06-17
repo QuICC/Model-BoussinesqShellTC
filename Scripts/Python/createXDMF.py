@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import sys, getopt
 
 from math import *
@@ -14,13 +16,13 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"hi:o:n:")
    except getopt.GetoptError:
-      print 'Single file: createXDMF.py -i <inputfile> -o <outputfile>'
-      print 'Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>'
+      print('Single file: createXDMF.py -i <inputfile> -o <outputfile>')
+      print('Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>')
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
-         print 'Single file: createXDMF.py -i <inputfile> -o <outputfile>'
-         print 'Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>'
+         print('Single file: createXDMF.py -i <inputfile> -o <outputfile>')
+         print('Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>')
          sys.exit()
       elif opt in ("-i"):
          inputfile = arg
@@ -45,15 +47,15 @@ def main(argv):
       outputfile = basename+str(sId).zfill(4)+'.xdmf' 
    elif outputfile == '':
       outputfile = basename+'Series_'+str(sId).zfill(4)+'_'+str(sId+snapshots-1).zfill(4)+'.xdmf' 
-   print 'Input file: ', inputfile
-   print 'Input ID: ', sId
-   print 'Input base: ', basename
-   print 'Output file: ', outputfile
-   print 'Scheme: ', scheme
-   print '1D grid size: ', n1D
-   print '2D grid size: ', n2D
-   print '3D grid size: ', n3D
-   print 'Time: ', time
+   print("Input file: ", inputfile)
+   print("Input ID: ", sId)
+   print("Input base: ", basename)
+   print('Output file: ', outputfile)
+   print("Scheme: ", scheme)
+   print("1D grid size: ", n1D)
+   print("2D grid size: ", n2D)
+   print("3D grid size: ", n3D)
+   print("Time: ", time)
    h5_file.close()
 
    # Open file
@@ -67,43 +69,43 @@ def main(argv):
    xdmfEndSeries = '\t\t</Grid>'
 
    out_file = open(outputfile, 'w')
-   print >>out_file, xdmfHead
+   print(xdmfHead, file=out_file)
    if snapshots > 1:
-      print >>out_file, xdmfSeries
+      print(xdmfSeries, file=out_file)
    for fId in range(sId, sId+snapshots):
       current = basename+str(fId).zfill(4)+'.hdf5'
       h5_file = h5py.File(current, 'r')
-      if scheme in ('TFT','TFF'):
+      if scheme in [b'TFT',b'TFF']:
          #if fId == sId:
          #   boxXYZ(h5_file)
-         #print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}
-         print >>out_file, xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D}
-      elif scheme in ('CFT'):
+         #print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}, file=out_file)
+         print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D}, file=out_file)
+      elif scheme in [b'CFT']:
          if fId == sId:
             cylinderXYZ(h5_file)
-         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'cylinder_grid'}
-      elif scheme in ('AFT'):
+         print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'cylinder_grid'}, file=out_file)
+      elif scheme in [b'AFT']:
          if fId == sId:
             annulusXYZ(h5_file)
             annulusWedgeXYZ(h5_file)
-         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'annulus_grid'}
-      elif scheme in ('BLF'):
+         print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'annulus_grid'}, file=out_file)
+      elif scheme in [b'BLF']:
          if fId == sId:
             sphereXYZ(h5_file)
-         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'sphere_grid'}
-      elif scheme in ('SLF'):
+         print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'sphere_grid'}, file=out_file)
+      elif scheme in [b'SLF']:
          if fId == sId:
             shellXYZ(h5_file)
-         print >>out_file, xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'shell_grid'}
+         print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'shell_grid'}, file=out_file)
       for s in list(h5_file):
          if s in list(h5_file[s]):
-            print >>out_file, xdmfScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'sname': s, 'fid': fId, 'basename': basename}
+            print(xdmfScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'sname': s, 'fid': fId, 'basename': basename}, file=out_file)
       time = h5_file['run']['time'].value
-      print >>out_file, xdmfTime % {'time': time}
+      print(xdmfTime % {'time': time}, file=out_file)
       if snapshots > 1:
-         print >>out_file, xdmfEndSeries
+         print(xdmfEndSeries, file=out_file)
       h5_file.close()
-   print >>out_file, xdmfEnd
+   print(xdmfEnd, file=out_file)
    out_file.close()
 
 def boxXYZ(h5_file):
