@@ -57,12 +57,12 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\theta\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 0.0/eta3);
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), -1.0/eta3);
 
       ///
       /// Computation of the mean temperature feedback
       ///
-      rNLComp.subData((2.0*(eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::MEANTEMPERATURE).dom(0).grad().comp(FieldComponents::Physical::ONE).data().array()).matrix());
+      rNLComp.addData((2.0*(eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->unknown().dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::MEANTEMPERATURE).dom(0).grad().comp(FieldComponents::Physical::ONE).data().array()).matrix());
    }
 
    void BoussinesqFPlane3DQGTransport::setRequirements()

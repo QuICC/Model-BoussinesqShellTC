@@ -141,14 +141,16 @@ namespace GeoMHDiSCC {
 
    ArrayI TransformResolution::mode(const int i) const
    {
-      ArrayI mode(2);
+      ArrayI mode(4); // 0 -> index 3D, 1 -> index 2D, 2 -> mode 3D, 3 -> mode 2D
 
       int current = 0;
       for(mode(0) = 0; mode(0) < this->mIdx3D.size(); ++mode(0))
       {
          if(i - current < this->mIdx2D.at(mode(0)).size())
          {
-            mode(1) = this->mIdx2D.at(mode(0))(i-current);
+            mode(1) = i-current;
+            mode(2) = this->mIdx3D(mode(0));
+            mode(3) = this->mIdx2D.at(mode(0))(mode(1));
             current = i;
             break;
          } else

@@ -24,7 +24,6 @@
 #include "PhysicalOperators/StreamAdvection.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -42,7 +41,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGVertical::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
    }
 
    void BoussinesqFPlane3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -57,7 +56,7 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3);
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), -1.0/eta3);
    }
 
    void BoussinesqFPlane3DQGVertical::setRequirements()

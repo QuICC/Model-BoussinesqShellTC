@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, true);
    }
 
    void BoussinesqFPlane3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -51,12 +51,13 @@ namespace Equations {
       // Get paramters
       MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
       MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
 
       /// 
       /// Computation of the jacobian:
       ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi\right)\theta\f$
       ///
-      rNLComp.setData(((eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
+      rNLComp.setData((Pr*(eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqFPlane3DQGMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
