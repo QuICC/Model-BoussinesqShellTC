@@ -143,7 +143,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
    """Create matrix block linear operator"""
 
    Pr = eq_params['prandtl']
@@ -245,5 +245,5 @@ def implicit_linear(res, eq_params, eigs, bcs, fields):
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = linear_block(res, eq_params, eigs, field_row, field_col)
    return mat

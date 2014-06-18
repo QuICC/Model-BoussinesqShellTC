@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, false);
    }
 
    void BoussinesqFPlane3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -49,8 +49,8 @@ namespace Equations {
       assert(id == FieldComponents::Physical::SCALAR);
 
       // Get paramters
-      MHDFloat eta2 = 0*std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = 0*std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
 
       /// 
       /// Computation of the jacobian:
