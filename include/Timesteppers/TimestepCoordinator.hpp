@@ -200,7 +200,7 @@ namespace Timestep {
       // Set RHS matrix
       spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::NO_BC);
       spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::NO_BC);
-      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), rhsLCoeff, linOp); 
+      Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsLCoeff, linOp); 
       Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, timeOp); 
 
       // Set time matrix for timestep updates

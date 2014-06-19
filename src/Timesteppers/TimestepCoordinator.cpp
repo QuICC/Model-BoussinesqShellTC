@@ -200,7 +200,7 @@ namespace Timestep {
       rhsT = IntegratorSelector::rhsT(this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for RHS Matrix
-      rhsL = -IntegratorSelector::rhsL(this->mStep);
+      rhsL = IntegratorSelector::rhsL(this->mStep);
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
