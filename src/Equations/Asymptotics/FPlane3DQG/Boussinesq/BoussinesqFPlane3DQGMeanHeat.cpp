@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::DIAGNOSTIC, 0, true, true, true);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true, false);
    }
 
    void BoussinesqFPlane3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -85,7 +85,7 @@ namespace Equations {
       this->setName(PhysicalNames::MEANTEMPERATURE);
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, false, true));
+      this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, true, false));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));

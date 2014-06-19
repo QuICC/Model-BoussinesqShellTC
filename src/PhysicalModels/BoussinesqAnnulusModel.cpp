@@ -65,7 +65,7 @@ namespace GeoMHDiSCC {
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
-      spGen->addOutputFile(spOut);
+      spGen->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqAnnulusModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spVis->addOutputFile(spOut);
+      spVis->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqAnnulusModel::setVisualizationState(SharedVisualizationGenerator spVis)
@@ -117,7 +117,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void BoussinesqAnnulusModel::setInitialState(SharedSimulation spSim)

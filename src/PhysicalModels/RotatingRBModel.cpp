@@ -66,7 +66,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
       
       // Create and add visualization file to IO
       IoVariable::SharedVisualizationFileWriter spViz(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -74,7 +74,7 @@ namespace GeoMHDiSCC {
       {
          spViz->expect(*it);
       }
-      spSim->addOutputFile(spViz);
+      spSim->addHdf5OutputFile(spViz);
    }
 
    void RotatingRBModel::setInitialState(SharedSimulation spSim)

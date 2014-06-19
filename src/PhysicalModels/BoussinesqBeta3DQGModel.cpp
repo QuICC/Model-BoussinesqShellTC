@@ -93,7 +93,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spGen->addOutputFile(spOut);
+      spGen->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqBeta3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -127,7 +127,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITY);
-      spVis->addOutputFile(spOut);
+      spVis->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqBeta3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
@@ -165,7 +165,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void BoussinesqBeta3DQGModel::setInitialState(SharedSimulation spSim)

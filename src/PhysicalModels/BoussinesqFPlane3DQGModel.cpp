@@ -22,6 +22,7 @@
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
+#include "IoVariable/NusseltWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
@@ -109,7 +110,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spGen->addOutputFile(spOut);
+      spGen->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqFPlane3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -143,7 +144,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::MEANTEMPERATURE);
-      spVis->addOutputFile(spOut);
+      spVis->addHdf5OutputFile(spOut);
    }
 
    void BoussinesqFPlane3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
@@ -163,11 +164,10 @@ namespace GeoMHDiSCC {
 
    void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
-      
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
+      // Create Nusselt number writer
+      IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
+      spState->expect(PhysicalNames::MEANTEMPERATURE);
+      spSim->addAsciiOutputFile(spState);
    }
 
    void BoussinesqFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
@@ -186,7 +186,7 @@ namespace GeoMHDiSCC {
       // Add mean temperature to ouput file
       spState->expect(PhysicalNames::MEANTEMPERATURE);
 
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)

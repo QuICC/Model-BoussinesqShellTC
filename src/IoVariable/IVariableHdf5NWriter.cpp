@@ -1,6 +1,6 @@
 /** 
  * @file IVariableHdf5NWriter.cpp 
- * @brief Source of the implementation of the generic variable to file writer
+ * @brief Source of the implementation of the generic variable to HDF5 file writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 

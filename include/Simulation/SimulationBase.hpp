@@ -153,17 +153,15 @@ namespace GeoMHDiSCC {
           * @brief Add ASCII output file to solver
           *
           * @param spOutFile Shared ASCII output file
-          *
-          * \mhdBug Fake declaration
           */
-         void addOutputFile(int spOutFile);//SharedAscii spOutFile);
+         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile);
 
          /**
           * @brief Add HDF5 output file to solver
           *
           * @param spOutFile Shared HDF5 output file
           */
-         void addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile);
+         void addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile);
 
       protected:
          /**

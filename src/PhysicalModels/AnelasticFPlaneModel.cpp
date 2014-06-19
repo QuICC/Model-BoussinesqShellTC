@@ -74,7 +74,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void AnelasticFPlaneModel::setInitialState(SharedSimulation spSim)

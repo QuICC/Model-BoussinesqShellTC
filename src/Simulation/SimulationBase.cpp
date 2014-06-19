@@ -234,14 +234,14 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void SimulationBase::addOutputFile(int spOutFile)//SharedAscii spOutFile)
+   void SimulationBase::addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile)
    {
-      /// \mhdBug Fake implementation
+      this->mSimIoCtrl.addAsciiOutputFile(spOutFile);
    }
 
-   void SimulationBase::addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
+   void SimulationBase::addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
    {
-      this->mSimIoCtrl.addOutputFile(spOutFile);
+      this->mSimIoCtrl.addHdf5OutputFile(spOutFile);
    }
 
    void SimulationBase::initSolvers()
@@ -345,27 +345,46 @@ namespace GeoMHDiSCC {
 
    void SimulationBase::setupOutput()
    {
-      // Loop over all files added to the simulation control
-      SimulationIoControl::hdf5_iterator  fIt;
-      for(fIt = this->mSimIoCtrl.beginHdf5(); fIt != this->mSimIoCtrl.endHdf5(); ++fIt)
+      // Loop over all ASCII files added to the simulation control
+      SimulationIoControl::ascii_iterator  asciiIt;
+      for(asciiIt = this->mSimIoCtrl.beginAscii(); asciiIt != this->mSimIoCtrl.endAscii(); ++asciiIt)
       {
          // Loop over all scalars
          std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
          for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
          {
-            (*fIt)->addScalar((*scalIt));
+            (*asciiIt)->addScalar((*scalIt));
          }
 
          // Loop over all vector variables
          std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
          for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
          {
-            (*fIt)->addVector((*vectIt));
+            (*asciiIt)->addVector((*vectIt));
+         }
+      }
+
+      // Loop over all HDF5 files added to the simulation control
+      SimulationIoControl::hdf5_iterator  hdf5It;
+      for(hdf5It = this->mSimIoCtrl.beginHdf5(); hdf5It != this->mSimIoCtrl.endHdf5(); ++hdf5It)
+      {
+         // Loop over all scalars
+         std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
+         for(scalIt = this->mScalarVariables.begin(); scalIt != this->mScalarVariables.end(); scalIt++)
+         {
+            (*hdf5It)->addScalar((*scalIt));
          }
 
-         if((*fIt)->space() == Dimensions::Space::PHYSICAL)
+         // Loop over all vector variables
+         std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
+         for(vectIt = this->mVectorVariables.begin(); vectIt != this->mVectorVariables.end(); vectIt++)
          {
-            (*fIt)->setMesh(this->mTransformCoordinator.mesh());
+            (*hdf5It)->addVector((*vectIt));
+         }
+
+         if((*hdf5It)->space() == Dimensions::Space::PHYSICAL)
+         {
+            (*hdf5It)->setMesh(this->mTransformCoordinator.mesh());
          }
       }
 

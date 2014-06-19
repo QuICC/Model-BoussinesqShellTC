@@ -61,27 +61,27 @@ namespace GeoMHDiSCC {
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 15.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 15.0, 1e0, 0.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 15.0, 1e0, 15.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spGen->addOutputFile(spOut);
+      spGen->addHdf5OutputFile(spOut);
    }
 
    void TestTFFModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -109,7 +109,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spVis->addOutputFile(spOut);
+      spVis->addHdf5OutputFile(spOut);
    }
 
    void TestTFFModel::setVisualizationState(SharedVisualizationGenerator spVis)
@@ -147,7 +147,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void TestTFFModel::setInitialState(SharedSimulation spSim)

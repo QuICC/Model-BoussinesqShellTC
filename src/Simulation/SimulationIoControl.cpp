@@ -78,18 +78,28 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void SimulationIoControl::addOutputFile(IoAscii::SharedIAsciiWriter spOutFile)
+   void SimulationIoControl::addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile)
    {
       this->mAsciiWriters.push_back(spOutFile);
    }
 
-   void SimulationIoControl::addOutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
+   void SimulationIoControl::addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter spOutFile)
    {
       this->mHdf5Writers.push_back(spOutFile);
    }
 
    void SimulationIoControl::initWriters()
    {  
+      // First check that all ASCII writers are full
+      SimulationIoControl::ascii_iterator itAscii;
+      for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
+      {
+         if(!(*itAscii)->isFull())
+         {
+            throw Exception("There are missing variables in the ASCII writers");
+         }
+      }
+
       // First check that all HDF5 writers are full
       SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
@@ -100,19 +110,19 @@ namespace GeoMHDiSCC {
          }
       }
 
-      // Iterate over all ASCII writer
-      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
-      for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
-      {
-         (*itAscii)->init();
-      }
-
       // Create physical parameters map
       std::map<std::string,MHDFloat> phys = this->configPhysical();
       std::map<std::string,int>::const_iterator it;
       for(it = this->configBoundary().begin(); it != this->configBoundary().end(); ++it)
       {
          phys.insert(std::make_pair("bc_"+it->first, it->second));
+      }
+
+      // Iterate over all ASCII writer
+      for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
+      {
+         (*itAscii)->setPhysical(phys);
+         (*itAscii)->init();
       }
 
       // Iterate over all HDF5 writer
@@ -126,7 +136,7 @@ namespace GeoMHDiSCC {
    void SimulationIoControl::finalizeWriters()
    {
       // Iterate over all ASCII writer
-      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
+      SimulationIoControl::ascii_iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
          (*itAscii)->finalize();
@@ -143,9 +153,15 @@ namespace GeoMHDiSCC {
    void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
    {
       // Iterate over all ASCII writer
-      std::vector<IoAscii::SharedIAsciiWriter>::iterator itAscii;
+      SimulationIoControl::ascii_iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
+         // Set simulation time
+         if(time > 0 && timestep >= 0)
+         {
+            (*itAscii)->setSimTime(time,timestep);
+         }
+
          (*itAscii)->write();
       }
    }
@@ -274,6 +290,16 @@ namespace GeoMHDiSCC {
       assert(this->mspCfgFile);
 
       return this->mspCfgFile->spBoundary()->iMap();
+   }
+
+   SimulationIoControl::ascii_iterator  SimulationIoControl::beginAscii()
+   {
+      return this->mAsciiWriters.begin();
+   }
+
+   SimulationIoControl::ascii_iterator  SimulationIoControl::endAscii()
+   {
+      return this->mAsciiWriters.end();
    }
 
    SimulationIoControl::hdf5_iterator  SimulationIoControl::beginHdf5()

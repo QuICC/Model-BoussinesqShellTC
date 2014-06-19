@@ -15,8 +15,8 @@
 
 // Project includes
 //
-#include "IoAscii/IAsciiWriter.hpp"
 #include "IoAscii/StdOutPipe.hpp"
+#include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "IoVariable/IVariableHdf5NWriter.hpp"
 #include "IoConfig/ConfigurationReader.hpp"
 
@@ -28,6 +28,9 @@ namespace GeoMHDiSCC {
    class SimulationIoControl
    {
       public:
+         /// Typedef for an iterator over all the ASCII writers
+         typedef std::vector<IoVariable::SharedIVariableAsciiEWriter>::iterator ascii_iterator;
+
          /// Typedef for an iterator over all the HDF5 writers
          typedef std::vector<IoVariable::SharedIVariableHdf5NWriter>::iterator hdf5_iterator;
 
@@ -76,14 +79,14 @@ namespace GeoMHDiSCC {
           *
           * @param spOutFile Shared ASCII writer
           */
-         void addOutputFile(IoAscii::SharedIAsciiWriter spOutFile);
+         void addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile);
 
          /**
           * @brief Add a HDF5 output file
           *
           * @param spOutFile Shared HDF5 writer
           */
-         void addOutputFile(IoVariable::SharedIVariableHdf5NWriter  spOutFile);
+         void addHdf5OutputFile(IoVariable::SharedIVariableHdf5NWriter  spOutFile);
 
          /**
           * @brief Get the dimension read from the configuration file
@@ -119,6 +122,16 @@ namespace GeoMHDiSCC {
           * @brief Get the timestepping options read from the configuration file
           */
          Array configTimestepping() const;
+
+         /**
+          * @brief Get begin iterator to ASCII files
+          */
+         ascii_iterator beginAscii();
+
+         /**
+          * @brief Get end iterator to ASCII files
+          */
+         ascii_iterator endAscii();
 
          /**
           * @brief Get begin iterator to HDF5 files
@@ -165,7 +178,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Vector of ASCII output files
           */
-         std::vector<IoAscii::SharedIAsciiWriter> mAsciiWriters;
+         std::vector<IoVariable::SharedIVariableAsciiEWriter> mAsciiWriters;
 
          /**
           * @brief Vector of HDF5 output files

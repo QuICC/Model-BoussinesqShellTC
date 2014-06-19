@@ -1,11 +1,11 @@
 /** 
- * @file StateFileTags.hpp
- * @brief Definitions and names use by the state file readers/writers
+ * @file NusseltTags.hpp
+ * @brief Definitions and names use by the Nusselt writer
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef STATEFILETAGS_HPP
-#define STATEFILETAGS_HPP
+#ifndef NUSSELTTAGS_HPP
+#define NUSSELTTAGS_HPP
 
 // System includes
 //
@@ -22,28 +22,28 @@ namespace GeoMHDiSCC {
 namespace IoVariable {
 
    /**
-    * @brief Definitions and names use by the state file readers/writers
+    * @brief Definitions and names use by the Nusselt writer
     */
-   class StateFileTags
+   class NusseltTags
    {
       public:
          /**
-          * @brief HEADER part for State file
+          * @brief HEADER part for Nusselt file
           */
          static const std::string   HEADER;
 
          /**
-          * @brief VERSION part for State file
+          * @brief VERSION part for Nusselt file
           */
          static const std::string   VERSION;
 
          /**
-          * @brief BASENAME of State file
+          * @brief BASENAME of Nusselt file
           */
          static const std::string   BASENAME;
 
          /**
-          * @brief EXTENSION of State file
+          * @brief EXTENSION of Nusselt file
           */
          static const std::string   EXTENSION;
 
@@ -51,14 +51,14 @@ namespace IoVariable {
          /**
          * @brief Empty destructor
          */
-         StateFileTags();
+         NusseltTags();
 
          /**
          * @brief Destructor
          */
-         ~StateFileTags();
+         ~NusseltTags();
    };
 }
 }
 
-#endif // STATEFILETAGS_HPP
+#endif // NUSSELTTAGS_HPP

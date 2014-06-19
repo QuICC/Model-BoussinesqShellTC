@@ -1,8 +1,11 @@
 # Create list of sources
 set(MHDSources
+   NusseltTags.cpp
+   NusseltWriter.cpp
    StateFileTags.cpp
    StateFileWriter.cpp
    StateFileReader.cpp
+   IVariableAsciiEWriter.cpp
    VariableHdf5Tags.cpp
    IVariableHdf5NWriter.cpp
    IVariableHdf5Reader.cpp

@@ -81,7 +81,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spGen->addOutputFile(spOut);
+      spGen->addHdf5OutputFile(spOut);
    }
 
    void TestTFTModel::addVisualizers(SharedVisualizationGenerator spVis)
@@ -109,7 +109,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spVis->addOutputFile(spOut);
+      spVis->addHdf5OutputFile(spOut);
    }
 
    void TestTFTModel::setVisualizationState(SharedVisualizationGenerator spVis)
@@ -147,7 +147,7 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
-      spSim->addOutputFile(spState);
+      spSim->addHdf5OutputFile(spState);
    }
 
    void TestTFTModel::setInitialState(SharedSimulation spSim)

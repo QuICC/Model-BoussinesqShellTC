@@ -136,14 +136,14 @@ def qi(res, eigs, bcs, field_row):
 
    elif field_row == ("meantemperature",""):
       if eigs[0] == 0 and eigs[1] == 0:
-         mat = c1d.i1(res[0], [0])*(c1d.qid(res[0],0,[0]) - c1d.avg(res[0]))
+         mat = (c1d.qid(res[0],0,[0]) - c1d.avg(res[0]))
       else:
          mat = c1d.zblk(res[0],0, [0])
 
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
    """Create matrix block linear operator"""
 
    Pr = eq_params['prandtl']
