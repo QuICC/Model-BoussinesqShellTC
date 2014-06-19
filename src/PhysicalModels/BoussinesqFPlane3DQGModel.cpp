@@ -91,17 +91,17 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.1, 0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
          // Add streamfunction initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-0.1, 0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
          // Add vertical velocity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqFPlane3DQGModel::PYNAME);
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.1, 0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
