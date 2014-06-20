@@ -1,10 +1,12 @@
 """Module provides the functions to generate the Anelastic F-Plane model"""
 
+from __future__ import division
+
+import numpy as np
 import scipy.sparse as spsp
 import utils
 from utils import triplets
 import cartesian_1d as c1d
-import numpy as np
 
 
 def nondimensional_parameters():
@@ -22,7 +24,7 @@ def periodicity():
 def all_fields():
    """Get the list of fields that need a configuration entry"""
 
-   return ["velocityx","velocityy","velocityz","density","entropy","pressure","temperature"]
+   return ["velocityx", "velocityy" ,"velocityz", "density", "entropy", "pressure", "temperature"]
 
 
 def implicit_fields(field_row):
@@ -89,7 +91,8 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
             if use_tau_boundary:
                bc = no_bc
             else:
-               bc = -bc_field[field_col]
+               bc = bc_field[field_col]
+               bc[0] = -bc[0]
    
    return bc
 
@@ -109,7 +112,7 @@ def qi(res, eigs, bcs, field_row):
    return mat
 
 
-def linear_block(res, eq_params, eigs, bcs, field_row, field_col):
+def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
    """Create matrix block linear operator"""
 
    bc = convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -165,16 +168,19 @@ def time_block(res, eq_params, eigs, bcs, field_row):
 def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
-   return utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
+   return mat
 
 
 def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
-   return utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
+   mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
+   return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   return -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = linear_block(res, eq_params, eigs, field_row, field_col)
+   return mat

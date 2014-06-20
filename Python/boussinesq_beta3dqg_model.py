@@ -7,7 +7,6 @@ import scipy.sparse as spsp
 import utils
 from utils import triplets
 import cartesian_2d as c2d
-import scipy.io as io
 
 
 def nondimensional_parameters():
@@ -206,7 +205,6 @@ def time(res, eq_params, eigs, bcs, fields):
    """Create the time derivative operator"""
 
    mat = utils.build_diag_matrix(fields, time_block, (res,eq_params,eigs,bcs))
-   io.mmwrite("matrix_time_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + ".mtx", mat)
    return mat
 
 
@@ -214,12 +212,11 @@ def implicit_linear(res, eq_params, eigs, bcs, fields):
    """Create the implicit linear operator"""
 
    mat = utils.build_block_matrix(fields, linear_block, (res,eq_params,eigs,bcs))
-   io.mmwrite("matrix_linear_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + ".mtx",mat)
    return mat
 
 
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = linear_block(res, eq_params, eigs, field_row, field_col)
    return mat

@@ -110,5 +110,5 @@ def implicit_linear(res, eq_params, eigs, bcs, fields):
 def explicit_linear(res, eq_params, eigs, bcs, field_row, field_col):
    """Create the explicit linear operator"""
 
-   mat = -linear_block(res, eq_params, eigs, field_row, field_col)
+   mat = linear_block(res, eq_params, eigs, field_row, field_col)
    return mat
