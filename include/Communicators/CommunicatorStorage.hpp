@@ -72,7 +72,7 @@ namespace Parallel {
          /**
           * @brief Get/Set data converter
           */
-         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
+         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& converter();
          
       protected:
 
@@ -100,7 +100,7 @@ namespace Parallel {
       return StorageDispatcher<TID>::get(*this);
    }
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType,typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::ONED,TTypes>::converter()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::FwdType,typename TTypes<static_cast<Dimensions::Transform::Id>(static_cast<int>(TID)-1)>::BwdType,typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& CommunicatorStorage<Dimensions::ONED,TTypes>::converter()
    {
       Debug::StaticAssert< false >();
 
@@ -143,13 +143,13 @@ namespace Parallel {
          /**
           * @brief Get/Set data converter
           */
-         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
+         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& converter();
          
       protected:
          /**
           * @brief Converter between first and second transform
           */
-         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > mspConverter2D;
+         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > mspConverter2D;
 
       private:
          /**
@@ -190,7 +190,7 @@ namespace Parallel {
       return StorageDispatcher<TID>::get(*this);
    }
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::TWOD,TTypes>::converter()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& CommunicatorStorage<Dimensions::TWOD,TTypes>::converter()
    {
       Debug::StaticAssert< TID == Dimensions::Transform::TRA2D >();
 
@@ -239,18 +239,18 @@ namespace Parallel {
          /**
           * @brief Get/Set data converter
           */
-         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& converter();
+         template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& converter();
          
       protected:
          /**
           * @brief Converter between first and second transform
           */
-         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType> > mspConverter2D;
+         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType,typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > mspConverter2D;
 
          /**
           * @brief Converter between second and third transform
           */
-         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType> > mspConverter3D;
+         SharedPtrMacro<IConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType,typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType,typename TTypes<Dimensions::Transform::TRA3D>::BwdType, typename IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > mspConverter3D;
 
       private:
          /**
@@ -306,7 +306,7 @@ namespace Parallel {
       return StorageDispatcher<TID>::get(*this);
    }
 
-   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType>& CommunicatorStorage<Dimensions::THREED,TTypes>::converter()
+   template <template <Dimensions::Transform::Id> class TTypes> template <Dimensions::Transform::Id TID> IConverter<typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::FwdType,typename TTypes<Dimensions::Transform::jump<TID,-1>::id>::BwdType, typename TTypes<TID>::FwdType,typename TTypes<TID>::BwdType, typename IndexConverterSelector<TID>::Type>& CommunicatorStorage<Dimensions::THREED,TTypes>::converter()
    {
       Debug::StaticAssert< TID != Dimensions::Transform::TRA1D >();
 

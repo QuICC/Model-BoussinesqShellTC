@@ -32,7 +32,7 @@ namespace Parallel {
    /**
     * @brief Implementation of the FDSH MPI data converter.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverter: public MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class MpiConverter: public MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
          /**
@@ -178,7 +178,7 @@ namespace Parallel {
          std::vector<MPI_Datatype> mBTypes;
    };
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverter()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverter()
    {
       // Check that all dimensions match
       Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
@@ -189,13 +189,13 @@ namespace Parallel {
       Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~MpiConverter()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~MpiConverter()
    {
       // Cleanup the types memory
       this->cleanupTypes();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::FWDCONVSEND);
 
@@ -205,7 +205,7 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::BWDCONVSEND);
 
@@ -215,7 +215,7 @@ namespace Parallel {
       DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVSEND);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TFwdA& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getFwd(StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TFwdA& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getFwd(StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::BWDCONVRECV);
 
@@ -230,7 +230,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> TBwdB& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::getBwd(StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TBwdB& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getBwd(StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
       DetailedProfilerMacro_start(ProfilerMacro::FWDCONVRECV);
 
@@ -245,7 +245,7 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::setup()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
    {
       // initialise the send and receive positions
       this->initPositions();
@@ -254,13 +254,13 @@ namespace Parallel {
       this->setupRequests();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::setupCommunication(const int packs)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs)
    {
       // Store the number of packs in the next communication
       this->mPacks = packs;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateForwardCommunication()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
    {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
@@ -283,7 +283,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initiateBackwardCommunication()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardCommunication()
    {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
@@ -306,7 +306,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
       // Store the possible pack sizes
       this->mForwardPacks = fwdPacks;
@@ -327,6 +327,9 @@ namespace Parallel {
       {
          this->mActiveFSendPacks = 0;
       }
+      
+      // Create index converter
+      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, fwdDim));
 
       // initialise the data types
       this->initTypes(spRes, fwdDim, fwdTmp, bwdTmp);
@@ -335,22 +338,22 @@ namespace Parallel {
       this->initLists();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
    {
       // Loop over all the cpus
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)
       {
          // Create TBwdB datatypes
-         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id);
+         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id, this->mspIdxConv);
          this->mBTypes.push_back(type);
 
          // Create TFwdA datatypes
-         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id);
+         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id, this->mspIdxConv);
          this->mFTypes.push_back(type);
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sendFwd(const TFwdA& data)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendFwd(const TFwdA& data)
    {
       // Check if communication interface is busy
       if(this->mIsSending)
@@ -387,7 +390,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::sendBwd(const TBwdB& data)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendBwd(const TBwdB& data)
    {
       // Check if communication interface is busy
       if(this->mIsSending)
@@ -422,7 +425,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::receiveFwd(TFwdA &rData)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::receiveFwd(TFwdA &rData)
    {
       // Check if communication interface is busy
       if(this->mIsReceiving)
@@ -460,7 +463,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::receiveBwd(TBwdB &rData)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::receiveBwd(TBwdB &rData)
    {
       // Check if communication interface is busy
       if(this->mIsReceiving)
@@ -498,7 +501,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::initLists()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initLists()
    {
       int sze;
       std::vector<int> unusedF;
@@ -548,7 +551,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::cleanupTypes()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupTypes()
    {
       // Cleanup the F Types
       typename std::vector<MPI_Datatype>::iterator  it;
@@ -565,7 +568,7 @@ namespace Parallel {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB>::profileStorage() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::profileStorage() const
    {
       MHDFloat memTypes = 0.0;
       MHDFloat memComm = 0.0;

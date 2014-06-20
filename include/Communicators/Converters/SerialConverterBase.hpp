@@ -38,7 +38,7 @@ namespace Parallel {
     *
     * \mhdTodo Does index converter really need to be templated ? Is the type selector not enough?
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB>
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class SerialConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
          /**
@@ -86,16 +86,11 @@ namespace Parallel {
           * @brief Store the local transform resolution of the first transform
           */
          SharedCTransformResolution mspTRes;
-
-         /**
-          * @brief Index converter 
-          */
-         SharedPtrMacro<TIdx>  mspIdxConv;
       private:
    };
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::SerialConverterBase()
-      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB>()
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>()
    {
       // Check that all dimensions match
       Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();

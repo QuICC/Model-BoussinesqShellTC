@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Resolutions/TransformResolution.hpp"
+#include "Resolutions/Resolution.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -33,15 +33,23 @@ namespace Parallel {
          /**
           * @brief Constructor
           *
-          * @param spTResFwd  Shared transform resolution on forward side
-          * @param spTResBwd  Shared transform resolution on backward side
+          * @param spRes   Shared resolution
+          * @param id      Forward dimension index ID
           */
-         NoIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd);
+         NoIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id);
 
          /**
           * @brief Destructor 
           */
          ~NoIndexConv();
+
+         /**
+          * @brief Compute shift due to central padding
+          *
+          * @param idx  Reference index
+          * @param k    Array index of third dimension
+          */
+         int centralPadding(const int idx, const int k);
 
          /**
           * @brief Convert first index (3D)
@@ -149,6 +157,11 @@ namespace Parallel {
           */
          int kS(const int i, const int j, const int k);
    };
+
+   inline int NoIndexConv::centralPadding(const int idx, const int k)
+   {
+      return 0;
+   }
 
    inline int NoIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {

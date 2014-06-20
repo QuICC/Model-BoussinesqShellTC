@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 
 namespace Parallel {
 
-   SHIndexConv::SHIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd)
+   SHIndexConv::SHIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id)
    {
    }
 

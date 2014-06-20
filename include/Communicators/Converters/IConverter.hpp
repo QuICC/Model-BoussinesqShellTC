@@ -29,7 +29,7 @@ namespace Parallel {
    /**
     * @brief Implementation of the interface for a data converter.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class IConverter
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class IConverter
    {
       public:
          /**
@@ -84,6 +84,11 @@ namespace Parallel {
           */
          virtual void initiateBackwardCommunication() = 0;
 
+         /**
+          * @brief Index converter 
+          */
+         SharedPtrMacro<TIdx>  mspIdxConv;
+
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Do storage profiling
@@ -96,7 +101,7 @@ namespace Parallel {
       private:
    };
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::IConverter()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::IConverter()
    {
       // Check that all dimensions match
       Debug::StaticAssert< (TFwdA::FieldDimension == TBwdA::FieldDimension) >();
@@ -107,7 +112,7 @@ namespace Parallel {
       Debug::StaticTypeAssert<typename TFwdA::PointType , typename TBwdB::PointType>();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> IConverter<TFwdA, TBwdA, TFwdB, TBwdB>::~IConverter()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~IConverter()
    {
    }
 

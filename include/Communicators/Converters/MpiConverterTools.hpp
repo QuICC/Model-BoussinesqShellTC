@@ -58,7 +58,7 @@ namespace Parallel {
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
+         template <typename TData, typename TIdx> static MPI_Datatype buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv);
 
          /**
           * @brief Build a backward MPI Datatype
@@ -68,7 +68,7 @@ namespace Parallel {
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
+         template <typename TData, typename TIdx> static MPI_Datatype buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv);
 
          /**
           * @brief Extract shared indexes
@@ -148,7 +148,7 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
+   template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
       // Create map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
@@ -202,7 +202,6 @@ namespace Parallel {
       //
       // Create the list of remote indexes in next transform
       //
-
       // Loop over slow data dimension
       for(int k=0; k < spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT3D>(); ++k)
       {
@@ -240,7 +239,7 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
+   template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
       // Create  map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
@@ -280,7 +279,7 @@ namespace Parallel {
                i_ = spRes->cpu(FrameworkMacro::id())->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
 
                // Combine array indexes into coordinate tuple
-               coord = std::tr1::make_tuple(i, j, k);
+               coord = std::tr1::make_tuple(i + spIdxConv->centralPadding(i_, k), j, k);
 
                // Create key as (2D, 3D, 1D)
                key = std::tr1::make_tuple(j_, k_, i_);

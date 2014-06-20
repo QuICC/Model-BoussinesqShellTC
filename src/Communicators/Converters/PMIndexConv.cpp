@@ -19,14 +19,16 @@
 
 // Project includes
 //
+#include "Enums/DimensionTools.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Parallel {
 
-   PMIndexConv::PMIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd)
-      : mspTResFwd(spTResFwd), mspTResBwd(spTResBwd)
+   PMIndexConv::PMIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id)
+      : mspTResFwd(spRes->cpu()->dim(id)), mspTResBwd(spRes->cpu()->dim(Dimensions::jump(id,1))), mSimN(spRes->sim()->dim(static_cast<Dimensions::Simulation::Id>(static_cast<int>(id)+1), Dimensions::Space::SPECTRAL))
    {
+      /// \mhdBug Calculation of mSimN with double static_cast is not ideal
    }
 
    PMIndexConv::~PMIndexConv()

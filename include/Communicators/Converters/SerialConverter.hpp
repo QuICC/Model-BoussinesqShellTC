@@ -155,7 +155,7 @@ namespace Parallel {
       this->mspTRes = spRes->cpu()->dim(id);
       
       // Create index converter
-      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(this->mspTRes, spRes->cpu()->dim(Dimensions::jump(id,1))));
+      this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, id));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

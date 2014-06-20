@@ -40,7 +40,7 @@ namespace Parallel {
    /**
     * @brief Templated implementation of the base of a MPI data converter.
     */
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> class MpiConverterBase: public IConverter<TFwdA,TBwdA,TFwdB,TBwdB>
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> class MpiConverterBase: public IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>
    {
       public:
          /**
@@ -278,17 +278,17 @@ namespace Parallel {
          std::map<int, std::vector<MPI_Request> >  mSendBRequests;
    };
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::fwdSizes() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::fwdSizes() const
    {
       return this->mFSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::bwdSizes() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline const std::vector<int>& MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdSizes() const
    {
       return this->mBSizes;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setBuffers(SharedCommunicationBuffer spFwd, SharedCommunicationBuffer spBwd)
    {
       // Set the forward buffers
       this->mspFBuffers = spFwd;
@@ -297,68 +297,68 @@ namespace Parallel {
       this->mspBBuffers = spBwd;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::nFCpu() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::nFCpu() const
    {
       return this->mFCpuGroup.size();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::nBCpu() const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::nBCpu() const
    {
       return this->mBCpuGroup.size();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::fCpu(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::fCpu(const int id) const
    {
       return this->mFCpuGroup.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::bCpu(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bCpu(const int id) const
    {
       return this->mBCpuGroup.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::sizeFPacket(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sizeFPacket(const int id) const
    {
       return this->mPacks*this->mFSizes.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::sizeBPacket(const int id) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sizeBPacket(const int id) const
    {
       return this->mPacks*this->mBSizes.at(id);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pRecvBRequests(const int size)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pRecvBRequests(const int size)
    {
       return &(this->mRecvBRequests.at(size).front());
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pRecvFRequests(const int size)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pRecvFRequests(const int size)
    {
       return &(this->mRecvFRequests.at(size).front());
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pSendBRequests(const int size)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pSendBRequests(const int size)
    {
       return &(this->mSendBRequests.at(size).front());
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::pSendFRequests(const int size)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> inline MPI_Request * MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::pSendFRequests(const int size)
    {
       return &(this->mSendFRequests.at(size).front());
    }
       
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::MpiConverterBase()
-      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveFSendPacks(0), mActiveBSendPacks(0)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverterBase()
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveFSendPacks(0), mActiveBSendPacks(0)
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::~MpiConverterBase()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::~MpiConverterBase()
    {
       // Cleanup the requests memory
       this->cleanupRequests();
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::initPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initPositions()
    {
       // Get maximum position size
       int maxSize = std::max(this->nFCpu(), this->nBCpu());
@@ -372,7 +372,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::resetRecvPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetRecvPositions()
    {
       // Create position iterator
       std::vector<int>::iterator it;
@@ -384,7 +384,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::resetSendPositions()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::resetSendPositions()
    {
       // Create position iterator
       std::vector<int>::iterator it;
@@ -396,19 +396,19 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::sendDest(const int id, const int ref, const int size) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendDest(const int id, const int ref, const int size) const
    {
       // Create send ring
       return ((id + 1 + ref) % size);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::recvSrc(const int id, const int ref, const int size) const
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> int MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::recvSrc(const int id, const int ref, const int size) const
    {
       // Create recv ring
       return ((size - 1 - id + ref) % size);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::setupRequests()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests()
    {
       // Storage for global location flags
       int dest;
@@ -538,7 +538,7 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB>::cleanupRequests()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::cleanupRequests()
    {
       // Create iterator
       std::map<int, std::vector<MPI_Request> >::iterator it;

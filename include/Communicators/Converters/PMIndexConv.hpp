@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Resolutions/TransformResolution.hpp"
+#include "Resolutions/Resolution.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -33,15 +33,23 @@ namespace Parallel {
          /**
           * @brief Constructor
           *
-          * @param spTResFwd  Shared transform resolution on forward side
-          * @param spTResBwd  Shared transform resolution on backward side
+          * @param spRes   Shared resolution
+          * @param id      Forward dimension index ID
           */
-         PMIndexConv(SharedCTransformResolution spTResFwd, SharedCTransformResolution spTResBwd);
+         PMIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id);
 
          /**
           * @brief Destructor 
           */
          ~PMIndexConv();
+
+         /**
+          * @brief Compute shift due to central padding
+          *
+          * @param idx  Reference index
+          * @param k    Array index of third dimension
+          */
+         int centralPadding(const int idx, const int k);
 
          /**
           * @brief Convert first index (3D)
@@ -159,19 +167,28 @@ namespace Parallel {
           * @brief Shared transform resolution backward side
           */
          SharedCTransformResolution mspTResBwd;
+
+         /**
+          * @brief Simulation resolution 
+          */
+         int mSimN;
    };
+
+   inline int PMIndexConv::centralPadding(const int idx, const int k)
+   {
+      // Compute central padding if necessary
+      int pad = 0;
+      if(idx >= this->mSimN/2 + (this->mSimN % 2))
+      {
+         pad = this->mspTResBwd->dim<Dimensions::Data::DATB1D>(k) - this->mSimN;
+      }
+
+      return pad;
+   }
 
    inline int PMIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      int sN = this->mspTResFwd->dim<Dimensions::Data::DAT3D>();
-
-      if(idxK < sN/2 + (sN % 2))
-      {
-         return idxK;
-      } else
-      {
-         return this->mspTResBwd->dim<Dimensions::Data::DATB1D>() - sN + idxK;
-      }
+      return idxK + this->centralPadding(idxK, j);
    }
 
    inline int PMIndexConv::iS(const int i, const int j, const int k)
