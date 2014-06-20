@@ -202,12 +202,13 @@ ALIASES                = "mhdBug=\xrefitem mhdBug \"Known bugs\" \"Known bugs\""
                          "mhdTable{1}=<table>\1</table>" \
                          "mhdTableHeader=<tr style=\"font-weight:bold;\"><td>Name</td><td>Serial</td><td>Fixed</td><td>Single1D</td><td>Single2D</td><td>Tubular</td></tr>" \
                          "mhdStatNA=<td style=\"background-color:grey;\"></td>" \
-                         "mhdStatus{2}=<tr><td>\1</td>\2\mhdStatNA\mhdStatNA\mhdStatNA\mhdStatNA</tr>" \
+                         "mhdStatus{2}=<tr><td>\1</td>\2 \mhdStatNA \mhdStatNA \mhdStatNA \mhdStatNA</tr>" \
                          "mhdStatus{3}=<tr><td>\1</td>\2 \3 \3 \3 \3</tr>" \
                          "mhdStatus{6}=<tr><td>\1</td>\2 \3 \4 \5 \6</tr>" \
                          "mhdStatPass=<td style=\"background-color:green;text-align:center;\"><span style=\"font-weight:bold;\">Passed</span></td>" \
                          "mhdStatFail=<td style=\"background-color:red;text-align:center;\"><span style=\"font-weight:bold;\">Failed</span></td>" \
                          "mhdStatPart=<td style=\"background-color:#F88017;text-align:center;\"><span style=\"font-weight:bold;\">Partial</span></td>" \
+                         "mhdStatNK=<td style=\"background-color:#CCCCCC;text-align:center;\"><span style=\"font-weight:bold;\">N/K</span></td>" \
                          "mhdStatNI=<td style=\"background-color:#0020C2;text-align:center;\"><span style=\"font-weight:bold;\">N/I</span></td>" \
                          "mhdStatIdea=<td style=\"background-color:#82CAFF;text-align:center;\"><span style=\"font-weight:bold;\">Idea</span></td>" \
                          "mhdStatTodo=<td style=\"background-color:red;text-align:center;\"><span style=\"font-weight:bold;\">Todo</span></td>" \

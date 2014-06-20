@@ -1,42 +1,104 @@
 /** \page mhdPNonlinear Nonlinear simulations
  *
+ *    \mhdTable{
+ *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
+ *       <tr>\mhdStatNK<td>Not known if component can or will be implemented</td></tr>
+ *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
+ *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
+ *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but is not yet fully tested</td></tr>
+ *       <tr>\mhdStatTest<td>Component implementation is done and tested</td></tr>
+ *    }   
+ *
  *    - \subpage mhdPNLBoussinesqBeta3DQG <em>(Work in progress)</em>
  *
  *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *          \mhdStatus{Streamfunction equation, \mhdStatTodo}
- *          \mhdStatus{Vertical velocity equation, \mhdStatTodo}
- *          \mhdStatus{Temperature equation, \mhdStatTodo}
- *          \mhdStatus{Vorticity equation, \mhdStatTodo}
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatDone, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Streamfunction (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Streamfunction (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vertical velocity (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vertical velocity (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vorticity (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vorticity (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
  *       }
  *
  *    - \subpage mhdPNLBoussinesqFPlane3DQG  <em>(Work in progress)</em>
  *
  *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *          \mhdStatus{Streamfunction equation, \mhdStatTodo}
- *          \mhdStatus{Vertical velocity equation, \mhdStatTodo}
- *          \mhdStatus{Temperature equation, \mhdStatTodo}
- *          \mhdStatus{Vorticity equation, \mhdStatTodo}
- *          \mhdStatus{Mean heat equation, \mhdStatTodo}
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatDone, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatDone, \mhdStatTodo, \mhdStatWip, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Visualization IO, \mhdStatDone, \mhdStatTodo, \mhdStatWip, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Streamfunction (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Streamfunction (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Vertical velocity (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Vertical velocity (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Temperature (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Temperature (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Mean temperature (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Mean temperature (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Vorticity (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
+ *          \mhdStatus{Vorticity (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatTodo, \mhdStatWip}
  *       }
  *
  *    - \subpage mhdPNLBoussinesqFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
  *    - \subpage mhdPNLAnelasticFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
  *    - \subpage mhdPNLCompressibleFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *          
  *    - \subpage mhdPNLBoussinesqCylinder <em>(Not started yet)</em>
