@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the anelastic F-Plane model"""
+"""Module provides the functions to generate the Boussinesq F-Plane model"""
 
 from __future__ import division
 
@@ -24,13 +24,13 @@ def periodicity():
 def all_fields():
    """Get the list of fields that need a configuration entry"""
 
-   return ["velocityx", "velocityy" ,"velocityz", "pressure", "density", "temperature", "entropy"]
+   return ["velocityx", "velocityy" ,"velocityz", "pressure", "temperature"]
 
 
 def implicit_fields(field_row):
    """Get the list of coupled fields in solve"""
 
-   return [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("density",""), ("temperature",""), ("entropy","")]
+   return [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("temperature","")]
 
 
 def explicit_fields(field_row):
@@ -90,9 +90,7 @@ def convert_bc(eq_params, eigs, bcs, field_row, field_col):
             bc_field[("velocityy","")] = [20]
             bc_field[("velocityz","")] = [20]
             bc_field[("pressure","")] = [20]
-            bc_field[("density","")] = [20]
             bc_field[("temperature","")] = [20]
-            bc_field[("entropy","")] = [20]
             if field_col == field_row:
                bc = bc_field[field_col]
 
@@ -121,13 +119,7 @@ def qi(res, eigs, bcs, field_row):
    elif field_row == ("pressure",""):
       mat = c1d.i2(res[0], [0])
 
-   elif field_row == ("density",""):
-      mat = c1d.i2(res[0], [0])
-
    elif field_row == ("temperature",""):
-      mat = c1d.i2(res[0], [0])
-
-   elif field_row == ("entropy",""):
       mat = c1d.i2(res[0], [0])
 
    return mat
@@ -150,13 +142,7 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Tr
       elif field_col == ("pressure",""):
          mat = c1d.i2(res[0], bc)
 
-      elif field_col == ("density",""):
-         mat = c1d.zblk(res[0],2, bc)
-
       elif field_col == ("temperature",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("entropy",""):
          mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("velocityy",""):
@@ -172,13 +158,7 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Tr
       elif field_col == ("pressure",""):
          mat = c1d.i2(res[0],bc)
 
-      elif field_col == ("density",""):
-         mat = c1d.zblk(res[0],2, bc)
-
       elif field_col == ("temperature",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("entropy",""):
          mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("velocityz",""):
@@ -194,13 +174,7 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Tr
       elif field_col == ("pressure",""):
          mat = c1d.i2(res[0], bc)
 
-      elif field_col == ("density",""):
-         mat = c1d.i2(res[0], bc)
-
       elif field_col == ("temperature",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("entropy",""):
          mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("pressure",""):
@@ -216,35 +190,7 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Tr
       elif field_col == ("pressure",""):
          mat = c1d.i2(res[0], bc)
 
-      elif field_col == ("density",""):
-         mat = c1d.i2(res[0], bc)
-
       elif field_col == ("temperature",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("entropy",""):
-         mat = c1d.i2(res[0], bc)
-
-   elif field_row == ("density",""):
-      if field_col == ("velocityx",""):
-         mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("velocityy",""):
-         mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("velocityz",""):
-         mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("pressure",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("density",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("temperature",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("entropy",""):
          mat = c1d.zblk(res[0],2, bc)
 
    elif field_row == ("temperature",""):
@@ -260,36 +206,8 @@ def linear_block(res, eq_params, eigs, bcs, field_row, field_col, linearize = Tr
       elif field_col == ("pressure",""):
          mat = c1d.i2(res[0], bc)
 
-      elif field_col == ("density",""):
-         mat = c1d.i2(res[0],2, bc)
-
       elif field_col == ("temperature",""):
          mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("entropy",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-   elif field_row == ("entropy",""):
-      if field_col == ("velocityx",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("velocityy",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("velocityz",""):
-         mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("pressure",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("density",""):
-         mat = c1d.zblk(res[0],2, bc)
-
-      elif field_col == ("temperature",""):
-         mat = c1d.i2(res[0], bc)
-
-      elif field_col == ("entropy",""):
-         mat = c1d.zblk(res[0],2, bc)
 
    return mat
 
@@ -305,12 +223,6 @@ def time_block(res, eq_params, eigs, bcs, field_row):
       mat = c1d.i2(res[0], bc)
 
    elif field_row == ("velocityz",""):
-      mat = c1d.i2(res[0], bc)
-
-   elif field_row == ("density",""):
-      mat = c1d.i2(res[0], bc)
-
-   elif field_row == ("entropy",""):
       mat = c1d.i2(res[0], bc)
 
    return mat

@@ -61,20 +61,20 @@ namespace GeoMHDiSCC {
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 0.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSSIN);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 7.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 7.0, 1e0, 0.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 2.0, 1e0, 0.0, 1e0, 0.0);
+      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINSIN);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 7.0, 1e0, 7.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -91,17 +91,17 @@ namespace GeoMHDiSCC {
 
       // Add first field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestTFFModel::PYNAME);
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestTFFModel::PYNAME);
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestTFFModel::PYNAME);
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add output file

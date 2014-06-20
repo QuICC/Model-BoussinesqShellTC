@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the anelastic F-Plane model"""
+"""Module provides the functions to generate the compressible F-Plane model"""
 
 from __future__ import division
 
