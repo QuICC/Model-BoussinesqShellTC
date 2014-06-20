@@ -55,7 +55,7 @@ namespace IoVariable {
       if(mode(2) == 0 && mode(3) == 0)
       {
          // Create boundary operator
-         Array bc = Array::Ones(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
+         Array bc = 2.0*Array::Ones(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
          bc(0) = bc(0)/2.0;
 
          // Compute Nusselt number

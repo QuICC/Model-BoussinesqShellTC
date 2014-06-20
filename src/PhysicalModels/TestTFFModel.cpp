@@ -62,19 +62,19 @@ namespace GeoMHDiSCC {
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 15.0);
+      spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 0.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 15.0, 1e0, 0.0);
+      spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestTFFModel::PYNAME);
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 15.0, 1e0, 15.0);
+      spExact->setModeOptions(1e0, 2.0, 1e0, 0.0, 1e0, 0.0);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
