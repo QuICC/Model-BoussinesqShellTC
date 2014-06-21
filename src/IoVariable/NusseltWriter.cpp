@@ -51,7 +51,6 @@ namespace IoVariable {
 
       ArrayI mode = sit->second->dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(0);
       MHDFloat nusselt = 0.0;
-      bool present = false;
       if(mode(2) == 0 && mode(3) == 0)
       {
          // Create boundary operator
@@ -60,8 +59,6 @@ namespace IoVariable {
 
          // Compute Nusselt number
          nusselt = -bc.dot(sit->second->dom(0).perturbation().profile(0,0).real());
-
-         present = true;
       }
 
       // Get the "global" Nusselt number from MPI code

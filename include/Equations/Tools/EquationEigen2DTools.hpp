@@ -74,7 +74,7 @@ namespace Eigen2D {
 
       // k3D_
       eigs.push_back(eq.spRes()->sim()->boxScale(Dimensions::Simulation::SIM3D)*static_cast<MHDFloat>(mode(3)));
-
+      
       return eigs;
    }
 
