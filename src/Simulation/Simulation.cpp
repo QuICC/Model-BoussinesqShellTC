@@ -27,6 +27,7 @@
 
 // Project includes
 //
+#include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
 
@@ -118,6 +119,9 @@ namespace GeoMHDiSCC {
 
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepCoordinator.init(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+
+      // Finalizing the Python model wrapper
+      PythonModelWrapper::finalize();
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);

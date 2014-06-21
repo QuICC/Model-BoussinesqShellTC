@@ -30,8 +30,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   SphereExactVectorState::SphereExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName,spEqParams), mTypeId(CONSTANT)
+   SphereExactVectorState::SphereExactVectorState(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGVorticity(const std::string& pyName, SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGVorticity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

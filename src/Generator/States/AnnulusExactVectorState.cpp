@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   AnnulusExactVectorState::AnnulusExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName, spEqParams), mTypeId(CONSTANT)
+   AnnulusExactVectorState::AnnulusExactVectorState(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

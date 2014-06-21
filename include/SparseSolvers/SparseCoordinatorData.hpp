@@ -418,7 +418,7 @@ namespace Solver {
       }
 
       // Store storage information
-      (*solveIt)->addInformation(id,startRow,spEq->pyName());
+      (*solveIt)->addInformation(id,startRow);
    }
 
    //

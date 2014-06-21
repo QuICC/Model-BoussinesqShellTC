@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGTransport::BoussinesqFPlane3DQGTransport(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams)
+   BoussinesqFPlane3DQGTransport::BoussinesqFPlane3DQGTransport(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

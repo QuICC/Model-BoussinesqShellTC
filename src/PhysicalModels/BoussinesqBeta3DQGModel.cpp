@@ -37,21 +37,23 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqBeta3DQGModel::PYNAME = "boussinesq_beta3dqg_model";
+   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg_model";
+
+   const std::string BoussinesqBeta3DQGModel::PYCLASS = "BoussinesqBeta3DQGModel";
 
    void BoussinesqBeta3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVertical>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVertical>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>();
       
       // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticity>(BoussinesqBeta3DQGModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticity>();
    }
 
    void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
@@ -62,18 +64,18 @@ namespace GeoMHDiSCC {
       Equations::SharedCartesianExactScalarState spExact;
 
       // Add transport initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
       spRand->setIdentity(PhysicalNames::TEMPERATURE);
       spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
       
       // Add streamfunction initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
       
       // Add vertical velocity initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(BoussinesqBeta3DQGModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
@@ -102,23 +104,23 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add transport field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add vorticity field visualization
       Equations::SharedVorticityStreamVisualizer spVort;
-      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>(BoussinesqBeta3DQGModel::PYNAME);
+      spVort = spVis->addScalarEquation<Equations::VorticityStreamVisualizer>();
       spVort->setFields(true, true);
 
       // Add output file
@@ -157,7 +159,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqBeta3DQGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -172,7 +174,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqBeta3DQGModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

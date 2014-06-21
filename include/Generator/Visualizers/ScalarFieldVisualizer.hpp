@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         ScalarFieldVisualizer(const std::string& pyName, SharedEquationParameters spEqParams);
+         ScalarFieldVisualizer(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

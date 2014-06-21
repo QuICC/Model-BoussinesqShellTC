@@ -8,6 +8,7 @@
 INSTALL(FILES 
    Python/annulus.py
    Python/annulus_radius.py
+   Python/base_model.py
    Python/cartesian_0d.py 
    Python/cartesian_1d.py 
    Python/cartesian_2d.py 

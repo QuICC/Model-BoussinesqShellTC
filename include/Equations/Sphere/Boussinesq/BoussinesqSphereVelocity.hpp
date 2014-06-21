@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqSphereVelocity(const std::string& pyName, SharedEquationParameters spEqParams);
+         BoussinesqSphereVelocity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

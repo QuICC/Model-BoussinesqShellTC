@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace Solver {
 
    SparseSolverBase::SparseSolverBase(const int start)
-      : mZeroIdx(start), mPyName(""), mIsInitialized(false)
+      : mZeroIdx(start), mIsInitialized(false)
    {
       // Safety assert
       assert(start >= 0);
@@ -34,16 +34,8 @@ namespace Solver {
    {
    }
 
-   void SparseSolverBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow, const std::string& pyName)
+   void SparseSolverBase::addInformation(const SpectralFieldId& id, const ArrayI& startRow)
    {
-      if(this->mPyName.length() == 0)
-      {
-         this->mPyName = pyName;
-      } else if(this->mPyName.compare(pyName) != 0)
-      {
-         throw Exception("Attempted to setup solver with different python generators!");
-      }
-
       this->mFieldIds.push_back(id);
 
       this->mInformation.insert(std::make_pair(id, startRow));

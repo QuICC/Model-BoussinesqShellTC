@@ -34,15 +34,17 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqSphereModel::PYNAME = "boussinesq_sphere_model";
+   const std::string BoussinesqSphereModel::PYMODULE = "boussinesq_sphere_model";
+
+   const std::string BoussinesqSphereModel::PYCLASS = "BoussinesqSphereModel";
 
    void BoussinesqSphereModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqSphereTransport>(BoussinesqSphereModel::PYNAME);
+      spSim->addScalarEquation<Equations::BoussinesqSphereTransport>();
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqSphereVelocity>(BoussinesqSphereModel::PYNAME);
+      spSim->addVectorEquation<Equations::BoussinesqSphereVelocity>();
    }
 
    void BoussinesqSphereModel::addStates(SharedStateGenerator spGen)
@@ -109,7 +111,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqSphereModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -124,7 +126,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(BoussinesqSphereModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

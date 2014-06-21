@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   VelocityStreamVisualizer::VelocityStreamVisualizer(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName, spEqParams), mViewField(true), mViewGradient(false)
+   VelocityStreamVisualizer::VelocityStreamVisualizer(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams), mViewField(true), mViewGradient(false)
    {
       // Set the variable requirements
       this->setRequirements();

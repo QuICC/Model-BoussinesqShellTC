@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGVorticity::BoussinesqFPlane3DQGVorticity(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams)
+   BoussinesqFPlane3DQGVorticity::BoussinesqFPlane3DQGVorticity(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

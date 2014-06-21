@@ -1,11 +1,11 @@
 /**
- * @file PythonWrapper.hpp
- * @brief Small wrapper for Python embedding
+ * @file PythonModelWrapper.hpp
+ * @brief Static class wrapper to the Python model embedding
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef PYTHONWRAPPER_HPP
-#define PYTHONWRAPPER_HPP
+#ifndef PYTHONMODELWRAPPER_HPP
+#define PYTHONMODELWRAPPER_HPP
 
 // System includes
 //
@@ -24,9 +24,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief This class is a small wrapper for the Python embedding
+    * @brief Static class wrapper to the Python model embedding
     */
-   class PythonWrapper
+   class PythonModelWrapper
    {
       public:
          /**
@@ -40,9 +40,9 @@ namespace GeoMHDiSCC {
          static void import(const std::string& module);
 
          /**
-          * @brief Create a Python class object
+          * @brief Create the Python model class
           */
-         static void createClass(const std::string& name);
+         static void createModel(const std::string& model);
 
          /**
           * @brief Set the Python function object
@@ -60,17 +60,17 @@ namespace GeoMHDiSCC {
          static PyObject* callFunction(PyObject* pArgs);
 
          /**
-          * @brief Set the Python class method object
+          * @brief Set the Python model method object
           */
          static void setMethod(const std::string& method);
 
          /**
-          * @brief Call the Python class method object
+          * @brief Call the Python model method object
           */
          static PyObject* callMethod();
 
          /**
-          * @brief Call the Python class method object with arguments
+          * @brief Call the Python model method object with arguments
           */
          static PyObject* callMethod(PyObject* pArgs);
 
@@ -140,12 +140,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         PythonWrapper();
+         PythonModelWrapper();
 
          /**
           * @brief Destructor
           */
-         ~PythonWrapper();
+         ~PythonModelWrapper();
 
          /**
           * @brief Python module object
@@ -158,16 +158,16 @@ namespace GeoMHDiSCC {
          static PyObject* mpFunc;
 
          /**
-          * @brief Python class object
+          * @brief Python model object
           */
-         static PyObject* mpClass;
+         static PyObject* mpModel;
 
          /**
-          * @brief Python class method object
+          * @brief Python model method object
           */
          static PyObject* mpMethod;
    };
 
 }
 
-#endif // PYTHONWRAPPER_HPP
+#endif // PYTHONMODELWRAPPER_HPP

@@ -43,10 +43,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         AnnulusExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams);
+         AnnulusExactScalarState(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

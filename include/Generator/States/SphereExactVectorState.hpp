@@ -46,10 +46,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         SphereExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams);
+         SphereExactVectorState(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

@@ -35,10 +35,9 @@ namespace Equations {
          /**
           * @brief Constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         TestLinearVector(const std::string& pyName, SharedEquationParameters spEqParams);
+         TestLinearVector(SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor

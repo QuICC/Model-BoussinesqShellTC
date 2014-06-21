@@ -43,10 +43,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         CylinderExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams);
+         CylinderExactVectorState(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

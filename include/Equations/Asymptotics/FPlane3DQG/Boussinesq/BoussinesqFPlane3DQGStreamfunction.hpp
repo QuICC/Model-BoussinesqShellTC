@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlane3DQGStreamfunction(const std::string& pyName, SharedEquationParameters spEqParams);
+         BoussinesqFPlane3DQGStreamfunction(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

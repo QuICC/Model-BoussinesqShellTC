@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqSphereTransport::BoussinesqSphereTransport(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams)
+   BoussinesqSphereTransport::BoussinesqSphereTransport(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

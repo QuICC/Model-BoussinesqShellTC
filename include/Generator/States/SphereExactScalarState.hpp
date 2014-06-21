@@ -44,10 +44,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         SphereExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams);
+         SphereExactScalarState(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

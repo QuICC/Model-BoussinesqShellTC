@@ -33,22 +33,24 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string TestFFFModel::PYNAME = "test_fff_model";
+   const std::string TestFFFModel::PYMODULE = "test_fff_model";
+
+   const std::string TestFFFModel::PYCLASS = "TestFFFModel";
 
    void TestFFFModel::addEquations(SharedSimulation spSim)
    {
       Equations::SharedTestLinearScalar   spLin;
 
       // Add first scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
       spLin->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
       spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>(TestFFFModel::PYNAME);
+      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
       spLin->setIdentity(PhysicalNames::TEMPERATURE);
    }
 
@@ -59,19 +61,19 @@ namespace GeoMHDiSCC {
       Equations::SharedCartesianExactScalarState spExact;
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
       spExact->setStateType(Equations::CartesianExactScalarState::SINSINCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
       spExact->setStateType(Equations::CartesianExactScalarState::COSSINCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>(TestFFFModel::PYNAME);
+      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
       spExact->setStateType(Equations::CartesianExactScalarState::SINCOSCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
@@ -90,17 +92,17 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
 
       // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
 
       // Add second field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add third field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>(TestFFFModel::PYNAME);
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
@@ -139,7 +141,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(TestFFFModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -154,7 +156,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(TestFFFModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

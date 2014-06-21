@@ -30,8 +30,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   ShellExactVectorState::ShellExactVectorState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName,spEqParams), mTypeId(CONSTANT)
+   ShellExactVectorState::ShellExactVectorState(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

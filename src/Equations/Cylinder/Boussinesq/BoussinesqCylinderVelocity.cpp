@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqCylinderVelocity::BoussinesqCylinderVelocity(const std::string& pyName, SharedEquationParameters spEqParams)
+   BoussinesqCylinderVelocity::BoussinesqCylinderVelocity(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Vector equation has two components, ie Toroidal/Poloidal

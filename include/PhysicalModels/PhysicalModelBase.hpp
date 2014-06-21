@@ -32,17 +32,17 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get vector of names for the boundary conditions
           */
-         static std::vector<PhysicalNames::Id> fieldIds(const std::string& pyName);
+         static std::vector<PhysicalNames::Id> fieldIds();
 
          /**
           * @brief Get vector of names for the nondimensional parameters
           */
-         static std::vector<NonDimensional::Id> paramIds(const std::string& pyName);
+         static std::vector<NonDimensional::Id> paramIds();
 
          /**
           * @brief Get vector of bools about periodic box
           */
-         static std::vector<bool> isPeriodicBox(const std::string& pyName);
+         static std::vector<bool> isPeriodicBox();
 
       protected:
 

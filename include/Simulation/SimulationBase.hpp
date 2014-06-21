@@ -123,17 +123,13 @@ namespace GeoMHDiSCC {
 
          /**
           * @brief Add scalar equation to solver
-          *
-          * @param pyName  Python script name
           */
-         template <typename TEquation> SharedPtrMacro<TEquation> addScalarEquation(const std::string& pyName);
+         template <typename TEquation> SharedPtrMacro<TEquation> addScalarEquation();
 
          /**
           * @brief Add vector equation to solver
-          *
-          * @param pyName  Python script name
           */
-         template <typename TEquation> SharedPtrMacro<TEquation> addVectorEquation(const std::string& pyName);
+         template <typename TEquation> SharedPtrMacro<TEquation> addVectorEquation();
 
          /**
           * @brief Set the base simulation configuration file and parameters
@@ -424,10 +420,10 @@ namespace GeoMHDiSCC {
       this->mSimIoCtrl.setConfigurationFile(spCfgFile);
    }
 
-   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addScalarEquation(const std::string& pyName)
+   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addScalarEquation()
    {
       // Create shared scalar equation
-      SharedPtrMacro<TEquation>  spEq(new TEquation(pyName, this->mspEqParams));
+      SharedPtrMacro<TEquation>  spEq(new TEquation(this->mspEqParams));
 
       // Add share scalar equation
       this->mScalarEquations.push_back(spEq);
@@ -435,10 +431,10 @@ namespace GeoMHDiSCC {
       return spEq;
    }
 
-   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addVectorEquation(const std::string& pyName)
+   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addVectorEquation()
    {
       // Create shared scalar equation
-      SharedPtrMacro<TEquation>  spEq(new TEquation(pyName, this->mspEqParams));
+      SharedPtrMacro<TEquation>  spEq(new TEquation(this->mspEqParams));
 
       // Add share scalar equation
       this->mVectorEquations.push_back(spEq);

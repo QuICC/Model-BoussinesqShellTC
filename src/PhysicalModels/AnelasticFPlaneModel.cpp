@@ -31,7 +31,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string AnelasticFPlaneModel::PYNAME = "anelastic_fplane_model";
+   const std::string AnelasticFPlaneModel::PYMODULE = "anelastic_fplane_model";
+
+   const std::string AnelasticFPlaneModel::PYCLASS = "AnelasticFPlaneModel";
 
    void AnelasticFPlaneModel::addEquations(SharedSimulation spSim)
    {
@@ -66,7 +68,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticFPlaneModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -81,7 +83,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(AnelasticFPlaneModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

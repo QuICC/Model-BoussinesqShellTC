@@ -35,8 +35,11 @@ namespace GeoMHDiSCC {
          /// Typedef for the spatial scheme used
          static const int DIMENSION = 3;
 
-         /// Python script name
-         static const std::string PYNAME;
+         /// Python script/module name
+         static const std::string PYMODULE;
+
+         /// Python model class name
+         static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
          typedef Schemes::BLFScheme SchemeType;

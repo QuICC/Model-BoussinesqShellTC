@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "Python/PythonModelWrapper.hpp"
 #include "Simulation/Simulation.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
@@ -54,8 +55,13 @@ namespace GeoMHDiSCC {
       // Create simulation
       SharedSimulation  spSim(new Simulation);
 
+      // Initialize the python model wrapper
+      PythonModelWrapper::init();
+      PythonModelWrapper::import(TModel::PYMODULE);
+      PythonModelWrapper::createModel(TModel::PYCLASS);
+
       // Create list of field ID strings for boundary conditions
-      std::vector<PhysicalNames::Id> fields = PhysicalModelBase::fieldIds(TModel::PYNAME);
+      std::vector<PhysicalNames::Id> fields = PhysicalModelBase::fieldIds();
       std::vector<PhysicalNames::Id>::iterator fIt;
       std::vector<std::string>   bcNames;
       for(fIt = fields.begin(); fIt != fields.end(); ++fIt)
@@ -64,7 +70,7 @@ namespace GeoMHDiSCC {
       }
 
       // Create list of nondimensional ID strings for physical parameters
-      std::vector<NonDimensional::Id> params = PhysicalModelBase::paramIds(TModel::PYNAME);
+      std::vector<NonDimensional::Id> params = PhysicalModelBase::paramIds();
       std::vector<NonDimensional::Id>::iterator pIt;
       std::vector<std::string>   ndNames;
       for(pIt = params.begin(); pIt != params.end(); ++pIt)
@@ -73,7 +79,7 @@ namespace GeoMHDiSCC {
       }
 
       // Add configuration file and parameters
-      spSim->setConfiguration<TModel::DIMENSION>(TModel::SchemeType::type(), PhysicalModelBase::isPeriodicBox(TModel::PYNAME), bcNames, ndNames);
+      spSim->setConfiguration<TModel::DIMENSION>(TModel::SchemeType::type(), PhysicalModelBase::isPeriodicBox(), bcNames, ndNames);
 
       // Initialise simulation
       spSim->initBase();

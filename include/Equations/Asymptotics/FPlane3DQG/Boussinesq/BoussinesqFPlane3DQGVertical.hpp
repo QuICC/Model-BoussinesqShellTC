@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlane3DQGVertical(const std::string& pyName, SharedEquationParameters spEqParams);
+         BoussinesqFPlane3DQGVertical(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

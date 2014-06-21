@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGVertical::BoussinesqBeta3DQGVertical(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams)
+   BoussinesqBeta3DQGVertical::BoussinesqBeta3DQGVertical(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

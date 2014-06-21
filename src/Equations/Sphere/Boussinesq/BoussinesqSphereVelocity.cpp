@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqSphereVelocity::BoussinesqSphereVelocity(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName, spEqParams)
+   BoussinesqSphereVelocity::BoussinesqSphereVelocity(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams)
    {
       // Vector equation has two components, ie Toroidal/Poloidal
       this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);

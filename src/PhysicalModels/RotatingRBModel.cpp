@@ -31,18 +31,20 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RotatingRBModel::PYNAME = "rotation_rb_model";
+   const std::string RotatingRBModel::PYMODULE = "rotating_rb_model";
+
+   const std::string RotatingRBModel::PYCLASS = "RotatingRBModel";
 
    void RotatingRBModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::RotatingRBTransport>(RotatingRBModel::PYNAME);
+      spSim->addScalarEquation<Equations::RotatingRBTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::RotatingRBStreamfunction>((RotatingRBModel::PYNAME);
+      spSim->addScalarEquation<Equations::RotatingRBStreamfunction>(();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::RotatingRBVertical>((RotatingRBModel::PYNAME);
+      spSim->addScalarEquation<Equations::RotatingRBVertical>(();
    }
 
    void RotatingRBModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -58,7 +60,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(RotatingRBModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -81,7 +83,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(RotatingRBModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

@@ -27,8 +27,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IScalarEquation::IScalarEquation(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IEquation(pyName, spEqParams)
+   IScalarEquation::IScalarEquation(SharedEquationParameters spEqParams)
+      : IEquation(spEqParams)
    {
    }
 

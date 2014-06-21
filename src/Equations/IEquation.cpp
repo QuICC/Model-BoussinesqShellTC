@@ -22,14 +22,14 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Python/PythonWrapper.hpp"
+#include "Python/PythonModelWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   IEquation::IEquation(const std::string& pyName, SharedEquationParameters spEqParams)
-      : EquationData(pyName, spEqParams)
+   IEquation::IEquation(SharedEquationParameters spEqParams)
+      : EquationData(spEqParams)
    {
    }
 
@@ -120,18 +120,12 @@ namespace Equations {
 
    void IEquation::dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes)
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
       pArgs = PyTuple_New(2);
 
       // Get resolution
-      pValue = PythonWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get field
@@ -143,8 +137,8 @@ namespace Equations {
       PyTuple_SetItem(pArgs, 1, pTmp);
 
       // Call model operator Python routine
-      PythonWrapper::setFunction((char *)"equation_info");
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setMethod((char *)"equation_info");
+      pValue = PythonModelWrapper::callMethod(pArgs);
       Py_DECREF(pArgs);
 
       // Get Complex solver flag
@@ -154,12 +148,12 @@ namespace Equations {
       // Get Implicit fields
       pTmp = PyTuple_GetItem(pValue, 1);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  imFields;
-      PythonWrapper::getList(imFields, pTmp);
+      PythonModelWrapper::getList(imFields, pTmp);
 
       // Get Explicit fields
       pTmp = PyTuple_GetItem(pValue, 2);
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exFields;
-      PythonWrapper::getList(exFields, pTmp);
+      PythonModelWrapper::getList(exFields, pTmp);
 
       // Get geometric coupling flag
       pTmp = PyTuple_GetItem(pValue, 3);
@@ -177,7 +171,7 @@ namespace Equations {
       int rhsSize = PyLong_AsLong(pTmp);
 
       // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
 
       // Initialise coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
@@ -231,18 +225,12 @@ namespace Equations {
 
    void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue, *pList;
       pArgs = PyTuple_New(5);
 
       // Get resolution
-      pValue = PythonWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get equation parameters
@@ -253,17 +241,17 @@ namespace Equations {
       {
          eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
       }
-      pValue = PythonWrapper::makeDict(eq_names, eq_vals);
+      pValue = PythonModelWrapper::makeDict(eq_names, eq_vals);
       PyTuple_SetItem(pArgs, 1, pValue);
 
       // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(eigs);
+      pValue = PythonModelWrapper::makeTuple(eigs);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get boundary conditions
       std::map<std::string,int> bcMap = this->bcIds().getTagMap();
       bcMap.insert(std::make_pair("bcType", bcType));
-      pValue = PythonWrapper::makeDict(bcMap);
+      pValue = PythonModelWrapper::makeDict(bcMap);
       PyTuple_SetItem(pArgs, 3, pValue);
 
       // Get list of implicit fields
@@ -282,41 +270,35 @@ namespace Equations {
       PyTuple_SetItem(pArgs, 4, pList);
 
       // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(opId));
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(opId));
+      pValue = PythonModelWrapper::callMethod(pArgs);
       Py_DECREF(pArgs);
 
       // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(rModelMatrix, pValue);
+      PythonModelWrapper::fillMatrix(rModelMatrix, pValue);
 
       // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
    }
 
    void IEquation::dispatchQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
       pArgs = PyTuple_New(4);
 
       // Get resolution
-      pValue = PythonWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(eigs);
+      pValue = PythonModelWrapper::makeTuple(eigs);
       PyTuple_SetItem(pArgs, 1, pValue);
 
       // Get boundary conditions
       std::map<std::string,int> bcMap = this->bcIds().getTagMap();
       bcMap.insert(std::make_pair("bcType", ModelOperatorBoundary::NO_BC));
-      pValue = PythonWrapper::makeDict(bcMap);
+      pValue = PythonModelWrapper::makeDict(bcMap);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get field
@@ -328,31 +310,25 @@ namespace Equations {
       PyTuple_SetItem(pArgs, 3, pTmp);
 
       // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(ModelOperator::QI));
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::QI));
+      pValue = PythonModelWrapper::callMethod(pArgs);
       Py_DECREF(pArgs);
 
       // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(mat, pValue);
+      PythonModelWrapper::fillMatrix(mat, pValue);
 
       // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
    }
 
    void IEquation::dispatchExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(this->pyName());
-
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
       pArgs = PyTuple_New(6);
 
       // Get resolution
-      pValue = PythonWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
+      pValue = PythonModelWrapper::makeTuple(spRes->sim()->dimensions(Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Get equation parameters
@@ -363,17 +339,17 @@ namespace Equations {
       {
          eq_vals.push_back(this->eqParams().nd(eq_ids.at(i)));
       }
-      pValue = PythonWrapper::makeDict(eq_names, eq_vals);
+      pValue = PythonModelWrapper::makeDict(eq_names, eq_vals);
       PyTuple_SetItem(pArgs, 1, pValue);
 
       // Get the eigen direction values
-      pValue = PythonWrapper::makeTuple(eigs);
+      pValue = PythonModelWrapper::makeTuple(eigs);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get boundary conditions
       std::map<std::string,int> bcMap = this->bcIds().getTagMap();
       bcMap.insert(std::make_pair("bcType", ModelOperatorBoundary::NO_BC));
-      pValue = PythonWrapper::makeDict(bcMap);
+      pValue = PythonModelWrapper::makeDict(bcMap);
       PyTuple_SetItem(pArgs, 3, pValue);
 
       // Get field row
@@ -393,15 +369,15 @@ namespace Equations {
       PyTuple_SetItem(pArgs, 5, pTmp);
 
       // Call model operator Python routine
-      PythonWrapper::setFunction(IoTools::IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR));
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR));
+      pValue = PythonModelWrapper::callMethod(pArgs);
       Py_DECREF(pArgs);
 
       // Convert Python matrix into triplets
-      PythonWrapper::fillMatrix(mat, pValue);
+      PythonModelWrapper::fillMatrix(mat, pValue);
 
       // Finalise Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
    }
 
    void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const

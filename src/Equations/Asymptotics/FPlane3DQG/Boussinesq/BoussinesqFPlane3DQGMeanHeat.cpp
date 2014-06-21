@@ -27,8 +27,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGMeanHeat::BoussinesqFPlane3DQGMeanHeat(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams)
+   BoussinesqFPlane3DQGMeanHeat::BoussinesqFPlane3DQGMeanHeat(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

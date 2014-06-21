@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   AnnulusExactScalarState::AnnulusExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams), mTypeId(CONSTANT)
+   AnnulusExactScalarState::AnnulusExactScalarState(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

@@ -25,8 +25,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestLinearVector::TestLinearVector(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IVectorEquation(pyName, spEqParams)
+   TestLinearVector::TestLinearVector(SharedEquationParameters spEqParams)
+      : IVectorEquation(spEqParams)
    {
    }
 

@@ -1,6 +1,6 @@
 /** 
- * @file PythonWrapper.cpp
- * @brief Source of Python interpreter wrapper
+ * @file PythonModelWrapper.cpp
+ * @brief Source of the model Python interpreter wrapper
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Python/PythonWrapper.hpp"
+#include "Python/PythonModelWrapper.hpp"
 
 // Project includes
 //
@@ -25,15 +25,15 @@
 
 namespace GeoMHDiSCC {
 
-   PyObject* PythonWrapper::mpModule = NULL;
+   PyObject* PythonModelWrapper::mpModule = NULL;
 
-   PyObject* PythonWrapper::mpFunc = NULL;
+   PyObject* PythonModelWrapper::mpFunc = NULL;
 
-   PyObject* PythonWrapper::mpClass = NULL;
+   PyObject* PythonModelWrapper::mpModel = NULL;
 
-   PyObject* PythonWrapper::mpMethod = NULL;
+   PyObject* PythonModelWrapper::mpMethod = NULL;
 
-   void PythonWrapper::init()
+   void PythonModelWrapper::init()
    {
       // Initialize the python interpreter
       Py_Initialize();
@@ -43,12 +43,12 @@ namespace GeoMHDiSCC {
       PyList_Append(sysPath, PyUnicode_FromString(GEOMHDISCC_PYTHON_DIR));
    }
 
-   void PythonWrapper::import(const std::string& module)
+   void PythonModelWrapper::import(const std::string& module)
    {
       // Cleanup
-      if(PythonWrapper::mpModule != NULL)
+      if(PythonModelWrapper::mpModule != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpModule);
+         Py_CLEAR(PythonModelWrapper::mpModule);
       }
 
       // Get string object for module name
@@ -56,51 +56,51 @@ namespace GeoMHDiSCC {
       pName = PyUnicode_FromString(module.c_str());
 
       // Import module
-      PythonWrapper::mpModule = PyImport_Import(pName);
+      PythonModelWrapper::mpModule = PyImport_Import(pName);
 
       // Release pName
       Py_DECREF(pName);
 
-      if(PythonWrapper::mpModule == NULL)
+      if(PythonModelWrapper::mpModule == NULL)
       {
          PyErr_Print();
          throw Exception("Python module import error!");
       }
    }
 
-   void PythonWrapper::createClass(const std::string& name)
+   void PythonModelWrapper::createModel(const std::string& model)
    {
       // Cleanup
-      if(PythonWrapper::mpClass != NULL)
+      if(PythonModelWrapper::mpModel != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpClass);
+         Py_CLEAR(PythonModelWrapper::mpModel);
       }
 
-      // Create class object
+      // Create model object
 
-      PythonWrapper::setFunction(name);
-      PythonWrapper::mpClass = PythonWrapper::callFunction();
+      PythonModelWrapper::setFunction(model);
+      PythonModelWrapper::mpModel = PythonModelWrapper::callFunction();
 
-      if(PythonWrapper::mpClass == NULL)
+      if(PythonModelWrapper::mpModel == NULL)
       {
          PyErr_Print();
-         throw Exception("Python class object creation error!");
+         throw Exception("Python model creation error!");
       }
    }
 
-   void PythonWrapper::setFunction(const std::string& func)
+   void PythonModelWrapper::setFunction(const std::string& func)
    {
       // Cleanup
-      if(PythonWrapper::mpFunc != NULL)
+      if(PythonModelWrapper::mpFunc != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpFunc);
+         Py_CLEAR(PythonModelWrapper::mpFunc);
       }
 
       // Get Python function object
-      PythonWrapper::mpFunc = PyObject_GetAttrString(PythonWrapper::mpModule, func.c_str());
+      PythonModelWrapper::mpFunc = PyObject_GetAttrString(PythonModelWrapper::mpModule, func.c_str());
 
       // Check for successfully loading function
-      if(! (PythonWrapper::mpFunc && PyCallable_Check(PythonWrapper::mpFunc)))
+      if(! (PythonModelWrapper::mpFunc && PyCallable_Check(PythonModelWrapper::mpFunc)))
       {
          if(PyErr_Occurred())
          {
@@ -110,33 +110,33 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::setMethod(const std::string& method)
+   void PythonModelWrapper::setMethod(const std::string& method)
    {
       // Cleanup
-      if(PythonWrapper::mpMethod != NULL)
+      if(PythonModelWrapper::mpMethod != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpMethod);
+         Py_CLEAR(PythonModelWrapper::mpMethod);
       }
 
-      // Get class method object
-      PythonWrapper::mpMethod = PyObject_GetAttrString(PythonWrapper::mpClass, method.c_str());
+      // Get model method object
+      PythonModelWrapper::mpMethod = PyObject_GetAttrString(PythonModelWrapper::mpModel, method.c_str());
 
       // Check for successfully loaded method
-      if(! (PythonWrapper::mpMethod && PyCallable_Check(PythonWrapper::mpMethod)))
+      if(! (PythonModelWrapper::mpMethod && PyCallable_Check(PythonModelWrapper::mpMethod)))
       {
          if(PyErr_Occurred())
          {
             PyErr_Print();
          }
-         throw Exception("Python class method loading error!");
+         throw Exception("Python model method loading error!");
       }
    }
 
-   PyObject* PythonWrapper::callFunction()
+   PyObject* PythonModelWrapper::callFunction()
    {
       PyObject *pValue;
 
-      pValue = PyObject_CallObject(PythonWrapper::mpFunc, NULL);
+      pValue = PyEval_CallObject(PythonModelWrapper::mpFunc, NULL);
 
       if(PyErr_Occurred())
       {
@@ -147,11 +147,11 @@ namespace GeoMHDiSCC {
       return pValue;
    }
 
-   PyObject* PythonWrapper::callFunction(PyObject* pArgs)
+   PyObject* PythonModelWrapper::callFunction(PyObject* pArgs)
    {
       PyObject *pValue;
 
-      pValue = PyObject_CallObject(PythonWrapper::mpFunc, pArgs);
+      pValue = PyEval_CallObject(PythonModelWrapper::mpFunc, pArgs);
 
       if(PyErr_Occurred())
       {
@@ -162,11 +162,11 @@ namespace GeoMHDiSCC {
       return pValue;
    }
 
-   PyObject* PythonWrapper::callMethod()
+   PyObject* PythonModelWrapper::callMethod()
    {
       PyObject *pValue;
 
-      pValue = PyObject_CallObject(PythonWrapper::mpMethod, NULL);
+      pValue = PyEval_CallObject(PythonModelWrapper::mpMethod, NULL);
 
       if(PyErr_Occurred())
       {
@@ -177,11 +177,11 @@ namespace GeoMHDiSCC {
       return pValue;
    }
 
-   PyObject* PythonWrapper::callMethod(PyObject* pArgs)
+   PyObject* PythonModelWrapper::callMethod(PyObject* pArgs)
    {
       PyObject *pValue;
 
-      pValue = PyObject_CallObject(PythonWrapper::mpMethod, pArgs);
+      pValue = PyEval_CallObject(PythonModelWrapper::mpMethod, pArgs);
 
       if(PyErr_Occurred())
       {
@@ -192,7 +192,7 @@ namespace GeoMHDiSCC {
       return pValue;
    }
 
-   PyObject* PythonWrapper::makeTuple(const ArrayI& val)
+   PyObject* PythonModelWrapper::makeTuple(const ArrayI& val)
    {
       PyObject *pTuple, *pValue;
 
@@ -206,7 +206,7 @@ namespace GeoMHDiSCC {
       return pTuple;
    }
 
-   PyObject* PythonWrapper::makeTuple(const std::vector<MHDFloat>& val)
+   PyObject* PythonModelWrapper::makeTuple(const std::vector<MHDFloat>& val)
    {
       PyObject *pTuple, *pValue;
 
@@ -220,7 +220,7 @@ namespace GeoMHDiSCC {
       return pTuple;
    }
 
-   PyObject* PythonWrapper::makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val)
+   PyObject* PythonModelWrapper::makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val)
    {
       PyObject *pDict, *pKey, *pValue;
 
@@ -235,7 +235,7 @@ namespace GeoMHDiSCC {
       return pDict;
    }
 
-   PyObject* PythonWrapper::makeDict(const std::map<std::string, int>& map)
+   PyObject* PythonModelWrapper::makeDict(const std::map<std::string, int>& map)
    {
       PyObject *pDict, *pKey, *pValue;
 
@@ -251,7 +251,7 @@ namespace GeoMHDiSCC {
       return pDict;
    }
 
-   void PythonWrapper::getList(std::vector<bool> &rList, PyObject *pList)
+   void PythonModelWrapper::getList(std::vector<bool> &rList, PyObject *pList)
    {
       PyObject *pValue;
 
@@ -266,7 +266,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::getList(std::vector<NonDimensional::Id> &rList, PyObject *pList)
+   void PythonModelWrapper::getList(std::vector<NonDimensional::Id> &rList, PyObject *pList)
    {
       PyObject *pValue, *pTmp;
 
@@ -282,7 +282,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::getList(std::vector<PhysicalNames::Id> &rList, PyObject *pList)
+   void PythonModelWrapper::getList(std::vector<PhysicalNames::Id> &rList, PyObject *pList)
    {
       PyObject *pValue, *pTmp;
 
@@ -298,7 +298,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList)
+   void PythonModelWrapper::getList(std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> > &rList, PyObject *pList)
    {
       PyObject *pValue, *pTmp, *pTmp2;
 
@@ -319,7 +319,7 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat) 
+   void PythonModelWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat) 
    {
       PyObject *pArgs, *pValue, *pTmp;
 
@@ -331,8 +331,8 @@ namespace GeoMHDiSCC {
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
       PyTuple_SetItem(pArgs, 0, pPyMat);
-      PythonWrapper::setFunction((char *)"triplets");
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setFunction((char *)"triplets");
+      pValue = PythonModelWrapper::callFunction(pArgs);
       Py_DECREF(pArgs);
 
       long int len = PyList_Size(pValue);
@@ -356,7 +356,7 @@ namespace GeoMHDiSCC {
       rMatrix.setFromTriplets(triplets.begin(), triplets.end());
    }
 
-   void PythonWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat) 
+   void PythonModelWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat) 
    {
       PyObject *pArgs, *pValue, *pTmp;
 
@@ -368,8 +368,8 @@ namespace GeoMHDiSCC {
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
       PyTuple_SetItem(pArgs, 0, pPyMat);
-      PythonWrapper::setFunction((char *)"triplets");
-      pValue = PythonWrapper::callFunction(pArgs);
+      PythonModelWrapper::setFunction((char *)"triplets");
+      pValue = PythonModelWrapper::callFunction(pArgs);
       Py_DECREF(pArgs);
 
       long int len = PyList_Size(pValue);
@@ -410,43 +410,43 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void PythonWrapper::cleanup()
+   void PythonModelWrapper::cleanup()
    {
       // Clean up
-      if(PythonWrapper::mpFunc != NULL)
+      if(PythonModelWrapper::mpFunc != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpFunc);
+         Py_CLEAR(PythonModelWrapper::mpFunc);
       }
-      if(PythonWrapper::mpMethod != NULL)
+      if(PythonModelWrapper::mpMethod != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpMethod);
+         Py_CLEAR(PythonModelWrapper::mpMethod);
       }
    }
 
-   void PythonWrapper::finalize()
+   void PythonModelWrapper::finalize()
    {
       // Clean up
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
 
-      // Clear class and module
-      if(PythonWrapper::mpClass != NULL)
+      // Clear model and module
+      if(PythonModelWrapper::mpModel != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpClass);
+         Py_CLEAR(PythonModelWrapper::mpModel);
       }
-      if(PythonWrapper::mpModule != NULL)
+      if(PythonModelWrapper::mpModule != NULL)
       {
-         Py_CLEAR(PythonWrapper::mpModule);
+         Py_CLEAR(PythonModelWrapper::mpModule);
       }
 
       // Finalize
       Py_Finalize();
    }
 
-   PythonWrapper::PythonWrapper()
+   PythonModelWrapper::PythonModelWrapper()
    {
    }
 
-   PythonWrapper::~PythonWrapper()
+   PythonModelWrapper::~PythonModelWrapper()
    {
    }
 

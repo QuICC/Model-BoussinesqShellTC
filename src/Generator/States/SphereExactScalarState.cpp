@@ -30,8 +30,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   SphereExactScalarState::SphereExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams), mTypeId(CONSTANT)
+   SphereExactScalarState::SphereExactScalarState(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

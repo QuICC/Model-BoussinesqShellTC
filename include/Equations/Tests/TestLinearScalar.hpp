@@ -35,10 +35,9 @@ namespace Equations {
          /**
           * @brief Constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         TestLinearScalar(const std::string& pyName, SharedEquationParameters spEqParams);
+         TestLinearScalar(SharedEquationParameters spEqParams);
 
          /**
           * @brief Destructor

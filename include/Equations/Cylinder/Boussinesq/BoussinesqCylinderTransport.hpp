@@ -36,10 +36,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * @param pyName     Python script name
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqCylinderTransport(const std::string& pyName, SharedEquationParameters spEqParams);
+         BoussinesqCylinderTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

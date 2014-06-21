@@ -24,8 +24,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   EquationData::EquationData(const std::string& pyName, SharedEquationParameters spEqParams)
-      : mPyName(pyName), mspEqParams(spEqParams)
+   EquationData::EquationData(SharedEquationParameters spEqParams)
+      : mspEqParams(spEqParams)
    {
    }
 
@@ -148,11 +148,6 @@ namespace Equations {
    void EquationData::setName(PhysicalNames::Id name)
    {
       this->mName = name;
-   }
-
-   const std::string& EquationData::pyName() const
-   {
-      return this->mPyName;
    }
 
    PhysicalNames::Id   EquationData::name() const

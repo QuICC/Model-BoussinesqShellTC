@@ -28,8 +28,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGStreamfunction::BoussinesqFPlane3DQGStreamfunction(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName, spEqParams)
+   BoussinesqFPlane3DQGStreamfunction::BoussinesqFPlane3DQGStreamfunction(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();

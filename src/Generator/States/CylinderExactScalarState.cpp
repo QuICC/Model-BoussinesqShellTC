@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   CylinderExactScalarState::CylinderExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName, spEqParams), mTypeId(CONSTANT)
+   CylinderExactScalarState::CylinderExactScalarState(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
    {
    }
 

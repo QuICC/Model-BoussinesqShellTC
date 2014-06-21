@@ -60,10 +60,9 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param pyName     Python script name
           * \param spEqParams Shared equation parameters
           */
-         explicit IEquation(const std::string& pyName, SharedEquationParameters spEqParams);
+         explicit IEquation(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor

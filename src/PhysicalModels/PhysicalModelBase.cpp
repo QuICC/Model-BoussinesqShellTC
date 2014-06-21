@@ -22,81 +22,63 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "IoTools/HumanToId.hpp"
-#include "Python/PythonWrapper.hpp"
+#include "Python/PythonModelWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
-   std::vector<PhysicalNames::Id> PhysicalModelBase::fieldIds(const std::string& pyName)
+   std::vector<PhysicalNames::Id> PhysicalModelBase::fieldIds()
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(pyName);
-
       // Prepare Python call arguments
       PyObject *pValue;
 
       // Call model operator Python routine
-      PythonWrapper::setFunction((char *)"all_fields");
-      pValue = PythonWrapper::callFunction();
+      PythonModelWrapper::setMethod((char *)"all_fields");
+      pValue = PythonModelWrapper::callMethod();
 
       // Create storage
       std::vector<PhysicalNames::Id> ids;
-      PythonWrapper::getList(ids, pValue);
+      PythonModelWrapper::getList(ids, pValue);
 
       // Clenup Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
 
       return ids;
    }
 
-   std::vector<NonDimensional::Id> PhysicalModelBase::paramIds(const std::string& pyName)
+   std::vector<NonDimensional::Id> PhysicalModelBase::paramIds()
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(pyName);
-
       // Prepare Python call arguments
       PyObject *pValue;
 
       // Call model operator Python routine
-      PythonWrapper::setFunction((char *)"nondimensional_parameters");
-      pValue = PythonWrapper::callFunction();
+      PythonModelWrapper::setMethod((char *)"nondimensional_parameters");
+      pValue = PythonModelWrapper::callMethod();
 
       // Create storage
       std::vector<NonDimensional::Id> ids;
-      PythonWrapper::getList(ids, pValue);
+      PythonModelWrapper::getList(ids, pValue);
 
       // Cleanup Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
 
       return ids;
    }
 
-   std::vector<bool> PhysicalModelBase::isPeriodicBox(const std::string& pyName)
+   std::vector<bool> PhysicalModelBase::isPeriodicBox()
    {
-      // Initialise Python interpreter
-      PythonWrapper::init();
-
-      // Load model module
-      PythonWrapper::import(pyName);
-
       // Prepare Python call arguments
       PyObject *pValue;
 
       // Call model operator Python routine
-      PythonWrapper::setFunction((char *)"periodicity");
-      pValue = PythonWrapper::callFunction();
+      PythonModelWrapper::setMethod((char *)"periodicity");
+      pValue = PythonModelWrapper::callMethod();
 
       // Create storage
       std::vector<bool> box;
-      PythonWrapper::getList(box, pValue);
+      PythonModelWrapper::getList(box, pValue);
 
       // Cleanup Python interpreter
-      PythonWrapper::cleanup();
+      PythonModelWrapper::cleanup();
 
       return box;
    }

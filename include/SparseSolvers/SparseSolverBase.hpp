@@ -56,7 +56,7 @@ namespace Solver {
          /**
           * @brief Add storage information 
           */
-         void addInformation(const SpectralFieldId& id, const ArrayI& startRow, const std::string& pyName);
+         void addInformation(const SpectralFieldId& id, const ArrayI& startRow);
 
          /**
           * @brief Get start row 
@@ -83,11 +83,6 @@ namespace Solver {
           * @brief Starting index
           */
          int mZeroIdx;
-
-         /**
-          * @brief Python generator name
-          */
-         std::string mPyName;
 
          /**
           * @brief Storage for the field Ids

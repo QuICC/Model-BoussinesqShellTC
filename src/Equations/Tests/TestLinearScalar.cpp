@@ -25,8 +25,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   TestLinearScalar::TestLinearScalar(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName, spEqParams)
+   TestLinearScalar::TestLinearScalar(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams)
    {
    }
 

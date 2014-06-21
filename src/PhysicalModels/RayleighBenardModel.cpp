@@ -31,18 +31,20 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RayleighBenardModel::PYNAME = "rayleigh_benard_model";
+   const std::string RayleighBenardModel::PYMODULE = "rayleigh_benard_model";
+
+   const std::string RayleighBenardModel::PYCLASS = "RayleighBenardModel";
 
    void RayleighBenardModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::RayleighBenardTransport>(RayleighBenardModel::PYNAME);
+      spSim->addScalarEquation<Equations::RayleighBenardTransport>();
       
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::RayleighBenardStreamfunction>(RayleighBenardModel::PYNAME);
+      spSim->addScalarEquation<Equations::RayleighBenardStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::RayleighBenardVertical>(RayleighBenardModel::PYNAME);
+      spSim->addScalarEquation<Equations::RayleighBenardVertical>();
    }
 
    void RayleighBenardModel::addAsciiOutputFiles(SharedSimulation spSim)
@@ -58,7 +60,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(RayleighBenardModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add state file to IO
       IoVariable::SharedStateFileWriter spState(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -81,7 +83,7 @@ namespace GeoMHDiSCC {
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
-      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds(RayleighBenardModel::PYNAME);
+      std::vector<GeoMHDiSCC::PhysicalNames::Id> ids = PhysicalModelBase::fieldIds();
 
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spInit(new IoVariable::StateFileReader("_initial", SchemeType::type(), SchemeType::isRegular()));

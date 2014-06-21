@@ -27,8 +27,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   VorticityStreamVisualizer::VorticityStreamVisualizer(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName,spEqParams), mViewField(true), mViewGradient(false)
+   VorticityStreamVisualizer::VorticityStreamVisualizer(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams), mViewField(true), mViewGradient(false)
    {
    }
 

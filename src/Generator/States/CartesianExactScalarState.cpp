@@ -29,8 +29,8 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   CartesianExactScalarState::CartesianExactScalarState(const std::string& pyName, SharedEquationParameters spEqParams)
-      : IScalarEquation(pyName, spEqParams), mTypeId(CONSTANT), mModeA(3), mModeK(3)
+   CartesianExactScalarState::CartesianExactScalarState(SharedEquationParameters spEqParams)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT), mModeA(3), mModeK(3)
    {
    }
 
