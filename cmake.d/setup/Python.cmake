@@ -20,6 +20,7 @@ INSTALL(FILES
    Python/cylinder_radius.py 
    Python/cylindrical_boundary.py 
    Python/cylindrical_radius_boundary.py 
+   Python/linear_stability.py
    Python/shell.py 
    Python/sphere.py 
    Python/spherical_boundary.py 
