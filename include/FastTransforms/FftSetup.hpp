@@ -72,6 +72,11 @@ namespace Transform {
          void setScale(const MHDFloat scale);
 
          /**
+          * @brief Set the box size scaling factor
+          */
+         void setBoxScale(const MHDFloat boxScale);
+
+         /**
           * @brief Get the size of the transform
           */
          int bwdSize() const;
@@ -85,6 +90,11 @@ namespace Transform {
           * @brief Get scaling factor
           */
          MHDFloat scale() const;
+
+         /**
+          * @brief Get box size scaling factor
+          */
+         MHDFloat boxScale() const;
          
       protected:
 
@@ -103,6 +113,11 @@ namespace Transform {
           * @brief Storage for the scale factor
           */
          MHDFloat mScale;
+
+         /**
+          * @brief Storage for the box scale factor for derivatives
+          */
+         MHDFloat mBoxScale;
    };
 
    /// Typedef for an smart reference counting pointer for a FftSetup

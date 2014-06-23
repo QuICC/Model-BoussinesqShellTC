@@ -24,7 +24,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    FftSetup::FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type)
-      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1)
+      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1)
    {
       // Set the backward size
       if(this->mType == FftSetup::MIXED)
@@ -58,6 +58,11 @@ namespace Transform {
       this->mScale = scale;
    }
 
+   void FftSetup::setBoxScale(const MHDFloat boxScale)
+   {
+      this->mBoxScale = boxScale;
+   }
+
    FftSetup::Type FftSetup::type() const
    {
       return this->mType;
@@ -85,6 +90,14 @@ namespace Transform {
       assert(this->mScale > 0.0);
 
       return this->mScale;
+   }
+
+   MHDFloat FftSetup::boxScale() const
+   {
+      // Assert to make sure scale is initialised
+      assert(this->mBoxScale > 0.0);
+
+      return this->mBoxScale;
    }
 
 }

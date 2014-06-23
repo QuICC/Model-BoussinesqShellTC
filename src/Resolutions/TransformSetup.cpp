@@ -45,5 +45,9 @@ namespace Transform {
       return this->mSpecSize;
    }
 
+   void TransformSetup::setBoxScale(const MHDFloat boxScale)
+   {
+   }
+
 }
 }

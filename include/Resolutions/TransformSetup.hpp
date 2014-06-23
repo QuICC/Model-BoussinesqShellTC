@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -58,6 +59,11 @@ namespace Transform {
           * @brief Get the spectral size of the transform
           */
          int specSize() const;
+
+         /**
+          * @brief Set box size scaling factor
+          */
+         virtual void setBoxScale(const MHDFloat boxScale);
          
       protected:
          /**

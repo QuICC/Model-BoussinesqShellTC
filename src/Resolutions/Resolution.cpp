@@ -65,6 +65,14 @@ namespace GeoMHDiSCC {
    void Resolution::setBoxScale(const Array& boxScale)
    {
       this->mspSim->setBoxScale(boxScale);
+
+      // Set the boxscale on the 
+      std::map<Dimensions::Transform::Id,Transform::SharedTransformSetup>::iterator it;
+      for(it = this->mTSetups.begin(); it != this->mTSetups.end(); ++it)
+      {
+         it->second->setBoxScale(this->sim()->boxScale(static_cast<Dimensions::Simulation::Id>(static_cast<int>(it->first))));
+      }
+      
    }
 
    void Resolution::setIndexCounter(SharedIndexCounter spCounter)
