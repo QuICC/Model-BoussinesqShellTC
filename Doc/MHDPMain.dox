@@ -2,6 +2,7 @@
  *
  * <center>
  * | \subpage mhdPNonlinear |
+ *   \subpage mhdPPython |
  *   \subpage mhdPEigen |
  *   \subpage mhdPFeatures |
  *   \subpage mhdPDevelopment |
