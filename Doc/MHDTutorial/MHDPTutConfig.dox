@@ -1,3 +1,94 @@
 /** \page mhdPTutConfig Configure sources
+ *  \section mhdSTutConfigBuild CMAKE_BUILD_TYPE
+ *    - Debug
+ *    - Release
+ *    - RelWithDebInfo
  *
+ *  \section mhdSTutConfigPrefix CMAKE_INSTALL_PREFIX
+ *     Leave at default values unless you know what you're doing.
+ *
+ *  \section mhdSTutConfigBM GEOMHDISCC_BOUNDARYMETHOD
+ *    - Tau 
+ *    - Galerkin
+ *
+ *  \section mhdSTutConfigCompiler GEOMHDISCC_COMPILER
+ *    - GCC
+ *    - (Intel)
+ *    - (Clang)
+ *
+ *  \section mhdSTutConfigFFT GEOMHDISCC_FFT
+ *    - FFTW
+ *
+ *  \section mhdSTutConfigFFTPlan GEOMHDISCC_FFTPLAN
+ *    - Fast
+ *    - Medium
+ *    - Slow
+ *
+ *  \section mhdSTutConfigLargIO GEOMHDISCC_LARGEIO
+ *    - HDF5
+ *
+ *  \section mhdSTutConfigLinAlg GEOMHDISCC_LINALG
+ *    - Eigen
+ *    - LAPACK
+ *
+ *  \section mhdSTutConfigMemory GEOMHDISCC_MEMORYUSAGE
+ *    - High
+ *    - Limited
+ *
+ *  \section mhdSTutConfigMPI GEOMHDISCC_MPIALGO
+ *    - Auto
+ *    - Fixed
+ *    - Serial
+ *    - Single1D
+ *    - Single2D
+ *    - Tubular
+ *
+ *  \section mhdSTutConfigMP GEOMHDISCC_MULTPRECISION
+ *    - ON 
+ *    - OFF 
+ *
+ *  \section mhdSTutConfigPlatform GEOMHDISCC_PLATFORM
+ *    - Desktop
+ *    - Fortytwo
+ *    - Janus
+ *    - Lothlorien
+ *
+ *  \section mhdSTutConfigProf GEOMHDISCC_PROFILE
+ *    - ON
+ *    - OFF
+ *
+ *  \section mhdSTutConfigSmartPtr GEOMHDISCC_SMARTPTR
+ *    - Boost
+ *    - TR1
+ *    - C++0x
+ *
+ *  \section mhdSTutConfigEVP GEOMHDISCC_SPEIGSOLVER
+ *    - ARPACK
+ *
+ *  \section mhdSTutConfigSpLinAlg GEOMHDISCC_SPLINALG
+ *    - UmfPack 
+ *    - SuperLU
+ *    - SparseLU
+ *    - Pardiso
+ *    - SPQR
+ *    - SparseQR
+ *    - BiCGStab
+ *
+ *  \section mhdSTutConfigStorageProf GEOMHDISCC_STORAGEPROFILE
+ *    - ON
+ *    - OFF
+ *
+ *  \section mhdSTutConfigTest GEOMHDISCC_TEST
+ *    - ON
+ *    - OFF
+ *
+ *  \section mhdSTutConfigTime GEOMHDISCC_TIMESTEPPER
+ *    - ImExRK3
+ *
+ *  \section mhdSTutConfigGrouper GEOMHDISCC_TRANSGROUPER
+ *    - Auto
+ *    - Equation
+ *    - Single1D
+ *    - Single2D
+ *    - Transform
  */
