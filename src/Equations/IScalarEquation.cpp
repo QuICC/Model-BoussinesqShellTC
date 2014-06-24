@@ -9,7 +9,6 @@
 
 // System includes
 //
-#include <Python.h>
 
 // External includes
 //

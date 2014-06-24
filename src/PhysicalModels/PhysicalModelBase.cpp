@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// First includes
+//
+#include "Python/PythonModelWrapper.hpp"
+
 // Configuration includes
 //
 
@@ -22,7 +26,6 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "IoTools/HumanToId.hpp"
-#include "Python/PythonModelWrapper.hpp"
 
 namespace GeoMHDiSCC {
 

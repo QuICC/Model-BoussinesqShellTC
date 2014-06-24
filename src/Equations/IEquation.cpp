@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// First includes
+//
+#include "Python/PythonModelWrapper.hpp"
+
 // Configuration includes
 //
 
@@ -22,7 +26,6 @@
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Python/PythonModelWrapper.hpp"
 
 namespace GeoMHDiSCC {
 

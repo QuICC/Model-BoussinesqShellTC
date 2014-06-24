@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// First includes
+//
+#include "Python/PythonModelWrapper.hpp"
+
 // Debug includes
 //
 
@@ -27,7 +31,6 @@
 
 // Project includes
 //
-#include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
 
