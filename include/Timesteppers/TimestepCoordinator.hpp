@@ -221,7 +221,7 @@ namespace Timestep {
    // Dummy solver specialization
    //
 
-   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(typename SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff) {};
+   template <> inline void buildSolverMatrixWrapper<Solver::SparseDummySolverComplexType>(SharedPtrMacro<Solver::SparseDummySolverComplexType> spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx, const MHDFloat lhsLCoeff, const MHDFloat lhsTCoeff, const MHDFloat rhsLCoeff, const MHDFloat rhsTCoeff) {};
 
 }
 }

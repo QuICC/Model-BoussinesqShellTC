@@ -216,7 +216,7 @@ namespace Equations {
          rEqField.imag().block(eqStart, 0, rows, cols) += mat*rhs.imag();
       }
 
-      inline void addExplicitWrapper(MatrixZ& rEqField, const int eqStart, const SparseMatrixZ& mat, const typename Eigen::Ref<const MatrixZ>& rhs)
+      inline void addExplicitWrapper(MatrixZ& rEqField, const int eqStart, const SparseMatrixZ& mat, const Eigen::Ref<const MatrixZ>& rhs)
       {
          rEqField.block(eqStart, 0, mat.rows(), rEqField.cols()) += mat*rhs;
       }

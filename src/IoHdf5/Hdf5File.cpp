@@ -47,8 +47,8 @@ namespace IoHdf5 {
             // Deactivate incompatible ROMIO features
             MPI_Info info;
             MPI_Info_create(&info);
-            MPI_Info_set(info, "romio_ds_write", "disable");
-            MPI_Info_set(info, "romio_ds_read", "disable");
+            MPI_Info_set(info, (char *)"romio_ds_write", (char *)"disable");
+            MPI_Info_set(info, (char *)"romio_ds_read", (char *)"disable");
 
             // Create the MPI IO access property
             H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, info);

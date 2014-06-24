@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    TimestepCoordinator::TimestepCoordinator()
-      : SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
+      : Solver::SparseLinearCoordinatorBase<SparseTimestepper>(), mcMaxJump(1.602), mcUpWindow(1.05), mcMinDt(1e-8), mOldDt(this->mcMinDt), mDt(this->mcMinDt), mTime(0.0)
    {
       this->mNStep = IntegratorSelector::STEPS;
    }
@@ -109,12 +109,12 @@ namespace Timestep {
 
          DebuggerMacro_start("Complex operator update", 0);
          // Update solvers from complex operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this);
+         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this);
          DebuggerMacro_stop("Complex operator solver update t = ", 0);
 
          DebuggerMacro_start("Real operator solver update", 0);
          // Update solvers from real operator, complex field steppers
-         Solver::updateSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this);
+         Solver::updateSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this);
          DebuggerMacro_stop("Real operator solver update t = ", 0);
 
          // Reset the step index
@@ -157,7 +157,7 @@ namespace Timestep {
       DebuggerMacro_showValue("Creating timestepper with initial timestep Dt = ", 0, this->mDt);
 
       // Initialise solver
-      SparseLinearCoordinatorBase::init(scalEq, vectEq);
+      Solver::SparseLinearCoordinatorBase<SparseTimestepper>::init(scalEq, vectEq);
    }
 
    void TimestepCoordinator::updateMatrices()
@@ -172,20 +172,20 @@ namespace Timestep {
          MHDFloat rhsCoeff = IntegratorSelector::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
          // Loop over all complex operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
 
          // Loop over all real operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
       }
    }
 
    void TimestepCoordinator::computeRHS()
    {
       // Compute RHS component for complex operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, this->mStep);
+      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, this->mStep);
 
       // Compute RHS component for real operator, complex field linear systems
-      Solver::computeRHSSolvers<SparseTimestepper,typename SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, this->mStep);
+      Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, this->mStep);
    }
 
    void TimestepCoordinator::computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT)
