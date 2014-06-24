@@ -76,7 +76,7 @@ namespace Physical {
          rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
       } else
       {
-         rS.setData(-(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
+         rS.setData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array()).matrix());
 
          rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
       }
