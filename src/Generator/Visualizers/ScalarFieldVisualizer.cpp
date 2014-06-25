@@ -56,7 +56,11 @@ namespace Equations {
 
    void ScalarFieldVisualizer::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, true, false, false);
+   }
+
+   void ScalarFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   {
    }
 
    void ScalarFieldVisualizer::setRequirements()

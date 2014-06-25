@@ -45,9 +45,15 @@ namespace Equations {
             POLYSINSIN,       // Polynomial, Sine, Sine
             POLYSINCOS,       // Polynomial, Sine, Cosine
             POLYCOSSIN,       // Polynomial, Cosine, Sine
+            PSINCOSCOS,       // Sine(Polynomial), Cosine, Cosine
+            PCOSCOSCOS,       // CosinePolynomial), Cosine, Cosine
             PSINCOSSIN,       // Sine(Polynomial), Cosine, Sine
             PCOSCOSSIN,       // CosinePolynomial), Cosine, Sine
-            COSCOSCOS = 40,   // Cosine, Cosine, Cosine
+            PSINSINSIN,       // Sine(Polynomial), Sine, Sine
+            PCOSSINSIN,       // CosinePolynomial), Sine, Sine
+            PSINSINCOS,       // Sine(Polynomial), Cosine, Cosine
+            PCOSSINCOS,       // CosinePolynomial), Cosine, Cosine
+            COSCOSCOS = 50,   // Cosine, Cosine, Cosine
             SINSINSIN,        // Sine, Sine, Sine
             COSCOSSIN,        // Cosine, Cosine, Sine
             SINSINCOS,        // Sine, Sine, Cosine

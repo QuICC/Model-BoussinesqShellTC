@@ -298,7 +298,7 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("solveDiagnosticEquations",3);
 
-      DebuggerMacro_start("Solve diagnotic",4);
+      DebuggerMacro_start("Solve diagnostic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
       this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);

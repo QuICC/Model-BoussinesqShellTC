@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// First includes
+//
+#include "Python/PythonModelWrapper.hpp"
+
 // Debug includes
 //
 
@@ -45,6 +49,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("preRun",1);
 
+      // Finalizing the Python model wrapper
+      PythonModelWrapper::finalize();
+
       // Debug statement
       DebuggerMacro_leave("preRun",1);
    }
@@ -73,8 +80,14 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("postRun",1);
 
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
+
       // Write the output
       this->writeOutput();
+
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
 
       // Debug statement
       DebuggerMacro_leave("postRun",1);

@@ -140,7 +140,7 @@ namespace Equations {
                      }
 
                      // Generate solutions for TFF geometries
-                  } else if(static_cast<int>(this->mTypeId) > 29 && static_cast<int>(this->mTypeId) < 40)
+                  } else if(static_cast<int>(this->mTypeId) > 29 && static_cast<int>(this->mTypeId) < 50)
                   {
                      if(this->mTypeId == POLYCOSCOS)
                      {
@@ -166,6 +166,18 @@ namespace Equations {
                         valJ = this->cos(1,j_);
                         valI = this->sin(2,i_);
 
+                     } else if(this->mTypeId == PSINCOSCOS)
+                     {
+                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->cos(1,j_);
+                        valI = this->cos(2,i_);
+
+                     } else if(this->mTypeId == PCOSCOSCOS)
+                     {
+                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->cos(1,j_);
+                        valI = this->cos(2,i_);
+
                      } else if(this->mTypeId == PSINCOSSIN)
                      {
                         valK = this->sin(0,Math::PI*(k_-1)/2.0);
@@ -177,6 +189,31 @@ namespace Equations {
                         valK = this->cos(0,Math::PI*(k_-1)/2.0);
                         valJ = this->cos(1,j_);
                         valI = this->sin(2,i_);
+
+                     } else if(this->mTypeId == PSINSINSIN)
+                     {
+                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->sin(1,j_);
+                        valI = this->sin(2,i_);
+
+                     } else if(this->mTypeId == PCOSSINSIN)
+                     {
+                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->sin(1,j_);
+                        valI = this->sin(2,i_);
+
+                     } else if(this->mTypeId == PSINSINCOS)
+                     {
+                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->sin(1,j_);
+                        valI = this->cos(2,i_);
+
+                     } else if(this->mTypeId == PCOSSINCOS)
+                     {
+                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
+                        valJ = this->sin(1,j_);
+                        valI = this->cos(2,i_);
+
                      } else
                      {
                         throw Exception("Unknown exact state");

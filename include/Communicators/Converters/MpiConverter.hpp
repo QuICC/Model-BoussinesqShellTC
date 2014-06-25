@@ -313,14 +313,14 @@ namespace Parallel {
       this->mBackwardPacks = bwdPacks;
 
       // initialise the previous active packs to a possible value
-      if(this->mBackwardPacks.size() > 0)
+      if(this->mForwardPacks.size() > 0 && this->mBackwardPacks.size() > 0)
       {
          this->mActiveBSendPacks = this->mForwardPacks(0);
       } else
       {
          this->mActiveBSendPacks = 0;
       }
-      if(this->mForwardPacks.size() > 0)
+      if(this->mBackwardPacks.size() > 0 && this->mForwardPacks.size() > 0)
       {
          this->mActiveFSendPacks = this->mBackwardPacks(0);
       } else

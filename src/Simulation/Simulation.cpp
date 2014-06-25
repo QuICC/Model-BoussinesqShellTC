@@ -212,6 +212,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("postRun",1);
 
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
+
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 

@@ -55,6 +55,14 @@ namespace Equations {
           */
          void setFields(const bool viewField, const bool viewGradient);
 
+         /**
+          * @brief Compute the nonlinear interaction term
+          *
+          * @param rNLComp Nonlinear term component
+          * @param compId  ID of the component (allows for a more general implementation)
+          */
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const;
+
       protected:
          /**
           * @brief Set variable requirements

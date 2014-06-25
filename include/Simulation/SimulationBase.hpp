@@ -41,6 +41,7 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
 
+#include "IoXml/GxlWriter.hpp"
 namespace GeoMHDiSCC {
 
    /**
@@ -370,6 +371,21 @@ namespace GeoMHDiSCC {
 
       // Store the shared resolution object
       this->mspRes = best.first;
+
+      #ifdef GEOMHDISCC_DEBUG
+         // Generate transpose structure graph
+         if(FrameworkMacro::id() == 0)
+         {
+            // Create GXL graph format file
+            IoXml::GxlWriter gxl(TScheme::type() + "_transpose_graph");
+
+            // Initialise and write graph for resolution
+            gxl.init();
+            gxl.graphResolution(this->mspRes);
+            gxl.write();
+            gxl.finalize();
+         }
+      #endif //GEOMHDISCC_DEBUG
 
       // Set additional options on final resolution object
       TScheme::tuneResolution(this->mspRes);
