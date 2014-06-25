@@ -12,6 +12,8 @@ import base_model
 class BoussinesqFPlane3DQGModel(base_model.BaseModel):
    """Class to setup the Boussinesq F-Plane 3DQG model"""
 
+   force_temperature_bc = True
+
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
 
@@ -137,6 +139,15 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
       elif field_row == ("velocityz",""):
          mat = c1d.i1(res[0], [0])
 
+      elif field_row == ("temperature",""):
+         mat = c1d.qid(res[0],0, [0])
+
+         # Force temperature boundary condition
+         if self.force_temperature_bc:
+            mat = mat.tolil()
+            mat[-2:,:] = 0
+            mat = mat.tocsr()
+
       elif field_row == ("meantemperature",""):
          if eigs[0] == 0 and eigs[1] == 0:
             mat = (c1d.qid(res[0],0,[0]) - c1d.avg(res[0]))
@@ -181,21 +192,44 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
          if field_col == ("streamfunction",""):
             if linearize:
                mat = c1d.qid(res[0],0, bc, -1j*kx*eta2)
+
+               # Force temperature boundary condition
+               if self.force_temperature_bc:
+                  mat = mat.tolil()
+                  mat[-2:,:] = 0
+                  mat = mat.tocsr()
             else:
                mat = c1d.zblk(res[0],0, bc)
 
          elif field_col == ("velocityz",""):
             if linearize:
                mat = c1d.qid(res[0],0, bc, eta3)
+
+               # Force temperature boundary condition
+               if self.force_temperature_bc:
+                  mat = mat.tolil()
+                  mat[-2:,:] = 0
+                  mat = mat.tocsr()
             else:
                mat = c1d.zblk(res[0],0, bc)
 
          elif field_col == ("temperature",""):
             mat = c1d.qid(res[0],0, bc, -(1/Pr)*(kx**2 + (1/eta3**2)*ky**2))
 
+            # Force temperature boundary condition
+            if self.force_temperature_bc:
+               mat = mat.tolil()
+               if bcs['bcType'] == 0:
+                  tmp = c1d.qid(res[0],2,[20])
+               else:
+                  tmp = c1d.qid(res[0],2,[0])
+               tmp = tmp.tolil()
+               mat[-2:,:] = tmp[0:2,:]
+               mat = mat.tocsr()
+
       elif field_row == ("vorticity",""): 
          if field_col == field_row:
-            mat = c1d.qid(res[0],0, bc, -(kx**2 + (1/eta3**2)*ky**2))
+            mat = c1d.qid(res[0],0, bc, (kx**2 + (1/eta3**2)*ky**2))
 
          else:
             mat = c1d.zblk(res[0],0, bc)
@@ -227,5 +261,11 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
 
       elif field_row == ("temperature",""):
          mat = c1d.qid(res[0],0, bc)
+
+         # Force temperature boundary condition
+         if self.force_temperature_bc:
+            mat = mat.tolil()
+            mat[-2:,:] = 0
+            mat = mat.tocsr()
 
       return mat

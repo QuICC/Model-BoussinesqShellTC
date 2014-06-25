@@ -85,10 +85,6 @@ namespace Equations {
             tmpMat.push_back(DecoupledZSparse());
             this->setExplicitLinearBlock(compId, tmpMat.at(i), *fIt, i);
 
-            // Explicit operator requires an additional minus sign
-            tmpMat.at(i).real() = -tmpMat.at(i).real();
-            tmpMat.at(i).imag() = -tmpMat.at(i).imag();
-
             isComplex = isComplex || (tmpMat.at(i).imag().nonZeros() > 0);
          }
 
@@ -109,7 +105,7 @@ namespace Equations {
          } else
          {
             this->mLDMatrices.insert(std::make_pair(key, std::vector<SparseMatrix>()));
-            this->mLDMatrices.find(key)->second.back().reserve(nSystems);
+            this->mLDMatrices.find(key)->second.reserve(nSystems);
 
             for(int i = 0; i < nSystems; ++i)
             {

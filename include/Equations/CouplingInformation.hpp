@@ -243,6 +243,7 @@ namespace Equations {
           * @brief Storage for the implicit fields information
           */
          std::vector<SpectralFieldId>   mImplicitFields;
+
          /**
           * @brief Storage for the implicit fields information
           */

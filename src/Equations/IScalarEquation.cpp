@@ -82,7 +82,7 @@ namespace Equations {
       bool needInit = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
 
       CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
-      needInit = needInit && (fRange.first == fRange.second);
+      needInit = needInit || (std::distance(fRange.first,fRange.second) > 0);
 
       // Initialise spectral matrices
       if(needInit)
