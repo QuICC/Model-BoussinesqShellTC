@@ -1,6 +1,7 @@
 """Module provides functions to generate the boundary conditions in a spherical geometry (shell and sphere)"""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import numpy as np
 

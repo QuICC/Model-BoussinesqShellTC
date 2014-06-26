@@ -1,6 +1,7 @@
 """Module provides functions to generate the boundary conditions in a cylindrical radius (annulus and cylinder) """
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import numpy as np
 

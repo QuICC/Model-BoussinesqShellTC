@@ -1,6 +1,7 @@
 """Module provides generic functions for the sparse chebyshev representation."""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 

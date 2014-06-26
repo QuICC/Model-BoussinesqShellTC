@@ -1,6 +1,7 @@
 """Module provides functions to generate sparse operators in a cylindrical annulus."""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 import cartesian_1d as c1d

@@ -1,6 +1,7 @@
 """Module provides functions to generate sparse operators in a triply periodic cartesian box."""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 

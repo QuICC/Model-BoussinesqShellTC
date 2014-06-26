@@ -1,6 +1,7 @@
 """Module provides functions to generate the boundary conditions in a cylindrical geometry (annulus and cylinder)"""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp

@@ -1,6 +1,7 @@
 """Module provides the functions to generate the ???? model"""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp

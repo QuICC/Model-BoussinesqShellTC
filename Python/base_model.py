@@ -1,6 +1,7 @@
 """Module provides the functions required for any model"""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import utils
 #import scipy.io as io

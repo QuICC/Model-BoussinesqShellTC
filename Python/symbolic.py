@@ -1,4 +1,8 @@
-# Functions used for symbolic manipulations of sparse chebyshev expansions
+"""Module used for symbolic manipulations of sparse chebyshev expansions"""
+
+from __future__ import division
+from __future__ import unicode_literals
+
 import sympy
 import copy
 

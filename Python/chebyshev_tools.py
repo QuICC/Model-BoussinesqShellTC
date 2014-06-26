@@ -1,6 +1,7 @@
 """Module provides functions to work with chebyshev expansions. It is mainly meant for testing purposes."""
 
 from __future__ import division
+from __future__ import unicode_literals
 
 import scipy.fftpack as fftpack
 import numpy as np
