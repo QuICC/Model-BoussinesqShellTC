@@ -33,11 +33,11 @@ class TestFFFModel(base_model.BaseModel):
    def implicit_fields(self, field_row):
       """Get the list of coupled fields in solve"""
 
-      # Solve as splitted equations
+      # Solve as coupled equations
       if True:
          fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
-      # Solve as coupled equations
+      # Solve as splitted equations
       else:
          fields = [field_row]
 

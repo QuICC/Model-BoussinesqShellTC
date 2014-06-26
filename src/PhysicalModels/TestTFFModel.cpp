@@ -26,6 +26,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Tests/TestLinearScalar.hpp"
+#include "Equations/Tests/TestNonlinearScalar.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -39,44 +40,87 @@ namespace GeoMHDiSCC {
 
    void TestTFFModel::addEquations(SharedSimulation spSim)
    {
-      Equations::SharedTestLinearScalar   spLin;
+      // Create linear test problem
+      if(false)
+      {
+         Equations::SharedTestLinearScalar   spLin;
 
-      // Add first scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-      spLin->setIdentity(PhysicalNames::STREAMFUNCTION);
+         // Add first scalar test equation
+         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+         spLin->setIdentity(PhysicalNames::STREAMFUNCTION);
 
-      // Add second scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-      spLin->setIdentity(PhysicalNames::VELOCITYZ);
+         // Add second scalar test equation
+         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+         spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
-      // Add third scalar test equation
-      spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-      spLin->setIdentity(PhysicalNames::TEMPERATURE);
+         // Add third scalar test equation
+         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+         spLin->setIdentity(PhysicalNames::TEMPERATURE);
+      } else
+      {
+         Equations::SharedTestNonlinearScalar   spNL;
+
+         // Add first scalar test equation
+         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+         spNL->setIdentity(PhysicalNames::STREAMFUNCTION);
+
+         // Add second scalar test equation
+         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+         spNL->setIdentity(PhysicalNames::VELOCITYZ);
+
+         // Add third scalar test equation
+         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+         spNL->setIdentity(PhysicalNames::TEMPERATURE);
+      }
    }
 
    void TestTFFModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedRandomScalarState spRand;
-      Equations::SharedCartesianExactScalarState spExact;
+      // Generate "exact" solutions (trigonometric or monomial)
+      if(true)
+      {
+         // Shared pointer to equation
+         Equations::SharedCartesianExactScalarState spExact;
 
-      // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSSIN);
-      spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 7.0);
+         // Add first scalar initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spExact->setStateType(Equations::CartesianExactScalarState::PCOSCOSSIN);
+         spExact->setModeOptions(1e0, 3.0, 1e0, 3.0, 1e0, 7.0);
 
-      // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
-      spExact->setModeOptions(1e0, 0.0, 1e0, 7.0, 1e0, 0.0);
+         // Add first scalar initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VELOCITYZ);
+         spExact->setStateType(Equations::CartesianExactScalarState::PCOSSINCOS);
+         spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
-      // Add first scalar initial state generator
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINSIN);
-      spExact->setModeOptions(1e0, 0.0, 1e0, 7.0, 1e0, 7.0);
+         // Add first scalar initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::TEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactScalarState::PSINSINSIN);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 7.0, 1e0, 7.0);
+
+         // Generate random spectrum
+      } else
+      {
+         // Shared pointer to random initial state equation
+         Equations::SharedRandomScalarState spRand;
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::TEMPERATURE);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add streamfunction initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add vertical velocity initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VELOCITYZ);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+      }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));

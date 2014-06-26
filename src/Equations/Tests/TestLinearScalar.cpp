@@ -51,7 +51,7 @@ namespace Equations {
    void TestLinearScalar::setRequirements()
    {
       // Add requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, true));
+      this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
    }
 
 }
