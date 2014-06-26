@@ -177,8 +177,22 @@ namespace Equations {
       infoIt = this->mCouplingInfos.insert(std::make_pair(comp,CouplingInformation()));
       SpectralFieldId eqId = std::make_pair(this->name(), comp);
 
+      // Compute effective starting index for local CPU
+      int cpuIZero = iZero;
+      if(iZero > 0)
+      {
+         cpuIZero = 0;
+         for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            if(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) < iZero)
+            {
+               cpuIZero = k + 1;
+            }
+         }
+      }
+
       // General setup: equation type? real/complex solver? start from m = ?
-      infoIt.first->second.setGeneral(eqType, isComplex, iZero);
+      infoIt.first->second.setGeneral(eqType, isComplex, cpuIZero);
 
       // Set nonlinear flags: has nonlinear term? has quasi-inverse?
       infoIt.first->second.setNonlinear(hasNL, hasQI);
