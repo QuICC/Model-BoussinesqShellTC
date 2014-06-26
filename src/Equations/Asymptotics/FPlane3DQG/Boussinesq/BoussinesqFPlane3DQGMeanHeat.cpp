@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGMeanHeat::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, true, true);
    }
 
    void BoussinesqFPlane3DQGMeanHeat::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -69,9 +69,9 @@ namespace Equations {
       {
          if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(iZ,iY) == 0)
          {
-            if(iX == 1)
+            if(iX == 0)
             {
-               return Datatypes::SpectralScalarType::PointType(-0.5);
+               return Datatypes::SpectralScalarType::PointType(-1.0);
             }
          }
       } 

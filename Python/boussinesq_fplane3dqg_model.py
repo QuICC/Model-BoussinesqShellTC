@@ -157,7 +157,7 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
       return mat
 
 
-   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
+   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
       """Create matrix block linear operator"""
 
       Pr = eq_params['prandtl']
