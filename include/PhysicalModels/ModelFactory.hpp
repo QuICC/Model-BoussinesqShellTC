@@ -7,6 +7,10 @@
 #ifndef MODELFACTORY_HPP
 #define MODELFACTORY_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // Configuration includes
 //
 

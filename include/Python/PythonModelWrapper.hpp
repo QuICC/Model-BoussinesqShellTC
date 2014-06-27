@@ -7,9 +7,12 @@
 #ifndef PYTHONMODELWRAPPER_HPP
 #define PYTHONMODELWRAPPER_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // System includes
 //
-#include <Python.h>
 #include <string>
 
 // External includes

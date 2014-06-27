@@ -7,6 +7,10 @@
 #ifndef STATEGENERATORFACTORY_HPP
 #define STATEGENERATORFACTORY_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // Configuration includes
 //
 

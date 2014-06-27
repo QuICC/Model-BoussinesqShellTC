@@ -7,6 +7,10 @@
 #ifndef VISUALIZATIONGENERATORFACTORY_HPP
 #define VISUALIZATIONGENERATORFACTORY_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // Configuration includes
 //
 

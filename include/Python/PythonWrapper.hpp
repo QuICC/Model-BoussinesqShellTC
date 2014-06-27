@@ -7,9 +7,12 @@
 #ifndef PYTHONWRAPPER_HPP
 #define PYTHONWRAPPER_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // System includes
 //
-#include <Python.h>
 #include <string>
 
 // External includes

@@ -4,9 +4,9 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-// First includes
+// First include
 //
-#include "Python/PythonModelWrapper.hpp"
+#include "Python/PythonHeader.hpp"
 
 // Configuration includes
 //
@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "Python/PythonModelWrapper.hpp"
 #include "Base/MathConstants.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"

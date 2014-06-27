@@ -6,7 +6,7 @@
 
 // First includes
 //
-#include "Python/PythonModelWrapper.hpp"
+#include "Python/PythonHeader.hpp"
 
 // Configuration includes
 //
@@ -23,6 +23,7 @@
 
 // Project includes
 //
+#include "Python/PythonModelWrapper.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "IoTools/HumanToId.hpp"

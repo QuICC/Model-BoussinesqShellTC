@@ -6,7 +6,7 @@
 
 // First includes
 //
-#include "Python/PythonModelWrapper.hpp"
+#include "Python/PythonHeader.hpp"
 
 // Debug includes
 //
@@ -30,6 +30,7 @@
 
 // Project includes
 //
+#include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
 
