@@ -179,16 +179,18 @@ namespace Equations {
 
       // Compute effective starting index for local CPU
       int cpuIZero = iZero;
-      if(iZero > 0)
+      if(iZero == 1)
       {
-         cpuIZero = 0;
-         for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         if(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
          {
-            if(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) < iZero)
-            {
-               cpuIZero = k + 1;
-            }
+            cpuIZero = 1;
+         } else
+         {
+            cpuIZero = 0;
          }
+      } else if(iZero > 1)
+      {
+         throw Exception("Matrix starting index > 1 is not implemented yet!");
       }
 
       // General setup: equation type? real/complex solver? start from m = ?
