@@ -32,6 +32,7 @@ namespace Transform {
       // Prepare computation of nonlinear interactions
       BackwardConfigurator::preparePhysical(rScalar, coord);
 
+
       // Compute first backward transform
       BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_SCALAR>(coord);
    }

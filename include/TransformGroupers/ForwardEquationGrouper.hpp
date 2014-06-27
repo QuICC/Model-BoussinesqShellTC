@@ -70,6 +70,15 @@ namespace Transform {
          virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
       protected:
+         /**
+          * @brief Setup grouped first exchange communication
+          */
+         void setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped second exchange communication
+          */
+         void setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
 
       private: 
    };
@@ -92,12 +101,12 @@ namespace Transform {
 
       // First treat the scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      for(scalEqIt = scalEqs.begin(); scalEqIt != scalEqs.end(); scalEqIt++)
       {
          // Setup the second exchange communication step for scalar equation
-         TConfigurator::setup2DCommunication(this->mScalarPacks2D, coord);
+         this->setupGrouped2DCommunication((*scalEqIt)->name(), coord);
          // Setup the first exchange communication step for scalar equation
-         TConfigurator::setup1DCommunication(this->mScalarPacks1D, coord);
+         this->setupGrouped1DCommunication((*scalEqIt)->name(), coord);
 
          // Compute first step of transform for scalar equation
          TConfigurator::firstStep(*scalEqIt, coord);
@@ -115,12 +124,12 @@ namespace Transform {
 
       // ... then the vector equations
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      for(vectEqIt = vectEqs.begin(); vectEqIt != vectEqs.end(); vectEqIt++)
       {
          // Setup the second exchange communication step for vector equation
-         TConfigurator::setup2DCommunication(this->mVectorPacks2D, coord);
+         this->setupGrouped2DCommunication((*vectEqIt)->name(), coord);
          // Setup the first exchange communication step for vector equation
-         TConfigurator::setup1DCommunication(this->mVectorPacks1D, coord);
+         this->setupGrouped1DCommunication((*vectEqIt)->name(), coord);
 
          // Compute first step of transform for vector equation
          TConfigurator::firstStep(*vectEqIt, coord);
@@ -141,28 +150,38 @@ namespace Transform {
       //
 
       // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      for(scalEqIt = scalEqs.begin(); scalEqIt != scalEqs.end(); scalEqIt++)
       {
          // Update equation variable after transforms for scalar equation
          TConfigurator::updateEquation(*scalEqIt, coord);
       }
 
       // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      for(vectEqIt = vectEqs.begin(); vectEqIt != vectEqs.end(); vectEqIt++)
       {
          // Update equation variable after transforms for vector equation
          TConfigurator::updateEquation(*vectEqIt, coord);
       }
    }
 
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   {
+      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(id), coord);
+   }
+
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   {
+      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
+   }
+
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {
-      return this->listPacks1D(varInfo, nonInfo);
+      return this->namePacks1D(varInfo, nonInfo);
    }
 
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
-      return this->listPacks2D(varInfo, nonInfo);
+      return this->namePacks2D(varInfo, nonInfo);
    }
 
 }

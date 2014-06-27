@@ -185,7 +185,7 @@ namespace Transform {
 
    template <typename TConfigurator> ArrayI ForwardSingle1DGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
    {  
-      return this->listPacks2D(varInfo, nonInfo);
+      return this->namePacks2D(varInfo, nonInfo);
    }
 
 }

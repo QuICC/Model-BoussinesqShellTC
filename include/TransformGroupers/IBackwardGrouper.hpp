@@ -114,20 +114,6 @@ namespace Transform {
          std::map<PhysicalNames::Id, int>  mNamedPacks2D;
 
          /**
-          * @brief Get the list of pack numbers for the first exchange
-          *
-          * @param varInfo Variable information
-          */
-         ArrayI listPacks1D(const VariableRequirement& varInfo);
-
-         /**
-          * @brief Get the list of pack numbers for the second exchange
-          *
-          * @param varInfo Variable information
-          */
-         ArrayI listPacks2D(const VariableRequirement& varInfo);
-
-         /**
           * @brief Get and set the name pack numbers for the first exchange
           *
           * @param varInfo Variable information

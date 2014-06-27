@@ -85,40 +85,30 @@ namespace Transform {
          const int mcVectorPacks2D;
 
          /**
-          * @brief Actual number of first exchange packets required for a scalar
+          * @brief Storage for named packet sizes for the first exchange
           */
-         int mScalarPacks1D;
+         std::map<PhysicalNames::Id, int>  mNamedPacks1D;
 
          /**
-          * @brief Actula number of second exchange packets required for a scalar
+          * @brief Storage for named packet sizes for the second exchange
           */
-         int mScalarPacks2D;
+         std::map<PhysicalNames::Id, int>  mNamedPacks2D;
 
          /**
-          * @brief Actual number of first exchange packets required for a vector field
-          */
-         int mVectorPacks1D;
-
-         /**
-          * @brief Actual number of second exchange packets required for a vector field
-          */
-         int mVectorPacks2D;
-
-         /**
-          * @brief Get the list of pack numbers for the first exchange
+          * @brief Get and set the name pack numbers for the first exchange
           *
           * @param varInfo Variable information
           * @param nonInfo Nonlinear requirements
           */
-         ArrayI listPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI namePacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
-          * @brief Get the list of pack numbers for the second exchange
+          * @brief Get and set the named pack numbers for the second exchange
           *
           * @param varInfo Variable information
           * @param nonInfo Nonlinear requirements
           */
-         ArrayI listPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI namePacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Get the grouped pack number for the first exchange

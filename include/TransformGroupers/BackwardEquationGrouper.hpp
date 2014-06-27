@@ -125,7 +125,7 @@ namespace Transform {
          // Setup the first exchange communication step for vector fields
          this->setupGrouped1DCommunication(vectIt->first, coord);
          // Setup the second exchange communication step for vector fields
-         this->setupGrouped1DCommunication(vectIt->first, coord);
+         this->setupGrouped2DCommunication(vectIt->first, coord);
 
          // Compute first step of transform for vector fields
          TConfigurator::firstStep(vectIt->first, *(vectIt->second), coord);
@@ -144,18 +144,12 @@ namespace Transform {
 
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
    {
-      if(this->mNamedPacks1D.count(id) == 1)
-      {
-         TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(id), coord);
-      }
+      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(id), coord);
    }
 
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
    {
-      if(this->mNamedPacks2D.count(id) == 1)
-      {
-         TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
-      }
+      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
    }
 
    template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
