@@ -188,6 +188,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("finalize",0);
 
+      // Print simulation run infos
+      this->mSimRunCtrl.printInfo(std::cout);
+
       // Print execution timer infos
       this->mExecutionTimer.printInfo(std::cout);
 

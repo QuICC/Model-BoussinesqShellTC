@@ -73,7 +73,24 @@ namespace GeoMHDiSCC {
           */
          void setMaxWallTime(const MHDFloat maxTime);
          
+         /**
+          * @brief Print run information
+          *
+          * @param stream  Output stream
+          */
+         void printInfo(std::ostream& stream);
+
+         /**
+          * @brief Static method to close simulation cleanly through signal
+          */
+         static void handleSignal(int signum);
+         
       protected:
+         /**
+          * @brief Status to be switched by signal
+          */
+         static RuntimeStatus::Id   SIGNAL_STATUS;
+
          /**
           * @brief Current runtime status
           */
@@ -100,6 +117,10 @@ namespace GeoMHDiSCC {
          MHDFloat mMaxWallTime;
 
       private:
+         /**
+          * @brief Initialise the signal handler
+          */
+         void initSignalHandler();
    };
 }
 
