@@ -119,7 +119,7 @@ namespace Schemes {
             j0.setConstant(0);
             jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
             c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+            cN = this->dim(transId, Dimensions::Data::DAT2D)*iN;
          }
 
       // Create index list for second transform
@@ -353,6 +353,8 @@ namespace Schemes {
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
          }
+
+      // Splittable size for FIXEd first transforms splitting
       } else if(flag == Splitting::Locations::FIXED)
       {
          // Get total size for first transform
