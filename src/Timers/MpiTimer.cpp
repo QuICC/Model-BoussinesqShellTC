@@ -55,6 +55,12 @@ namespace GeoMHDiSCC {
       return this->mStop - this->mStart;
    }
 
+   MHDFloat MpiTimer::queryTime() const
+   {
+      // Compute elapsed time
+      return MPI_Wtime() - this->mStart;
+   }
+
    MHDFloat MpiTimer::resetTimer()
    {
       // Stop the timer

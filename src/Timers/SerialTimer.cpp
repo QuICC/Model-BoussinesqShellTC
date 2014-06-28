@@ -59,6 +59,20 @@ namespace GeoMHDiSCC {
       return this->elapsedSeconds();
    }
 
+   MHDFloat SerialTimer::queryTime() const
+   {
+      // Store current stop time
+      timespec tmp = this->mStop;
+
+      // Get current elasped time
+      clock_gettime(CLOCK_REALTIME, &const_cast<SerialTimer *>(this)->mStop);
+      MHDFloat current = this->elapsedSeconds();
+      const_cast<SerialTimer*>(this)->mStop = tmp;
+
+      // return elapsed seconds
+      return current;
+   }
+
    MHDFloat SerialTimer::resetTimer()
    {
       // Stop the timer

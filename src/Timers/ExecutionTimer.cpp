@@ -45,6 +45,11 @@ namespace GeoMHDiSCC {
       }
    }
 
+   MHDFloat ExecutionTimer::queryTime(BreakPoint point) const
+   {
+      return this->mTimes(point) + TimerMacro::queryTime();
+   }
+
    void ExecutionTimer::analyze(Array& min, Array& max)
    {
       // Get the "global" times from MPI code

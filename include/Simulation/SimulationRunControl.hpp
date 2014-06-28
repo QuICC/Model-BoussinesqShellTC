@@ -42,12 +42,19 @@ namespace GeoMHDiSCC {
          virtual ~SimulationRunControl();
 
          /**
-          * @brief Update control status
+          * @brief Update control status with simulation information
           *
           * @param simTime Simulation time
           * @param simDt   Simulation timestep
           */
-         void update(const MHDFloat simTime, const MHDFloat simDt);
+         void updateSimulation(const MHDFloat simTime, const MHDFloat simDt);
+
+         /**
+          * @brief Update control status with cluster information
+          *
+          * @param wallTime Wall time
+          */
+         void updateCluster(const MHDFloat wallTime);
 
          /**
           * @brief Should the simulation keep running?

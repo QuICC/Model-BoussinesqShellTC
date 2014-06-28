@@ -51,6 +51,11 @@ namespace GeoMHDiSCC {
          virtual MHDFloat time() const = 0;
 
          /**
+          * @brief Get current time without stoping timer
+          */
+         virtual MHDFloat queryTime() const = 0;
+
+         /**
           * @brief Reset timer (stop and restart)
           */
          virtual MHDFloat resetTimer() = 0;

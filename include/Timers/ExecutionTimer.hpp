@@ -54,6 +54,15 @@ namespace GeoMHDiSCC {
           * @param point Breakpoint for which the timing has to be updated
           */
          void update(BreakPoint point);
+
+         /**
+          * @brief Query current time of given region. 
+          *
+          * The possible breakpoints are defined in the BreakPoint enum
+          *
+          * @param point Breakpoint for which the timing has to be updated
+          */
+         MHDFloat queryTime(BreakPoint point) const;
          
          /**
           * @brief Print execution time information to stream

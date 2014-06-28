@@ -83,6 +83,9 @@ namespace GeoMHDiSCC {
 
          // Synchronise computation nodes
          FrameworkMacro::synchronize();
+      
+         // Update simulation run control
+         this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
       }
 
       // Debug statement
@@ -165,7 +168,7 @@ namespace GeoMHDiSCC {
          this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
       
          // Update simulation run control
-         this->mSimRunCtrl.update(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
+         this->mSimRunCtrl.updateSimulation(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       
          // Update simulation IO control
          this->mSimIoCtrl.update();

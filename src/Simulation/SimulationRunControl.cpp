@@ -39,15 +39,10 @@ namespace GeoMHDiSCC {
       return this->mStatus;
    }
 
-   void SimulationRunControl::update(const MHDFloat simTime, const MHDFloat simDt)
+   void SimulationRunControl::updateSimulation(const MHDFloat simTime, const MHDFloat simDt)
    {
       // Increment timestep counter
       this->mSteps++;
-
-      // Not ideal but OK for the moment
-      this->mCtrlFile.read();
-
-      this->mStatus = static_cast<RuntimeStatus::Id>(static_cast<int>(this->mStatus) + static_cast<int>(this->mCtrlFile.status()));
 
       // Check for maximum simulation time
       if(this->mMaxSimTime > 0 && simTime > this->mMaxSimTime)
@@ -79,6 +74,28 @@ namespace GeoMHDiSCC {
          // Produce a nice looking output to std output 
          IoTools::Formatter::printLine(std::cout, '#');
          IoTools::Formatter::printCentered(std::cout, "Adaptive timestep failed!", '#');
+         IoTools::Formatter::printLine(std::cout, '#');
+      }
+   }
+
+   void SimulationRunControl::updateCluster(const MHDFloat wallTime)
+   {
+      // Not ideal but OK for the moment
+      this->mCtrlFile.read();
+
+      // Convert wallTime to hours
+      MHDFloat hours = wallTime/3600.;
+
+      this->mStatus = static_cast<RuntimeStatus::Id>(static_cast<int>(this->mStatus) + static_cast<int>(this->mCtrlFile.status()));
+
+      // Check for maximum wall time
+      if(this->mMaxWallTime > 0 && hours > this->mMaxWallTime)
+      {
+         this->mStatus = RuntimeStatus::STOP;
+
+         // Produce a nice looking output to std output 
+         IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printCentered(std::cout, "Simulation wall time reached!", '#');
          IoTools::Formatter::printLine(std::cout, '#');
       }
 
@@ -128,7 +145,7 @@ namespace GeoMHDiSCC {
 
    void SimulationRunControl::handleSignal(int signum)
    {
-      if(signum == 10)
+      if(signum == SIGUSR1)
       {
          SimulationRunControl::SIGNAL_STATUS = RuntimeStatus::STOP;
 
@@ -140,7 +157,7 @@ namespace GeoMHDiSCC {
 
    void SimulationRunControl::initSignalHandler()
    {
-      signal(10, SimulationRunControl::handleSignal);
+      signal(SIGUSR1, SimulationRunControl::handleSignal);
    }
 
 }
