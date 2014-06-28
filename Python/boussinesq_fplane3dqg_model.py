@@ -52,7 +52,7 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
       """Get the list of fields with explicit linear dependence"""
    
       if field_row == ("vorticity",""):
-         fields = [("vorticity","")]
+         fields = [("streamfunction","")]
 
       else:
          fields = []
@@ -229,7 +229,7 @@ class BoussinesqFPlane3DQGModel(base_model.BaseModel):
                mat = mat.tocsr()
 
       elif field_row == ("vorticity",""): 
-         if field_col == field_row:
+         if field_col == ("streamfunction",""):
             mat = c1d.qid(res[0],0, bc, (kx**2 + (1/eta3**2)*ky**2))
 
          else:

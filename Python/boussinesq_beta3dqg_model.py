@@ -35,7 +35,7 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
       """Get the list of coupled fields in solve"""
 
       if field_row == ("vorticity",""):
-         fields = []
+         fields = [("vorticity", "")]
       else:
          fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
@@ -46,7 +46,7 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
       """Get the list of fields with explicit linear dependence"""
 
       if field_row == ("vorticity",""):
-         fields = [("vorticity","")]
+         fields = [("streamfunction","")]
       else:
          fields = []
 
@@ -75,7 +75,7 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
       # Rows per equation block and number of rhs
       block_info = (res[0]*res[2], 1)
 
-      return (is_complex, im_fields, ex_fields, has_gometric_coupling, index_mode, block_info)
+      return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
 
    def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
@@ -183,6 +183,13 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
 
          elif field_col == ("temperature",""):
             mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
+
+      elif field_row == ("vorticity",""): 
+         if field_col == ("streamfunction",""):
+            mat = c2d.qid(res[0],res[2],2,2, bc)
+
+         else:
+            mat = c1d.zblk(res[0],0, bc)
 
       return mat
 
