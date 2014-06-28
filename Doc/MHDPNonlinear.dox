@@ -31,20 +31,20 @@
  *
  *       \mhdTable{
  *          \mhdTableHeader
- *          \mhdStatus{Simulation base, \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Simulation base, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
  *          \mhdStatus{Spectral operators (Python), \mhdStatDone, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
- *          \mhdStatus{State IO, \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Visualization IO, \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Streamfunction (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Streamfunction (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Vertical velocity (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Vertical velocity (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Temperature (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Temperature (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Mean temperature (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Mean temperature (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Vorticity (C++), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
- *          \mhdStatus{Vorticity (Python), \mhdStatDone, \mhdStatTodo, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{State IO, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Visualization IO, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Streamfunction (C++), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Streamfunction (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Vertical velocity (C++), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Vertical velocity (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Temperature (C++), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Temperature (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Mean temperature (C++), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Mean temperature (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Vorticity (C++), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
+ *          \mhdStatus{Vorticity (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
  *       }
  *
  *    - \subpage mhdPNLBoussinesqFPlane <em>(Not started yet)</em>
