@@ -34,9 +34,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqShellModel::PYMODULE = "boussinesq_shell_model";
+   const std::string BoussinesqShellModel::PYMODULE = "boussinesq_shell";
 
-   const std::string BoussinesqShellModel::PYCLASS = "BoussinesqShellModel";
+   const std::string BoussinesqShellModel::PYCLASS = "BoussinesqShell";
 
    void BoussinesqShellModel::addEquations(SharedSimulation spSim)
    {

@@ -10,7 +10,7 @@ import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 
 
-class BoussinesqFPlane3DQGModel(base_model.BaseModel):
+class BoussinesqFPlane3DQG(base_model.BaseModel):
    """Class to setup the Boussinesq F-Plane 3DQG model"""
 
    force_temperature_bc = True

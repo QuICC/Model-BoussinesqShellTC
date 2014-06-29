@@ -31,9 +31,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RotatingRBModel::PYMODULE = "rotating_rb_model";
+   const std::string RotatingRBModel::PYMODULE = "rotating_rb";
 
-   const std::string RotatingRBModel::PYCLASS = "RotatingRBModel";
+   const std::string RotatingRBModel::PYCLASS = "RotatingRB";
 
    void RotatingRBModel::addEquations(SharedSimulation spSim)
    {

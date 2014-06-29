@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
 
       // Get string object for module name
       PyObject* pName;
-      pName = PyUnicode_FromString(("geomhdiscc."+module).c_str());
+      pName = PyUnicode_FromString(("geomhdiscc.model."+module).c_str());
 
       // Import module
       PythonModelWrapper::mpModule = PyImport_Import(pName);

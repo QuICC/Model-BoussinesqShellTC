@@ -10,7 +10,7 @@ import geomhdiscc.geometry.cylindrical.cylinder as cylinder
 import geomhdiscc.base.base_model as base_model
 
 
-class TestCFTModel(base_model.BaseModel):
+class TestCFT(base_model.BaseModel):
    """Class to setup the test model for the CFT scheme"""
 
    def nondimensional_parameters(self):

@@ -37,9 +37,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqFPlane3DQGModel::PYMODULE = "boussinesq_fplane3dqg_model";
+   const std::string BoussinesqFPlane3DQGModel::PYMODULE = "boussinesq_fplane3dqg";
 
-   const std::string BoussinesqFPlane3DQGModel::PYCLASS = "BoussinesqFPlane3DQGModel";
+   const std::string BoussinesqFPlane3DQGModel::PYCLASS = "BoussinesqFPlane3DQG";
 
    void BoussinesqFPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
@@ -62,7 +62,7 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;

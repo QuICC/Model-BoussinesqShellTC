@@ -31,9 +31,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string CompressibleFPlaneModel::PYMODULE = "anelastic_fplane_model";
+   const std::string CompressibleFPlaneModel::PYMODULE = "anelastic_fplane";
 
-   const std::string CompressibleFPlaneModel::PYCLASS = "AnelasticFPlaneModel";
+   const std::string CompressibleFPlaneModel::PYCLASS = "AnelasticFPlane";
 
    void CompressibleFPlaneModel::addEquations(SharedSimulation spSim)
    {

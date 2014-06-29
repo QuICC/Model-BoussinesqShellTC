@@ -31,9 +31,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string RayleighBenardModel::PYMODULE = "rayleigh_benard_model";
+   const std::string RayleighBenardModel::PYMODULE = "rayleigh_benard";
 
-   const std::string RayleighBenardModel::PYCLASS = "RayleighBenardModel";
+   const std::string RayleighBenardModel::PYCLASS = "RayleighBenard";
 
    void RayleighBenardModel::addEquations(SharedSimulation spSim)
    {

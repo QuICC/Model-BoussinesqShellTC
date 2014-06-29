@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the test model for the TTT scheme"""
+"""Module provides the functions to generate the test model for the AFT (annulus) scheme"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,37 +6,37 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 from geomhdiscc.base.utils import triplets
-import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
-import geohmdiscc.base.base_model as base_model
+import geomhdiscc.geometry.cylindrical.annulus as annulus
+import geomhdiscc.base.base_model as base_model
 
 
-class TestTTTModel(base_model.BaseModel):
-   """Class to setup the test model for the TTT scheme"""
+class TestAFT(base_model.BaseModel):
+   """Class to setup the test model for the AFT scheme"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
 
-      return ["prandtl", "rayleigh", "gamma", "chi"]
+      return ["prandtl", "rayleigh"]
 
 
    def periodicity(self):
       """Get the domain periodicity"""
 
-      return [False, False, False]
+      return [False, True, False]
 
 
    def all_fields(self):
       """Get the list of fields that need a configuration entry"""
 
-      return ["streamfunction", "velocityz", "temperature"]
+      return ["velocity", "temperature"]
 
 
    def implicit_fields(self, field_row):
       """Get the list of coupled fields in solve"""
 
       # Solve as coupled equations
-      if True:
-         fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+      if False:
+         fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
       # Solve as splitted equations
       else:
@@ -68,17 +68,18 @@ class TestTTTModel(base_model.BaseModel):
       index_mode = 0
 
       # Rows per equation block and number of rhs
-      block_info = (res[0]*res[1]*res[2], 1)
+      block_info = (res[0], 1)
 
-      return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode,block_info)
+      return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
 
    def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
       """Convert simulation input boundary conditions to ID"""
 
       use_tau_boundary = True
+
       # Impose no boundary conditions
-      no_bc = {'x':[0],'y':[0],'z':[0]}
+      no_bc = {'r':[0],'z':[0]}
       if bcs["bcType"] == 2:
          bc = no_bc
       else:
@@ -90,9 +91,9 @@ class TestTTTModel(base_model.BaseModel):
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
                bc_field = {}
-               bc_field[("streamfunction","")] = {'x':[40],'y':[40],'z':[40]}
-               bc_field[("velocityz","")] = {'x':[20],'y':[20],'z':[20]}
-               bc_field[("temperature","")] = {'x':[20],'y':[20],'z':[20]}
+               bc_field[("velocity","tor")] = {'r':[20],'z':[20]}
+               bc_field[("velocity","pol")] = {'r':[40],'z':[40]}
+               bc_field[("temperature","")] = {'r':[20],'z':[20]}
                if field_col == field_row:
                   bc = bc_field[field_col]
 
@@ -111,14 +112,14 @@ class TestTTTModel(base_model.BaseModel):
    def qi(self, res, eigs, bcs, field_row):
       """Create the quasi-inverse operator"""
 
-      if field_row == ("streamfunction",""):
-         mat = c3d.i2j2k2(res[0],res[1],res[2], {'x':[0], 'y':[0], 'z':[0]})
+      if field_row == ("velocity","tor"):
+         mat = annulus.i2j2x2(res[0],res[2], {'r':[0], 'z':[0]})
 
-      elif field_row == ("velocityz",""):
-         mat = c3d.i4j4k4(res[0],res[1],res[2], {'x':[0], 'y':[0], 'z':[0]})
+      elif field_row == ("velocity","pol"):
+         mat = annulus.i4j4x4(res[0],res[2], {'r':[0], 'z':[0]})
 
       elif field_row == ("temperature",""):
-         mat = c3d.i2j2k2(res[0],res[1],res[2], {'x':[0], 'y':[0], 'z':[0]})
+         mat = annulus.i2j2x2(res[0],res[2], {'r':[0], 'z':[0]})
 
       return mat
 
@@ -127,35 +128,35 @@ class TestTTTModel(base_model.BaseModel):
       """Create matrix block of linear operator"""
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-      if field_row == ("streamfunction",""):
-         if field_row == ("streamfunction",""):
-            mat = c3d.i2j2k2lapl(res[0],res[1],res[2], bc)
+      if field_row == ("velocity","tor"):
+         if field_col == ("velocity","tor"):
+            mat = annulus.i2j2x2lapl(res[0],res[2],eigs[0], bc)
 
-         elif field_row == ("velocityz",""):
-            mat = c3d.zblk(res[0],res[1],res[2],4,4,4, bc)
+         elif field_col == ("velocity","pol"):
+            mat = annulus.zblk(res[0],res[2],2,2, bc)
 
-         elif field_row == ("temperature",""):
-            mat = c3d.zblk(res[0],res[1],res[2],4,4,4, bc)
+         elif field_col == ("temperature",""):
+            mat = annulus.zblk(res[0],res[2],2,2, bc )
 
-      elif field_row == ("velocityz",""):
-         if field_row == ("streamfunction",""):
-            mat = c3d.zblk(res[0],res[1],res[2],2,2,2, bc)
+      elif field_row == ("velocity","pol"):
+         if field_col == ("velocity","tor"):
+            mat = annulus.zblk(res[0],res[2],4,4, bc)
 
-         elif field_row == ("velocityz",""):
-            mat = c3d.i4j4k4lapl2(res[0],res[1],res[2], bc)
+         elif field_col == ("velocity","pol"):
+            mat = annulus.i4j4x4lapl2(res[0],res[2],eigs[0], bc)
 
-         elif field_row == ("temperature",""):
-            mat = c3d.zblk(res[0],res[1],res[2],2,2,2, bc)
+         elif field_col == ("temperature",""):
+            mat = annulus.zblk(res[0],res[2],4,4, bc)
 
       elif field_row == ("temperature",""):
-         if field_row == ("streamfunction",""):
-            mat = c3d.zblk(res[0],res[1],res[2],2,2,2, bc)
+         if field_col == ("velocity","tor"):
+            mat = annulus.zblk(res[0],res[2],2,2, bc)
 
-         elif field_row == ("velocityz",""):
-            mat = c3d.zblk(res[0],res[1],res[2],2,2,2, bc)
+         elif field_col == ("velocity","pol"):
+            mat = annulus.zblk(res[0],res[2],2,2, bc)
 
-         elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2lapl(res[0],res[1],res[2], bc)
+         elif field_col == ("temperature",""):
+            mat = annulus.i2j2x2lapl(res[0],res[2],eigs[0], bc)
 
       return mat
 
@@ -164,13 +165,13 @@ class TestTTTModel(base_model.BaseModel):
       """Create matrix block of time operator"""
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-      if field_row == ("streamfunction",""):
-         mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+      if field_row == ("velocity","tor"):
+         mat = annulus.i2j2x2(res[0],res[2],eigs[0], bc)
 
-      elif field_row == ("velocityz",""):
-         mat = c3d.i4j4k4lapl(res[0],res[1],res[2], bc)
+      elif field_row == ("velocity","pol"):
+         mat = annulus.i4j4x4lapl(res[0],res[2],eigs[0], bc)
 
       elif field_row == ("temperature",""):
-         mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+         mat = annulus.i2j2x2(res[0],res[2],eigs[0], bc)
 
       return mat

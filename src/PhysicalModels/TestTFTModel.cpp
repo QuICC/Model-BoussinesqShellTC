@@ -33,9 +33,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string TestTFTModel::PYMODULE = "test_tft_model";
+   const std::string TestTFTModel::PYMODULE = "test_tft";
 
-   const std::string TestTFTModel::PYCLASS = "TestTFTModel";
+   const std::string TestTFTModel::PYCLASS = "TestTFT";
 
    void TestTFTModel::addEquations(SharedSimulation spSim)
    {

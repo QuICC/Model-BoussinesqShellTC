@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the test model for the BLF (sphere) scheme"""
+"""Module provides the functions to generate the test model for the TFF scheme"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,37 +6,37 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 from geomhdiscc.base.utils import triplets
-import geomhdiscc.geometry.spherical.sphere as sphere
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 
 
-class TestBLFModel(base_model.BaseModel):
-   """Class to setup the test model for the BLF scheme"""
+class TestTFF(base_model.BaseModel):
+   """Class to setup the test model for the TFF scheme"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
 
-      return ["prandtl", "rayleigh"]
+      return ["prandtl", "rayleigh", "theta"]
 
 
    def periodicity(self):
       """Get the domain periodicity"""
 
-      return [False, True, False]
+      return [False, True, True]
 
 
    def all_fields(self):
       """Get the list of fields that need a configuration entry"""
 
-      return ["velocity", "temperature"]
+      return ["streamfunction", "velocityz", "temperature"]
 
 
    def implicit_fields(self, field_row):
       """Get the list of coupled fields in solve"""
 
       # Solve as coupled equations
-      if False:
-         fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+      if True:
+         fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
       # Solve as splitted equations
       else:
@@ -77,6 +77,7 @@ class TestBLFModel(base_model.BaseModel):
       """Convert simulation input boundary conditions to ID"""
 
       use_tau_boundary = True
+
       # Impose no boundary conditions
       no_bc = [0]
       if bcs["bcType"] == 2:
@@ -90,8 +91,8 @@ class TestBLFModel(base_model.BaseModel):
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
                bc_field = {}
-               bc_field[("velocity","tor")] = [20]
-               bc_field[("velocity","pol")] = [40]
+               bc_field[("streamfunction","")] = [40]
+               bc_field[("velocityz","")] = [20]
                bc_field[("temperature","")] = [20]
                if field_col == field_row:
                   bc = bc_field[field_col]
@@ -109,51 +110,54 @@ class TestBLFModel(base_model.BaseModel):
    def qi(self, res, eigs, bcs, field_row):
       """Create the quasi-inverse operator"""
 
-      if field_row == ("velocity","tor"):
-         mat = sphere.i2x2(res[0], [0])
+      if field_row == ("streamfunction",""):
+         mat = c1d.i4(res[0], [0])
 
-      elif field_row == ("velocity","pol"):
-         mat = sphere.i4x4(res[0], [0])
+      elif field_row == ("velocityz",""):
+         mat = c1d.i2(res[0], [0])
 
       elif field_row == ("temperature",""):
-         mat = sphere.i2x2(res[0], [0])
+         mat = c1d.i2(res[0], [0])
 
       return mat
 
 
-   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
-      """Create matrix block of linear operator"""
+   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+      """Create matrix block linear operator"""
+
+      kx = eigs[0]
+      ky = eigs[1]
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-      if field_row == ("velocity","tor"):
-         if field_col == ("velocity","tor"):
-            mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1], bc)
+      if field_row == ("streamfunction",""):
+         if field_col == ("streamfunction",""):
+            mat = c1d.i4lapl2(res[0],kx,ky, bc)
 
-         elif field_col == ("velocity","pol"):
-            mat = sphere.zblk(res[0],2, bc)
-
-         elif field_col == ("temperature",""):
-            mat = sphere.zblk(res[0],2, bc)
-
-      elif field_row == ("velocity","pol"):
-         if field_col == ("velocity","tor"):
-            mat = sphere.zblk(res[0],4, bc)
-
-         elif field_col == ("velocity","pol"):
-            mat = sphere.i4x4lapl2(res[0],eigs[0],eigs[1], bc)
+         elif field_col == ("velocityz",""):
+            mat = c1d.zblk(res[0],4, bc)
 
          elif field_col == ("temperature",""):
-            mat = sphere.zblk(res[0],4, bc)
+            mat = c1d.zblk(res[0],4, bc)
+
+      elif field_row == ("velocityz",""):
+         if field_col == ("streamfunction",""):
+            mat = c1d.zblk(res[0],2, bc)
+
+         elif field_col == ("velocityz",""):
+            mat = c1d.i2lapl(res[0],kx,ky, bc)
+
+         elif field_col == ("temperature",""):
+            mat = c1d.zblk(res[0],2, bc)
 
       elif field_row == ("temperature",""):
-         if field_col == ("velocity","tor"):
-            mat = sphere.zblk(res[0],2, bc)
+         if field_col == ("streamfunction",""):
+            mat = c1d.zblk(res[0],2, bc)
 
-         elif field_col == ("velocity","pol"):
-            mat = sphere.zblk(res[0],2, bc)
+         elif field_col == ("velocityz",""):
+            mat = c1d.zblk(res[0],2, bc)
 
          elif field_col == ("temperature",""):
-            mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1], bc)
+            mat = c1d.i2lapl(res[0],kx,ky, bc)
 
       return mat
 
@@ -161,14 +165,17 @@ class TestBLFModel(base_model.BaseModel):
    def time_block(self, res, eq_params, eigs, bcs, field_row):
       """Create matrix block of time operator"""
 
-      bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-      if field_row == ("velocity","tor"):
-         mat = sphere.i2x2(res[0], bc)
+      kx = eigs[0]
+      ky = eigs[1]
 
-      elif field_row == ("velocity","pol"):
-         mat = sphere.i4x4lapl(res[0],eigs[0],eigs[1], bc)
+      bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+      if field_row == ("streamfunction",""):
+         mat = c1d.i4lapl(res[0],kx,ky, bc)
+
+      elif field_row == ("velocityz",""):
+         mat = c1d.i2(res[0], bc)
 
       elif field_row == ("temperature",""):
-         mat = sphere.i2x2(res[0], bc)
+         mat = c1d.i2(res[0], bc)
 
       return mat

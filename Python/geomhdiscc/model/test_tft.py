@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Beta 3DQG model"""
+"""Module provides the functions to generate the test model for the TFT scheme"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -10,8 +10,8 @@ import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
 import geomhdiscc.base.base_model as base_model
 
 
-class BoussinesqBeta3DQGModel(base_model.BaseModel):
-   """Class to setup the Boussinesq Beta 3DQG model"""
+class TestTFT(base_model.BaseModel):
+   """Class to setup the test model for the TFT scheme"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
@@ -34,10 +34,13 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
    def implicit_fields(self, field_row):
       """Get the list of coupled fields in solve"""
 
-      if field_row == ("vorticity",""):
-         fields = [("vorticity", "")]
-      else:
+      # Solve as coupled equations
+      if True:
          fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+      # Solve as splitted equations
+      else:
+         fields = [field_row]
 
       return fields
 
@@ -45,22 +48,14 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
    def explicit_fields(self, field_row):
       """Get the list of fields with explicit linear dependence"""
 
-      if field_row == ("vorticity",""):
-         fields = [("streamfunction","")]
-      else:
-         fields = []
-
-      return fields
+      return []
 
 
    def equation_info(self, res, field_row):
       """Provide description of the system of equation"""
 
-      # Matrix operator is complex except for vorticity
-      if field_row == ("vorticity",""):
-         is_complex = False
-      else:
-         is_complex = True
+      # Matrix operator is real
+      is_complex = False
 
       # Implicit field coupling
       im_fields = self.implicit_fields(field_row)
@@ -92,31 +87,15 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
          if bcs["bcType"] == 1 and use_tau_boundary:
             bc = no_bc
          else: #bcType == 0 or Galerkin boundary
-            chi = eq_params['chi']
-            G = eq_params['gamma']
-            k = eigs[0]/2
-
             bc = None
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
                bc_field = {}
-               bc_field[("streamfunction","")] = {'x':[40],'z':[10, -1j*k*np.tan(chi*np.pi/180)/G]}
-               bc_field[("velocityz","")] = {'x':[20],'z':[11]}
-               bc_field[("temperature","")] = {'x':[20],'z':[0]}
+               bc_field[("streamfunction","")] = {'x':[40],'z':[40]}
+               bc_field[("velocityz","")] = {'x':[20],'z':[20]}
+               bc_field[("temperature","")] = {'x':[20],'z':[20]}
                if field_col == field_row:
                   bc = bc_field[field_col]
-            elif bcId == 1:
-               bc_field = {}
-               bc_field[("streamfunction","")] = {'x':[41],'z':[10, -1j*k*np.tan(chi*np.pi/180)/G]}
-               bc_field[("velocityz","")] = {'x':[21],'z':[11]}
-               bc_field[("temperature","")] = {'x':[20],'z':[0]}
-               if field_col == field_row:
-                  bc = bc_field[field_col]
-
-            if field_row == ("streamfunction","") and field_col == ("velocityz",""):
-               bc = {'x':[0],'z':[10]}
-            elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-               bc = {'x':[0],'z':[11, 1j*k*np.tan(chi*np.pi/180)/G]}
 
             if bc is None:
                if use_tau_boundary:
@@ -134,13 +113,13 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
       """Create the quasi-inverse operator"""
 
       if field_row == ("streamfunction",""):
-         mat = c2d.i4j1(res[0],res[2], {'x':[0], 'z':[0]})
+         mat = c2d.i4j4(res[0],res[2], {'x':[0], 'z':[0]})
 
       elif field_row == ("velocityz",""):
-         mat = c2d.i2j1(res[0],res[2], {'x':[0], 'z':[0]})
+         mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
 
       elif field_row == ("temperature",""):
-         mat = c2d.i2j0(res[0],res[2], {'x':[0], 'z':[0]})
+         mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
 
       return mat
 
@@ -148,48 +127,36 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
       """Create matrix block of linear operator"""
 
-      Pr = eq_params['prandtl']
-      Ra = eq_params['rayleigh']
-      G = eq_params['gamma']
-      k = eigs[0]/2
-
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
       if field_row == ("streamfunction",""):
          if field_col == ("streamfunction",""):
-            mat = c2d.i4j1lapl2h(res[0],res[2],k, bc)
+            mat = c2d.i4j4lapl2(res[0],res[2],eigs[0], bc)
 
          elif field_col == ("velocityz",""):
-            mat = c2d.i4j1d0d1(res[0],res[2], bc)
+            mat = c2d.zblk(res[0],res[2],4,4, bc)
 
          elif field_col == ("temperature",""):
-            mat = c2d.i4j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+            mat = c2d.zblk(res[0],res[2],4,4, bc)
 
       elif field_row == ("velocityz",""):
          if field_col == ("streamfunction",""):
-            mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1/G**2))
+            mat = c2d.zblk(res[0],res[2],2,2, bc)
 
          elif field_col == ("velocityz",""):
-            mat = c2d.i2j1laplh(res[0],res[2],k, bc)
+            mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
 
          elif field_col == ("temperature",""):
             mat = c2d.zblk(res[0],res[2],2,2, bc)
 
       elif field_row == ("temperature",""):
          if field_col == ("streamfunction",""):
-            mat = c2d.i2j0(res[0],res[2], bc, 1j*k)
+            mat = c2d.zblk(res[0],res[2],2,2, bc)
 
          elif field_col == ("velocityz",""):
             mat = c2d.zblk(res[0],res[2],2,2, bc)
 
          elif field_col == ("temperature",""):
-            mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
-
-      elif field_row == ("vorticity",""): 
-         if field_col == ("streamfunction",""):
-            mat = c2d.qid(res[0],res[2],2,2, bc)
-
-         else:
-            mat = c1d.zblk(res[0],0, bc)
+            mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
 
       return mat
 
@@ -197,16 +164,14 @@ class BoussinesqBeta3DQGModel(base_model.BaseModel):
    def time_block(self, res, eq_params, eigs, bcs, field_row):
       """Create matrix block of time operator"""
 
-      k = eigs[0]/2
-
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
       if field_row == ("streamfunction",""):
-         mat = c2d.i4j1laplh(res[0],res[2],k, bc)
+         mat = c2d.i4j4lapl(res[0],res[2],eigs[0], bc)
 
       elif field_row == ("velocityz",""):
-         mat = c2d.i2j1(res[0],res[2], bc)
+         mat = c2d.i2j2(res[0],res[2], bc)
 
       elif field_row == ("temperature",""):
-         mat = c2d.i2j0(res[0],res[2], bc)
+         mat = c2d.i2j2(res[0],res[2], bc)
 
       return mat

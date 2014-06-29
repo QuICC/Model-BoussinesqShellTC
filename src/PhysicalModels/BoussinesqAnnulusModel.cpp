@@ -34,9 +34,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqAnnulusModel::PYMODULE = "boussinesq_annulus_model";
+   const std::string BoussinesqAnnulusModel::PYMODULE = "boussinesq_annulus";
 
-   const std::string BoussinesqAnnulusModel::PYCLASS = "BoussinesqAnnulusModel";
+   const std::string BoussinesqAnnulusModel::PYCLASS = "BoussinesqAnnulus";
 
    void BoussinesqAnnulusModel::addEquations(SharedSimulation spSim)
    {

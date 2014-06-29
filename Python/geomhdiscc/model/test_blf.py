@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the test model for the SLF (shell) scheme"""
+"""Module provides the functions to generate the test model for the BLF (sphere) scheme"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,12 +6,12 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 from geomhdiscc.base.utils import triplets
-import geomhdiscc.geometry.spherical.shell as shell
+import geomhdiscc.geometry.spherical.sphere as sphere
 import geomhdiscc.base.base_model as base_model
 
 
-class TestSLFModel(base_model.BaseModel):
-   """Class to setup the test model for the SLF scheme"""
+class TestBLF(base_model.BaseModel):
+   """Class to setup the test model for the BLF scheme"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
@@ -89,7 +89,6 @@ class TestSLFModel(base_model.BaseModel):
             bc = None
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
-            if bcs[field_col[0]] == 0:
                bc_field = {}
                bc_field[("velocity","tor")] = [20]
                bc_field[("velocity","pol")] = [40]
@@ -111,50 +110,50 @@ class TestSLFModel(base_model.BaseModel):
       """Create the quasi-inverse operator"""
 
       if field_row == ("velocity","tor"):
-         mat = shell.i2x2(res[0], [0])
+         mat = sphere.i2x2(res[0], [0])
 
       elif field_row == ("velocity","pol"):
-         mat = shell.i4x4(res[0], [0])
+         mat = sphere.i4x4(res[0], [0])
 
       elif field_row == ("temperature",""):
-         mat = shell.i2x2(res[0], [0])
+         mat = sphere.i2x2(res[0], [0])
 
       return mat
 
 
-   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+   def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
       """Create matrix block of linear operator"""
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
       if field_row == ("velocity","tor"):
          if field_col == ("velocity","tor"):
-            mat = shell.i2x2lapl(res[0],eigs[0],eigs[1], bc)
+            mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1], bc)
 
          elif field_col == ("velocity","pol"):
-            mat = shell.zblk(res[0],2, bc)
+            mat = sphere.zblk(res[0],2, bc)
 
          elif field_col == ("temperature",""):
-            mat = shell.zblk(res[0],2, bc)
+            mat = sphere.zblk(res[0],2, bc)
 
       elif field_row == ("velocity","pol"):
          if field_col == ("velocity","tor"):
-            mat = shell.zblk(res[0],4, bc)
+            mat = sphere.zblk(res[0],4, bc)
 
          elif field_col == ("velocity","pol"):
-            mat = shell.i4x4lapl2(res[0],eigs[0],eigs[1], bc)
+            mat = sphere.i4x4lapl2(res[0],eigs[0],eigs[1], bc)
 
          elif field_col == ("temperature",""):
-            mat = shell.zblk(res[0],4, bc)
+            mat = sphere.zblk(res[0],4, bc)
 
       elif field_row == ("temperature",""):
          if field_col == ("velocity","tor"):
-            mat = shell.zblk(res[0],2, bc)
+            mat = sphere.zblk(res[0],2, bc)
 
          elif field_col == ("velocity","pol"):
-            mat = shell.zblk(res[0],2, bc)
+            mat = sphere.zblk(res[0],2, bc)
 
          elif field_col == ("temperature",""):
-            mat = shell.i2x2lapl(res[0],eigs[0],eigs[1], bc)
+            mat = sphere.i2x2lapl(res[0],eigs[0],eigs[1], bc)
 
       return mat
 
@@ -162,14 +161,14 @@ class TestSLFModel(base_model.BaseModel):
    def time_block(self, res, eq_params, eigs, bcs, field_row):
       """Create matrix block of time operator"""
 
-      bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+      bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
       if field_row == ("velocity","tor"):
-         mat = shell.i2x2(res[0], bc)
+         mat = sphere.i2x2(res[0], bc)
 
       elif field_row == ("velocity","pol"):
-         mat = shell.i4x4lapl(res[0],eigs[0],eigs[1], bc)
+         mat = sphere.i4x4lapl(res[0],eigs[0],eigs[1], bc)
 
       elif field_row == ("temperature",""):
-         mat = shell.i2x2(res[0], bc)
+         mat = sphere.i2x2(res[0], bc)
 
       return mat

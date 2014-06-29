@@ -34,9 +34,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqSphereModel::PYMODULE = "boussinesq_sphere_model";
+   const std::string BoussinesqSphereModel::PYMODULE = "boussinesq_sphere";
 
-   const std::string BoussinesqSphereModel::PYCLASS = "BoussinesqSphereModel";
+   const std::string BoussinesqSphereModel::PYCLASS = "BoussinesqSphere";
 
    void BoussinesqSphereModel::addEquations(SharedSimulation spSim)
    {

@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the anelastic F-Plane model"""
+"""Module provides the functions to generate the compressible F-Plane model"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -10,8 +10,8 @@ import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 
 
-class AnelasticFPlaneModel(base_model.BaseModel):
-   """Class to setup the anelastic F-Plane model"""
+class CompressibleFPlane(base_model.BaseModel):
+   """Class to setup the compressible F-Plane model"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
@@ -52,9 +52,9 @@ class AnelasticFPlaneModel(base_model.BaseModel):
       is_complex = False
 
       # Implicit field coupling
-      im_fields = self.implicit_fields(field_row)
+      im_fields = implicit_fields(field_row)
       # Additional explicit linear fields
-      ex_fields = self.explicit_fields(field_row)
+      ex_fields = explicit_fields(field_row)
 
       # Equation doesn't have geometric coupling
       has_geometric_coupling = False

@@ -34,9 +34,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqCylinderModel::PYMODULE = "boussinesq_cylinder_model";
+   const std::string BoussinesqCylinderModel::PYMODULE = "boussinesq_cylinder";
 
-   const std::string BoussinesqCylinderModel::PYCLASS = "BoussinesqCylinderModel";
+   const std::string BoussinesqCylinderModel::PYCLASS = "BoussinesqCylinder";
 
    void BoussinesqCylinderModel::addEquations(SharedSimulation spSim)
    {

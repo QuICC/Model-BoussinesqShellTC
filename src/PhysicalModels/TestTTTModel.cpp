@@ -33,9 +33,9 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string TestTTTModel::PYMODULE = "test_ttt_model";
+   const std::string TestTTTModel::PYMODULE = "test_ttt";
 
-   const std::string TestTTTModel::PYCLASS = "TestTTTModel";
+   const std::string TestTTTModel::PYCLASS = "TestTTT";
 
    void TestTTTModel::addEquations(SharedSimulation spSim)
    {

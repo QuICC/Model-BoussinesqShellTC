@@ -10,7 +10,7 @@ import geomhdiscc.geometry.cartesian.cartesian_0d as c0d
 import geomhdiscc.base.base_model as base_model
 
 
-class TestFFFModel(base_model.BaseModel):
+class TestFFF(base_model.BaseModel):
    """Class to setup the test model for the FFF scheme"""
 
    def nondimensional_parameters(self):

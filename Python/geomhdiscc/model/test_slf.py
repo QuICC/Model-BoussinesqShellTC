@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the test model for the TFT scheme"""
+"""Module provides the functions to generate the test model for the SLF (shell) scheme"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -6,17 +6,17 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 from geomhdiscc.base.utils import triplets
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
+import geomhdiscc.geometry.spherical.shell as shell
 import geomhdiscc.base.base_model as base_model
 
 
-class TestTFTModel(base_model.BaseModel):
-   """Class to setup the test model for the TFT scheme"""
+class TestSLF(base_model.BaseModel):
+   """Class to setup the test model for the SLF scheme"""
 
    def nondimensional_parameters(self):
       """Get the list of nondimensional parameters"""
 
-      return ["prandtl", "rayleigh", "gamma", "chi"]
+      return ["prandtl", "rayleigh"]
 
 
    def periodicity(self):
@@ -28,15 +28,15 @@ class TestTFTModel(base_model.BaseModel):
    def all_fields(self):
       """Get the list of fields that need a configuration entry"""
 
-      return ["streamfunction", "velocityz", "temperature"]
+      return ["velocity", "temperature"]
 
 
    def implicit_fields(self, field_row):
       """Get the list of coupled fields in solve"""
 
       # Solve as coupled equations
-      if True:
-         fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+      if False:
+         fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
       # Solve as splitted equations
       else:
@@ -65,10 +65,10 @@ class TestTFTModel(base_model.BaseModel):
       # Equation doesn't have geometric coupling
       has_geometric_coupling = False
       # Index mode: SLOWEST = 0, MODE = 1
-      index_mode = 0
+      index_mode = 1
 
       # Rows per equation block and number of rhs
-      block_info = (res[0]*res[2], 1)
+      block_info = (res[0], 1)
 
       return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 
@@ -77,9 +77,8 @@ class TestTFTModel(base_model.BaseModel):
       """Convert simulation input boundary conditions to ID"""
 
       use_tau_boundary = True
-
       # Impose no boundary conditions
-      no_bc = {'x':[0],'z':[0]}
+      no_bc = [0]
       if bcs["bcType"] == 2:
          bc = no_bc
       else:
@@ -90,10 +89,11 @@ class TestTFTModel(base_model.BaseModel):
             bc = None
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
+            if bcs[field_col[0]] == 0:
                bc_field = {}
-               bc_field[("streamfunction","")] = {'x':[40],'z':[40]}
-               bc_field[("velocityz","")] = {'x':[20],'z':[20]}
-               bc_field[("temperature","")] = {'x':[20],'z':[20]}
+               bc_field[("velocity","tor")] = [20]
+               bc_field[("velocity","pol")] = [40]
+               bc_field[("temperature","")] = [20]
                if field_col == field_row:
                   bc = bc_field[field_col]
 
@@ -101,10 +101,8 @@ class TestTFTModel(base_model.BaseModel):
                if use_tau_boundary:
                   bc = no_bc
                else:
-                  bc = {}
-                  for k,v in bc_field[field_col]:
-                     bc[k] = v
-                     bc[k][0] = -v[0]
+                  bc = bc_field[field_col]
+                  bc[0] = -bc[0]
       
       return bc
 
@@ -112,14 +110,14 @@ class TestTFTModel(base_model.BaseModel):
    def qi(self, res, eigs, bcs, field_row):
       """Create the quasi-inverse operator"""
 
-      if field_row == ("streamfunction",""):
-         mat = c2d.i4j4(res[0],res[2], {'x':[0], 'z':[0]})
+      if field_row == ("velocity","tor"):
+         mat = shell.i2x2(res[0], [0])
 
-      elif field_row == ("velocityz",""):
-         mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
+      elif field_row == ("velocity","pol"):
+         mat = shell.i4x4(res[0], [0])
 
       elif field_row == ("temperature",""):
-         mat = c2d.i2j2(res[0],res[2], {'x':[0], 'z':[0]})
+         mat = shell.i2x2(res[0], [0])
 
       return mat
 
@@ -128,35 +126,35 @@ class TestTFTModel(base_model.BaseModel):
       """Create matrix block of linear operator"""
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-      if field_row == ("streamfunction",""):
-         if field_col == ("streamfunction",""):
-            mat = c2d.i4j4lapl2(res[0],res[2],eigs[0], bc)
+      if field_row == ("velocity","tor"):
+         if field_col == ("velocity","tor"):
+            mat = shell.i2x2lapl(res[0],eigs[0],eigs[1], bc)
 
-         elif field_col == ("velocityz",""):
-            mat = c2d.zblk(res[0],res[2],4,4, bc)
-
-         elif field_col == ("temperature",""):
-            mat = c2d.zblk(res[0],res[2],4,4, bc)
-
-      elif field_row == ("velocityz",""):
-         if field_col == ("streamfunction",""):
-            mat = c2d.zblk(res[0],res[2],2,2, bc)
-
-         elif field_col == ("velocityz",""):
-            mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
+         elif field_col == ("velocity","pol"):
+            mat = shell.zblk(res[0],2, bc)
 
          elif field_col == ("temperature",""):
-            mat = c2d.zblk(res[0],res[2],2,2, bc)
+            mat = shell.zblk(res[0],2, bc)
+
+      elif field_row == ("velocity","pol"):
+         if field_col == ("velocity","tor"):
+            mat = shell.zblk(res[0],4, bc)
+
+         elif field_col == ("velocity","pol"):
+            mat = shell.i4x4lapl2(res[0],eigs[0],eigs[1], bc)
+
+         elif field_col == ("temperature",""):
+            mat = shell.zblk(res[0],4, bc)
 
       elif field_row == ("temperature",""):
-         if field_col == ("streamfunction",""):
-            mat = c2d.zblk(res[0],res[2],2,2, bc)
+         if field_col == ("velocity","tor"):
+            mat = shell.zblk(res[0],2, bc)
 
-         elif field_col == ("velocityz",""):
-            mat = c2d.zblk(res[0],res[2],2,2, bc)
+         elif field_col == ("velocity","pol"):
+            mat = shell.zblk(res[0],2, bc)
 
          elif field_col == ("temperature",""):
-            mat = c2d.i2j2lapl(res[0],res[2],eigs[0], bc)
+            mat = shell.i2x2lapl(res[0],eigs[0],eigs[1], bc)
 
       return mat
 
@@ -165,13 +163,13 @@ class TestTFTModel(base_model.BaseModel):
       """Create matrix block of time operator"""
 
       bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-      if field_row == ("streamfunction",""):
-         mat = c2d.i4j4lapl(res[0],res[2],eigs[0], bc)
+      if field_row == ("velocity","tor"):
+         mat = shell.i2x2(res[0], bc)
 
-      elif field_row == ("velocityz",""):
-         mat = c2d.i2j2(res[0],res[2], bc)
+      elif field_row == ("velocity","pol"):
+         mat = shell.i4x4lapl(res[0],eigs[0],eigs[1], bc)
 
       elif field_row == ("temperature",""):
-         mat = c2d.i2j2(res[0],res[2], bc)
+         mat = shell.i2x2(res[0], bc)
 
       return mat
