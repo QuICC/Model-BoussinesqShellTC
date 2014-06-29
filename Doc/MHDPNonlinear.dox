@@ -101,49 +101,105 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLBoussinesqCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBoussinesqConvectionCylinder <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *       }
+ *          
+ *    - \subpage mhdPNLBoussinesqConvectionAnnulus <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *       }
+ *
+ *    - \subpage mhdPNLBoussinesqConvectionSphere <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *       }
+ *          
+ *    - \subpage mhdPNLBoussinesqConvectionShell <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *       }
+ *          
+ *    - \subpage mhdPNLAnelasticConvectionCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLBoussinesqAnnulus <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelasticConvectionAnnulus <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *
- *    - \subpage mhdPNLBoussinesqSphere <em>(Not started yet)</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *          
- *    - \subpage mhdPNLBoussinesqShell <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelasticConvectionSphere <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLAnelasticCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelasticConvectionShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLAnelasticAnnulus <em>(Not started yet)</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *
- *    - \subpage mhdPNLAnelasticSphere <em>(Not started yet)</em>
+ *    - \subpage mhdPNLCompressibleConvectionCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLAnelasticShell <em>(Not started yet)</em>
+ *    - \subpage mhdPNLCompressibleConvectionAnnulus <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPNLCompressibleConvectionSphere <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - \subpage mhdPNLCompressibleConvectionShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
