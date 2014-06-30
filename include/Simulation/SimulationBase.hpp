@@ -374,7 +374,7 @@ namespace GeoMHDiSCC {
 
       #ifdef GEOMHDISCC_DEBUG
          // Generate transpose structure graph
-         if(FrameworkMacro::id() == 0)
+         if(FrameworkMacro::allowsIO() == 0)
          {
             // Create GXL graph format file
             IoXml::GxlWriter gxl(TScheme::type() + "_transpose_graph");
