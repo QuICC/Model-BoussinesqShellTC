@@ -68,6 +68,8 @@ namespace GeoMHDiSCC {
     * @name Matrix types typedefs
     */
    //@{
+   /// Typedef for a matrix of int values
+   typedef Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>   MatrixI;
    /// Typedef for a matrix of float values
    typedef Eigen::Matrix<MHDFloat, Eigen::Dynamic, Eigen::Dynamic>   Matrix;
    /// Typedef for a matrix of complex values

@@ -40,8 +40,8 @@
 #include "IoVariable/IVariableHdf5Reader.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "Diagnostics/DiagnosticCoordinator.hpp"
-
 #include "IoXml/GxlWriter.hpp"
+
 namespace GeoMHDiSCC {
 
    /**
