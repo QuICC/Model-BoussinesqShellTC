@@ -81,6 +81,11 @@ namespace Parallel {
          int mNCpu;
 
          /**
+          * @brief Maximum number of stored scores
+          */
+         int mMaxNScores;
+
+         /**
           * @brief Storage for the actual splitting algorithms used
           */
          std::vector<SharedSplittingAlgorithm>  mAlgorithms;

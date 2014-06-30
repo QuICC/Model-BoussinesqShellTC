@@ -172,7 +172,7 @@ namespace Parallel {
          structure.push_back(std::multimap<int,int>());
 
          // Storage for the communication structure
-         std::map<std::tr1::tuple<int,int>, int> fwdMap, bwdMap;
+         std::map<std::tr1::tuple<int,int>, int> bwdMap;
 
          // Storage for a tuple object
          std::tr1::tuple<int,int> point;
@@ -183,23 +183,6 @@ namespace Parallel {
          // Loop over CPUs
          for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
          {
-            // Initialise the position hint for inserts
-            mapPos = fwdMap.begin();
-
-            // Loop over second dimension
-            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); j++)
-            {
-               // Loop over forward dimension
-               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>(j); k++)
-               {
-                  // Generate point information
-                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j));
-
-                  // Get insertion position to use as next starting point to speed up insertion
-                  mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
-               }
-            }
-
             // initialise the position hint for inserts
             mapPos = bwdMap.begin();
 
@@ -218,29 +201,32 @@ namespace Parallel {
             }
          }
 
-         // Check that both sets have the same size
-         if(fwdMap.size() != bwdMap.size())
-         {
-            throw Exception("The size of the computed index sets don't match!");
-         }
-
          // Make sure the content is the same also
-         std::map<std::tr1::tuple<int,int>, int>::const_iterator it;
          std::set<std::pair<int,int> > filter;
-         mapPos = bwdMap.begin();
-         for(it = fwdMap.begin(); it != fwdMap.end(); it++)
+         for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
          {
-            // Check that both position are the same
-            if(it->first != mapPos->first)
+            // Loop over second dimension
+            for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(); j++)
             {
-               throw Exception("The computed index sets don't match!");
+               // Loop over forward dimension
+               for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>(j); k++)
+               {
+                  // Generate point information
+                  point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(k,j), spRes->cpu(cpu)->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j));
+
+                  // Look for same key in backward list
+                  mapPos = bwdMap.find(point);
+
+                  // Check that both position are the same
+                  if(mapPos == bwdMap.end())
+                  {
+                     throw Exception("The computed index sets don't match!");
+                  }
+
+                  // Add corresponding communication edge to filter
+                  filter.insert(std::make_pair(cpu, mapPos->second));
+               }
             }
-
-            // Add corresponding communication edge to filter
-            filter.insert(std::make_pair(it->second, mapPos->second));
-
-            // Increment second iterator
-            mapPos++;
          }
 
          // Store obtained minimized structure
@@ -251,14 +237,13 @@ namespace Parallel {
          }
 
          // Clear all the data
-         fwdMap.clear();
          bwdMap.clear();
 
       // Handle 3D resolution
       } else if(spRes->cpu(0)->nDim() == 3)
       {
          // Extract communication structure from resolution object
-         std::map<std::tr1::tuple<int,int,int>, int> fwdMap, bwdMap;
+         std::map<std::tr1::tuple<int,int,int>, int> bwdMap;
 
          // Storage for a tuple object
          std::tr1::tuple<int,int,int> point;
@@ -275,27 +260,6 @@ namespace Parallel {
             // Loop over CPUs
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
-               // initialise the position hint for inserts
-               mapPos = fwdMap.begin();
-
-               // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
-               {
-                  // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
-                  {
-                     // Loop over forward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
-                     {
-                        // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
-
-                        // Get insertion position to use as next starting point to speed up insertion
-                        mapPos = fwdMap.insert(mapPos, std::make_pair(point, cpu));
-                     }
-                  }
-               }
-
                // initialise the position hint for inserts
                mapPos = bwdMap.begin();
 
@@ -318,30 +282,36 @@ namespace Parallel {
                }
             }
 
-            // Both sets should have the same set. Padding and unaliased runs unfortunately invalidate this check
-            // As a workaround let's only check for correct order. In addition with the next check we should be on 
-            // the safe side
-            if(fwdMap.size() > bwdMap.size())
-            {
-               throw Exception("The size of the computed index sets don't match!");
-            }
-
             // Make sure both maps contain the same and exctract communication structure
-            std::map<std::tr1::tuple<int,int,int>, int>::const_iterator it;
             std::set<std::pair<int,int> > filter;
-            for(it = fwdMap.begin(); it != fwdMap.end(); it++)
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
-               // Look for same key in backward list
-               mapPos = bwdMap.find(it->first);
-
-               // Check that both position are the same
-               if(mapPos == bwdMap.end())
+               // Loop over third dimension
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
                {
-                  throw Exception("The computed index sets don't match!");
-               }
+                  // Loop over second dimension
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
+                  {
+                     // Loop over forward dimension
+                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
+                     {
+                        // Generate point information
+                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
 
-               // Add corresponding communication edge to filter
-               filter.insert(std::make_pair(it->second, mapPos->second));
+                        // Look for same key in backward list
+                        mapPos = bwdMap.find(point);
+
+                        // Check that both position are the same
+                        if(mapPos == bwdMap.end())
+                        {
+                           throw Exception("The computed index sets don't match!");
+                        }
+
+                        // Add corresponding communication edge to filter
+                        filter.insert(std::make_pair(cpu, mapPos->second));
+                     }
+                  }
+               }
             }
 
             // Store obtained minimized structure
@@ -352,7 +322,6 @@ namespace Parallel {
             }
 
             // Clear all the data for next loop
-            fwdMap.clear();
             bwdMap.clear();
          }
       }

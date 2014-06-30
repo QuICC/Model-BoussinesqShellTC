@@ -40,7 +40,7 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    LoadSplitter::LoadSplitter(const int id, const int nCpu)
-      : mId(id), mNCpu(nCpu)
+      : mId(id), mNCpu(nCpu), mMaxNScores(1)
    {
    }
 
@@ -130,7 +130,20 @@ namespace Parallel {
                // Only scores bigger than 0 are considered
                if(scored.first > 0)
                {
-                  this->mScores.insert(scored);
+                  // If not at minimal size yet, add to scores
+                  if(this->mScores.size() < static_cast<unsigned int>(this->mMaxNScores))
+                  {
+                     this->mScores.insert(scored);
+                  } else
+                  {
+                     if(scored.first > this->mScores.begin()->first)
+                     {
+                        // Remove lowest score
+                        this->mScores.erase(this->mScores.begin());
+                        // Add new score
+                        this->mScores.insert(scored);
+                     }
+                  }
                }
             }
          }
