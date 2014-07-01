@@ -1,4 +1,4 @@
-"""Module provides functions to generate sparse operators in a spherical shell."""
+"""Module provides functions to generate sparse operators for the radial direction in a spherical shell."""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -9,13 +9,14 @@ import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.spherical.spherical_boundary as sphbc
 
 
-def zblk(nr):
+def zblk(nr, q, bc):
    """Create a block of zeros"""
 
-   return spsp.lil_matrix((nr,nr))
+   mat = spsp.lil_matrix((nr,nr))
+   return sphbc.constrain(mat,bc,q)
 
 
-def i2x2(nr, l, m, a, b):
+def i2x2(nr, a, b, bc, coeff = 1.0):
    """Create operator for 2nd integral of x^2 T_n(x).""" 
 
    ns = np.arange(0, nr)
@@ -48,7 +49,7 @@ def i2x2(nr, l, m, a, b):
 
    # Generate 2nd superdiagonal
    def d2(n):
-      return -d_2(n) + (a^2*b^2)/(2.0*(n**2 - 1))
+      return -a**2*(a**2 - 2.0*b**2*n + 2.0*b**2)/(8.0*n*(n - 1.0)*(n + 1.0))
 
    # Generate 3rd superdiagonal
    def d3(n):
@@ -61,9 +62,11 @@ def i2x2(nr, l, m, a, b):
    ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = coeff*spsp.diags(diags, offsets)
+   return sphbc.constrain(mat, bc, 2)
 
-def i2x2lapl(nr, l, m, a, b):
+
+def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
    """Create operator for 2nd integral of x^2 Laplacian T_n(x).""" 
 
    ns = np.arange(0, nr)
@@ -84,18 +87,20 @@ def i2x2lapl(nr, l, m, a, b):
 
    # Generate 1st superdiagonal
    def d1(n):
-      return d_1(n) + 2.0*a*b/n
+      return a*b*(n + 1.0)/n
 
    # Generate 2nd superdiagonal
    def d2(n):
-      return d_2(n + 1.0) + (a**2*(2.0*n + 1.0))/(2.0*n*(n + 1.0))
+      return -a**2*(l - n - 1.0)*(l + n + 2.0)/(4.0*n*(n + 1.0))
 
    ds = [d_2, d_1, d0, d1, d2]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = coeff*spsp.diags(diags, offsets)
+   return sphbc.constrain(mat, bc, 2)
 
-def i4x4(nr, l, m, a, b):
+
+def i4x4(nr, a, b, bc, coeff = 1.0):
    """Create operator for 4th integral of x^4 T_n(x).""" 
 
    ns = np.arange(0, nr)
@@ -173,10 +178,11 @@ def i4x4(nr, l, m, a, b):
    ds = [d_8, d_7, d_6, d_5, d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7, d8]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = coeff*spsp.diags(diags, offsets)
+   return sphbc.constrain(mat, bc, 4)
 
 
-def i4x4lapl(nr, l, m, a, b):
+def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
    """Create operator for 4th integral of x^4 Laplacian T_n(x).""" 
 
    ns = np.arange(0, nr)
@@ -238,10 +244,11 @@ def i4x4lapl(nr, l, m, a, b):
    ds = [d_6, d_5, d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = coeff*spsp.diags(diags, offsets)
+   return sphbc.constrain(mat, bc, 4)
 
 
-def i4x4lapl2(nr, l, m, a, b):
+def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
    """Create operator for 4th integral of x^4 Laplacian^2 T_n(x).""" 
 
    ns = np.arange(0, nr)
@@ -287,5 +294,6 @@ def i4x4lapl2(nr, l, m, a, b):
    ds = [d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-   return spsp.diags(diags, offsets)
+   mat = coeff*spsp.diags(diags, offsets)
+   return sphbc.constrain(mat, bc, 4)
 

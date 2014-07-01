@@ -95,8 +95,9 @@ def change_variable(terms, type):
    if type == 'linear_r2x':
       a, b, x = sympy.symbols('a b x')
       for term in terms:
-         poly = sympy.poly((a*x+b)**term['p'], x);
-         for j,c in enumerate(poly.coeffs()):
+         poly = sympy.poly((a*x+b)**term['p'], x)
+         pcoeffs = list(reversed(poly.coeffs()))
+         for j,c in enumerate(pcoeffs):
             t = term.copy()
             t['c'] = c*t['c']*a**(t['q'] - t['d'])
             t['p'] = j
