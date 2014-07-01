@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
+
 // System includes
 //
 #include <algorithm>
@@ -86,8 +90,15 @@ namespace Parallel {
          // Loop over all dimensions
          for(int j = 0; j < this->dims(); j++)
          {
-            // Add new shared transform resolution
-            transformRes.push_back(this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id));
+            SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id);
+
+            // Clear unused indexes for remote resolutions
+            if(id != FrameworkMacro::id())
+            {
+               spTRes->clearIndexes();
+            }
+
+            transformRes.push_back(spTRes);
          }
 
          // Create new shared core resolution
@@ -242,77 +253,196 @@ namespace Parallel {
       // Handle 3D resolution
       } else if(spRes->cpu(0)->nDim() == 3)
       {
-         // Extract communication structure from resolution object
-         std::map<std::tr1::tuple<int,int,int>, int> bwdMap;
+         // Simplify syntax
+         typedef std::tr1::tuple<int,int,int>   Coordinate;
 
-         // Storage for a tuple object
-         std::tr1::tuple<int,int,int> point;
+         // Extract communication structure from resolution object
+         std::set<Coordinate> bwdMap;
+         std::set<Coordinate> fwdMap;
+
+         // Storage for a coordinate
+         Coordinate point;
 
          // Position iterator for insert calls
-         std::map<std::tr1::tuple<int,int,int>, int>::iterator   mapPos;
+         std::set<Coordinate>::iterator   mapPos;
 
-         // Loop over possible data exchanges
+         // Loop over possible data exchanges 
          for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
          {
             // Create storage for structure
             structure.push_back(std::multimap<int,int>());
 
-            // Loop over CPUs
-            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            // initialise the position hint for inserts
+            mapPos = bwdMap.begin();
+
+            // Loop over third dimension
+            for(int i = 0; i < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT3D>(); i++)
             {
-               // initialise the position hint for inserts
-               mapPos = bwdMap.begin();
-
-               // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT3D>(); i++)
+               // Loop over second dimension
+               for(int j = 0; j < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT2D>(i); j++)
                {
-                  // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT2D>(i); j++)
+                  // Loop over backward dimension
+                  for(int k = 0; k < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DATB1D>(i); k++)
                   {
-                     // Loop over backward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DATB1D>(i); k++)
-                     {
-                        // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT2D>(j, i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT3D>(i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DATB1D>(k,i));
+                     // Generate point information
+                     point = std::tr1::make_tuple(spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT2D>(j, i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT3D>(i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DATB1D>(k,i));
 
-                        // Get insertion position to use as next starting point to speed up insertion
-                        mapPos = bwdMap.insert(mapPos,std::make_pair(point, cpu));
-                     }
+                     // Get insertion position to use as next starting point to speed up insertion
+                     mapPos = bwdMap.insert(mapPos,point);
                   }
                }
             }
 
-            // Make sure both maps contain the same and exctract communication structure
+            // Loop over CPUs
+            MatrixI  matRemote;
+            int matched = 0;
+            int toMatch = -1;
             std::set<std::pair<int,int> > filter;
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
-               // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
+               matched = 0;
+
+               // Local CPU
+               if(cpu == FrameworkMacro::id())
                {
-                  // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
+                  // Loop over third dimension
+                  for(int i = 0; i < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
                   {
-                     // Loop over forward dimension
-                     for(int k = 0; k < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
+                     // Loop over second dimension
+                     for(int j = 0; j < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
                      {
-                        // Generate point information
-                        point = std::tr1::make_tuple(spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
-
-                        // Look for same key in backward list
-                        mapPos = bwdMap.find(point);
-
-                        // Check that both position are the same
-                        if(mapPos == bwdMap.end())
+                        // Loop over forward dimension
+                        for(int k = 0; k < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
                         {
-                           throw Exception("The computed index sets don't match!");
-                        }
+                           // Generate point information
+                           point = std::tr1::make_tuple(spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
 
+                           // Look for same key in backward list
+                           mapPos = bwdMap.find(point);
+
+                           // Key was present, drop enntry and extend filter
+                           if(mapPos != bwdMap.end())
+                           {
+                              // Add corresponding communication edge to filter
+                              filter.insert(std::make_pair(cpu, FrameworkMacro::id()));
+
+                              // Delete found coordinate
+                              bwdMap.erase(mapPos);
+                           } else
+                           {
+                              fwdMap.insert(point);
+                           }
+                        }
+                     }
+                  }
+
+                  // Store size of forward coordinates
+                  toMatch = fwdMap.size();
+
+               #ifdef GEOMHDISCC_MPI
+                  // Convert coordinates set to matrix to send through MPI
+                  matRemote.resize(3, fwdMap.size());
+                  int i =0;
+                  for(std::set<Coordinate>::iterator it = fwdMap.begin(); it != fwdMap.end(); ++it)
+                  {
+                     matRemote(0,i) = std::tr1::get<0>(*it);
+                     matRemote(1,i) = std::tr1::get<1>(*it);
+                     matRemote(2,i) = std::tr1::get<2>(*it);
+                     i++;
+                  }
+
+                  // Broadcast size
+                  MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                  // Broadcast data
+                  MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+
+               // Remote CPU   
+               } else
+               {
+                  // Get size
+                  MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                  // Get remote keys as matrix
+                  matRemote.resize(3, toMatch);
+                  MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+
+                  // Compare received data to stored indexes
+                  for(int i = 0; i < toMatch; i++)
+                  {
+                     point = std::tr1::make_tuple(matRemote(0,i), matRemote(1,i), matRemote(2,i));
+
+                     mapPos = bwdMap.find(point);
+
+                     // Check if point is in backward map
+                     if(mapPos != bwdMap.end())
+                     {
                         // Add corresponding communication edge to filter
-                        filter.insert(std::make_pair(cpu, mapPos->second));
+                        filter.insert(std::make_pair(cpu, FrameworkMacro::id()));
+
+                        // Delete found entry
+                        bwdMap.erase(mapPos);
+
+                        // Increase matched counter
+                        matched++;
+                     }
+                  }
+               #endif // GEOMHDISCC_MPI
+               }
+            }
+
+            #ifdef GEOMHDISCC_MPI
+               // Gather total number of match entries
+               MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            #endif // GEOMHDISCC_MPI
+
+            // Check that everything matched
+            if(toMatch != matched)
+            {
+               throw Exception("The computed index sets don't match!");
+            }
+
+            #ifdef GEOMHDISCC_MPI
+               // Store current filter
+               MatrixI locFilter(2, filter.size());
+               int i = 0;
+               for(std::set<std::pair<int,int> >::iterator it = filter.begin(); it != filter.end(); ++it)
+               {
+                  locFilter(0, i) = it->first;
+                  locFilter(1, i) = it->second;
+                  i++;
+               }
+
+               // Gather full communication structure
+               for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+               {
+                  int filterSize = 0;
+                  if(cpu == FrameworkMacro::id())
+                  {
+                     filterSize = locFilter.cols();
+
+                     // Get size
+                     MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                     // Get remote keys as matrix
+                     MPI_Bcast(locFilter.data(), locFilter.cols()*locFilter.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+
+                  } else
+                  {
+                     // Get size
+                     MPI_Bcast(&filterSize, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                     // Get remote keys as matrix
+                     matRemote.resize(2, filterSize);
+                     MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpu, MPI_COMM_WORLD); 
+
+                     for(int i = 0; i < filterSize; ++i)
+                     {
+                        filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
                      }
                   }
                }
-            }
+            #endif // GEOMHDISCC_MPI
 
             // Store obtained minimized structure
             std::set<std::pair<int,int> >::iterator filIt;
@@ -323,6 +453,7 @@ namespace Parallel {
 
             // Clear all the data for next loop
             bwdMap.clear();
+            fwdMap.clear();
          }
       }
 

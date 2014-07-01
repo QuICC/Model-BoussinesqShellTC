@@ -376,14 +376,14 @@ namespace GeoMHDiSCC {
          // Generate transpose structure graph
          if(FrameworkMacro::allowsIO() == 0)
          {
-            // Create GXL graph format file
-            IoXml::GxlWriter gxl(TScheme::type() + "_transpose_graph");
-
-            // Initialise and write graph for resolution
-            gxl.init();
-            gxl.graphResolution(this->mspRes);
-            gxl.write();
-            gxl.finalize();
+//            // Create GXL graph format file
+//            IoXml::GxlWriter gxl(TScheme::type() + "_transpose_graph");
+//
+//            // Initialise and write graph for resolution
+//            gxl.init();
+//            gxl.graphResolution(this->mspRes);
+//            gxl.write();
+//            gxl.finalize();
          }
       #endif //GEOMHDISCC_DEBUG
 

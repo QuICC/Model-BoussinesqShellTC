@@ -21,22 +21,29 @@
 namespace GeoMHDiSCC {
 
    TransformResolution::TransformResolution(const std::vector<ArrayI>& fwd, const std::vector<ArrayI>& bwd, const std::vector<ArrayI>& idx2D, const ArrayI& idx3D)
-      : mFwd(fwd), mBwd(bwd), mIdx2D(idx2D), mIdx3D(idx3D)
+      : mFwd(fwd), mBwd(bwd), mIdx2D(idx2D), mIdx3D(idx3D), mDimF1D(idx3D.size()), mDimB1D(idx3D.size()), mDim2D(idx3D.size()), mDim3D(idx3D.size())
    {
+      // Initialise the dimensions
+      this->initDimensions();
    }
 
    TransformResolution::~TransformResolution()
    {
    }
 
+   void TransformResolution::initDimensions()
+   {
+      for(int k = 0; k < this->mDim3D; k++)
+      {
+         this->mDimF1D(k) = this->mFwd.at(k).rows();
+         this->mDimB1D(k) = this->mBwd.at(k).rows();
+         this->mDim2D(k) = this->mIdx2D.at(k).size();
+      }
+   }
+
    template <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int k) const
    {
-      // Check for correct sizes
-      assert(k >= 0);
-      assert(this->mFwd.size() > 0);
-      assert(static_cast<size_t>(k) < this->mFwd.size());
-
-      return this->mFwd.at(k).rows();
+      return this->mDimF1D(k);
    }
 
    template <> int TransformResolution::dim<Dimensions::Data::DATF1D>() const
@@ -46,12 +53,7 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int k) const
    {
-      // Check for correct sizes
-      assert(k >= 0);
-      assert(this->mBwd.size() > 0);
-      assert(static_cast<size_t>(k) < this->mBwd.size());
-
-      return this->mBwd.at(k).rows();
+      return this->mDimB1D(k);
    }
 
    template <> int TransformResolution::dim<Dimensions::Data::DATB1D>() const
@@ -61,12 +63,7 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DAT2D>(const int k) const
    {
-      // Check for correct sizes
-      assert(k >= 0);
-      assert(this->mIdx2D.size() > 0);
-      assert(static_cast<size_t>(k) < this->mIdx2D.size());
-
-      return this->mIdx2D.at(k).size();
+      return this->mDim2D(k);
    }
 
    template <> int TransformResolution::dim<Dimensions::Data::DAT2D>() const
@@ -76,10 +73,7 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DAT3D>() const
    {
-      // Check for correct size
-      assert(this->mIdx3D.size() > 0);
-
-      return this->mIdx3D.size();
+      return this->mDim3D;
    }
 
    template <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i, const int k) const
@@ -163,6 +157,21 @@ namespace GeoMHDiSCC {
       assert(current == i);
 
       return mode;
+   }
+
+   void TransformResolution::clearIndexes()
+   {
+      // Create forward indexes
+      std::vector<ArrayI>().swap(this->mFwd);
+
+      // Create forward indexes
+      std::vector<ArrayI>().swap(this->mBwd);
+
+      // Clear indexes of second dimension
+      std::vector<ArrayI>().swap(this->mIdx2D);
+
+      // Clear indexes of third dimension
+      this->mIdx3D.resize(0);
    }
 
 }

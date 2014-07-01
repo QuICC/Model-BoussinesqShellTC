@@ -262,7 +262,7 @@ namespace Parallel {
          int nCoords;
          MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, MPI_COMM_WORLD);
 
-         // Get remot ekeys as matrix
+         // Get remote keys as matrix
          matRemote.resize(3, nCoords);
          MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, MPI_COMM_WORLD); 
 
