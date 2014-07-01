@@ -40,7 +40,7 @@ namespace Parallel {
           * @param factors    CPU splitting factors
           * @param score      Score 
           */
-         SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score);
+         SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score, const std::vector<std::multimap<int,int> >& structure);
 
          /**
           * @brief Destructor
@@ -71,6 +71,11 @@ namespace Parallel {
           * @brief Score of the splitting
           */
          MHDFloat score;
+
+         /**
+          * @brief Communication structure
+          */
+         std::vector<std::multimap<int,int> >   structure;
          
       protected:
 

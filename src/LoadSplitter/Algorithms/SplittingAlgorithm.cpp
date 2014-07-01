@@ -105,7 +105,7 @@ namespace Parallel {
       int score = this->computeScore(spRes);
 
       // Create splitting description
-      SplittingDescription descr(this->mAlgo, this->mGrouper, this->mDims, this->mFactors, score);
+      SplittingDescription descr(this->mAlgo, this->mGrouper, this->mDims, this->mFactors, score, this->mCommStructure);
 
       // Return combination of score and shared resolution/description
       return std::make_pair(score, std::make_pair(spRes,descr));
@@ -157,8 +157,8 @@ namespace Parallel {
       details.resize(spRes->cpu(0)->nDim()-1);
       details.setConstant(worst);
 
-      // Storage for the communication structure
-      std::vector<std::multimap<int,int> >  structure;
+      // Clear the communication structure
+      std::vector<std::multimap<int,int> >().swap(this->mCommStructure);
 
       // Handle 1D resolution
       if(spRes->cpu(0)->nDim() == 1)
@@ -169,7 +169,7 @@ namespace Parallel {
       } else if(spRes->cpu(0)->nDim() == 2)
       {
          // Create storage for structure
-         structure.push_back(std::multimap<int,int>());
+         this->mCommStructure.push_back(std::multimap<int,int>());
 
          // Storage for the communication structure
          std::map<std::tr1::tuple<int,int>, int> bwdMap;
@@ -233,7 +233,7 @@ namespace Parallel {
          std::set<std::pair<int,int> >::iterator filIt;
          for(filIt = filter.begin(); filIt != filter.end(); filIt++)
          {
-            structure.at(static_cast<int>(Dimensions::Transform::TRA1D)).insert(*filIt);
+            this->mCommStructure.at(static_cast<int>(Dimensions::Transform::TRA1D)).insert(*filIt);
          }
 
          // Clear all the data
@@ -255,7 +255,7 @@ namespace Parallel {
          for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
          {
             // Create storage for structure
-            structure.push_back(std::multimap<int,int>());
+            this->mCommStructure.push_back(std::multimap<int,int>());
 
             // Loop over CPUs
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
@@ -318,7 +318,7 @@ namespace Parallel {
             std::set<std::pair<int,int> >::iterator filIt;
             for(filIt = filter.begin(); filIt != filter.end(); filIt++)
             {
-               structure.at(ex).insert(*filIt);
+               this->mCommStructure.at(ex).insert(*filIt);
             }
 
             // Clear all the data for next loop
@@ -335,7 +335,7 @@ namespace Parallel {
          // Loop over CPUs
          for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
          {
-            groups.insert(structure.at(ex).count(cpu));
+            groups.insert(this->mCommStructure.at(ex).count(cpu));
          }
 
          // Store the group size (use the last one in set, to take into account case with unequal sizes. End score will be bad due to inbalance)

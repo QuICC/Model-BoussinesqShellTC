@@ -188,6 +188,12 @@ namespace Parallel {
           * @brief Storage for the simulation resolution
           */
          ArrayI mSimDim;
+
+         /**
+          * @brief Storage for the communication structure
+          */
+         std::vector<std::multimap<int,int> >   mCommStructure;
+
    };
 
    template <typename TSchemeType> void SplittingAlgorithm::initScheme(const ArrayI& dim)

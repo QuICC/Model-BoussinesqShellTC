@@ -52,12 +52,7 @@ namespace IoXml {
           */
          virtual void write();
 
-         /**
-          * @brief Setup XML for resolution splitting graph
-          *
-          * @param spRes Shared resolution
-          */
-         void graphResolution(SharedResolution spRes);
+         void graphCommunication(const std::vector<std::multimap<int,int> >& structure);
          
       protected:
          /**
@@ -68,28 +63,6 @@ namespace IoXml {
           * @param value   Value to store in string child
           */
          void createAttr(rapidxml::xml_node<>* parent, const std::string& name, const std::string& value);
-
-         /**
-          * @brief Setup XML for 1D resolution splitting graph 
-          *
-          * @param spRes Shared resolution
-          */
-         void graph1DResolution(SharedResolution spRes);
-
-         /**
-          * @brief  
-          * @brief Setup XML for 2D resolution splitting graph 
-          *
-          * @param spRes Shared resolution
-          */
-         void graph2DResolution(SharedResolution spRes);
-
-         /**
-          * @brief Setup XML for 3D resolution splitting graph 
-          *
-          * @param spRes Shared resolution
-          */
-         void graph3DResolution(SharedResolution spRes);
 
       private:
    };

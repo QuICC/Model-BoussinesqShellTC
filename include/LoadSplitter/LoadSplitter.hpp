@@ -112,7 +112,7 @@ namespace Parallel {
           *
           * @param descr Splitting description object
           */
-         void describeSplitting(const SplittingDescription& descr) const;
+         void describeSplitting(const SplittingDescription& descr, const bool isTest = false) const;
    };
 
    template <typename TSchemeType> void LoadSplitter::init(const ArrayI& dim)

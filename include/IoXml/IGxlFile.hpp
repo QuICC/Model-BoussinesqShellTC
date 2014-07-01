@@ -31,7 +31,7 @@ namespace GeoMHDiSCC {
 namespace IoXml {
 
    /**
-    * @brief Implementation of the base for a configuration file
+    * @brief Implementation of the base for a GXL format file
     */
    template <typename TBase> class IGxlFile: public TBase
    {

@@ -39,85 +39,7 @@ namespace IoXml {
    {
    }
 
-   void GxlWriter::graphResolution(SharedResolution spRes)
-   {
-      if(spRes->cpu(0)->nDim() == 1)
-      {
-         this->graph1DResolution(spRes);
-
-      } else if(spRes->cpu(0)->nDim() == 2)
-      {
-         this->graph1DResolution(spRes);
-
-      } else if(spRes->cpu(0)->nDim() == 3)
-      {
-         this->graph3DResolution(spRes);
-      }
-   }
-
-   void GxlWriter::graph1DResolution(SharedResolution spRes)
-   {
-      std::stringstream oss;
-
-      // Set graph color
-      std::string color = "blue";
-
-      // Get master GXL tag
-      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
-
-      // Create master graph
-      rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
-      pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
-      pGxl->append_node(pGraph);
-
-      // Loop over the CPUs
-      for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-      {
-         rapidxml::xml_node<> *pCpu = this->mXML.allocate_node(rapidxml::node_element, "node");
-         oss << "cpu" << cpu;
-         pCpu->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
-         oss.str("");
-
-         oss << "CPU " << cpu;
-         this->createAttr(pCpu, "label", oss.str());
-         oss.str("");
-
-         pGraph->append_node(pCpu);
-      }
-   }
-
-   void GxlWriter::graph2DResolution(SharedResolution spRes)
-   {
-      std::stringstream oss;
-
-      // Set graph color
-      std::string color = "blue";
-
-      // Get master GXL tag
-      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
-
-      // Create master graph
-      rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
-      pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
-      pGxl->append_node(pGraph);
-
-      // Loop over the CPUs
-      for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-      {
-         rapidxml::xml_node<> *pCpu = this->mXML.allocate_node(rapidxml::node_element, "node");
-         oss << "cpu" << cpu;
-         pCpu->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
-         oss.str("");
-
-         oss << "CPU " << cpu;
-         this->createAttr(pCpu, "label", oss.str());
-         oss.str("");
-
-         pGraph->append_node(pCpu);
-      }
-   }
-
-   void GxlWriter::graph3DResolution(SharedResolution spRes)
+   void GxlWriter::graphCommunication(const std::vector<std::multimap<int,int> >& structure)
    {
       std::stringstream oss;
 
@@ -145,83 +67,8 @@ namespace IoXml {
       pGxl->append_node(pGraph);
 
       // Loop over the two transposes
-      for(int i = 0; i < 2; i++)
+      for(size_t i = 0; i < structure.size(); i++)
       {
-         // Cast integer to dimension ID
-         Dimensions::Transform::Id fwdDim = static_cast<Dimensions::Transform::Id>(i);
-
-         // Create forward coordinates list
-         std::vector<std::set<std::tr1::tuple<int,int,int> > > coordFwd;
-         coordFwd.reserve(spRes->nCpu());
-
-         // Loop over all CPUs
-         for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-         {
-            // Initialise coordinate list for current CPU
-            coordFwd.push_back(std::set<std::tr1::tuple<int,int,int> >());
-
-            // Loop over slow data dimension
-            int i_, j_, k_;
-            for(int k = 0; k < spRes->cpu(cpu)->dim(fwdDim)->dim<Dimensions::Data::DAT3D>(); ++k)
-            {
-               // Get global slow index
-               k_ = spRes->cpu(cpu)->dim(fwdDim)->idx<Dimensions::Data::DAT3D>(k);
-
-               // Loop over middle data dimension
-               for(int j = 0; j < spRes->cpu(cpu)->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(k); ++j)
-               {
-                  // Get global middle index
-                  j_ = spRes->cpu(cpu)->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j,k);
-
-                  // Loop over middle Forward data dimension
-                  for(int i = 0; i < spRes->cpu(cpu)->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(k); ++i)
-                  {
-                     // Get global fast index
-                     i_ = spRes->cpu(cpu)->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
-
-                     // Add coordinate to list
-                     coordFwd.back().insert(std::tr1::make_tuple(i_,k_,j_));
-                  }
-               }
-            }
-         }
-
-         // Create backward coordinate list
-         std::vector<std::set<std::tr1::tuple<int,int,int> > > coordBwd;
-         coordBwd.reserve(spRes->nCpu());
-
-         // Loop over all CPUs
-         for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-         {
-            // Initialise coordinate list for current CPU
-            coordBwd.push_back(std::set<std::tr1::tuple<int,int,int> >());
-
-            // Loop over slow data dimension
-            int i_, j_, k_;
-            for(int k = 0; k < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT3D>(); ++k)
-            {
-               // Get global slow index
-               k_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT3D>(k);
-
-               // Loop over middle backward data dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
-               {
-                  // Get global fast index
-                  i_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
-
-                  // Loop over middle data dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
-                  {
-                     // Get global middle index
-                     j_ = spRes->cpu(cpu)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
-
-                     // Add coordinate to list
-                     coordBwd.back().insert(coordBwd.back().end()--,std::tr1::make_tuple(j_,i_,k_));
-                  }
-               }
-            }
-         }
-
          // Create subgraph
          rapidxml::xml_node<> *pNSubgraph = this->mXML.allocate_node(rapidxml::node_element, "node");
          oss << "N_" << lName.at(i);
@@ -230,7 +77,7 @@ namespace IoXml {
          rapidxml::xml_node<> *pSubgraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
          pSubgraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(lName.at(i).c_str(),0)));
 
-         if(fwdDim == Dimensions::Transform::TRA1D)
+         if(static_cast<Dimensions::Transform::Id>(i) == Dimensions::Transform::TRA1D)
          {
             this->createAttr(pSubgraph, "label", "Transpose 1D/2D");
          } else
@@ -243,51 +90,37 @@ namespace IoXml {
          pGraph->append_node(pNSubgraph);
 
          // Loop over the CPUs
-         for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+         for(std::multimap<int,int>::const_iterator itCpu = structure.at(i).begin(); itCpu != structure.at(i).end(); itCpu = structure.at(i).upper_bound(itCpu->first))
          {
             rapidxml::xml_node<> *pCpu = this->mXML.allocate_node(rapidxml::node_element, "node");
-            oss << "cpu" << cpu << sName.at(i);
+            oss << "cpu" << itCpu->first << sName.at(i);
             pCpu->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
             oss.str("");
 
-            oss << "CPU " << cpu;
+            oss << "CPU " << itCpu->first;
             this->createAttr(pCpu, "label", oss.str());
             oss.str("");
 
             pSubgraph->append_node(pCpu);
          }
 
-         // Create set for shared coordinates
-         std::set<std::tr1::tuple<int,int,int> > shared;
-
-         // Loop over forward cpus
-         for(int cpu1D = 0; cpu1D < spRes->nCpu(); cpu1D++)
+         // Loop over the CPUs
+         for(std::multimap<int,int>::const_iterator itCpu = structure.at(i).begin(); itCpu != structure.at(i).end(); ++itCpu)
          {
-            // Loop over backward cpus
-            for(int cpu2D = 0; cpu2D < spRes->nCpu(); cpu2D++)
-            {
-               // Compute coordinate intersection
-               std::set_intersection(coordFwd.at(cpu1D).begin(), coordFwd.at(cpu1D).end(), coordBwd.at(cpu2D).begin(), coordBwd.at(cpu2D).end(), std::inserter(shared, shared.begin()));
+            // Set "from" attribute
+            rapidxml::xml_node<> *pEdge = this->mXML.allocate_node(rapidxml::node_element, "edge");
+            oss << "cpu" << itCpu->first << sName.at(i);
+            pEdge->append_attribute(this->mXML.allocate_attribute("from", this->mXML.allocate_string(oss.str().c_str(),0)));
+            oss.str("");
 
-               // Create link if at least one coordinate is shared
-               if(shared.size() > 0)
-               {
-                  rapidxml::xml_node<> *pEdge = this->mXML.allocate_node(rapidxml::node_element, "edge");
-                  oss << "cpu" << cpu1D << sName.at(i);
-                  pEdge->append_attribute(this->mXML.allocate_attribute("from", this->mXML.allocate_string(oss.str().c_str(),0)));
-                  oss.str("");
-                  oss << "cpu" << cpu2D << sName.at(i);
-                  pEdge->append_attribute(this->mXML.allocate_attribute("to", this->mXML.allocate_string(oss.str().c_str(),0)));
-                  oss.str("");
+            // Set "to" attribute
+            oss << "cpu" << itCpu->second << sName.at(i);
+            pEdge->append_attribute(this->mXML.allocate_attribute("to", this->mXML.allocate_string(oss.str().c_str(),0)));
+            oss.str("");
 
-                  this->createAttr(pEdge, "color", color.at(i));
-
-                  pSubgraph->append_node(pEdge);
-               }
-
-               // Clear shared list
-               shared.clear();
-            }
+            // Add edge
+            this->createAttr(pEdge, "color", color.at(i));
+            pSubgraph->append_node(pEdge);
          }
       }
    }

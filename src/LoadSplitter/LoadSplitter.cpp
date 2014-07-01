@@ -34,6 +34,7 @@
 #include "LoadSplitter/Algorithms/SingleSplitting.hpp"
 #include "LoadSplitter/Algorithms/TubularSplitting.hpp"
 #include "LoadSplitter/Algorithms/FixedSplitting.hpp"
+#include "IoXml/GxlWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -144,6 +145,11 @@ namespace Parallel {
                         this->mScores.insert(scored);
                      }
                   }
+
+                  #ifdef GEOMHDISCC_DEBUG
+                  // Show description of tested splittings
+                  this->describeSplitting(scored.second.second, true);
+                  #endif // GEOMHDISCC_DEBUG
                }
             }
          }
@@ -166,15 +172,24 @@ namespace Parallel {
       }
    }
 
-   void LoadSplitter::describeSplitting(const SplittingDescription& descr) const
+   void LoadSplitter::describeSplitting(const SplittingDescription& descr, const bool isTest) const
    {
       // Output a short description of the selected splitting. Make it look nice ;)
       if(this->mId == 0)
       {
-         // Print load splitting header
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "Load distribution", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
+         if(isTest)
+         {
+            // Print load splitting test header
+            IoTools::Formatter::printLine(std::cout, '~');
+            IoTools::Formatter::printCentered(std::cout, "Tested load distribution", '~');
+            IoTools::Formatter::printLine(std::cout, '~');
+         } else
+         {
+            // Print load splitting header
+            IoTools::Formatter::printLine(std::cout, '-');
+            IoTools::Formatter::printCentered(std::cout, "Load distribution", '*');
+            IoTools::Formatter::printLine(std::cout, '-');
+         }
 
          std::string tmpStr;
 
@@ -238,6 +253,14 @@ namespace Parallel {
             tmpStr = "1 x " + tmpStr;
          }
          IoTools::Formatter::printCentered(std::cout, "Factorisation: " + tmpStr);
+
+         // Create GXL graph format file
+         tmpStr.erase(std::remove(tmpStr.begin(),tmpStr.end(),' '),tmpStr.end());
+         IoXml::GxlWriter gxl("Communication_graph_" + tmpStr);
+         gxl.init();
+         gxl.graphCommunication(descr.structure);
+         gxl.write();
+         gxl.finalize();
 
          oss.str("");
          oss << descr.score;
