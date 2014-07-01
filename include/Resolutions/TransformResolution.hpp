@@ -31,12 +31,14 @@ namespace GeoMHDiSCC {
 
    /**
     * @brief Definition of the required resolution information for a transform
+    *
+    * \mhdBug The resolution with dimension only is not safe and will segfault if idx methods are called
     */
    class TransformResolution
    {
       public:
          /**
-          * @brief Empty constructor
+          * @brief Constructor for full resolution
           *
           * @param fwd Set of indexes for 1D (forward direction)
           * @param bwd Set of indexes for 1D (backward direction)
@@ -84,9 +86,19 @@ namespace GeoMHDiSCC {
           */
          ArrayI mode(const int i) const;
 
+         /**
+          * @brief Clear the indexes
+          */
+         void clearIndexes();
+
       protected:
 
       private:
+         /**
+          * @brief Initialise the dimensions from the indexes
+          */
+         void initDimensions();
+
          /**
           * @brief Set of indexes describing the first dimensions (forward direction)
           */
@@ -106,6 +118,26 @@ namespace GeoMHDiSCC {
           * @brief Set of indexes describing the third dimensions
           */
          ArrayI   mIdx3D;
+
+         /**
+          * @brief Dimension of the first dimension (forward direction)
+          */
+         ArrayI   mDimF1D;
+
+         /**
+          * @brief Dimension of the first dimension (backward direction)
+          */
+         ArrayI   mDimB1D;
+
+         /**
+          * @brief Dimension of the second dimension
+          */
+         ArrayI   mDim2D;
+
+         /**
+          * @brief Dimension of the third dimension
+          */
+         int mDim3D;
    };
 
    template <Dimensions::Data::Id TID> int TransformResolution::dim(const int k) const
