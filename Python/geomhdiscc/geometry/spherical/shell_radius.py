@@ -175,7 +175,7 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
    def d8(n):
       return d_8(n + 3.0)
 
-   ds = [d_8, d_7, d_6, d_5, d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7, d8]
+   ds = [d_8, d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7, d8]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
    mat = coeff*spsp.diags(diags, offsets)
@@ -241,7 +241,7 @@ def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
    def d6(n):
       return -(a**6*(l - n - 5)*(l + n + 6))/(64*n*(n + 3)*(n + 2)*(n + 1))
 
-   ds = [d_6, d_5, d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
+   ds = [d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
    mat = coeff*spsp.diags(diags, offsets)
@@ -291,7 +291,7 @@ def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
    def d4(n):
       return (a**4*(l + n + 6)*(l - n - 3)*(l + n + 4)*(l - n - 5))/(16*n*(n + 3)*(n + 2)*(n + 1))
 
-   ds = [d_4, d_4, d_2, d_1, d0, d1, d2, d3, d4]
+   ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
    mat = coeff*spsp.diags(diags, offsets)
