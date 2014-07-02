@@ -67,7 +67,7 @@ def i2x2lapl(nr, ls, bc, rg):
         print("\tTest for l = " + str(l))
         A = sphere.i2x2lapl(nr, l, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
-        ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1))
+        ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
         ssol = sy.integrate(ssol,x,x)
         test_forward(A, l%2, sphys, ssol, rg, 1)
 
@@ -95,7 +95,7 @@ def i4x4lapl(nr, ls, bc, rg):
         print("\tTest for l = " + str(l))
         A = sphere.i4x4lapl(nr, l, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2)
+        ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
         test_forward(A, l%2, sphys, ssol, rg, 2)
 
@@ -109,7 +109,7 @@ def i4x4lapl2(nr, ls, bc, rg):
         print("\tTest for l = " + str(l))
         A = sphere.i4x4lapl2(nr, l, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) - (l-1)*l*(l+1)*(l+2))
+        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) + (l-1)*l*(l+1)*(l+2)*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
         test_forward(A, l%2, sphys, ssol, rg, 2)
 

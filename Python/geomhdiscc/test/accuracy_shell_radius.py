@@ -55,7 +55,7 @@ def i2x2(nr, ls, a, b, bc, rg):
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(sphys*x**2)
         ssol = sy.integrate(ssol,x,x)
-        test_forward(A, sphys, ssol, rg, 1)
+        test_forward(A, sphys, ssol, rg, 2)
 
 
 def i2x2lapl(nr, ls, a, b, bc, rg):
@@ -67,9 +67,9 @@ def i2x2lapl(nr, ls, a, b, bc, rg):
         print("\tTest for l = " + str(l))
         A = shell.i2x2lapl(nr, l, a, b, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-        ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1))
+        ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
         ssol = sy.integrate(ssol,x,x)
-        test_forward(A, sphys, ssol, rg, 1)
+        test_forward(A, sphys, ssol, rg, 2)
 
 
 def i4x4(nr, ls, a, b, bc, rg):
@@ -83,7 +83,7 @@ def i4x4(nr, ls, a, b, bc, rg):
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(sphys*x**4)
         ssol = sy.integrate(ssol,x,x,x,x)
-        test_forward(A, sphys, ssol, rg, 2)
+        test_forward(A, sphys, ssol, rg, 4)
 
 
 def i4x4lapl(nr, ls, a, b, bc, rg):
@@ -95,9 +95,9 @@ def i4x4lapl(nr, ls, a, b, bc, rg):
         print("\tTest for l = " + str(l))
         A = shell.i4x4lapl(nr, l, a, b, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2)
+        ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
-        test_forward(A, sphys, ssol, rg, 2)
+        test_forward(A, sphys, ssol, rg, 4)
 
 
 def i4x4lapl2(nr, ls, a, b, bc, rg):
@@ -109,19 +109,19 @@ def i4x4lapl2(nr, ls, a, b, bc, rg):
         print("\tTest for l = " + str(l))
         A = shell.i4x4lapl2(nr, l, a, b, no_bc)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) - (l-1)*l*(l+1)*(l+2))
+        ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) + (l-1)*l*(l+1)*(l+2)*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
-        test_forward(A, sphys, ssol, rg, 2)
+        test_forward(A, sphys, ssol, rg, 4)
 
 
 if __name__ == "__main__":
     # Set test parameters
     nr = 20
-    rg = transf.grid(nr)
     ls = [2, 3]
     no_bc = [0]
     a = 0.325
     b = 0.675
+    rg = (a*transf.grid(nr) + b)
 
     # run tests
     #zblk(nr, ls, a, b, no_bc, rg)

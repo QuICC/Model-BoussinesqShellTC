@@ -30,7 +30,7 @@ def i2x2(nr, m, bc, coeff = 1.0):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return -1.0/(8.0*n*(n - 1.0)*(n + 1.0))
+        return 1.0/(8.0*n*(n - 1.0)*(n + 1.0))
 
     # Generate main diagonal
     def d0(n):
@@ -88,31 +88,31 @@ def i4x4(nr, m, bc, coeff = 1.0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return 1.0/(256.0*n*(n - 1.0)*(n - 2.0)*(n - 3.0))
+        return 1.0/(256.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 3rd subdiagonal
     def d_3(n):
-        return 3.0/(64.0*n*(n - 1.0)*(n + 1.0)*(n - 2.0)*(n - 3.0))
+        return 3.0/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -(n**2 - 19.0)/(64.0*n*(n - 1.0)*(n + 1.0)*(n - 2.0)*(n + 2.0)*(n - 3.0))
+        return -(n**2 - 19.0)/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return -(3.0*(3.0*n + 11.0))/(64.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n - 3.0)*(n + 3.0))
+        return -(3.0*(3.0*n + 11.0))/(64.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     # Generate main diagonal
     def d0(n):
-        return (3.0*(n**2 - 29.0))/(128.0*(n - 1.0)*(n - 2.0)*(n - 3.0)*(n + 3.0)*(n + 2.0)*(n + 1.0))
+        return (3.0*(n**2 - 29.0))/(128.0*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     # Generate 1st superdiagonal
     def d1(n):
-        return (3.0*(3.0*n - 11.0))/(64.0*n*(n - 1.0)*(n + 1.0)*(n - 2.0)*(n - 3.0)*(n + 3.0))
+        return (3.0*(3.0*n - 11.0))/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 3.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -(n**2 - 19.0)/(64.0*n*(n - 1.0)*(n + 1.0)*(n - 2.0)*(n + 2.0)*(n + 3.0))
+        return -(n**2 - 19.0)/(64.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     # Generate 3rd superdiagonal
     def d3(n):
