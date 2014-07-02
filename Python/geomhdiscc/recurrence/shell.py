@@ -18,7 +18,7 @@ def i2x2():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 
@@ -34,7 +34,7 @@ def i2x2lapl():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 
@@ -49,7 +49,7 @@ def i4x4():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 
@@ -65,7 +65,7 @@ def i4x4lapl():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 
@@ -81,5 +81,5 @@ def i4x4lapl2():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")

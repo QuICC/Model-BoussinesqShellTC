@@ -13,12 +13,12 @@ x = sympy.Symbol('x')
 z = sympy.Symbol('z')
 
 def x_to_phys(expr, grid):
-   func = sympy.utilities.lambdify(x, expr)
-   return func(grid)
+    func = sympy.utilities.lambdify(x, expr)
+    return func(grid)
 
 
 def test_forward(op, res_expr, sol_expr, grid, q):
-   print("NOTHING YET")
+    print("NOTHING YET")
 #   lhs = ct.tocheb(x_to_phys(res_expr,grid))
 #   rhs = op*lhs
 #   t = x_to_phys(sol_expr,grid)

@@ -12,18 +12,18 @@ import scipy.sparse as spsp
 x = sympy.Symbol('x')
 
 def x_to_phys(expr, grid):
-   func = sympy.utilities.lambdify(x, expr)
-   return func(grid)
+    func = sympy.utilities.lambdify(x, expr)
+    return func(grid)
 
 
 def test_forward(op, res_expr, sol_expr, grid, q):
-   lhs = ct.tocheb(x_to_phys(res_expr,grid))
-   rhs = op*lhs
-   t = x_to_phys(sol_expr,grid)
-   sol = ct.tocheb(t)
-   err = np.abs(rhs - sol)
-   print(err)
-   print(np.max(err[q:]))
+    lhs = ct.tocheb(x_to_phys(res_expr,grid))
+    rhs = op*lhs
+    t = x_to_phys(sol_expr,grid)
+    sol = ct.tocheb(t)
+    err = np.abs(rhs - sol)
+    print(err)
+    print(np.max(err[q:]))
 
 
 nx = 20

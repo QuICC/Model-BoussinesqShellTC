@@ -30,7 +30,7 @@ def i2():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i2lapl():
@@ -44,7 +44,7 @@ def i2lapl():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i2laplh():
@@ -58,7 +58,7 @@ def i2laplh():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4():
@@ -71,7 +71,7 @@ def i4():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4d2():
@@ -84,7 +84,7 @@ def i4d2():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4lapl():
@@ -98,7 +98,7 @@ def i4lapl():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4laplh():
@@ -112,7 +112,7 @@ def i4laplh():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4lapl2():
@@ -126,7 +126,7 @@ def i4lapl2():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
 def i4lapl2h():
@@ -140,5 +140,5 @@ def i4lapl2h():
 
     # Print recurrence relation per diagonals
     for k,rec in sorted(r.items()):
-       print("\t" + str(k) + ": \t" + str(rec))
+        print("\t" + str(k) + ": \t" + str(rec))
     print("\n")

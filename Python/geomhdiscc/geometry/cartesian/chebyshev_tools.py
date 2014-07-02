@@ -7,21 +7,20 @@ import scipy.fftpack as fftpack
 import numpy as np
 
 def grid(nx):
-   """Create the Chebyshev grid"""
+    """Create the Chebyshev grid"""
 
-   return np.cos(np.pi*(np.arange(0,nx)+0.5)/nx)
+    return np.cos(np.pi*(np.arange(0,nx)+0.5)/nx)
 
 def tophys(spec):
-   """Transform spectral coefficients to physical values"""
+    """Transform spectral coefficients to physical values"""
 
-   n = len(spec)
+    n = len(spec)
 
-   return fftpack.dct(spec,3)
+    return fftpack.dct(spec,3)
 
 def tocheb(phys):
-   """Transform physical values to spectral coefficients"""
+    """Transform physical values to spectral coefficients"""
 
-   n = len(phys)
+    n = len(phys)
 
-   return fftpack.dct(phys,2)/(2*n)
-
+    return fftpack.dct(phys,2)/(2*n)
