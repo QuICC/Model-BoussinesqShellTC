@@ -1,9 +1,10 @@
-"""Module provides functions to generate the boundary conditions in a spherical geometry (shell and sphere)"""
+"""Module provides functions to generate the radial boundary conditions in a cylindrical annulus"""
 
 from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
+
 
 def constrain(mat, bc, eq_zrows):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
@@ -48,7 +49,7 @@ def apply_tau(mat, bc):
     return bc_mat
 
 
-def tau_value(nx, pos, coeffs = None):
+def tau_value(nr, pos, coeffs = None):
     """Create the boundary value tau line(s)"""
 
     if coeffs is None or len(coeffs) < 1:
@@ -58,15 +59,15 @@ def tau_value(nx, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append([c*norm_c(i) for i in np.arange(0,nx)])
+        cond.append([c*norm_c(i) for i in np.arange(0,nr)])
 
     if pos <= 0:
-        cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nx)])
+        cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nr)])
 
     return np.array(cond)
 
 
-def tau_diff(nx, pos, coeffs = None):
+def tau_diff(nr, pos, coeffs = None):
     """Create the first derivative tau line(s)"""
 
     if coeffs is None or len(coeffs) < 1:
@@ -76,15 +77,15 @@ def tau_diff(nx, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append([c*i**2 for i in np.arange(0,nx)])
+        cond.append([c*i**2 for i in np.arange(0,nr)])
 
     if pos <= 0:
-        cond.append([(-1.0)**(i+1)*c*i**2 for i in np.arange(0,nx)])
+        cond.append([(-1.0)**(i+1)*c*i**2 for i in np.arange(0,nr)])
 
     return np.array(cond)
 
 
-def tau_diff2(nx, pos, coeffs = None):
+def tau_diff2(nr, pos, coeffs = None):
     """Create the second deriviative tau line(s)"""
 
     if coeffs is None or len(coeffs) < 1:
@@ -94,15 +95,15 @@ def tau_diff2(nx, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
 
     if pos <= 0:
-        cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
 
     return np.array(cond)
 
 
-def tau_value_diff(nx, pos, coeffs = None):
+def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
     if coeffs is None or len(coeffs) < 1:
@@ -112,17 +113,17 @@ def tau_value_diff(nx, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nx,1,coeffs)[0]))
-        cond.append(list(tau_diff(nx,1,coeffs)[0]))
+        cond.append(list(tau_value(nr,1,coeffs)[0]))
+        cond.append(list(tau_diff(nr,1,coeffs)[0]))
 
     if pos <= 0:
-        cond.append(list(tau_value(nx,-1,coeffs)[0]))
-        cond.append(list(tau_diff(nx,-1,coeffs)[0]))
+        cond.append(list(tau_value(nr,-1,coeffs)[0]))
+        cond.append(list(tau_diff(nr,-1,coeffs)[0]))
 
     return np.array(cond)
 
 
-def tau_value_diff2(nx, pos, coeffs = None):
+def tau_value_diff2(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
     if coeffs is None or len(coeffs) < 1:
@@ -132,12 +133,12 @@ def tau_value_diff2(nx, pos, coeffs = None):
 
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nx,1,coeffs)[0]))
-        cond.append(list(tau_diff2(nx,1,coeffs)[0]))
+        cond.append(list(tau_value(nr,1,coeffs)[0]))
+        cond.append(list(tau_diff2(nr,1,coeffs)[0]))
 
     if pos <= 0:
-        cond.append(list(tau_value(nx,-1,coeffs)[0]))
-        cond.append(list(tau_diff2(nx,-1,coeffs)[0]))
+        cond.append(list(tau_value(nr,-1,coeffs)[0]))
+        cond.append(list(tau_diff2(nr,-1,coeffs)[0]))
 
     return np.array(cond)
 

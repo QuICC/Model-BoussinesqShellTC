@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.spherical_boundary as sphbc
+import geomhdiscc.geometry.spherical.shell_radius_boundary as sphbc
 
 
 def zblk(nr, q, bc):

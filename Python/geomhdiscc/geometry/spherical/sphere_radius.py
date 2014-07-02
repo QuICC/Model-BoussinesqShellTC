@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.spherical_boundary as sphbc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary as sphbc
 
 
 def zblk(nr, q, bc):
@@ -38,7 +38,7 @@ def i2x2(nr, l, bc, coeff = 1.0):
 
     # Generate 1st superdiagonal
     def d1(n):
-        return -d1(n)
+        return -d_1(n)
 
     # Generate 2nd superdiagonal
     def d2(n):

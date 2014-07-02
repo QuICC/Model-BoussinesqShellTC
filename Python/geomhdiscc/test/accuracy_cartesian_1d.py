@@ -1,4 +1,4 @@
-"""Check accuracy of operations for cartesian 1D operators"""
+"""Check accuracy for cartesian 1D operators"""
 
 from __future__ import division
 from __future__ import unicode_literals

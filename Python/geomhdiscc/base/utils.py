@@ -8,12 +8,16 @@ import scipy.sparse as spsp
 def build_diagonals(ns, nzrow, ds, offsets):
     """Build diagonals from function list and offsets"""
 
+    # Build diagonals
     diags = [0]*len(ds)
+    corr = [0]*len(ds)
     for d,f in enumerate(ds):
         lb = max(0, -offsets[d])
         ub = min(len(ns),len(ns)-offsets[d])
         diags[d] = [f(n) if n > nzrow else 0 for n in ns[lb:ub]]
+        corr[d] = [f(n) if n > nzrow else 0 for n in ns[0:lb]]
 
+    print(corr)
     return diags
 
 def build_block_matrix(fields, func, func_args):

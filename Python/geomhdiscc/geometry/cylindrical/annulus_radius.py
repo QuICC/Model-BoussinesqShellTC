@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.cylindrical_radius_boundary as cylbc
+import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as cylbc
 
 
 def zblk(nr, q, bc):
