@@ -4,159 +4,220 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
-import sympy
-import geomhdiscc.geometry.cartesian.chebyshev_tools as ct
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import sympy as sy
 import scipy.sparse as spsp
+import geomhdiscc.transform.cartesian as transf
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 
-x = sympy.Symbol('x')
 
 def x_to_phys(expr, grid):
-    func = sympy.utilities.lambdify(x, expr)
+    """Convert sympy expression to grid values"""
+
+    x = sy.Symbol('x')
+    func = sy.utilities.lambdify(x, expr)
     return func(grid)
 
 
 def test_forward(op, res_expr, sol_expr, grid, q):
-    lhs = ct.tocheb(x_to_phys(res_expr,grid))
+    """Perform a forward operation test"""
+
+    x = sy.Symbol('x')
+    lhs = transf.tocheb(x_to_phys(res_expr,grid))
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
-    sol = ct.tocheb(t)
+    sol = transf.tocheb(t)
     err = np.abs(rhs - sol)
     print(err)
-    print(np.max(err[q:]))
+    print("\t\tMax forward error: " + str(np.max(err[q:])))
 
 
-nx = 20
-xg = ct.grid(nx)
+def zblk(nx, bc, xg):
+    """Accuracy test for zblk operator"""
 
-#
-# Accuracy tests: zblk
-#
-print("zblk:")
-A = c1d.zblk(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = 0
-#test_forward(A, sphys, ssol, xg, 0)
+    print("zblk:")
+    x = sy.Symbol('x')
+    A = c1d.zblk(nx)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = 0
+    test_forward(A, sphys, ssol, xg, 0)
 
-#
-# Accuracy tests: i2d2
-#
-print("i2d2:")
-A = c1d.i2d2(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x),x,x)
-test_forward(A, sphys, ssol, xg, 2)
 
-#
-# Accuracy tests: i1
-#
-print("i1:")
-A = c1d.i1(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
-ssol = sympy.integrate(sphys,x)
-test_forward(A, sphys, ssol, xg, 1)
+def i1(nx, bc, xg):
+    """Accuracy test for i1 operator"""
 
-#
-# Accuracy tests: i2
-#
-print("i2:")
-A = c1d.i2(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
-ssol = sympy.integrate(sphys,x,x)
-test_forward(A, sphys, ssol, xg, 2)
+    print("i1:")
+    x = sy.Symbol('x')
+    A = c1d.i1(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sy.integrate(sphys,x)
+    test_forward(A, sphys, ssol, xg, 1)
 
-#
-# Accuracy tests: i2lapl
-#
-print("i2lapl:")
-k, l = np.random.rand(2)*nx
-A = c1d.i2lapl(nx, k, l)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x) - k**2*sphys - l**2*sphys,x,x)
-test_forward(A, sphys, ssol, xg, 2)
 
-#
-# Accuracy tests: i2laplh
-#
-print("i2laplh:")
-k = np.random.ranf()*nx
-A = c1d.i2laplh(nx, k)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x) - k**2*sphys,x,x)
-test_forward(A, sphys, ssol, xg, 2)
+def i2(nx, bc, xg):
+    """Accuracy test for i2 operator"""
 
-#
-# Accuracy tests: i4
-#
-print("i4:")
-A = c1d.i4(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)])
-ssol = sympy.integrate(sphys,x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
+    print("i2:")
+    x = sy.Symbol('x')
+    A = c1d.i2(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.integrate(sphys,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
 
-#
-# Accuracy tests: i4d2
-#
-print("i4d2:")
-A = c1d.i4d2(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x),x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
 
-#
-# Accuracy tests: i4d4
-#
-print("i4d4:")
-A = c1d.i4d4(nx)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x,x,x),x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
+def i2d2(nx, bc, xg):
+    """Accuracy test for i2d2 operator"""
 
-#
-# Accuracy tests: i4lapl
-#
-print("i4lapl:")
-k, l = np.random.rand(2)*nx
-A = c1d.i4lapl(nx, k, l)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x) - k**2*sphys - l**2*sphys,x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
+    print("i2d2:")
+    x = sy.Symbol('x')
+    A = c1d.i2d2(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x))
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
 
-#
-# Accuracy tests: i4laplh
-#
-print("i4laplh:")
-k = np.random.ranf()*nx
-A = c1d.i4laplh(nx, k)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x) - k**2*sphys,x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
 
-#
-# Accuracy tests: i4lapl2
-#
-print("i4lapl2:")
-k, l = np.random.rand(2)*nx
-A = c1d.i4lapl2(nx, k, l)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x,x,x) + k**4*sphys + l**4*sphys - 2*k**2*sympy.diff(sphys,x,x) - 2*l**2*sympy.diff(sphys,x,x) + 2*k**2*l**2*sphys,x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
+def i2lapl(nx, bc, xg):
+    """Accuracy test for i2lapl operator"""
 
-#
-# Accuracy tests: i4lapl2h
-#
-print("i4lapl2h:")
-k = np.random.ranf()*nx
-A = c1d.i4lapl2h(nx, k)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sympy.integrate(sympy.diff(sphys,x,x,x,x) + k**4*sphys - 2*k**2*sympy.diff(sphys,x,x),x,x,x,x)
-test_forward(A, sphys, ssol, xg, 4)
+    print("i2lapl:")
+    x = sy.Symbol('x')
+    k, l = np.random.rand(2)*nx
+    A = c1d.i2lapl(nx, k, l, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
 
-#
-# Accuracy tests: qid
-#
-print("qid:")
-A = c1d.qid(nx, 3)
-sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-ssol = sphys
-test_forward(A, sphys, ssol, xg, 3)
+
+def i2laplh(nx, bc, xg):
+    """Accuracy test for i2laplh operator"""
+
+    print("i2laplh:")
+    x = sy.Symbol('x')
+    k = np.random.ranf()*nx
+    A = c1d.i2laplh(nx, k, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
+
+
+def i4(nx, bc, xg):
+    """Accuracy test for i4 operator"""
+
+    print("i4:")
+    x = sy.Symbol('x')
+    A = c1d.i4(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)])
+    ssol = sy.integrate(sphys,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4d2(nx, bc, xg):
+    """Accuracy test for i4d2 operator"""
+
+    print("i4d2:")
+    x = sy.Symbol('x')
+    A = c1d.i4d2(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x))
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4d4(nx, bc, xg):
+    """Accuracy test for i4d4 operator"""
+
+    print("i4d4:")
+    x = sy.Symbol('x')
+    A = c1d.i4d4(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x,x,x))
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4lapl(nx, bc, xg):
+    """Accuracy test for i4lapl operator"""
+
+    print("i4lapl:")
+    x = sy.Symbol('x')
+    k, l = np.random.rand(2)*nx
+    A = c1d.i4lapl(nx, k, l, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4laplh(nx, bc, xg):
+    """Accuracy test for i4laplh operator"""
+
+    print("i4laplh:")
+    x = sy.Symbol('x')
+    k = np.random.ranf()*nx
+    A = c1d.i4laplh(nx, k, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4lapl2(nx, bc, xg):
+    """Accuracy test for i4lapl2 operator"""
+
+    print("i4lapl2:")
+    x = sy.Symbol('x')
+    k, l = np.random.rand(2)*nx
+    A = c1d.i4lapl2(nx, k, l, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys + l**4*sphys - 2*k**2*sy.diff(sphys,x,x) - 2*l**2*sy.diff(sphys,x,x) + 2*k**2*l**2*sphys)
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def i4lapl2h(nx, bc, xg):
+    """Accuracy test for i4lapl2h operator"""
+
+    print("i4lapl2h:")
+    x = sy.Symbol('x')
+    k = np.random.ranf()*nx
+    A = c1d.i4lapl2h(nx, k, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys - 2*k**2*sy.diff(sphys,x,x))
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
+
+def qid(nx, bc, xg):
+    """Accuracy test for qid operator"""
+
+    print("qid:")
+    x = sy.Symbol('x')
+    A = c1d.qid(nx, 3, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sphys
+    test_forward(A, sphys, ssol, xg, 3)
+
+
+if __name__ == "__main__":
+    # Set test parameters
+    nx = 20
+    xg = transf.grid(nx)
+    no_bc = [0]
+
+    # run tests
+    #zblk(nx, no_bc, xg)
+    i1(nx, no_bc, xg)
+    i2(nx, no_bc, xg)
+    i2d2(nx, no_bc, xg)
+    i2lapl(nx, no_bc, xg)
+    i2laplh(nx, no_bc, xg)
+    i4(nx, no_bc, xg)
+    i4d2(nx, no_bc, xg)
+    i4d4(nx, no_bc, xg)
+    i4lapl(nx, no_bc, xg)
+    i4laplh(nx, no_bc, xg)
+    i4lapl2(nx, no_bc, xg)
+    i4lapl2h(nx, no_bc, xg)
+    qid(nx, no_bc, xg)

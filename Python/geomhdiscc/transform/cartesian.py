@@ -1,4 +1,4 @@
-"""Module provides functions to work with chebyshev expansions. It is mainly meant for testing purposes."""
+"""Module provides functions to transform chebyshev expansions between physical and spectral space."""
 
 from __future__ import division
 from __future__ import unicode_literals
