@@ -114,6 +114,62 @@ def i4x4lapl2(nr, ls, a, b, bc, rg):
         test_forward(A, sphys, ssol, rg, 4)
 
 
+def i2x1(nr, ls, a, b, bc, rg):
+    """Accuracy test for i2x1 operator"""
+
+    print("i2x1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = shell.i2x1(nr, a, b, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.expand(x*sphys)
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, sphys, ssol, rg, 4)
+
+
+def i2x2d1(nr, ls, a, b, bc, rg):
+    """Accuracy test for i2x2d1 operator"""
+
+    print("i2x2d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = shell.i2x2d1(nr, a, b, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.expand(x**2*sy.diff(sphys,x))
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, sphys, ssol, rg, 4)
+
+
+def i4x3(nr, ls, a, b, bc, rg):
+    """Accuracy test for i4x3 operator"""
+
+    print("i4x3:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = shell.i4x3(nr, a, b, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.expand(x**3*sphys)
+        ssol = sy.integrate(ssol,x,x,x,x)
+        test_forward(A, sphys, ssol, rg, 4)
+
+
+def i4x4d1(nr, ls, a, b, bc, rg):
+    """Accuracy test for i4x4d1 operator"""
+
+    print("i4x4d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = shell.i4x4d1(nr, a, b, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.expand(x**4*sy.diff(sphys,x))
+        ssol = sy.integrate(ssol,x,x,x,x)
+        test_forward(A, sphys, ssol, rg, 4)
+
+
 def qid(nr, a, b, bc, xg):
     """Accuracy test for qid operator"""
 
@@ -141,4 +197,8 @@ if __name__ == "__main__":
     i4x4(nr, ls, a, b, no_bc, rg)
     i4x4lapl(nr, ls, a, b, no_bc, rg)
     i4x4lapl2(nr, ls, a, b, no_bc, rg)
+    i2x1(nr, ls, a, b, no_bc, rg)
+    i2x2d1(nr, ls, a, b, no_bc, rg)
+    i4x3(nr, ls, a, b, no_bc, rg)
+    i4x4d1(nr, ls, a, b, no_bc, rg)
     qid(nr, a, b, no_bc, rg)

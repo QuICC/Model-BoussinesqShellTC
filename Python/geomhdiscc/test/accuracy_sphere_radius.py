@@ -21,11 +21,17 @@ def x_to_phys(expr, grid):
 def test_forward(op, parity, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
+    try:
+        pres, psol = parity
+    except:
+        pres = parity
+        psol = parity
+
     x = sy.Symbol('x')
-    lhs = transf.tocheb(x_to_phys(res_expr,grid), parity)
+    lhs = transf.tocheb(x_to_phys(res_expr,grid), pres)
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
-    sol = transf.tocheb(t, parity)
+    sol = transf.tocheb(t, psol)
     err = np.abs(rhs - sol)
     print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
@@ -114,6 +120,62 @@ def i4x4lapl2(nr, ls, bc, rg):
         test_forward(A, l%2, sphys, ssol, rg, 2)
 
 
+def i2x1(nr, ls, bc, rg):
+    """Accuracy test for i2x1 operator"""
+
+    print("i2x1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = sphere.i2x1(nr, l, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(x*sphys)
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, (l%2,(l+1)%2), sphys, ssol, rg, 1)
+
+
+def i2x2d1(nr, ls, bc, rg):
+    """Accuracy test for i2x2d1 operator"""
+
+    print("i2x2d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = sphere.i2x2d1(nr, l, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(x**2*sy.diff(sphys,x))
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, (l%2,(l+1)%2), sphys, ssol, rg, 1)
+
+
+def i4x3(nr, ls, bc, rg):
+    """Accuracy test for i4x3 operator"""
+
+    print("i4x3:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = sphere.i4x3(nr, l, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(x**3*sphys)
+        ssol = sy.integrate(ssol,x,x,x,x)
+        test_forward(A, (l%2,(l+1)%2), sphys, ssol, rg, 2)
+
+
+def i4x4d1(nr, ls, bc, rg):
+    """Accuracy test for i4x4d1 operator"""
+
+    print("i4x4d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = sphere.i4x4d1(nr, l, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.expand(x**4*sy.diff(sphys,x))
+        ssol = sy.integrate(ssol,x,x,x,x)
+        test_forward(A, (l%2,(l+1)%2), sphys, ssol, rg, 2)
+
+
 def qid(nr, ls, bc, xg):
     """Accuracy test for qid operator"""
 
@@ -140,4 +202,8 @@ if __name__ == "__main__":
     i4x4(nr, ls, no_bc, rg)
     i4x4lapl(nr, ls, no_bc, rg)
     i4x4lapl2(nr, ls, no_bc, rg)
+    i2x1(nr, ls, no_bc, rg)
+    i2x2d1(nr, ls, no_bc, rg)
+    i4x3(nr, ls, no_bc, rg)
+    i4x4d1(nr, ls, no_bc, rg)
     qid(nr, ls, no_bc, rg)
