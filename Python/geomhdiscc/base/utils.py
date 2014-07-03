@@ -5,25 +5,26 @@ from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 
-def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None):
+def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None, has_wrap = True):
     """Build diagonals from function list and offsets"""
 
     # Build wrapped around values
-    wrap = [[0]*abs(offsets[0]) for i in range(len(ds))]
-    for d,f in enumerate(ds):
-        lb = max(0, -offsets[d])
-        for i in range(0, lb):
-            if ns[i] > nzrow:
-                lbw = sum(offsets < 0)
-                step = (ns[1]-ns[0])
-                if cross_parity == None:
-                    shift = 0
-                else:
-                    shift = (-1)**cross_parity 
-                col = sum(((ns + shift) - (-(ns[i] + shift) - step*offsets[d])) < 0)
-                col = lbw + col - i
-                row = i - max(0, lbw - col)
-                wrap[col][row] = f(ns[i])
+    if has_wrap:
+        wrap = [[0]*abs(offsets[0]) for i in range(len(ds))]
+        for d,f in enumerate(ds):
+            lb = max(0, -offsets[d])
+            for i in range(0, lb):
+                if ns[i] > nzrow:
+                    lbw = sum(offsets < 0)
+                    step = (ns[1]-ns[0])
+                    if cross_parity == None:
+                        shift = 0
+                    else:
+                        shift = (-1)**cross_parity 
+                    col = sum(((ns + shift) - (-(ns[i] + shift) - step*offsets[d])) < 0)
+                    col = lbw + col - i
+                    row = i - max(0, lbw - col)
+                    wrap[col][row] = f(ns[i])
 
     # Build diagonals
     diags = [0]*len(ds)
@@ -31,8 +32,9 @@ def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None):
         lb = max(0, -offsets[d])
         ub = min(len(ns),len(ns)-offsets[d])
         diags[d] = [f(n) if n > nzrow else 0 for n in ns[lb:ub]]
-        if len(wrap[d]) > 0:
-            diags[d][0:len(wrap[d])] = [x + y for x, y in zip(diags[d][0:len(wrap[d])], wrap[d][:])]
+        if has_wrap:
+            if len(wrap[d]) > 0:
+                diags[d][0:len(wrap[d])] = [x + y for x, y in zip(diags[d][0:len(wrap[d])], wrap[d][:])]
 
     return diags
 
