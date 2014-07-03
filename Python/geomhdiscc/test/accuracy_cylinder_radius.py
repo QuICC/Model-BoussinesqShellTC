@@ -114,6 +114,18 @@ def i4x4lapl2(nr, ms, bc, rg):
         test_forward(A, m%2, sphys, ssol, rg, 2)
 
 
+def qid(nr, ms, bc, xg):
+    """Accuracy test for qid operator"""
+
+    print("qid:")
+    x = sy.Symbol('x')
+    for m in ms:
+        A = cylinder.qid(nr, 3, bc)
+        sphys = np.sum([np.random.ranf()*x**i for i in np.arange(m%2,2*nr,2)])
+        ssol = sphys
+        test_forward(A, m%2, sphys, ssol, xg, 3)
+
+
 if __name__ == "__main__":
     # Set test parameters
     nr = 20
@@ -128,3 +140,4 @@ if __name__ == "__main__":
     i4x4(nr, ms, no_bc, rg)
     i4x4lapl(nr, ms, no_bc, rg)
     i4x4lapl2(nr, ms, no_bc, rg)
+    qid(nr, ms, no_bc, rg)

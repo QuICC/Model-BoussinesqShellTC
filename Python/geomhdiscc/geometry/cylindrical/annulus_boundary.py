@@ -1,11 +1,12 @@
-"""Module provides functions to generate the boundary conditions in a cylindrical geometry (annulus and cylinder)"""
+"""Module provides functions to generate the boundary conditions in a cylindrical annulus"""
 
 from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
-import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
+import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
+import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as radbc
 
 def qid(nx, q, bc):
     """Create a quasi indentity"""
@@ -35,18 +36,18 @@ def bid(nx, q, bc):
     return mat.tocsr()
 
 
-def constrain(mat, nx, nz, bc, eq_zrows_x, eq_zrows_z):
+def constrain(mat, nr, nz, bc, eq_zrows_r, eq_zrows_z):
     """Contrain the matrix with the Tau boundary condition"""
 
     bc_mat = mat
-    if bc['x'][0] > 0:
-        bcMat = spsp.lil_matrix((nx,nx))
-        bcMat = c1dbc.constrain(bcMat, bc['x'], 0)
+    if bc['r'][0] > 0:
+        bcMat = spsp.lil_matrix((nr,nr))
+        bcMat = radbc.constrain(bcMat, bc['r'], 0)
         bc_mat = bc_mat + spsp.kron(bid(nz,eq_zrows_z,bc['z']), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], 0)
-        bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,0,bc['x']))
+        bc_mat = bc_mat + spsp.kron(bcMat, bid(nr,0,bc['x']))
 
     return bc_mat

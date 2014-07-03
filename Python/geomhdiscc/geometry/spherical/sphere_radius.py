@@ -205,3 +205,13 @@ def i4x4lapl2(nr, l, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
+
+
+def qid(nr, q, bc, coeff = 1.0):
+    """Create a quasi identity block of order q"""
+
+    offsets = [0]
+    diags = [[0]*q + [1]*(nr-q)]
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return sphbc.constrain(mat, bc, q)

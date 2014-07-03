@@ -7,6 +7,7 @@ import scipy.sparse as spsp
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cartesian.cartesian_boundary_2d as c2dbc
 
+
 def convert_bc(bc):
     """Convert boundary dictionary into x and z kronecker product boundaries"""
 

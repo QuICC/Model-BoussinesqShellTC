@@ -114,6 +114,17 @@ def i4x4lapl2(nr, ls, a, b, bc, rg):
         test_forward(A, sphys, ssol, rg, 4)
 
 
+def qid(nr, a, b, bc, xg):
+    """Accuracy test for qid operator"""
+
+    print("qid:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 3, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
+    ssol = sphys
+    test_forward(A, sphys, ssol, xg, 3)
+
+
 if __name__ == "__main__":
     # Set test parameters
     nr = 20
@@ -130,3 +141,4 @@ if __name__ == "__main__":
     i4x4(nr, ls, a, b, no_bc, rg)
     i4x4lapl(nr, ls, a, b, no_bc, rg)
     i4x4lapl2(nr, ls, a, b, no_bc, rg)
+    qid(nr, a, b, no_bc, rg)

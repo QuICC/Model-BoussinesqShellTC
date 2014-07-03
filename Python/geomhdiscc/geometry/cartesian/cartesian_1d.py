@@ -339,6 +339,7 @@ def qid(nx, q, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc, q)
 
+
 def avg(nx):
     """Compute the average of the expansion"""
 
