@@ -7,41 +7,46 @@ import numpy as np
 import scipy.sparse as spsp
 import geomhdiscc.geometry.spherical.sphere_radius_boundary as sphbc
 
-def qid(nr, q, bc):
+def qid(n, q, bc):
     """Create a quasi indentity"""
 
     if bc[0] < 0:
-        mat = spsp.identity(nr-bc[0]//10)
+        mat = spsp.identity(n-bc[0]//10)
     else:
         offsets = [0]
-        diags = [[0]*q + [1]*(nr-q)]
+        diags = [[0]*q + [1]*(n-q)]
 
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
 
 
-def bid(nr, q, bc):
+def bid(n, q, bc):
     """Create a boundary indentity"""
 
     if bc[0] < 0:
-        mat = spsp.identity(nr-bc[0]//10)
+        mat = spsp.identity(n-bc[0]//10)
     else:
         offsets = [-q]
-        diags = [[1]*(nr-q)]
+        diags = [[1]*(n-q)]
 
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
 
 
-def constrain(mat, nr, nl, bc):
+def constrain(mat, nr, maxl, m, bc):
     """Contrain the matrix with the tau boundary condition"""
 
     bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bcMat = sphbc.constrain(bcMat, bc, 0)
-        bc_mat = bc_mat + spsp.kron(bid(nl,0,[0]), bcMat)
+        bc_mat = sphbc.constrain(bcMat, m, bc, 0)
+        for l in range(m+1, maxl+1):
+            bcMat = spsp.lil_matrix((nr,nr))
+            bcMat = sphbc.constrain(bcMat, l, bc, 0)
+            bc_mat = spsp.block_diag((bc_mat,bcMat))
+
+        bc_mat = mat + bc_mat
 
     return bc_mat

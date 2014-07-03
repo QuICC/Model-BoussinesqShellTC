@@ -25,12 +25,12 @@ def convert_bc(bc):
     return (bcr, bcz)
 
 
-def zblk(nr, nz, qr, qz, bc):
+def zblk(nr, nz, m, qr, qz, bc):
     """Create a block of zeros"""
 
     bcr, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.zblk(nz,qz,bcz),rad.zblk(nr,qr,bcr))
-    return cylbc.constrain(mat, nr, nz, bc, qr, qz)
+    mat = spsp.kron(c1d.zblk(nz,qz,bcz),rad.zblk(nr,m,qr,bcr))
+    return cylbc.constrain(mat, nr, nz, m, bc, qr, qz)
 
 
 def i2j2x2(nr, nz, m, bc, coeff = 1.0):
@@ -38,7 +38,7 @@ def i2j2x2(nr, nz, m, bc, coeff = 1.0):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.j2(nz,2,bcz), rad.i2x2(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, bc, 1, 2)
+    return cylbc.constrain(mat, nr, nz, m, bc, 1, 2)
 
 
 def i2j2x2lapl(nr, nz, m, bc, coeff = 1.0):
@@ -46,7 +46,7 @@ def i2j2x2lapl(nr, nz, m, bc, coeff = 1.0):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,2,bcz), rad.i2x2lapl(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, bc, 1, 2)
+    return cylbc.constrain(mat, nr, nz, m, bc, 1, 2)
 
 
 def i4j4x4(nr, nz, m, bc, coeff = 1.0):
@@ -54,7 +54,7 @@ def i4j4x4(nr, nz, m, bc, coeff = 1.0):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,4,bcz), rad.i4x4(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
 
 
 def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0):
@@ -62,7 +62,7 @@ def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,4,bcz), rad.i4x4lapl(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
 
 
 def i4j4x4lapl2(nr, nz, m, bc, coeff = 1.0):
@@ -70,12 +70,12 @@ def i4j4x4lapl2(nr, nz, m, bc, coeff = 1.0):
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,4,bcz), rad.i4x4lapl2(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
 
 
 def qid(nr, nz, m, qr, qz, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), rad.qid(nr,qr,bcr))
-    return cylbc.constrain(mat, nr, nz, bc, qr, qz)
+    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), rad.qid(nr, m, qr,bcr))
+    return cylbc.constrain(mat, nr, nz, m, bc, qr, qz)

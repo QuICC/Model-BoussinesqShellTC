@@ -6,30 +6,30 @@ from __future__ import unicode_literals
 import numpy as np
 
 
-def constrain(mat, bc, eq_zrows):
+def constrain(mat, l, bc, eq_zrows):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
     if bc[0] > 0:
-        bc_mat = apply_tau(mat, bc)
+        bc_mat = apply_tau(mat, l, bc)
     elif bc[0] < 0:
-        bc_mat = apply_galerkin(mat, bc, eq_zrows)
+        bc_mat = apply_galerkin(mat, l, bc, eq_zrows)
     else:
         bc_mat = mat
 
     return bc_mat
 
 
-def apply_tau(mat, bc):
+def apply_tau(mat, l, bc):
     """Add Tau lines to the matrix"""
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], 0, bc[1:])
-    elif bc[0] == 11:
-        cond = tau_value(mat.shape[0], 1, bc[1:])
-    elif bc[0] == 12:
-        cond = tau_diff(mat.shape[0], 0, bc[1:])
-    elif bc[0] == 13:
-        cond = tau_diff(mat.shape[0], 1, bc[1:])
+        cond = tau_value(mat.shape[0], l%2, bc[1:])
+    if bc[0] == 11:
+        cond = tau_diff(mat.shape[0], l%2, bc[1:])
+    elif bc[0] == 20:
+        cond = tau_value_diff(mat.shape[0], l%2, bc[1:])
+    elif bc[0] == 21:
+        cond = tau_value_diff2(mat.shape[0], l%2, bc[1:])
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -83,7 +83,37 @@ def tau_diff2(nr, parity, coeffs = None):
     return np.array(cond)
 
 
-def apply_galerkin(mat, bc, eq_zero_rows):
+def tau_value_diff(nr, parity, coeffs = None):
+    """Create the no penetration and no-slip tau line(s)"""
+
+    if coeffs is None or len(coeffs) < 1:
+        c = 1.0
+    else:
+        c = coeffs[0]
+
+    cond = []
+    cond.append(list(tau_value(nr,parity,coeffs)[0]))
+    cond.append(list(tau_diff(nr,parity,coeffs)[0]))
+
+    return np.array(cond)
+
+
+def tau_value_diff2(nr, parity, coeffs = None):
+    """Create the no penetration and no-slip tau line(s)"""
+
+    if coeffs is None or len(coeffs) < 1:
+        c = 1.0
+    else:
+        c = coeffs[0]
+
+    cond = []
+    cond.append(list(tau_value(nr,parity,coeffs)[0]))
+    cond.append(list(tau_diff2(nr,parity,coeffs)[0]))
+
+    return np.array(cond)
+
+
+def apply_galerkin(mat, l, bc, eq_zero_rows):
     """Apply a Galerkin stencil on the matrix"""
 
     return mat

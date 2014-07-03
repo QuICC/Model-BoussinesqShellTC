@@ -20,6 +20,19 @@ def convert_bc(bc):
     return bcr
 
 
+def sh_coeff(coeff):
+    """Compute coefficients from spherical harmonic expansion"""
+
+    if coeff == 'laplh':
+        def fct(x):
+            return x*(x + 1.0)
+    else:
+        def fct(x):
+            return 1.0
+    
+    return fct
+
+
 def zblk(nr, maxl, m, qr, bc):
     """Create a block of zeros"""
 
@@ -30,58 +43,67 @@ def zblk(nr, maxl, m, qr, bc):
     return sphbc.constrain(mat, nr, maxl, bc)
 
 
-def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    nl = maxl + 1 - m
-    mat = coeff*spsp.kron(rad.qid(nl,0,[0]), rad.i2x2(nr, a, b, bcr))
+    mat = coeff*shc(m)*rad.i2x2(nr, a, b, bcr)
+    for l in range(m+1, maxl+1):
+        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2(nr, a, b, bcr)))
+
     return sphbc.constrain(mat, nr, maxl, bc)
 
 
-def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*rad.i2x2lapl(nr, m, a, b, bcr)
+    mat = coeff*shc(m)*rad.i2x2lapl(nr, m, a, b, bcr)
     for l in range(m+1, maxl+1):
-        mat = coeff*spsp.block_diag((mat,rad.i2x2lapl(nr, l, a, b, bcr)))
+        mat = spsp.block_diag((mat,coeff*shc(m)*rad.i2x2lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, bc)
 
 
-def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    nl = maxl + 1 - m
-    mat = coeff*spsp.kron(rad.qid(nl,0,[0]), rad.i4x4(nr, a, b, bcr))
+    mat = coeff*shc(m)*rad.i4x4(nr, a, b, bcr)
+    for l in range(m+1, maxl+1):
+        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4(nr, a, b, bcr)))
+
     return sphbc.constrain(mat, nr, maxl, bc)
 
 
-def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*rad.i4x4lapl(nr, m, a, b, bcr)
+    mat = coeff*shc(m)*rad.i4x4lapl(nr, m, a, b, bcr)
     for l in range(m+1, maxl+1):
-        mat = coeff*spsp.block_diag((mat,rad.i4x4lapl(nr, l, a, b, bcr)))
+        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, bc)
 
 
-def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*rad.i4x4lapl2(nr, m, a, b, bcr)
+    mat = coeff*shc(m)*rad.i4x4lapl2(nr, m, a, b, bcr)
     for l in range(m+1, maxl+1):
-        mat = coeff*spsp.block_diag((mat,rad.i4x4lapl2(nr, l, a, b, bcr)))
+        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, bc)
 

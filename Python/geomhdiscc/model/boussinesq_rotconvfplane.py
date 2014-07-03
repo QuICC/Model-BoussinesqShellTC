@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the compressible F-Plane model"""
+"""Module provides the functions to generate the Boussinesq convection in a rotating F-Plane model"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -10,8 +10,8 @@ import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 
 
-class CompressibleFPlane(base_model.BaseModel):
-    """Class to setup the compressible F-Plane model"""
+class BoussinesqRotConvFPlane(base_model.BaseModel):
+    """Class to setup the Boussinesq convection in a rotating F-Plane model"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -28,13 +28,13 @@ class CompressibleFPlane(base_model.BaseModel):
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocityx", "velocityy" ,"velocityz", "pressure", "density", "temperature", "entropy"]
+        return ["velocityx", "velocityy" ,"velocityz", "pressure", "temperature"]
 
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        return [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("density",""), ("temperature",""), ("entropy","")]
+        return [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("temperature","")]
 
 
     def explicit_fields(self, field_row):
@@ -52,9 +52,9 @@ class CompressibleFPlane(base_model.BaseModel):
         is_complex = False
 
         # Implicit field coupling
-        im_fields = implicit_fields(field_row)
+        im_fields = self.implicit_fields(field_row)
         # Additional explicit linear fields
-        ex_fields = explicit_fields(field_row)
+        ex_fields = self.explicit_fields(field_row)
 
         # Equation doesn't have geometric coupling
         has_geometric_coupling = False
@@ -94,9 +94,7 @@ class CompressibleFPlane(base_model.BaseModel):
                     bc_field[("velocityy","")] = [20]
                     bc_field[("velocityz","")] = [20]
                     bc_field[("pressure","")] = [20]
-                    bc_field[("density","")] = [20]
                     bc_field[("temperature","")] = [20]
-                    bc_field[("entropy","")] = [20]
                     if field_col == field_row:
                         bc = bc_field[field_col]
 
@@ -125,19 +123,13 @@ class CompressibleFPlane(base_model.BaseModel):
         elif field_row == ("pressure",""):
             mat = c1d.i2(res[0], [0])
 
-        elif field_row == ("density",""):
-            mat = c1d.i2(res[0], [0])
-
         elif field_row == ("temperature",""):
-            mat = c1d.i2(res[0], [0])
-
-        elif field_row == ("entropy",""):
             mat = c1d.i2(res[0], [0])
 
         return mat
 
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -154,13 +146,7 @@ class CompressibleFPlane(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c1d.i2(res[0], bc)
 
-            elif field_col == ("density",""):
-                mat = c1d.zblk(res[0],2, bc)
-
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0],2, bc)
 
         elif field_row == ("velocityy",""):
@@ -176,13 +162,7 @@ class CompressibleFPlane(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c1d.i2(res[0],bc)
 
-            elif field_col == ("density",""):
-                mat = c1d.zblk(res[0],2, bc)
-
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0],2, bc)
 
         elif field_row == ("velocityz",""):
@@ -198,13 +178,7 @@ class CompressibleFPlane(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c1d.i2(res[0], bc)
 
-            elif field_col == ("density",""):
-                mat = c1d.i2(res[0], bc)
-
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0],2, bc)
 
         elif field_row == ("pressure",""):
@@ -220,35 +194,7 @@ class CompressibleFPlane(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c1d.i2(res[0], bc)
 
-            elif field_col == ("density",""):
-                mat = c1d.i2(res[0], bc)
-
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("entropy",""):
-                mat = c1d.i2(res[0], bc)
-
-        elif field_row == ("density",""):
-            if field_col == ("velocityx",""):
-                mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("velocityy",""):
-                mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("pressure",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("density",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0],2, bc)
 
         elif field_row == ("temperature",""):
@@ -264,36 +210,8 @@ class CompressibleFPlane(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c1d.i2(res[0], bc)
 
-            elif field_col == ("density",""):
-                mat = c1d.i2(res[0],2, bc)
-
             elif field_col == ("temperature",""):
                 mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("entropy",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-        elif field_row == ("entropy",""):
-            if field_col == ("velocityx",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("velocityy",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("velocityz",""):
-                mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("pressure",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("density",""):
-                mat = c1d.zblk(res[0],2, bc)
-
-            elif field_col == ("temperature",""):
-                mat = c1d.i2(res[0], bc)
-
-            elif field_col == ("entropy",""):
-                mat = c1d.zblk(res[0],2, bc)
 
         return mat
 
@@ -309,12 +227,6 @@ class CompressibleFPlane(base_model.BaseModel):
             mat = c1d.i2(res[0], bc)
 
         elif field_row == ("velocityz",""):
-            mat = c1d.i2(res[0], bc)
-
-        elif field_row == ("density",""):
-            mat = c1d.i2(res[0], bc)
-
-        elif field_row == ("entropy",""):
             mat = c1d.i2(res[0], bc)
 
         return mat

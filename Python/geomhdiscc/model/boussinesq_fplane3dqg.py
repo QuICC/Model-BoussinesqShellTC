@@ -158,7 +158,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         return mat
 
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
@@ -191,7 +191,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
-                if linearize:
+                if self.linearize:
                     mat = c1d.qid(res[0],0, bc, -1j*kx*eta2)
 
                     # Force temperature boundary condition
@@ -203,7 +203,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     mat = c1d.zblk(res[0],0, bc)
 
             elif field_col == ("velocityz",""):
-                if linearize:
+                if self.linearize:
                     mat = c1d.qid(res[0],0, bc, eta3)
 
                     # Force temperature boundary condition

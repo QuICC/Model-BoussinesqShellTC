@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the anelastic F-Plane model"""
+"""Module provides the functions to generate the compressible convection in a rotating F-Plane model"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -10,8 +10,8 @@ import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 
 
-class AnelasticFPlane(base_model.BaseModel):
-    """Class to setup the anelastic F-Plane model"""
+class CompressibleRotConvFPlane(base_model.BaseModel):
+    """Class to setup the compressible convection in a rotating F-Plane model"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -52,9 +52,9 @@ class AnelasticFPlane(base_model.BaseModel):
         is_complex = False
 
         # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
+        im_fields = implicit_fields(field_row)
         # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
+        ex_fields = explicit_fields(field_row)
 
         # Equation doesn't have geometric coupling
         has_geometric_coupling = False
@@ -137,7 +137,7 @@ class AnelasticFPlane(base_model.BaseModel):
         return mat
 
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = True):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)

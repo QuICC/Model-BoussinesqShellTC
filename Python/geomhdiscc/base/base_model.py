@@ -9,6 +9,8 @@ import geomhdiscc.base.utils as utils
 class BaseModel:
     """Base class for all the models"""
 
+    linearize = False
+
     def time(self, res, eq_params, eigs, bcs, fields):
         """Create the time derivative operator"""
 

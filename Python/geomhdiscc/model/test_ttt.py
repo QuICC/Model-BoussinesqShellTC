@@ -123,7 +123,7 @@ class TestTTT(base_model.BaseModel):
         return mat
 
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, linearize = False):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block of linear operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)

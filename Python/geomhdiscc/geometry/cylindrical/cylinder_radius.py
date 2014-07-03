@@ -9,11 +9,11 @@ import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as cylbc
 
 
-def zblk(nr, q, bc):
+def zblk(nr, m, q, bc):
     """Create a block of zeros"""
 
     mat = spsp.lil_matrix((nr,nr))
-    return cylbc.constrain(mat,bc,q)
+    return cylbc.constrain(mat,m,bc,q)
 
 
 def i2x2(nr, m, bc, coeff = 1.0):
@@ -48,7 +48,7 @@ def i2x2(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 1)
+    return cylbc.constrain(mat, m, bc, 1)
 
 
 def i2x2lapl(nr, m, bc, coeff = 1.0):
@@ -75,7 +75,7 @@ def i2x2lapl(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 1)
+    return cylbc.constrain(mat, m, bc, 1)
 
 
 def i4x4(nr, m, bc, coeff = 1.0):
@@ -126,7 +126,7 @@ def i4x4(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 2)
+    return cylbc.constrain(mat, m, bc, 2)
 
 
 def i4x4lapl(nr, m, bc, coeff = 1.0):
@@ -169,7 +169,7 @@ def i4x4lapl(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 2)
+    return cylbc.constrain(mat, m, bc, 2)
 
 
 def i4x4lapl2(nr, m, bc, coeff = 1.0):
@@ -204,14 +204,14 @@ def i4x4lapl2(nr, m, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 2)
+    return cylbc.constrain(mat, m, bc, 2)
 
 
-def qid(nr, q, bc, coeff = 1.0):
+def qid(nr, m, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 
     offsets = [0]
     diags = [[0]*q + [1]*(nr-q)]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, q)
+    return cylbc.constrain(mat, m, bc, q)

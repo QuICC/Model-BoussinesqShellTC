@@ -8,41 +8,41 @@ import scipy.sparse as spsp
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
 
-def qid(nx, q, bc):
+def qid(n, q, bc):
     """Create a quasi indentity"""
 
     if bc[0] < 0:
-        mat = spsp.identity(nx-bc[0]//10)
+        mat = spsp.identity(n-bc[0]//10)
     else:
         offsets = [0]
-        diags = [[0]*q + [1]*(nx-q)]
+        diags = [[0]*q + [1]*(n-q)]
 
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
 
 
-def bid(nx, q, bc):
+def bid(n, q, bc):
     """Create a boundary indentity"""
 
     if bc[0] < 0:
-        mat = spsp.identity(nx-bc[0]//10)
+        mat = spsp.identity(n-bc[0]//10)
     else:
         offsets = [-q]
-        diags = [[1]*(nx-q)]
+        diags = [[1]*(n-q)]
 
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
 
 
-def constrain(mat, nr, nz, bc, eq_zrows_r, eq_zrows_z):
+def constrain(mat, nr, nz, m, bc, eq_zrows_r, eq_zrows_z):
     """Contrain the matrix with the Tau boundary condition"""
 
     bc_mat = mat
     if bc['r'][0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bcMat = radbc.constrain(bcMat, bc['r'], 0)
+        bcMat = radbc.constrain(bcMat, m, bc['r'], 0)
         bc_mat = bc_mat + spsp.kron(bid(nz,eq_zrows_z,bc['z']), bcMat)
 
     if bc['z'][0] > 0:

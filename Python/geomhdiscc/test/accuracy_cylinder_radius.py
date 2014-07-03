@@ -120,7 +120,7 @@ def qid(nr, ms, bc, xg):
     print("qid:")
     x = sy.Symbol('x')
     for m in ms:
-        A = cylinder.qid(nr, 3, bc)
+        A = cylinder.qid(nr, m, 3, bc)
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(m%2,2*nr,2)])
         ssol = sphys
         test_forward(A, m%2, sphys, ssol, xg, 3)
