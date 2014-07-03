@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import scipy.sparse as spsp
 
-def build_diagonals(ns, nzrow, ds, offsets):
+def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None):
     """Build diagonals from function list and offsets"""
 
     # Build wrapped around values
@@ -14,9 +14,15 @@ def build_diagonals(ns, nzrow, ds, offsets):
         lb = max(0, -offsets[d])
         for i in range(0, lb):
             if ns[i] > nzrow:
-                col = sum((ns - (-ns[i] - (ns[1]-ns[0])*offsets[d])) < 0)
-                col = len(ds)//2 + col - i
-                row = i - max(0, len(ds)//2 - col)
+                lbw = sum(offsets < 0)
+                step = (ns[1]-ns[0])
+                if cross_parity == None:
+                    shift = 0
+                else:
+                    shift = (-1)**cross_parity 
+                col = sum(((ns + shift) - (-(ns[i] + shift) - step*offsets[d])) < 0)
+                col = lbw + col - i
+                row = i - max(0, lbw - col)
                 wrap[col][row] = f(ns[i])
 
     # Build diagonals

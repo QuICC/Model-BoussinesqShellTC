@@ -234,7 +234,7 @@ def i2x1(nr, l, bc, coeff = 1.0):
         return d_2(n + 1.0)
 
     ds = [d_2, d_1, d1, d2]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 1)
@@ -267,7 +267,7 @@ def i2x2d1(nr, l, bc, coeff = 1.0):
         return -d_1(n)
 
     ds = [d_2, d_1, d1, d2]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 1)
@@ -316,7 +316,7 @@ def i4x3(nr, l, bc, coeff = 1.0):
         return 1.0/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_3, d_2, d_1, d1, d2, d3, d4]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
@@ -365,7 +365,7 @@ def i4x4d1(nr, l, bc, coeff = 1.0):
         return -(n + 7.0)/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_3, d_2, d_1, d1, d2, d3, d4]
-    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
