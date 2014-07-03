@@ -9,7 +9,7 @@
  *       <tr>\mhdStatTest<td>Component implementation is done and tested</td></tr>
  *    }   
  *
- *    - \subpage mhdPNLBoussinesqBeta3DQG <em>(Work in progress)</em>
+ *    - \subpage mhdPNLBousBeta3DQG <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -27,7 +27,7 @@
  *          \mhdStatus{Vorticity (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
  *       }
  *
- *    - \subpage mhdPNLBoussinesqFPlane3DQG  <em>(Work in progress)</em>
+ *    - \subpage mhdPNLBousFPlane3DQG  <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -47,7 +47,7 @@
  *          \mhdStatus{Vorticity (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
  *       }
  *
- *    - \subpage mhdPNLBoussinesqFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRotConvFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -65,7 +65,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
- *    - \subpage mhdPNLAnelasticFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelRotConvFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -83,7 +83,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
- *    - \subpage mhdPNLCompressibleFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLCompRotConvFPlane <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -101,7 +101,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLBoussinesqConvectionCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRotConvCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -115,7 +115,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLBoussinesqConvectionAnnulus <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRotConvAnnulus <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -129,7 +129,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *       }
  *
- *    - \subpage mhdPNLBoussinesqConvectionSphere <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRotConvSphere <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -143,7 +143,7 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLBoussinesqConvectionShell <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRotConvShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -157,49 +157,49 @@
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLAnelasticConvectionCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelRotConvCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLAnelasticConvectionAnnulus <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelRotConvAnnulus <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *
- *    - \subpage mhdPNLAnelasticConvectionSphere <em>(Not started yet)</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *          
- *    - \subpage mhdPNLAnelasticConvectionShell <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelRotConvSphere <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLCompressibleConvectionCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLAnelRotConvShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLCompressibleConvectionAnnulus <em>(Not started yet)</em>
- *
- *       \mhdTable{
- *          \mhdStatus{Simulation base, \mhdStatTodo}
- *       }
- *
- *    - \subpage mhdPNLCompressibleConvectionSphere <em>(Not started yet)</em>
+ *    - \subpage mhdPNLCompRotConvCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *          
- *    - \subpage mhdPNLCompressibleConvectionShell <em>(Not started yet)</em>
+ *    - \subpage mhdPNLCompRotConvAnnulus <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPNLCompRotConvSphere <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - \subpage mhdPNLCompRotConvShell <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
