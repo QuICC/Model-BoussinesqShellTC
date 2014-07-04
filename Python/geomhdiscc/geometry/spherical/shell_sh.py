@@ -23,13 +23,16 @@ def coriolisdr(maxl, m, coeff = 1.0):
     offsets = np.arange(-1,2,2)
     nzrow = -1
 
+    def dgen(l):
+        return -(l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
+
     # Generate 1st subdiagonal
     def d_1(l):
-        return -(l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/(2.0*l - 1.0)*(2.0*l + 1.0))
+        return dgen(l)
 
     # Generate 1st superdiagonal
     def d1(l):
-        return d_1(l + 1.0)
+        return dgen(l+1.0)
 
     ds = [d_1, d1]
     diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)
@@ -46,15 +49,15 @@ def coriolis_r(maxl, m, coeff = 1.0):
     nzrow = -1
 
     def dgen(l):
-        return  -(l - 1.0)*(l + 1.0)*np.sqrt(((l - m)*(l + m))/(2.0*l - 1.0)*(2.0*l + 1.0))
+        return np.sqrt(((l - m)*(l + m))/((2.0*l - 1.0)*(2.0*l + 1.0)))
 
     # Generate 1st subdiagonal
     def d_1(l):
-        return  (l - 1.0)*dgen(l)
+        return  -(l + 1.0)**2*(l - 1.0)*dgen(l)
 
     # Generate 1st superdiagonal
     def d1(l):
-        return (l + 2.0)*dgen(l + 1.0)
+        return l**2*(l + 2.0)*dgen(l + 1.0)
 
     ds = [d_1, d1]
     diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)

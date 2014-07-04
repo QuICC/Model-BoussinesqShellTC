@@ -73,7 +73,7 @@ class TestFFF(base_model.BaseModel):
         return (is_complex,im_fields,ex_fields,has_geometric_coupling, index_mode, block_info)
 
 
-    def qi(self, res, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
         if field_row == ("streamfunction",""):

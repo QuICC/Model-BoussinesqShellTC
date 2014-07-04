@@ -108,7 +108,7 @@ class TestTTT(base_model.BaseModel):
         return bc
 
 
-    def qi(self, res, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
         if field_row == ("streamfunction",""):

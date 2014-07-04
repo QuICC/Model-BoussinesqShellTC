@@ -40,7 +40,7 @@ def zblk(nr, maxl, m, qr, bc):
 
     nl = maxl + 1 - m
     mat = spsp.kron(rad.zblk(nl,0,[0]),rad.zblk(nr,qr,bcr))
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -53,7 +53,7 @@ def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     for l in range(m+1, maxl+1):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2(nr, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -64,9 +64,9 @@ def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     mat = coeff*shc(m)*rad.i2x2lapl(nr, m, a, b, bcr)
     for l in range(m+1, maxl+1):
-        mat = spsp.block_diag((mat,coeff*shc(m)*rad.i2x2lapl(nr, l, a, b, bcr)))
+        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2lapl(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -79,7 +79,7 @@ def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     for l in range(m+1, maxl+1):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4(nr, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -92,7 +92,7 @@ def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     for l in range(m+1, maxl+1):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -105,7 +105,7 @@ def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     for l in range(m+1, maxl+1):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
@@ -121,7 +121,7 @@ def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
         row = coeff*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
@@ -137,7 +137,7 @@ def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
         row = coeff*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)
 
 
 def qid(nr, maxl, m, qr, bc, coeff = 1.0):
@@ -147,4 +147,4 @@ def qid(nr, maxl, m, qr, bc, coeff = 1.0):
 
     nl = maxl + 1 - m
     mat = coeff*spsp.kron(rad.qid(nl,0,[0]), rad.qid(nr,qr,bcr))
-    return sphbc.constrain(mat, nr, maxl, bc)
+    return sphbc.constrain(mat, nr, maxl, m, bc)

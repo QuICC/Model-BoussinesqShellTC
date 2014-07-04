@@ -31,6 +31,14 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         return ["velocity", "temperature"]
 
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+
+        return fields
+
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
@@ -97,6 +105,14 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
                     if field_col == field_row:
                         bc = bc_field[field_col]
 
+                elif bcId == 1:
+                    bc_field = {}
+                    bc_field[("velocity","tor")] = [11]
+                    bc_field[("velocity","pol")] = [21]
+
+                    if field_col == field_row:
+                        bc = bc_field[field_col]
+
                 if bc is None:
                     if use_tau_boundary:
                         bc = no_bc
@@ -108,7 +124,7 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         return bc
 
 
-    def qi(self, res, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
         l = eigs[0]

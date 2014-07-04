@@ -7,6 +7,10 @@
 #ifndef IEQUATION_HPP
 #define IEQUATION_HPP
 
+// First include
+//
+#include "Python/PythonHeader.hpp"
+
 // Configuration includes
 //
 #include "SmartPointers/SharedPtrMacro.h"
@@ -146,6 +150,11 @@ namespace Equations {
           * \brief Implementation of the coupling definition to python scripts
           */
          void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes);
+
+         /**
+          * @brief Implementation of base arguments common to all dispatcher
+          */
+         PyObject* dispatchBaseArguments(const int tupleSize, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
          /**
           * @brief Implementation of model operator dispatcher to python scripts

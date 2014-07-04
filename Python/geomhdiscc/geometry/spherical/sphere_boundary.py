@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
-import geomhdiscc.geometry.spherical.sphere_radius_boundary as sphbc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary as radbc
 
 def qid(n, q, bc):
     """Create a quasi indentity"""
@@ -41,10 +41,10 @@ def constrain(mat, nr, maxl, m, bc):
     bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bc_mat = sphbc.constrain(bcMat, m, bc, 0)
+        bc_mat = radbc.constrain(bcMat, m, bc, 0)
         for l in range(m+1, maxl+1):
             bcMat = spsp.lil_matrix((nr,nr))
-            bcMat = sphbc.constrain(bcMat, l, bc, 0)
+            bcMat = radbc.constrain(bcMat, l, bc, 0)
             bc_mat = spsp.block_diag((bc_mat,bcMat))
 
         bc_mat = mat + bc_mat
