@@ -31,6 +31,14 @@ class BoussinesqRotConvFPlane(base_model.BaseModel):
         return ["velocityx", "velocityy" ,"velocityz", "pressure", "temperature"]
 
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields = [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("temperature","")]
+
+        return fields
+
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 

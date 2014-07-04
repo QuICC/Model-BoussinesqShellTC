@@ -31,6 +31,14 @@ class TestCFT(base_model.BaseModel):
         return ["velocity", "temperature"]
 
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields = [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+
+        return fields
+
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 

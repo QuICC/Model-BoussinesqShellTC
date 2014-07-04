@@ -33,6 +33,14 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         return ["streamfunction", "velocityz", "temperature"]
 
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+
+        return fields
+
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 

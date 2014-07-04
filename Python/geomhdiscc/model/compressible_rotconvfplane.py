@@ -31,6 +31,14 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
         return ["velocityx", "velocityy" ,"velocityz", "pressure", "density", "temperature", "entropy"]
 
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields = [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("density",""), ("temperature",""), ("entropy","")]
+
+        return fields
+
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
