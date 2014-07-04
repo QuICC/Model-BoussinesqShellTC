@@ -3,11 +3,12 @@
 ###################################################
 
 #
-# Install Python scripts
+# Install Python package and scripts
 #
 INSTALL(DIRECTORY Python/geomhdiscc DESTINATION ${PROJECT_BINARY_DIR}/Python)
+INSTALL(DIRECTORY Python/scripts DESTINATION ${PROJECT_BINARY_DIR}/Python)
 
-# Set path to installed python scripts
+# Set path to installed python package and scripts
 set(GEOMHDISCC_PYTHON_DIR "${PROJECT_BINARY_DIR}/Python")
 
 #

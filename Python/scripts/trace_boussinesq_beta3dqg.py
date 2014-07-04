@@ -1,17 +1,17 @@
-"""Script to run a marginal curve trace for the Boussinesq convection in a rotating spherical shell"""
+"""Script to run a marginal curve trace for the Boussinesq Beta 3DQG model"""
 
-import geomhdiscc.model.boussinesq_rotconvshell
+import geomhdiscc.model.boussinesq_beta3dqg
 
 # Create the model and activate linearization
-model = geomhdiscc.model.boussinesq_rotconvshell.BoussinesqRotConvShell()
+model = geomhdiscc.model.boussinesq_beta3dqg.BoussinesqBeta3DQG()
 model.linearize = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 50]
-eq_params = {'ekman':10**(-4.5), 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
-eigs = [1, 9]
-bcs = {'bcType':0, 'velocity':0, 'temperature':0}
+res = [50, 0, 50]
+eq_params = {'prandtl':1, 'rayleigh':4.761e6, 'gamma':1, 'chi':0.0}
+eigs = [9]
+bcs = {'bcType':0, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

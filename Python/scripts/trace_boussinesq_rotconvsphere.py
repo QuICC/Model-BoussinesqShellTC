@@ -8,7 +8,7 @@ model.linearize = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 50]
+res = [50, 50, 0]
 eq_params = {'ekman':10**(-4.5), 'prandtl':1, 'rayleigh':4.761e6}
 eigs = [1, 9]
 bcs = {'bcType':0, 'velocity':0, 'temperature':0}
