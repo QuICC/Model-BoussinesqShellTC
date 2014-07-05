@@ -8,6 +8,7 @@ import sympy as sy
 import scipy.sparse as spsp
 import geomhdiscc.transform.cartesian as transf
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import geomhdiscc.geometry.cartesian.cartesian_generic_1d as cg1d
 
 
 def x_to_phys(expr, grid):
@@ -73,6 +74,17 @@ def i2d2(nx, bc, xg):
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
+
+
+def i2d1(nx, bc, xg):
+    """Accuracy test for i2d1 operator"""
+
+    print("i2d1:")
+    x = sy.Symbol('x')
+    A = c1d.i2d1(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.integrate(sy.diff(sphys,x),x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
 
@@ -200,16 +212,54 @@ def qid(nx, bc, xg):
     test_forward(A, sphys, ssol, xg, 3)
 
 
+def genx1(nx, bc, xg):
+    """Accuracy test for genx1 operator"""
+
+    print("genx1:")
+    x = sy.Symbol('x')
+    expr = 'x'
+    A = cg1d.generic(nx, 1, expr, x, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sphys*x
+    test_forward(A, sphys, ssol, xg, 1)
+
+
+def genx2(nx, bc, xg):
+    """Accuracy test for genx2 operator"""
+
+    print("genx2:")
+    x = sy.Symbol('x')
+    expr = 'x**2'
+    A = cg1d.generic(nx, 1, expr, x, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sphys*x**2
+    test_forward(A, sphys, ssol, xg, 1)
+
+
+def genx4(nx, bc, xg):
+    """Accuracy test for genx4 operator"""
+
+    print("genx4:")
+    x = sy.Symbol('x')
+    expr = 'x**4'
+    A = cg1d.generic(nx, 1, expr, x, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sphys*x**4
+    test_forward(A, sphys, ssol, xg, 1)
+
+
 if __name__ == "__main__":
     # Set test parameters
-    nx = 20
+    nx = 10
     xg = transf.grid(nx)
     no_bc = [0]
 
     # run tests
+    print('Hard coded exact operators')
     #zblk(nx, no_bc, xg)
     i1(nx, no_bc, xg)
     i2(nx, no_bc, xg)
+    i2d1(nx, no_bc, xg)
     i2d2(nx, no_bc, xg)
     i2lapl(nx, no_bc, xg)
     i2laplh(nx, no_bc, xg)
@@ -221,3 +271,9 @@ if __name__ == "__main__":
     i4lapl2(nx, no_bc, xg)
     i4lapl2h(nx, no_bc, xg)
     qid(nx, no_bc, xg)
+
+    # run generic operator tests
+    print('Generic operator generator')
+    genx1(nx, no_bc, xg)
+    genx2(nx, no_bc, xg)
+    genx4(nx, no_bc, xg)

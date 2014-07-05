@@ -20,6 +20,7 @@ def i1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i2():
     """Cartesian second integral operator"""
 
@@ -32,6 +33,21 @@ def i2():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
+
+
+def i2d1():
+    """Cartesian second integral of first derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':0, 'd':1, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 
 def i2lapl():
     """Cartesian second integral of laplacian operator"""
@@ -47,6 +63,7 @@ def i2lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i2laplh():
     """Cartesian second integral of horizontal laplacian operator"""
 
@@ -61,6 +78,7 @@ def i2laplh():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i4():
     """Cartesian fourth integral operator"""
 
@@ -74,6 +92,7 @@ def i4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i4d2():
     """Cartesian fourth integral of second derivative operator"""
 
@@ -86,6 +105,7 @@ def i4d2():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
+
 
 def i4lapl():
     """Cartesian fourth integral of laplacian operator"""
@@ -101,6 +121,7 @@ def i4lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i4laplh():
     """Cartesian fourth integral of horizontal laplacian operator"""
 
@@ -115,6 +136,7 @@ def i4laplh():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+
 def i4lapl2():
     """Cartesian fourth integral of bilaplacian operator"""
 
@@ -128,6 +150,7 @@ def i4lapl2():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
+
 
 def i4lapl2h():
     """Cartesian fourth integral of horizontal bilaplacian operator"""

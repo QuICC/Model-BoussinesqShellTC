@@ -76,6 +76,28 @@ def i2(nx, bc, coeff = 1.0):
     return c1dbc.constrain(mat, bc, 2)
 
 
+def i2d1(nx, bc, coeff = 1.0):
+    """Create operator for 2nd integral in x of T_n(x)"""
+    
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-1,2,2)
+    nzrow = 1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return 1.0/(2*n)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -1.0/(2*n)
+
+    ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return c1dbc.constrain(mat, bc, 2)
+
+
 def i2lapl(nx, k, l, bc, coeff = 1.0):
     """Create operator for 2nd integral in x of Laplacian T_n(x)"""
 
