@@ -85,8 +85,20 @@ def marginal(pbm, res, ks, params, save_file = True, new_file = False, db_file =
 
 def find_critical(pbm, res, kc, rac0, params):
     """Find the critical value for given parameters"""
-
+    
+    racs = []
+    omegas = []
     # Loop over the requested modes
     for n in range(1,params['mode']+1):
-        # Compute approximation with Brent's root finding algorithm
+        # Compute approximation for the root
         print('Start root finding algorithm')
+
+        rac_lb, rac_ub, lmb_lb, lmb_ub = root.secant_bisection(pbm, res, kc, n, rac0, params)
+
+        if np.any(np.isnan([crit_lb, crit_ub, lmb_lb, lmb_ub])):
+            racs.append(np.nan)
+        else:
+            racs.append((rac_lb + rac_ub)/2.0)
+    
+    return (racs, omegas)
+

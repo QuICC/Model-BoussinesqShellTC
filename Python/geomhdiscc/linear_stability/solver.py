@@ -10,6 +10,64 @@ import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 
 
+def bound_gevp(A, B, mode, lb, ub):
+    """Compute eigenvalues and bounds"""
+
+    # Compute eigenvalues
+    evp_vec, evp_lmb = solve_gevp(A, B, lb, ub)
+
+    # Found an upper bound for eigenvalue search
+    if sum(np.real(evp_lmb) > 0) >= mode:
+        bound = evp_lmb(mode-1)
+        lmb = evp_lmb(mode-1)
+    elif len(evp_lmb) >= mode:
+        bound = np.real(evp_lmb(min(5,len(evp_lmb))))
+        lmb = evp_lmb(mode)
+    else:
+        bound = -1e0
+        lmb = -np.inf
+
+    return (bound, lmb)
+
+
+def solve_gevp(A, B, lb, ub):
+    """Solve the generalized eigenvalue problem"""
+
+    # max multiplicity of eigenvalues
+    max_mult = 100
+    # restart whole calculation if it fails (random algorithm)
+    max_fail = 10
+
+    # basis size
+    nbasis = 200
+
+    # Loop with increasing multiplicity until all eigenvalue in interval have been found
+    iresult = -1
+    for mult in range(10, min(max_mult, A.shape[0]), 10):
+        for run in range(0, max_fail):
+            try:
+                evp_vec, evp_lmb, iresult = sptarn(A, B, lb, ub, 100*np.spacing(2), nbasis, mult)
+                break
+            except:
+                print("SPTARN crashed, restarting with different guess")
+
+        if iresult > -1:
+            break
+
+    # Sort the eigenvalues and remove infinities
+    evp_vec, evp_lmb = sort_no_inf(evp_vec, evp_lmb)
+
+    return (evp_vec, evp_lmb)
+
+
+def sort_no_inf(vec, lmb):
+    """Sort eigenvalues and eigenvectors and remove infinities"""
+
+    idx = np.argsort(np.real(lmb))[::-1]
+
+    return (vec[:,idx], lmb[idx])
+
+
 def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 100, maxmul = 10):
     """Compute eigenvalues in a given interval for the generalized eigenvalue problem using the shift-invert Arnoldi algorithm"""
 
