@@ -212,45 +212,34 @@ def qid(nx, bc, xg):
     test_forward(A, sphys, ssol, xg, 3)
 
 
-def genx1(nx, bc, xg):
-    """Accuracy test for genx1 operator"""
+def genxp(nx, q, p, bc, xg, ntrunc = -1):
+    """Accuracy test for genxp operator"""
 
-    print("genx1:")
+    print("genx"+ str(p) + ":")
     x = sy.Symbol('x')
-    expr = 'x'
-    A = cg1d.generic(nx, 1, expr, x, bc)
+    expr = 'x**' + str(p)
+    A = cg1d.generic(nx, q, expr, x, bc, 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
-    ssol = sphys*x
+    ssol = sphys*x**p
     test_forward(A, sphys, ssol, xg, 1)
 
 
-def genx2(nx, bc, xg):
-    """Accuracy test for genx2 operator"""
+def genlinxp(nx, q, p, bc, xg, ntrunc = -1):
+    """Accuracy test for gen_linxp operator"""
 
-    print("genx2:")
+    print("genlinx"+ str(p) + ":")
     x = sy.Symbol('x')
-    expr = 'x**2'
-    A = cg1d.generic(nx, 1, expr, x, bc)
+    expr = '(1+x)**' + str(p)
+    print(expr)
+    A = cg1d.generic(nx, q, expr, x, bc, 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
-    ssol = sphys*x**2
-    test_forward(A, sphys, ssol, xg, 1)
-
-
-def genx4(nx, bc, xg):
-    """Accuracy test for genx4 operator"""
-
-    print("genx4:")
-    x = sy.Symbol('x')
-    expr = 'x**4'
-    A = cg1d.generic(nx, 1, expr, x, bc)
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
-    ssol = sphys*x**4
+    ssol = sphys*(1+x)**p
     test_forward(A, sphys, ssol, xg, 1)
 
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 10
+    nx = 50
     xg = transf.grid(nx)
     no_bc = [0]
 
@@ -274,6 +263,12 @@ if __name__ == "__main__":
 
     # run generic operator tests
     print('Generic operator generator')
-    genx1(nx, no_bc, xg)
-    genx2(nx, no_bc, xg)
-    genx4(nx, no_bc, xg)
+    genxp(nx, 0, 1, no_bc, xg)
+    genxp(nx, 0, 2, no_bc, xg)
+    genxp(nx, 0, 3, no_bc, xg)
+    genxp(nx, 0, 4, no_bc, xg)
+    genxp(nx, 0, 9, no_bc, xg)
+    genlinxp(nx, 0, 1, no_bc, xg)
+    genlinxp(nx, 0, 2, no_bc, xg)
+    genlinxp(nx, 0, 1.3, no_bc, xg)
+    genlinxp(nx, 0, 1.3, no_bc, xg, 10)

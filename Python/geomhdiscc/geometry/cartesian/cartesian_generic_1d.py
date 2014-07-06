@@ -12,29 +12,32 @@ import geomhdiscc.transform.cartesian as transf
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 
 
-def generic(nx, q, expr, var, bc, coeff = 1.0):
+def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
     """Compute the spectral operator for a generic expression"""
 
-    # Integrate expression q times
-    #if q > 0:
-    #    nvar = (var,)
-    #    for i in range(1,q):
-    #        nvar = nvar + (var,)
-    #    expr = sy.integrate(expr, nvar)
+    # Convert expression to function
     func = sy.utilities.lambdify(var, expr)
 
     # Convert to physical space values
     grid = transf.grid(2*nx)
     phys = func(grid)
     spec = transf.tocheb(phys)[0:nx]
-    spec *= 2*(np.abs(spec) > np.spacing(1))
-    spec[0] = spec[0]/2
+    spec *= (np.abs(spec) > np.spacing(1))
+    spec[1:] *= 2
 
+    # Truncate non constant coefficient expansion
+    if ntrunc > -1 and ntrunc+1 < nx:
+        spec[ntrunc+1:] = 0
+    
     # Form operator matrix
     h = splin.hankel(spec)
     h[0,:] = 0
     mat = splin.toeplitz(np.append(2*spec[0], spec[1:]))
     mat = 0.5*(mat + h)
+    mat[0,:] *= 2.0
+    mat[:,0] *= 0.5
 
+    # Clear q top rows
+    mat[0:q,:] = 0
     mat = coeff*spsp.coo_matrix(mat)
     return c1dbc.constrain(mat, bc, 2)

@@ -156,7 +156,6 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
         delta_t = np.exp(n_rho/n)-1.0;
         h_t = (1.0/delta_t)*(gamma/((gamma - 1.0)*(n + 1.0)))
         h_tb = 1.0/(delta_t-1.0/h_t) 
-        
 
         c3 = delta_t*((n + 1.0)/gamma - n)
         if Pr >= 1:
@@ -167,24 +166,25 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             c5 = 1
         else:
             # Viscou scaling
-            c1 = sqrt(Ta)
+            c1 = Ta**0.5
             c2 = 1
             c4 = 1/Pr
             c5 = Ra/Pr
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        # X-momentum
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
                 mat = c1d.i2(res[0], bc, -c2*(kx**2 + ky**2 + (1.0/3.0)*kx**2)) + c1d.i2d2(res[0], bc, 4.0*c2)
 
             elif field_col == ("velocityy",""):
-                mat = c1d.i2(res[0], bc, -c1*eta3) + c1d.i2(res[0], bc, -c1*eta3)
+                mat = c1d.i2(res[0], bc, -c1*eta3) + c1d.i2(res[0], bc, -c2*(1.0/3.0)*kx*ky)
 
             elif field_col == ("velocityz",""):
                 mat = c1d.i2d1(res[0], bc, 1j*2.0*c2*(1.0/3.0)*kx) + c1d.i2(res[0], bc, c1*eta2)
 
             elif field_col == ("pressure",""):
-                mat = c1d.i2(res[0], bc, -1j*kx*c4*h_tb)
+                mat = c1d.i2(res[0], bc, -1j*kx*c5*h_tb)
 
             elif field_col == ("density",""):
                 mat = c1d.zblk(res[0], 2, bc)
@@ -195,6 +195,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 2, bc)
 
+        # Y-momentum
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
                 mat = c1d.i2(res[0], bc, c1*eta3) + c1d.i2(res[0], bc, -c2*(1.0/3.0)*kx*ky)
@@ -217,6 +218,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 2, bc)
 
+        # Z-momentum
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
                 mat = c1d.i2(res[0], bc, -c1*eta2) + c1d.i2d1(res[0], bc, 1j*2*c2*(1.0/3.0)*kx)
@@ -239,6 +241,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 2, bc)
 
+        # Thermodynamic relation
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
                 mat = c1d.zblk(res[0], 0, bc)
@@ -261,6 +264,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.qid(res[0], 0, bc, -1.0)
 
+        # Mass conservation
         elif field_row == ("density",""):
             if field_col == ("velocityx",""):
                 mat = c1d.qid(res[0], 0, bc, 1j*kx)
@@ -283,6 +287,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 0, bc)
 
+        # Equation of state
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
                 mat = c1d.zblk(res[0], 0, bc)
@@ -305,6 +310,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 0, bc)
 
+        # Energy
         elif field_row == ("entropy",""):
             if field_col == ("velocityx",""):
                 mat = c1d.zblk(res[0], 0, bc)
@@ -322,7 +328,7 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
                 mat = c1d.zblk(res[0], 0, bc)
 
             elif field_col == ("temperature",""):
-                mat = c1d.i2(res[0], bc, -c4*(kx**2 + ky**2)) + c1d.i2d2(res[0], bc, -c4**4.0)
+                mat = c1d.i2(res[0], bc, -c4*(kx**2 + ky**2)) + c1d.i2d2(res[0], bc, c4*4.0)
 
             elif field_col == ("entropy",""):
                 mat = c1d.zblk(res[0], 0, bc)
@@ -333,36 +339,32 @@ class CompressibleRotConvFPlane(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
-        n_rho = eq_params['density_scales']
-        n = eq_params['polytropic_index']
-        eta2 = np.sin(np.pi*eq_params['theta']/180)
-        eta3 = np.cos(np.pi*eq_params['theta']/180)
-        gamma = eq_params['gamma']
-        kx = eigs[0]
-        ky = eigs[1]
-
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        # X-momentum
         if field_row == ("velocityx",""):
             mat = c1d.i2(res[0], bc)
 
+        # Y-momentum
         elif field_row == ("velocityy",""):
             mat = c1d.i2(res[0], bc)
 
+        # Z-momentum
         elif field_row == ("velocityz",""):
             mat = c1d.i2(res[0], bc)
 
+        # Thermodynamic relation
         elif field_row == ("pressure",""):
             mat = c1d.zblk(res[0], 0, bc)
-
+        
+        # Mass conservation
         elif field_row == ("density",""):
             mat = c1d.qid(res[0], 0, bc, -1.0)
-
+        
+        # Equation of state
         elif field_row == ("temperature",""):
             mat = c1d.zblk(res[0], 0, bc)
-
+    
+        # Energy
         elif field_row == ("entropy",""):
             mat = c1d.i2(res[0], bc)
 
