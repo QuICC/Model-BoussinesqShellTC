@@ -91,22 +91,6 @@ namespace Equations {
       }
    }
 
-   const Boundary::CoordinatorSelector& IScalarEquation::bcCoord(FieldComponents::Spectral::Id compId) const
-   {
-      // Assert scalar
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      return this->mBcCoord;
-   }
-
-   Boundary::CoordinatorSelector& IScalarEquation::rBcCoord(FieldComponents::Spectral::Id compId)
-   {
-      // Assert scalar
-      assert(compId == FieldComponents::Spectral::SCALAR);
-
-      return this->mBcCoord;
-   }
-
    void IScalarEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource)
    {
       this->dispatchCoupling(comp, eqType, iZero, hasNL, hasQI, hasSource, this->unknown().dom(0).spRes());

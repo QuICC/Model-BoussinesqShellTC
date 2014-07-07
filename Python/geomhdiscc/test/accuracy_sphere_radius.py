@@ -50,6 +50,19 @@ def zblk(nr, ls, bc, rg):
         test_forward(A, l%2, sphys, ssol, rg, 0)
 
 
+def d1(nr, ls, bc, rg):
+    """Accuracy test for d1 operator"""
+
+    print("d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = sphere.i2x2(nr, l, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
+        ssol = sy.diff(sphys,x)
+        test_forward(A, l%2, sphys, ssol, rg, 1)
+
+
 def i2x2(nr, ls, bc, rg):
     """Accuracy test for i2x2 operator"""
 

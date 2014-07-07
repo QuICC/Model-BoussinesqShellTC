@@ -32,7 +32,6 @@ message(STATUS "!!!WARNING!!! AllSrc.cmake OVERRIDING ACTUAL DIRECTORY LIST WITH
 #
 set(MHDAllSrcDirs
    Base
-   BoundaryCondition
    Debug
    Communicators
    Diagnostics
@@ -60,7 +59,6 @@ set(MHDAllSrcDirs
    Simulation
    SparseSolvers
    SpatialSchemes
-   SpectralOperators
    StorageProfiler
    Timers
    Timesteppers

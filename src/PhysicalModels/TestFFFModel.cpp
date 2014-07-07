@@ -20,7 +20,6 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "BoundaryCondition/BoundaryCondition.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"

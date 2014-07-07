@@ -53,6 +53,11 @@ namespace GeoMHDiSCC {
          static void setFunction(const std::string& func);
 
          /**
+          * @brief Set the Python function object
+          */
+         static void setFunction(const std::string& func, const std::string& submod);
+
+         /**
           * @brief Call the Python function object
           */
          static PyObject* callFunction();

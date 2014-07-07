@@ -21,9 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/SpectralOperatorSelector.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
-#include "SpectralOperators/SphericalHarmonicOperator.hpp"
 
 namespace GeoMHDiSCC {
 

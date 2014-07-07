@@ -16,6 +16,18 @@ def zblk(nx, q, bc):
     return c1dbc.constrain(mat,bc,q)
 
 
+def d1(nx, bc, coeff = 1.0):
+    """Create operator for 1st derivative"""
+
+    row = [2*j for j in range(0,nx)]
+    mat = spsp.lil_matrix((nx,nx))
+    for i in range(0,nx-1):
+        mat[i,i+1:nx:2] = row[i+1:nx:2]
+
+    mat = coeff*mat
+    return c1dbc.constrain(mat, bc, 1)
+
+
 def i1d1(nx, bc, coeff = 1.0):
     """Create a quasi identity block of order 1"""
 

@@ -44,6 +44,19 @@ def zblk(nr, ls, a, b, bc, rg):
         test_forward(A, sphys, ssol, rg, 0)
 
 
+def d1(nr, ls, a, b, bc, rg):
+    """Accuracy test for d1 operator"""
+
+    print("d1:")
+    x = sy.Symbol('x')
+    for l in ls:
+        print("\tTest for l = " + str(l))
+        A = shell.i2x2(nr, a, b, no_bc)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.diff(sphys,x)
+        test_forward(A, sphys, ssol, rg, 2)
+
+
 def i2x2(nr, ls, a, b, bc, rg):
     """Accuracy test for i2x2 operator"""
 
@@ -192,6 +205,7 @@ if __name__ == "__main__":
 
     # run tests
     #zblk(nr, ls, a, b, no_bc, rg)
+    d1(nr, ls, a, b, no_bc, rg)
     i2x2(nr, ls, a, b, no_bc, rg)
     i2x2lapl(nr, ls, a, b, no_bc, rg)
     i4x4(nr, ls, a, b, no_bc, rg)

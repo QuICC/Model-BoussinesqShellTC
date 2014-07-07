@@ -19,6 +19,7 @@
 //
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/CuFftLibrary.hpp"
+#include "Python/PythonWrapper.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -59,6 +60,9 @@ namespace Transform {
 
       // Initialise FFTW interface
       this->initFft();
+
+      // Initialise Chebyshev operator(s)
+      this->initOperators();
 
       // Register the FFTW object
       CuFftLibrary::registerFft();
@@ -111,6 +115,37 @@ namespace Transform {
       // Create the spectral to physical plan
       const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
       this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, CuFftLibrary::planFlag());
+   }
+
+   void ChebyshevCuFftTransform::initOperators()
+   {
+      this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+
+      // Initialise python wrapper
+      PythonWrapper::init();
+      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
+
+      // Prepare arguments to d1(...) call
+      PyObject *pArgs, *pValue;
+      pArgs = PyTuple_New(3);
+      // ... get operator size
+      pValue = PyLong_FromLong(this->mspSetup->specSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
+      // ... create boundray condition (none)
+      pValue = PyList_New(1);
+      PyList_SetItem(pValue, 0, PyLong_FromLong(0));
+      PyTuple_SetItem(pArgs, 1, pValue);
+      // ... set coefficient to 1.0
+      pValue = PyFloat_FromDouble(1.0);
+      PyTuple_SetItem(pArgs, 2, pValue);
+
+      // Call d1
+      PythonWrapper::setFunction("d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+
+      // Fill matrix and clenup
+      PythonWrapper::fillMatrix(this->mDiff, pValue);
+      PythonWrapper::finalize();
    }
 
    void ChebyshevCuFftTransform::cleanupFft()

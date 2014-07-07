@@ -32,7 +32,6 @@
 #include "Equations/CouplingInformation.hpp"
 #include "Equations/EquationData.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/BoundaryMethodSelector.hpp"
 #include "Variables/VariableRequirement.hpp"
 #include "Simulation/SimulationBoundary.hpp"
 
@@ -112,20 +111,6 @@ namespace Equations {
           * @param spBcIds   List of boundary condition IDs
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
-
-         /**
-          * @brief Get the boundary condition coordinator
-          *
-          * @param compId  Component ID
-          */
-         virtual const Boundary::CoordinatorSelector& bcCoord(FieldComponents::Spectral::Id compId) const = 0;
-
-         /**
-          * @brief Set the boundary condition coordinator
-          *
-          * @param compId  Component ID
-          */
-         virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId) = 0;
          
       protected:
          /**

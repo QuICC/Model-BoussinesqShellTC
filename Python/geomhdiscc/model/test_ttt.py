@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
-from geomhdiscc.base.utils import triplets
+import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
 import geohmdiscc.base.base_model as base_model
 

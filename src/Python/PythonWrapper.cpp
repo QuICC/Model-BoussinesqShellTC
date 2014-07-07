@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Python/PythonConfig.hpp"
+#include "Python/PythonCoordinator.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/HumanToId.hpp"
 
@@ -35,12 +36,7 @@ namespace GeoMHDiSCC {
 
    void PythonWrapper::init()
    {
-      // Initialize the python interpreter
-      Py_Initialize();
-
-      // Setup the search path
-      PyObject* sysPath = PySys_GetObject((char*)"path");
-      PyList_Append(sysPath, PyUnicode_FromString(GEOMHDISCC_PYTHON_DIR));
+      PythonCoordinator::init();
    }
 
    void PythonWrapper::import(const std::string& module)
@@ -107,6 +103,39 @@ namespace GeoMHDiSCC {
             PyErr_Print();
          }
          throw Exception("Python function loading error!");
+      }
+   }
+
+   void PythonWrapper::setFunction(const std::string& func, const std::string& submod)
+   {
+      // Cleanup
+      if(PythonWrapper::mpFunc != NULL)
+      {
+         Py_CLEAR(PythonWrapper::mpFunc);
+      }
+
+      // Get Python function object
+      PyObject *pTmp = PyObject_GetAttrString(PythonWrapper::mpModule, submod.c_str());
+
+      if(pTmp)
+      {
+         PythonWrapper::mpFunc = PyObject_GetAttrString(pTmp, func.c_str());
+
+         // Check for successfully loading function
+         if(! (PythonWrapper::mpFunc && PyCallable_Check(PythonWrapper::mpFunc)))
+         {
+            if(PyErr_Occurred())
+            {
+               PyErr_Print();
+            }
+            throw Exception("Python function loading error!");
+         }
+      } else
+      {
+         if(PyErr_Occurred())
+         {
+            PyErr_Print();
+         }
       }
    }
 
@@ -331,7 +360,7 @@ namespace GeoMHDiSCC {
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
       PyTuple_SetItem(pArgs, 0, pPyMat);
-      PythonWrapper::setFunction((char *)"triplets");
+      PythonWrapper::setFunction("triplets", "utils");
       pValue = PythonWrapper::callFunction(pArgs);
       Py_DECREF(pArgs);
 
@@ -368,7 +397,7 @@ namespace GeoMHDiSCC {
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
       PyTuple_SetItem(pArgs, 0, pPyMat);
-      PythonWrapper::setFunction((char *)"triplets");
+      PythonWrapper::setFunction("triplets", "utils");
       pValue = PythonWrapper::callFunction(pArgs);
       Py_DECREF(pArgs);
 
@@ -439,7 +468,7 @@ namespace GeoMHDiSCC {
       }
 
       // Finalize
-      Py_Finalize();
+      PythonCoordinator::finalize();
    }
 
    PythonWrapper::PythonWrapper()

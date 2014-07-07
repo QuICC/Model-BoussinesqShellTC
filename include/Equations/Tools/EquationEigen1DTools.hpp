@@ -26,8 +26,6 @@
 #include "Base/KroneckerTypedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TypeSelectors/BoundaryMethodSelector.hpp"
-#include "SpectralOperators/UnitOperator.hpp"
 
 namespace GeoMHDiSCC {
 

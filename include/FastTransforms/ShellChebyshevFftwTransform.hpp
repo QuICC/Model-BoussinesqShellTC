@@ -30,7 +30,6 @@
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
-#include "SpectralOperators/ShellChebyshevOperator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -210,9 +209,19 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
+          * @brief Storage for the Chebyshev differentiation matrix
+          */
+         SparseMatrix   mDiff;
+
+         /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
           */
          void initFft();
+
+         /**
+          * @brief Initialise the spectral operators
+          */
+         void initOperators();
 
          /**
           * @brief Cleanup memory used by FFTW on destruction
@@ -276,10 +285,7 @@ namespace Transform {
       // Compute first derivative
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ShellChebyshevOperator  spec(this->mspSetup->specSize());
-
-         // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
 
       // Compute simple projection
       } else
@@ -349,10 +355,7 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ShellChebyshevOperator  spec(this->mspSetup->specSize());
-
-         // Compute derivative
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
 
       // Compute simple projection of real part
       } else
@@ -371,10 +374,7 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         Spectral::ShellChebyshevOperator  spec(this->mspSetup->specSize());
-
-         // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = spec.diff(0,1)*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
 
       // Compute simple projection of imaginary part
       } else

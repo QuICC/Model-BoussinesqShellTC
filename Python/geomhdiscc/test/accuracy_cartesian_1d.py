@@ -43,6 +43,17 @@ def zblk(nx, bc, xg):
     test_forward(A, sphys, ssol, xg, 0)
 
 
+def d1(nx, bc, xg):
+    """Accuracy test for d1 operator"""
+
+    print("d1:")
+    x = sy.Symbol('x')
+    A = c1d.d1(nx, bc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sy.diff(sphys,x)
+    test_forward(A, sphys, ssol, xg, 1)
+
+
 def i1(nx, bc, xg):
     """Accuracy test for i1 operator"""
 
@@ -246,6 +257,7 @@ if __name__ == "__main__":
     # run tests
     print('Hard coded exact operators')
     #zblk(nx, no_bc, xg)
+    d1(nx, no_bc, xg)
     i1(nx, no_bc, xg)
     i2(nx, no_bc, xg)
     i2d1(nx, no_bc, xg)

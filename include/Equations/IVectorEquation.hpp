@@ -110,20 +110,6 @@ namespace Equations {
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds);
 
          /**
-          * @brief Get the boundary condition coordinator
-          *
-          * @param compId  Component ID
-          */
-         virtual const Boundary::CoordinatorSelector& bcCoord(FieldComponents::Spectral::Id compId) const;
-
-         /**
-          * @brief Get the boundary condition coordinator
-          *
-          * @param compId  Component ID
-          */
-         virtual Boundary::CoordinatorSelector& rBcCoord(FieldComponents::Spectral::Id compId);
-
-         /**
           * @brief Generic model operator dispatcher to python scripts
           */
          virtual void buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const;
@@ -159,11 +145,6 @@ namespace Equations {
           * @brief Storage for the shared scalar variable
           */
          Datatypes::SharedVectorVariableType mspUnknown;
-
-         /**
-          * @brief Boundary condition coordinator
-          */
-         std::map<FieldComponents::Spectral::Id, Boundary::CoordinatorSelector> mBcCoord;
    };
 
    /// Typedef for a shared IVectorEquation
