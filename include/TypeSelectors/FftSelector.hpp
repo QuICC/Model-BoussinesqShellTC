@@ -20,7 +20,7 @@
 //
 
 /// Setup typedef for FFTW based transforms
-#ifdef GEOMHDISCC_FFT_FFTW
+#if defined GEOMHDISCC_FFT_FFTW
 
    // FFTW includes
    #include "FastTransforms/FftwTools.hpp"
@@ -60,6 +60,31 @@
          }
       }
    }
+#elif defined GEOMHDISCC_FFT_CUFFT
+
+   // FFTW includes
+   #include "FastTransforms/CuFftTools.hpp"
+   #include "FastTransforms/CuFftTransform.hpp"
+   #include "FastTransforms/ChebyshevCuFftTransform.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Transform {
+
+         namespace Fft {
+
+            /// Typedef for FFTW's FFT tools implementation
+            typedef CuFftTools ToolsSelector;
+
+            /// Typedef for FFTW's FFT implementation
+            typedef CuFftTransform FftSelector;
+
+            /// Typedef for FFTW's Chebyshev FFT implementation
+            typedef ChebyshevCuFftTransform ChebyshevSelector;
+         }
+      }
+   }
+
 #endif //GEOMHDISCC_FFT_FFTW
 
 #endif // FFTSELECTOR_HPP
