@@ -199,14 +199,14 @@ namespace Transform {
          fftw_plan   mBPlan;
 
          /**
-          * @brief Storage for data input
+          * @brief Temporary real storage
           */
-         Matrix   mTmpIn;
+         Matrix   mTmpR;
 
          /**
-          * @brief Storage for data output
+          * @brief Temporary complex storage
           */
-         Matrix   mTmpOut;
+         MatrixZ  mTmpZ;
 
          /**
           * @brief Storage for the Chebyshev differentiation matrix
@@ -246,7 +246,7 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
       // Do transform
-      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+      fftw_execute_dft_r2c(this->mFPlan, const_cast<MHDFloat *>(this->mTmpR.data()), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
       // Rescale to remove FFT scaling
       rChebVal *= this->mspSetup->scale();
@@ -288,7 +288,7 @@ namespace Transform {
       this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
+      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
    }
 
    template <Arithmetics::Id TOperation> void ChebyshevCuFftTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevCuFftTransform::IntegratorType::Id integrator)
@@ -309,14 +309,14 @@ namespace Transform {
 
       // Do transform of real part
       this->mTmpIn = physVal.real();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
       // Rescale FFT output
       rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
 
       // Do transform of imaginary part
       this->mTmpIn = physVal.imag();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
       // Rescale FFT output
       rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
@@ -358,7 +358,7 @@ namespace Transform {
       this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of real part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
       rPhysVal.real() = this->mTmpOut;
 
       // Compute first derivative of imaginary part
@@ -377,7 +377,7 @@ namespace Transform {
       this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of imaginary part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
       rPhysVal.imag() = this->mTmpOut;
    }
 
