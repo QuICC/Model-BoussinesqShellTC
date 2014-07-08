@@ -22,11 +22,12 @@
 
 // External includes
 //
-#include <cufft.h>
+#include <cufftw.h>
 
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Base/MathConstants.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
@@ -148,8 +149,6 @@ namespace Transform {
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projector should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
@@ -162,8 +161,6 @@ namespace Transform {
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
-          *
-          * \mhdTodo Projector should be converted to Python
           *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
@@ -214,6 +211,16 @@ namespace Transform {
          SparseMatrix   mDiff;
 
          /**
+          * @brief Phase shift to convert DFT to DCT
+          */
+         ArrayZ   mPhase;
+
+         /**
+          * @brief 1/Phase shift to convert DFT to DCT
+          */
+         ArrayZ   mPhase_1;
+
+         /**
           * @brief Initialise the spectral operators
           */
          void initOperators();
@@ -245,11 +252,16 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
+      // Copy data to perform 2N R2C
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal;
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.colwise().reverse();
+
       // Do transform
       fftw_execute_dft_r2c(this->mFPlan, const_cast<MHDFloat *>(this->mTmpR.data()), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      // Extract real part and rescale to remove FFT scaling
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
    }
 
    template <Arithmetics::Id TOperation> void ChebyshevCuFftTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevCuFftTransform::ProjectorType::Id projector)
@@ -275,20 +287,25 @@ namespace Transform {
       // Compute first derivative
       if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
 
       // Compute simple projection
       } else
       {
          // Copy into other array
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize());
       }
 
       // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform
       fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
+
+      // Extract physical values
+      rPhysVal = this->mTmpR.topRows(this->mspSetup->fwdSize());
    }
 
    template <Arithmetics::Id TOperation> void ChebyshevCuFftTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevCuFftTransform::IntegratorType::Id integrator)
@@ -308,18 +325,22 @@ namespace Transform {
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
       // Do transform of real part
-      this->mTmpIn = physVal.real();
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.real().colwise().reverse();
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.real();
       fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
       // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal.real() = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
 
       // Do transform of imaginary part
-      this->mTmpIn = physVal.imag();
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.imag().colwise().reverse();
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.imag();
       fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
 
       // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal.imag() = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
    }
 
    template <Arithmetics::Id TOperation> void ChebyshevCuFftTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevCuFftTransform::ProjectorType::Id projector)
@@ -345,40 +366,44 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
 
       // Compute simple projection of real part
       } else
       {
          // Copy values into simple matrix
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize()).real();
       }
 
       // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform of real part
       fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
-      rPhysVal.real() = this->mTmpOut;
+      rPhysVal.real() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
 
       // Compute first derivative of imaginary part
       if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
 
       // Compute simple projection of imaginary part
       } else
       {
          // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize()).imag();
       }
 
       // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform of imaginary part
       fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
-      rPhysVal.imag() = this->mTmpOut;
+      rPhysVal.imag() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
    }
 
 }

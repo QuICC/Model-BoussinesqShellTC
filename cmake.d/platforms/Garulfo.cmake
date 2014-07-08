@@ -22,6 +22,7 @@ set(GEOMHDISCC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_CUFFT "cufft" "cufftw" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_CUFFT "/opt/cuda/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_CUFFT "/opt/cuda/lib64" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#

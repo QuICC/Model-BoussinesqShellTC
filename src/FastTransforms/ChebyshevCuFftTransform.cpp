@@ -91,8 +91,8 @@ namespace Transform {
    {  
       /// \mhdBug implement strided stranforms for complex <-> complex case if possible
 
-      int fwdSize = this->mspSetup->fwdSize();
-      int bwdSize = this->mspSetup->bwdSize();
+      int fwdSize = 2*this->mspSetup->fwdSize();
+      int bwdSize = this->mspSetup->bwdSize()+1;
       int howmany = this->mspSetup->howmany();
 
       // Create the two plans
@@ -105,14 +105,18 @@ namespace Transform {
       }
 
       // Initialise temporary storage
-      this->mTmpIn.setZero(fwdSize, howmany);
-      this->mTmpOut.setZero(bwdSize, howmany);
+      this->mTmpR.setZero(fwdSize, howmany);
+      this->mTmpZ.setZero(bwdSize, howmany);
 
       // Create the physical to spectral plan
-      this->mFPlan = fftw_plan_many_dft_r2c(1, fftSize, howmany, this->mTmpIn.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, CuFftLibrary::planFlag());
+      this->mFPlan = fftw_plan_many_dft_r2c(1, fftSize, howmany, this->mTmpR.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), NULL, 1, bwdSize, CuFftLibrary::planFlag());
 
       // Create the spectral to physical plan
-      this->mBPlan = fftw_plan_many_dft_c2r(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, tmpReal.data(), NULL, 1, fwdSize, CuFftLibrary::planFlag());
+      this->mBPlan = fftw_plan_many_dft_c2r(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), NULL, 1, bwdSize, this->mTmpR.data(), NULL, 1, fwdSize, CuFftLibrary::planFlag());
+
+
+      this->mPhase = (-Math::cI*2.0*Math::PI*((this->mspSetup->fwdSize()-0.5)/(2.0*this->mspSetup->fwdSize()))*Array::LinSpaced(this->mTmpZ.rows(), 0, this->mTmpZ.rows()-1)).array().exp();
+      this->mPhase_1 = 1.0/this->mPhase.array();
    }
 
    void ChebyshevCuFftTransform::initOperators()

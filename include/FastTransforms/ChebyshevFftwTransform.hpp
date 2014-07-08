@@ -148,8 +148,6 @@ namespace Transform {
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projector should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
@@ -162,8 +160,6 @@ namespace Transform {
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
-          *
-          * \mhdTodo Projector should be converted to Python
           *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
