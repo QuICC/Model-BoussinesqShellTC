@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -62,6 +62,11 @@ namespace Equations {
       return this->mIsComplex;
    }
 
+   bool CouplingInformation::isGalerkin() const
+   {
+      return this->mIsGalerkin;
+   }
+
    CouplingInformation::IndexType CouplingInformation::indexType() const
    {
       return this->mIndexType;
@@ -77,14 +82,24 @@ namespace Equations {
       return this->mNSystems;
    }
 
-   int CouplingInformation::blockN(const int idx) const
+   int CouplingInformation::tauN(const int idx) const
    {
-      return this->mBlockNs(idx);
+      return this->mTauNs(idx);
+   }
+
+   int CouplingInformation::galerkinN(const int idx) const
+   {
+      return this->mGalerkinNs(idx);
+   }
+
+   int CouplingInformation::galerkinShift(const int dim) const
+   {
+      return this->mGalerkinShifts(dim);
    }
 
    int CouplingInformation::systemN(const int idx) const
    {
-      return this->blockN(idx)*this->nBlocks();
+      return this->galerkinN(idx)*this->nBlocks();
    }
 
    int CouplingInformation::fieldIndex() const
@@ -158,13 +173,19 @@ namespace Equations {
       this->mHasSource = hasSource;
    }
 
-   void CouplingInformation::setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols)
+   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols)
    {
       this->mNSystems = nSystems;
 
-      this->mBlockNs = blockNs;
+      this->mTauNs = tauNs;
+
+      this->mGalerkinNs = galerkinNs;
+
+      this->mGalerkinShifts = galerkinShifts;
 
       this->mRhsCols = rhsCols;
+
+      this->mIsGalerkin = (this->mGalerkinShifts.sum() > 0);
    }
 
    void CouplingInformation::setSolverIndex(const int idx)

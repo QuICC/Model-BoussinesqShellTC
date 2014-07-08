@@ -343,7 +343,7 @@ namespace Solver {
       // Get solver input
       for(int i = 0; i < (*solIt)->nSystem(); i++)
       {
-         Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+         Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true);
       }
    }
 
@@ -369,9 +369,6 @@ namespace Solver {
       {
          // Copy field values into solver input
          Equations::copyNonlinear(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
-
-         // Apply quasi-inverse to nonlinear terms
-         Equations::applyQuasiInverse(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
          // Apply quasi-inverse to nonlinear terms
          Equations::addSource(*(*eqIt), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
@@ -414,7 +411,7 @@ namespace Solver {
       for(int i = 0; i < nSystems; i++)
       {
          // Store the start row
-         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).blockN(i);
+         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).galerkinN(i);
       }
 
       // Store storage information

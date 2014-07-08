@@ -162,8 +162,15 @@ namespace Equations {
       // Get block information
       pArgs = PyTuple_GetItem(pValue, 5);
       pTmp = PyTuple_GetItem(pArgs, 0);
-      int blockSize = PyLong_AsLong(pTmp);
+      int tauSize = PyLong_AsLong(pTmp);
       pTmp = PyTuple_GetItem(pArgs, 1);
+      int galerkinSize = PyLong_AsLong(pTmp);
+      pTmp = PyTuple_GetItem(pArgs, 2);
+      ArrayI galerkinShifts(3);
+      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 0));
+      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
+      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
+      pTmp = PyTuple_GetItem(pArgs, 3);
       int rhsSize = PyLong_AsLong(pTmp);
 
       // Finalise Python interpreter
@@ -224,11 +231,13 @@ namespace Equations {
       } else
       {
          int nMat = EigenSelector::fieldCouplingNMat(spRes);
-         ArrayI blockNs(nMat);
-         blockNs.setConstant(blockSize);
+         ArrayI tauNs(nMat);
+         ArrayI galerkinNs(nMat);
+         tauNs.setConstant(tauSize);
+         galerkinNs.setConstant(galerkinSize);
          ArrayI rhsCols(nMat);
          rhsCols.setConstant(rhsSize);
-         infoIt.first->second.setSizes(nMat, blockNs, rhsCols); 
+         infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols); 
       }
 
       // Sort implicit fields

@@ -49,9 +49,15 @@ namespace Equations {
 
       void addExplicitWrapper(DecoupledZMatrix& rEqField, const int eqStart, const SparseMatrixZ& mat, const Eigen::Ref<const MatrixZ>& rhs);
 
-      template <typename TData> void applyQuasiInverseWrapper(TData& rField, const int start, const int rows, const SparseMatrix& mat);
+      template <typename TData> void applyQuasiInverse(TData& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const TData& rhs);
 
-      template <> void applyQuasiInverseWrapper<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat);
+      template <> void applyQuasiInverse<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const DecoupledZMatrix& rhs);
+
+      //template <typename TData> void applyQuasiInverseWrapper(TData& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const TData>& rhs);
+      void applyQuasiInverseWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs);
+      void applyQuasiInverseWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs);
+
+      void applyQuasiInverseWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag);
    }
 
    /**
@@ -173,16 +179,6 @@ namespace Equations {
    typedef SharedPtrMacro<IEquation> SharedIEquation;
 
    /**
-    * @brief Apply quasi-inverse to the nonlinear term
-    *
-    * @param compId  Component ID
-    * @param storage Storage for the equation values
-    * @param matIdx  Index of the given data
-    * @param start   Start index for the storage
-    */
-   template <typename TData> void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
-
-   /**
     * @brief Compute and add the explicit linear terms
     *
     * @param compId     Equation field component ID
@@ -226,40 +222,43 @@ namespace Equations {
          rEqField.imag().block(eqStart, 0, rows, cols) += mat.real()*rhs.imag() + mat.imag()*rhs.real();
       }
 
-      template <typename TData> inline void applyQuasiInverseWrapper(TData& rField, const int start, const int rows, const SparseMatrix& mat)
+      template <typename TData> inline void applyQuasiInverse(TData& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const TData& rhs)
       {
          int cols = rField.cols();
-         rField.block(start, 0, rows, cols) = mat*rField.block(start, 0, rows, cols);
+         int rhsRows = mat.cols();
+         applyQuasiInverseWrapper(rField, start, rows, mat, rhs.block(rhsStart, 0, rhsRows, cols));
       }
 
-      template <> inline void applyQuasiInverseWrapper<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat)
+      template <> inline void applyQuasiInverse<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const DecoupledZMatrix& rhs)
       {
          assert(rField.real().rows() == rField.imag().rows());
          assert(rField.real().cols() == rField.imag().cols());
 
          int cols = rField.real().cols();
-         rField.real().block(start, 0, rows, cols) = mat*rField.real().block(start, 0, rows, cols);
-         rField.imag().block(start, 0, rows, cols) = mat*rField.imag().block(start, 0, rows, cols);
+         int rhsRows = mat.cols();
+         applyQuasiInverseWrapper(rField, start, rows, mat, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
       }
-   }
 
-   template <typename TData> void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
-   {
-      // Apply quasi inverse
-      if(eq.couplingInfo(compId).hasQuasiInverse())
+      inline void applyQuasiInverseWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs)
       {
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+         int cols = rField.cols();
+         rField.block(start, 0, rows, cols) = mat*rhs;
+      }
 
-         // Get number of rows
-         int rows = eq.couplingInfo(compId).blockN(matIdx);
+      inline void applyQuasiInverseWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs)
+      {
+         int cols = rField.cols();
+         rField.block(start, 0, rows, cols) = mat*rhs;
+      }
 
-         // Safety asserts
-         assert(op->rows() == op->cols());
-         assert(op->cols() == rows);
+      inline void applyQuasiInverseWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag)
+      {
+         assert(rField.real().rows() == rField.imag().rows());
+         assert(rField.real().cols() == rField.imag().cols());
 
-         // Multiply nonlinear term by quasi-inverse
-         internal::applyQuasiInverseWrapper(storage, start, rows, *op);
+         int cols = rField.real().cols();
+         rField.real().block(start, 0, rows, cols) = mat*rhsReal;
+         rField.imag().block(start, 0, rows, cols) = mat*rhsImag;
       }
    }
 
@@ -286,7 +285,7 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          /// \mhdBug very bad and slow implementation!
-         Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->rows());
+         Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
          int k = 0;
          for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
          {
@@ -309,7 +308,7 @@ namespace Equations {
          ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
 
          // Assert correct sizes
-         assert(op->rows() == explicitField.slice(mode(0)).rows());
+         assert(op->cols() == explicitField.slice(mode(0)).rows());
 
          // Apply operator to field
          internal::addExplicitWrapper(eqField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));

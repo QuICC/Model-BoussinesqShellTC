@@ -87,8 +87,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         # Index mode: SLOWEST = 0, MODE = 1
         index_mode = 1
 
-        # Rows per equation block and number of rhs
-        block_info = (res[0], 1)
+        # Rows per tau equation block, rows per galerkin equation block and number of rhs
+        block_info = (res[0], res[0], (0,0,0), 1)
 
         return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
 

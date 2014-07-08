@@ -102,6 +102,11 @@ namespace Equations {
          bool isComplex() const;
 
          /**
+          * @brief Is Galerkin system?
+          */
+         bool isGalerkin() const;
+
+         /**
           * @brief Get index type
           */
          IndexType indexType() const;
@@ -117,11 +122,25 @@ namespace Equations {
          int nSystems() const;
 
          /**
-          * @brief Size of block
+          * @brief Size of Tau block
           *
           * @param idx System index
           */
-         int blockN(const int idx) const;
+         int tauN(const int idx) const;
+
+         /**
+          * @brief Size of Galerkin block
+          *
+          * @param idx System index
+          */
+         int galerkinN(const int idx) const;
+
+         /**
+          * @brief Index shift for the Galerkin block
+          *
+          * @param dim dimension
+          */
+         int galerkinShift(const int dim) const;
 
          /**
           * @brief Size of system
@@ -208,11 +227,13 @@ namespace Equations {
          /**
           * @brief Set system sizes
           *
-          * @param nSystems   Number of systems
-          * @param blockNs    Block size for each system
-          * @param rhsCols    Number of columns in RHS for each system
+          * @param nSystems         Number of systems
+          * @param tauNs            Tau block size for each system
+          * @param galerkinNs       Galerkin block size for each system
+          * @param galerkinShifts   Galerkin index shifts
+          * @param rhsCols          Number of columns in RHS for each system
           */
-         void setSizes(const int nSystems, const ArrayI& blockNs, const ArrayI& rhsCols);
+         void setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols);
 
          /**
           * @brief Set the index type
@@ -280,6 +301,11 @@ namespace Equations {
          bool mIsComplex;
 
          /**
+          * @brief Storage for the galerkin flag
+          */
+         bool mIsGalerkin;
+
+         /**
           * @brief Storage for the index type
           */
          IndexType mIndexType;
@@ -305,9 +331,19 @@ namespace Equations {
          int mFieldStart;
 
          /**
-          * @brief Storage for the block sizes
+          * @brief Storage for the Tau block sizes
           */
-         ArrayI mBlockNs;
+         ArrayI mTauNs;
+
+         /**
+          * @brief Storage for the Galerkin block sizes
+          */
+         ArrayI mGalerkinNs;
+
+         /**
+          * @brief Storage for the Galerkin index shifts
+          */
+         ArrayI mGalerkinShifts;
 
          /**
           * @brief Storage for the number of RHS in solver
