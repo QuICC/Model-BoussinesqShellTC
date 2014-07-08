@@ -91,6 +91,14 @@ namespace Equations {
       return *this->mspBcIds;
    }
 
+   const SparseMatrix& EquationData::galerkinStencil(const FieldComponents::Spectral::Id compId, const int j) const
+   {
+      // Safety assert
+      assert(this->mGStencils.count(compId) > 0);
+      
+      return this->mGStencils.find(compId)->second.at(j);
+   }
+
    const SparseMatrix& EquationData::quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const
    {
       // Safety assert

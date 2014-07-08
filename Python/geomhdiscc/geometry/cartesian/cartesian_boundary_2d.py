@@ -5,7 +5,9 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
+
 
 def qid(nx, q, bc):
     """Create a quasi indentity"""
@@ -20,7 +22,6 @@ def qid(nx, q, bc):
 
     return mat.tocsr()
 
-
 def bid(nx, q, bc):
     """Create a boundary indentity"""
 
@@ -33,7 +34,6 @@ def bid(nx, q, bc):
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
-
 
 def constrain(mat, nx, nz, bc, eq_zrows_x, eq_zrows_z):
     """Contrain the matrix with the Tau boundary condition"""

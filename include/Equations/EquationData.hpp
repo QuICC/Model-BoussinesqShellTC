@@ -86,6 +86,14 @@ namespace Equations {
          void setField(PhysicalNames::Id name, Datatypes::SharedVectorVariableType spField);
 
          /**
+          * @brief Get the galerkin stencil matrix
+          *
+          * @param compId  Field component ID
+          * @param j       Matrix index
+          */
+         const SparseMatrix& galerkinStencil(const FieldComponents::Spectral::Id compId, const int j) const;
+
+         /**
           * @brief Get the quasi-inverse matrix for the nonlinear terms
           *
           * @param compId  Field component ID
@@ -198,6 +206,11 @@ namespace Equations {
           * @brief Map of component and nonlinear term multiplication matrices
           */
          std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
+
+         /**
+          * @brief Map of component and galerkin stencil matrices
+          */
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mGStencils;
 
          /**
           * @brief Storage for the shared boundary condition list

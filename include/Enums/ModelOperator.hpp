@@ -37,6 +37,8 @@ namespace GeoMHDiSCC {
             IMPLICIT_LINEAR,
             /// Explicitly timestepped linear operator
             EXPLICIT_LINEAR,
+            /// Galerkin stencil
+            STENCIL,
          };
       };
 }

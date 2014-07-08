@@ -5,7 +5,9 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.geometry.spherical.shell_radius_boundary as radbc
+
 
 def qid(n, q, bc):
     """Create a quasi indentity"""
@@ -20,7 +22,6 @@ def qid(n, q, bc):
 
     return mat.tocsr()
 
-
 def bid(n, q, bc):
     """Create a boundary indentity"""
 
@@ -33,7 +34,6 @@ def bid(n, q, bc):
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
-
 
 def constrain(mat, nr, maxl, m, bc):
     """Contrain the matrix with the tau boundary condition"""

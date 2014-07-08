@@ -48,6 +48,24 @@ namespace Equations {
       int nSystems = this->couplingInfo(compId).nSystems();
 
       //
+      // Initialise the galerkin stencils (if activated and required)
+      //
+      #ifdef GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+      if(this->couplingInfo(compId).isGalerkin())
+      {
+         this->mGStencils.insert(std::make_pair(compId, std::vector<SparseMatrix>()));
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> >::iterator sIt = this->mGStencils.find(compId);
+         sIt->second.reserve(nSystems);
+         for(int i = 0; i < nSystems; ++i)
+         {
+            sIt->second.push_back(SparseMatrix());
+
+            this->setGalerkinStencil(compId, sIt->second.back(), i);
+         }
+      }
+      #endif //GEOMHDISCC_BOUNDARYMETHOD_GALERKIN
+
+      //
       // Initialise the quasi-inverse operators for the nonlinear terms (if required)
       //
       if(this->couplingInfo(compId).hasQuasiInverse())
@@ -168,8 +186,8 @@ namespace Equations {
       pTmp = PyTuple_GetItem(pArgs, 2);
       ArrayI galerkinShifts(3);
       galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 0));
-      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
-      galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
+      galerkinShifts(1) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
+      galerkinShifts(2) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
       pTmp = PyTuple_GetItem(pArgs, 3);
       int rhsSize = PyLong_AsLong(pTmp);
 
@@ -313,6 +331,34 @@ namespace Equations {
       PythonModelWrapper::cleanup();
    }
 
+   void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
+   {
+      // Get first four standard arguments in a tuple of size 5
+      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::HAS_BC, spRes, eigs);
+
+      // Prepare Python call arguments
+      PyObject *pTmp, *pValue;
+
+      // Get field
+      pTmp = PyTuple_New(2);
+      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(this->name()).c_str());
+      PyTuple_SetItem(pTmp, 0, pValue);
+      pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
+      PyTuple_SetItem(pTmp, 1, pValue);
+      PyTuple_SetItem(pArgs, 4, pTmp);
+
+      // Call model operator Python routine
+      PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::STENCIL));
+      pValue = PythonModelWrapper::callMethod(pArgs);
+      Py_DECREF(pArgs);
+
+      // Convert Python matrix into triplets
+      PythonModelWrapper::fillMatrix(mat, pValue);
+
+      // Finalise Python interpreter
+      PythonModelWrapper::cleanup();
+   }
+
    void IEquation::dispatchQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
       // Get first four standard arguments in a tuple of size 5
@@ -375,6 +421,12 @@ namespace Equations {
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();
+   }
+
+   void IEquation::setGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
+   {
+      // This implementation should never get called!
+      throw Exception("Called dummy implementation of setGalerkinStencil!");
    }
 
    void IEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const

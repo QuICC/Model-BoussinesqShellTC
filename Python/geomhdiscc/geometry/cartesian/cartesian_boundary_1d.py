@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
 
 
@@ -19,7 +20,6 @@ def constrain(mat, bc, eq_zrows):
         bc_mat = mat
 
     return bc_mat
-
 
 def apply_tau(mat, bc):
     """Add Tau lines to the matrix"""
@@ -50,7 +50,6 @@ def apply_tau(mat, bc):
 
     return bc_mat
 
-
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
 
@@ -67,7 +66,6 @@ def tau_value(nx, pos, coeffs = None):
         cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nx)])
 
     return np.array(cond)
-
 
 def tau_diff(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 1st derivative"""
@@ -86,7 +84,6 @@ def tau_diff(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-
 def tau_diff2(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 2nd derivative"""
 
@@ -103,7 +100,6 @@ def tau_diff2(nx, pos, coeffs = None):
         cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
     return np.array(cond)
-
 
 def tau_value_diff(nx, pos, coeffs = None):
     """Create the tau lines for a zero boundary value and a zero 1st derivative"""
@@ -124,7 +120,6 @@ def tau_value_diff(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-
 def tau_value_diff2(nx, pos, coeffs = None):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
 
@@ -143,7 +138,6 @@ def tau_value_diff2(nx, pos, coeffs = None):
         cond.append(list(tau_diff2(nx,-1,coeffs)[0]))
 
     return np.array(cond)
-
 
 def stencil(nx, bc):
     """Create a Galerkin stencil matrix"""
@@ -167,14 +161,12 @@ def stencil(nx, bc):
 
     return mat
 
-
 def apply_galerkin(mat, bc, eq_zero_rows):
     """Apply a Galerkin stencil on the matrix"""
 
     nx = mat.shape[0]
 
     return stencil_eye(nx, eq_zero_rows)*mat*stencil(nx, bc)
-
 
 def stencil_eye(nx, q):
     """Create the restriction identity to resize matrix after stencil use"""
@@ -183,7 +175,6 @@ def stencil_eye(nx, q):
     diags = [[1]*(nx-q)]
 
     return spsp.diags(diags, offsets, (nx-q, nx))
-
 
 def stencil_value(nx, pos):
     """Create stencil matrix for a zero boundary value"""
@@ -210,7 +201,6 @@ def stencil_value(nx, pos):
 
     return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
-
 def stencil_diff(nx, pos):
     """Create stencil matrix for a zero 1st derivative"""
 
@@ -234,8 +224,7 @@ def stencil_diff(nx, pos):
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
     diags[-1] = diags[-1][0:nx+offsets[0]]
 
-    return spsp.diags(diags, offsets)
-
+    return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
 def stencil_diff2(nx, pos):
     """Create stencil matrix for a zero 2nd derivative"""
@@ -263,8 +252,7 @@ def stencil_diff2(nx, pos):
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
     diags[-1] = diags[-1][0:nx+offsets[0]]
 
-    return spsp.diags(diags, offsets)
-
+    return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
 def stencil_value_diff(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
@@ -300,8 +288,7 @@ def stencil_value_diff(nx, pos):
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
     diags[-1] = diags[-1][0:nx+offsets[0]]
 
-    return spsp.diags(diags, offsets)
-
+    return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
 def stencil_value_diff2(nx, pos):
     """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
@@ -337,8 +324,7 @@ def stencil_value_diff2(nx, pos):
     diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
     diags[-1] = diags[-1][0:nx+offsets[0]]
 
-    return spsp.diags(diags, offsets)
-
+    return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
 def tau_c(n):
     """Compute the chebyshev normalisation c factor for tau boundary"""
@@ -347,7 +333,6 @@ def tau_c(n):
         return 2
     else:
         return 1
-
 
 def galerkin_c(n):
     """Compute the chebyshev normalisation c factor for galerkin boundary"""

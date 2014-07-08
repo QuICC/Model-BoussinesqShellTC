@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
 
 
@@ -14,7 +15,6 @@ def zblk(maxl, m):
     nl = maxl + 1 - m
     mat = spsp.lil_matrix((nl,nl))
     return mat
-
 
 def coriolisdr(maxl, m, coeff = 1.0):
     """Create operator for the spherical harmonic coriolis Q term with D_r radial dependence."""
@@ -40,7 +40,6 @@ def coriolisdr(maxl, m, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return mat
 
-
 def coriolis_r(maxl, m, coeff = 1.0):
     """Create operator for the spherical harmonic coriolis Q term with 1/r radial dependence."""
 
@@ -64,7 +63,6 @@ def coriolis_r(maxl, m, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return mat
-
 
 def qid(maxl, m, coeff = 1.0):
     """Create a quasi identity block"""

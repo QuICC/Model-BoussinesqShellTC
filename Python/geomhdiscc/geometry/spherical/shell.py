@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import scipy.sparse as spsp
+
 import geomhdiscc.geometry.spherical.shell_radius as rad
 import geomhdiscc.geometry.spherical.shell_sh as sh
 import geomhdiscc.geometry.spherical.shell_boundary as sphbc
@@ -19,7 +20,6 @@ def convert_bc(bc):
 
     return bcr
 
-
 def sh_coeff(coeff):
     """Compute coefficients from spherical harmonic expansion"""
 
@@ -32,7 +32,6 @@ def sh_coeff(coeff):
     
     return fct
 
-
 def zblk(nr, maxl, m, qr, bc):
     """Create a block of zeros"""
 
@@ -41,7 +40,6 @@ def zblk(nr, maxl, m, qr, bc):
     nl = maxl + 1 - m
     mat = spsp.kron(rad.zblk(nl,0,[0]),rad.zblk(nr,qr,bcr))
     return sphbc.constrain(mat, nr, maxl, m, bc)
-
 
 def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2 radial operator kronecker with an identity"""
@@ -55,7 +53,6 @@ def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-
 def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
@@ -67,7 +64,6 @@ def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
-
 
 def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4 radial operator kronecker with an identity"""
@@ -81,7 +77,6 @@ def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-
 def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
@@ -94,7 +89,6 @@ def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-
 def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
@@ -106,7 +100,6 @@ def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
-
 
 def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
     """Create a i2x2 radial operator kronecker with coriolis Q term"""
@@ -123,7 +116,6 @@ def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-
 def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
     """Create a i4x4 radial operator kronecker with coriolis Q term"""
 
@@ -138,7 +130,6 @@ def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
         mat = spsp.vstack([mat,row])
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
-
 
 def qid(nr, maxl, m, qr, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""

@@ -49,15 +49,11 @@ namespace Equations {
 
       void addExplicitWrapper(DecoupledZMatrix& rEqField, const int eqStart, const SparseMatrixZ& mat, const Eigen::Ref<const MatrixZ>& rhs);
 
-      template <typename TData> void applyQuasiInverse(TData& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const TData& rhs);
+      void applyOperatorWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs);
 
-      template <> void applyQuasiInverse<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const DecoupledZMatrix& rhs);
+      void applyOperatorWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs);
 
-      //template <typename TData> void applyQuasiInverseWrapper(TData& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const TData>& rhs);
-      void applyQuasiInverseWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs);
-      void applyQuasiInverseWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs);
-
-      void applyQuasiInverseWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag);
+      void applyOperatorWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag);
    }
 
    /**
@@ -153,7 +149,12 @@ namespace Equations {
          void dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
          /**
-          * @brief Implementation of the the quasi inverse matrix operator dispatch to python scripts
+          * @brief Implementation of the galerkin stencil dispatch to python scripts
+          */
+         void dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
+
+         /**
+          * @brief Implementation of the quasi inverse matrix operator dispatch to python scripts
           */
          void dispatchQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
@@ -163,6 +164,11 @@ namespace Equations {
          void dispatchExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
       private:
+         /**
+          * @brief Set the galerkin stencil
+          */
+         virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const; // = 0;
+
          /**
           * @brief Set the quasi inverse matrix operator
           */
@@ -181,6 +187,7 @@ namespace Equations {
    /**
     * @brief Compute and add the explicit linear terms
     *
+    * @param eq         Equation
     * @param compId     Equation field component ID
     * @param eqField    Equation field values
     * @param eqStart    Start index for the equation field
@@ -190,6 +197,33 @@ namespace Equations {
     */
    template <typename TData> void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx);
    template <typename TOperator,typename TData> void computeExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx);
+
+   /**
+    * @brief Apply the quasi-inverse operator
+    *
+    * @param eq         Equation
+    * @param compId     Equation field component ID
+    * @param rField     Output field
+    * @param start      Start index in linear storage
+    * @param matIdx     System index
+    * @param rhsStart   Start index in RHS data
+    * @param rhs        RHS field data
+    */
+   template <typename TData> void applyQuasiInverse(const IEquation& eq, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs);
+   template <> void applyQuasiInverse<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const int rhsStart, const DecoupledZMatrix& rhs);
+
+   /**
+    * @brief Apply the galerkin stencil operator
+    *
+    * @param eq         Equation
+    * @param compId     Equation field component ID
+    * @param rField     Output field
+    * @param start      Start index in linear storage
+    * @param matIdx     System index
+    * @param rhs        RHS field data
+    */
+   template <typename TData> void applyGalerkinStencil(const IEquation& eq, TData& rField, const int start, const int matIdx, const TData& rhs);
+   template <> void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs);
 
    namespace internal
    {
@@ -222,36 +256,19 @@ namespace Equations {
          rEqField.imag().block(eqStart, 0, rows, cols) += mat.real()*rhs.imag() + mat.imag()*rhs.real();
       }
 
-      template <typename TData> inline void applyQuasiInverse(TData& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const TData& rhs)
-      {
-         int cols = rField.cols();
-         int rhsRows = mat.cols();
-         applyQuasiInverseWrapper(rField, start, rows, mat, rhs.block(rhsStart, 0, rhsRows, cols));
-      }
-
-      template <> inline void applyQuasiInverse<DecoupledZMatrix>(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const int rhsStart, const DecoupledZMatrix& rhs)
-      {
-         assert(rField.real().rows() == rField.imag().rows());
-         assert(rField.real().cols() == rField.imag().cols());
-
-         int cols = rField.real().cols();
-         int rhsRows = mat.cols();
-         applyQuasiInverseWrapper(rField, start, rows, mat, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
-      }
-
-      inline void applyQuasiInverseWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs)
+      inline void applyOperatorWrapper(Matrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhs)
       {
          int cols = rField.cols();
          rField.block(start, 0, rows, cols) = mat*rhs;
       }
 
-      inline void applyQuasiInverseWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs)
+      inline void applyOperatorWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs)
       {
          int cols = rField.cols();
          rField.block(start, 0, rows, cols) = mat*rhs;
       }
 
-      inline void applyQuasiInverseWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag)
+      inline void applyOperatorWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag)
       {
          assert(rField.real().rows() == rField.imag().rows());
          assert(rField.real().cols() == rField.imag().cols());
@@ -260,6 +277,60 @@ namespace Equations {
          rField.real().block(start, 0, rows, cols) = mat*rhsReal;
          rField.imag().block(start, 0, rows, cols) = mat*rhsImag;
       }
+   }
+
+   template <typename TData> inline void applyQuasiInverse(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const int rhsStart, const TData& rhs)
+   {
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+
+      // Get number of rows and cols
+      int rows = eq.couplingInfo(compId).galerkinN(matIdx);
+      int cols = rField.cols();
+      int rhsRows = op->cols();
+
+      internal::applyOperatorWrapper(rField, start, rows, *op, rhs.block(rhsStart, 0, rhsRows, cols));
+   }
+
+   template <> inline void applyQuasiInverse<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const int rhsStart, const DecoupledZMatrix& rhs)
+   {
+      assert(rField.real().rows() == rField.imag().rows());
+      assert(rField.real().cols() == rField.imag().cols());
+
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
+
+      // Get number of rows and cols
+      int rows = eq.couplingInfo(compId).galerkinN(matIdx);
+      int cols = rField.real().cols();
+      int rhsRows = op->cols();
+
+      internal::applyOperatorWrapper(rField, start, rows, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
+   }
+
+   template <typename TData> inline void applyGalerkinStencil(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& rField, const int start, const int matIdx, const TData& rhs)
+   {
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
+
+      // Get number of rows and cols
+      int rows = eq.couplingInfo(compId).tauN(matIdx);
+
+      internal::applyOperatorWrapper(rField, start, rows, *op, rhs);
+   }
+
+   template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
+   {
+      assert(rField.real().rows() == rField.imag().rows());
+      assert(rField.real().cols() == rField.imag().cols());
+
+      // Create pointer to sparse operator
+      const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
+
+      // Get number of rows and cols
+      int rows = eq.couplingInfo(compId).tauN(matIdx);
+
+      internal::applyOperatorWrapper(rField, start, rows, *op, rhs.real(), rhs.imag());
    }
 
    template <typename TData> void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx)

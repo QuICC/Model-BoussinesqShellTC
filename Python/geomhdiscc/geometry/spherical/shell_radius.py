@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.spherical.shell_radius_boundary as sphbc
 
@@ -14,7 +15,6 @@ def zblk(nr, q, bc):
 
     mat = spsp.lil_matrix((nr,nr))
     return sphbc.constrain(mat,bc,q)
-
 
 def i2x2(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 T_n(x)."""
@@ -65,7 +65,6 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
 
-
 def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
 
@@ -98,7 +97,6 @@ def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
-
 
 def i4x4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
@@ -181,7 +179,6 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 4)
 
-
 def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
 
@@ -247,7 +244,6 @@ def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 4)
 
-
 def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
 
@@ -297,7 +293,6 @@ def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 4)
 
-
 def i2x1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x T_n(x)."""
 
@@ -339,7 +334,6 @@ def i2x1(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
 
-
 def i2x2d1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 D_x T_n(x)."""
 
@@ -380,7 +374,6 @@ def i2x2d1(nr, a, b, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 2)
-
 
 def i4x3(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^3 T_n(x)."""
@@ -455,7 +448,6 @@ def i4x3(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 4)
 
-
 def i4x4d1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 D_x T_n(x)."""
 
@@ -528,7 +520,6 @@ def i4x4d1(nr, a, b, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return sphbc.constrain(mat, bc, 4)
-
 
 def qid(nr, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""

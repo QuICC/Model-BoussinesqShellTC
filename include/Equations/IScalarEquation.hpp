@@ -98,6 +98,11 @@ namespace Equations {
          
       protected:
          /**
+          * @brief Set the galerkin stencil
+          */
+         virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;
+
+         /**
           * @brief Set the quasi inverse matrix operator
           */
          virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;
@@ -166,21 +171,41 @@ namespace Equations {
       // Assert scalar
       assert(compId == FieldComponents::Spectral::SCALAR);
 
+      const TData * solution;
+      TData tmp;
+      int solStart;
+      if(this->couplingInfo(compId).isGalerkin())
+      {
+         // Temporary storage is required
+         tmp = TData(this->couplingInfo(compId).tauN(matIdx), this->couplingInfo(compId).rhsCols(matIdx));
+
+         // Apply Galerkin stencil
+         applyGalerkinStencil(*this, compId, tmp, start, matIdx, storage);
+
+         solStart = 0;
+         solution = &tmp;
+
+      } else
+      {
+         solStart = start;
+         solution = &storage;
+      }
+
       if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
       {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
          // Copy data
-         int k = start;
+         int k = solStart;
          for(int j = 0; j < cols; j++)
          {
             for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(storage, k),i,j,matIdx);
+               this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
 
-               // increase storage counter
+               // increase linear storage counter
                k++;
             }
          }
@@ -191,13 +216,13 @@ namespace Equations {
          int rows = this->unknown().dom(0).perturbation().slice(mode(0)).rows();
 
          // Copy data
-         int k = start;
+         int k = solStart;
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(storage,k),i,mode(1),mode(0));
+            this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution,k),i,mode(1),mode(0));
 
-            // increase storage counter
+            // increase linear storage counter
             k++;
          }
       }
@@ -277,7 +302,7 @@ namespace Equations {
          if(eq.couplingInfo(compId).isGalerkin())
          {
             // Temporary storage is required
-            tmp= TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+            tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
             rhs = &tmp;
             useShift = false;
             copyStart = 0;
@@ -292,14 +317,8 @@ namespace Equations {
          // simply copy values from unknown
          copyUnknown(eq, compId, *rhs, matIdx, copyStart, useShift);
 
-         // Create pointer to sparse operator
-         const SparseMatrix * op = &eq.quasiInverse(compId, matIdx);
-
-         // Get number of rows
-         int rows = eq.couplingInfo(compId).galerkinN(matIdx);
-
          // Multiply nonlinear term by quasi-inverse
-         internal::applyQuasiInverse(storage, start, rows, *op, copyStart, *rhs);
+         applyQuasiInverse(eq, compId, storage, start, matIdx, copyStart, *rhs);
 
       /// Nonlinear computation took place but no quas-inverse is required
       } else if(eq.couplingInfo(compId).hasNonlinear())

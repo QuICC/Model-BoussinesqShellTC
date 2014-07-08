@@ -39,7 +39,6 @@ def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None, has_wrap = True
 
     return diags
 
-
 def build_block_matrix(fields, func, func_args):
 
     tmp = []
@@ -52,7 +51,6 @@ def build_block_matrix(fields, func, func_args):
 
     return spsp.bmat(tmp)
 
-
 def build_diag_matrix(fields, func, func_args):
 
     tmp = []
@@ -61,7 +59,6 @@ def build_diag_matrix(fields, func, func_args):
         tmp.append(func(*args))
    
     return spsp.block_diag(tmp)
-
 
 def triplets(mat):
     mat = mat.tocoo();

@@ -251,12 +251,19 @@ namespace IoTools {
       {
          case ModelOperator::QI:
             return "qi";
+
          case ModelOperator::TIME:
             return "time";
+
          case ModelOperator::IMPLICIT_LINEAR:
             return "implicit_linear";
+
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";
+
+         case ModelOperator::STENCIL:
+            return "stencil";
+
          default:
             throw Exception("Unknown ID to string conversion requested (ModelOperator)");
       }
