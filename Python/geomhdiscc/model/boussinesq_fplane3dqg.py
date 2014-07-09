@@ -77,9 +77,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Equation doesn't have geometric coupling
-        has_geometric_coupling = False
-        # Index mode: SLOWEST = 0, MODE = 1
+        # Index mode: SLOWEST = 0, MODE = 1, GEOMETRIC_1D_3D = 2
         index_mode = 1
 
         # Rows per tau equation block, rows per galerkin equation block and number of rhs
@@ -102,7 +100,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         block_info = (tau_n, gal_n, (shift_x,0,0), 1)
 
-        return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
+        return (is_complex, im_fields, ex_fields, index_mode, block_info)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
 import geomhdiscc.base.base_model as base_model
@@ -18,18 +19,15 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return ["prandtl", "rayleigh", "gamma", "chi"]
 
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, True, False]
 
-
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["streamfunction", "velocityz", "temperature"]
-
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -37,7 +35,6 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         return fields
-
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
@@ -49,7 +46,6 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return fields
 
-
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
@@ -59,7 +55,6 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             fields = []
 
         return fields
-
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -75,21 +70,38 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Equation doesn't have geometric coupling
-        has_geometric_coupling = False
-        # Index mode: SLOWEST = 0, MODE = 1
+        # Index mode: SLOWEST = 0, MODE = 1, GEOMETRIC_1D_3D = 2
         index_mode = 0
 
         # Rows per equation block and number of rhs
-        block_info = (res[0]*res[2], 1)
+        tau_n = res[0]*res[2]
+        if self.use_galerkin:
+            if field_row == ("streamfunction",""):
+                shift_x = 0
+                shift_y = 0
+            elif field_row == ("velocityz",""):
+                shift_x = 0
+                shift_y = 0
+            elif field_row == ("temperature",""):
+                shift_x = 2
+                shift_y = 0
+            else:
+                shift_x = 0
+                shift_y = 0
 
-        return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
+            gal_n = (res[0]-shift_x )*(res[2]-shift_z)
 
+        else:
+            gal_n = tau_n
+            shift_x = 0
+            shift_y = 0
+
+        block_info = (tau_n, gal_n, (shift_x,shift_z,0), 1)
+
+        return (is_complex, im_fields, index_mode, block_info)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
-
-        use_tau_boundary = True
 
         # Impose no boundary conditions
         no_bc = {'x':[0],'z':[0]}
@@ -97,7 +109,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             bc = no_bc
         else:
             # Impose no boundary conditions
-            if bcs["bcType"] == 1 and use_tau_boundary:
+            if bcs["bcType"] == 1 and not use_galerkin:
                 bc = no_bc
             else: #bcType == 0 or Galerkin boundary
                 chi = eq_params['chi']
@@ -127,16 +139,23 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                     bc = {'x':[0],'z':[11, 1j*k*np.tan(chi*np.pi/180)/G]}
 
                 if bc is None:
-                    if use_tau_boundary:
-                        bc = no_bc
-                    else:
+                    if use_galerkin:
                         bc = {}
                         for k,v in bc_field[field_col]:
                             bc[k] = v
                             bc[k][0] = -v[0]
+                    else:
+                        bc = no_bc
 
         return bc
 
+    def stencil(self, res, eq_params, eigs, bcs, field_row):
+        """Create the galerkin stencil"""
+        
+        # Get boundary condition
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+
+        return c2d.stencil(res[0], res[2], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
@@ -151,7 +170,6 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             mat = c2d.i2j0(res[0],res[2], {'x':[0], 'z':[0]})
 
         return mat
-
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block of linear operator"""
@@ -200,7 +218,6 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c1d.zblk(res[0],0, bc)
 
         return mat
-
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""

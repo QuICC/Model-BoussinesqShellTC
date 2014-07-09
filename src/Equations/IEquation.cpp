@@ -169,16 +169,12 @@ namespace Equations {
       std::vector<std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> >  exFields;
       PythonModelWrapper::getList(exFields, pTmp);
 
-      // Get geometric coupling flag
+      // Get index mode
       pTmp = PyTuple_GetItem(pValue, 3);
-      bool hasGeometricCoupling = PyObject_IsTrue(pTmp);
-
-      // Get geometric coupling flag
-      pTmp = PyTuple_GetItem(pValue, 4);
       int indexMode = PyLong_AsLong(pTmp);
 
       // Get block information
-      pArgs = PyTuple_GetItem(pValue, 5);
+      pArgs = PyTuple_GetItem(pValue, 4);
       pTmp = PyTuple_GetItem(pArgs, 0);
       int tauSize = PyLong_AsLong(pTmp);
       pTmp = PyTuple_GetItem(pArgs, 1);
@@ -241,7 +237,7 @@ namespace Equations {
       }
 
       // Set geometric coupling information
-      if(hasGeometricCoupling)
+      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::GEOMETRIC_1D_3D)
       {
          throw Exception("Geometric coupling is not yet implemented!");
 
