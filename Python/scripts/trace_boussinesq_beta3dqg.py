@@ -1,9 +1,9 @@
 """Script to run a marginal curve trace for the Boussinesq Beta 3DQG model"""
 
-import geomhdiscc.model.boussinesq_beta3dqg
+import geomhdiscc.model.boussinesq_beta3dqg as mod
 
 # Create the model and activate linearization
-model = geomhdiscc.model.boussinesq_beta3dqg.BoussinesqBeta3DQG()
+model = mod.BoussinesqBeta3DQG()
 model.linearize = True
 fields = model.stability_fields()
 

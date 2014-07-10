@@ -1,9 +1,9 @@
 """Script to run a marginal curve trace for the compressible convection in a rotating F-plane model"""
 
-import geomhdiscc.model.compressible_rotconvfplane
+import geomhdiscc.model.compressible_rotconvfplane as mod
 
 # Create the model and activate linearization
-model = geomhdiscc.model.compressible_rotconvfplane.CompressibleRotConvFPlane()
+model = mod.CompressibleRotConvFPlane()
 model.linearize = True
 fields = model.stability_fields()
 

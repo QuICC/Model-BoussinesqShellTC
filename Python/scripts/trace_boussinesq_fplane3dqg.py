@@ -1,10 +1,10 @@
 """Script to run a marginal curve trace for the Boussinesq F-plane 3DQG model"""
 
 import numpy as np
-import geomhdiscc.model.boussinesq_fplane3dqg
+import geomhdiscc.model.boussinesq_fplane3dqg as mod
 
 # Create the model and activate linearization
-model = geomhdiscc.model.boussinesq_fplane3dqg.BoussinesqFPlane3DQG()
+model = mod.BoussinesqFPlane3DQG()
 model.linearize = True
 fields = model.stability_fields()
 

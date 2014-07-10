@@ -1,9 +1,9 @@
 """Script to run a marginal curve trace for the Boussinesq convection in a rotating spherical shell"""
 
-import geomhdiscc.model.boussinesq_rotconvshell
+import geomhdiscc.model.boussinesq_rotconvshell as mod
 
 # Create the model and activate linearization
-model = geomhdiscc.model.boussinesq_rotconvshell.BoussinesqRotConvShell()
+model = mod.BoussinesqRotConvShell()
 model.linearize = True
 fields = model.stability_fields()
 

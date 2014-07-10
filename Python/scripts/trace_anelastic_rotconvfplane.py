@@ -1,9 +1,9 @@
 """Script to run a marginal curve trace for the anelastic convection in a rotating F-plane model"""
 
-import geomhdiscc.model.anelastic_rotconvfplane
+import geomhdiscc.model.anelastic_rotconvfplane as mod
 
 # Create the model and activate linearization
-model = geomhdiscc.model.anelastic_rotconvfplane.AnelasticRotConvFPlane()
+model = mod.AnelasticRotConvFPlane()
 model.linearize = True
 fields = model.stability_fields()
 
