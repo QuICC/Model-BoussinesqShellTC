@@ -10,11 +10,11 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [50, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.8, 'theta':0}
+eq_params = {'prandtl':1, 'rayleigh':6.6648, 'theta':35}
 
 # Set wave number
 phi = 0
-kp = 1.3048
+kp = 1.2209
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]

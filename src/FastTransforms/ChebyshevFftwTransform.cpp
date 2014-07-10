@@ -132,8 +132,8 @@ namespace Transform {
       pValue = PyLong_FromLong(this->mspSetup->specSize());
       PyTuple_SetItem(pArgs, 0, pValue);
       // ... create boundray condition (none)
-      pValue = PyList_New(1);
-      PyList_SetItem(pValue, 0, PyLong_FromLong(0));
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
       // ... set coefficient to 1.0
       pValue = PyFloat_FromDouble(1.0);

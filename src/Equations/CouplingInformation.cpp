@@ -99,7 +99,7 @@ namespace Equations {
 
    int CouplingInformation::systemN(const int idx) const
    {
-      return this->galerkinN(idx)*this->nBlocks();
+      return this->mSystemNs(idx);
    }
 
    int CouplingInformation::fieldIndex() const
@@ -173,7 +173,7 @@ namespace Equations {
       this->mHasSource = hasSource;
    }
 
-   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols)
+   void CouplingInformation::setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs)
    {
       this->mNSystems = nSystems;
 
@@ -186,6 +186,8 @@ namespace Equations {
       this->mRhsCols = rhsCols;
 
       this->mIsGalerkin = (this->mGalerkinShifts.sum() > 0);
+
+      this->mSystemNs = systemNs;
    }
 
    void CouplingInformation::setSolverIndex(const int idx)

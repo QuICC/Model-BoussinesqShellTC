@@ -92,7 +92,7 @@ set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 ###################################################
 
 # Find python headers and library
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibs REQUIRED 3.3)
 
 set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARIES} PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIRS} PARENT_SCOPE)

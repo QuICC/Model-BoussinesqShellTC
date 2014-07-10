@@ -9,15 +9,22 @@ import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
 
 
-def constrain(mat, bc, eq_zrows):
+no_bc = {0:0}
+
+def constrain(mat, bc):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
     if bc[0] > 0:
         bc_mat = apply_tau(mat, bc)
     elif bc[0] < 0:
-        bc_mat = apply_galerkin(mat, bc, eq_zrows)
+        bc_mat = apply_galerkin(mat, bc)
     else:
         bc_mat = mat
+
+    # Restrict if required
+    if bc.get('r', 0) > 0:
+        assert bc[0] <= 0
+        bc_mat = stencil_eye(mat.shape[0], bc['r'])*bc_mat
 
     return bc_mat
 
@@ -25,21 +32,21 @@ def apply_tau(mat, bc):
     """Add Tau lines to the matrix"""
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], 1, bc[1:])
+        cond = tau_value(mat.shape[0], 1, bc.get('c',None))
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[0], -1, bc[1:])
+        cond = tau_value(mat.shape[0], -1, bc.get('c',None))
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[0], 1, bc[1:])
+        cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[0], -1, bc[1:])
+        cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[0], 0, bc[1:])
+        cond = tau_value(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[0], 0, bc[1:])
+        cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[0], 0, bc[1:])
+        cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[0], 0, bc[1:])
+        cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -53,10 +60,10 @@ def apply_tau(mat, bc):
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
 
-    if coeffs is None or len(coeffs) < 1:
+    if coeffs is None:
         c = 1.0
     else:
-        c = coeffs[0]
+        c = coeffs
 
     cond = []
     if pos >= 0:
@@ -70,10 +77,10 @@ def tau_value(nx, pos, coeffs = None):
 def tau_diff(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 1st derivative"""
 
-    if coeffs is None or len(coeffs) < 1:
+    if coeffs is None:
         c = 1.0
     else:
-        c = coeffs[0]
+        c = coeffs
 
     cond = []
     if pos >= 0:
@@ -87,10 +94,10 @@ def tau_diff(nx, pos, coeffs = None):
 def tau_diff2(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 2nd derivative"""
 
-    if coeffs is None or len(coeffs) < 1:
+    if coeffs is None:
         c = 1.0
     else:
-        c = coeffs[0]
+        c = coeffs
 
     cond = []
     if pos >= 0:
@@ -103,11 +110,6 @@ def tau_diff2(nx, pos, coeffs = None):
 
 def tau_value_diff(nx, pos, coeffs = None):
     """Create the tau lines for a zero boundary value and a zero 1st derivative"""
-
-    if coeffs is None or len(coeffs) < 1:
-        c = 1.0
-    else:
-        c = coeffs[0]
 
     cond = []
     if pos >= 0:
@@ -122,11 +124,6 @@ def tau_value_diff(nx, pos, coeffs = None):
 
 def tau_value_diff2(nx, pos, coeffs = None):
     """Create tau lines for a zero boundary value and a zero 2nd derivative """
-
-    if coeffs is None or len(coeffs) < 1:
-        c = 1.0
-    else:
-        c = coeffs[0]
 
     cond = []
     if pos >= 0:
@@ -161,12 +158,11 @@ def stencil(nx, bc):
 
     return mat
 
-def apply_galerkin(mat, bc, eq_zero_rows):
+def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nx = mat.shape[0]
-
-    return stencil_eye(nx, eq_zero_rows)*mat*stencil(nx, bc)
+    return mat*stencil(nx, bc)
 
 def stencil_eye(nx, q):
     """Create the restriction identity to resize matrix after stencil use"""

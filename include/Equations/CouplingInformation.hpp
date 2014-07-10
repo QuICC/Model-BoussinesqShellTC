@@ -234,8 +234,9 @@ namespace Equations {
           * @param galerkinNs       Galerkin block size for each system
           * @param galerkinShifts   Galerkin index shifts
           * @param rhsCols          Number of columns in RHS for each system
+          * @param systemNs         Number of columns in RHS for each system
           */
-         void setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols);
+         void setSizes(const int nSystems, const ArrayI& tauNs, const ArrayI& galerkinNs, const ArrayI& galerkinShifts, const ArrayI& rhsCols, const ArrayI& systemNs);
 
          /**
           * @brief Set the index type
@@ -351,6 +352,11 @@ namespace Equations {
           * @brief Storage for the number of RHS in solver
           */
          ArrayI mRhsCols;
+
+         /**
+          * @brief Storage for the system sizes
+          */
+         ArrayI mSystemNs;
    };
 }
 }

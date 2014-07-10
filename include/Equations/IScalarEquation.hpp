@@ -25,6 +25,7 @@
 #include "Equations/IEquation.hpp"
 #include "Base/DecoupledComplexInternal.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {

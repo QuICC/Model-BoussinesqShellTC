@@ -216,7 +216,7 @@ namespace Equations {
          int cols = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
 
          // Copy data
-         int k = start;
+         int k = solStart;
          for(int j = 0; j < cols; j++)
          {
             for(int i = 0; i < rows; i++)
@@ -235,7 +235,7 @@ namespace Equations {
          int rows = this->unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
 
          // Copy data
-         int k = start;
+         int k = solStart;
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
