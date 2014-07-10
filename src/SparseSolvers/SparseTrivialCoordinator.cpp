@@ -104,6 +104,9 @@ namespace Solver {
             }
          }
       }
+
+      // Initialise the start rows
+      this->initStartRow();
       DebuggerMacro_stop("Trivial: create storage t = ", 2);
 
       //

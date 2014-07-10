@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell as sph
+import geomhdiscc.geometry.spherical.shell as sphere
 import geomhdiscc.base.base_model as base_model
 
 
@@ -18,18 +19,15 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         return ["ekman", "prandtl", "rayleigh", "ro", "rratio"]
 
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
-
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -38,7 +36,6 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         return fields
 
-
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
@@ -46,14 +43,12 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         return fields
 
-
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
         fields = []
 
         return fields
-
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -75,7 +70,6 @@ class BoussinesqRotConvShell(base_model.BaseModel):
         block_info = (res[0]*res[1], 1)
 
         return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
-
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -121,7 +115,6 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         return bc
 
-
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
@@ -130,21 +123,20 @@ class BoussinesqRotConvShell(base_model.BaseModel):
         m = eigs[1]
 
         if field_row == ("velocity","tor"):
-            mat = sph.i2x2(res[0], res[1], m, a, b, [0])
+            mat = shell.i2x2(res[0], res[1], m, a, b, [0])
 
         elif field_row == ("velocity","pol"):
-            mat = sph.i4x4(res[0], res[1], m, a, b, [0])
+            mat = shell.i4x4(res[0], res[1], m, a, b, [0])
 
         elif field_row == ("temperature",""):
-            mat = sph.i2x2(res[0], res[1], m, a, b, [0])
+            mat = shell.i2x2(res[0], res[1], m, a, b, [0])
 
         return mat
-
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Ta = eq_params['ekman']**(-2)
+        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
@@ -154,45 +146,44 @@ class BoussinesqRotConvShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = sph.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0, 'laplh') + sph.i2x2(res[0], res[1], m, a, b, [min(bc[0],0)], 1j*m*Ta**0.5)
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0, 'laplh') + shell.i2x2(res[0], res[1], m, a, b, [min(bc[0],0)], 1j*m*Ta**0.5)
 
             elif field_col == ("velocity","pol"):
-                mat = sph.i2x2coriolis(res[0], res[1], m, a, b, bc, -Ta**0.5)
+                mat = shell.i2x2coriolis(res[0], res[1], m, a, b, bc, -Ta**0.5)
 
             elif field_col == ("temperature",""):
-                mat = sph.zblk(res[0], res[1], m, 2, bc)
+                mat = shell.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = sph.i4x4coriolis(res[0], res[1], m, a, b, bc, Ta**0.5)
+                mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, Ta**0.5)
 
             elif field_col == ("velocity","pol"):
-                mat = sph.i4x4lapl2(res[0], res[1], m, a, b, bc, 1.0, 'laplh') + sph.i4x4lapl(res[0], res[1], m, a, b, [min(bc[0],0)], 1j*m*Ta**0.5)
+                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, 1.0, 'laplh') + shell.i4x4lapl(res[0], res[1], m, a, b, [min(bc[0],0)], 1j*m*Ta**0.5)
 
             elif field_col == ("temperature",""):
-                mat = sph.i4x4(res[0], res[1], m, a, b, bc, -Ra, 'laplh')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
-                mat = sph.zblk(res[0], res[1], m, 2, bc)
+                mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = sph.i2x2(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
+                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
 
                 else:
-                    mat = sph.zblk(res[0], res[1], m ,2, bc)
+                    mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = sph.i2x2lapl(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc)
 
         return mat
-
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        Ek = eq_params['ekman']
+        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
@@ -201,16 +192,15 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = sph.i2x2(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = sph.i4x4lapl(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1.0, 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = sph.i2x2(res[0], res[1], m, a, b, bc, Pr)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, Pr)
 
         return mat
-
 
     def linear_r2x(self, ro, rratio):
         """Calculat a and b for linear map r = a*x + b"""

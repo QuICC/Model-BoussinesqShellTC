@@ -55,8 +55,17 @@ namespace Solver {
 
          /**
           * @brief Add storage information 
+          *
+          * @param id         Field ID
+          * @param idx        Field index in solver matrix
+          * @param startRow   Sizes required to compute start row sizes
           */
-         void addInformation(const SpectralFieldId& id, const ArrayI& startRow);
+         void addInformation(const SpectralFieldId& id, const int idx, const ArrayI& startRow);
+
+         /**
+          * @brief Initialise the startRow based on added information
+          */
+         void initStartRow();
 
          /**
           * @brief Get start row 
@@ -92,7 +101,7 @@ namespace Solver {
          /**
           * @brief Storage for the storage information
           */
-         std::map<SpectralFieldId, ArrayI> mInformation;
+         std::map<SpectralFieldId, std::pair<int, ArrayI> > mInformation;
 
          /**
           * @brief Flag for operator initialization

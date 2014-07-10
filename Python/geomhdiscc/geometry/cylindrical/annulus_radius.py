@@ -5,16 +5,16 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as cylbc
 
 
-def zblk(nr, q, bc):
+def zblk(nr, bc):
     """Create a block of zeros"""
 
     mat = spsp.lil_matrix((nr,nr))
-    return cylbc.constrain(mat,bc,q)
-
+    return cylbc.constrain(mat,bc)
 
 def i2x2(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 T_n(x)."""
@@ -63,8 +63,7 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 2)
-
+    return cylbc.constrain(mat, bc)
 
 def i2x2lapl(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
@@ -97,8 +96,7 @@ def i2x2lapl(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 2)
-
+    return cylbc.constrain(mat, bc)
 
 def i4x4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
@@ -179,8 +177,7 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 4)
-
+    return cylbc.constrain(mat, bc)
 
 def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
@@ -245,8 +242,7 @@ def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 4)
-
+    return cylbc.constrain(mat, bc)
 
 def i4x4lapl2(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
@@ -295,8 +291,7 @@ def i4x4lapl2(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, 4)
-
+    return cylbc.constrain(mat, bc)
 
 def qid(nr, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
@@ -305,4 +300,4 @@ def qid(nr, q, bc, coeff = 1.0):
     diags = [[0]*q + [1]*(nr-q)]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc, q)
+    return cylbc.constrain(mat, bc)

@@ -111,6 +111,11 @@ namespace Solver {
          void addSolver(ComplexSolver_iterator solIt, const int idx, const int start);
 
          /**
+          * @brief Initi the start rows for the solvers
+          */
+         void initStartRow();
+
+         /**
           * @brief Vector of (coupled) real operator
           */
          std::vector<SharedRealSolverType> mRealSolvers;
@@ -207,6 +212,19 @@ namespace Solver {
          SparseCoordinatorData<TSolver>::SharedComplexSolverType spSolver(new SparseCoordinatorData<TSolver>::ComplexSolverType(start));
 
          this->mComplexSolvers.push_back(spSolver);
+      }
+   }
+
+   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::initStartRow()
+   {
+      for(typename std::vector<SharedRealSolverType>::iterator rIt = this->mRealSolvers.begin(); rIt != this->mRealSolvers.end(); ++rIt)
+      {
+         (*rIt)->initStartRow();
+      }
+
+      for(typename std::vector<SharedComplexSolverType>::iterator zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
+      {
+         (*zIt)->initStartRow();
       }
    }
 
@@ -411,11 +429,11 @@ namespace Solver {
       for(int i = 0; i < nSystems; i++)
       {
          // Store the start row
-         startRow(i) = spEq->couplingInfo(id.second).fieldIndex()*spEq->couplingInfo(id.second).galerkinN(i);
+         startRow(i) = spEq->couplingInfo(id.second).galerkinN(i);
       }
 
       // Store storage information
-      (*solveIt)->addInformation(id,startRow);
+      (*solveIt)->addInformation(id, spEq->couplingInfo(id.second).fieldIndex(), startRow);
    }
 
    //

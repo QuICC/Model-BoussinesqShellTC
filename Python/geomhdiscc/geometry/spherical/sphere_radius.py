@@ -9,11 +9,11 @@ import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.spherical.sphere_radius_boundary as sphbc
 
 
-def zblk(nr, l, q, bc):
+def zblk(nr, l, bc):
     """Create a block of zeros"""
 
     mat = spsp.lil_matrix((nr,nr))
-    return sphbc.constrain(mat,l,bc,q)
+    return sphbc.constrain(mat,l,bc)
 
 
 def i2x2(nr, l, bc, coeff = 1.0):
@@ -48,7 +48,7 @@ def i2x2(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 1)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i2x2lapl(nr, l, bc, coeff = 1.0):
@@ -75,7 +75,7 @@ def i2x2lapl(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 1)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i4x4(nr, l, bc, coeff = 1.0):
@@ -126,7 +126,7 @@ def i4x4(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 2)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i4x4lapl(nr, l, bc, coeff = 1.0):
@@ -169,7 +169,7 @@ def i4x4lapl(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 2)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i4x4lapl2(nr, l, bc, coeff = 1.0):
@@ -204,7 +204,7 @@ def i4x4lapl2(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 2)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i2x1(nr, l, bc, coeff = 1.0):
@@ -237,7 +237,7 @@ def i2x1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 1)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i2x2d1(nr, l, bc, coeff = 1.0):
@@ -270,7 +270,7 @@ def i2x2d1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 1)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i4x3(nr, l, bc, coeff = 1.0):
@@ -319,7 +319,7 @@ def i4x3(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 2)
+    return sphbc.constrain(mat, l, bc)
 
 
 def i4x4d1(nr, l, bc, coeff = 1.0):
@@ -368,7 +368,7 @@ def i4x4d1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, 2)
+    return sphbc.constrain(mat, l, bc)
 
 
 def qid(nr, l, q, bc, coeff = 1.0):
@@ -378,4 +378,4 @@ def qid(nr, l, q, bc, coeff = 1.0):
     diags = [[0]*q + [1]*(nr-q)]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc, q)
+    return sphbc.constrain(mat, l, bc)

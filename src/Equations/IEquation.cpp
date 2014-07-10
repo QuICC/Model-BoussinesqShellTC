@@ -24,7 +24,6 @@
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -185,7 +184,6 @@ namespace Equations {
       galerkinShifts(0) = PyLong_AsLong(PyTuple_GetItem(pTmp, 0));
       galerkinShifts(1) = PyLong_AsLong(PyTuple_GetItem(pTmp, 1));
       galerkinShifts(2) = PyLong_AsLong(PyTuple_GetItem(pTmp, 2));
-      std::cerr << galerkinShifts.transpose() << std::endl;
       pTmp = PyTuple_GetItem(pArgs, 3);
       int rhsSize = PyLong_AsLong(pTmp);
       pTmp = PyTuple_GetItem(pArgs, 4);

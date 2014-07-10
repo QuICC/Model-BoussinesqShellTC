@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere as sph
+import geomhdiscc.geometry.spherical.sphere as sphere
 import geomhdiscc.base.base_model as base_model
 
 
@@ -16,20 +17,17 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["ekman", "prandtl", "rayleigh"]
-
+        return ["taylor", "prandtl", "rayleigh"]
 
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
-
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -38,7 +36,6 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         return fields
 
-
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
@@ -46,14 +43,12 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         return fields
 
-
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
         fields = []
 
         return fields
-
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
@@ -75,7 +70,6 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         block_info = (res[0]*res[1], 1)
 
         return (is_complex, im_fields, ex_fields, has_geometric_coupling, index_mode, block_info)
-
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -123,7 +117,6 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         return bc
 
-
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
@@ -131,21 +124,20 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         m = eigs[1]
 
         if field_row == ("velocity","tor"):
-            mat = sph.i2x2(res[0], res[1], m, [0])
+            mat = sphere.i2x2(res[0], res[1], m, [0])
 
         elif field_row == ("velocity","pol"):
-            mat = sph.i4x4(res[0], res[1], m, [0])
+            mat = sphere.i4x4(res[0], res[1], m, [0])
 
         elif field_row == ("temperature",""):
-            mat = sph.i2x2(res[0], res[1], m, [0])
+            mat = sphere.i2x2(res[0], res[1], m, [0])
 
         return mat
-
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Ek = eq_params['ekman']
+        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         l = eigs[0]
@@ -154,45 +146,44 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = sph.i2x2lapl(res[0], res[1], m, bc, Ek, 'laplh') + sph.i2x2(res[0], res[1], m, [min(bc[0],0)], 1j*m)
+                mat = sphere.i2x2lapl(res[0], res[1], m, bc, Ek, 'laplh') + sphere.i2x2(res[0], res[1], m, [min(bc[0],0)], 1j*m)
 
             elif field_col == ("velocity","pol"):
-                mat = sph.i2x2coriolis(res[0], res[1], m, bc, -1.0)
+                mat = sphere.i2x2coriolis(res[0], res[1], m, bc, -1.0)
 
             elif field_col == ("temperature",""):
-                mat = sph.zblk(res[0], res[1], m, 2, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = sph.i4x4coriolis(res[0], res[1], m, bc)
+                mat = sphere.i4x4coriolis(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = sph.i4x4lapl2(res[0], res[1], m, bc, Ek, 'laplh') + sph.i4x4lapl(res[0], res[1], m, [min(bc[0],0)], 1j*m)
+                mat = sphere.i4x4lapl2(res[0], res[1], m, bc, Ek, 'laplh') + sphere.i4x4lapl(res[0], res[1], m, [min(bc[0],0)], 1j*m)
 
             elif field_col == ("temperature",""):
-                mat = sph.i4x4(res[0], res[1], m, bc, -Ek*Ra, 'laplh')
+                mat = sphere.i4x4(res[0], res[1], m, bc, -Ek*Ra, 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
-                mat = sph.zblk(res[0], res[1], m, 2, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = sph.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+                    mat = sphere.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
 
                 else:
-                    mat = sph.zblk(res[0], res[1], m ,2, bc)
+                    mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = sph.i2x2lapl(res[0], res[1], m, bc)
+                mat = sphere.i2x2lapl(res[0], res[1], m, bc)
 
         return mat
-
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        Ek = eq_params['ekman']
+        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         l = eigs[0]
@@ -200,12 +191,12 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = sph.i2x2(res[0], res[1], m, bc, Ek, 'laplh')
+            mat = sphere.i2x2(res[0], res[1], m, bc, Ek, 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = sph.i4x4lapl(res[0], res[1], m, bc, Ek, 'laplh')
+            mat = sphere.i4x4lapl(res[0], res[1], m, bc, Ek, 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = sph.i2x2(res[0], res[1], m, bc, Pr)
+            mat = sphere.i2x2(res[0], res[1], m, bc, Pr)
 
         return mat

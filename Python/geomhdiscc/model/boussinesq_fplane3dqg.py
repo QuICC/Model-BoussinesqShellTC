@@ -123,20 +123,19 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         # Impose no boundary conditions
         if bcs["bcType"] == 2:
-            bc = no_bc
+            bc = no_bc.copy()
         else:
             # Impose no tau boundary conditions
             if bcs["bcType"] == 1 and not self.use_galerkin:
-                bc = no_bc
+                bc = no_bc.copy()
 
             # Impose tau and Galerkin
             else:
-                eta2 = np.sin(np.pi*eq_params['theta']/180)
                 eta3 = np.cos(np.pi*eq_params['theta']/180)
                 kx = eigs[0]
                 ky = eigs[1]
 
-                bc = no_bc
+                bc = no_bc.copy()
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if self.use_galerkin:
@@ -144,37 +143,25 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                             bc = {0:-20, 'r':0}
 
                         elif eq_params['theta'] == 0:
-                            if field_col == ("streamfunction",""):
-                                bc = {0:-21, 'r':0}
-                            elif field_col == ("velocityz",""):
+                            if field_col == ("velocityz",""):
                                 bc = {0:-20, 'r':0}
                         else:
-                            if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                                bc = {0:10, 'c':-1j*kx*eta2, 'r':0}
-                            elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                                bc = {0:11, 'c':eta3, 'r':0}
-                            elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                                bc = {0:10, 'c':eta3, 'r':0}
-                            elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                                bc = {0:11, 'c':-1j*kx*eta2, 'r':0}
+                            if field_row == ("velocityz","") and field_col == ("velocityz",""):
+                                bc = {0:11, 'r':0}
+                            if field_row == ("streamfunction","") and field_col == ("velocityz",""):
+                                bc = {0:10, 'r':0}
 
                         if field_row ==("temperature",""):
                             bc['r'] = 2
                         elif eq_params['theta'] == 0:
-                            if field_row == ("streamfunction",""):
-                                bc['r'] = 2
-                            elif field_row == ("velocityz",""):
+                            if field_row == ("velocityz",""):
                                 bc['r'] = 2
 
                     else:
-                        if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                            bc = {0:10, 'c':-1j*kx*eta2}
-                        elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                            bc = {0:11, 'c':eta3}
+                        if field_row == ("velocityz","") and field_col == ("velocityz",""):
+                            bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                            bc = {0:10, 'c':eta3}
-                        elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                            bc = {0:11, 'c':-1j*kx*eta2}
+                            bc = {0:10}
 
         return bc
 
@@ -183,20 +170,20 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-
         return c1d.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c1d.i1(res[0], no_bc)
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("velocityz",""):
-            mat = c1d.i1(res[0], no_bc)
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = c1d.qid(res[0],0, no_bc)
+            mat = c1d.qid(res[0], 0, bc)
 
             # Force temperature boundary condition
             if self.force_temperature_bc and not self.use_galerkin:
@@ -206,9 +193,9 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("meantemperature",""):
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = (c1d.qid(res[0],0,no_bc) - c1d.avg(res[0]))
+                mat = (c1d.qid(res[0],0, bc) - c1d.avg(res[0]))
             else:
-                mat = c1d.zblk(res[0], no_bc)
+                mat = c1d.zblk(res[0], bc)
 
         return mat
 
@@ -217,7 +204,6 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        eta2 = np.sin(np.pi*eq_params['theta']/180)
         eta3 = np.cos(np.pi*eq_params['theta']/180)
         kx = eigs[0]
         ky = eigs[1]
@@ -228,37 +214,29 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat = c1d.i1(res[0], bc, (kx**2 + (1/eta3**2)*ky**2)**2)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1d1(res[0], bc, 2*eta3)
+                mat = c1d.i1d1(res[0], bc, -2*eta3*(kx**2 + (1/eta3**2)*ky**2))
 
             elif field_col == ("temperature",""):
-                mat = c1d.i1(res[0], bc, -1j*kx*eta2*(Ra/Pr))
+                mat = c1d.zblk(res[0], bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
                 mat = c1d.i1d1(res[0], bc, -2*eta3)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
+                mat = c1d.i1(res[0], bc, (kx**2 + (1/eta3**2)*ky**2)**2)
 
             elif field_col == ("temperature",""):
-                mat = c1d.i1(res[0], bc, eta3*Ra/Pr)
+                mat = c1d.i1(res[0], bc, (Ra/Pr)*(kx**2 + ky**2)/(kx**2 + (1/eta3**2)*ky**2))
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
                 if self.linearize:
-                    mat = c1d.qid(res[0],0, bc, -1j*kx*eta2)
-
-                    # Force temperature boundary condition
-                    if self.force_temperature_bc and not self.use_galerkin:
-                        mat = mat.tolil()
-                        mat[-2:,:] = 0
-                        mat = mat.tocsr()
-                else:
                     mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocityz",""):
                 if self.linearize:
-                    mat = c1d.qid(res[0],0, bc, eta3)
+                    mat = c1d.qid(res[0],0, bc, -(kx**2 + (1/eta3**2)*ky**2))
 
                     # Force temperature boundary condition
                     if self.force_temperature_bc and not self.use_galerkin:
@@ -294,7 +272,6 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        eta2 = np.sin(np.pi*eq_params['theta']/180)
         eta3 = np.cos(np.pi*eq_params['theta']/180)
         kx = eigs[0]
         ky = eigs[1]
@@ -304,7 +281,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
 
         elif field_row == ("velocityz",""):
-            mat = c1d.i1(res[0], bc)
+            mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
 
         elif field_row == ("temperature",""):
             mat = c1d.qid(res[0],0, bc)

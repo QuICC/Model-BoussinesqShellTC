@@ -316,7 +316,7 @@ namespace Equations {
       // Get number of rows and cols
       int rows = eq.couplingInfo(compId).tauN(matIdx);
 
-      internal::applyOperatorWrapper(rField, start, rows, *op, rhs);
+      internal::applyOperatorWrapper(rField, 0, rows, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
    }
 
    template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
@@ -330,7 +330,7 @@ namespace Equations {
       // Get number of rows and cols
       int rows = eq.couplingInfo(compId).tauN(matIdx);
 
-      internal::applyOperatorWrapper(rField, start, rows, *op, rhs.real(), rhs.imag());
+      internal::applyOperatorWrapper(rField, 0, rows, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
    }
 
    template <typename TData> void addExplicitLinear(const IEquation& eq, FieldComponents::Spectral::Id compId, TData& eqField, const int eqStart, SpectralFieldId fieldId, const Datatypes::SpectralScalarType& explicitField, const int matIdx)

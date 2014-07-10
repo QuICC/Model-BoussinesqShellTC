@@ -212,6 +212,9 @@ namespace Solver {
             }
          }
       }
+
+      // Initialise the start rows
+      this->initStartRow();
       DebuggerMacro_stop("Linear: create storage t = ", 2);
 
       //
