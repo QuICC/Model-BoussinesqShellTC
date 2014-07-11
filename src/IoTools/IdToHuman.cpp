@@ -37,6 +37,9 @@ namespace IoTools {
          case PhysicalNames::DENSITY:
             return "Density";
 
+         case PhysicalNames::DZ_MEANTEMPERATURE:
+            return "D_z mean temperature";
+
          case PhysicalNames::ENTROPY:
             return "Entropy";
 
@@ -73,6 +76,15 @@ namespace IoTools {
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
 
+         case PhysicalNames::NO_STREAMFUNCTION:
+            return "Non orthogonal streamfunction";
+
+         case PhysicalNames::NO_VELOCITYZ:
+            return "Non orthogonal velocityZ";
+
+         case PhysicalNames::NO_VORTICITYZ:
+            return "Non orthogonal vorticityZ";
+
          default:
             throw Exception("Unknown ID to string conversion requested (PhysicalNames)");
       }
@@ -87,6 +99,9 @@ namespace IoTools {
 
          case PhysicalNames::DENSITY:
             return "density";
+
+         case PhysicalNames::DZ_MEANTEMPERATURE:
+            return "dz_meantemperature";
 
          case PhysicalNames::ENTROPY:
             return "entropy";
@@ -123,6 +138,15 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
+
+         case PhysicalNames::NO_STREAMFUNCTION:
+            return "no_streamfunction";
+
+         case PhysicalNames::NO_VELOCITYZ:
+            return "no_velocityz";
+
+         case PhysicalNames::NO_VORTICITYZ:
+            return "no_vorticityz";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (PhysicalNames)");

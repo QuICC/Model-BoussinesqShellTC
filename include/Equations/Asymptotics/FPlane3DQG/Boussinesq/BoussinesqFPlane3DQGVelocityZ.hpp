@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGStreamfunction.hpp
- * @brief Implementation of the streamfunction equation for the Boussinesq F-plane 3DQG model
+ * @file BoussinesqFPlane3DQGVelocityZ.hpp
+ * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGSTREAMFUNCTION_HPP
-#define BOUSSINESQFPLANE3DQGSTREAMFUNCTION_HPP
+#ifndef BOUSSINESQFPLANE3DQGVELOCITYZ_HPP
+#define BOUSSINESQFPLANE3DQGVELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the streamfunction equation for the Boussinesq F-plane 3DQG model
+    * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGStreamfunction: public IScalarEquation
+   class BoussinesqFPlane3DQGVelocityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlane3DQGStreamfunction(SharedEquationParameters spEqParams);
+         BoussinesqFPlane3DQGVelocityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGStreamfunction();
+         virtual ~BoussinesqFPlane3DQGVelocityZ();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGSTREAMFUNCTION_HPP
+#endif // BOUSSINESQFPLANE3DQGVELOCITYZ_HPP

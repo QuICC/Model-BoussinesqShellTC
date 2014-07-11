@@ -136,7 +136,7 @@ namespace Equations {
          /**
           * \brief Implementation of the coupling definition to python scripts
           */
-         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes);
+         void dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes, const bool allowExplicit = true);
 
          /**
           * @brief Implementation of base arguments common to all dispatcher

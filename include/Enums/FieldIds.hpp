@@ -35,6 +35,8 @@ namespace GeoMHDiSCC {
          CODENSITY = 0,
          /// Density field
          DENSITY,
+         /// Z derivative of mean temperature field
+         DZ_MEANTEMPERATURE,
          /// Entropy field
          ENTROPY,
          /// Magnetic field
@@ -59,6 +61,13 @@ namespace GeoMHDiSCC {
          VORTICITY,
          /// Axial vorticity field
          VORTICITYZ,
+   
+         /// Non orthogonal streamfunction field
+         NO_STREAMFUNCTION,
+         /// Non orthogonal vertical velocity field
+         NO_VELOCITYZ,
+         /// Non orthogonal vertical vorticity field
+         NO_VORTICITYZ,
       };
    };
 

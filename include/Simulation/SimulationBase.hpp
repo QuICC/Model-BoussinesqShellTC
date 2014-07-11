@@ -132,6 +132,16 @@ namespace GeoMHDiSCC {
          template <typename TEquation> SharedPtrMacro<TEquation> addVectorEquation();
 
          /**
+          * @brief Add scalar equation with timing information to solver
+          */
+         template <typename TEquation> SharedPtrMacro<TEquation> addScalarEquation(const SolveTiming::Id time);
+
+         /**
+          * @brief Add vector equation with timing information to solver
+          */
+         template <typename TEquation> SharedPtrMacro<TEquation> addVectorEquation(const SolveTiming::Id time);
+
+         /**
           * @brief Set the base simulation configuration file and parameters
           *
           * @param bcNames Vector of names for the boundary conditions
@@ -435,6 +445,28 @@ namespace GeoMHDiSCC {
    {
       // Create shared scalar equation
       SharedPtrMacro<TEquation>  spEq(new TEquation(this->mspEqParams));
+
+      // Add share scalar equation
+      this->mVectorEquations.push_back(spEq);
+
+      return spEq;
+   }
+
+   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addScalarEquation(const SolveTiming::Id time)
+   {
+      // Create shared scalar equation
+      SharedPtrMacro<TEquation>  spEq(new TEquation(this->mspEqParams, time));
+
+      // Add share scalar equation
+      this->mScalarEquations.push_back(spEq);
+
+      return spEq;
+   }
+
+   template <typename TEquation> SharedPtrMacro<TEquation> SimulationBase::addVectorEquation(const SolveTiming::Id time)
+   {
+      // Create shared scalar equation
+      SharedPtrMacro<TEquation>  spEq(new TEquation(this->mspEqParams, time));
 
       // Add share scalar equation
       this->mVectorEquations.push_back(spEq);

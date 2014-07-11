@@ -45,8 +45,17 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         if field_row == ("vorticity",""):
             fields = [("vorticity","")]
 
-        elif field_row == ("meantemperature",""):
-            fields = [("meantemperature","")]
+        elif field_row == ("dz_meantemperature",""):
+            fields = [("dz_meantemperature","")]
+
+        elif field_row == ("no_streamfunction",""):
+            fields = [("no_streamfunction","")]
+
+        elif field_row == ("no_velocityz",""):
+            fields = [("no_velocityz","")]
+
+        elif field_row == ("no_vorticityz",""):
+            fields = [("no_vorticityz","")]
 
         else:
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
@@ -56,8 +65,20 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        if field_row == ("vorticity",""):
-            fields = [("streamfunction","")]
+        if field_row == ("streamfunction",""):
+            fields = [("no_streamfunction",""),("no_velocityz","")]
+
+        if field_row == ("velocityz",""):
+            fields = [("no_streamfunction",""),("no_velocityz","")]
+
+        elif field_row == ("no_streamfunction",""):
+            fields = [("streamfunction",""),("velocityz","")]
+
+        elif field_row == ("no_velocityz",""):
+            fields = [("streamfunction",""),("velocityz","")]
+
+        elif field_row == ("no_vorticityz",""):
+            fields = [("streamfunction",""),("velocityz","")]
 
         else:
             fields = []
@@ -91,7 +112,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         """Provide description of the system of equation"""
 
         # Matrix operator is complex except for vorticity and mean temperature
-        if field_row == ("vorticity","") or field_row == ("meantemperature",""):
+        if field_row == ("vorticity","") or field_row == ("dz_meantemperature",""):
             is_complex = False
         else:
             is_complex = True
@@ -176,13 +197,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         """Create the quasi-inverse operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("streamfunction",""):
-            mat = c1d.i1(res[0], bc)
-
-        elif field_row == ("velocityz",""):
-            mat = c1d.i1(res[0], bc)
-
-        elif field_row == ("temperature",""):
+        if field_row == ("temperature",""):
             mat = c1d.qid(res[0], 0, bc)
 
             # Force temperature boundary condition
@@ -191,7 +206,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat[-2:,:] = 0
                 mat = mat.tocsr()
 
-        elif field_row == ("meantemperature",""):
+        elif field_row == ("dz_meantemperature",""):
             if eigs[0] == 0 and eigs[1] == 0:
                 mat = (c1d.qid(res[0],0, bc) - c1d.avg(res[0]))
             else:
@@ -204,6 +219,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        eta2 = np.sin(np.pi*eq_params['theta']/180)
         eta3 = np.cos(np.pi*eq_params['theta']/180)
         kx = eigs[0]
         ky = eigs[1]
@@ -214,29 +230,46 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat = c1d.i1(res[0], bc, (kx**2 + (1/eta3**2)*ky**2)**2)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1d1(res[0], bc, -2*eta3*(kx**2 + (1/eta3**2)*ky**2))
+                mat = c1d.i1d1(res[0], bc, 2*eta3)
 
             elif field_col == ("temperature",""):
                 mat = c1d.zblk(res[0], bc)
+
+            elif field_col == ("no_streamfunction",""):
+                mat = c1d.i1(res[0],0, bc, eta3)
+
+            elif field_col == ("no_velocityz",""):
+                mat = c1d.i1(res[0],0, bc, -1j*eta2*kx)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
                 mat = c1d.i1d1(res[0], bc, -2*eta3)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1(res[0], bc, (kx**2 + (1/eta3**2)*ky**2)**2)
+                mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
 
             elif field_col == ("temperature",""):
-                mat = c1d.i1(res[0], bc, (Ra/Pr)*(kx**2 + ky**2)/(kx**2 + (1/eta3**2)*ky**2))
+                if kx == 0 and ky == 0:
+                    mat = c1d.zblk(res[0], bc)
+                else:
+                    mat = c1d.i1(res[0], bc, (Ra/Pr)*(kx**2 + ky**2)/(kx**2 + (1/eta3**2)*ky**2))
+
+            elif field_col == ("no_streamfunction",""):
+                if kx == 0 and ky == 0:
+                    mat = c1d.zblk(res[0], bc)
+                else:
+                    mat = c1d.i1(res[0], bc, 1j*eta2*kx/(kx**2 + (1/eta3**2)*ky**2))
+
+            elif field_col == ("no_velocityz",""):
+                mat = c1d.i1(res[0], bc, eta3)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
-                if self.linearize:
-                    mat = c1d.zblk(res[0], bc)
+                mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocityz",""):
                 if self.linearize:
-                    mat = c1d.qid(res[0],0, bc, -(kx**2 + (1/eta3**2)*ky**2))
+                    mat = c1d.qid(res[0],0, bc)
 
                     # Force temperature boundary condition
                     if self.force_temperature_bc and not self.use_galerkin:
@@ -260,12 +293,32 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     mat[-2:,:] = tmp[0:2,:]
                     mat = mat.tocsr()
 
-        elif field_row == ("vorticity",""):
-            if field_col == ("streamfunction",""):
-                mat = c1d.qid(res[0],0, bc, (kx**2 + (1/eta3**2)*ky**2))
-
-            else:
+        elif field_row == ("no_streamfunction",""):
+            if kx == 0 and ky == 0:
                 mat = c1d.zblk(res[0], bc)
+            elif field_col == ("streamfunction",""):
+                mat = c1d.qid(res[0],0, bc, -eta3*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+
+            elif field_col == ("velocityz",""):
+                mat = c1d.qid(res[0],0, bc, -1j*eta2*kx/(kx**2 + ky**2))
+
+        elif field_row == ("no_velocityz",""):
+            if kx == 0 and ky == 0:
+                mat = c1d.zblk(res[0], bc)
+            elif field_col == ("streamfunction",""):
+                mat = c1d.qid(res[0],0, bc, -1j*eta2*kx*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+
+            elif field_col == ("velocityz",""):
+                mat = c1d.qid(res[0],0, bc, -eta3*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+
+        elif field_row == ("no_vorticityz",""):
+            if kx == 0 and ky == 0:
+                mat = c1d.zblk(res[0], bc)
+            elif field_col == ("streamfunction",""):
+                mat = c1d.qid(res[0],0, bc, eta3*(kx**2 + (1/eta3**2)*ky**2)**2/(kx**2 + ky**2))
+
+            elif field_col == ("velocityz",""):
+                mat = c1d.qid(res[0],0, bc, 1j*eta2*kx*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
 
         return mat
 
@@ -281,7 +334,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
 
         elif field_row == ("velocityz",""):
-            mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
             mat = c1d.qid(res[0],0, bc)

@@ -125,6 +125,10 @@ namespace IoTools {
       {
          return PhysicalNames::DENSITY;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::DZ_MEANTEMPERATURE))
+      {
+         return PhysicalNames::DZ_MEANTEMPERATURE;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ENTROPY))
       {
          return PhysicalNames::ENTROPY;
@@ -172,6 +176,18 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(PhysicalNames::VORTICITYZ))
       {
          return PhysicalNames::VORTICITYZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NO_STREAMFUNCTION))
+      {
+         return PhysicalNames::NO_STREAMFUNCTION;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NO_VELOCITYZ))
+      {
+         return PhysicalNames::NO_VELOCITYZ;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NO_VORTICITYZ))
+      {
+         return PhysicalNames::NO_VORTICITYZ;
 
       } else
       {

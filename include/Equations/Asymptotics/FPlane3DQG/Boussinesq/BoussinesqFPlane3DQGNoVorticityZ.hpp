@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGVorticity.hpp
- * @brief Implementation of the voriticity computation for the Boussinesq F-plane 3DQG model 
+ * @file BoussinesqFPlane3DQGNoVorticityZ.hpp
+ * @brief Implementation of the non orthogonal vertical vorticity computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGVORTICITY_HPP
-#define BOUSSINESQFPLANE3DQGVORTICITY_HPP
+#ifndef BOUSSINESQFPLANE3DQGNOVORTICITYZ_HPP
+#define BOUSSINESQFPLANE3DQGNOVORTICITYZ_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the voriticity computation for the Boussinesq F-plane 3DQG model
+    * @brief Implementation of the non orthogonal vertical vorticity computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGVorticity: public IScalarEquation
+   class BoussinesqFPlane3DQGNoVorticityZ: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqFPlane3DQGVorticity(SharedEquationParameters spEqParams);
+         BoussinesqFPlane3DQGNoVorticityZ(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGVorticity();
+         virtual ~BoussinesqFPlane3DQGNoVorticityZ();
          
       protected:
          /**
@@ -62,4 +62,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGVORTICITY_HPP
+#endif // BOUSSINESQFPLANE3DQGNOVORTICITYZ_HPP

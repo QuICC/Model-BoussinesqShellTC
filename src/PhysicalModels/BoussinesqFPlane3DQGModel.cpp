@@ -25,11 +25,13 @@
 #include "IoVariable/NusseltWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVelocityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVertical.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticity.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGNoStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGNoVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGNoVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -43,17 +45,31 @@ namespace GeoMHDiSCC {
 
    void BoussinesqFPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
-      // Add streamfunction equation
+      // Add upright streamfunction equation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGStreamfunction>();
       
-      // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVertical>();
+      // Add upright vertical velocity equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVelocityZ>();
       
-      // Add transport equation
+      // Add upright transport equation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGTransport>();
-      
-      // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVorticity>();
+
+
+      // Add non orthogonal streamfunction equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGNoStreamfunction>(SolveTiming::BEFORE);
+
+      // Add non orthogonal vertical velocity equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGNoVelocityZ>(SolveTiming::BEFORE);
+
+      // Add non orthogonal streamfunction equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGNoStreamfunction>(SolveTiming::AFTER);
+
+      // Add non orthogonal vertical velocity equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGNoVelocityZ>(SolveTiming::AFTER);
+
+      // Add non orthogonal vertical vorticity equation
+      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGNoVorticityZ>();
+
       
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGMeanHeat>();
@@ -138,14 +154,14 @@ namespace GeoMHDiSCC {
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
-      spField->setIdentity(PhysicalNames::MEANTEMPERATURE);
+      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -158,7 +174,7 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
       spIn->expect(PhysicalNames::VELOCITYZ);
-      spIn->expect(PhysicalNames::MEANTEMPERATURE);
+      spIn->expect(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -168,7 +184,7 @@ namespace GeoMHDiSCC {
    {
       // Create Nusselt number writer
       IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::MEANTEMPERATURE);
+      spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spSim->addAsciiOutputFile(spState);
    }
 
@@ -186,7 +202,7 @@ namespace GeoMHDiSCC {
       }
 
       // Add mean temperature to ouput file
-      spState->expect(PhysicalNames::MEANTEMPERATURE);
+      spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
 
       spSim->addHdf5OutputFile(spState);
    }

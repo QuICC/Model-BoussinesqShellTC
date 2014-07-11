@@ -132,7 +132,7 @@ namespace Equations {
       }
    }
 
-   void IEquation::dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes)
+   void IEquation::dispatchCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const SharedResolution spRes, const bool allowExplicit)
    {
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
@@ -233,9 +233,12 @@ namespace Equations {
       }
 
       // Create explicit field
-      for(fIt = exFields.begin(); fIt != exFields.end(); ++fIt)
+      if(allowExplicit)
       {
-         infoIt.first->second.addExplicitField(fIt->first, fIt->second);
+         for(fIt = exFields.begin(); fIt != exFields.end(); ++fIt)
+         {
+            infoIt.first->second.addExplicitField(fIt->first, fIt->second);
+         }
       }
 
       // Set geometric coupling information

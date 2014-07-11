@@ -133,7 +133,7 @@ namespace Equations {
          /**
           * @brief Build coupling information from Python scripts
           */
-         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource);
+         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const bool allowExplicit = true);
 
          /**
           * @brief Set the unknown variable

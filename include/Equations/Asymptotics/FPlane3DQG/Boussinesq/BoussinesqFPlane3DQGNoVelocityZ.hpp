@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGVertical.hpp
- * @brief Implementation of the vertical velocity equation for the Boussinesq F-plane 3DQG model
+ * @file BoussinesqFPlane3DQGNoVelocityZ.hpp
+ * @brief Implementation of the non orthogonal vertical velocity computation for the Boussinesq F-plane 3DQG model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGVERTICAL_HPP
-#define BOUSSINESQFPLANE3DQGVERTICAL_HPP
+#ifndef BOUSSINESQFPLANE3DQGNOVELOCITYZ_HPP
+#define BOUSSINESQFPLANE3DQGNOVELOCITYZ_HPP
 
 // Configuration includes
 //
@@ -28,22 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the vertical velocity equation for the Boussinesq F-plane 3DQG model
+    * @brief Implementation of the non orthogonal vertical velocity computation for the Boussinesq F-plane 3DQG model
     */
-   class BoussinesqFPlane3DQGVertical: public IScalarEquation
+   class BoussinesqFPlane3DQGNoVelocityZ: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
           * @param spEqParams Shared equation parameters
+          * @param Solver timing
           */
-         BoussinesqFPlane3DQGVertical(SharedEquationParameters spEqParams);
+         BoussinesqFPlane3DQGNoVelocityZ(SharedEquationParameters spEqParams, const SolveTiming::Id time);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGVertical();
+         virtual ~BoussinesqFPlane3DQGNoVelocityZ();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +71,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGVERTICAL_HPP
+#endif // BOUSSINESQFPLANE3DQGNOVELOCITYZ_HPP

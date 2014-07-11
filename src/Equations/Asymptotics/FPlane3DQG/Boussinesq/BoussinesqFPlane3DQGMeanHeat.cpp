@@ -49,15 +49,13 @@ namespace Equations {
       assert(id == FieldComponents::Physical::SCALAR);
 
       // Get paramters
-      MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
-      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
       MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
 
       /// 
-      /// Computation of the jacobian:
-      ///   \f$ \left(\eta_3 w - \eta_2*\partial_x\psi\right)\theta\f$
+      /// Computation:
+      ///   \f$ Pr w \theta\f$
       ///
-      rNLComp.setData((Pr*(eta3*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array() - eta2*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array())*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
+      rNLComp.setData((Pr*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::TEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
    Datatypes::SpectralScalarType::PointType BoussinesqFPlane3DQGMeanHeat::sourceTerm(FieldComponents::Spectral::Id compId, const int iX, const int iZ, const int iY) const
@@ -82,21 +80,18 @@ namespace Equations {
    void BoussinesqFPlane3DQGMeanHeat::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::MEANTEMPERATURE);
+      this->setName(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, true, false));
+      // Add mean temperature requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, true, true, false));
 
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
-
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add temperature requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, false, true, false));
 
-      // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));
    }
 
