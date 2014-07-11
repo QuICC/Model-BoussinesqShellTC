@@ -64,6 +64,9 @@ namespace Equations {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
+
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
 

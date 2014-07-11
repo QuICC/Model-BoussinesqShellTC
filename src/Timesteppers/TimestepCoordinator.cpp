@@ -124,7 +124,6 @@ namespace Timestep {
 
    void TimestepCoordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
-
       DetailedProfilerMacro_start(ProfilerMacro::TSTEPIN);
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq, scalVar, vectVar);
@@ -145,8 +144,8 @@ namespace Timestep {
       this->transferOutput(scalEq, vectEq);
       DetailedProfilerMacro_stop(ProfilerMacro::TSTEPOUT);
 
-      // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % this->mNStep;
+      // Update the internal step counter
+      this->updateStep();
    }
 
    void TimestepCoordinator::init(const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)

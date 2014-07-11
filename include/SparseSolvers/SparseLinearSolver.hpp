@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Enums/SolveTiming.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseSolverBase.hpp"
 
@@ -41,8 +42,9 @@ namespace Solver {
           * @brief Constructor
           *
           * @param start   Starting index (for example without m=0)
+          * @param time    Solver timing with respect to timestepping
           */
-         SparseLinearSolver(const int start);
+         SparseLinearSolver(const int start, const SolveTiming::Id time);
 
          /**
           * @brief Destructor
@@ -138,8 +140,8 @@ namespace Solver {
       private:
    };
 
-   template <typename TOperator,typename TData> SparseLinearSolver<TOperator,TData>::SparseLinearSolver(const int start)
-      : SparseSolverBase(start)
+   template <typename TOperator,typename TData> SparseLinearSolver<TOperator,TData>::SparseLinearSolver(const int start, const SolveTiming::Id time)
+      : SparseSolverBase(start, time)
    {
    }
 

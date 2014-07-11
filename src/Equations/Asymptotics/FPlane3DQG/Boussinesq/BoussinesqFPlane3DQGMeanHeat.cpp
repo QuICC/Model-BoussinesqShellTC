@@ -84,6 +84,9 @@ namespace Equations {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::MEANTEMPERATURE);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::MEANTEMPERATURE, FieldRequirement(true, true, true, false));
 

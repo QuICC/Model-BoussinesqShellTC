@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "Enums/SolveTiming.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,7 +35,7 @@ namespace Solver {
           *
           * @param start   Starting index (for example without m=0)
           */
-         SparseDummySolver(const int start) {};
+         SparseDummySolver(const int start, const SolveTiming::Id time) {};
 
          /**
           * @brief Dummy destructor

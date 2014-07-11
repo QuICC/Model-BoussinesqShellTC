@@ -139,14 +139,20 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("solveEquations",2);
 
+      // Solve trivial equations
+      this->solveTrivialEquations(SolveTiming::BEFORE);
+
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations(SolveTiming::BEFORE);
+
       // Solve prognostic equations (timestep)
       this->solvePrognosticEquations();
 
       // Solve diagnostic equations
-      this->solveDiagnosticEquations();
+      this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Solve trivial equations
-      this->solveTrivialEquations();
+      this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Update conditions at the end of timestep
       ProfilerMacro_start(ProfilerMacro::CONTROL);
@@ -186,6 +192,7 @@ namespace GeoMHDiSCC {
 
       DebuggerMacro_start("Solve prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
+      this->mTimestepCoordinator.setSolveTime(SolveTiming::PROGNOSTIC);
       this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
       DebuggerMacro_stop("Solve prognostic t = ",4);

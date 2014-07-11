@@ -44,8 +44,8 @@ namespace Solver {
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
 
-      // Update the internal step counter, counting from 0 to steps - 1
-      this->mStep = (this->mStep + 1) % this->mNStep;
+      // Update the internal step counter
+      this->updateStep();
    }
 
    void SparseTrivialCoordinator::init(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)

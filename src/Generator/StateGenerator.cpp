@@ -67,10 +67,10 @@ namespace GeoMHDiSCC {
       this->computeNonlinear();
 
       // Solve trivial equations
-      this->solveTrivialEquations();
+      this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Solve diagnostic equations
-      this->solveDiagnosticEquations();
+      this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Synchronise computation nodes
       FrameworkMacro::synchronize();

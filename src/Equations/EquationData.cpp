@@ -178,7 +178,17 @@ namespace Equations {
       // Safety assert
       assert(this->mCouplingInfos.count(compId) > 0);
       
-      return this->mCouplingInfos.find(compId)->second.setSolverIndex(idx);
+      this->mCouplingInfos.find(compId)->second.setSolverIndex(idx);
+   }
+
+   void EquationData::setSolveTiming(const SolveTiming::Id time)
+   {
+      this->mSolveTiming = time;
+   }
+
+   SolveTiming::Id  EquationData::solveTiming() const
+   {
+      return this->mSolveTiming;
    }
 }
 }

@@ -281,13 +281,14 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("computeNonlinear",2);
    }
 
-   void SimulationBase::solveTrivialEquations()
+   void SimulationBase::solveTrivialEquations(const SolveTiming::Id time)
    {
       // Debug statement
       DebuggerMacro_enter("solveTrivialEquations",3);
 
       DebuggerMacro_start("Solve trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
+      this->mTrivialCoordinator.setSolveTime(time);
       this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
       DebuggerMacro_stop("Solve trivial t = ",4);
@@ -296,13 +297,14 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
 
-   void SimulationBase::solveDiagnosticEquations()
+   void SimulationBase::solveDiagnosticEquations(const SolveTiming::Id time)
    {
       // Debug statement
       DebuggerMacro_enter("solveDiagnosticEquations",3);
 
       DebuggerMacro_start("Solve diagnostic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
+      this->mLinearCoordinator.setSolveTime(time);
       this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
       DebuggerMacro_stop("Solve diagnostic t = ",4);

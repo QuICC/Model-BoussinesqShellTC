@@ -106,6 +106,11 @@ namespace Solver {
          void transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
+          * @brief Update the step, counting from 0 to Nstep - 1
+          */
+         void updateStep();
+
+         /**
           * @brief Number of solver substeps
           */
          int   mNStep;
@@ -132,19 +137,27 @@ namespace Solver {
       return (this->mStep == 0);
    }
 
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::updateStep()
+   {
+      if(this->solveTime() == SolveTiming::PROGNOSTIC || this->solveTime() == SolveTiming::AFTER)
+      {
+         this->mStep = (this->mStep + 1) % this->mNStep;
+      }
+   }
+
    template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
       // System has a complex operator
       if(spEq->couplingInfo(comp).isComplex())
       {
          typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator solIt;
-         this->addSolver(solIt, spEq->couplingInfo(comp).solverIndex(), spEq->couplingInfo(comp).fieldStart());
+         this->addSolver(solIt, spEq->couplingInfo(comp).solverIndex(), spEq->couplingInfo(comp).fieldStart(), spEq->solveTiming());
 
       // System has a real operator
       } else
       {
          typename SparseCoordinatorBase<TSolver>::RealSolver_iterator solIt;
-         this->addSolver(solIt, spEq->couplingInfo(comp).solverIndex(), spEq->couplingInfo(comp).fieldStart());
+         this->addSolver(solIt, spEq->couplingInfo(comp).solverIndex(), spEq->couplingInfo(comp).fieldStart(), spEq->solveTiming());
       }
    }
 
@@ -177,21 +190,24 @@ namespace Solver {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; scalEqIt++)
       {
-         // Get field identity
-         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
-
-         // Get index of solver
-         int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // System operator is complex
-         if((*scalEqIt)->couplingInfo(myId.second).isComplex())
+         if((*scalEqIt)->solveTiming() == this->solveTime())
          {
-            storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId);
+            // Get field identity
+            myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
 
-         // System operator is real real
-         } else
-         {
-            storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId);
+            // Get index of solver
+            int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
+
+            // System operator is complex
+            if((*scalEqIt)->couplingInfo(myId.second).isComplex())
+            {
+               storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId);
+
+               // System operator is real real
+            } else
+            {
+               storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId);
+            }
          }
       }
 
@@ -199,26 +215,29 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         // Loop over the vector equation components
-         Equations::IVectorEquation::SpectralComponent_iterator compIt;
-         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+         if((*vectEqIt)->solveTiming() == this->solveTime())
          {
-            // Get field identity
-            myId = std::make_pair((*vectEqIt)->name(), *compIt);
-
-            // Get index of solver
-            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-            // System operator is complex
-            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+            // Loop over the vector equation components
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
             {
-               storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId);
+               // Get field identity
+               myId = std::make_pair((*vectEqIt)->name(), *compIt);
 
-            // System operator is real
-            } else
-            {
-               storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId);
+               // Get index of solver
+               int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+               // System operator is complex
+               if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+               {
+                  storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId);
+
+                  // System operator is real
+               } else
+               {
+                  storeSolverSolution<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId);
+               }
             }
          }
       }
@@ -288,21 +307,24 @@ namespace Solver {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; scalEqIt++)
       {
-         // Get field identity
-         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
-
-         // Get index of solver
-         int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
-
-         // System operator is complex
-         if((*scalEqIt)->couplingInfo(myId.second).isComplex())
+         if((*scalEqIt)->solveTiming() == this->solveTime())
          {
-            getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
+            // Get field identity
+            myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
 
-         // System operator is real
-         } else
-         {
-            getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
+            // Get index of solver
+            int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
+
+            // System operator is complex
+            if((*scalEqIt)->couplingInfo(myId.second).isComplex())
+            {
+               getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
+
+               // System operator is real
+            } else
+            {
+               getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
+            }
          }
       }
 
@@ -310,25 +332,28 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         Equations::IVectorEquation::SpectralComponent_iterator compIt;
-         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+         if((*vectEqIt)->solveTiming() == this->solveTime())
          {
-            // Get field identity for first component
-            myId = std::make_pair((*vectEqIt)->name(), *compIt);
-
-            // Get index of solver
-            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-            // Linear solve matrices are complex
-            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+            Equations::IVectorEquation::SpectralComponent_iterator compIt;
+            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
             {
-               getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
+               // Get field identity for first component
+               myId = std::make_pair((*vectEqIt)->name(), *compIt);
 
-            // Linear solve matrices are real
-            } else
-            {
-               getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
+               // Get index of solver
+               int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+               // Linear solve matrices are complex
+               if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+               {
+                  getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
+
+                  // Linear solve matrices are real
+               } else
+               {
+                  getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
+               }
             }
          }
       }

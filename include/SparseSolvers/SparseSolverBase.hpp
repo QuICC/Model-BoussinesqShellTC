@@ -21,6 +21,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/SolveTiming.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -45,8 +46,9 @@ namespace Solver {
           * @brief Constructor
           *
           * @param start   Starting index (for example without m=0)
+          * @param time    Solver timing with respect to timestepping
           */
-         SparseSolverBase(const int start);
+         SparseSolverBase(const int start, const SolveTiming::Id time);
 
          /**
           * @brief Destructor
@@ -86,12 +88,22 @@ namespace Solver {
           * @brief Set operator to initialized
           */
          void setInitialized();
+
+         /**
+          * @brief Solve timing
+          */
+         SolveTiming::Id solveTiming() const;
          
       protected:
          /**
           * @brief Starting index
           */
          int mZeroIdx;
+
+         /**
+          * @brief Solver timing
+          */
+         SolveTiming::Id   mSolveTiming;
 
          /**
           * @brief Storage for the field Ids

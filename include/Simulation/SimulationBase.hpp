@@ -173,12 +173,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Solve the trivial equations
           */
-         void solveTrivialEquations();
+         void solveTrivialEquations(const SolveTiming::Id time);
 
          /**
           * @brief Solve the diagnostic equations
           */
-         void solveDiagnosticEquations();
+         void solveDiagnosticEquations(const SolveTiming::Id time);
 
          /**
           * @brief Execution timer

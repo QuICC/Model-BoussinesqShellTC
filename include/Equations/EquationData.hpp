@@ -22,6 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/SolveTiming.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -160,11 +161,21 @@ namespace Equations {
           */
          void setSolverIndex(const FieldComponents::Spectral::Id, const int idx);
 
+         /**
+          * @brief Timing of the solver for the equation
+          */
+         SolveTiming::Id  solveTiming() const;
+
       protected:
          /**
           * @brief Set the unknown name of equation
           */
          void setName(PhysicalNames::Id name);
+
+         /**
+          * @brief Set solver timing
+          */
+         void setSolveTiming(const SolveTiming::Id time);
 
          /**
           * @brief Set scalar variable
@@ -216,6 +227,11 @@ namespace Equations {
           * @brief Storage for the shared boundary condition list
           */
          SharedSimulationBoundary mspBcIds;
+
+         /**
+          * @brief Storage for the solve timing
+          */
+         SolveTiming::Id   mSolveTiming;
 
       private:
          /**

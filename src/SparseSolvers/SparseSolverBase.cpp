@@ -23,8 +23,8 @@ namespace GeoMHDiSCC {
 
 namespace Solver {
 
-   SparseSolverBase::SparseSolverBase(const int start)
-      : mZeroIdx(start), mIsInitialized(false)
+   SparseSolverBase::SparseSolverBase(const int start, const SolveTiming::Id time)
+      : mZeroIdx(start), mSolveTiming(time), mIsInitialized(false)
    {
       // Safety assert
       assert(start >= 0);
@@ -86,6 +86,11 @@ namespace Solver {
    void SparseSolverBase::setInitialized()
    {
       this->mIsInitialized = true;
+   }
+
+   SolveTiming::Id SparseSolverBase::solveTiming() const
+   {
+      return this->mSolveTiming;
    }
 }
 }

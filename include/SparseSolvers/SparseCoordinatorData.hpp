@@ -98,17 +98,27 @@ namespace Solver {
           * \mhdBug Should not be public
           */
          void setEndIterator(ComplexSolver_iterator& solIt);
+
+         /**
+          * @brief Get current solver time
+          */
+         SolveTiming::Id solveTime() const;
+
+         /**
+          * @brief Set solve time
+          */
+         void setSolveTime(const SolveTiming::Id time);
          
       protected:
          /**
           * @brief Create a real operator
           */
-         void addSolver(RealSolver_iterator solIt, const int idx, const int start);
+         void addSolver(RealSolver_iterator solIt, const int idx, const int start, const SolveTiming::Id time);
 
          /**
           * @brief Create a complex operator
           */
-         void addSolver(ComplexSolver_iterator solIt, const int idx, const int start);
+         void addSolver(ComplexSolver_iterator solIt, const int idx, const int start, const SolveTiming::Id time);
 
          /**
           * @brief Initi the start rows for the solvers
@@ -124,6 +134,11 @@ namespace Solver {
           * @brief Vector of (coupled) complex operator
           */
          std::vector<SharedComplexSolverType> mComplexSolvers;
+
+         /**
+          * @brief Storage for the current solve time
+          */
+         SolveTiming::Id   mSolveTime;
 
       private:
    };
@@ -195,21 +210,31 @@ namespace Solver {
    {
    }
 
-   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::RealSolver_iterator solIt, const int idx, const int start)
+   template <template <class,class> class TSolver> SolveTiming::Id SparseCoordinatorData<TSolver>::solveTime() const
+   {
+      return this->mSolveTime;
+   }
+
+   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::setSolveTime(const SolveTiming::Id time)
+   {
+      this->mSolveTime = time;
+   }
+
+   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::RealSolver_iterator solIt, const int idx, const int start, const SolveTiming::Id time)
    {
       if(idx > static_cast<int>(this->mRealSolvers.size()) - 1)
       {
-         SparseCoordinatorData<TSolver>::SharedRealSolverType spSolver(new SparseCoordinatorData<TSolver>::RealSolverType(start));
+         SparseCoordinatorData<TSolver>::SharedRealSolverType spSolver(new SparseCoordinatorData<TSolver>::RealSolverType(start,time));
 
          this->mRealSolvers.push_back(spSolver);
       }
    }
 
-   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator solIt, const int idx, const int start)
+   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator solIt, const int idx, const int start, const SolveTiming::Id time)
    {
       if(idx > static_cast<int>(this->mComplexSolvers.size()) - 1)
       {
-         SparseCoordinatorData<TSolver>::SharedComplexSolverType spSolver(new SparseCoordinatorData<TSolver>::ComplexSolverType(start));
+         SparseCoordinatorData<TSolver>::SharedComplexSolverType spSolver(new SparseCoordinatorData<TSolver>::ComplexSolverType(start,time));
 
          this->mComplexSolvers.push_back(spSolver);
       }
@@ -316,8 +341,11 @@ namespace Solver {
 
       for(; solIt != endIt; ++solIt)
       {
-         // Compute linear solve RHS
-         (*solIt)->solve(step);
+         if((*solIt)->solveTiming() == coord.solveTime())
+         {
+            // Compute linear solve RHS
+            (*solIt)->solve(step);
+         }
       }
    }
 
@@ -331,8 +359,11 @@ namespace Solver {
 
       for(; solIt != endIt; ++solIt)
       {
-         // Compute linear solve RHS
-         (*solIt)->computeRHS(step);
+         if((*solIt)->solveTiming() == coord.solveTime())
+         {
+            // Compute linear solve RHS
+            (*solIt)->computeRHS(step);
+         }
       }
    }
 

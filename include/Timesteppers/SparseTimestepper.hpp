@@ -45,7 +45,7 @@ namespace Timestep {
           *
           * @param start   Starting index (for example without m=0)
           */
-         SparseTimestepper(const int start);
+         SparseTimestepper(const int start, const SolveTiming::Id time);
 
          /**
           * @brief Destructor
@@ -116,8 +116,8 @@ namespace Timestep {
       private:
    };
 
-   template <typename TOperator,typename TData> SparseTimestepper<TOperator,TData>::SparseTimestepper(const int start)
-      : Solver::SparseLinearSolver<TOperator,TData>(start)
+   template <typename TOperator,typename TData> SparseTimestepper<TOperator,TData>::SparseTimestepper(const int start, const SolveTiming::Id time)
+      : Solver::SparseLinearSolver<TOperator,TData>(start, time)
    {
    }
 

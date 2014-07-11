@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Enums/SolveTiming.hpp"
 #include "SparseSolvers/SparseSolverBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -35,8 +36,9 @@ namespace Solver {
           * @brief Constructor
           *
           * @param start   Starting index (for example without m=0)
+          * @param time    Solver timing with respect to timestepping
           */
-         SparseTrivialSolver(const int start);
+         SparseTrivialSolver(const int start, const SolveTiming::Id time);
 
          /**
           * @brief Destructor
@@ -86,8 +88,8 @@ namespace Solver {
       private:
    };
 
-   template <typename TOperator,typename TData> SparseTrivialSolver<TOperator,TData>::SparseTrivialSolver(const int start)
-      : SparseSolverBase(start)
+   template <typename TOperator,typename TData> SparseTrivialSolver<TOperator,TData>::SparseTrivialSolver(const int start, const SolveTiming::Id time)
+      : SparseSolverBase(start, time)
    {
       this->setInitialized();
    }

@@ -64,6 +64,9 @@ namespace Equations {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::STREAMFUNCTION);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
+
       // Set streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
 

@@ -70,6 +70,9 @@ namespace Equations {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
+
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
 
