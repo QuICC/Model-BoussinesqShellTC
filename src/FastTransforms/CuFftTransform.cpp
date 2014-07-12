@@ -1,6 +1,6 @@
 /** 
  * @file CuFftTransform.cpp
- * @brief Source of the implementation of the FFTW transform
+ * @brief Source of the implementation of the cuFFT transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -39,13 +39,13 @@ namespace Transform {
    }
 
    CuFftTransform::CuFftTransform()
-      : mFPlan(NULL), mBPlan(NULL)
+      : mFPlan(), mBPlan()
    {
    }
 
    CuFftTransform::~CuFftTransform()
-   {
-      // Cleanup memory used by FFTW
+   {  
+      // Cleanup memory used by cuFFT
       CuFftLibrary::cleanupFft();
    }
 
@@ -57,10 +57,10 @@ namespace Transform {
       // Set the scaling factor
       this->mspSetup->setScale(1.0/static_cast<MHDFloat>(this->mspSetup->fwdSize()));
 
-      // Initialise FFTW plans
+      // Initialise cuFFT plans
       this->initFft();
 
-      // Register the FFTW object
+      // Register the cuFFT object
       CuFftLibrary::registerFft();
    }
 
@@ -90,29 +90,31 @@ namespace Transform {
       int howmany = this->mspSetup->howmany();
 
       // Create the two plans
-      const int  *fftSize = &fwdSize;
+      int  *fftSize = &fwdSize;
 
       if(this->mspSetup->type() == FftSetup::MIXED)
       {
-         // create temporary storage for plan computation
-         Matrix    tmpReal(fwdSize, howmany);
-         MatrixZ   tmpCplx(bwdSize, howmany);
-
          // Create the real to complex plan
-         this->mFPlan = fftw_plan_many_dft_r2c(1, fftSize, howmany, tmpReal.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, CuFftLibrary::planFlag());
+         checkCudaErrors(cufftPlanMany(&this->mFPlan, 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_D2Z, howmany));
 
          // Create the complex to real plan
-         this->mBPlan = fftw_plan_many_dft_c2r(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, tmpReal.data(), NULL, 1, fwdSize, CuFftLibrary::planFlag());
+         checkCudaErrors(cufftPlanMany(&this->mBPlan,1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2D, howmany));
+
+         // Allocate common device memory
+         checkCudaErrors(cudaMalloc((void **)&this->mDevR, sizeof(cufftDoubleReal)*fwdSize*howmany));
+         checkCudaErrors(cudaMalloc((void **)&this->mDevZI, sizeof(cufftDoubleComplex)*bwdSize*howmany));
+
       } else
       {
-         MatrixZ   tmpCplxA(fwdSize, howmany);
-         MatrixZ   tmpCplxB(bwdSize, howmany);
-
          // Create the forward complex to complex plan
-         this->mFPlan = fftw_plan_many_dft(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, FFTW_FORWARD, CuFftLibrary::planFlag());
+         checkCudaErrors(cufftPlanMany(&this->mFPlan, 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_Z2Z, howmany));
 
          // Create the backward complex to complex plan
-         this->mBPlan = fftw_plan_many_dft(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, FFTW_BACKWARD, CuFftLibrary::planFlag());
+         checkCudaErrors(cufftPlanMany(&this->mBPlan, 1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2Z, howmany));
+
+         // Allocate common device memory
+         checkCudaErrors(cudaMalloc((void **)&this->mDevZI, sizeof(cufftDoubleComplex)*bwdSize*howmany));
+         checkCudaErrors(cudaMalloc((void **)&this->mDevZO, sizeof(cufftDoubleComplex)*fwdSize*howmany));
       }
 
       // Initialise temporary storage
@@ -125,19 +127,19 @@ namespace Transform {
       // Detroy forward plan
       if(this->mFPlan)
       {
-         fftw_destroy_plan(this->mFPlan);
+         checkCudaErrors(cufftDestroy(this->mFPlan));
       }
 
       // Detroy backward plan
       if(this->mBPlan)
       {
-         fftw_destroy_plan(this->mBPlan);
+         checkCudaErrors(cufftDestroy(this->mBPlan));
       }
 
-      // Unregister the FFTW object
+      // Unregister the cuFFT object
       CuFftLibrary::unregisterFft();
 
-      // cleanup FFTW library
+      // cleanup cuFFT library
       CuFftLibrary::cleanupFft();
    }
 
@@ -146,7 +148,7 @@ namespace Transform {
    {
       MHDFloat mem = 0.0;
 
-      // Storage required for the fftw plans 
+      // Storage required for the cuFFT plans 
       mem += 8.0*2.0;
 
       return mem;

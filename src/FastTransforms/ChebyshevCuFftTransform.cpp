@@ -1,6 +1,6 @@
 /** 
  * @file ChebyshevCuFftTransform.cpp
- * @brief Source of the implementation of the FFTW transform
+ * @brief Source of the implementation of the Chebyshev cuFFT transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -40,13 +40,13 @@ namespace Transform {
    }
 
    ChebyshevCuFftTransform::ChebyshevCuFftTransform()
-      : mFPlan(NULL), mBPlan(NULL)
+      : mFPlan(), mBPlan()
    {
    }
 
    ChebyshevCuFftTransform::~ChebyshevCuFftTransform()
    {
-      // Cleanup memory used by FFTW
+      // Cleanup memory used by cuFFT
       CuFftLibrary::cleanupFft();
    }
 
@@ -58,13 +58,13 @@ namespace Transform {
       // Set the scaling factor
       this->mspSetup->setScale(1.0/static_cast<MHDFloat>(2*this->mspSetup->fwdSize()));
 
-      // Initialise FFTW interface
+      // Initialise cuFFT interface
       this->initFft();
 
       // Initialise Chebyshev operator(s)
       this->initOperators();
 
-      // Register the FFTW object
+      // Register the cuFFT object
       CuFftLibrary::registerFft();
    }
 
@@ -96,7 +96,7 @@ namespace Transform {
       int howmany = this->mspSetup->howmany();
 
       // Create the two plans
-      const int  *fftSize = &fwdSize;
+      int  *fftSize = &fwdSize;
 
       if(this->mspSetup->type() == FftSetup::COMPONENT)
       {
@@ -109,12 +109,16 @@ namespace Transform {
       this->mTmpZ.setZero(bwdSize, howmany);
 
       // Create the physical to spectral plan
-      this->mFPlan = fftw_plan_many_dft_r2c(1, fftSize, howmany, this->mTmpR.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), NULL, 1, bwdSize, CuFftLibrary::planFlag());
+      checkCudaErrors(cufftPlanMany(&this->mFPlan, 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_D2Z, howmany));
 
       // Create the spectral to physical plan
-      this->mBPlan = fftw_plan_many_dft_c2r(1, fftSize, howmany, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), NULL, 1, bwdSize, this->mTmpR.data(), NULL, 1, fwdSize, CuFftLibrary::planFlag());
+      checkCudaErrors(cufftPlanMany(&this->mBPlan, 1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2D, howmany));
 
+      // Allocate common device memory
+      checkCudaErrors(cudaMalloc((void **)&this->mDevR, sizeof(cufftDoubleReal)*fwdSize*howmany));
+      checkCudaErrors(cudaMalloc((void **)&this->mDevZ, sizeof(cufftDoubleComplex)*bwdSize*howmany));
 
+      // Initialise phases
       this->mPhase = (-Math::cI*2.0*Math::PI*((this->mspSetup->fwdSize()-0.5)/(2.0*this->mspSetup->fwdSize()))*Array::LinSpaced(this->mTmpZ.rows(), 0, this->mTmpZ.rows()-1)).array().exp();
       this->mPhase_1 = 1.0/this->mPhase.array();
    }
@@ -155,19 +159,23 @@ namespace Transform {
       // Detroy forward plan
       if(this->mFPlan)
       {
-         fftw_destroy_plan(this->mFPlan);
+         checkCudaErrors(cufftDestroy(this->mFPlan));
       }
 
       // Detroy backward plan
       if(this->mBPlan)
       {
-         fftw_destroy_plan(this->mBPlan);
+         checkCudaErrors(cufftDestroy(this->mBPlan));
       }
 
-      // Unregister the FFTW object
+      // Free device memory
+      cudaFree(this->mDevR);
+      cudaFree(this->mDevZ);
+
+      // Unregister the cuFFT object
       CuFftLibrary::unregisterFft();
 
-      // cleanup fftw library
+      // cleanup cuFFT library
       CuFftLibrary::cleanupFft();
    }
 

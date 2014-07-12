@@ -1,6 +1,6 @@
 /**
  * @file ChebyshevCuFftTransform.hpp
- * @brief Implementation of the FFTW transform for a Chebyshev expansion 
+ * @brief Implementation of the cuFFT transform for a Chebyshev expansion 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -22,7 +22,9 @@
 
 // External includes
 //
-#include <cufftw.h>
+#include <cuda_runtime.h>
+#include <cufft.h>
+#include <helper_cuda.h>
 
 // Project includes
 //
@@ -62,7 +64,7 @@ namespace Transform {
    };
 
    /**
-    * @brief Implementation of the FFTW transform for a Chebyshev expansion
+    * @brief Implementation of the cuFFT transform for a Chebyshev expansion
     */ 
    class ChebyshevCuFftTransform
    {
@@ -90,7 +92,7 @@ namespace Transform {
          ChebyshevCuFftTransform();
 
          /**
-          * @brief Destroy the FFTW plans
+          * @brief Destroy the cuFFT plans
           */
          ~ChebyshevCuFftTransform();
 
@@ -186,14 +188,14 @@ namespace Transform {
          SharedFftSetup    mspSetup;
 
          /**
-          * @brief FFTW plan for the forward transform (real -> real)
+          * @brief Plan for the forward transform (real -> real)
           */
-         fftw_plan   mFPlan;
+         cufftHandle   mFPlan;
 
          /**
-          * @brief FFTW plan for the backward transform (real -> real)
+          * @brief Plan for the backward transform (real -> real)
           */
-         fftw_plan   mBPlan;
+         cufftHandle   mBPlan;
 
          /**
           * @brief Temporary real storage
@@ -204,6 +206,16 @@ namespace Transform {
           * @brief Temporary complex storage
           */
          MatrixZ  mTmpZ;
+
+         /**
+          * @brief Real storage on device
+          */
+         cufftDoubleReal *mDevR;
+
+         /**
+          * @brief Complex storage on device
+          */
+         cufftDoubleComplex *mDevZ;
 
          /**
           * @brief Storage for the Chebyshev differentiation matrix
@@ -226,12 +238,12 @@ namespace Transform {
          void initOperators();
 
          /**
-          * @brief Initialise the FFTW transforms (i.e. create plans, etc)
+          * @brief Initialise the cuFFT transforms (i.e. create plans, etc)
           */
          void initFft();
 
          /**
-          * @brief Cleanup memory used by FFTW on destruction
+          * @brief Cleanup memory used by cuFFT on destruction
           */
          void cleanupFft();
    };
@@ -257,7 +269,9 @@ namespace Transform {
       this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.colwise().reverse();
 
       // Do transform
-      fftw_execute_dft_r2c(this->mFPlan, const_cast<MHDFloat *>(this->mTmpR.data()), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
 
       // Extract real part and rescale to remove FFT scaling
       this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
@@ -302,7 +316,9 @@ namespace Transform {
       this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform
-      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
 
       // Extract physical values
       rPhysVal = this->mTmpR.topRows(this->mspSetup->fwdSize());
@@ -327,7 +343,9 @@ namespace Transform {
       // Do transform of real part
       this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.real().colwise().reverse();
       this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.real();
-      fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
 
       // Rescale FFT output
       this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
@@ -336,7 +354,9 @@ namespace Transform {
       // Do transform of imaginary part
       this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.imag().colwise().reverse();
       this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.imag();
-      fftw_execute_dft_r2c(this->mFPlan, this->mTmpR.data(), reinterpret_cast<fftw_complex* >(this->mTmpZ.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
 
       // Rescale FFT output
       this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
@@ -381,7 +401,9 @@ namespace Transform {
       this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform of real part
-      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
       rPhysVal.real() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
 
       // Compute first derivative of imaginary part
@@ -402,7 +424,9 @@ namespace Transform {
       this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
 
       // Do transform of imaginary part
-      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpZ.data()), this->mTmpR.data());
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
       rPhysVal.imag() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
    }
 

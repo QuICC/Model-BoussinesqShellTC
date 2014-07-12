@@ -22,7 +22,9 @@
 
 // External includes
 //
-#include <cufftw.h>
+#include <cuda_runtime.h>
+#include <cufft.h>
+#include <helper_cuda.h>
 
 // Project includes
 //
@@ -188,12 +190,12 @@ namespace Transform {
          /**
           * @brief Plan for the forward transform (real->complex or complex->complex)
           */
-         fftw_plan   mFPlan;
+         cufftHandle   mFPlan;
 
          /**
           * @brief Plan for the backward transform (complex->real or complex->complex)
           */
-         fftw_plan   mBPlan;
+         cufftHandle   mBPlan;
 
          /**
           * @brief Temporary storage used in the projections (complex -> real)
@@ -204,6 +206,21 @@ namespace Transform {
           * @brief Temporary storage used in the projections (complex -> complex)
           */
          MatrixZ  mTmpZIn;
+
+         /**
+          * @brief Real storage on device
+          */
+         cufftDoubleReal *mDevR;
+
+         /**
+          * @brief Complex storage on device
+          */
+         cufftDoubleComplex *mDevZI;
+
+         /**
+          * @brief Complex storage on device
+          */
+         cufftDoubleComplex *mDevZO;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -233,7 +250,9 @@ namespace Transform {
       assert(rFFTVal.cols() == this->mspSetup->howmany());
 
       // Do transform
-      fftw_execute_dft_r2c(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), reinterpret_cast<fftw_complex* >(rFFTVal.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevR, physVal.data(), sizeof(cufftDoubleReal)*physVal.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZI));
+      checkCudaErrors(cudaMemcpy(rFFTVal.data(), this->mDevZI, sizeof(cufftDoubleComplex)*rFFTVal.size(), cudaMemcpyDeviceToHost));
 
       // Rescale output from FFT
       rFFTVal *= this->mspSetup->scale();
@@ -282,7 +301,9 @@ namespace Transform {
       this->mTmpRIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
-      fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
+      checkCudaErrors(cudaMemcpy(this->mDevZI, this->mTmpRIn.data(), sizeof(cufftDoubleComplex)*this->mTmpRIn.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZI, this->mDevR));
+      checkCudaErrors(cudaMemcpy(rPhysVal.data(), this->mDevR, sizeof(cufftDoubleReal)*rPhysVal.size(), cudaMemcpyDeviceToHost));
    }
 
    template <Arithmetics::Id TOperation> void CuFftTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, CuFftTransform::IntegratorType::Id integrator)
@@ -302,7 +323,9 @@ namespace Transform {
       assert(rFFTVal.cols() == this->mspSetup->howmany());
 
       // Do transform
-      fftw_execute_dft(this->mFPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(physVal.data())), reinterpret_cast<fftw_complex* >(rFFTVal.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevZI, physVal.data(), sizeof(cufftDoubleComplex)*physVal.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2Z(this->mFPlan, this->mDevZI, this->mDevZO, CUFFT_FORWARD));
+      checkCudaErrors(cudaMemcpy(rFFTVal.data(), this->mDevZO, sizeof(cufftDoubleComplex)*rFFTVal.size(), cudaMemcpyDeviceToHost));
 
       // Rescale output from FFT
       rFFTVal *= this->mspSetup->scale();
@@ -355,7 +378,9 @@ namespace Transform {
       this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
       // Do transform
-      fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
+      checkCudaErrors(cudaMemcpy(this->mDevZI, this->mTmpZIn.data(), sizeof(cufftDoubleComplex)*this->mTmpZIn.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2Z(this->mFPlan, this->mDevZI, this->mDevZO, CUFFT_INVERSE));
+      checkCudaErrors(cudaMemcpy(rPhysVal.data(), this->mDevZO, sizeof(cufftDoubleComplex)*rPhysVal.size(), cudaMemcpyDeviceToHost));
    }
 
 }

@@ -30,11 +30,6 @@ namespace Transform {
    {
       public:
          /**
-          * @brief Get the plan flag
-          */
-         static unsigned int planFlag();
-
-         /**
           * @brief Register object using FFTW library
           */
          static void registerFft();
@@ -54,11 +49,6 @@ namespace Transform {
           * @brief Counter for the number of active FFTW objects
           */
          static int sCounter; 
-
-         /**
-          * @brief FFTW3 flags for the plan setup
-          */
-         static unsigned int  sPlanFlag;
 
          /**
           * @brief Empty constructor

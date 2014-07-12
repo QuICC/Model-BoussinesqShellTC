@@ -9,7 +9,7 @@
 
 // External includes
 //
-#include <cufftw.h>
+#include <cufft.h>
 
 // Class include
 //
@@ -22,17 +22,6 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-  // Fastest FFTW plan creation
-  #ifdef GEOMHDISCC_FFTPLAN_FAST
-     unsigned int CuFftLibrary::sPlanFlag = FFTW_ESTIMATE;
-  // Medium FFTW plan creation
-  #elif defined GEOMHDISCC_FFTPLAN_MEDIUM
-     unsigned int CuFftLibrary::sPlanFlag = FFTW_MEASURE;
-  // Slow FFTW plan creation
-  #elif defined GEOMHDISCC_FFTPLAN_SLOW
-     unsigned int CuFftLibrary::sPlanFlag = FFTW_PATIENT;
-  #endif // GEOMHDISCC_FFTW_ESTIMATE
-
    int CuFftLibrary::sCounter = 0;
 
    CuFftLibrary::CuFftLibrary()
@@ -41,11 +30,6 @@ namespace Transform {
 
    CuFftLibrary::~CuFftLibrary()
    {
-   }
-
-   unsigned int CuFftLibrary::planFlag()
-   {
-      return CuFftLibrary::sPlanFlag;
    }
 
    void CuFftLibrary::registerFft()
@@ -60,11 +44,6 @@ namespace Transform {
 
    void CuFftLibrary::cleanupFft()
    {
-      // Check if all objects have been destroyed
-      if(CuFftLibrary::sCounter == 0)
-      {
-         fftw_cleanup();
-      }
    }
 
 }

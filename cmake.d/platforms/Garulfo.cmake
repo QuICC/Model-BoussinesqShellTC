@@ -20,8 +20,8 @@ set(GEOMHDISCC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 
 set(GEOMHDISCC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_CUFFT "cufft" "cufftw" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_CUFFT "/opt/cuda/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_CUFFT "/opt/cuda/include" "/opt/cuda/sdk/common/inc/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_CUFFT "/opt/cuda/lib64" PARENT_SCOPE)
 
 ###################################################

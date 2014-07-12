@@ -236,7 +236,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("no_streamfunction",""):
-                mat = c1d.i1(res[0],0, bc, eta3)
+                mat = c1d.i1(res[0],0, bc, -eta3)
 
             elif field_col == ("no_velocityz",""):
                 mat = c1d.i1(res[0],0, bc, -1j*eta2*kx)
@@ -258,10 +258,10 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if kx == 0 and ky == 0:
                     mat = c1d.zblk(res[0], bc)
                 else:
-                    mat = c1d.i1(res[0], bc, 1j*eta2*kx/(kx**2 + (1/eta3**2)*ky**2))
+                    mat = c1d.i1(res[0], bc, -1j*eta2*kx/(kx**2 + (1/eta3**2)*ky**2))
 
             elif field_col == ("no_velocityz",""):
-                mat = c1d.i1(res[0], bc, eta3)
+                mat = c1d.i1(res[0], bc, -eta3)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
