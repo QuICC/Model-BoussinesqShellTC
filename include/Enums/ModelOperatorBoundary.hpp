@@ -29,12 +29,14 @@ namespace GeoMHDiSCC {
           * @brief Enums of different model operator boundary types
           */
          enum Id {
-            /// Operator has a boundary condition (Tau or Galerkin)
-            HAS_BC = 0,
-            /// Operator has no Tau boundary but Galerkin should be applied
-            NO_TAU,
-            /// Operator is boundary free (no Tau and no Galerkin)
-            NO_BC,
+            /// Solver operator with a boundary condition (Tau or Galerkin)
+            SOLVER_HAS_BC = 0,
+            /// Solver operator without Tau boundary but with Galerkin condition (ie RHS part)
+            SOLVER_NO_TAU,
+            /// Special setup for Galerkin stencil matrix
+            STENCIL,
+            /// Setup for operators projecting from field values to solver RHS (ie, QI, explicit linear terms)
+            FIELD_TO_RHS,
          };
       };
 }

@@ -392,7 +392,14 @@ namespace Solver {
       // Get solver input
       for(int i = 0; i < (*solIt)->nSystem(); i++)
       {
-         Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true);
+         if((*eqIt)->couplingInfo(id.second).isGalerkin())
+         {
+            Equations::solveStencilUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
+
+         } else
+         {
+            Equations::copyUnknown(*(*eqIt), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true);
+         }
       }
    }
 

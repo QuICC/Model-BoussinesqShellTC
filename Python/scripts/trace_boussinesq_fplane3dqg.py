@@ -6,6 +6,7 @@ import geomhdiscc.model.boussinesq_fplane3dqg as mod
 # Create the model and activate linearization
 model = mod.BoussinesqFPlane3DQG()
 model.linearize = True
+model.use_galerkin = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
@@ -25,14 +26,8 @@ bcs = {'bcType':0, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
 
 # Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = 2
+bcs['bcType'] = 1
 B = model.time(res, eq_params, eigs, bcs, fields)
-
-# Solve EVP with sptarn
-if False:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
-    print(evp_lmb)
 
 # Show the "spy" of the two matrices
 if False:
@@ -47,3 +42,9 @@ if True:
     import scipy.io as io
     io.mmwrite("matrix_A.mtx", A)
     io.mmwrite("matrix_B.mtx", B)
+
+# Solve EVP with sptarn
+if True:
+    import geomhdiscc.linear_stability.solver as solver
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
+    print(evp_lmb)

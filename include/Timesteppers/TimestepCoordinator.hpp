@@ -189,17 +189,17 @@ namespace Timestep {
       DecoupledZSparse  timeOp;
 
       // Compute model's linear operator
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::HAS_BC);
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
       // Compute model's time operator
-      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::NO_TAU);
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
 
       // Set LHS matrix
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), lhsLCoeff, linOp); 
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), -lhsTCoeff, timeOp); 
 
       // Set RHS matrix
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::NO_TAU);
-      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::NO_TAU);
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
+      spEq->buildModelMatrix(timeOp, ModelOperator::TIME, comp, idx, ModelOperatorBoundary::SOLVER_NO_TAU);
       Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsLCoeff, linOp); 
       Solver::internal::addOperators(spSolver->rRHSMatrix(matIdx), -rhsTCoeff, timeOp); 
 

@@ -22,15 +22,11 @@
 #include "Enums/SolveTiming.hpp"
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseSolverBase.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Solver {
-
-   namespace internal
-   {
-      template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSelector<TOperator>::Type > solver, const TData& rhs);
-   }
 
    /**
     * @brief Implementation of a templated (coupled) linear solver structure
@@ -162,7 +158,8 @@ namespace Solver {
       // Solve other modes
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
-         internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
+         //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
+         internal::solveWrapper(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
       }
    }
 
@@ -254,30 +251,6 @@ namespace Solver {
    template <typename TOperator,typename TData> TData& SparseLinearSolver<TOperator,TData>::rSolution(const int idx)
    {
       return this->mSolution.at(idx);
-   }
-
-   namespace internal
-   {
-   template <typename TOperator,typename TData> inline void solveWrapper(TData& rSolution, SharedPtrMacro<typename SparseSelector<TOperator>::Type > solver, const TData& rhs)
-   {
-      rSolution = solver->solve(rhs);
-
-      // Safety assert for successful solve
-      assert(solver->info() == Eigen::Success);
-   }
-
-   template <> inline void solveWrapper<SparseMatrix,DecoupledZMatrix>(DecoupledZMatrix& rSolution, SharedPtrMacro<SparseSelector<SparseMatrix>::Type > solver, const DecoupledZMatrix& rhs)
-   {
-      rSolution.real() = solver->solve(rhs.real());
-
-      // Safety assert for successful solve
-      assert(solver->info() == Eigen::Success);
-
-      rSolution.imag() = solver->solve(rhs.imag());
-
-      // Safety assert for successful solve
-      assert(solver->info() == Eigen::Success);
-   }
    }
 }
 }

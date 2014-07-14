@@ -17,6 +17,11 @@ class BaseModel:
 
     use_galerkin = False
 
+    SOLVER_HAS_BC = 0
+    SOLVER_NO_TAU = 1
+    STENCIL = 2
+    FIELD_TO_RHS = 3
+
     def time(self, res, eq_params, eigs, bcs, fields):
         """Create the time derivative operator"""
 

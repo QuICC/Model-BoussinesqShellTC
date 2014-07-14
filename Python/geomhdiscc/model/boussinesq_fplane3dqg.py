@@ -42,23 +42,11 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("vorticity",""):
-            fields = [("vorticity","")]
-
-        elif field_row == ("dz_meantemperature",""):
-            fields = [("dz_meantemperature","")]
-
-        elif field_row == ("no_streamfunction",""):
-            fields = [("no_streamfunction","")]
-
-        elif field_row == ("no_velocityz",""):
-            fields = [("no_velocityz","")]
-
-        elif field_row == ("no_vorticityz",""):
-            fields = [("no_vorticityz","")]
+        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature",""):
+            fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         else:
-            fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
+            fields = []
 
         return fields
 
@@ -90,10 +78,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("streamfunction",""):
-                shift_x = 0
-            elif field_row == ("velocityz",""):
-                shift_x = 0
+            if field_row == ("velocityz",""):
+                shift_x = 2
             elif field_row == ("temperature",""):
                 shift_x = 2
             else:
@@ -111,11 +97,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
-        if field_row == ("vorticity","") or field_row == ("dz_meantemperature",""):
-            is_complex = False
-        else:
-            is_complex = True
+        # Matrix operator is real
+        is_complex = False
 
         # Implicit field coupling
         im_fields = self.implicit_fields(field_row)
@@ -142,47 +125,60 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        # Impose no boundary conditions
-        if bcs["bcType"] == 2:
+        # Solver: no tau boundary conditions
+        if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc.copy()
-        else:
-            # Impose no tau boundary conditions
-            if bcs["bcType"] == 1 and not self.use_galerkin:
-                bc = no_bc.copy()
 
-            # Impose tau and Galerkin
-            else:
-                eta3 = np.cos(np.pi*eq_params['theta']/180)
-                kx = eigs[0]
-                ky = eigs[1]
+        # Solver: tau and Galerkin
+        elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            eta3 = np.cos(np.pi*eq_params['theta']/180)
+            kx = eigs[0]
+            ky = eigs[1]
 
-                bc = no_bc.copy()
-                bcId = bcs.get(field_col[0], -1)
-                if bcId == 0:
-                    if self.use_galerkin:
-                        if field_col == ("temperature",""):
-                            bc = {0:-20, 'r':0}
+            bc = no_bc.copy()
+            bcId = bcs.get(field_col[0], -1)
+            if bcId == 0:
+                if self.use_galerkin:
+                    if field_col == ("temperature",""):
+                        bc = {0:-20, 'r':0}
+                    elif field_col == ("velocityz",""):
+                        bc = {0:-20, 'r':0}
 
-                        elif eq_params['theta'] == 0:
-                            if field_col == ("velocityz",""):
-                                bc = {0:-20, 'r':0}
-                        else:
-                            if field_row == ("velocityz","") and field_col == ("velocityz",""):
-                                bc = {0:11, 'r':0}
-                            if field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                                bc = {0:10, 'r':0}
-
-                        if field_row ==("temperature",""):
-                            bc['r'] = 2
-                        elif eq_params['theta'] == 0:
-                            if field_row == ("velocityz",""):
-                                bc['r'] = 2
-
-                    else:
+                else:
+                    if bcs["bcType"] == 0:
                         if field_row == ("velocityz","") and field_col == ("velocityz",""):
                             bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                             bc = {0:10}
+                    else:
+                        bc = no_bc.copy()
+            
+            # Set LHS galerkin restriction
+            if self.use_galerkin:
+                if field_row == ("velocityz","") or field_row == ("streamfunction",""):
+                    bc['r'] = 1
+                elif field_row == ("temperature",""):
+                    bc['r'] = 2
+
+        # Stencil:
+        elif bcs["bcType"] == self.STENCIL:
+            if self.use_galerkin:
+                if field_col == ("temperature",""):
+                    bc = {0:-20, 'r':0}
+                elif field_col == ("velocityz",""):
+                    bc = {0:-20, 'r':0}
+        
+        # Field values to RHS:
+        elif bcs["bcType"] == self.FIELD_TO_RHS:
+            bc = no_bc.copy()
+            if self.use_galerkin:
+                if field_row == ("velocityz",""):
+                    bc['r'] = 2
+                elif field_row == ("temperature",""):
+                    bc['r'] = 2
+
+        else:
+            bc = no_bc.copy()
 
         return bc
 
@@ -288,7 +284,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs['bcType'] == 0:
                         tmp = c1d.qid(res[0],2,{0:20})
                     else:
-                        tmp = c1d.qid(res[0],2, no_bc)
+                        tmp = c1d.qid(res[0],2, no_bc.copy())
                     tmp = tmp.tolil()
                     mat[-2:,:] = tmp[0:2,:]
                     mat = mat.tocsr()

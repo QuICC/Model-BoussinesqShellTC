@@ -54,6 +54,12 @@ namespace Equations {
       void applyOperatorWrapper(MatrixZ& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const MatrixZ>& rhs);
 
       void applyOperatorWrapper(DecoupledZMatrix& rField, const int start, const int rows, const SparseMatrix& mat, const Eigen::Ref<const Matrix>& rhsReal, const Eigen::Ref<const Matrix>& rhsImag);
+
+      void setTopBlock(MatrixZ& rField, const int start, const int rows, const MatrixZ& rhs);
+
+      void setTopBlock(Matrix& rField, const int start, const int rows, const Matrix& rhs);
+
+      void setTopBlock(DecoupledZMatrix& rField, const int start, const int rows, const DecoupledZMatrix& rhs);
    }
 
    /**
@@ -276,6 +282,28 @@ namespace Equations {
          int cols = rField.real().cols();
          rField.real().block(start, 0, rows, cols) = mat*rhsReal;
          rField.imag().block(start, 0, rows, cols) = mat*rhsImag;
+      }
+
+      inline void setTopBlock(Matrix& rField, const int start, const int rows, const Matrix& rhs)
+      {
+         int cols = rField.cols();
+         rField.block(start, 0, rows, cols) = rhs.topRows(rows);
+      }
+
+      inline void setTopBlock(MatrixZ& rField, const int start, const int rows, const MatrixZ& rhs)
+      {
+         int cols = rField.cols();
+         rField.block(start, 0, rows, cols) = rhs.topRows(rows);
+      }
+
+      inline void setTopBlock(DecoupledZMatrix& rField, const int start, const int rows, const DecoupledZMatrix& rhs)
+      {
+         assert(rField.real().rows() == rField.imag().rows());
+         assert(rField.real().cols() == rField.imag().cols());
+
+         int cols = rField.real().cols();
+         rField.real().block(start, 0, rows, cols) = rhs.real().topRows(rows);
+         rField.imag().block(start, 0, rows, cols) = rhs.imag().topRows(rows);
       }
    }
 

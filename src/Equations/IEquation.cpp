@@ -337,7 +337,7 @@ namespace Equations {
    void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
       // Get first four standard arguments in a tuple of size 5
-      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::HAS_BC, spRes, eigs);
+      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::STENCIL, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;
@@ -365,7 +365,7 @@ namespace Equations {
    void IEquation::dispatchQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
       // Get first four standard arguments in a tuple of size 5
-      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::NO_BC, spRes, eigs);
+      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;
@@ -393,7 +393,7 @@ namespace Equations {
    void IEquation::dispatchExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
       // Get first four standard arguments in a tuple of size 6
-      PyObject *pArgs = this->dispatchBaseArguments(6, ModelOperatorBoundary::NO_BC, spRes, eigs);
+      PyObject *pArgs = this->dispatchBaseArguments(6, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;

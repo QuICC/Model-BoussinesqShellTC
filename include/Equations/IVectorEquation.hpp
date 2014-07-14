@@ -26,6 +26,8 @@
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEquation.hpp"
 #include "Base/DecoupledComplexInternal.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -156,6 +158,17 @@ namespace Equations {
    typedef SharedPtrMacro<IVectorEquation> SharedIVectorEquation;
 
    /**
+    * @brief Solve for galerkin unknown using the stencil
+    *
+    * @param eq         Equation to work on
+    * @param compId     Component ID
+    * @param storage    Storage for the equation values
+    * @param matIdx     Index of the given data
+    * @param start      Start index for the storage
+    */
+   template <typename TData> void solveStencilUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
+
+   /**
     * @brief Copy unknown spectral values to solver
     *
     * @param eq         Equation to work on
@@ -245,6 +258,30 @@ namespace Equations {
             k++;
          }
       }
+   }
+
+   template <typename TData> void solveStencilUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      // Create temporary storage for tau data
+      TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+      Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false);
+      TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+      internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+
+      // Get a restricted stencil matrixstencil matrix
+      SparseMatrix stencil = eq.galerkinStencil(compId, matIdx).topRows(eq.couplingInfo(compId).galerkinN(matIdx));
+      stencil.makeCompressed();
+
+      // Create solver and factorize stencil
+      Solver::SparseSelector<SparseMatrix>::Type solver;
+      solver.compute(stencil);
+      // Safety assert for successful factorisation
+      assert(solver.info() == Eigen::Success);
+
+      // solve for galerkin expansion
+      TData lhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
+      Solver::internal::solveWrapper(lhs, solver, rhs);
+      internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
    }
 
    template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift)

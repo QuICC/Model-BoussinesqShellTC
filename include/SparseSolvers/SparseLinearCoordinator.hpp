@@ -94,7 +94,7 @@ namespace Solver {
 
       // Get model operator
       DecoupledZSparse  linOp;
-      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::HAS_BC);
+      spEq->buildModelMatrix(linOp, ModelOperator::IMPLICIT_LINEAR, comp, idx, ModelOperatorBoundary::SOLVER_HAS_BC);
       Solver::internal::addOperators(spSolver->rLHSMatrix(matIdx), 1.0, linOp); 
 
       // Solver is initialized
