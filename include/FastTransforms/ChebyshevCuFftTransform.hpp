@@ -24,7 +24,12 @@
 //
 #include <cuda_runtime.h>
 #include <cufft.h>
-#include <helper_cuda.h>
+
+#ifdef GEOMHDISCC_DEBUG
+   #include <helper_cuda.h>
+#else
+   #define checkCudaErrors(x) x
+#endif //GEOMHDISCC_DEBUG
 
 // Project includes
 //

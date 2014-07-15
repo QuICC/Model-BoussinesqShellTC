@@ -18,8 +18,11 @@ set(GEOMHDISCC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 
-set(GEOMHDISCC_FFTS "FFTW" PARENT_SCOPE)
+set(GEOMHDISCC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_CUFFT "/curc/tools/x_86_64/rh6/cuda/5.5/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_CUFFT "/curc/tools/x_86_64/rh6/cuda/5.5/lib64" PARENT_SCOPE)
 
 ###################################################
 #-------------- AVAILABLE FFT PLANS --------------#
