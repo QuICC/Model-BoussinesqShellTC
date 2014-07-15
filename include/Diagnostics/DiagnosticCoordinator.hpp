@@ -80,6 +80,16 @@ namespace Diagnostics {
          MHDFloat kineticEnergy() const;
 
          /**
+          * @brief Get start time
+          */
+         MHDFloat startTime() const;
+
+         /**
+          * @brief Use time and timestep from state file
+          */
+         void useStateTime(const MHDFloat time, const MHDFloat timestep);
+
+         /**
           * @brief Synchronize diagnostics among CPUs
           */
          void synchronize();
@@ -106,6 +116,11 @@ namespace Diagnostics {
           * @brief Current kinetic energy
           */
          MHDFloat mKinetic;
+
+         /**
+          * @brief Start simulation time
+          */
+         MHDFloat mStartTime;
 
          /**
           * @brief Spacing between grid points

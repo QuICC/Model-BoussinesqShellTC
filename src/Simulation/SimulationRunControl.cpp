@@ -53,6 +53,7 @@ namespace GeoMHDiSCC {
          IoTools::Formatter::printLine(std::cout, '#');
          IoTools::Formatter::printCentered(std::cout, "Simulation time limit reached!", '#');
          IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printNewline(std::cout);
       }
 
       // Check for maximum simulation steps
@@ -64,6 +65,7 @@ namespace GeoMHDiSCC {
          IoTools::Formatter::printLine(std::cout, '#');
          IoTools::Formatter::printCentered(std::cout, "Simulation steps limit reached!", '#');
          IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printNewline(std::cout);
       }
 
       // Check if timestepper requested abort due to too small timestep
@@ -75,6 +77,7 @@ namespace GeoMHDiSCC {
          IoTools::Formatter::printLine(std::cout, '#');
          IoTools::Formatter::printCentered(std::cout, "Adaptive timestep failed!", '#');
          IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printNewline(std::cout);
       }
    }
 
@@ -97,6 +100,7 @@ namespace GeoMHDiSCC {
          IoTools::Formatter::printLine(std::cout, '#');
          IoTools::Formatter::printCentered(std::cout, "Simulation wall time reached!", '#');
          IoTools::Formatter::printLine(std::cout, '#');
+         IoTools::Formatter::printNewline(std::cout);
       }
 
       // Signal status

@@ -49,6 +49,11 @@ namespace GeoMHDiSCC {
          virtual void initAdditionalBase();
 
          /**
+          * @brief Pre solve equations for full initialisation
+          */
+         void preSolveEquations();
+
+         /**
           * @brief Do operations required just before starting the time integration
           */
          virtual void preRun();

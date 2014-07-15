@@ -124,7 +124,6 @@ namespace GeoMHDiSCC {
          IoTools::Formatter::printLine(std::cout, '-');
          IoTools::Formatter::printCentered(std::cout, "Simulation initialisation successfull", '*');
          IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printNewline(std::cout);
       }
 
       // Debug statement
@@ -229,6 +228,9 @@ namespace GeoMHDiSCC {
       // Addition operations on initial state file
       this->tuneInitialState(spInitFile);
 
+      // Forward state file time and timestep to diagnostic coordinator
+      this->mDiagnostics.useStateTime(spInitFile->time(), spInitFile->timestep());
+
       // Finalise file
       spInitFile->finalize();
    }
@@ -251,6 +253,13 @@ namespace GeoMHDiSCC {
    {
       // Debug statement
       DebuggerMacro_enter("initSolvers",1);
+
+      // Print message to signal start of timestepper building
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... Building Solvers ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
 
       // Init trivial solver for trivial equations
       this->mTrivialCoordinator.init(this->mScalarTrivialRange, this->mVectorTrivialRange);

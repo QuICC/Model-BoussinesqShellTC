@@ -73,12 +73,12 @@ namespace Transform {
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord);
 
       private: 
    };
@@ -102,11 +102,12 @@ namespace Transform {
       // First treat the scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt != scalEqs.end(); scalEqIt++)
-      {
+      {  
+         bool hasNL = (*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear();
          // Setup the second exchange communication step for scalar equation
-         this->setupGrouped2DCommunication((*scalEqIt)->name(), coord);
+         this->setupGrouped2DCommunication((*scalEqIt)->name(), hasNL, coord);
          // Setup the first exchange communication step for scalar equation
-         this->setupGrouped1DCommunication((*scalEqIt)->name(), coord);
+         this->setupGrouped1DCommunication((*scalEqIt)->name(), hasNL, coord);
 
          // Compute first step of transform for scalar equation
          TConfigurator::firstStep(*scalEqIt, coord);
@@ -126,10 +127,11 @@ namespace Transform {
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt != vectEqs.end(); vectEqIt++)
       {
+         bool hasNL = (*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear();
          // Setup the second exchange communication step for vector equation
-         this->setupGrouped2DCommunication((*vectEqIt)->name(), coord);
+         this->setupGrouped2DCommunication((*vectEqIt)->name(), hasNL, coord);
          // Setup the first exchange communication step for vector equation
-         this->setupGrouped1DCommunication((*vectEqIt)->name(), coord);
+         this->setupGrouped1DCommunication((*vectEqIt)->name(), hasNL, coord);
 
          // Compute first step of transform for vector equation
          TConfigurator::firstStep(*vectEqIt, coord);
@@ -164,14 +166,26 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(id), coord);
+      int packs = this->mNamedPacks1D.at(id);
+      if(!hasNL)
+      {
+         packs = 0;
+      }
+
+      TConfigurator::setup1DCommunication(packs, coord);
    }
 
-   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
+      int packs = this->mNamedPacks2D.at(id);
+      if(!hasNL)
+      {
+         packs = 0;
+      }
+
+      TConfigurator::setup2DCommunication(packs, coord);
    }
 
    template <typename TConfigurator> ArrayI ForwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)

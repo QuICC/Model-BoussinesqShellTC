@@ -69,6 +69,15 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("mainRun",1);
 
+      // Print message to signal successful completion of initialisation step
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "... Starting simulation ...", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
       {
@@ -92,31 +101,72 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("mainRun",1);
    }
 
+   void Simulation::preSolveEquations()
+   {  
+      /// \mhdBug This is not sufficient to recover all fields from previous computation
+
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations(SolveTiming::AFTER);
+
+      // Solve trivial equations
+      this->solveTrivialEquations(SolveTiming::AFTER);
+
+      // Compute physical values
+      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
+
+      // Only compute forward transform for diagnostic and trivial equations
+      std::vector<Equations::SharedIScalarEquation> scalEqs;
+      std::vector<Equations::SharedIVectorEquation> vectEqs;
+      for(ScalarEquation_iterator sIt = this->mScalarDiagnosticRange.first; sIt != this->mScalarDiagnosticRange.second; ++sIt)
+      {
+         scalEqs.push_back(*sIt);
+      }
+      for(ScalarEquation_iterator sIt = this->mScalarTrivialRange.first; sIt != this->mScalarTrivialRange.second; ++sIt)
+      {
+         scalEqs.push_back(*sIt);
+      }
+      for(VectorEquation_iterator vIt = this->mVectorDiagnosticRange.first; vIt != this->mVectorDiagnosticRange.second; ++vIt)
+      {
+         vectEqs.push_back(*vIt);
+      }
+      for(VectorEquation_iterator vIt = this->mVectorTrivialRange.first; vIt != this->mVectorTrivialRange.second; ++vIt)
+      {
+         vectEqs.push_back(*vIt);
+      }
+      this->mspFwdGrouper->transform(scalEqs, vectEqs, this->mTransformCoordinator);
+
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations(SolveTiming::BEFORE);
+
+      // Solve trivial equations
+      this->solveTrivialEquations(SolveTiming::BEFORE);
+
+      // Solve diagnostic equations
+      this->solveDiagnosticEquations(SolveTiming::AFTER);
+
+      // Solve trivial equations
+      this->solveTrivialEquations(SolveTiming::AFTER);
+   }
+
    void Simulation::preRun()
    {
       // Debug statement
       DebuggerMacro_enter("preRun",1);
 
-      // Print message to signal successful completion of initialisation step
+      // Print message to signal start of pre simulation computation
       if(FrameworkMacro::allowsIO())
       {
          IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "... Starting simulation ...", '*');
+         IoTools::Formatter::printCentered(std::cout, "... Pre simulation ...", '*');
          IoTools::Formatter::printLine(std::cout, '-');
          IoTools::Formatter::printNewline(std::cout);
       }
 
-      // Write initial ASCII output
-      this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
-
-      // Write initial state file
-      this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
+      // Initialise all values (solve and nonlinear computations except timestep)
+      this->preSolveEquations();
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
-
-      // Compute physical space data to initialise timestepper initial step
-      this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
 
       // Update CFL condition
       this->mDiagnostics.initialCfl();
@@ -124,11 +174,23 @@ namespace GeoMHDiSCC {
       // Synchronise diagnostics
       this->mDiagnostics.synchronize();
 
+      // Print message to signal start of timestepper building
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... Building timestepper ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
       // Init timestepper using clf/100 as starting timestep
-      this->mTimestepCoordinator.init(this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
+      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
+
+      // Write initial ASCII output
+      this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
+
+      // Write initial state file
+      this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);
@@ -222,6 +284,15 @@ namespace GeoMHDiSCC {
    {
       // Debug statement
       DebuggerMacro_enter("postRun",1);
+
+      // Print message to signal start of post simulation computation
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "... Post simulation ...", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printNewline(std::cout);
+      }
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();

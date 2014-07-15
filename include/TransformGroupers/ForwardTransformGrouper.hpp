@@ -71,6 +71,16 @@ namespace Transform {
 
       protected:
          /**
+          * @brief Setup grouped first exchange communication
+          */
+         void setupGrouped1DCommunication(TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped second exchange communication
+          */
+         void setupGrouped2DCommunication(TransformCoordinatorType& coord);
+
+         /**
           * @brief Storage for the size of the grouped first exchange communication
           */
          int mGroupedPacks1D;
@@ -101,7 +111,7 @@ namespace Transform {
       //
 
       // Setup the grouped second exchnage communication
-      TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
+      this->setupGrouped2DCommunication(coord);
 
       //
       // Compute first step
@@ -127,7 +137,7 @@ namespace Transform {
       TConfigurator::initiate2DCommunication(coord);
 
       // Setup the grouped first exchange communication
-      TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+      this->setupGrouped1DCommunication(coord);
 
       //
       // Compute intermediate step
@@ -185,6 +195,16 @@ namespace Transform {
          // Update equation variable after transforms for vector equation
          TConfigurator::updateEquation(*vectEqIt, coord);
       }
+   }
+
+   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
+   {
+      TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+   }
+
+   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped2DCommunication(TransformCoordinatorType& coord)
+   {
+      TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
    }
 
    template <typename TConfigurator> ArrayI ForwardTransformGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)

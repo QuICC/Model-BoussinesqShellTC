@@ -156,12 +156,7 @@ namespace GeoMHDiSCC {
       SimulationIoControl::ascii_iterator itAscii;
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
       {
-         // Set simulation time
-         if(time > 0 && timestep >= 0)
-         {
-            (*itAscii)->setSimTime(time,timestep);
-         }
-
+         (*itAscii)->setSimTime(time,timestep);
          (*itAscii)->write();
       }
    }
@@ -172,12 +167,7 @@ namespace GeoMHDiSCC {
       SimulationIoControl::hdf5_iterator itHdf5;
       for(itHdf5 = this->mHdf5Writers.begin(); itHdf5 < this->mHdf5Writers.end(); itHdf5++)
       {
-         // Set simulation time
-         if(time > 0 && timestep >= 0)
-         {
-            (*itHdf5)->setSimTime(time,timestep);
-         }
-
+         (*itHdf5)->setSimTime(time,timestep);
          (*itHdf5)->write();
       }
    }

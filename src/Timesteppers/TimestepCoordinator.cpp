@@ -148,8 +148,11 @@ namespace Timestep {
       this->updateStep();
    }
 
-   void TimestepCoordinator::init(const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
+      // Set initial time
+      this->mTime = time;
+
       // Set initial timestep
       this->mOldDt = dt;
       this->mDt = dt;

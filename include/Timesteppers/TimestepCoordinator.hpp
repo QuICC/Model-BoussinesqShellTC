@@ -62,11 +62,12 @@ namespace Timestep {
          /**
           * @brief Initialise timestepper
           *
+          * @param time    Initial time value
           * @param dt      Initial timestep value
           * @param scalEq  Shared scalar equations
           * @param vectEq  Shared vector equations
           */
-         void init(const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
 
          /**
           * @brief Adapt the timestep used
