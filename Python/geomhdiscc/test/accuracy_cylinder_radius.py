@@ -44,7 +44,7 @@ def zblk(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.zblk(nr, 0, cylinder.radbc.no_bc.copy())
+        A = cylinder.zblk(nr, 0, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(l%2,2*nr,2)])
         ssol = 0
         test_forward(A, m%2, sphys, ssol, rg, 0)
@@ -56,7 +56,7 @@ def d1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.d1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.d1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.diff(sphys,x)
         test_forward(A, (m%2,(m+1)%2), sphys, ssol, rg, 1)
@@ -68,7 +68,7 @@ def i1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.integrate(sphys,x)
         test_forward(A, (m%2,(m+1)%2), sphys, ssol, rg, 1)
@@ -80,7 +80,7 @@ def i1x1d1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i1x1d1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i1x1d1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sy.diff(sphys,x)*x)
         ssol = sy.integrate(ssol,x)
@@ -93,7 +93,7 @@ def i1x1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i1x1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i1x1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sphys*x)
         ssol = sy.integrate(ssol,x)
@@ -106,7 +106,7 @@ def i2(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.integrate(sphys,x,x)
         test_forward(A, m%2, sphys, ssol, rg, 1)
@@ -118,7 +118,7 @@ def i2x1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2x1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2x1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sphys*x)
         ssol = sy.integrate(ssol,x,x)
@@ -131,7 +131,7 @@ def i2x2d1(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2x2d1(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2x2d1(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sy.diff(sphys,x)*x**2)
         ssol = sy.integrate(ssol,x,x)
@@ -144,7 +144,7 @@ def i2x2d2(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2x2d2(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2x2d2(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sy.diff(sphys,x,x)*x**2)
         ssol = sy.integrate(ssol,x,x)
@@ -157,7 +157,7 @@ def i2x2(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2x2(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2x2(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sphys*x**2)
         ssol = sy.integrate(ssol,x,x)
@@ -170,7 +170,7 @@ def i2x2lapl(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i2x2lapl(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i2x2lapl(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(x**2*sy.diff(sphys,x,x) + x*sy.diff(sphys,x) - m**2*sphys)
         ssol = sy.integrate(ssol,x,x)
@@ -183,7 +183,7 @@ def i4x4(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i4x4(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i4x4(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(sphys*x**4)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -196,7 +196,7 @@ def i4x4lapl(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i4x4lapl(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i4x4lapl(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x) + x**3*sy.diff(sphys,x) - m**2*x**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -209,7 +209,7 @@ def i4x4lapl2(nr, ms, rg):
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = cylinder.i4x4lapl2(nr, m, cylinder.radbc.no_bc.copy())
+        A = cylinder.i4x4lapl2(nr, m, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(m%2,2*nr,2)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -221,7 +221,7 @@ def qid(nr, ms, xg):
     print("qid:")
     x = sy.Symbol('x')
     for m in ms:
-        A = cylinder.qid(nr, m, 3, cylinder.radbc.no_bc.copy())
+        A = cylinder.qid(nr, m, 3, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(m%2,2*nr,2)])
         ssol = sphys
         test_forward(A, m%2, sphys, ssol, xg, 3)

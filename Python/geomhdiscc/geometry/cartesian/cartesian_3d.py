@@ -15,17 +15,17 @@ def convert_bc(bc):
     if bc['x'][0] < 0:
         bcx = bc['x']
     else:
-        bcx = c1d.c1dbc.no_bc.copy()
+        bcx = c1d.c1dbc.no_bc()
 
     if bc['y'][0] < 0:
         bcy = bc['y']
     else:
-        bcy = c1d.c1dbc.no_bc.copy()
+        bcy = c1d.c1dbc.no_bc()
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
-        bcz = c1d.c1dbc.no_bc.copy()
+        bcz = c1d.c1dbc.no_bc()
 
     return (bcx, bcy, bcz)
 

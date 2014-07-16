@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqBeta3DQGVertical.cpp
+ * @file BoussinesqBeta3DQGVelocityZ.cpp
  * @brief Source of the implementation of the vertical velocity equation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVelocityZ.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGVertical::BoussinesqBeta3DQGVertical(SharedEquationParameters spEqParams)
+   BoussinesqBeta3DQGVelocityZ::BoussinesqBeta3DQGVelocityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGVertical::~BoussinesqBeta3DQGVertical()
+   BoussinesqBeta3DQGVelocityZ::~BoussinesqBeta3DQGVelocityZ()
    {
    }
 
-   void BoussinesqBeta3DQGVertical::setCoupling()
+   void BoussinesqBeta3DQGVelocityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
    }
 
-   void BoussinesqBeta3DQGVertical::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqBeta3DQGVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +56,7 @@ namespace Equations {
       Physical::StreamAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqBeta3DQGVertical::setRequirements()
+   void BoussinesqBeta3DQGVelocityZ::setRequirements()
    {
       // Set vertical velocity as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);

@@ -123,7 +123,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         # Impose no boundary conditions
         if bcs["bcType"] == 2:
-            bc = no_bc.copy()
+            bc = no_bc()
 
             if field_row ==("temperature",""):
                 bc['r'] = 2
@@ -135,7 +135,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         else:
             # Impose no tau boundary conditions
             if bcs["bcType"] == 1 and not self.use_galerkin:
-                bc = no_bc.copy()
+                bc = no_bc()
 
             # Impose tau and Galerkin
             else:
@@ -144,7 +144,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 kx = eigs[0]
                 ky = eigs[1]
 
-                bc = no_bc.copy()
+                bc = no_bc()
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if self.use_galerkin:
@@ -285,7 +285,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs['bcType'] == 0:
                         tmp = c1d.qid(res[0],2,{0:20})
                     else:
-                        tmp = c1d.qid(res[0],2, no_bc.copy())
+                        tmp = c1d.qid(res[0],2, no_bc())
                     tmp = tmp.tolil()
                     mat[-2:,:] = tmp[0:2,:]
                     mat = mat.tocsr()

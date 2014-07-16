@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqBeta3DQGVorticity.cpp
- * @brief Source of the implementation of the vorticity computation in the Beta 3DQG model
+ * @file BoussinesqBeta3DQGVorticityZ.cpp
+ * @brief Source of the implementation of the vertical vorticity computation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticity.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
 
 // Project includes
 //
@@ -27,29 +27,29 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqBeta3DQGVorticity::BoussinesqBeta3DQGVorticity(SharedEquationParameters spEqParams)
+   BoussinesqBeta3DQGVorticityZ::BoussinesqBeta3DQGVorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqBeta3DQGVorticity::~BoussinesqBeta3DQGVorticity()
+   BoussinesqBeta3DQGVorticityZ::~BoussinesqBeta3DQGVorticityZ()
    {
    }
 
-   void BoussinesqBeta3DQGVorticity::setCoupling()
+   void BoussinesqBeta3DQGVorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, false);
    }
 
-   void BoussinesqBeta3DQGVorticity::setRequirements()
+   void BoussinesqBeta3DQGVorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::VORTICITY);
+      this->setName(PhysicalNames::VORTICITYZ);
 
       // Set vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VORTICITY, FieldRequirement(true, true, true, true));
+      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, true));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, false));

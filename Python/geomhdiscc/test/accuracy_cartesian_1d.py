@@ -74,7 +74,7 @@ def d1(nx, xg):
 
     print("d1:")
     x = sy.Symbol('x')
-    A = c1d.d1(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.d1(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
@@ -84,7 +84,7 @@ def i1(nx, xg):
 
     print("i1:")
     x = sy.Symbol('x')
-    A = c1d.i1(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i1(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sy.integrate(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
@@ -94,7 +94,7 @@ def i2(nx, xg):
 
     print("i2:")
     x = sy.Symbol('x')
-    A = c1d.i2(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i2(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, xg, 2)
@@ -104,7 +104,7 @@ def i2d2(nx, xg):
 
     print("i2d2:")
     x = sy.Symbol('x')
-    A = c1d.i2d2(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i2d2(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x)
@@ -112,14 +112,14 @@ def i2d2(nx, xg):
 
     print("\tbc = 20")
     A = c1d.i2d2(nx, {0:20}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.diff(ssol,x,x)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
     A = c1d.i2d2(nx, {0:-20, 'r':2}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tolil()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tolil()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
@@ -131,7 +131,7 @@ def i2d1(nx, xg):
 
     print("i2d1:")
     x = sy.Symbol('x')
-    A = c1d.i2d1(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i2d1(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.integrate(sy.diff(sphys,x),x,x)
     test_forward(A, sphys, ssol, xg, 2)
@@ -142,7 +142,7 @@ def i2lapl(nx, xg):
     print("i2lapl:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i2lapl(nx, k, l, c1d.c1dbc.no_bc.copy())
+    A = c1d.i2lapl(nx, k, l, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -150,14 +150,14 @@ def i2lapl(nx, xg):
 
     print("\tbc = 20")
     A = c1d.i2lapl(nx, k, l, {0:20}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
     A = c1d.i2lapl(nx, k, l, {0:-20, 'r':2}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
@@ -170,7 +170,7 @@ def i2laplh(nx, xg):
     print("i2laplh:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i2laplh(nx, k, c1d.c1dbc.no_bc.copy())
+    A = c1d.i2laplh(nx, k, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -178,14 +178,14 @@ def i2laplh(nx, xg):
 
     print("\tbc = 20")
     A = c1d.i2laplh(nx, k, {0:20}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
     A = c1d.i2laplh(nx, k, {0:-20, 'r':2}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
@@ -197,7 +197,7 @@ def i4(nx, xg):
 
     print("i4:")
     x = sy.Symbol('x')
-    A = c1d.i4(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)])
     ssol = sy.integrate(sphys,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
@@ -207,7 +207,7 @@ def i4d2(nx, xg):
 
     print("i4d2:")
     x = sy.Symbol('x')
-    A = c1d.i4d2(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4d2(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -218,7 +218,7 @@ def i4d4(nx, xg):
 
     print("i4d4:")
     x = sy.Symbol('x')
-    A = c1d.i4d4(nx, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4d4(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -230,7 +230,7 @@ def i4lapl(nx, xg):
     print("i4lapl:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i4lapl(nx, k, l, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4lapl(nx, k, l, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -242,7 +242,7 @@ def i4laplh(nx, xg):
     print("i4laplh:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i4laplh(nx, k, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4laplh(nx, k, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -254,7 +254,7 @@ def i4lapl2(nx, xg):
     print("i4lapl2:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i4lapl2(nx, k, l, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4lapl2(nx, k, l, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys + l**4*sphys - 2*k**2*sy.diff(sphys,x,x) - 2*l**2*sy.diff(sphys,x,x) + 2*k**2*l**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -266,7 +266,7 @@ def i4lapl2h(nx, xg):
     print("i4lapl2h:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i4lapl2h(nx, k, c1d.c1dbc.no_bc.copy())
+    A = c1d.i4lapl2h(nx, k, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys - 2*k**2*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -277,7 +277,7 @@ def qid(nx, xg):
 
     print("qid:")
     x = sy.Symbol('x')
-    A = c1d.qid(nx, 3, c1d.c1dbc.no_bc.copy())
+    A = c1d.qid(nx, 3, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sphys
     test_forward(A, sphys, ssol, xg, 3)
@@ -288,7 +288,7 @@ def genxp(nx, q, p, xg, ntrunc = -1):
     print("genx"+ str(p) + ":")
     x = sy.Symbol('x')
     expr = 'x**' + str(p)
-    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc.copy(), 1.0, ntrunc)
+    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*x**p
     test_forward(A, sphys, ssol, xg, 1)
@@ -300,7 +300,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
     x = sy.Symbol('x')
     expr = '(1+x)**' + str(p)
     print(expr)
-    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc.copy(), 1.0, ntrunc)
+    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*(1+x)**p
     test_forward(A, sphys, ssol, xg, 1)

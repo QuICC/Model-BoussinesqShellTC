@@ -13,15 +13,15 @@ import geomhdiscc.geometry.cylindrical.cylinder_boundary as cylbc
 def convert_bc(bc):
     """Convert boundary dictionary into x and z kronecker product boundaries"""
 
-    if bc['r']bcz < 0:
+    if bc['r'][0] < 0:
         bcx = bc['r']
     else:
-        bcx = bcz
+        bcx = rad.radbc.no_bc()
 
-    if bc['z']bcz < 0:
+    if bc['z'][0] < 0:
         bcz = bc['z']
     else:
-        bcz = bcz
+        bcz = c1d.c1dbc.no_bc()
 
     return (bcr, bcz)
 

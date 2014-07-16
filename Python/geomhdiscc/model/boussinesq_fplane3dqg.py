@@ -127,7 +127,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
-            bc = no_bc.copy()
+            bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
@@ -135,7 +135,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             kx = eigs[0]
             ky = eigs[1]
 
-            bc = no_bc.copy()
+            bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
                 if self.use_galerkin:
@@ -151,7 +151,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                             bc = {0:10}
                     else:
-                        bc = no_bc.copy()
+                        bc = no_bc()
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -170,7 +170,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
-            bc = no_bc.copy()
+            bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityz",""):
                     bc['r'] = 2
@@ -178,7 +178,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     bc['r'] = 2
 
         else:
-            bc = no_bc.copy()
+            bc = no_bc()
 
         return bc
 
@@ -284,7 +284,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     if bcs['bcType'] == 0:
                         tmp = c1d.qid(res[0],2,{0:20})
                     else:
-                        tmp = c1d.qid(res[0],2, no_bc.copy())
+                        tmp = c1d.qid(res[0],2, no_bc())
                     tmp = tmp.tolil()
                     mat[-2:,:] = tmp[0:2,:]
                     mat = mat.tocsr()

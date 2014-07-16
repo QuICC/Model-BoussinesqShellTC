@@ -16,7 +16,7 @@ def convert_bc(bc):
     if bc[0] < 0:
         bcr = bc
     else:
-        bcr = rad.radb.no_bc.copy()
+        bcr = rad.radbc.no_bc()
 
     return bcr
 

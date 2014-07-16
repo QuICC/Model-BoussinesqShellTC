@@ -25,9 +25,9 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVertical.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVelocityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticity.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -46,13 +46,13 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>();
       
       // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVertical>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVelocityZ>();
       
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>();
       
       // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticity>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticityZ>();
    }
 
    void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
@@ -127,7 +127,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::VORTICITY);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

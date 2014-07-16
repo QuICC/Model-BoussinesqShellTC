@@ -9,6 +9,11 @@ import scipy.sparse as spsp
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 
 
+def no_bc():
+    """Get a no boundary condition flag"""
+
+    return {'x':{0:0}, 'z':{0:0}}
+
 def qid(nx, q, bc):
     """Create a quasi indentity"""
 

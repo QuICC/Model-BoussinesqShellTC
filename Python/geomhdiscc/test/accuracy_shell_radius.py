@@ -38,7 +38,7 @@ def zblk(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.zblk(nr, 0, shell.radbc.no_bc.copy())
+        A = shell.zblk(nr, 0, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
         ssol = 0
         test_forward(A, sphys, ssol, rg, 0)
@@ -50,7 +50,7 @@ def d1(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.d1(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.d1(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.diff(sphys,x)
         test_forward(A, sphys, ssol, rg, 2)
@@ -62,7 +62,7 @@ def i2x2(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i2x2(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i2x2(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(sphys*x**2)
         ssol = sy.integrate(ssol,x,x)
@@ -75,7 +75,7 @@ def i2x2lapl(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i2x2lapl(nr, l, a, b, shell.radbc.no_bc.copy())
+        A = shell.i2x2lapl(nr, l, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
         ssol = sy.integrate(ssol,x,x)
@@ -88,7 +88,7 @@ def i4x4(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i4x4(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i4x4(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(sphys*x**4)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -101,7 +101,7 @@ def i4x4lapl(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i4x4lapl(nr, l, a, b, shell.radbc.no_bc.copy())
+        A = shell.i4x4lapl(nr, l, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x) + 2*x**3*sy.diff(sphys,x) - l*(l+1)*x**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -114,7 +114,7 @@ def i4x4lapl2(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i4x4lapl2(nr, l, a, b, shell.radbc.no_bc.copy())
+        A = shell.i4x4lapl2(nr, l, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 4*x**3*sy.diff(sphys,x,x,x) - 2*l*(l+1)*x**2*sy.diff(sphys,x,x) + (l-1)*l*(l+1)*(l+2)*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -127,7 +127,7 @@ def i2x1(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i2x1(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i2x1(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x*sphys)
         ssol = sy.integrate(ssol,x,x)
@@ -140,7 +140,7 @@ def i2x2d1(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i2x2d1(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i2x2d1(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**2*sy.diff(sphys,x))
         ssol = sy.integrate(ssol,x,x)
@@ -153,7 +153,7 @@ def i4x3(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i4x3(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i4x3(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**3*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -166,7 +166,7 @@ def i4x4d1(nr, ls, a, b, rg):
     x = sy.Symbol('x')
     for l in ls:
         print("\tTest for l = " + str(l))
-        A = shell.i4x4d1(nr, a, b, shell.radbc.no_bc.copy())
+        A = shell.i4x4d1(nr, a, b, shell.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**4*sy.diff(sphys,x))
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -177,7 +177,7 @@ def qid(nr, a, b, xg):
 
     print("qid:")
     x = sy.Symbol('x')
-    A = shell.qid(nr, 3, shell.radbc.no_bc.copy())
+    A = shell.qid(nr, 3, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
     ssol = sphys
     test_forward(A, sphys, ssol, xg, 3)

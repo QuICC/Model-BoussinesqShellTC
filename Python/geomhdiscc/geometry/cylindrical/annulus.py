@@ -16,12 +16,12 @@ def convert_bc(bc):
     if bc['r'][0] < 0:
         bcr = bc['r']
     else:
-        bcr = cylbc.no_bc
+        bcr = rad.radbc.no_bc()
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
-        bcz = c1d.no_bc
+        bcz = c1d.c1dbc.no_bc()
 
     return (bcr, bcz)
 

@@ -9,7 +9,10 @@ import scipy.sparse as spsp
 import geomhdiscc.base.utils as utils
 
 
-no_bc = {0:0}
+def no_bc():
+    """Get a no boundary condition flag"""
+
+    return {0:0}
 
 def constrain(mat, bc):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
