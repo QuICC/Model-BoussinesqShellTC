@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sympy
+
 import geomhdiscc.recurrence.symbolic as symbolic
 
 
@@ -20,7 +21,6 @@ def i2x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i2x2lapl():
     """Sphere second integral of x^2 laplacian operator"""
 
@@ -35,7 +35,6 @@ def i2x2lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i4x4():
     """Sphere fourth integral of x^4 operator"""
 
@@ -48,7 +47,6 @@ def i4x4():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i4x4lapl():
     """Sphere fourth integral of x^4 laplacian operator"""
@@ -64,7 +62,6 @@ def i4x4lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i4x4lapl2():
     """Sphere fourth integral of x^4 bilaplacian operator"""
 
@@ -78,7 +75,6 @@ def i4x4lapl2():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i2x1():
     """Sphere fourth integral of x^4 bilaplacian operator"""
@@ -94,7 +90,6 @@ def i2x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i4x3():
     """Sphere fourth integral of x^4 bilaplacian operator"""
 
@@ -109,7 +104,6 @@ def i4x3():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i2x2d1():
     """Sphere fourth integral of x^4 bilaplacian operator"""
 
@@ -123,7 +117,6 @@ def i2x2d1():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i4x4d1():
     """Sphere fourth integral of x^4 bilaplacian operator"""

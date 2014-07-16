@@ -63,8 +63,8 @@ class BoussinesqRotConvShell(base_model.BaseModel):
 
         # Equation doesn't have geometric coupling
         has_geometric_coupling = True
-        # Index mode: SLOWEST = 0, MODE = 1
-        index_mode = 1
+        # Index mode: SLOWEST, MODE, GEOMETRIC_1D_3D
+        index_mode = self.GEOMETRIC_1D_3D
 
         # Rows per equation block and number of rhs
         block_info = (res[0]*res[1], 1)

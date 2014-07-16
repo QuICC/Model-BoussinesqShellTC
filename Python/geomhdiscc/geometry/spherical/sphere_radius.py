@@ -5,16 +5,27 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere_radius_boundary as sphbc
+import geomhdiscc.geometry.spherical.sphere_radius_boundary as radbc
 
 
 def zblk(nr, l, bc):
     """Create a block of zeros"""
 
     mat = spsp.lil_matrix((nr,nr))
-    return sphbc.constrain(mat,l,bc)
+    return radbc.constrain(mat,l,bc)
 
+def d1(nr, l, bc, coeff = 1.0):
+    """Create operator for 1st derivative"""
+
+    row = [2*j for j in range(l%2,2*nr,2)]
+    mat = spsp.lil_matrix((nr,nr))
+    for i in range(0,nr-1):
+        mat[i,i+(l+1)%2:] = row[i+(l+1)%2:]
+
+    mat = coeff*mat
+    return radbc.constrain(mat, l, bc)
 
 def i2x2(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 T_n(x)."""
@@ -48,8 +59,7 @@ def i2x2(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i2x2lapl(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
@@ -75,8 +85,7 @@ def i2x2lapl(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i4x4(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
@@ -126,8 +135,7 @@ def i4x4(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i4x4lapl(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
@@ -169,8 +177,7 @@ def i4x4lapl(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i4x4lapl2(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
@@ -204,8 +211,7 @@ def i4x4lapl2(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i2x1(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of x T_n(x)."""
@@ -237,8 +243,7 @@ def i2x1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i2x2d1(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 D T_n(x)."""
@@ -270,8 +275,7 @@ def i2x2d1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i4x3(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of x^3 T_n(x)."""
@@ -319,8 +323,7 @@ def i4x3(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def i4x4d1(nr, l, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 D T_n(x)."""
@@ -368,8 +371,7 @@ def i4x4d1(nr, l, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
-
+    return radbc.constrain(mat, l, bc)
 
 def qid(nr, l, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
@@ -378,4 +380,4 @@ def qid(nr, l, q, bc, coeff = 1.0):
     diags = [[0]*q + [1]*(nr-q)]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return sphbc.constrain(mat, l, bc)
+    return radbc.constrain(mat, l, bc)

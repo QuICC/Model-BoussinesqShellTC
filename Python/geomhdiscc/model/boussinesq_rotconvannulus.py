@@ -196,7 +196,7 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
                 mat = annulus.i1j1(res[0], res[1], bc) + annulus.i1j1x1d1(res[0], res[1], bc)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.ij1(res[0], res[1],  bc, 1j*m)
+                mat = annulus.i1j1(res[0], res[1],  bc, 1j*m)
 
             elif field_col == ("velocityz",""):
                 mat = annulus.i1j1x1e1(res[0], res[1], bc)

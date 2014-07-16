@@ -35,7 +35,7 @@ def bid(nx, q, bc):
 
     return mat.tocsr()
 
-def constrain(mat, nx, nz, bc, eq_zrows_x, eq_zrows_z):
+def constrain(mat, nx, nz, bc):
     """Contrain the matrix with the Tau boundary condition"""
 
     bc_mat = mat

@@ -4,8 +4,107 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import sympy
+
 import geomhdiscc.recurrence.symbolic as symbolic
 
+
+def i1():
+    """Cylindrical annulus first integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1x1d1():
+    """Cylindrical annulus first integral of x of first derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':1, 'd':1, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1x1():
+    """Cylindrical annulus first integral of x operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':1, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2():
+    """Cylindrical annulus second integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':0, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x1():
+    """Cylindrical annulus second integral of x operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':1, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x2d2():
+    """Cylindrical annulus second integral of x^2 of second derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x2d1():
+    """Cylindrical annulus second integral of x^2 of first derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':2, 'd':1, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
 
 def i2x2():
     """Cylindrical annulus second integral of x^2 operator"""
@@ -20,7 +119,6 @@ def i2x2():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i2x2lapl():
     """Cylindrical annulus second integral of x^2 laplacian operator"""
@@ -37,7 +135,6 @@ def i2x2lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-
 def i4x4():
     """Cylindrical annulus fourth integral of x^4 operator"""
 
@@ -51,7 +148,6 @@ def i4x4():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i4x4lapl():
     """Cylindrical annulus fourth integral of x^4 laplacian operator"""
@@ -67,7 +163,6 @@ def i4x4lapl():
     for k,rec in sorted(r.items()):
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
-
 
 def i4x4lapl2():
     """Cylindrical annulus fourth integral of x^4 bilaplacian operator"""

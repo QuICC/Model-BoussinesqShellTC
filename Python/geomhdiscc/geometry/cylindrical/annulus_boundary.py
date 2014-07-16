@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as radbc
 

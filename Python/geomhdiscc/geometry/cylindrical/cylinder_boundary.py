@@ -5,8 +5,10 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
+
 
 def qid(n, q, bc):
     """Create a quasi indentity"""
@@ -21,7 +23,6 @@ def qid(n, q, bc):
 
     return mat.tocsr()
 
-
 def bid(n, q, bc):
     """Create a boundary indentity"""
 
@@ -34,7 +35,6 @@ def bid(n, q, bc):
         mat = spsp.diags(diags, offsets)
 
     return mat.tocsr()
-
 
 def constrain(mat, nr, nz, m, bc, eq_zrows_r, eq_zrows_z):
     """Contrain the matrix with the Tau boundary condition"""

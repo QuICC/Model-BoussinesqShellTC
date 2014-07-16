@@ -22,6 +22,10 @@ class BaseModel:
     STENCIL = 2
     FIELD_TO_RHS = 3
 
+    SLOWEST = 0
+    MODE = 1
+    GEOMETRIC_1D_3D = 2
+
     def time(self, res, eq_params, eigs, bcs, fields):
         """Create the time derivative operator"""
 

@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import numpy as np
 
 
+no_bc = {0:0}
+
 def constrain(mat, l, bc):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 

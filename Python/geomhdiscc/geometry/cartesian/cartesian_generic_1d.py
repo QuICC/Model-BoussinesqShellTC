@@ -41,4 +41,4 @@ def generic(nx, q, expr, var, bc, coeff = 1.0, ntrunc = -1):
     # Clear q top rows
     mat[0:q,:] = 0
     mat = coeff*spsp.coo_matrix(mat)
-    return c1dbc.constrain(mat, bc, 2)
+    return c1dbc.constrain(mat, bc)

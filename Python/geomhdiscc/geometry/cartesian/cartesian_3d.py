@@ -15,30 +15,30 @@ def convert_bc(bc):
     if bc['x'][0] < 0:
         bcx = bc['x']
     else:
-        bcx = [0]
+        bcx = c1d.c1dbc.no_bc.copy()
 
     if bc['y'][0] < 0:
         bcy = bc['y']
     else:
-        bcy = [0]
+        bcy = c1d.c1dbc.no_bc.copy()
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
-        bcz = [0]
+        bcz = c1d.c1dbc.no_bc.copy()
 
     return (bcx, bcy, bcz)
 
-def zblk(nx, ny, nz, qx, qy, qz, bc):
+def zblk(nx, ny, nz, bc):
     """Create a block of zeros"""
 
     bcx, bcy, bcz = convert_bc(bc)
-    return spsp.kron(c1d.zblk(ny,qy,bcy),spsp.kron(c1d.zblk(nz,qz,bcz),c1d.zblk(nx,qx,bcx)))
+    return spsp.kron(c1d.zblk(ny,bcy),spsp.kron(c1d.zblk(nz,bcz),c1d.zblk(nx,bcx)))
 
 def i2j2k2d2d2d2(nx, ny, nz, bc):
     """Create a quasi identity block of order 2,2,2"""
 
-    return qid(nx,ny,nz,2,2,2,bc)
+    return qid(nx,ny,nz,bc)
 
 def i2j2k2(nx, ny, nz, bc):
     """Create operator for 2nd integral in x,y,z of T_n(x)T_n(y)T_n(z)"""

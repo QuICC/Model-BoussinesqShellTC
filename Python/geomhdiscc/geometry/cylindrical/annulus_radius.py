@@ -7,14 +7,244 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as cylbc
+import geomhdiscc.geometry.cylindrical.annulus_radius_boundary as radbc
 
 
 def zblk(nr, bc):
     """Create a block of zeros"""
 
     mat = spsp.lil_matrix((nr,nr))
-    return cylbc.constrain(mat,bc)
+    return radbc.constrain(mat,bc)
+
+def d1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st derivative"""
+
+    row = [2*j for j in range(0,nr)]
+    mat = spsp.lil_matrix((nr,nr))
+    for i in range(0,nr-1):
+        mat[i,i+1:nr:2] = row[i+1:nr:2]
+
+    mat = coeff*(1/a)*mat
+    return radbc.constrain(mat, bc)
+
+def i1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2,2)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a/(2.0*n)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_1(n)
+
+    ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i1x1d1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral x 1st derivative T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*(n - 1.0)/(2.0*n)
+
+    # Generate diagonal
+    def d0(n):
+        return b
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a*(n + 1.0)/(2.0*n)
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i1x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral of x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = 0
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2/(4.0*n)
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b/(2.0*n)
+
+    # Generate diagonal
+    def d0(n):
+        return 0
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_1(n)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -d_2(n)
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3,2)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2/(4.0*n*(n - 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -a**2/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**2/(4.0*n*(n + 1.0))
+
+    ds = [d_2, d0, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-3,4)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -a**3/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -a**2*b/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a**3/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**2*b/(4.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return a**3/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2x2d2(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^2 2nd derivative T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*(n - 3.0)*(n - 2.0)/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b*(n - 2.0)/n
+
+    # Generate main diagonal
+    def d0(n):
+        return (a**2*n**2 - 3.0*a**2 + 2.0*b**2*n**2 - 2.0*b**2)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a*b*(n + 2.0)/n
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**2*(n + 2.0)*(n + 3.0)/(4.0*n*(n + 1.0))
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2x2d1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^2 1st derivative T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-3,4)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*(n - 3.0)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b*(n - 2.0)/(2.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*(a**2*n + 3.0*a**2 + 4.0*b**2*n + 4.0*b**2)/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return a**2*b/((n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a*(a**2*n - 3.0*a**2 + 4.0*b**2*n - 4.0*b**2)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(n + 2.0)/(2.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -a**3*(n + 3.0)/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
 
 def i2x2(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 T_n(x)."""
@@ -63,7 +293,7 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)
 
 def i2x2lapl(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
@@ -96,7 +326,7 @@ def i2x2lapl(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)
 
 def i4x4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
@@ -177,7 +407,7 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)
 
 def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
@@ -242,7 +472,7 @@ def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)
 
 def i4x4lapl2(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
@@ -291,7 +521,7 @@ def i4x4lapl2(nr, m, a, b, bc, coeff = 1.0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)
 
 def qid(nr, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
@@ -300,4 +530,4 @@ def qid(nr, q, bc, coeff = 1.0):
     diags = [[0]*q + [1]*(nr-q)]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return cylbc.constrain(mat, bc)
+    return radbc.constrain(mat, bc)

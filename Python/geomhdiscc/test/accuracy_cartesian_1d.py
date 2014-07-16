@@ -11,7 +11,6 @@ import geomhdiscc.transform.cartesian as transf
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cartesian.cartesian_generic_1d as cg1d
 
-no_bc = [0]
 
 def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
@@ -19,7 +18,6 @@ def x_to_phys(expr, grid):
     x = sy.Symbol('x')
     func = sy.utilities.lambdify(x, expr)
     return func(grid)
-
 
 def test_forward(op, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
@@ -35,7 +33,6 @@ def test_forward(op, res_expr, sol_expr, grid, q):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
 
-
 def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     """Perform a tau backward operation test"""
 
@@ -48,7 +45,6 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     if np.max(err) > 10*np.spacing(1):
         print(err)
     print("\t\tMax tau backward error: " + str(np.max(err)))
-
 
 def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     """Perform a galerkin backward operation test"""
@@ -63,7 +59,6 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
         print(err)
     print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
-
 def zblk(nx, xg):
     """Accuracy test for zblk operator"""
 
@@ -74,78 +69,72 @@ def zblk(nx, xg):
     ssol = 0
     test_forward(A, sphys, ssol, xg, 0)
 
-
 def d1(nx, xg):
     """Accuracy test for d1 operator"""
 
     print("d1:")
     x = sy.Symbol('x')
-    A = c1d.d1(nx, no_bc)
+    A = c1d.d1(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
-
 
 def i1(nx, xg):
     """Accuracy test for i1 operator"""
 
     print("i1:")
     x = sy.Symbol('x')
-    A = c1d.i1(nx, no_bc)
+    A = c1d.i1(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sy.integrate(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
-
 
 def i2(nx, xg):
     """Accuracy test for i2 operator"""
 
     print("i2:")
     x = sy.Symbol('x')
-    A = c1d.i2(nx, no_bc)
+    A = c1d.i2(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, xg, 2)
-
 
 def i2d2(nx, xg):
     """Accuracy test for i2d2 operator"""
 
     print("i2d2:")
     x = sy.Symbol('x')
-    A = c1d.i2d2(nx, no_bc)
+    A = c1d.i2d2(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
     print("\tbc = 20")
-    A = c1d.i2d2(nx, [20]).tocsr()
-    B = c1d.i2(nx, no_bc).tocsr()
+    A = c1d.i2d2(nx, {0:20}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.diff(ssol,x,x)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
-    A = c1d.i2d2(nx, [-20]).tocsr()
-    B = c1d.i2(nx, no_bc).tolil()
+    A = c1d.i2d2(nx, {0:-20, 'r':2}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tolil()
     B = B[2:,:]
-    S = c1d.c1dbc.stencil(nx, [-20])
+    S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.diff(ssol,x,x)
     test_backward_galerkin(A, B, S, sphys, ssol, xg)
-
 
 def i2d1(nx, xg):
     """Accuracy test for i2d1 operator"""
 
     print("i2d1:")
     x = sy.Symbol('x')
-    A = c1d.i2d1(nx, no_bc)
+    A = c1d.i2d1(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.integrate(sy.diff(sphys,x),x,x)
     test_forward(A, sphys, ssol, xg, 2)
-
 
 def i2lapl(nx, xg):
     """Accuracy test for i2lapl operator"""
@@ -153,28 +142,27 @@ def i2lapl(nx, xg):
     print("i2lapl:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i2lapl(nx, k, l, no_bc)
+    A = c1d.i2lapl(nx, k, l, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
     print("\tbc = 20")
-    A = c1d.i2lapl(nx, k, l, [20]).tocsr()
-    B = c1d.i2(nx, no_bc).tocsr()
+    A = c1d.i2lapl(nx, k, l, {0:20}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
-    A = c1d.i2lapl(nx, k, l, [-20]).tocsr()
-    B = c1d.i2(nx, no_bc).tocsr()
+    A = c1d.i2lapl(nx, k, l, {0:-20, 'r':2}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
     B = B[2:,:]
-    S = c1d.c1dbc.stencil(nx, [-20])
+    S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
     test_backward_galerkin(A, B, S, sphys, ssol, xg)
-
 
 def i2laplh(nx, xg):
     """Accuracy test for i2laplh operator"""
@@ -182,63 +170,59 @@ def i2laplh(nx, xg):
     print("i2laplh:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i2laplh(nx, k, no_bc)
+    A = c1d.i2laplh(nx, k, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
     print("\tbc = 20")
-    A = c1d.i2laplh(nx, k, [20]).tocsr()
-    B = c1d.i2(nx, no_bc).tocsr()
+    A = c1d.i2laplh(nx, k, {0:20}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
     print("\tbc = -20")
-    A = c1d.i2laplh(nx, k, [-20]).tocsr()
-    B = c1d.i2(nx, no_bc).tocsr()
+    A = c1d.i2laplh(nx, k, {0:-20, 'r':2}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc.copy()).tocsr()
     B = B[2:,:]
-    S = c1d.c1dbc.stencil(nx, [-20])
+    S = c1d.c1dbc.stencil(nx, {0:-20})
     ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
     test_backward_galerkin(A, B, S, sphys, ssol, xg)
-
 
 def i4(nx, xg):
     """Accuracy test for i4 operator"""
 
     print("i4:")
     x = sy.Symbol('x')
-    A = c1d.i4(nx, no_bc)
+    A = c1d.i4(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)])
     ssol = sy.integrate(sphys,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4d2(nx, xg):
     """Accuracy test for i4d2 operator"""
 
     print("i4d2:")
     x = sy.Symbol('x')
-    A = c1d.i4d2(nx, no_bc)
+    A = c1d.i4d2(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4d4(nx, xg):
     """Accuracy test for i4d4 operator"""
 
     print("i4d4:")
     x = sy.Symbol('x')
-    A = c1d.i4d4(nx, no_bc)
+    A = c1d.i4d4(nx, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4lapl(nx, xg):
     """Accuracy test for i4lapl operator"""
@@ -246,12 +230,11 @@ def i4lapl(nx, xg):
     print("i4lapl:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i4lapl(nx, k, l, no_bc)
+    A = c1d.i4lapl(nx, k, l, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys - l**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4laplh(nx, xg):
     """Accuracy test for i4laplh operator"""
@@ -259,12 +242,11 @@ def i4laplh(nx, xg):
     print("i4laplh:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i4laplh(nx, k, no_bc)
+    A = c1d.i4laplh(nx, k, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4lapl2(nx, xg):
     """Accuracy test for i4lapl2 operator"""
@@ -272,12 +254,11 @@ def i4lapl2(nx, xg):
     print("i4lapl2:")
     x = sy.Symbol('x')
     k, l = np.random.rand(2)*nx
-    A = c1d.i4lapl2(nx, k, l, no_bc)
+    A = c1d.i4lapl2(nx, k, l, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys + l**4*sphys - 2*k**2*sy.diff(sphys,x,x) - 2*l**2*sy.diff(sphys,x,x) + 2*k**2*l**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def i4lapl2h(nx, xg):
     """Accuracy test for i4lapl2h operator"""
@@ -285,23 +266,21 @@ def i4lapl2h(nx, xg):
     print("i4lapl2h:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
-    A = c1d.i4lapl2h(nx, k, no_bc)
+    A = c1d.i4lapl2h(nx, k, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys - 2*k**2*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
-
 
 def qid(nx, xg):
     """Accuracy test for qid operator"""
 
     print("qid:")
     x = sy.Symbol('x')
-    A = c1d.qid(nx, 3, no_bc)
+    A = c1d.qid(nx, 3, c1d.c1dbc.no_bc.copy())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sphys
     test_forward(A, sphys, ssol, xg, 3)
-
 
 def genxp(nx, q, p, xg, ntrunc = -1):
     """Accuracy test for genxp operator"""
@@ -309,11 +288,10 @@ def genxp(nx, q, p, xg, ntrunc = -1):
     print("genx"+ str(p) + ":")
     x = sy.Symbol('x')
     expr = 'x**' + str(p)
-    A = cg1d.generic(nx, q, expr, x, no_bc, 1.0, ntrunc)
+    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc.copy(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*x**p
     test_forward(A, sphys, ssol, xg, 1)
-
 
 def genlinxp(nx, q, p, xg, ntrunc = -1):
     """Accuracy test for gen_linxp operator"""
@@ -322,7 +300,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
     x = sy.Symbol('x')
     expr = '(1+x)**' + str(p)
     print(expr)
-    A = cg1d.generic(nx, q, expr, x, no_bc, 1.0, ntrunc)
+    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc.copy(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*(1+x)**p
     test_forward(A, sphys, ssol, xg, 1)

@@ -105,8 +105,8 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST = 0, MODE = 1, GEOMETRIC_1D_3D = 2
-        index_mode = 1
+        # Index mode: SLOWEST, MODE, GEOMETRIC_1D_3D
+        index_mode = self.MODE
 
         # Compute block info
         block_info = self.block_size(res, field_row)

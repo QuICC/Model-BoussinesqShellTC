@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import numpy as np
 
 
+no_bc = {0:0}
+
 def constrain(mat, bc):
     """Contrain the matrix with the (Tau or Galerkin) boundary condition"""
 
@@ -41,7 +43,7 @@ def apply_tau(mat, bc):
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[0], 0, bc[1:]bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
