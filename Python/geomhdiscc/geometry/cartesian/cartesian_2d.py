@@ -16,11 +16,13 @@ def convert_bc(bc):
         bcx = bc['x']
     else:
         bcx = c1d.c1dbc.no_bc()
+        bcx['r'] = bc['x'].get('r',0)
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
         bcz = c1d.c1dbc.no_bc()
+        bcz['r'] = bc['z'].get('r',0)
 
     return (bcx, bcz)
 
@@ -36,6 +38,13 @@ def i2j1d0d1(nx, nz, bc, coeff = 1.0):
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,1,bcz), c1d.i2(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, bc)
+
+def i2j2d0d2(nx, nz, bc, coeff = 1.0):
+    """Create operator for 2nd integral in x and 2nd integrazl in z of 2nd derivative"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.qid(nz,2,bcz), c1d.i2(nx,bcx))
     return c2dbc.constrain(mat, nx, nz, bc)
 
 def i2j2d2d2(nx, nz, bc, coeff = 1.0):
@@ -65,24 +74,32 @@ def i2j2(nx, nz, bc, coeff = 1.0):
     return c2dbc.constrain(mat, nx, nz, bc)
 
 def i2j0laplh(nx, nz, k, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x and 1st integral in z of Laplacian T_n(x)T_n(z)"""
+    """Create operator for 2nd integral in x and 1st integral in z of of horizontal Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.i2laplh(nx,k,bcz))
+    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.i2laplh(nx,k,bcx))
     return c2dbc.constrain(mat, nx, nz, bc)
 
 def i2j1laplh(nx, nz, k, bc, coeff = 1.0):
     """Create operator for 2nd integral in x and 1st integral in z of Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.i1(nz,bcz), c1d.i2laplh(nx,k,bcz))
+    mat = coeff*spsp.kron(c1d.i1(nz,bcz), c1d.i2laplh(nx,k,bcx))
+    return c2dbc.constrain(mat, nx, nz, bc)
+
+def i2j2laplh(nx, nz, k, bc, coeff = 1.0):
+    """Create operator for 2nd integral in x,z of horizontal Laplacian T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = spsp.kron(c1d.i2(nz,bcz), c1d.i2laplh(nx,k,bcx))
+    mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, bc)
 
 def i2j2lapl(nx, nz, k, bc, coeff = 1.0):
     """Create operator for 2nd integral in x,z of Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.i2(nz,bcz), c1d.i2laplh(nx,k,bcz)) + spsp.kron(c1d.i2d2(nz,bcz), c1d.i2(nx,bcx))
+    mat = spsp.kron(c1d.i2(nz,bcz), c1d.i2laplh(nx,k,bcx)) + spsp.kron(c1d.i2d2(nz,bcz), c1d.i2(nx,bcx))
     mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, bc)
 

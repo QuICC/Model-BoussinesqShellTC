@@ -20,13 +20,13 @@ kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]
 
-bcs = {'bcType':0, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
 
 # Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = 1
+bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Show the "spy" of the two matrices

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import scipy.sparse as spsp
+import itertools
 
 import geomhdiscc.base.utils as utils
 
@@ -46,6 +47,8 @@ def apply_tau(mat, bc):
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 21:
         cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+    elif bc[0] == 22:
+        cond = tau_diff2(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -62,15 +65,25 @@ def apply_tau(mat, bc):
 
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
-
+    
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*tau_c(i) for i in np.arange(0,nx)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nx)])
