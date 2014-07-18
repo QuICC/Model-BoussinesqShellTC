@@ -24,6 +24,12 @@ namespace Timestep {
    // Scheme requires 3 substeps
    const int ImExRK3::STEPS = 3;
 
+   // Scheme requires field at t_n
+   const int ImExRK3::FIELD_MEMORY = 0;
+
+   // Scheme requires nonlinear term at t(n-1)
+   const int ImExRK3::NONLINEAR_MEMORY = 1;
+
    // Set the alpha parameters
    const Eigen::Array<MHDFloat,3,1> ImExRK3::mAlpha = Eigen::Array<MHDFloat,3,1>(29./96., -3./40., 1./6.);
 
@@ -38,32 +44,77 @@ namespace Timestep {
 
    MHDFloat ImExRK3::lhsT(const int step)
    {
+      assert(step < ImExRK3::STEPS);
+
       return 1./ImExRK3::mBeta(step);
    }
 
    MHDFloat ImExRK3::lhsL(const int step)
    {
+      assert(step < ImExRK3::STEPS);
+
       return 1.0;
    }
 
-   MHDFloat ImExRK3::rhsT(const int step)
+   MHDFloat ImExRK3::rhsT(const int i, const int step)
    {
+      assert(step < ImExRK3::STEPS);
+      assert(i > -1);
+      assert(i < ImExRK3::FIELD_MEMORY+1);
+
       return 1./ImExRK3::mBeta(step);
    }
 
-   MHDFloat ImExRK3::rhsL(const int step)
+   MHDFloat ImExRK3::rhsL(const int i, const int step)
    {
+      assert(step < ImExRK3::STEPS);
+      assert(i > -1);
+      assert(i < ImExRK3::FIELD_MEMORY+1);
+
       return ImExRK3::mAlpha(step)/ImExRK3::mBeta(step);
    }
 
-   MHDFloat ImExRK3::rhsN(const int step)
+   MHDFloat ImExRK3::rhsN(const int i, const int step)
    {
-      return ImExRK3::mGamma(step)/ImExRK3::mBeta(step);
+      assert(step < ImExRK3::STEPS);
+      assert(i > -1);
+      assert(i < ImExRK3::NONLINEAR_MEMORY+1);
+
+      MHDFloat coeff;
+      if(i == 0)
+      {
+         coeff = ImExRK3::mGamma(step)/ImExRK3::mBeta(step);
+      } else
+      {
+         coeff = ImExRK3::mZeta(step)/ImExRK3::mBeta(step);
+      }
+
+      return coeff;
    }
 
-   MHDFloat ImExRK3::rhsNN(const int step)
+   int ImExRK3::fieldMemory(const int step)
    {
-      return ImExRK3::mZeta(step)/ImExRK3::mBeta(step);
+      assert(step < ImExRK3::STEPS);
+
+      return ImExRK3::FIELD_MEMORY;
+   }
+
+   int ImExRK3::nonlinearMemory(const int step)
+   {
+      assert(step < ImExRK3::STEPS);
+
+      int mem;
+
+      // First step does not use t_(n-1) nonlinear term
+      if(step == 0)
+      {
+         mem = 0;
+      } else
+      {
+         mem = ImExRK3::NONLINEAR_MEMORY;
+      }
+
+      return mem;
    }
 
 }

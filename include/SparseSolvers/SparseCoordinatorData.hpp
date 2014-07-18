@@ -176,7 +176,7 @@ namespace Solver {
    /**
     * @brief Generic implementation to update the time matrix solvers
     */
-   template <template <class,class> class TSol,typename TSolverIt> void updateTimeMatrixSolvers(SparseCoordinatorData<TSol>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step);
+   template <template <class,class> class TSol,typename TSolverIt> void updateTimeMatrixSolvers(SparseCoordinatorData<TSol>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const std::vector<MHDFloat>& oldRhsCoeff, const int step);
 
    /**
     * @brief Generic implementation to initialise the solver solution
@@ -367,7 +367,7 @@ namespace Solver {
       }
    }
 
-   template <template <class,class> class TSolver,typename TSolverIt> void updateTimeMatrixSolvers(SparseCoordinatorData<TSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step)
+   template <template <class,class> class TSolver,typename TSolverIt> void updateTimeMatrixSolvers(SparseCoordinatorData<TSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const std::vector<MHDFloat>& oldRhsCoeff, const int step)
    {
       // Create iterator to current solver
       TSolverIt solIt;
@@ -378,7 +378,7 @@ namespace Solver {
       for(; solIt != endIt; ++solIt)
       {
          // Compute linear solve RHS
-         (*solIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, step);
+         (*solIt)->updateTimeMatrix(lhsCoeff, rhsCoeff, oldRhsCoeff, step);
       }
    }
 
@@ -498,7 +498,7 @@ namespace Solver {
 
    template <> inline void computeRHSSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const int step) {};
 
-   template <> inline void updateTimeMatrixSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+   template <> inline void updateTimeMatrixSolvers<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const std::vector<MHDFloat>& oldRhsCoeff, const int step) {};
 
    template <> inline void storeSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
    template <> inline void storeSolverSolution<SparseLinearSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseLinearSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
@@ -521,7 +521,7 @@ namespace Solver {
 
    template <> inline void computeRHSSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const int step) {};
 
-   template <> inline void updateTimeMatrixSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+   template <> inline void updateTimeMatrixSolvers<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const std::vector<MHDFloat>& oldRhsCoeff, const int step) {};
 
    template <> inline void storeSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
    template <> inline void storeSolverSolution<SparseTrivialSolver,ComplexDummy_iterator>(SparseCoordinatorData<SparseTrivialSolver>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
@@ -544,7 +544,7 @@ namespace Solver {
 
    template <> inline void computeRHSSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const int step) {};
 
-   template <> inline void updateTimeMatrixSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const int step) {};
+   template <> inline void updateTimeMatrixSolvers<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, const MHDFloat lhsCoeff, const MHDFloat rhsCoeff, const std::vector<MHDFloat>& oldRhsCoeff, const int step) {};
 
    template <> inline void storeSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIScalarEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};
    template <> inline void storeSolverSolution<Timestep::SparseTimestepper,ComplexDummy_iterator>(SparseCoordinatorData<Timestep::SparseTimestepper>& coord, std::vector<Equations::SharedIVectorEquation>::const_iterator eqIt, const int idx, SpectralFieldId) {};

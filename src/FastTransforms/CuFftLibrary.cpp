@@ -22,7 +22,11 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
+   const int CuFftLibrary::NSTREAMS = 10;
+
    int CuFftLibrary::sCounter = 0;
+
+   std::vector<cudaStream_t>  CuFftLibrary::sStream = std::vector<cudaStream_t>();
 
    CuFftLibrary::CuFftLibrary()
    {
@@ -35,6 +39,15 @@ namespace Transform {
    void CuFftLibrary::registerFft()
    {
       ++CuFftLibrary::sCounter;
+
+      if(CuFftLibrary::sCounter == 1)
+      {
+         for(int i = 0; i < CuFftLibrary::NSTREAMS; ++i)
+         {
+            CuFftLibrary::sStream.push_back(cudaStream_t());
+            checkCudaErrors(cudaStreamCreate(&CuFftLibrary::sStream.at(i)));
+         }
+      }
    }
 
    void CuFftLibrary::unregisterFft()
@@ -44,6 +57,13 @@ namespace Transform {
 
    void CuFftLibrary::cleanupFft()
    {
+      if(CuFftLibrary::sCounter == 0)
+      {
+         for(int i = 0; i < CuFftLibrary::NSTREAMS; ++i)
+         {
+            checkCudaErrors(cudaStreamDestroy(CuFftLibrary::sStream.at(i)));
+         }
+      }
    }
 
 }

@@ -58,14 +58,14 @@ namespace Transform {
       // Set the scaling factor
       this->mspSetup->setScale(1.0/static_cast<MHDFloat>(2*this->mspSetup->fwdSize()));
 
+      // Register the cuFFT object
+      CuFftLibrary::registerFft();
+
       // Initialise cuFFT interface
       this->initFft();
 
       // Initialise Chebyshev operator(s)
       this->initOperators();
-
-      // Register the cuFFT object
-      CuFftLibrary::registerFft();
    }
 
    void ChebyshevCuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list) const

@@ -40,18 +40,18 @@ def qid(n, q, bc):
 
     return mat.tocsr()
 
-def constrain(mat, nx, nz, bc):
+def constrain(mat, nx, nz, qx, qz, bc):
     """Contrain the matrix with the Tau boundary condition"""
 
     bc_mat = mat
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'])
-        bc_mat = bc_mat + spsp.kron(bid(nz,bc['z'][0]//10,bc['z']), bcMat)
+        bc_mat = bc_mat + spsp.kron(bid(nz,0,bc['z']), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'])
-        bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,0*bc['x'][0]//10,bc['x']))
+        bc_mat = bc_mat + spsp.kron(bcMat, qid(nx,qx,bc['x']))
 
     return bc_mat

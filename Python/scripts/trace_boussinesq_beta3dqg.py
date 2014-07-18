@@ -7,7 +7,7 @@ import geomhdiscc.model.boussinesq_beta3dqg as mod
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
 model.linearize = True
-model.use_galerkin = True
+model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions

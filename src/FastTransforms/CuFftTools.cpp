@@ -90,28 +90,6 @@ namespace Transform {
             {
                factorised /= 7;
                good = true;
-            // Check for optimised factor 11 (single factor)
-            } else if(factorised % 11 == 0)
-            {
-               factorised /= 11;
-
-               // Only single factor possible
-               if(factorised == 1)
-               {
-                  good = true;
-               }
-               break;
-            // Check for optimised factor 13 (single factor)
-            } else if(factorised % 13 == 0)
-            {
-               factorised /= 13;
-
-               // Only single factor possible
-               if(factorised == 1)
-               {
-                  good = true;
-               }
-               break;
             } else
             {
                good = false;

@@ -57,11 +57,11 @@ namespace Transform {
       // Set the scaling factor
       this->mspSetup->setScale(1.0/static_cast<MHDFloat>(this->mspSetup->fwdSize()));
 
-      // Initialise cuFFT plans
-      this->initFft();
-
       // Register the cuFFT object
       CuFftLibrary::registerFft();
+
+      // Initialise cuFFT plans
+      this->initFft();
    }
 
    void CuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
@@ -89,32 +89,64 @@ namespace Transform {
       int bwdSize = this->mspSetup->bwdSize();
       int howmany = this->mspSetup->howmany();
 
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         this->mStreamBatch.push_back(howmany/CuFftLibrary::NSTREAMS);
+         if(i == CuFftLibrary::NSTREAMS - 1)
+         {
+            this->mStreamBatch.back() += howmany % CuFftLibrary::NSTREAMS;
+         }
+      }
+
       // Create the two plans
       int  *fftSize = &fwdSize;
 
       if(this->mspSetup->type() == FftSetup::MIXED)
       {
-         // Create the real to complex plan
-         checkCudaErrors(cufftPlanMany(&this->mFPlan, 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_D2Z, howmany));
+         for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+         {
+            // Initialise handles
+            this->mFPlan.push_back(cufftHandle());
+            this->mBPlan.push_back(cufftHandle());
 
-         // Create the complex to real plan
-         checkCudaErrors(cufftPlanMany(&this->mBPlan,1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2D, howmany));
+            // Create the real to complex plan
+            checkCudaErrors(cufftPlanMany(&this->mFPlan.at(i), 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_D2Z, this->mStreamBatch.at(i)));
+            checkCudaErrors(cufftSetStream(this->mFPlan.at(i), CuFftLibrary::sStream.at(i)));
 
-         // Allocate common device memory
-         checkCudaErrors(cudaMalloc((void **)&this->mDevR, sizeof(cufftDoubleReal)*fwdSize*howmany));
-         checkCudaErrors(cudaMalloc((void **)&this->mDevZI, sizeof(cufftDoubleComplex)*bwdSize*howmany));
+            // Create the complex to real plan
+            checkCudaErrors(cufftPlanMany(&this->mBPlan.at(i),1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2D, this->mStreamBatch.at(i)));
+            checkCudaErrors(cufftSetStream(this->mBPlan.at(i), CuFftLibrary::sStream.at(i)));
+
+            // Allocate common device memory
+            cufftDoubleReal * tmpR;
+            checkCudaErrors(cudaMalloc((void **)&tmpR, sizeof(cufftDoubleReal)*fwdSize*this->mStreamBatch.at(i)));
+            this->mpDevR.push_back(tmpR);
+            cufftDoubleComplex * tmpZ;
+            checkCudaErrors(cudaMalloc((void **)&tmpZ, sizeof(cufftDoubleComplex)*bwdSize*this->mStreamBatch.at(i)));
+            this->mpDevZI.push_back(tmpZ);
+         }
 
       } else
       {
-         // Create the forward complex to complex plan
-         checkCudaErrors(cufftPlanMany(&this->mFPlan, 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_Z2Z, howmany));
+         for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+         {
+            // Initialise handles
+            this->mFPlan.push_back(cufftHandle());
+            this->mBPlan.push_back(cufftHandle());
 
-         // Create the backward complex to complex plan
-         checkCudaErrors(cufftPlanMany(&this->mBPlan, 1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2Z, howmany));
+            // Create the forward complex to complex plan
+            checkCudaErrors(cufftPlanMany(&this->mFPlan.back(), 1, fftSize, NULL, 1, fwdSize, NULL, 1, bwdSize, CUFFT_Z2Z, this->mStreamBatch.at(i)));
 
-         // Allocate common device memory
-         checkCudaErrors(cudaMalloc((void **)&this->mDevZI, sizeof(cufftDoubleComplex)*bwdSize*howmany));
-         checkCudaErrors(cudaMalloc((void **)&this->mDevZO, sizeof(cufftDoubleComplex)*fwdSize*howmany));
+            // Create the backward complex to complex plan
+            checkCudaErrors(cufftPlanMany(&this->mBPlan.back(), 1, fftSize, NULL, 1, bwdSize, NULL, 1, fwdSize, CUFFT_Z2Z, this->mStreamBatch.at(i)));
+
+            // Allocate common device memory
+            cufftDoubleComplex * tmpZ;
+            checkCudaErrors(cudaMalloc((void **)&tmpZ, sizeof(cufftDoubleComplex)*bwdSize*this->mStreamBatch.at(i)));
+            this->mpDevZI.push_back(tmpZ);
+            checkCudaErrors(cudaMalloc((void **)&tmpZ, sizeof(cufftDoubleComplex)*fwdSize*this->mStreamBatch.at(i)));
+            this->mpDevZO.push_back(tmpZ);
+         }
       }
 
       // Initialise temporary storage
@@ -124,16 +156,37 @@ namespace Transform {
 
    void CuFftTransform::cleanupFft()
    {
-      // Detroy forward plan
-      if(this->mFPlan)
+      for(size_t i = 0; i < this->mFPlan.size(); i++)
       {
-         checkCudaErrors(cufftDestroy(this->mFPlan));
+         // Destroy forward plan
+         if(this->mFPlan.at(i))
+         {
+            checkCudaErrors(cufftDestroy(this->mFPlan.at(i)));
+         }
       }
 
-      // Detroy backward plan
-      if(this->mBPlan)
+      for(size_t i = 0; i < this->mBPlan.size(); i++)
       {
-         checkCudaErrors(cufftDestroy(this->mBPlan));
+         // Destroy backward plan
+         if(this->mBPlan.at(i))
+         {
+            checkCudaErrors(cufftDestroy(this->mBPlan.at(i)));
+         }
+      }
+
+      for(size_t i = 0; i < this->mpDevR.size(); i++)
+      {
+         cudaFree(this->mpDevR.at(i));
+      }
+
+      for(size_t i = 0; i < this->mpDevZI.size(); i++)
+      {
+         cudaFree(this->mpDevZI.at(i));
+      }
+
+      for(size_t i = 0; i < this->mpDevZO.size(); i++)
+      {
+         cudaFree(this->mpDevZO.at(i));
       }
 
       // Unregister the cuFFT object

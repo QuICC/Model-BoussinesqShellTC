@@ -1,11 +1,11 @@
 /** 
- * @file ImExRK3.hpp
- * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
+ * @file ImExSBDF2.hpp
+ * @brief Implementation of an implicit/explicit SBDF scheme of order 2
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IMEXRK3_HPP
-#define IMEXRK3_HPP
+#ifndef IMEXSBDF2_HPP
+#define IMEXSBDF2_HPP
 
 // Configuration includes
 //
@@ -25,9 +25,9 @@ namespace GeoMHDiSCC {
 namespace Timestep {
 
    /**
-    * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
+    * @brief Implementation of an implicit/explicit SBDF scheme of order 2
     */
-   class ImExRK3
+   class ImExSBDF2
    {
       public:
          /**
@@ -98,39 +98,20 @@ namespace Timestep {
          static const int NONLINEAR_MEMORY;
          
       protected:
-         /**
-          * @brief Storage for the alpha parameters
-          */
-         static const Eigen::Array<MHDFloat,3,1> mAlpha;
-
-         /**
-          * @brief Storage for the beta parameters
-          */
-         static const Eigen::Array<MHDFloat,3,1> mBeta;
-
-         /**
-          * @brief Storage for the gamma parameters
-          */
-         static const Eigen::Array<MHDFloat,3,1> mGamma;
-
-         /**
-          * @brief Storage for the zeta parameters
-          */
-         static const Eigen::Array<MHDFloat,3,1> mZeta;
 
       private:
          /**
           * @brief Constructor
           */
-         ImExRK3();
+         ImExSBDF2();
 
          /**
           * @brief Destructor
           */
-         ~ImExRK3();
+         ~ImExSBDF2();
 
    };
 }
 }
 
-#endif // IMEXRK3_HPP
+#endif // IMEXSBDF2_HPP

@@ -19,7 +19,7 @@
 // Project includes
 //
 
-// Setup code to use ImExRK3
+// Configure code to use ImExRK3
 #ifdef GEOMHDISCC_TIMESTEPPER_IMEXRK3
 
    #include "Timesteppers/ImExRK3.hpp"
@@ -33,5 +33,20 @@
       }
    }
 #endif //GEOMHDISCC_TIMESTEPPER_IMEXRK3
+
+// Configure code to use ImExSBDF2
+#ifdef GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
+
+   #include "Timesteppers/ImExSBDF2.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Timestep {
+
+         typedef ImExSBDF2 IntegratorSelector;
+
+      }
+   }
+#endif //GEOMHDISCC_TIMESTEPPER_IMEXSBDF2
 
 #endif // TIMESCHEMESELECTOR_HPP

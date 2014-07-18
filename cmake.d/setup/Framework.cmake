@@ -114,9 +114,9 @@ endif(boundaryTest)
 
 #
 # Choose the type of time integration the code is using.
-# Possible options are: ImExRK3
+# Possible options are: ImExRK3, ImExSBDF2
 #
-set(GEOMHDISCC_TIMESTEPPERS "ImExRK3")
+set(GEOMHDISCC_TIMESTEPPERS "ImExRK3" "ImExSBDF2")
 
 geomhdiscc_provide_choice(GEOMHDISCC_TIMESTEPPERS "Time integrator" GEOMHDISCC_TIMESTEPPER timeTest)
 

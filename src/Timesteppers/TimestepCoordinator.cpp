@@ -170,14 +170,21 @@ namespace Timestep {
          // Compute timestep correction coefficient for LHS matrix
          MHDFloat lhsCoeff = IntegratorSelector::lhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
 
-         // Compute timestep correction coefficient for RHS matrix
-         MHDFloat rhsCoeff = IntegratorSelector::rhsT(step)*(1.0/this->mOldDt - 1.0/this->mDt);
+         // Compute timestep correction coefficient for RHS matrix at t_n
+         MHDFloat rhsCoeff = IntegratorSelector::rhsT(0, step)*(1.0/this->mOldDt - 1.0/this->mDt);
+
+         // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
+         std::vector<MHDFloat> oldRhsCoeff;
+         for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
+         {
+            oldRhsCoeff.push_back(IntegratorSelector::rhsT(i+1, step)*(1.0/this->mOldDt - 1.0/this->mDt));
+         }
 
          // Loop over all complex operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::ComplexSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
 
          // Loop over all real operator, complex field timesteppers
-         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, step);
+         Solver::updateTimeMatrixSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, lhsCoeff, rhsCoeff, oldRhsCoeff, step);
       }
    }
 
@@ -190,7 +197,7 @@ namespace Timestep {
       Solver::computeRHSSolvers<SparseTimestepper, Solver::SparseCoordinatorBase<SparseTimestepper>::RealSolver_iterator>(*this, this->mStep);
    }
 
-   void TimestepCoordinator::computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT)
+   void TimestepCoordinator::computeTimeCoeffs(MHDFloat& lhsL, MHDFloat& lhsT, MHDFloat& rhsL, MHDFloat& rhsT, std::vector<MHDFloat>& oldRhsL, std::vector<MHDFloat>& oldRhsT)
    {
       // Set time coefficients for LHS Matrix
       lhsT = IntegratorSelector::lhsT(this->mStep)*1.0/this->mDt;
@@ -199,30 +206,41 @@ namespace Timestep {
       lhsL = IntegratorSelector::lhsL(this->mStep);
 
       // Set time coefficients for RHS Matrix
-      rhsT = IntegratorSelector::rhsT(this->mStep)*1.0/this->mDt;
+      rhsT = IntegratorSelector::rhsT(0, this->mStep)*1.0/this->mDt;
 
       // Set linear coefficients for RHS Matrix
-      rhsL = IntegratorSelector::rhsL(this->mStep);
+      rhsL = IntegratorSelector::rhsL(0, this->mStep);
+
+      // Compute timestep correction coefficient for RHS matrix at t_(n-i), i > 0
+      for(int i = 0; i < IntegratorSelector::FIELD_MEMORY; ++i)
+      {
+         oldRhsT.push_back(IntegratorSelector::rhsT(i+1, this->mStep)*1.0/this->mDt);
+         oldRhsL.push_back(IntegratorSelector::rhsL(i+1, this->mStep));
+      }
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Operator coefficients
       MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
+      std::vector<MHDFloat>   oldRhsLCoeff;
+      std::vector<MHDFloat>   oldRhsTCoeff;
 
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff);
+      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
       
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff);
+      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
    }
 
    void TimestepCoordinator::buildSolverMatrix(TimestepCoordinator::SharedComplexSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
    {
       // Operator coefficients
       MHDFloat lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff;
+      std::vector<MHDFloat>   oldRhsLCoeff;
+      std::vector<MHDFloat>   oldRhsTCoeff;
 
-      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff);
+      this->computeTimeCoeffs(lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
 
-      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff);
+      buildSolverMatrixWrapper(spSolver, matIdx, spEq, comp, idx, lhsLCoeff, lhsTCoeff, rhsLCoeff, rhsTCoeff, oldRhsLCoeff, oldRhsTCoeff);
    }
 
 }

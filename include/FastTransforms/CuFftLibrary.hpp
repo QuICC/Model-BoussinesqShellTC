@@ -12,9 +12,18 @@
 
 // System includes
 //
+#include <vector>
 
 // External includes
 //
+#include <cuda_runtime.h>
+#include <cufft.h>
+
+#ifdef GEOMHDISCC_DEBUG
+   #include <helper_cuda.h>
+#else
+   #define checkCudaErrors(x) x
+#endif //GEOMHDISCC_DEBUG
 
 // Project includes
 //
@@ -30,6 +39,11 @@ namespace Transform {
    {
       public:
          /**
+          * @brief Number of CUDA streams to use
+          */
+         static const int NSTREAMS;
+
+         /**
           * @brief Register object using FFTW library
           */
          static void registerFft();
@@ -43,6 +57,11 @@ namespace Transform {
           * @brief Cleanup the FFTW library
           */
          static void cleanupFft();
+
+         /**
+          * @brief CUDA streams to use for FFTs
+          */
+         static std::vector<cudaStream_t> sStream;
 
       private:
          /**

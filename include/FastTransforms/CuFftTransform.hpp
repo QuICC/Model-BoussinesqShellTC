@@ -38,6 +38,7 @@
 #include "Enums/NonDimensional.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "FastTransforms/CuFftLibrary.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -193,14 +194,19 @@ namespace Transform {
          SharedFftSetup    mspSetup;
 
          /**
+          * @brief Batch size for each CUDA stream
+          */
+         std::vector<int>  mStreamBatch;
+
+         /**
           * @brief Plan for the forward transform (real->complex or complex->complex)
           */
-         cufftHandle   mFPlan;
+         std::vector<cufftHandle>   mFPlan;
 
          /**
           * @brief Plan for the backward transform (complex->real or complex->complex)
           */
-         cufftHandle   mBPlan;
+         std::vector<cufftHandle>   mBPlan;
 
          /**
           * @brief Temporary storage used in the projections (complex -> real)
@@ -215,17 +221,17 @@ namespace Transform {
          /**
           * @brief Real storage on device
           */
-         cufftDoubleReal *mDevR;
+         std::vector<cufftDoubleReal *> mpDevR;
 
          /**
           * @brief Complex storage on device
           */
-         cufftDoubleComplex *mDevZI;
+         std::vector<cufftDoubleComplex *> mpDevZI;
 
          /**
           * @brief Complex storage on device
           */
-         cufftDoubleComplex *mDevZO;
+         std::vector<cufftDoubleComplex *> mpDevZO;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -255,9 +261,30 @@ namespace Transform {
       assert(rFFTVal.cols() == this->mspSetup->howmany());
 
       // Do transform
-      checkCudaErrors(cudaMemcpy(this->mDevR, physVal.data(), sizeof(cufftDoubleReal)*physVal.size(), cudaMemcpyHostToDevice));
-      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZI));
-      checkCudaErrors(cudaMemcpy(rFFTVal.data(), this->mDevZI, sizeof(cufftDoubleComplex)*rFFTVal.size(), cudaMemcpyDeviceToHost));
+      int offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = physVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(this->mpDevR.at(i), physVal.data() + offset, sizeof(cufftDoubleReal)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
+
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         checkCudaErrors(cufftExecD2Z(this->mFPlan.at(i), this->mpDevR.at(i), this->mpDevZI.at(i)));
+      }
+
+      offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = rFFTVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(rFFTVal.data() + offset, this->mpDevZI.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
 
       // Rescale output from FFT
       rFFTVal *= this->mspSetup->scale();
@@ -306,9 +333,30 @@ namespace Transform {
       this->mTmpRIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
-      checkCudaErrors(cudaMemcpy(this->mDevZI, this->mTmpRIn.data(), sizeof(cufftDoubleComplex)*this->mTmpRIn.size(), cudaMemcpyHostToDevice));
-      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZI, this->mDevR));
-      checkCudaErrors(cudaMemcpy(rPhysVal.data(), this->mDevR, sizeof(cufftDoubleReal)*rPhysVal.size(), cudaMemcpyDeviceToHost));
+      int offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = this->mTmpRIn.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), this->mTmpRIn.data() + offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
+
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         checkCudaErrors(cufftExecZ2D(this->mBPlan.at(i), this->mpDevZI.at(i), this->mpDevR.at(i)));
+      }
+
+      offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = rPhysVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(rPhysVal.data() + offset, this->mpDevR.at(i), sizeof(cufftDoubleReal)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
    }
 
    template <Arithmetics::Id TOperation> void CuFftTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, CuFftTransform::IntegratorType::Id integrator)
@@ -328,9 +376,29 @@ namespace Transform {
       assert(rFFTVal.cols() == this->mspSetup->howmany());
 
       // Do transform
-      checkCudaErrors(cudaMemcpy(this->mDevZI, physVal.data(), sizeof(cufftDoubleComplex)*physVal.size(), cudaMemcpyHostToDevice));
-      checkCudaErrors(cufftExecZ2Z(this->mFPlan, this->mDevZI, this->mDevZO, CUFFT_FORWARD));
-      checkCudaErrors(cudaMemcpy(rFFTVal.data(), this->mDevZO, sizeof(cufftDoubleComplex)*rFFTVal.size(), cudaMemcpyDeviceToHost));
+      int offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = physVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), physVal.data() + offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         checkCudaErrors(cufftExecZ2Z(this->mFPlan.at(i), this->mpDevZI.at(i), this->mpDevZO.at(i), CUFFT_FORWARD));
+      }
+
+      offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = rFFTVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(rFFTVal.data() + offset, this->mpDevZO.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
 
       // Rescale output from FFT
       rFFTVal *= this->mspSetup->scale();
@@ -383,9 +451,30 @@ namespace Transform {
       this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
 
       // Do transform
-      checkCudaErrors(cudaMemcpy(this->mDevZI, this->mTmpZIn.data(), sizeof(cufftDoubleComplex)*this->mTmpZIn.size(), cudaMemcpyHostToDevice));
-      checkCudaErrors(cufftExecZ2Z(this->mFPlan, this->mDevZI, this->mDevZO, CUFFT_INVERSE));
-      checkCudaErrors(cudaMemcpy(rPhysVal.data(), this->mDevZO, sizeof(cufftDoubleComplex)*rPhysVal.size(), cudaMemcpyDeviceToHost));
+      int offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = this->mTmpZIn.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), this->mTmpZIn.data()+offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
+
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         checkCudaErrors(cufftExecZ2Z(this->mFPlan.at(i), this->mpDevZI.at(i), this->mpDevZO.at(i), CUFFT_INVERSE));
+      }
+
+      offset = 0;
+      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
+      {
+         int sze = rPhysVal.rows()*this->mStreamBatch.at(i);
+
+         checkCudaErrors(cudaMemcpyAsync(rPhysVal.data()+offset, this->mpDevZO.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
+
+         offset += sze;
+      }
    }
 
 }
