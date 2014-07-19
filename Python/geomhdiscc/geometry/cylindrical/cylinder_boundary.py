@@ -10,6 +10,11 @@ import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.geometry.cylindrical.cylinder_radius_boundary as radbc
 
 
+def no_bc():
+    """Get a no boundary condition flag"""
+
+    return {'r':radbc.no_bc(), 'z':c1dbc.no_bc()}
+
 def qid(n, q, bc):
     """Create a quasi indentity"""
 
@@ -45,12 +50,12 @@ def constrain(mat, nr, nz, m, qr, qz, bc):
     bc_mat = mat
     if bc['r'][0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bcMat = radbc.constrain(bcMat, m, bc['r'], 0)
+        bcMat = radbc.constrain(bcMat, m, bc['r'])
         bc_mat = bc_mat + spsp.kron(bid(nz,sz,bc['z']), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
-        bcMat = c1dbc.constrain(bcMat, bc['z'], 0)
-        bc_mat = bc_mat + spsp.kron(bcMat, qid(nr,sr,bc['x']))
+        bcMat = c1dbc.constrain(bcMat, bc['z'])
+        bc_mat = bc_mat + spsp.kron(bcMat, qid(nr,sr,bc['r']))
 
     return bc_mat

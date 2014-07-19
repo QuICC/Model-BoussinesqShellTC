@@ -129,7 +129,7 @@ def tau_diff2(nx, pos, coeffs = None):
     if pos >= 0:
         cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
-    if pos <= 0:
+    if pos <= 10:
         cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
     return np.array(cond)

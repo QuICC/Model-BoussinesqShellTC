@@ -48,14 +48,14 @@ def zblk(nx, nz, qx, qz, bc):
     return c2dbc.constrain(mat, nx, nz, qx, qz, bc)
 
 def i2j1d0d1(nx, nz, bc, coeff = 1.0):
-    """Create a quasi identity block of order 2,2"""
+    """Create operator for 2nd integral in X and 1st integral of 1st derivative in Z"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,1,bcz), c1d.i2(nx,bcx))
     return c2dbc.constrain(mat, nx, nz, 2, 1, bc)
 
 def i2j2d0d2(nx, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x and 2nd integrazl in z of 2nd derivative"""
+    """Create operator for 2nd integral in X and 2nd integrazl of 2nd derivative in Z"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,2,bcz), c1d.i2(nx,bcx))
@@ -67,7 +67,7 @@ def i2j2d2d2(nx, nz, bc, coeff = 1.0):
     return qid(nx,nz,2,2, bc, coeff)
 
 def i2j0(nx, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x of T_n(x)T_n(z)"""
+    """Create operator for 2nd integral in X of T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.i2(nx,bcx))
@@ -81,7 +81,7 @@ def i2j1(nx, nz, bc, coeff = 1.0):
     return c2dbc.constrain(mat, nx, nz, 2, 1, bc)
 
 def i2j2(nx, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x,z of T_n(x)T_n(z)"""
+    """Create operator for 2nd integral in X,z of T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), c1d.i2(nx,bcx))

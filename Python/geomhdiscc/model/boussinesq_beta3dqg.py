@@ -149,7 +149,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                             bc = {'x':{0:40}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    if field_row == ("streamfunction","") and field_col == ("phi",""):
+                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
                             bc = {'x':{0:0}, 'z':{0:21}}
                     elif field_row == ("phi","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:0}, 'z':{0:0}}
@@ -177,7 +177,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:41}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    if field_row == ("streamfunction","") and field_col == ("phi",""):
+                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
                         bc = {'x':{0:0}, 'z':{0:21}}
                     elif field_row == ("phi","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:0}, 'z':{0:0}}
@@ -188,10 +188,13 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
                     bc['x']['r'] = 4
+                    bc['z']['r'] = 0
                 elif field_row == ("phi",""):
                     bc['x']['r'] = 2
+                    bc['z']['r'] = 0
                 elif field_row == ("temperature",""):
                     bc['x']['r'] = 2
+                    bc['z']['r'] = 0
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:

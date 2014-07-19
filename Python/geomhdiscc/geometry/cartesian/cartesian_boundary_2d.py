@@ -55,6 +55,10 @@ def constrain(mat, nx, nz, qx, qz, bc):
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'])
-        bc_mat = bc_mat + spsp.kron(bcMat, qid(nx,sx,bc['x']))
+        if bc['x'][0] >= 0:
+            bc_mat = bc_mat + spsp.kron(bcMat, qid(nx,sx,bc['x']))
+        else:
+            tmpB = c1dbc.constrain(qid(nx,0,c1dbc.no_bc()),bc['x'])
+            bc_mat = bc_mat + spsp.kron(bcMat, tmpB)
 
     return bc_mat
