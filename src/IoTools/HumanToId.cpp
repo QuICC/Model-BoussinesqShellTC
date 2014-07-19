@@ -177,6 +177,10 @@ namespace IoTools {
       {
          return PhysicalNames::VORTICITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::PHI))
+      {
+         return PhysicalNames::PHI;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::NO_STREAMFUNCTION))
       {
          return PhysicalNames::NO_STREAMFUNCTION;

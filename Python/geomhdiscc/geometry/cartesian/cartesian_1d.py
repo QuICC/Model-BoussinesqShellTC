@@ -27,6 +27,24 @@ def d1(nx, bc, coeff = 1.0):
     mat = coeff*mat
     return c1dbc.constrain(mat, bc)
 
+def d2(nx, bc, coeff = 1.0):
+    """Create operator for 2nd derivative"""
+
+    mat = spsp.lil_matrix((nx,nx))
+    for i in range(0,nx-2):
+        mat[i,i+2:nx:2] = [j*(j**2 - i**2) for j in range(0,nx)][i+2:nx:2]
+    
+    mat = coeff*mat
+    return c1dbc.constrain(mat, bc)
+
+def laplh(nx, k, bc, coeff = 1.0):
+    """Create operator for horizontal laplacian"""
+
+    mat = d2(nx, bc) - k**2*qid(nx,0,bc) 
+
+    mat = coeff*mat
+    return c1dbc.constrain(mat, bc)
+
 def i1d1(nx, bc, coeff = 1.0):
     """Create a quasi identity block of order 1"""
 

@@ -7,14 +7,15 @@ import geomhdiscc.model.boussinesq_beta3dqg as mod
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [25, 0, 25]
-eq_params = {'prandtl':1, 'rayleigh':1707.802388, 'gamma':1.0, 'chi':0.0}
-eigs = [2.2214122]
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+res = [15, 0, 15]
+chi = 1
+eq_params = {'prandtl':1, 'rayleigh':1711.5, 'gamma':1, 'chi':chi}
+eigs = [3.11627]
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

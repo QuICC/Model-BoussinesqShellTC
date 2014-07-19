@@ -14,62 +14,64 @@ def convert_bc(bc):
     """Convert boundary dictionary into x and z kronecker product boundaries"""
 
     if bc['r'][0] < 0:
-        bcx = bc['r']
+        bcr = bc['r']
     else:
-        bcx = rad.radbc.no_bc()
+        bcr = rad.radbc.no_bc()
+        bcr['r'] = bc['r'].get('r',0)
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
         bcz = c1d.c1dbc.no_bc()
+        bcz['r'] = bc['z'].get('r',0)
 
     return (bcr, bcz)
 
-def zblk(nr, nz, m, qr, qz, bc):
+def zblk(nr, nz, m, bc):
     """Create a block of zeros"""
 
     bcr, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.zblk(nz,qz,bcz),rad.zblk(nr,m,qr,bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, qr, qz)
+    mat = spsp.kron(c1d.zblk(nz,bcz),rad.zblk(nr,m,bcr))
+    return cylbc.constrain(mat, nr, nz, m, 0, 0, bc)
 
 def i2j2x2(nr, nz, m, bc, coeff = 1.0):
     """Create a i2x2 radial operator kronecker with an identity"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.j2(nz,2,bcz), rad.i2x2(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, 1, 2)
+    return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
 
 def i2j2x2lapl(nr, nz, m, bc, coeff = 1.0):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,2,bcz), rad.i2x2lapl(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, 1, 2)
+    return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
 
 def i4j4x4(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4 radial operator kronecker with an identity"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,4,bcz), rad.i4x4(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
 def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,4,bcz), rad.i4x4lapl(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
 def i4j4x4lapl2(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,4,bcz), rad.i4x4lapl2(nr, m, bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, 2, 4)
+    return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
 def qid(nr, nz, m, qr, qz, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), rad.qid(nr, m, qr,bcr))
-    return cylbc.constrain(mat, nr, nz, m, bc, qr, qz)
+    return cylbc.constrain(mat, nr, nz, m, qr, qz, bc)

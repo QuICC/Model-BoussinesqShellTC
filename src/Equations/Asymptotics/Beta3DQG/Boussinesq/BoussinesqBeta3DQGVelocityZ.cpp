@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqBeta3DQGVelocityZ.cpp
- * @brief Source of the implementation of the vertical velocity equation in the Beta 3DQG model
+ * @brief Source of the implementation of the vertical velocity computation in the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -11,7 +11,6 @@
 //
 
 // External includes
-//
 
 // Class include
 //
@@ -21,7 +20,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "PhysicalOperators/StreamAdvection.hpp"
+#include "Enums/NonDimensional.hpp"
 #include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -41,31 +40,22 @@ namespace Equations {
 
    void BoussinesqBeta3DQGVelocityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
-   }
-
-   void BoussinesqBeta3DQGVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
-   {
-      // Assert on scalar component is used
-      assert(id == FieldComponents::Physical::SCALAR);
-
-      /// 
-      /// Computation of the jacobian:
-      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
-      ///
-      Physical::StreamAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, false);
    }
 
    void BoussinesqBeta3DQGVelocityZ::setRequirements()
    {
-      // Set vertical velocity as equation unknown
+      // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VELOCITYZ);
 
-      // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
+      // Set vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, true));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
+      this->mRequirements.addField(PhysicalNames::PHI, FieldRequirement(true, true, false, false));
    }
 
 }

@@ -14,24 +14,11 @@ def no_bc():
 
     return {'x':c1dbc.no_bc(), 'z':c1dbc.no_bc()}
 
-def bid(nx, q, bc):
-    """Create a boundary indentity"""
-
-    if bc[0] < 0:
-        mat = spsp.identity(nx-bc['r'])
-    else:
-        offsets = [-q]
-        diags = [[1]*(nx-q)]
-
-        mat = spsp.diags(diags, offsets)
-
-    return mat.tocsr()
-
 def qid(n, q, bc):
     """Create a quasi indentity"""
 
     if bc[0] < 0:
-        mat = spsp.identity(n-bc[0]//10)
+        mat = spsp.eye(n-q, n-(-bc[0])//10)
     else:
         offsets = [0]
         diags = [[0]*q + [1]*(n-q)]
@@ -40,18 +27,34 @@ def qid(n, q, bc):
 
     return mat.tocsr()
 
+def bid(nx, q, bc):
+    """Create a boundary indentity"""
+
+    if bc[0] < 0:
+        mat = spsp.eye(n-q, n-(-bc[0])//10)
+    else:
+        offsets = [-q]
+        diags = [[1]*(nx-q)]
+
+        mat = spsp.diags(diags, offsets)
+
+    return mat.tocsr()
+
 def constrain(mat, nx, nz, qx, qz, bc):
     """Contrain the matrix with the Tau boundary condition"""
 
+    sx = qx
+    sz = 0
+            
     bc_mat = mat
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'])
-        bc_mat = bc_mat + spsp.kron(bid(nz,0,bc['z']), bcMat)
+        bc_mat = bc_mat + spsp.kron(bid(nz,sz,bc['z']), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'])
-        bc_mat = bc_mat + spsp.kron(bcMat, qid(nx,qx,bc['x']))
+        bc_mat = bc_mat + spsp.kron(bcMat, qid(nx,sx,bc['x']))
 
     return bc_mat

@@ -26,12 +26,26 @@ def convert_bc(bc):
 
     return (bcx, bcz)
 
-def zblk(nx, nz, bc):
+def d0d1(nx, nz, bc, coeff = 1.0):
+    """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.d1(nz,bcz), c1d.qid(nx,0,bcx))
+    return c2dbc.constrain(mat, nx, nz, 0, 1, bc)
+
+def laplh(nx, nz, k, bc, coeff = 1.0):
+    """Create operator for the horizontal Laplacian T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.laplh(nx,k,bcx))
+    return c2dbc.constrain(mat, nx, nz, 2, 0, bc)
+
+def zblk(nx, nz, qx, qz, bc):
     """Create a block of zeros"""
 
     bcx, bcz = convert_bc(bc)
     mat = spsp.kron(c1d.zblk(nz,bcz),c1d.zblk(nx,bcx))
-    return c2dbc.constrain(mat, nx, nz, 0, 0, bc)
+    return c2dbc.constrain(mat, nx, nz, qx, qz, bc)
 
 def i2j1d0d1(nx, nz, bc, coeff = 1.0):
     """Create a quasi identity block of order 2,2"""
@@ -74,7 +88,7 @@ def i2j2(nx, nz, bc, coeff = 1.0):
     return c2dbc.constrain(mat, nx, nz, 2, 2, bc)
 
 def i2j0laplh(nx, nz, k, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x and 1st integral in z of of horizontal Laplacian T_n(x)T_n(z)"""
+    """Create operator for 2nd integral in x and 1st integral in z of horizontal Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.i2laplh(nx,k,bcx))
@@ -166,6 +180,13 @@ def i4j1lapl2h(nx, nz, k, bc, coeff = 1.0):
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1(nz,bcz), c1d.i4lapl2h(nx,k,bcx))
     return c2dbc.constrain(mat, nx, nz, 4, 1, bc)
+
+def i4j2lapl2h(nx, nz, k, bc, coeff = 1.0):
+    """Create operator for 4th integral in x and 2nd integral in z of horizontal Laplacian^2 T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i2(nz,bcz), c1d.i4lapl2h(nx,k,bcx))
+    return c2dbc.constrain(mat, nx, nz, 4, 2, bc)
 
 def i4j4lapl2(nx, nz, k, bc, coeff = 1.0):
     """Create operator for 4th integral in x,z of Laplacian^2 T_n(x)T_n(z)"""

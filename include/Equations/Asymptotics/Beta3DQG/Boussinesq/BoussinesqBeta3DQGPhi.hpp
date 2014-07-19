@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqBeta3DQGVelocityZ.hpp
- * @brief Implementation of the vertical velocity computation for the Boussinesq Beta 3DQG model 
+ * @file BoussinesqBeta3DQGPhi.hpp
+ * @brief Implementation of the phi equation (D_z w) for the Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQBETA3DQGVELOCITYZ_HPP
-#define BOUSSINESQBETA3DQGVELOCITYZ_HPP
+#ifndef BOUSSINESQBETA3DQGPHI_HPP
+#define BOUSSINESQBETA3DQGPHI_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the voriticity computation for the Boussinesq Beta 3DQG model
+    * @brief Implementation of the phi equation (D_z w) for the Boussinesq Beta 3DQG model
     */
-   class BoussinesqBeta3DQGVelocityZ: public IScalarEquation
+   class BoussinesqBeta3DQGPhi: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,20 @@ namespace Equations {
           *
           * @param spEqParams Shared equation parameters
           */
-         BoussinesqBeta3DQGVelocityZ(SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGPhi(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqBeta3DQGVelocityZ();
+         virtual ~BoussinesqBeta3DQGPhi();
+
+         /**
+          * @brief Compute the nonlinear interaction term
+          *
+          * @param rNLComp Nonlinear term component
+          * @param id      ID of the component (allows for a more general implementation)
+          */
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
          
       protected:
          /**
@@ -62,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQBETA3DQGVELOCITYZ_HPP
+#endif // BOUSSINESQBETA3DQGPHI_HPP

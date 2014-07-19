@@ -76,6 +76,9 @@ namespace IoTools {
          case PhysicalNames::VORTICITYZ:
             return "VorticityZ";
 
+         case PhysicalNames::PHI:
+            return "Phi";
+
          case PhysicalNames::NO_STREAMFUNCTION:
             return "Non orthogonal streamfunction";
 
@@ -138,6 +141,9 @@ namespace IoTools {
 
          case PhysicalNames::VORTICITYZ:
             return "vorticityz";
+
+         case PhysicalNames::PHI:
+            return "phi";
 
          case PhysicalNames::NO_STREAMFUNCTION:
             return "no_streamfunction";

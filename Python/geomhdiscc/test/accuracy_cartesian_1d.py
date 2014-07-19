@@ -79,6 +79,27 @@ def d1(nx, xg):
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
 
+def d2(nx, xg):
+    """Accuracy test for d2 operator"""
+
+    print("d2:")
+    x = sy.Symbol('x')
+    A = c1d.d2(nx, c1d.c1dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sy.diff(sphys,x,x)
+    test_forward(A, sphys, ssol, xg, 1)
+
+def laplh(nx, xg):
+    """Accuracy test for d1 operator"""
+
+    print("laplh:")
+    x = sy.Symbol('x')
+    k = np.random.ranf()*nx
+    A = c1d.laplh(nx, k, c1d.c1dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sy.diff(sphys,x,x) - k**2*sphys
+    test_forward(A, sphys, ssol, xg, 1)
+
 def i1(nx, xg):
     """Accuracy test for i1 operator"""
 
@@ -315,6 +336,8 @@ if __name__ == "__main__":
     print('Hard coded exact operators')
     #zblk(nx, xg)
     d1(nx, xg)
+    d2(nx, xg)
+    laplh(nx, xg)
     i1(nx, xg)
     i2(nx, xg)
     i2d1(nx, xg)

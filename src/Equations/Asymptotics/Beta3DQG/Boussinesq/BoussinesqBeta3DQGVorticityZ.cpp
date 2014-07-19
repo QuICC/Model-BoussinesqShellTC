@@ -48,6 +48,9 @@ namespace Equations {
       // Set streamfunction as equation unknown
       this->setName(PhysicalNames::VORTICITYZ);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
       // Set vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, true));
 

@@ -61,6 +61,9 @@ namespace GeoMHDiSCC {
          VORTICITY,
          /// Axial vorticity field
          VORTICITYZ,
+
+         /// Phi field (for example phi = D_z w)
+         PHI,
    
          /// Non orthogonal streamfunction field
          NO_STREAMFUNCTION,
