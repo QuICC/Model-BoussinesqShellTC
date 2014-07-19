@@ -34,7 +34,7 @@ namespace Timestep {
    {
       assert(step < ImExSBDF2::STEPS);
 
-      return 3.0;
+      return 3.0/2.0;
    }
 
    MHDFloat ImExSBDF2::lhsL(const int step)
@@ -53,10 +53,10 @@ namespace Timestep {
       MHDFloat coeff;
       if(i == 0)
       {
-         coeff = 4.0;
+         coeff = 2.0;
       } else
       {
-         coeff = -1.0;
+         coeff = -1.0/2.0;
       }
 
       return coeff;
@@ -68,16 +68,7 @@ namespace Timestep {
       assert(i > -1);
       assert(i < ImExSBDF2::FIELD_MEMORY+1);
 
-      MHDFloat coeff;
-      if(i == 0)
-      {
-         coeff = 0.0;
-      } else
-      {
-         coeff = 0.0;
-      }
-
-      return coeff;
+      return 0.0;
    }
 
    MHDFloat ImExSBDF2::rhsN(const int i, const int step)
