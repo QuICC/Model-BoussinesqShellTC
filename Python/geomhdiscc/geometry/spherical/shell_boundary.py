@@ -7,6 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.geometry.spherical.shell_radius_boundary as radbc
+from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
 
 def qid(n, q, bc):
@@ -41,10 +42,10 @@ def constrain(mat, nr, maxl, m, bc):
     bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bc_mat = radbc.constrain(bcMat, bc, 0)
+        bc_mat = radbc.constrain(bcMat, bc)
         for l in range(m+1, maxl+1):
             bcMat = spsp.lil_matrix((nr,nr))
-            bcMat = radbc.constrain(bcMat, bc, 0)
+            bcMat = radbc.constrain(bcMat, bc)
             bc_mat = spsp.block_diag((bc_mat,bcMat))
 
         bc_mat = mat + bc_mat

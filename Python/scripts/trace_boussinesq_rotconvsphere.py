@@ -8,26 +8,36 @@ model.linearize = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 50, 0]
-eq_params = {'ekman':10**(-4.5), 'prandtl':1, 'rayleigh':4.761e6}
-eigs = [1, 9]
-bcs = {'bcType':0, 'velocity':0, 'temperature':0}
+l = 0
+m = 6
+res = [30,m+20, 0]
+eigs = [l, m]
+eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':4.33385e4}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
 
 # Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = 2
+bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Show the "spy" of the two matrices
-import matplotlib.pylab as pl
-pl.spy(A, markersize=0.2)
-pl.show()
-pl.spy(B, markersize=0.2)
-pl.show()
+if False:
+    import matplotlib.pylab as pl
+    pl.spy(A, markersize=0.2)
+    pl.show()
+    pl.spy(B, markersize=0.2)
+    pl.show()
 
 # Export the two matrices to matrix market format
-#import scipy.io as io
-#io.mmwrite("matrix_A.mtx", A)
-#io.mmwrite("matrix_B.mtx", B)
+if True:
+    import scipy.io as io
+    io.mmwrite("matrix_A.mtx", A)
+    io.mmwrite("matrix_B.mtx", B)
+
+# Solve EVP with sptarn
+if True:
+    import geomhdiscc.linear_stability.solver as solver
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
+    print(evp_lmb)

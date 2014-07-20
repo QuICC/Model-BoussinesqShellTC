@@ -17,6 +17,7 @@ def convert_bc(bc):
         bcr = bc
     else:
         bcr = rad.radbc.no_bc()
+        bcr['r'] = bc.get('r',0)
 
     return bcr
 
@@ -32,14 +33,14 @@ def sh_coeff(coeff):
     
     return fct
 
-def zblk(nr, maxl, m, qr, bc):
+def zblk(nr, maxl, m, bc):
     """Create a block of zeros"""
 
     bcr = convert_bc(bc)
 
-    mat = rad.zblk(nr, m, qr, bcr)
+    mat = rad.zblk(nr, m, bcr)
     for l in range(m+1, maxl+1):
-        mat = spsp.block_diag((mat,rad.zblk(nr, l, qr, bcr)))
+        mat = spsp.block_diag((mat,rad.zblk(nr, l, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
@@ -141,6 +142,6 @@ def qid(nr, maxl, m, qr, bc, coeff = 1.0):
 
     mat = coeff*rad.qid(nr, m, bcr)
     for l in range(m+1, maxl+1):
-        mat = spsp.block_diag((mat,coeff*rad.qid(nr, l, bcr)))
+        mat = spsp.block_diag((mat,coeff*rad.qid(nr, l, qr, bcr)))
 
     return sphbc.constrain(mat, nr, maxl, m, bc)

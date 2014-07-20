@@ -17,6 +17,7 @@ def convert_bc(bc):
         bcr = bc
     else:
         bcr = rad.radbc.no_bc()
+        bcr['r'] = bc.get('r',0)
 
     return bcr
 
@@ -32,13 +33,13 @@ def sh_coeff(coeff):
     
     return fct
 
-def zblk(nr, maxl, m, qr, bc):
+def zblk(nr, maxl, m, bc):
     """Create a block of zeros"""
 
     bcr = convert_bc(bc)
 
     nl = maxl + 1 - m
-    mat = spsp.kron(rad.zblk(nl,0,[0]),rad.zblk(nr,qr,bcr))
+    mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr))
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
 def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
@@ -137,5 +138,5 @@ def qid(nr, maxl, m, qr, bc, coeff = 1.0):
     bcr = convert_bc(bc)
 
     nl = maxl + 1 - m
-    mat = coeff*spsp.kron(rad.qid(nl,0,[0]), rad.qid(nr,qr,bcr))
+    mat = coeff*spsp.kron(rad.qid(nl,0,rad.radbc.no_bc()), rad.qid(nr,qr,bcr))
     return sphbc.constrain(mat, nr, maxl, m, bc)
