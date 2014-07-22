@@ -230,13 +230,21 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         else:
             bc = no_bc()
 
-        if field_col == ("phi","") or field_col == ("temperature",""):
+        if field_col == ("phi",""):
             bc['x']['cr'] = 2
-        if field_row == ("phi","") or field_row == ("temperature",""):
+        if field_row == ("phi",""):
             bc['x']['rb'] = 2
-        if field_col == ("streamfunction","") or field_col == ("temperature",""):
+        if field_col == ("temperature",""):
+            bc['x']['cr'] = 2
+        if field_row == ("temperature",""):
+            bc['x']['rb'] = 2
+        if field_col == ("streamfunction",""):
             bc['z']['cr'] = 2
-        if field_row == ("streamfunction","") or field_row == ("temperature",""):
+        if field_row == ("streamfunction",""):
+            bc['z']['rb'] = 2
+        if field_col == ("temperature",""):
+            bc['z']['cr'] = 2
+        if field_row == ("temperature",""):
             bc['z']['rb'] = 2
         if field_col == ("phi",""):
             bc['z']['cl'] = 1

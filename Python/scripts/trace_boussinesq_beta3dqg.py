@@ -12,7 +12,7 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-chi = 0
+chi = 1
 eq_params = {'prandtl':1, 'rayleigh':1711.5, 'gamma':1, 'chi':chi}
 eigs = [3.11627]
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0}
@@ -39,7 +39,7 @@ if True:
     io.mmwrite("matrix_B.mtx", B)
 
 # Solve EVP with sptarn
-if True:
+if False:
     import geomhdiscc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
     print(evp_lmb)
