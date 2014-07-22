@@ -12,7 +12,7 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-chi = 1
+chi = 0
 eq_params = {'prandtl':1, 'rayleigh':1711.5, 'gamma':1, 'chi':chi}
 eigs = [3.11627]
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0}

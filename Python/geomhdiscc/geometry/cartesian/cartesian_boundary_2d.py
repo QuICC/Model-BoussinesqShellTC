@@ -25,7 +25,12 @@ def qid(n, q, bc):
 
         mat = spsp.diags(diags, offsets)
 
-    return mat.tocsr()
+    tbc = c1dbc.no_bc()
+    tbc['cr'] = bc.get('cr', 0)
+    tbc['rb'] = bc.get('rb', 0)
+    tbc['cl'] = bc.get('cl', 0)
+    tbc['rt'] = bc.get('rt', 0)
+    return c1dbc.constrain(mat, tbc)
 
 def bid(nx, q, bc):
     """Create a boundary indentity"""
@@ -38,7 +43,12 @@ def bid(nx, q, bc):
 
         mat = spsp.diags(diags, offsets)
 
-    return mat.tocsr()
+    tbc = c1dbc.no_bc()
+    tbc['cr'] = bc.get('cr', 0)
+    tbc['rb'] = bc.get('rb', 0)
+    tbc['cl'] = bc.get('cl', 0)
+    tbc['rt'] = bc.get('rt', 0)
+    return c1dbc.constrain(mat, tbc)
 
 def constrain(mat, nx, nz, qx, qz, bc):
     """Contrain the matrix with the Tau boundary condition"""

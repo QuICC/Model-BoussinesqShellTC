@@ -16,13 +16,19 @@ def convert_bc(bc):
         bcx = bc['x']
     else:
         bcx = c1d.c1dbc.no_bc()
-        bcx['r'] = bc['x'].get('r',0)
+        bcx['rt'] = bc['x'].get('rt',0)
+        bcx['rb'] = bc['x'].get('rb',0)
+        bcx['cl'] = bc['x'].get('cl',0)
+        bcx['cr'] = bc['x'].get('cr',0)
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
         bcz = c1d.c1dbc.no_bc()
-        bcz['r'] = bc['z'].get('r',0)
+        bcz['rt'] = bc['z'].get('rt',0)
+        bcz['rb'] = bc['z'].get('rb',0)
+        bcz['cl'] = bc['z'].get('cl',0)
+        bcz['cr'] = bc['z'].get('cr',0)
 
     return (bcx, bcz)
 

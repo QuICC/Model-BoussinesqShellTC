@@ -379,7 +379,7 @@ def qid(nx, q, bc, coeff = 1.0):
 def stencil(nx, bc):
     """Create a galerkin stencil matrix"""
 
-    bc['r'] = 0
+    bc['rt'] = 0
     return c1dbc.stencil(nx, bc)
 
 def avg(nx):

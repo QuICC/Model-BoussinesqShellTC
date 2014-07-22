@@ -131,20 +131,20 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-40, 'r':0}, 'z':{0:0}}
+                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-40, 'r':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
+                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
                     elif field_row == ("streamfunction","") and field_col == ("phi",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-20}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-20}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
-                        bc = {'x':{0:-40, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("phi",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
 
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
@@ -162,18 +162,18 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-41, 'r':0}, 'z':{0:0}}
+                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-41, 'r':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
+                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
                     elif field_row == ("streamfunction","") and field_col == ("phi",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-21}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-21}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
-                        bc = {'x':{0:-41, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("phi",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:41}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
@@ -187,14 +187,14 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
-                    bc['x']['r'] = 4
-                    bc['z']['r'] = 0
+                    bc['x']['rt'] = 4
+                    bc['z']['rt'] = 0
                 elif field_row == ("phi",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 0
+                    bc['x']['rt'] = 2
+                    bc['z']['rt'] = 0
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 0
+                    bc['x']['rt'] = 2
+                    bc['z']['rt'] = 0
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -202,33 +202,46 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-40, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("phi",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
 
                 elif bcId == 1:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-41, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("phi",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
-                    bc['x']['r'] = 4
+                    bc['x']['rt'] = 4
                 elif field_row == ("phi",""):
-                    bc['x']['r'] = 2
+                    bc['x']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
+                    bc['x']['rt'] = 2
 
         else:
             bc = no_bc()
+
+        if field_col == ("phi","") or field_col == ("temperature",""):
+            bc['x']['cr'] = 2
+        if field_row == ("phi","") or field_row == ("temperature",""):
+            bc['x']['rb'] = 2
+        if field_col == ("streamfunction","") or field_col == ("temperature",""):
+            bc['z']['cr'] = 2
+        if field_row == ("streamfunction","") or field_row == ("temperature",""):
+            bc['z']['rb'] = 2
+        if field_col == ("phi",""):
+            bc['z']['cl'] = 1
+        if field_row == ("phi",""):
+            bc['z']['rt'] = 1
 
         return bc
 

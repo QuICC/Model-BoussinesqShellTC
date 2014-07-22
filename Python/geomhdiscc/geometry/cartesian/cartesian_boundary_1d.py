@@ -25,10 +25,21 @@ def constrain(mat, bc):
     else:
         bc_mat = mat
 
-    # Restrict if required
-    if bc.get('r', 0) > 0:
-        assert bc[0] <= 0
-        bc_mat = stencil_eye(mat.shape[0], bc['r'])*bc_mat
+    # Top row(s) restriction if required
+    if bc.get('rt', 0) > 0:
+        bc_mat = restrict_eye(bc_mat.shape[0], 'rt', bc['rt'])*bc_mat
+
+    # Bottom row(s) restriction if required
+    if bc.get('rb', 0) > 0:
+        bc_mat = restrict_eye(bc_mat.shape[0], 'rb', bc['rb'])*bc_mat
+
+    # Left columns restriction if required
+    if bc.get('cl', 0) > 0:
+        bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cl', bc['cl'])
+
+    # Right columns restriction if required
+    if bc.get('cr', 0) > 0:
+        bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cr', bc['cr'])
 
     return bc_mat
 
@@ -206,13 +217,31 @@ def apply_galerkin(mat, bc):
     nx = mat.shape[0]
     return mat*stencil(nx, bc)
 
-def stencil_eye(nx, q):
-    """Create the restriction identity to resize matrix after stencil use"""
+def restrict_eye(nx, t, q):
+    """Create the non-square identity to restrict matrix"""
 
-    offsets = [q]
-    diags = [[1]*(nx-q)]
+    if t == 'rt':
+        offsets = [q]
+        diags = [[1]*(nx-q)]
+        nrows = nx - q
+        ncols = nx
+    elif t == 'rb':
+        offsets = [0]
+        diags = [[1]*(nx-q)]
+        nrows = nx - q
+        ncols = nx
+    elif t == 'cl':
+        offsets = [-q]
+        diags = [[1]*(nx-q)]
+        nrows = nx
+        ncols = nx - q
+    elif t == 'cr':
+        offsets = [0]
+        diags = [[1]*(nx-q)]
+        nrows = nx
+        ncols = nx - q
 
-    return spsp.diags(diags, offsets, (nx-q, nx))
+    return spsp.diags(diags, offsets, (nrows, ncols))
 
 def stencil_value(nx, pos):
     """Create stencil matrix for a zero boundary value"""
