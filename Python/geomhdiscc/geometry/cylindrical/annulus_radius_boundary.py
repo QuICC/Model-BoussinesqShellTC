@@ -43,6 +43,10 @@ def apply_tau(mat, bc):
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 21:
         cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+    elif bc[0] == 22:
+        cond = tau_diff2(mat.shape[0], 0, bc.get('c',None))
+    elif bc[0] == 23:
+        cond = tau_1rdr(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -107,6 +111,13 @@ def tau_diff2(nr, pos, coeffs = None):
         cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
 
     return np.array(cond)
+
+def tau_1rdr(nr, pos, coeffs = None):
+    """Create the 1/r D_r tau line(s)"""
+
+    cond = tau_value(nr, pos, coeffs) + tau_diff(nr, pos, coeffs)
+
+    return cond
 
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""

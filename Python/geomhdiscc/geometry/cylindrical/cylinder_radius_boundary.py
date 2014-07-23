@@ -35,6 +35,8 @@ def apply_tau(mat, m, bc):
         cond = tau_value(mat.shape[0], m%2, bc.get('c',None))
     elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], m%2, bc.get('c',None))
+    elif bc[0] == 13:
+        cond = tau_1rdr(mat.shape[0], m%2, bc.get('c',None))
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -83,6 +85,13 @@ def tau_diff2(nr, parity, coeffs = None):
     cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(parity, 2*nr, 2)])
 
     return np.array(cond)
+
+def tau_1rdr(nr, parity, coeffs = None):
+    """Create the 1/r D_r tau line(s)"""
+
+    cond = tau_value(nr, parity, coeffs) + tau_diff(nr, parity, coeffs)
+
+    return cond
 
 def apply_galerkin(mat, m, bc):
     """Apply a Galerkin stencil on the matrix"""

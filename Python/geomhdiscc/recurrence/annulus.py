@@ -120,8 +120,23 @@ def i2x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2lapl():
-    """Cylindrical annulus second integral of x^2 laplacian operator"""
+def i2x2div():
+    """Cylindrical annulus second integral of x^2 radial divergence operator"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':2, 'p':2, 'd':1, 'c':1}, {'q':2, 'p':1, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x2laplh():
+    """Cylindrical annulus second integral of x^2 horizontal laplacian operator"""
 
     # Setup terms in recurrence
     m = sympy.Symbol('m')
@@ -149,8 +164,8 @@ def i4x4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl():
-    """Cylindrical annulus fourth integral of x^4 laplacian operator"""
+def i4x4laplh():
+    """Cylindrical annulus fourth integral of x^4 horizontal laplacian operator"""
 
     # Setup terms in recurrence
     m = sympy.Symbol('m')
@@ -164,8 +179,8 @@ def i4x4lapl():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i4x4lapl2():
-    """Cylindrical annulus fourth integral of x^4 bilaplacian operator"""
+def i4x4lapl2h():
+    """Cylindrical annulus fourth integral of x^4 horizontal bilaplacian operator"""
 
     # Setup terms in recurrence
     m = sympy.Symbol('m')

@@ -24,7 +24,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Show the "spy" of the two matrices
-if True:
+if False:
     import matplotlib.pylab as pl
     pl.spy(A, markersize=0.2)
     pl.show()

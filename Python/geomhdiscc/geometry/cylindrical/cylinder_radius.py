@@ -251,7 +251,7 @@ def i2x2(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, m, bc)
 
-def i2x2lapl(nr, m, bc, coeff = 1.0):
+def i2x2laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
 
     parity = m%2
@@ -327,7 +327,7 @@ def i4x4(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, m, bc)
 
-def i4x4lapl(nr, m, bc, coeff = 1.0):
+def i4x4laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
 
     parity = m%2
@@ -369,7 +369,7 @@ def i4x4lapl(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, m, bc)
 
-def i4x4lapl2(nr, m, bc, coeff = 1.0):
+def i4x4lapl2h(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
 
     parity = m%2

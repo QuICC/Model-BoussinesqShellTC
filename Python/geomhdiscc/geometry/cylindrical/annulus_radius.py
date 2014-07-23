@@ -295,7 +295,48 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
-def i2x2lapl(nr, m, a, b, bc, coeff = 1.0):
+def i2x2div(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^2 radial divergence T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-3,4)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*(n - 2.0)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b*(2.0*n - 3.0)/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*(a**2*n + 2.0*a**2 + 4.0*b**2*n + 4.0*b**2)/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return a**2*b/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a*(a**2*n - 2.0*a**2 + 4.0*b**2*n - 4.0*b**2)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(2.0*n + 3.0)/(4.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -a**3*(n + 2.0)/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2x2laplh(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
 
     ns = np.arange(0, nr)
@@ -409,7 +450,7 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
-def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
+def i4x4laplh(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
 
     ns = np.arange(0, nr)
@@ -474,7 +515,7 @@ def i4x4lapl(nr, m, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
-def i4x4lapl2(nr, m, a, b, bc, coeff = 1.0):
+def i4x4lapl2h(nr, m, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
 
     ns = np.arange(0, nr)

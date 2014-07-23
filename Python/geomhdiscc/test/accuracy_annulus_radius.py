@@ -156,14 +156,28 @@ def i2x2(nr, ms, a, b, rg):
         ssol = sy.integrate(ssol,x,x)
         test_forward(A, sphys, ssol, rg, 2)
 
-def i2x2lapl(nr, ms, a, b, rg):
-    """Accuracy test for zblk operator"""
+def i2x2div(nr, ms, a, b, rg):
+    """Accuracy test for i2x2div operator"""
 
-    print("i2x2lapl:")
+    print("i2x2div:")
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = annulus.i2x2lapl(nr, m, a, b, annulus.radbc.no_bc())
+        A = annulus.i2x2div(nr, a, b, annulus.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+        ssol = sy.expand(x*sphys)
+        ssol = sy.expand(x*sy.diff(ssol,x))
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, sphys, ssol, rg, 2)
+
+def i2x2laplh(nr, ms, a, b, rg):
+    """Accuracy test for i2x2laplh operator"""
+
+    print("i2x2laplh:")
+    x = sy.Symbol('x')
+    for m in ms:
+        print("\tTest for m = " + str(m))
+        A = annulus.i2x2laplh(nr, m, a, b, annulus.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**2*sy.diff(sphys,x,x) + x*sy.diff(sphys,x) - m**2*sphys)
         ssol = sy.integrate(ssol,x,x)
@@ -182,27 +196,27 @@ def i4x4(nr, ms, a, b, rg):
         ssol = sy.integrate(ssol,x,x,x,x)
         test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4lapl(nr, ms, a, b, rg):
-    """Accuracy test for i4x4lapl operator"""
+def i4x4laplh(nr, ms, a, b, rg):
+    """Accuracy test for i4x4laplh operator"""
 
-    print("i4x4lapl:")
+    print("i4x4laplh:")
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = annulus.i4x4lapl(nr, m, a, b, annulus.radbc.no_bc())
+        A = annulus.i4x4laplh(nr, m, a, b, annulus.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x) + x**3*sy.diff(sphys,x) - m**2*x**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
         test_forward(A, sphys, ssol, rg, 4)
 
-def i4x4lapl2(nr, ms, a, b, rg):
-    """Accuracy test for i4x4lapl2 operator"""
+def i4x4lapl2h(nr, ms, a, b, rg):
+    """Accuracy test for i4x4lapl2h operator"""
 
-    print("i4x4lapl2:")
+    print("i4x4lapl2h:")
     x = sy.Symbol('x')
     for m in ms:
         print("\tTest for m = " + str(m))
-        A = annulus.i4x4lapl2(nr, m, a, b, annulus.radbc.no_bc())
+        A = annulus.i4x4lapl2h(nr, m, a, b, annulus.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
         ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
         ssol = sy.integrate(ssol,x,x,x,x)
@@ -238,8 +252,9 @@ if __name__ == "__main__":
     i2x2(nr, ms, a, b, rg)
     i2x2d2(nr, ms, a, b, rg)
     i2x2d1(nr, ms, a, b, rg)
-    i2x2lapl(nr, ms, a, b, rg)
+    i2x2div(nr, ms, a, b, rg)
+    i2x2laplh(nr, ms, a, b, rg)
     i4x4(nr, ms, a, b, rg)
-    i4x4lapl(nr, ms, a, b, rg)
-    i4x4lapl2(nr, ms, a, b, rg)
+    i4x4laplh(nr, ms, a, b, rg)
+    i4x4lapl2h(nr, ms, a, b, rg)
     qid(nr, a, b, rg)

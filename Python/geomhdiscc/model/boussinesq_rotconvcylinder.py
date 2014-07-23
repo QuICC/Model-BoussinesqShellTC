@@ -135,7 +135,7 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:11}, 'z':{0:20}}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:11}, 'z':{0:0}}
+                        bc = {'r':{0:13}, 'z':{0:0}}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
                         bc = {'r':{0:0}, 'z':{0:21}}
             
@@ -271,7 +271,7 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = cylinder.i2j2x1(res[0], res[2], m, bc, -1j*m*Ta**0.5)
+                mat = cylinder.i2j2x2div(res[0], res[2], m, bc, -1j*m*Ta**0.5)
 
             elif field_col == ("velocityy",""):
                 mat = cylinder.i2j2x2d1(res[0], res[2], m, bc, Ta**0.5)
