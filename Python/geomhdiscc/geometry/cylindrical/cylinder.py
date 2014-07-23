@@ -72,8 +72,10 @@ def i2j2x2e1(nr, nz, m, bc, coeff = 1.0):
 def i2j2x2lapl(nr, nz, m, bc, coeff = 1.0):
     """Create a i2x2lapl in R kronecker with i2 in Z"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2lapl(nr, m, bcr))
+    mat = mat + coeff*spsp.kron(c1d.i2d2(nz,bcz), rad.i2x2(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
 
 def i4j4x4(nr, nz, m, bc, coeff = 1.0):
@@ -86,6 +88,7 @@ def i4j4x4(nr, nz, m, bc, coeff = 1.0):
 def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl in R kronecker with an i4 in Z"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), rad.i4x4lapl(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
@@ -93,6 +96,7 @@ def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0):
 def i4j4x4lapl2(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl2 in R kronecker with an i4 in Z"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), rad.i4x4lapl2(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)

@@ -93,8 +93,10 @@ def i2j2x2e1(nr, nz, a, b, bc, coeff = 1.0, zscale = 1.0):
 def i2j2x2lapl(nr, nz, m, a, b, bc, coeff = 1.0):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2lapl(nr, m, a, b, bcr))
+    mat = mat + coeff*spsp.kron(c1d.i2d2(nz,bcz), rad.i2x2(nr, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 
 def i4j4x4(nr, nz, m, a, b, bc, coeff = 1.0):
@@ -107,6 +109,7 @@ def i4j4x4(nr, nz, m, a, b, bc, coeff = 1.0):
 def i4j4x4lapl(nr, nz, m, a, b, bc, coeff = 1.0):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), rad.i4x4lapl(nr, m, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 4, 4, bc)
@@ -114,6 +117,7 @@ def i4j4x4lapl(nr, nz, m, a, b, bc, coeff = 1.0):
 def i4j4x4lapl2(nr, nz, m, a, b, bc, coeff = 1.0):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
+    print("NOT RIGHT")
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), rad.i4x4lapl2(nr, m, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 4, 4, bc)

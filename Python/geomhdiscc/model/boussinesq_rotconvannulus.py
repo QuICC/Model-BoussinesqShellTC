@@ -274,10 +274,10 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = annulus.i2j2x1(res[0], res[2], 2, 2, bc, -1j*m*Ta**0.5)
+                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m*Ta**0.5)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i2j2x2d1(res[0], res[2], 2, 2, bc, Ta**0.5)
+                mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
@@ -286,7 +286,7 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, -1.0)
 
             elif field_col == ("temperature",""):
-                mat = annulus.i2j2x2e1(res[0], res[2], 2, 2, bc, 2.0*Ra)
+                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, 2.0*Ra)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
