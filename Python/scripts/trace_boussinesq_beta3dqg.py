@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_beta3dqg as mod
+import geomhdiscc.model.boussinesq_beta3dqg2 as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
@@ -15,7 +15,7 @@ res = [20, 0, 20]
 chi = 1
 eq_params = {'prandtl':1, 'rayleigh':1711.5, 'gamma':1, 'chi':chi}
 eigs = [3.11627]
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0, 'velocityz':0, 'lambda':0, 'chi':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

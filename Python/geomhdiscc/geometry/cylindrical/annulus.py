@@ -48,7 +48,7 @@ def i1j1x1d1(nr, nz, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i1(nz,bcz), rad.i1x1d1(nr, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 
-def i1j1x1e1(nr, nz, a, b, bc, coeff = 1.0):
+def i1j1x1e1(nr, nz, a, b, bc, coeff = 1.0, zscale = 1.0):
     """Create a i1x1 in R kronecker with an i1d1 in Z"""
 
     bcr, bcz = convert_bc(bc)
@@ -83,7 +83,7 @@ def i2j2x2d1(nr, nz, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2d1(nr, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 
-def i2j2x2e1(nr, nz, a, b, bc, coeff = 1.0):
+def i2j2x2e1(nr, nz, a, b, bc, coeff = 1.0, zscale = 1.0):
     """Create a i2x2 in R kronecker with an i2d1 in Z"""
 
     bcr, bcz = convert_bc(bc)

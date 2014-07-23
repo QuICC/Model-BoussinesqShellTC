@@ -28,20 +28,20 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["streamfunction", "phi", "temperature"]
+        return ["streamfunction", "velocityz", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields = [("streamfunction",""), ("phi",""), ("temperature","")]
+        fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("lambda",""), ("chi","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("streamfunction","") or field_row == ("phi","") or field_row == ("temperature",""):
-            fields = [("streamfunction",""), ("phi",""), ("temperature","")]
+        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("lambda","") or field_row == ("chi",""):
+            fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("lambda",""), ("chi","")]
         else:
             fields = []
 
@@ -53,7 +53,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         if field_row == ("vorticityz",""):
             fields = [("streamfunction", "")]
         elif field_row == ("velocityz",""):
-            fields = [("phi", "")]
+            fields = [("velocityz", "")]
         else:
             fields = []
 
@@ -64,7 +64,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         tau_n = res[0]*res[2]
         if self.use_galerkin:
-            if field_row == ("temperature","") or field_row == ("phi",""):
+            if field_row == ("temperature","") or field_row == ("velocityz",""):
                 shift_x = 2
                 shift_z = 0
             elif field_row == ("streamfunction",""):
@@ -134,29 +134,29 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                             bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-40, 'rt':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
+                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-20}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-20}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
                         bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("phi",""):
+                    elif field_col == ("velocityz",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
 
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                            bc = {'x':{0:40}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
-                            bc = {'x':{0:0}, 'z':{0:21}}
-                    elif field_row == ("phi","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:0}, 'z':{0:0}}
-                    elif field_row == ("phi","") and field_col == ("phi",""):
+                        bc = {'x':{0:40}, 'z':{0:0}}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:20}, 'z':{0:0}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:0}}
+                    elif field_row == ("streamfunction","") and field_col == ("lambda",""):
+                        bc = {'x':{0:0}, 'z':{0:10}}
+                    elif field_row == ("velocityz","") and field_col == ("chi",""):
+                        bc = {'x':{0:0}, 'z':{0:11}}
 
             elif bcId == 1:
                 if self.use_galerkin:
@@ -165,23 +165,23 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                             bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-41, 'rt':0}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
+                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-21}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-21}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
                         bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("phi",""):
+                    elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:41}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
-                    elif field_row == ("streamfunction","") and field_col == ("phi",""):
+                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         bc = {'x':{0:0}, 'z':{0:21}}
-                    elif field_row == ("phi","") and field_col == ("streamfunction",""):
+                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:0}, 'z':{0:0}}
-                    elif field_row == ("phi","") and field_col == ("phi",""):
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:21}, 'z':{0:0}}
             
             # Set LHS galerkin restriction
@@ -189,7 +189,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 if field_row == ("streamfunction",""):
                     bc['x']['rt'] = 4
                     bc['z']['rt'] = 0
-                elif field_row == ("phi",""):
+                elif field_row == ("velocityz",""):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 0
                 elif field_row == ("temperature",""):
@@ -203,7 +203,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 if bcId == 0:
                     if field_col == ("streamfunction",""):
                         bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("phi",""):
+                    elif field_col == ("velocityz",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
@@ -211,7 +211,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 elif bcId == 1:
                     if field_col == ("streamfunction",""):
                         bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("phi",""):
+                    elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
@@ -222,34 +222,13 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
                     bc['x']['rt'] = 4
-                elif field_row == ("phi",""):
+                elif field_row == ("velocityz",""):
                     bc['x']['rt'] = 2
                 elif field_row == ("temperature",""):
                     bc['x']['rt'] = 2
 
         else:
             bc = no_bc()
-
-#        if field_col == ("phi",""):
-#            bc['x']['cr'] = 2
-#        if field_row == ("phi",""):
-#            bc['x']['rb'] = 2
-#        if field_col == ("temperature",""):
-#            bc['x']['cr'] = 2
-#        if field_row == ("temperature",""):
-#            bc['x']['rb'] = 2
-#        if field_col == ("streamfunction",""):
-#            bc['z']['cr'] = 1
-#        if field_row == ("streamfunction",""):
-#            bc['z']['rb'] = 1
-#        if field_col == ("temperature",""):
-#            bc['z']['cr'] = 2
-#        if field_row == ("temperature",""):
-#            bc['z']['rb'] = 2
-#        if field_col == ("phi",""):
-#            bc['z']['cl'] = 1
-#        if field_row == ("phi",""):
-#            bc['z']['rt'] = 1
 
         return bc
 
@@ -267,7 +246,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         if field_row == ("streamfunction",""):
             mat = c2d.i4j2(res[0],res[2], bc)
 
-        elif field_row == ("phi",""):
+        elif field_row == ("velocityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
@@ -281,28 +260,41 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
+        tanchi = np.tan(eq_params['chi']*np.pi/180)
         k = eigs[0]/2
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i4j2lapl2h(res[0],res[2], k, bc)
+                mat = c2d.i4j1lapl2h(res[0],res[2], k, bc)
 
-            elif field_col == ("phi",""):
-                mat = c2d.i4j2d0d2(res[0],res[2], bc)
+            elif field_col == ("velocityz",""):
+                mat = c2d.i4j1d0d1(res[0],res[2], bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i4j2(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+                mat = c2d.i4j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
 
-        elif field_row == ("phi",""):
+            elif field_col == ("lambda",""):
+                mat = c2d.zblk(res[0],res[2], 4, 1, bc)
+
+            elif field_col == ("chi",""):
+                mat = c2d.zblk(res[0],res[2], 4, 1, bc)
+
+        elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j0(res[0],res[2], bc, (-1/G**2))
+                mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1/G**2))
 
-            elif field_col == ("phi",""):
-                mat = c2d.i2j0laplh(res[0],res[2],k, bc)
+            elif field_col == ("velocityz",""):
+                mat = c2d.i2j1laplh(res[0],res[2],k, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+
+            elif field_col == ("lambda",""):
+                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+
+            elif field_col == ("chi",""):
+                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -311,19 +303,53 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 else:
                     mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
-            elif field_col == ("phi",""):
+            elif field_col == ("velocityz",""):
                 mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
 
+            elif field_col == ("lambda",""):
+                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+
+            elif field_col == ("chi",""):
+                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+
+        elif field_row == ("lambda",""):
+            if field_col == ("streamfunction",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc, -1j*k*tanchi/G)
+
+            elif field_col == ("velocityz",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc)
+
+            elif field_col == ("temperature",""):
+                mat = c2d.zblk(res[0],res[2], 0, 0, bc)
+
+            elif field_col == ("lambda",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc, -1.0)
+
+            elif field_col == ("chi",""):
+                mat = c2d.zblk(res[0],res[2], 0, 0, bc)
+
+        elif field_row == ("chi",""):
+            if field_col == ("streamfunction",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc, 1j*k*tanchi/G)
+
+            elif field_col == ("velocityz",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc)
+
+            elif field_col == ("temperature",""):
+                mat = c2d.zblk(res[0],res[2], 0, 0, bc)
+
+            elif field_col == ("lambda",""):
+                mat = c2d.zblk(res[0],res[2], 0, 0, bc)
+
+            elif field_col == ("chi",""):
+                mat = c2d.qid(res[0],res[2], 0, 0, bc, -1.0)
+
         elif field_row == ("vorticityz",""):
             if field_col == ("streamfunction",""):
                 mat = c2d.laplh(res[0],res[2], k, bc, -1.0)
-
-        elif field_row == ("velocityz",""):
-            if field_col == ("phi",""):
-                mat = c2d.d0d1(res[0],res[2], bc, -1.0)
 
         return mat
 
@@ -334,12 +360,18 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i4j2laplh(res[0],res[2], k, bc)
+            mat = c2d.i4j1laplh(res[0],res[2], k, bc)
 
-        elif field_row == ("phi",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+        elif field_row == ("velocityz",""):
+            mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j0(res[0],res[2], bc)
+
+        elif field_row == ("lambda",""):
+            mat = c2d.zblk(res[0],res[2], 0, 0, bc)
+
+        elif field_row == ("chi",""):
+            mat = c2d.zblk(res[0],res[2], 0, 0, bc)
 
         return mat
