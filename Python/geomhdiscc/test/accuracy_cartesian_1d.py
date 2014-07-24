@@ -7,10 +7,21 @@ import numpy as np
 import sympy as sy
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
+import matplotlib.pylab as pl
+
 import geomhdiscc.transform.cartesian as transf
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cartesian.cartesian_generic_1d as cg1d
 
+
+def vis_error(err, title):
+    """Visualize the error"""
+
+    if np.max(err) > 10*np.spacing(1):
+        print(err)
+        pl.semilogy(np.abs(err))
+        pl.title(title)
+        pl.show()
 
 def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
@@ -29,8 +40,7 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     t = x_to_phys(sol_expr,grid)
     sol = transf.tocheb(t)
     err = np.abs(rhs - sol)
-    if np.max(err[q:]) > 10*np.spacing(1):
-        print(err)
+    vis_error(err, 'Forward error')
     print("\t\tMax forward error: " + str(np.max(err[q:])))
 
 def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
@@ -42,8 +52,7 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.tocheb(x_to_phys(sol_expr,grid))
     err = np.abs(lhs - sol)
-    if np.max(err) > 10*np.spacing(1):
-        print(err)
+    vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
 
 def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
@@ -55,8 +64,7 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.tocheb(x_to_phys(sol_expr,grid))
     err = np.abs(opS*lhs - sol)
-    if np.max(err) > 10*np.spacing(1):
-        print(err)
+    vis_error(err, 'Galerkin backward error')
     print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
 def zblk(nx, xg):
@@ -134,7 +142,7 @@ def i2d2(nx, xg):
     print("\tbc = 20")
     A = c1d.i2d2(nx, {0:20}).tocsr()
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.diff(ssol,x,x)
     test_backward_tau(A, B, sphys, ssol, xg)
 
@@ -143,9 +151,9 @@ def i2d2(nx, xg):
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tolil()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.diff(ssol,x,x)
-    test_backward_galerkin(A, B, S, sphys, ssol, xg)
+    #test_backward_galerkin(A, B, S, sphys, ssol, xg)
 
 def i2d1(nx, xg):
     """Accuracy test for i2d1 operator"""
@@ -172,7 +180,7 @@ def i2lapl(nx, xg):
     print("\tbc = 20")
     A = c1d.i2lapl(nx, k, l, {0:20}).tocsr()
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
@@ -181,9 +189,9 @@ def i2lapl(nx, xg):
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
-    test_backward_galerkin(A, B, S, sphys, ssol, xg)
+    #test_backward_galerkin(A, B, S, sphys, ssol, xg)
 
 def i2laplh(nx, xg):
     """Accuracy test for i2laplh operator"""
@@ -200,7 +208,7 @@ def i2laplh(nx, xg):
     print("\tbc = 20")
     A = c1d.i2laplh(nx, k, {0:20}).tocsr()
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg)
 
@@ -209,9 +217,9 @@ def i2laplh(nx, xg):
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
     B = B[2:,:]
     S = c1d.c1dbc.stencil(nx, {0:-20})
-    ssol = np.sum([np.random.ranf()*((1.0+x)*(1.0-x))**i for i in np.arange(1,nx//2,1)])
+    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
-    test_backward_galerkin(A, B, S, sphys, ssol, xg)
+    #test_backward_galerkin(A, B, S, sphys, ssol, xg)
 
 def i4(nx, xg):
     """Accuracy test for i4 operator"""
@@ -257,6 +265,14 @@ def i4lapl(nx, xg):
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
 
+    print("\tbc = 40")
+    k, l = np.random.rand(2)*nx
+    A = c1d.i4lapl(nx, k, l, {0:40}).tocsr()
+    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+    ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
+    test_backward_tau(A, B, sphys, ssol, xg)
+
 def i4laplh(nx, xg):
     """Accuracy test for i4laplh operator"""
 
@@ -268,6 +284,14 @@ def i4laplh(nx, xg):
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
+
+    print("\tbc = 40")
+    k = np.random.ranf()*nx
+    A = c1d.i4laplh(nx, k, {0:40}).tocsr()
+    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+    ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
+    test_backward_tau(A, B, sphys, ssol, xg)
 
 def i4lapl2(nx, xg):
     """Accuracy test for i4lapl2 operator"""
@@ -281,6 +305,64 @@ def i4lapl2(nx, xg):
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
 
+    print("\tbc = 40 (1)")
+    k, l = np.random.rand(2)*nx
+    A = c1d.i4lapl2(nx, k, l, {0:40}).tocsr()
+    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+    ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + k**4*ssol + l**4*ssol - 2*k**2*sy.diff(ssol,x,x) - 2*l**2*sy.diff(ssol,x,x) + 2*k**2*l**2*ssol)
+    test_backward_tau(A, B, sphys, ssol, xg)
+
+    print("\tbc = 40 (2)")
+    k, l = np.random.rand(2)*nx
+    A = c1d.i4lapl2(nx, k, l, {0:40}).tocsr()
+    B = c1d.i4lapl(nx, k, l, c1d.c1dbc.no_bc()).tocsr()
+    ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
+    test_backward_tau(A, B, sphys, ssol, xg)
+
+    print("\tbc = 40 split (2)")
+    A11 = c1d.i2lapl(nx, k, l, {0:20}).tolil()
+    A12 = -c1d.i2(nx, c1d.c1dbc.no_bc()).tolil()
+    A21 = c1d.zblk(nx, {0:21}).tolil()
+    A22 = c1d.i2lapl(nx, k, l, {0:0}).tolil()
+    A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
+    B11 = c1d.zblk(nx, c1d.c1dbc.no_bc()).tolil()
+    B12 = c1d.zblk(nx, c1d.c1dbc.no_bc()).tolil()
+    B21 = c1d.zblk(nx, c1d.c1dbc.no_bc()).tolil()
+    B22 = c1d.i2lapl(nx, k, l, c1d.c1dbc.no_bc()).tolil()
+    B = spsp.bmat([[B11,B12],[B21,B22]]).tocsr()
+    rhs = transf.tocheb(x_to_phys(sphys,xg))
+    rhs = np.append(0*rhs, rhs)
+    lhs = spsplin.spsolve(A,B*rhs)
+    sol = transf.tocheb(x_to_phys(ssol,xg))
+    sol = np.append(sol, 0*sol)
+    err = np.abs(lhs - sol)
+    if np.max(err[0:nx]) > 10*np.spacing(1):
+        print(err[0:nx])
+    print("\t\tMax forward error: " + str(np.max(err[0:nx])))
+
+    print("\tbc = 40 split (trunc) (2)")
+    A12 = A12[:,0:-2]
+    A22 = A22[:,0:-2]
+    A21 = A21[0:-2,:]
+    A22 = A22[0:-2,:]
+    A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
+    B12 = B12[:,0:-2]
+    B22 = B22[:,0:-2]
+    B21 = B21[0:-2,:]
+    B22 = B22[0:-2,:]
+    B = spsp.bmat([[B11,B12],[B21,B22]]).tocsr()
+    rhs = transf.tocheb(x_to_phys(sphys,xg))
+    rhs = np.append(0*rhs, rhs[0:-2])
+    lhs = spsplin.spsolve(A,B*rhs)
+    sol = transf.tocheb(x_to_phys(ssol,xg))
+    sol = np.append(sol, 0*sol[0:-2])
+    err = np.abs((lhs - sol))
+    if np.max(err[0:nx]) > 10*np.spacing(1):
+        print(err[0:nx])
+    print("\t\tMax forward error: " + str(np.max(err[0:nx])))
+
 def i4lapl2h(nx, xg):
     """Accuracy test for i4lapl2h operator"""
 
@@ -292,6 +374,14 @@ def i4lapl2h(nx, xg):
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) + k**4*sphys - 2*k**2*sy.diff(sphys,x,x))
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
+
+    print("\tbc = 40")
+    k = np.random.ranf()*nx
+    A = c1d.i4lapl2h(nx, k, {0:40}).tocsr()
+    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+    ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + k**4*ssol - 2*k**2*sy.diff(ssol,x,x))
+    test_backward_tau(A, B, sphys, ssol, xg)
 
 def qid(nx, xg):
     """Accuracy test for qid operator"""
@@ -329,7 +419,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 20
+    nx = 100
     xg = transf.grid(nx)
 
     # run hardcoded operator tests

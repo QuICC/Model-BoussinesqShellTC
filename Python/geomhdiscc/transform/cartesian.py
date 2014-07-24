@@ -24,3 +24,13 @@ def tocheb(phys):
     n = len(phys)
 
     return fftpack.dct(phys,2)/(2*n)
+
+def tocheb2d(phys):
+    """Transform 2D physical array to 2D spectral coefficients"""
+
+    for i in range(phys.shape[0]):
+        phys[i,:] = tocheb(phys[i,:])
+    for j in range(phys.shape[1]):
+        phys[:,j] = tocheb(phys[:,j])
+    
+    return phys

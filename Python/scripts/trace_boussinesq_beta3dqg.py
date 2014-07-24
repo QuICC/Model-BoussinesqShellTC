@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_beta3dqg2 as mod
+import geomhdiscc.model.boussinesq_beta3dqg3 as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [10, 0, 10]
 chi = 1
 eq_params = {'prandtl':1, 'rayleigh':1711.5, 'gamma':1, 'chi':chi}
 eigs = [3.11627]

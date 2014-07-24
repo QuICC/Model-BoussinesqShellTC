@@ -175,7 +175,7 @@ def i2x2div(nr, ms, rg):
         ssol = sy.expand(x*sphys)
         ssol = sy.expand(x*sy.diff(ssol,x))
         ssol = sy.integrate(ssol,x,x)
-        test_forward(A, m%2, sphys, ssol, rg, 1)
+        test_forward(A, (m%2,(m+1)%2), sphys, ssol, rg, 1)
 
 def i2x2laplh(nr, ms, rg):
     """Accuracy test for i2x2laplh operator"""
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     i2x2(nr, ms, rg)
     i2x2d2(nr, ms, rg)
     i2x2d1(nr, ms, rg)
-    #i2x2div(nr, ms, rg)
+    i2x2div(nr, ms, rg)
     i2x2laplh(nr, ms, rg)
     i4x4(nr, ms, rg)
     i4x4laplh(nr, ms, rg)

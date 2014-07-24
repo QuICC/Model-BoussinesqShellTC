@@ -251,6 +251,39 @@ def i2x2(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, m, bc)
 
+def i2x2div(nr, m, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^2 radial divergence T_n(x)."""
+
+    parity = (m+1)%2
+    ns = np.arange(parity, 2*nr, 2)
+    if m%2 == 0:
+        offsets = np.arange(-1,3)
+    else:
+        offsets = np.arange(-2,2)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return (n - 2.0)/(8.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return (n + 2.0)/(8.0*n*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -(n - 2.0)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -(n + 2.0)/(8.0*n*(n + 1.0))
+
+    ds = [d_2, d_1, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (m+1)%2)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, m, bc)
+
 def i2x2laplh(nr, m, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
 

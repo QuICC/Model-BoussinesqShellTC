@@ -121,7 +121,7 @@ def i2j2lapl(nx, nz, k, bc, coeff = 1.0):
     mat = spsp.kron(c1d.i2(nz,bcz), c1d.i2laplh(nx,k,bcx))
     bcx[0] = min(bcx[0], 0)
     bcz[0] = min(bcz[0], 0)
-    mat = mat + spsp.kron(c1d.i2(nz,bcz), c1d.i2laplh(nx,k,bcx))
+    mat = mat + spsp.kron(c1d.i2d2(nz,bcz), c1d.i2(nx,bcx))
     mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, 2, 2, bc)
 
@@ -181,7 +181,7 @@ def i4j4lapl(nx, nz, k, bc, coeff = 1.0):
     mat = spsp.kron(c1d.i4(nz,bcz), c1d.i4laplh(nx,k,bcx))
     bcx[0] = min(bcx[0], 0)
     bcz[0] = min(bcz[0], 0)
-    mat = mat + spsp.kron(c1d.i4(nz,bcz), c1d.i4laplh(nx,k,bcx))
+    mat = mat + spsp.kron(c1d.i4d2(nz,bcz), c1d.i4(nx,bcx))
     mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, 4, 4, bc)
 

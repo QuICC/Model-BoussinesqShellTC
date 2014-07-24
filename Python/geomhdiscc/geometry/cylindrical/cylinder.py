@@ -69,6 +69,13 @@ def i2j2x2e1(nr, nz, m, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i2d1(nz,bcz), rad.i2x2(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
 
+def i2j2x2div(nr, nz, m, bc, coeff = 1.0):
+    """Create a i2x2div in R kronecker with an i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2div(nr, m, bcr))
+    return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
+
 def i2j2x2laplh(nr, nz, m, bc, coeff = 1.0):
     """Create a i2x2lapl in R kronecker with i2 in Z"""
 

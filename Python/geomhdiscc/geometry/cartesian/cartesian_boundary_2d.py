@@ -38,13 +38,18 @@ def bid(nx, q, d, bc):
 def bgrid(n, q, d, bc):
     """Create a boundary grid matrix"""
 
-    g = phys.grid(n-q)
+    g = np.cos(np.pi*(np.arange(0,n)+0.5)/n)
+    #g = np.cos(np.pi*np.arange(0,n)/(n - 1.0))
+    print(g)
+    if q > 0:
+        g = g[q//2:-q//2]
+    print(g)
     mat = np.zeros((n,n))
     for i,x in enumerate(g):
         for j in range(0,n):
             c = np.zeros((n,))
             c[j] = 1
-            norm = 1.0/(1.0 + (j != 0))
+            norm = (1.0 + (j == 0))/2.0
             mat[i+q,j] = norm*cheby.chebval(x,c)
 
     #mat[0:q,:] = 0
@@ -61,13 +66,13 @@ def constrain(mat, nx, nz, qx, qz, bc):
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'])
-        bc_mat = bc_mat + spsp.kron(bgrid(nz,sz,0,bc['z']), bcMat)
+        bc_mat = bc_mat + spsp.kron(bid(nz,sz,0,bc['z']), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'])
         if bc['x'][0] >= 0:
-            bc_mat = bc_mat + spsp.kron(bcMat, bgrid(nx,sx,0,bc['x']))
+            bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,0,bc['x']))
         else:
             tmpB = c1dbc.constrain(bgrid(nx,0,0,c1dbc.no_bc()),bc['x'])
             bc_mat = bc_mat + spsp.kron(bcMat, tmpB)
