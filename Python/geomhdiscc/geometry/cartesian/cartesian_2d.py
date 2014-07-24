@@ -32,19 +32,26 @@ def convert_bc(bc):
 
     return (bcx, bcz)
 
-def d0d1(nx, nz, bc, coeff = 1.0):
+def d0d1(nx, nz, sx, bc, coeff = 1.0):
     """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.d1(nz,bcz), c1d.qid(nx,0,bcx))
-    return c2dbc.constrain(mat, nx, nz, 0, 1, bc)
+    mat = coeff*spsp.kron(c1d.d1(nz,bcz), c1d.sid(nx,sx,bcx))
+    return c2dbc.constrain(mat, nx, nz, sx, 1, bc, location = 'b')
 
-def laplh(nx, nz, k, bc, coeff = 1.0):
+def laplh(nx, nz, k, sz, bc, coeff = 1.0):
     """Create operator for the horizontal Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.qid(nz,0,bcz), c1d.laplh(nx,k,bcx))
-    return c2dbc.constrain(mat, nx, nz, 2, 0, bc)
+    mat = coeff*spsp.kron(c1d.sid(nz,sz,bcz), c1d.laplh(nx,k,bcx))
+    return c2dbc.constrain(mat, nx, nz, 2, sz, bc, location = 'b')
+
+def lapl2h(nx, nz, k, sz, bc, coeff = 1.0):
+    """Create operator for the horizontal bilaplacian T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.sid(nz,sz,bcz), c1d.lapl2h(nx,k,bcx))
+    return c2dbc.constrain(mat, nx, nz, 4, sz, bc, location = 'b')
 
 def zblk(nx, nz, qx, qz, bc):
     """Create a block of zeros"""
@@ -217,3 +224,10 @@ def qid(nx, nz, qx, qz, bc, coeff = 1.0):
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,qz,bcz), c1d.qid(nx,qx,bcx))
     return c2dbc.constrain(mat, nx, nz, qx, qz, bc)
+
+def sid(nx, nz, sx, sz, bc, coeff = 1.0):
+    """Create a identity block order with last sx, sz rows zeroed"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.sid(nz,sz,bcz), c1d.sid(nx,sx,bcx))
+    return c2dbc.constrain(mat, nx, nz, sx, sz, bc)

@@ -39,6 +39,7 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
     sol = transf.tocheb(t)
+    pl.semilogy(np.abs(sol))
     err = np.abs(rhs - sol)
     vis_error(err, 'Forward error')
     print("\t\tMax forward error: " + str(np.max(err[q:])))
@@ -83,7 +84,7 @@ def d1(nx, xg):
     print("d1:")
     x = sy.Symbol('x')
     A = c1d.d1(nx, c1d.c1dbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, xg, 1)
 
@@ -93,20 +94,42 @@ def d2(nx, xg):
     print("d2:")
     x = sy.Symbol('x')
     A = c1d.d2(nx, c1d.c1dbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x,x)
-    test_forward(A, sphys, ssol, xg, 1)
+    test_forward(A, sphys, ssol, xg, 2)
+
+def d4(nx, xg):
+    """Accuracy test for d4 operator"""
+
+    print("d4:")
+    x = sy.Symbol('x')
+    A = c1d.d4(nx, c1d.c1dbc.no_bc())
+    print(A.todense())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.diff(sphys,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
 
 def laplh(nx, xg):
-    """Accuracy test for d1 operator"""
+    """Accuracy test for laplh operator"""
 
     print("laplh:")
     x = sy.Symbol('x')
     k = np.random.ranf()*nx
     A = c1d.laplh(nx, k, c1d.c1dbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x,x) - k**2*sphys
-    test_forward(A, sphys, ssol, xg, 1)
+    test_forward(A, sphys, ssol, xg, 2)
+
+def lapl2h(nx, xg):
+    """Accuracy test for lapl2h operator"""
+
+    print("lapl2h:")
+    x = sy.Symbol('x')
+    k = np.random.ranf()*nx
+    A = c1d.lapl2h(nx, k, c1d.c1dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.expand(sy.diff(sphys,x,x,x,x) - 2.0*k**2*sy.diff(sphys,x,x) + k**4*sphys)
+    test_forward(A, sphys, ssol, xg, 4)
 
 def i1(nx, xg):
     """Accuracy test for i1 operator"""
@@ -419,7 +442,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 100
+    nx = 30
     xg = transf.grid(nx)
 
     # run hardcoded operator tests
@@ -427,7 +450,9 @@ if __name__ == "__main__":
     #zblk(nx, xg)
     d1(nx, xg)
     d2(nx, xg)
+    d4(nx, xg)
     laplh(nx, xg)
+    lapl2h(nx, xg)
     i1(nx, xg)
     i2(nx, xg)
     i2d1(nx, xg)

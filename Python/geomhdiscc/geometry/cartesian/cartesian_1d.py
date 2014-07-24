@@ -23,9 +23,10 @@ def d1(nx, bc, coeff = 1.0):
     mat = spsp.lil_matrix((nx,nx))
     for i in range(0,nx-1):
         mat[i,i+1:nx:2] = row[i+1:nx:2]
+    mat[-1:,:] = 0
 
     mat = coeff*mat
-    return c1dbc.constrain(mat, bc)
+    return c1dbc.constrain(mat, bc, location = 'b')
 
 def d2(nx, bc, coeff = 1.0):
     """Create operator for 2nd derivative"""
@@ -33,17 +34,37 @@ def d2(nx, bc, coeff = 1.0):
     mat = spsp.lil_matrix((nx,nx))
     for i in range(0,nx-2):
         mat[i,i+2:nx:2] = [j*(j**2 - i**2) for j in range(0,nx)][i+2:nx:2]
+    mat[-2:,:] = 0
+
+    mat = coeff*mat
+    return c1dbc.constrain(mat, bc, location = 'b')
+
+def d4(nx, bc, coeff = 1.0):
+    """Create operator for 4th derivative"""
+
+    mat_d2 = d2(nx + 4, c1dbc.no_bc())
+    mat = mat_d2*mat_d2
+    mat = mat[0:-4, 0:-4]
+    mat[-4:,:] = 0
     
     mat = coeff*mat
-    return c1dbc.constrain(mat, bc)
+    return c1dbc.constrain(mat, bc, location = 'b')
 
 def laplh(nx, k, bc, coeff = 1.0):
     """Create operator for horizontal laplacian"""
 
-    mat = d2(nx, bc) - k**2*qid(nx,0,bc) 
+    mat = d2(nx, bc) - k**2*sid(nx,2,bc)
 
     mat = coeff*mat
-    return c1dbc.constrain(mat, bc)
+    return c1dbc.constrain(mat, bc, location = 'b')
+
+def lapl2h(nx, k, bc, coeff = 1.0):
+    """Create operator for horizontal bilaplacian"""
+
+    mat = d4(nx, bc) - 2.0*k**2*sid(nx,4,bc)*d2(nx,bc) + k**4*sid(nx,4,bc) 
+
+    mat = coeff*mat
+    return c1dbc.constrain(mat, bc, location = 'b')
 
 def i1d1(nx, bc, coeff = 1.0):
     """Create a quasi identity block of order 1"""
@@ -372,6 +393,15 @@ def qid(nx, q, bc, coeff = 1.0):
 
     offsets = [0]
     diags = [[0]*q + [1]*(nx-q)]
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return c1dbc.constrain(mat, bc)
+
+def sid(nx, s, bc, coeff = 1.0):
+    """Create a identity block with last s rows zeroed"""
+
+    offsets = [0]
+    diags = [[1]*(nx-s) + [0]*s]
 
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
