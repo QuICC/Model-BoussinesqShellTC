@@ -197,7 +197,7 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
-        a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
@@ -220,7 +220,7 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -324,7 +324,7 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -344,11 +344,3 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
         return mat
-
-    def linear_r2x(self, ro, rratio):
-        """Calculat a and b for linear map r = a*x + b"""
-
-        b = (ro*rratio + ro)/2.0;
-        a = ro - b;
-
-        return (a, b)

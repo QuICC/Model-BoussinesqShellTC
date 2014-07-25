@@ -369,6 +369,39 @@ def i2x2laplh(nr, m, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i4(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-4,5,2)
+    nzrow = 3
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return 3.0*a**4/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**4/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return a**4/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_4, d_2, d0, d2, d4]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i4x4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
 
@@ -572,3 +605,11 @@ def qid(nr, q, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
+
+def linear_r2x(ro, rratio):
+    """Calculat a and b for linear map r = a*x + b"""
+
+    b = (ro*rratio + ro)/2.0;
+    a = ro - b;
+
+    return (a, b)

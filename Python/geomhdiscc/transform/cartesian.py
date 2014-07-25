@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import scipy.fftpack as fftpack
 import numpy as np
 
+
 def grid(nx):
     """Create the Chebyshev grid"""
 
