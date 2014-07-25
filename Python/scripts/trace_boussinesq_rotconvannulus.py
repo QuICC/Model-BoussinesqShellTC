@@ -12,8 +12,8 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [10, 0, 10]
-eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':1711.5, 'ro':1, 'rratio':0.35}
-eigs = [3]
+eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5.5, 'ro':1, 'rratio':0.35}
+eigs = [1]
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':0, 'velocityy':0, 'velocityz':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
@@ -38,7 +38,7 @@ if True:
     io.mmwrite("matrix_B.mtx", B)
 
 # Solve EVP with sptarn
-if False:
+if True:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)

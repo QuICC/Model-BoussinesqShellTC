@@ -154,6 +154,7 @@ def apply_galerkin(mat, bc):
 
 def norm_c(n):
     """Compute the chebyshev normalisation c factor"""
+
     if n > 0:
         return 2
     else:
