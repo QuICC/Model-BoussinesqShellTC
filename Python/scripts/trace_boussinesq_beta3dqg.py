@@ -11,10 +11,11 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [60, 0, 60]
+res = [30, 0, 30]
 chi = 1
 eq_params = {'prandtl':1, 'rayleigh':1711.0, 'gamma':1, 'chi':chi}
 eigs = [3.11627]
+#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'phi':1, 'temperature':0, 'velocityz':1, 'lambda':1, 'chi':1}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0, 'velocityz':0, 'lambda':0, 'chi':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
@@ -25,7 +26,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Show the "spy" of the two matrices
-if True:
+if False:
     import matplotlib.pylab as pl
     pl.spy(A, markersize=0.2)
     pl.show()
@@ -48,6 +49,7 @@ if True:
     sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
     sol_t = evp_vec[2*res[0]*res[2]:,-1].reshape(res[0], res[2], order = 'F')
 
+    import matplotlib.pylab as pl
     pl.subplot(1,3,1)
     pl.imshow(np.log10(np.abs(sol_psi)))
     pl.colorbar()
@@ -58,6 +60,7 @@ if True:
     pl.imshow(np.log10(np.abs(sol_t)))
     pl.colorbar()
     pl.show()
+    pl.close("all")
     import geomhdiscc.transform.cartesian as transf
     phys_psi = transf.tophys2d(sol_psi)
     phys_w = transf.tophys2d(sol_w)
@@ -72,6 +75,7 @@ if True:
     pl.imshow(sol_t.real)
     pl.colorbar()
     pl.show()
+    pl.close("all")
 
     xg = transf.grid(res[0])
     zg = transf.grid(res[2])
@@ -85,6 +89,7 @@ if True:
     pl.plot(xg, sol_t.real[:,10])
     pl.title('T')
     pl.show()
+    pl.close("all")
     pl.subplot(1,3,1)
     pl.plot(zg, sol_psi.real[0,:])
     pl.title('Psi')
@@ -95,6 +100,7 @@ if True:
     pl.plot(zg, sol_t.real[0,:])
     pl.title('T')
     pl.show()
+    pl.close("all")
     pl.subplot(1,3,1)
     pl.plot(zg, sol_psi.real[res[0]//2,:])
     pl.title('Psi')
@@ -105,6 +111,7 @@ if True:
     pl.plot(zg, sol_t.real[res[0]//2,:])
     pl.title('T')
     pl.show()
+    pl.close("all")
     pl.subplot(1,3,1)
     pl.plot(zg, sol_psi.real[-1,:])
     pl.title('Psi')
@@ -115,3 +122,4 @@ if True:
     pl.plot(zg, sol_t.real[-1,:])
     pl.title('T')
     pl.show()
+    pl.close("all")

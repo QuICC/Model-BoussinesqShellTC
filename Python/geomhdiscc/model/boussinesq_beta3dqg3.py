@@ -176,12 +176,14 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:41}, 'z':{0:20, 'c':[-1j*k*tanchi/G, 1j*k*tanchi/G]}}
+                        bc = {'x':{0:41}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:21}}
-                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:0}, 'z':{0:0}}
+                        bc = {'x':{0:0}, 'z':{0:10}}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:21}, 'z':{0:11}}
+                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
+                        bc = {'x':{0:0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'z':{0:0}}
             
             # Set LHS galerkin restriction

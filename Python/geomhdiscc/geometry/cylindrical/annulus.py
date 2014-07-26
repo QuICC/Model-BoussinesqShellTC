@@ -147,12 +147,11 @@ def i4j4x4lapl(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, 4, 4, bc)
 
-def i4j0x4lapl2h(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):
+def i4j0x4lapl2h(nr, nz, m, a, b, bc, coeff = 1.0):
     """Create a i4x4lapl2h in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.qid(nz, 0, bcz), rad.i4x4lapl2h(nr, m, a, b, bcr))
-    mat = coeff*mat
+    mat = coeff*spsp.kron(c1d.qid(nz, 0, bcz), rad.i4x4lapl2h(nr, m, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 4, 0, bc)
 
 def i4j4x4lapl2(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):

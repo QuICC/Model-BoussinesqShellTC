@@ -17,15 +17,29 @@ def zgrid(nz):
 
     return np.cos(np.pi*(np.arange(0,nz)+0.5)/nz)
 
-def tophys(spec):
-    """Transform spectral coefficients to physical values"""
+def torphys(spec):
+    """Transform R spectral coefficients to physical values"""
 
     n = len(spec)
 
     return fftpack.dct(spec,3)
 
-def tocheb(phys):
-    """Transform physical values to spectral coefficients"""
+def torcheb(phys):
+    """Transform R physical values to spectral coefficients"""
+
+    n = len(phys)
+
+    return fftpack.dct(phys,2)/(2*n)
+
+def tozphys(spec):
+    """Transform Z spectral coefficients to physical values"""
+
+    n = len(spec)
+
+    return fftpack.dct(spec,3)
+
+def tozcheb(phys):
+    """Transform Z physical values to spectral coefficients"""
 
     n = len(phys)
 
@@ -35,20 +49,20 @@ def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""
 
     for i in range(spec.shape[0]):
-        spec.real[i,:] = tophys(spec.real[i,:])
-        spec.imag[i,:] = tophys(spec.imag[i,:])
+        spec.real[i,:] = tozphys(spec.real[i,:])
+        spec.imag[i,:] = tozphys(spec.imag[i,:])
     for j in range(spec.shape[1]):
-        spec.real[:,j] = tophys(spec.real[:,j])
-        spec.imag[:,j] = tophys(spec.imag[:,j])
+        spec.real[:,j] = torphys(spec.real[:,j])
+        spec.imag[:,j] = torphys(spec.imag[:,j])
     
     return spec
 
 def tocheb2d(phys):
     """Transform 2D physical array to 2D spectral coefficients"""
 
-    for i in range(phys.shape[0]):
-        phys[i,:] = tocheb(phys[i,:])
     for j in range(phys.shape[1]):
-        phys[:,j] = tocheb(phys[:,j])
+        phys[:,j] = torcheb(phys[:,j])
+    for i in range(phys.shape[0]):
+        phys[i,:] = tozcheb(phys[i,:])
     
     return phys

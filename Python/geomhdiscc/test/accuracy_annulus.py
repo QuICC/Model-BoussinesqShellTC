@@ -1,4 +1,4 @@
-"""Check accuracy for cartesian 2D operators"""
+"""Check accuracy for cylindrical annulus operators"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -74,18 +74,6 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, rg, zg):
     err = np.abs(lhs - sol)
     vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
-
-def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
-    """Perform a galerkin backward operation test"""
-
-    print("\tBackward galkerin test")
-    x = sy.Symbol('x')
-    rhs = transf.tocheb(x_to_phys(res_expr,grid))
-    lhs = spsplin.spsolve(opA,opB*rhs)
-    sol = transf.tocheb(x_to_phys(sol_expr,grid))
-    err = np.abs(opS*lhs - sol)
-    vis_error(err, 'Galerkin backward error')
-    print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
 def i1j1(nr, nz, a, b, rg, zg):
     """Accuracy test for i1j1 operator"""

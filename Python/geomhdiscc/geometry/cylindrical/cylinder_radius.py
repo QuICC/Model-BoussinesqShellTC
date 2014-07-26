@@ -310,6 +310,40 @@ def i2x2laplh(nr, m, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, m, bc)
 
+def i4(nr, m, bc, coeff = 1.0):
+    """Create operator for 2nd integral T_n(x)."""
+
+    parity = m%2
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = np.arange(-2,3)
+    nzrow = 3
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return 1.0/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -1.0/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return 3.0/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -1.0/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return 1.0/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, m, bc)
+
 def i4x4(nr, m, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
 

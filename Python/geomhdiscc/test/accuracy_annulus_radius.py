@@ -22,10 +22,10 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
     x = sy.Symbol('x')
-    lhs = transf.tocheb(x_to_phys(res_expr,grid))
+    lhs = transf.torcheb(x_to_phys(res_expr,grid))
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
-    sol = transf.tocheb(t)
+    sol = transf.torcheb(t)
     err = np.abs(rhs - sol)
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)

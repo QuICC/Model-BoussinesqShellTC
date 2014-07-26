@@ -140,6 +140,19 @@ def i2x2laplh():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i4():
+    """Cylinder 4th integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':4, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i4x4():
     """Cylinder 4th integral of x^4 operator"""
 

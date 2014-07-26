@@ -133,11 +133,11 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'r':{0:10}, 'z':{0:20}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'r':{0:11}, 'z':{0:20}}
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:13}, 'z':{0:0}}
+                        bc = {'r':{0:13}, 'z':{0:0}, 'priority':'n'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:0}, 'z':{0:21}}
+                        bc = {'r':{0:0}, 'z':{0:21}, 'priority':'n'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -223,10 +223,16 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc) + cylinder.i2j2(res[0], res[2], m, bc, -1.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, 1.0, 2.0)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2(res[0], res[2], m, bc, -1.0)
 
             elif field_col == ("velocityy",""):
-                mat = cylinder.i2j2(res[0], res[2], m, bc, -2.0*1j*m) + cylinder.i2j2x2(res[0], res[2], m, bc, Ta**0.5)
+                mat = cylinder.i2j2(res[0], res[2], m, bc, -2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2x2(res[0], res[2], m, bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
                 mat = cylinder.zblk(res[0], res[2], m, 1, 2, bc)
@@ -239,10 +245,16 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = cylinder.i2j2(res[0], res[2], m, bc, 2.0*1j*m) + cylinder.i2j2x2(res[0], res[2], m, bc, -Ta**0.5)
+                mat = cylinder.i2j2(res[0], res[2], m, bc, 2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2x2(res[0], res[2], m, bc, -Ta**0.5)
 
             elif field_col == ("velocityy",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc) + cylinder.i2j2(res[0], res[2], m, bc, -1.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, 1.0, 2.0)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2(res[0], res[2], m, bc, -1.0)
 
             elif field_col == ("velocityz",""):
                 mat = cylinder.zblk(res[0], res[2], m, 1, 2, bc)
@@ -261,29 +273,29 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, 1.0, 2.0)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x2e1(res[0], res[2], m, bc, -2.0)
+                mat = cylinder.i2j2x2e1(res[0], res[2], m, bc, -1.0, 2.0)
 
             elif field_col == ("temperature",""):
                 mat = cylinder.i2j2x2(res[0], res[2], m, bc, Ra)
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = cylinder.i2j2x2div(res[0], res[2], m, bc, -1j*m*Ta**0.5)
+                mat = cylinder.i2j2x1(res[0], res[2], m, bc, -1j*m*Ta**0.5)
 
             elif field_col == ("velocityy",""):
-                mat = cylinder.i2j2x2d1(res[0], res[2], m, bc, Ta**0.5)
+                mat = cylinder.i2j2x2div(res[0], res[2], m, bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
                 mat = cylinder.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, -1.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, -1.0, 2.0)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.i2j2x2e1(res[0], res[2], m, bc, 2.0*Ra)
+                mat = cylinder.i2j2x2e1(res[0], res[2], m, bc, Ra, 2.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -299,7 +311,7 @@ class BoussinesqRotConvCylinder(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], m, 1, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, bc, 1.0, 2.0)
 
         return mat
 

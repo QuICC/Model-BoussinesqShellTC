@@ -10,31 +10,10 @@ import geomhdiscc.geometry.spherical.shell_radius_boundary as radbc
 from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-def qid(n, q, bc):
-    """Create a quasi indentity"""
+def no_bc():
+    """Get a no boundary condition flag"""
 
-    if bc[0] < 0:
-        mat = spsp.identity(n-bc[0]//10)
-    else:
-        offsets = [0]
-        diags = [[0]*q + [1]*(n-q)]
-
-        mat = spsp.diags(diags, offsets)
-
-    return mat.tocsr()
-
-def bid(n, q, bc):
-    """Create a boundary indentity"""
-
-    if bc[0] < 0:
-        mat = spsp.identity(n-bc[0]//10)
-    else:
-        offsets = [-q]
-        diags = [[1]*(n-q)]
-
-        mat = spsp.diags(diags, offsets)
-
-    return mat.tocsr()
+    return radbc.no_bc()
 
 def constrain(mat, nr, maxl, m, bc):
     """Contrain the matrix with the tau boundary condition"""

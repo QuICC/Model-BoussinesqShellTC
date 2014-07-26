@@ -6,13 +6,19 @@ from __future__ import unicode_literals
 import scipy.fftpack as fftpack
 import numpy as np
 
-def grid(nr):
+
+def rgrid(nr):
     """Create the Chebyshev grid"""
 
     return np.cos(np.pi*(np.arange(0,2*nr)+0.5)/(2*nr))
 
-def tophys(spec, parity):
-    """Transform spectral coefficients to physical values"""
+def zgrid(nz):
+    """Create the z Chebyshev grid"""
+
+    return np.cos(np.pi*(np.arange(0,nz)+0.5)/nz)
+
+def torphys(spec, parity):
+    """Transform R spectral coefficients to physical values"""
 
     n = 2*len(spec)
     full = np.array([0.0]*n)
@@ -20,10 +26,50 @@ def tophys(spec, parity):
 
     return fftpack.dct(full,3)
 
-def tocheb(phys, parity):
-    """Transform physical values to spectral coefficients"""
+def torcheb(phys, parity):
+    """Transform R physical values to spectral coefficients"""
 
     n = len(phys)
     spec = fftpack.dct(phys,2)/(2*n)
 
     return spec[np.arange(parity,n,2)]
+
+def tozphys(spec):
+    """Transform Z spectral coefficients to physical values"""
+
+    n = len(spec)
+
+    return fftpack.dct(spec,3)
+
+def tozcheb(phys):
+    """Transform Z physical values to spectral coefficients"""
+
+    n = len(phys)
+
+    return fftpack.dct(phys,2)/(2*n)
+
+def tophys2d(spec, parity):
+    """Transform 2D spectral coefficients to 2D physical values"""
+
+    phys = np.zeros((2*spec.shape[0], spec.shape[1]))
+
+    for i in range(spec.shape[0]):
+        phys.real[i,:] = tozphys(spec.real[i,:])
+        phys.imag[i,:] = tozphys(spec.imag[i,:])
+    for j in range(phys.shape[1]):
+        phys.real[:,j] = torphys(phys.real[:,j], parity)
+        phys.imag[:,j] = torphys(phys.imag[:,j], parity)
+    
+    return phys
+
+def tocheb2d(phys, parity):
+    """Transform 2D physical array to 2D spectral coefficients"""
+
+    spec = np.zeros((len(np.arange(parity,phys.shape[0],2)), phys.shape[1]))
+
+    for j in range(phys.shape[1]):
+        spec[:,j] = torcheb(phys[:,j], parity)
+    for i in range(spec.shape[0]):
+        spec[i,:] = tozcheb(spec[i,:])
+
+    return spec

@@ -17,35 +17,21 @@ def no_bc():
 
     return {'x':c1dbc.no_bc(), 'z':c1dbc.no_bc()}
 
-def bid(nx, q, d, bc):
+def bid(nx, q, d, bc, location = 't'):
     """Create a boundary indentity"""
 
     if bc[0] < 0:
         mat = spsp.eye(n-q, n-(-bc[0])//10)
     else:
-        offsets = [-d]
-        diags = [[1]*(nx-d)]
+        offsets = [d]
+        diags = [[1]*(nx-abs(d))]
 
         mat = spsp.diags(diags, offsets).tolil()
-        mat[0:q,:] = 0
-
-    tbc = c1dbc.no_bc()
-    tbc['cr'] = bc.get('cr', 0)
-    tbc['rb'] = bc.get('rb', 0)
-    tbc['cl'] = bc.get('cl', 0)
-    tbc['rt'] = bc.get('rt', 0)
-    return c1dbc.constrain(mat, tbc)
-
-def sid(nx, q, d, bc):
-    """Create a boundary indentity"""
-
-    if bc[0] < 0:
-        mat = spsp.eye(n-q, n-(-bc[0])//10)
-    else:
-        offsets = [0]
-        diags = [[1]*(nx-q) + [0]*q]
-
-        mat = spsp.diags(diags, offsets)
+        if location == 't':
+            mat[0:q,:] = 0
+        elif location == 'b':
+            if q > 0:
+                mat[-q:,:] = 0
 
     tbc = c1dbc.no_bc()
     tbc['cr'] = bc.get('cr', 0)
@@ -78,31 +64,30 @@ def bgrid(n, q, d, bc):
 def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
     """Contrain the matrix with the Tau boundary condition"""
 
-    sx = qx
-    sz = 0
+    priority = bc.get('priority', 'x')
+    if priority == 'x':
+        sx = qx
+        sz = 0
+    elif priority == 'z':
+        sx = 0
+        sz = qz
+    elif priority == 'n':
+        sx = qx
+        sz = qz
             
     bc_mat = mat
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'], location = location)
-        if location == 't':
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,0,bc['z']), bcMat)
-        elif location == 'b':
-            bc_mat = bc_mat + spsp.kron(sid(nz,sz,0,bc['z']), bcMat)
+        bc_mat = bc_mat + spsp.kron(bid(nz,sz,0,bc['z'], location = location), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
         if bc['x'][0] >= 0:
-            if location == 't':
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,0,bc['x']))
-            elif location == 'b':
-                bc_mat = bc_mat + spsp.kron(bcMat, sid(nx,sx,0,bc['x']))
+            bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,0,bc['x'], location = location))
         else:
-            if location == 't':
-                tmpB = c1dbc.constrain(bid(nx,0,0,c1dbc.no_bc()),bc['x'], location = location)
-            elif location == 'b':
-                tmpB = c1dbc.constrain(sid(nx,0,0,c1dbc.no_bc()),bc['x'], location = location)
+            tmpB = c1dbc.constrain(bid(nx,0,0,c1dbc.no_bc(), location = location),bc['x'], location = location)
             bc_mat = bc_mat + spsp.kron(bcMat, tmpB)
 
     return bc_mat
