@@ -12,7 +12,7 @@ l = 0
 m = 9
 res = [20, m+20, 0]
 eigs = [l, m]
-eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
+eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x

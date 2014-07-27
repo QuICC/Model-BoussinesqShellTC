@@ -540,3 +540,11 @@ def qid(nr, q, bc, coeff = 1.0):
 
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
+
+def linear_r2x(ro, rratio):
+    """Calculat a and b for linear map r = a*x + b"""
+
+    b = (ro*rratio + ro)/2.0;
+    a = ro - b;
+
+    return (a, b)

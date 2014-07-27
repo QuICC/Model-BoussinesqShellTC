@@ -54,6 +54,21 @@ def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
+def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
+    """Create a i2x2 radial operator kronecker with coriolis Q term"""
+
+    cor_r = sh.coriolis_r(maxl, m).tocsr()
+    cordr = sh.coriolisdr(maxl, m).tocsr()
+
+    bcr = convert_bc(bc)
+
+    mat = coeff*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
+    for ir,l in enumerate(range(m+1, maxl+1)):
+        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
+        mat = spsp.vstack([mat,row])
+
+    return sphbc.constrain(mat, nr, maxl, m, bc)
+
 def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
@@ -78,6 +93,21 @@ def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
+def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
+    """Create a i4x4 radial operator kronecker with coriolis Q term"""
+
+    cor_r = sh.coriolis_r(maxl, m).tocsr()
+    cordr = sh.coriolisdr(maxl, m).tocsr()
+
+    bcr = convert_bc(bc)
+
+    mat = coeff*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
+    for ir,l in enumerate(range(m+1, maxl+1)):
+        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
+        mat = spsp.vstack([mat,row])
+
+    return sphbc.constrain(mat, nr, maxl, m, bc)
+
 def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
@@ -99,36 +129,6 @@ def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     mat = coeff*shc(m)*rad.i4x4lapl2(nr, m, a, b, bcr)
     for l in range(m+1, maxl+1):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxl, m, bc)
-
-def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
-    """Create a i2x2 radial operator kronecker with coriolis Q term"""
-
-    cor_r = sh.coriolis_r(maxl, m).tocsr()
-    cordr = sh.coriolisdr(maxl, m).tocsr()
-
-    bcr = convert_bc(bc)
-
-    mat = coeff*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
-    for ir,l in enumerate(range(m+1, maxl+1)):
-        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
-        mat = spsp.vstack([mat,row])
-
-    return sphbc.constrain(mat, nr, maxl, m, bc)
-
-def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
-    """Create a i4x4 radial operator kronecker with coriolis Q term"""
-
-    cor_r = sh.coriolis_r(maxl, m).tocsr()
-    cordr = sh.coriolisdr(maxl, m).tocsr()
-
-    bcr = convert_bc(bc)
-
-    mat = coeff*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
-    for ir,l in enumerate(range(m+1, maxl+1)):
-        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
-        mat = spsp.vstack([mat,row])
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
