@@ -28,20 +28,20 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["streamfunction", "velocityz", "temperature"]
+        return ["streamfunction", "velocityz", "temperature", "vorticityz"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+        fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz", "")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature",""):
-            fields = [("streamfunction",""), ("velocityz",""), ("temperature","")]
+        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("vorticityz",""):
+            fields = [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]
         else:
             fields = []
 
@@ -50,12 +50,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        if field_row == ("vorticityz",""):
-            fields = [("streamfunction", "")]
-        elif field_row == ("velocityz",""):
-            fields = [("velocityz", "")]
-        else:
-            fields = []
+        fields = []
 
         return fields
 
@@ -211,15 +206,9 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             elif bcId == 2:
                 if self.use_galerkin:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-20}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-20}, 'z':{0:10}}
+                        bc = {'x':{0:-20}, 'z':{0:0}}
                     elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
@@ -230,29 +219,44 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                             bc = {'x':{0:-20}, 'z':{0:0}}
                         else:
                             bc = {'x':{0:-20}, 'z':{0:11}}
+                    elif field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+                        bc = {'x':{0:-41}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                    elif field_row == ("vorticityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:-20}, 'z':{0:10}}
                     elif field_col == ("streamfunction",""):
                         bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("velocityz",""):
                         bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
+                    elif field_col == ("vorticityz",""):
+                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:41}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                        bc = {'x':{0:20}, 'z':{0:0}}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:10}}
+                        bc = {'x':{0:0}, 'z':{0:00}}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:20}, 'z':{0:11}}
                     elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
                         bc = {'x':{0:0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
+                    elif field_row == ("vorticityz","") and field_col == ("vorticityz",""):
+                        bc = {'x':{0:20}, 'z':{0:0}}
+                    elif field_row == ("vorticityz","") and field_col == ("streamfunction",""):
+                        bc = {'x':{0:0}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                    elif field_row == ("vorticityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:0}, 'z':{0:10}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
                     bc['x']['rt'] = 4
-                    bc['z']['rt'] = 1
+                    bc['z']['rt'] = 0
                 elif field_row == ("velocityz",""):
                     bc['x']['rt'] = 2
-                    bc['z']['rt'] = 1
+                    bc['z']['rt'] = 0
                 elif field_row == ("temperature",""):
+                    bc['x']['rt'] = 2
+                    bc['z']['rt'] = 0
+                elif field_row == ("vorticity",""):
                     bc['x']['rt'] = 2
                     bc['z']['rt'] = 0
 
@@ -292,6 +296,8 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                     bc['x']['rt'] = 2
                 elif field_row == ("temperature",""):
                     bc['x']['rt'] = 2
+                elif field_row == ("vorticityz",""):
+                    bc['x']['rt'] = 2
 
         else:
             bc = no_bc()
@@ -310,13 +316,16 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i4j1(res[0],res[2], bc)
+            mat = c2d.i2j0(res[0],res[2], bc)
 
         elif field_row == ("velocityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j0(res[0],res[2], bc)
+
+        elif field_row == ("vorticityz",""):
+            mat = c2d.i2j1(res[0],res[2], bc)
 
         return mat
 
@@ -332,13 +341,16 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i4j1lapl2h(res[0],res[2], k, bc)
+                mat = c2d.i2j0laplh(res[0],res[2], k, bc, -1.0)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i4j1d0d1(res[0],res[2], bc)
+                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i4j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+
+            elif field_col == ("vorticityz",""):
+                mat = c2d.i2j0(res[0],res[2], bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
@@ -348,6 +360,9 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c2d.i2j1laplh(res[0],res[2], k, bc)
 
             elif field_col == ("temperature",""):
+                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+
+            elif field_col == ("vorticityz",""):
                 mat = c2d.zblk(res[0],res[2], 2, 1, bc)
 
         elif field_row == ("temperature",""):
@@ -363,6 +378,22 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
 
+            elif field_col == ("vorticityz",""):
+                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+
+        elif field_row == ("vorticityz",""):
+            if field_col == ("streamfunction",""):
+                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+
+            elif field_col == ("velocityz",""):
+                mat = c2d.i2j1d0d1(res[0],res[2], bc)
+
+            elif field_col == ("temperature",""):
+                mat = c2d.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+
+            elif field_col == ("vorticityz",""):
+                mat = c2d.i2j1laplh(res[0],res[2],k, bc)
+
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
@@ -372,12 +403,15 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i4j1laplh(res[0],res[2], k, bc)
+            mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
         elif field_row == ("velocityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j0(res[0],res[2], bc)
+
+        elif field_row == ("vorticityz",""):
+            mat = c2d.i2j1(res[0],res[2], bc)
 
         return mat

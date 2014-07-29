@@ -65,6 +65,9 @@ namespace Equations {
       // Set the name
       this->setName(PhysicalNames::VELOCITY);
 
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(false, false, this->mViewField, this->mViewGradient));
    }

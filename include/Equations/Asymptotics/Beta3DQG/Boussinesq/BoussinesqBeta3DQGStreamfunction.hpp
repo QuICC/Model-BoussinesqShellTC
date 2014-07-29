@@ -44,14 +44,6 @@ namespace Equations {
           * @brief Simple empty destructor
           */
          virtual ~BoussinesqBeta3DQGStreamfunction();
-
-         /**
-          * @brief Compute the nonlinear interaction term
-          *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
-          */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
          
       protected:
          /**

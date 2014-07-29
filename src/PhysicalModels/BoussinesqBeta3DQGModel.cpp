@@ -25,7 +25,6 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPhi.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVelocityZ.hpp"
@@ -37,7 +36,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg";
+   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg4";
 
    const std::string BoussinesqBeta3DQGModel::PYCLASS = "BoussinesqBeta3DQG";
 
@@ -46,58 +45,80 @@ namespace GeoMHDiSCC {
       // Add streamfunction equation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>();
       
-      // Add vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPhi>();
+      // Add vertical velocity computation
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVelocityZ>();
       
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>();
       
-      // Add vorticity computation
+      // Add vertical vorticity computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticityZ>();
-      
-      // Add vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVelocityZ>();
    }
 
    void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedRandomScalarState spRand;
-      // Shared pointer to equation
-      Equations::SharedCartesianExactScalarState spExact;
+      // Generate "exact" solutions (trigonometric or monomial)
+      if(false)
+      {
+         // Shared pointer to equation
+         Equations::SharedCartesianExactScalarState spExact;
+      
+         // Add temperature initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::TEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+         
+         // Add streamfunction initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+         
+         // Add vertical velocity initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VELOCITYZ);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+         
+         // Add vertical velocity initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VORTICITYZ);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
-      // Add transport initial state generation equation
-      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-      spRand->setIdentity(PhysicalNames::TEMPERATURE);
-      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
-      
-      // Add streamfunction initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
-      
-      // Add vertical velocity initial state generation equation
-      spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spExact->setIdentity(PhysicalNames::PHI);
-      spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
-      spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
-      
-//      // Add streamfunction initial state generation equation
-//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-//      spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
-//      
-//      // Add vertical velocity initial state generation equation
-//      spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-//      spRand->setIdentity(PhysicalNames::PHI);
-//      spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+      } else
+      {
+         // Shared pointer to equation
+         Equations::SharedRandomScalarState spRand;
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::TEMPERATURE);
+         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
+         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VELOCITYZ);
+         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+
+         // Add transport initial state generation equation
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VORTICITYZ);
+         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+      }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::PHI);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -119,13 +140,19 @@ namespace GeoMHDiSCC {
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
-      spField->setIdentity(PhysicalNames::PHI);
+      spField->setIdentity(PhysicalNames::VELOCITYZ);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, true);
+      spField->setIdentity(PhysicalNames::VORTICITYZ);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::PHI);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -137,7 +164,8 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
-      spIn->expect(PhysicalNames::PHI);
+      spIn->expect(PhysicalNames::VELOCITYZ);
+      spIn->expect(PhysicalNames::VORTICITYZ);
 
       // Set simulation state
       spVis->setInitialState(spIn);

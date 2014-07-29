@@ -21,7 +21,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
+#include "PhysicalOperators/StreamAdvection.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -40,7 +40,19 @@ namespace Equations {
 
    void BoussinesqBeta3DQGVelocityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+   }
+
+   void BoussinesqBeta3DQGVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
+      /// 
+      /// Computation of the jacobian:
+      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
+      ///
+      Physical::StreamAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqBeta3DQGVelocityZ::setRequirements()
@@ -49,13 +61,13 @@ namespace Equations {
       this->setName(PhysicalNames::VELOCITYZ);
 
       // Set solver timing
-      this->setSolveTiming(SolveTiming::AFTER);
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Set vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, true));
 
       // Add streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::PHI, FieldRequirement(true, true, false, false));
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, true));
    }
 
 }

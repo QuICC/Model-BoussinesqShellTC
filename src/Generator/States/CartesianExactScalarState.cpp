@@ -295,6 +295,9 @@ namespace Equations {
 
    void CartesianExactScalarState::setRequirements()
    {
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, true, false));
    }

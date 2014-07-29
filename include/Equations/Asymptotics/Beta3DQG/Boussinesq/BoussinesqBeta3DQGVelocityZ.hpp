@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the voriticity computation for the Boussinesq Beta 3DQG model
+    * @brief Implementation of the vertical velocity computation for the Boussinesq Beta 3DQG model
     */
    class BoussinesqBeta3DQGVelocityZ: public IScalarEquation
    {
@@ -44,6 +44,14 @@ namespace Equations {
           * @brief Simple empty destructor
           */
          virtual ~BoussinesqBeta3DQGVelocityZ();
+
+         /**
+          * @brief Compute the nonlinear interaction term
+          *
+          * @param rNLComp Nonlinear term component
+          * @param id      ID of the component (allows for a more general implementation)
+          */
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
          
       protected:
          /**

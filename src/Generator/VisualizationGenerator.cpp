@@ -99,26 +99,6 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("tuneOutput",2);
 
-      // Get time and timestep from configuration
-      Array tstep = this->mSimIoCtrl.configTimestepping();
-
-      // Set to zero if value is negative
-      if(tstep(0) < 0)
-      {
-         tstep(0) = 0;
-      }
-      if(tstep(1) < 0)
-      {
-         tstep(1) = 0;
-      }
-
-      // Loop over all files added to the simulation control
-      SimulationIoControl::hdf5_iterator  fIt;
-      for(fIt = this->mSimIoCtrl.beginHdf5(); fIt != this->mSimIoCtrl.endHdf5(); ++fIt)
-      {
-         (*fIt)->setSimTime(tstep(0), tstep(1));
-      }
-
       // Debug statement
       DebuggerMacro_leave("tuneOutput",2);
    }
@@ -129,7 +109,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("writeOutput",1);
 
       // Write final state file (using store time and timestep)
-      this->mSimIoCtrl.writeHdf5(-1, -1);
+      this->mSimIoCtrl.writeHdf5(this->mDiagnostics.startTime(), this->mDiagnostics.startTimestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();

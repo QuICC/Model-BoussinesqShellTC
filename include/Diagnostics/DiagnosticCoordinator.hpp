@@ -85,6 +85,11 @@ namespace Diagnostics {
          MHDFloat startTime() const;
 
          /**
+          * @brief Get start timestep
+          */
+         MHDFloat startTimestep() const;
+
+         /**
           * @brief Use time and timestep from state file
           */
          void useStateTime(const MHDFloat time, const MHDFloat timestep);
@@ -121,6 +126,11 @@ namespace Diagnostics {
           * @brief Start simulation time
           */
          MHDFloat mStartTime;
+
+         /**
+          * @brief Start simulation timestep
+          */
+         MHDFloat mStartTimestep;
 
          /**
           * @brief Spacing between grid points

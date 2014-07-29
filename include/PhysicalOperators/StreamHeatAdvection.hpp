@@ -71,33 +71,18 @@ namespace Physical {
    {
       if(c != 1.0)
       {
-         rS.setData(-c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
+         rS.setData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
                                                                               
-         rS.addData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
+         rS.subData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
       } else
       {
-         rS.setData(-(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
-
-         rS.addData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).matrix());
+         rS.setData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
+                                                                              
+         rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
       }
    }
 
    template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
-   {
-      if(c != 1.0)
-      {
-         rS.subData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
-
-         rS.addData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
-      } else
-      {
-         rS.subData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
-
-         rS.addData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
-      }
-   }
-
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -109,6 +94,21 @@ namespace Physical {
          rS.addData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
 
          rS.subData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
+      }
+   }
+
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   {
+      if(c != 1.0)
+      {
+         rS.subData(c*(dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
+
+         rS.addData(c*(dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
+      } else
+      {
+         rS.subData((dPsi.comp(TXComp).data().array()*w.comp(TYComp).data().array() + dPsi.comp(TXComp).data().array()).matrix());
+
+         rS.addData((dPsi.comp(TYComp).data().array()*w.comp(TXComp).data().array()).matrix());
       }
    }
 }

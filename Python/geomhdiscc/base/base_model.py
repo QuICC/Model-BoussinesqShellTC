@@ -31,7 +31,10 @@ class BaseModel:
 
         mat = utils.build_diag_matrix(fields, self.time_block, (res,eq_params,eigs,bcs))
         if verbose_write_mtx:
-            io.mmwrite("matrix_time_" + str(bcs["bcType"]) + "_"+ str(eigs[0])  + "_"+ str(eigs[1]) + ".mtx", mat)
+            fname = "matrix_time_" + str(bcs["bcType"])
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname + ".mtx", mat)
         return mat
 
     def implicit_linear(self, res, eq_params, eigs, bcs, fields):
@@ -39,7 +42,10 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.linear_block, (res,eq_params,eigs,bcs))
         if verbose_write_mtx:
-            io.mmwrite("matrix_linear_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + "_"+ str(eigs[1]) + ".mtx", mat)
+            fname = "matrix_linear_" + str(bcs["bcType"])
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname  + ".mtx", mat)
         return mat
 
     def explicit_linear(self, res, eq_params, eigs, bcs, field_row, field_col):
@@ -47,5 +53,8 @@ class BaseModel:
 
         mat = -self.linear_block(res, eq_params, eigs, bcs, field_row, field_col)
         if verbose_write_mtx:
-            io.mmwrite("matrix_explicit_" + str(bcs["bcType"]) + "_"+ str(eigs[0]) + "_"+ str(eigs[1]) + ".mtx", mat)
+            fname = "matrix_explicit_" + str(bcs["bcType"])
+            for e in eigs:
+                fname = fname + "_" + str(e)
+            io.mmwrite(fname + ".mtx", mat)
         return mat

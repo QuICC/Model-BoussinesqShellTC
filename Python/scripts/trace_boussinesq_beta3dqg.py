@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_beta3dqg3 as mod
+import geomhdiscc.model.boussinesq_beta3dqg4 as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()
@@ -13,10 +13,15 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [30, 0, 30]
 chi = 1
-eq_params = {'prandtl':1, 'rayleigh':1711.0, 'gamma':1, 'chi':chi}
-eigs = [3.11627]
-#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'phi':1, 'temperature':0, 'velocityz':1, 'lambda':1, 'chi':1}
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'phi':0, 'temperature':0, 'velocityz':0, 'lambda':0, 'chi':0}
+eq_params = {'prandtl':1, 'rayleigh':700.0, 'gamma':1, 'chi':chi}
+eigs = [2.221403788]
+
+# No-slip/No-slip
+#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'temperature':0, 'velocityz':1} 
+# Stress-free/Stress-free
+#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'temperature':0, 'velocityz':1}
+# Stress-free/No-slip (simple Beta)
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':2, 'temperature':0, 'velocityz':2, 'vorticityz':2}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

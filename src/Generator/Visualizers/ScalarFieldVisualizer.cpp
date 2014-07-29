@@ -64,6 +64,9 @@ namespace Equations {
 
    void ScalarFieldVisualizer::setRequirements()
    {
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::AFTER);
+
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, this->mViewField, this->mViewGradient));
    }

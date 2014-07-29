@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Beta 3DQG model"""
+"""Module provides the functions to generate the simple (1D) Boussinesq Beta 3DQG model"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,13 +7,14 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import geomhdiscc.base.utils as utils
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
+from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqBeta3DQG(base_model.BaseModel):
-    """Class to setup the Boussinesq Beta 3DQG model"""
+class BoussinesqSimpleBeta3DQG(base_model.BaseModel):
+    """Class to setup the simple Boussinesq Beta 3DQG model"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -62,26 +63,26 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[2]
+        tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("temperature","") or field_row == ("velocityz",""):
-                shift_x = 2
+                shift_x = 0
                 shift_z = 0
             elif field_row == ("streamfunction",""):
-                shift_x = 4
+                shift_x = 0
                 shift_z = 0
             else:
                 shift_x = 0
                 shift_z = 0
 
-            gal_n = (res[0] - shift_x)*(res[2] - shift_z)
+            gal_n = (res[0] - shift_x)
 
         else:
             gal_n = tau_n
             shift_x = 0
             shift_z = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
+        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -123,7 +124,8 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             tanchi = np.tan(eq_params['chi']*np.pi/180)
             G = eq_params['gamma']
-            k = eigs[0]/2
+            kx = eigs[0]*np.pi/2
+            ky = eigs[1]/2
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -133,22 +135,12 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:20, 'c':[-1j*ky*tanchi/G, 1j*ky*tanchi/G]}}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-20}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-20, 'rt':0}, 'z':{0:10}}
-                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-40, 'rt':0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-20}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-20, 'rt':0}, 'z':{0:11}}
+                            bc = {'x':{0:-20}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
                         bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("velocityz",""):
@@ -158,15 +150,15 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:40}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                        bc = {0:10, 'c':-1j*ky*tanchi/G}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:10}}
+                        bc = {0:10}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:11}}
+                        bc = {0:11}
                     elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
+                        bc = {0:11, 'c':1j*ky*tanchi/G}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'z':{0:0}}
+                        bc = {0:0}
 
             elif bcId == 1:
                 if self.use_galerkin:
@@ -174,87 +166,36 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:20, 'c':[-1j*ky*tanchi/G, 1j*ky*tanchi/G]}}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                         if bcs["bcType"] == self.SOLVER_NO_TAU:
                             bc = {'x':{0:-21}, 'z':{0:0}}
                         else:
-                            bc = {'x':{0:-21}, 'z':{0:10}}
-                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-21}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-21}, 'z':{0:11}}
+                            bc = {'x':{0:-21}, 'z':{0:21}}
                     elif field_col == ("streamfunction",""):
                         bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
                     elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
-                    elif field_row == ("temperature",""):
-                        bc = {'x':{0:-21}, 'z':{0:0}}
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:41}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
+                        bc = {0:10, 'c':-1j*ky*tanchi/G}
                     elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:10}}
+                        bc = {0:10}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'z':{0:11}}
+                        bc = {0:11}
                     elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
+                        bc = {0:11, 'c':1j*ky*tanchi/G}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'z':{0:0}}
-
-            elif bcId == 2:
-                if self.use_galerkin:
-                    if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
-                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-20}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-20}, 'z':{0:10}}
-                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-41, 'rt':0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        if bcs["bcType"] == self.SOLVER_NO_TAU:
-                            bc = {'x':{0:-20}, 'z':{0:0}}
-                        else:
-                            bc = {'x':{0:-20}, 'z':{0:11}}
-                    elif field_col == ("streamfunction",""):
-                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
-                else:
-                    if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:41}, 'z':{0:10, 'c':-1j*k*tanchi/G}}
-                    elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:10}}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:11}}
-                    elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:0}, 'z':{0:11, 'c':1j*k*tanchi/G}}
+                        bc = {0:0}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("streamfunction",""):
-                    bc['x']['rt'] = 4
-                    bc['z']['rt'] = 1
+                    bc['rt'] = 0
                 elif field_row == ("velocityz",""):
-                    bc['x']['rt'] = 2
-                    bc['z']['rt'] = 1
+                    bc['rt'] = 0
                 elif field_row == ("temperature",""):
-                    bc['x']['rt'] = 2
-                    bc['z']['rt'] = 0
+                    bc['rt'] = 0
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -262,36 +203,23 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-40, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
 
                 elif bcId == 1:
                     if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'rt':0}, 'z':{0:0}}
-
-                elif bcId == 2:
-                    if field_col == ("streamfunction",""):
-                        bc = {'x':{0:-41, 'rt':0}, 'z':{0:0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'rt':0}, 'z':{0:0}}
+                        bc = {0:0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
-            if self.use_galerkin:
-                if field_row == ("streamfunction",""):
-                    bc['x']['rt'] = 4
-                elif field_row == ("velocityz",""):
-                    bc['x']['rt'] = 2
-                elif field_row == ("temperature",""):
-                    bc['x']['rt'] = 2
 
         else:
             bc = no_bc()
@@ -303,20 +231,20 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c2d.stencil(res[0], res[2], bc)
+        return c1d.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i4j1(res[0],res[2], bc)
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+            mat = c1d.qid(res[0], 0, bc)
 
         return mat
 
@@ -327,57 +255,61 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
         tanchi = np.tan(eq_params['chi']*np.pi/180)
-        k = eigs[0]/2
+        kx = eigs[0]*np.pi/2
+        ky = eigs[1]/2
+        alpha2 = kx**2 + ky**2
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i4j1lapl2h(res[0],res[2], k, bc)
+                mat = c1d.i1(res[0], bc, alpha2**2)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i4j1d0d1(res[0],res[2], bc)
+                mat = c1d.i1d1(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i4j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+                mat = c1d.i1(res[0], bc, 1j*ky*(Ra/(16*Pr)))
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1/G**2))
+                mat = c1d.i1d1(res[0], bc, (-1/G**2))
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j1laplh(res[0],res[2], k, bc)
+                mat = c1d.i1(res[0], bc, -alpha2)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+                mat = c1d.zblk(res[0], bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
                 if self.linearize:
-                    mat = c2d.i2j0(res[0],res[2], bc, 1j*k)
+                    mat = c1d.qid(res[0], 0, bc, 1j*ky)
                 else:
-                    mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                    mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr))
+                mat = c1d.qid(res[0], 0, bc, -(1/Pr)*alpha2)
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        k = eigs[0]/2
+        kx = eigs[0]*np.pi/2
+        ky = eigs[1]/2
+        alpha2 = kx**2 + ky**2
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i4j1laplh(res[0],res[2], k, bc)
+            mat = c1d.i1(res[0], bc, -alpha2)
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+            mat = c1d.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+            mat = c1d.qid(res[0], 0, bc)
 
         return mat

@@ -21,8 +21,9 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
+#include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/StreamAdvection.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
+#include "PhysicalOperators/StreamHeatAdvection.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -53,13 +54,16 @@ namespace Equations {
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T}\f$
       ///
-      Physical::StreamAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      Physical::StreamHeatAdvection<>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqBeta3DQGTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
+
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
