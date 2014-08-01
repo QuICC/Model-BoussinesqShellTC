@@ -98,7 +98,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         """Provide description of the system of equation"""
 
         # Matrix operator is real
-        is_complex = False
+        is_complex = True
 
         # Implicit field coupling
         im_fields = self.implicit_fields(field_row)

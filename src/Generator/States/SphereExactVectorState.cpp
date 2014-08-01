@@ -69,7 +69,7 @@ namespace Equations {
       SpectralComponent_iterator specIt;
       for(specIt = specRange.first; specIt != specRange.second; ++specIt)
       {
-         this->defineCoupling(*specIt, CouplingInformation::TRIVIAL, 0, true, false, false);
+         this->defineCoupling(*specIt, CouplingInformation::TRIVIAL, 0, true, false, false, false);
       }
    }
 
