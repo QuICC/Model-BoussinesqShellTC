@@ -207,6 +207,9 @@ namespace GeoMHDiSCC {
             setGrouper<TGroup,Splitting::Algorithms::FIXED>(spFwdGrouper, spBwdGrouper);
          #endif //GEOMHDISCC_MPIALGO_FIXED
       #endif //GEOMHDISCC_MPI
+         } else
+         {
+            throw Exception("Unknown algorithm for transform grouper setup");
          }
       }
    }

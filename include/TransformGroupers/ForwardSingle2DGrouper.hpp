@@ -138,6 +138,9 @@ namespace Transform {
       // First treat the scalar equations
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
+         // Synchronize
+         FrameworkMacro::synchronize();
+         
          bool hasNL = (*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear();
          // Setup the first communication step
          this->setupGrouped1DCommunication((*scalEqIt)->name(), hasNL, coord);
@@ -154,6 +157,9 @@ namespace Transform {
       // ... then the vector equations
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
+         // Synchronize
+         FrameworkMacro::synchronize();
+         
          bool hasNL = (*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear();
          // Setup the first communication step
          this->setupGrouped1DCommunication((*vectEqIt)->name(), hasNL, coord);

@@ -105,20 +105,20 @@ namespace Parallel {
       // Different splitting directions require a different treatment
       if(this->mSplit == Splitting::Locations::FIRST)
       {
-         // SINGLE1D or TRANSFORM grouper setup
-         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+         // SINGLE1D grouper setup
+         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
             this->mGrouper = Splitting::Groupers::SINGLE1D;
          #else
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
       } else
       {
-         // SINGLE2D or TRANSFORM grouper setup
-         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE2D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+         // SINGLE2D grouper setup
+         #if defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
             this->mGrouper = Splitting::Groupers::SINGLE2D;
          #else
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE2D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+         #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE2D
       }
    }
 

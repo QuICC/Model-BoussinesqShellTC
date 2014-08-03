@@ -44,6 +44,9 @@ namespace Parallel {
          setGrouper<Splitting::Groupers::TRANSFORM>(descr.algorithm, spFwdGrouper, spBwdGrouper);
       #endif //GEOMHDISCC_TRANSGROUPER_TRANSFORM
    #endif //GEOMHDISCC_MPI
+      } else
+      {
+         throw Exception("Unknown transform grouper setup");
       }
    }
 }

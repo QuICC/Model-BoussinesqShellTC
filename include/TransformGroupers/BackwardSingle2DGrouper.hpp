@@ -112,6 +112,9 @@ namespace Transform {
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
       for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
       {
+         // Synchronize
+         FrameworkMacro::synchronize();
+         
          // Setup the first exchange communication
          this->setupGrouped1DCommunication(scalIt->first, coord);
          // Compute first step of transform for scalar fields
@@ -127,6 +130,9 @@ namespace Transform {
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
       for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
       {
+         // Synchronize
+         FrameworkMacro::synchronize();
+         
          // Setup the first exchange communication
          this->setupGrouped1DCommunication(vectIt->first, coord);
          // Compute first step of transform for vector fields

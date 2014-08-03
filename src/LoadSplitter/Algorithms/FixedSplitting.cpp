@@ -81,11 +81,11 @@ namespace Parallel {
    void FixedSplitting::selectGrouper()
    {
       // SINGLE1D or TRANSFORM grouper setup
-      #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
          this->mGrouper = Splitting::Groupers::SINGLE1D;
       #else
          this->mGrouper = Splitting::Groupers::EQUATION;
-      #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D || defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
+      #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
    }
 
    int FixedSplitting::computeScore(SharedResolution spResolution)

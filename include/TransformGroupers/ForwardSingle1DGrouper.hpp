@@ -116,6 +116,9 @@ namespace Transform {
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
       for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
       {
+         // Sychronize
+         FrameworkMacro::synchronize();
+
          bool hasNL = (*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear();
          // Setup the second exchange communication step
          this->setupGrouped2DCommunication((*scalEqIt)->name(), hasNL, coord);
@@ -133,6 +136,9 @@ namespace Transform {
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
       for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
       {
+         // Sychronize
+         FrameworkMacro::synchronize();
+
          bool hasNL = (*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear();
          // Setup the second exchange communication step
          this->setupGrouped2DCommunication((*vectEqIt)->name(), hasNL, coord);

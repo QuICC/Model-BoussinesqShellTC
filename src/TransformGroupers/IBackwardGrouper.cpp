@@ -161,10 +161,16 @@ namespace Transform {
    ArrayI IBackwardGrouper::groupPacks1D(const VariableRequirement& varInfo)
    {
       // Initialise the number of packs
-      ArrayI packs(1);
+      ArrayI packs = this->namePacks1D(varInfo);
+
+      // Resize packs to single value
+      packs.resize(1);
       packs.setConstant(0);
 
-      packs(0) = this->namePacks1D(varInfo).sum();
+      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks1D.begin(); it != this->mNamedPacks1D.end(); ++it)
+      {
+         packs(0) = packs(0) + it->second;
+      }
 
       return packs;
    }
@@ -172,10 +178,16 @@ namespace Transform {
    ArrayI IBackwardGrouper::groupPacks2D(const VariableRequirement& varInfo)
    {  
       // Initialise the number of packs
-      ArrayI packs(1);
+      ArrayI packs = this->namePacks2D(varInfo);
+
+      // Resize packs to single value
+      packs.resize(1);
       packs.setConstant(0);
 
-      packs(0) = this->namePacks2D(varInfo).sum();
+      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks2D.begin(); it != this->mNamedPacks2D.end(); ++it)
+      {
+         packs(0) = packs(0) + it->second;
+      }
 
       return packs;
    }
