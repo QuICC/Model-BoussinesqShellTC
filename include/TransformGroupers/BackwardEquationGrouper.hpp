@@ -10,6 +10,7 @@
 
 // Configuration includes
 // 
+#include "Framework/FrameworkMacro.h"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
 

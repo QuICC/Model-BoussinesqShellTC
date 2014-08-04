@@ -9,7 +9,8 @@
 #define FORWARDEQUATIONGROUPER_HPP
 
 // Configuration includes
-// 
+//
+#include "Framework/FrameworkMacro.h"
 #include "TypeSelectors/TransformSelector.hpp"
 
 // System includes
