@@ -95,22 +95,22 @@ namespace GeoMHDiSCC {
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
 
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
 
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
 
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VORTICITYZ);
-         spRand->setSpectrum(-0.1,0.1, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
       }
 
       // Add output file

@@ -336,7 +336,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
         tanchi = np.tan(eq_params['chi']*np.pi/180)
-        k = eigs[0]/2
+        k = eigs[0]/2.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -354,7 +354,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1/G**2))
+                mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1.0/G**2))
 
             elif field_col == ("velocityz",""):
                 mat = c2d.i2j1laplh(res[0],res[2], k, bc)
@@ -389,7 +389,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c2d.i2j1d0d1(res[0],res[2], bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16*Pr)))
+                mat = c2d.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16.0*Pr)))
 
             elif field_col == ("vorticityz",""):
                 mat = c2d.i2j1laplh(res[0],res[2],k, bc)
