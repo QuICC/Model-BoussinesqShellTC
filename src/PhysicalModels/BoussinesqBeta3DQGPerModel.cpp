@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqBeta3DQGModel.cpp
- * @brief Source of the Boussinesq Beta 3DQG model
+ * @file BoussinesqBeta3DQGPerModel.cpp
+ * @brief Source of the Boussinesq F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,102 +15,103 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqBeta3DQGModel.hpp"
+#include "PhysicalModels/BoussinesqBeta3DQGPerModel.hpp"
 
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
+#include "IoVariable/NusseltWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGTransport.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVorticityZ.hpp"
-#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGVelocityZ.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVelocityZ.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "Generator/Visualizers/VorticityStreamVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg4";
+   const std::string BoussinesqBeta3DQGPerModel::PYMODULE = "boussinesq_beta3dqg_per";
 
-   const std::string BoussinesqBeta3DQGModel::PYCLASS = "BoussinesqBeta3DQG";
+   const std::string BoussinesqBeta3DQGPerModel::PYCLASS = "BoussinesqBeta3DQGPer";
 
-   void BoussinesqBeta3DQGModel::addEquations(SharedSimulation spSim)
+   void BoussinesqBeta3DQGPerModel::addEquations(SharedSimulation spSim)
    {
       // Add streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerStreamfunction>();
       
       // Add vertical velocity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVelocityZ>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerVelocityZ>();
       
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerTransport>();
       
       // Add vertical vorticity computation
-      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGVorticityZ>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerVorticityZ>();
    }
 
-   void BoussinesqBeta3DQGModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
       {
          // Shared pointer to equation
          Equations::SharedCartesianExactScalarState spExact;
-      
-         // Add temperature initial state generation equation
+
+         // Add transport initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
-         
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+         spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
-         
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 0.0);
+
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
-         
-         // Add vertical velocity initial state generation equation
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+         spExact->setModeOptions(1e0, 2.0, 1e0, 0.0, 1e0, 0.0);
+
+         // Add vertical vorticity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VORTICITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
+         spExact->setModeOptions(1e0, 2.0, 1e0, 0.0, 1e0, 0.0);
 
+      // Generate random spectrum
       } else
       {
-         // Shared pointer to equation
+         // Shared pointer to random initial state equation
          Equations::SharedRandomScalarState spRand;
 
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
-         // Add transport initial state generation equation
+         // Add streamfunction initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
-         // Add transport initial state generation equation
+         // Add vertical velocity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
-         // Add transport initial state generation equation
+         // Add vertical vorticity initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VORTICITYZ);
-         spRand->setSpectrum(-1.0e-10, 1.0e-10, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -122,7 +123,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqBeta3DQGPerModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -145,18 +146,18 @@ namespace GeoMHDiSCC {
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, true);
-      spField->setIdentity(PhysicalNames::VORTICITYZ);
+      spField->setIdentity(PhysicalNames::VORTICITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::VORTICITYZ);
+      spOut->expect(PhysicalNames::VORTICITY);
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqBeta3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqBeta3DQGPerModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -165,19 +166,19 @@ namespace GeoMHDiSCC {
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::STREAMFUNCTION);
       spIn->expect(PhysicalNames::VELOCITYZ);
-      spIn->expect(PhysicalNames::VORTICITYZ);
+      spIn->expect(PhysicalNames::VORTICITY);
 
       // Set simulation state
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqBeta3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqBeta3DQGPerModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqBeta3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqBeta3DQGPerModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -189,10 +190,11 @@ namespace GeoMHDiSCC {
       {
          spState->expect(*it);
       }
+
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqBeta3DQGModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqBeta3DQGPerModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
