@@ -11,14 +11,27 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [50, 0, 0]
-chi = 1
-eq_params = {'prandtl':1, 'rayleigh':9.0, 'gamma':1, 'chi':chi}
+chi = 45
+Pr = 1
+G = 1e-2
+tanchi = np.tan(chi*np.pi/180.)
+beta = tanchi/G
+
+kxc = 0.0
+kyc = (2.0**(-1.0/6.0)*(beta*Pr/(1.0 + Pr))**(1.0/3.0))
+Rac = 16*((kxc**2 + kyc**2)**3/kyc**2 + beta**2*Pr**2/((kxc**2 + kyc**2)*(Pr + 1.0)**2))
+fc = -beta*kyc/((kxc**2 + kyc**2)*(1.0 + Pr))
+print("Ra_c = " + str(Rac))
+print("k_c = " + str(kyc))
+print("f_c = " + str(fc))
 
 # Set wave number
-kx = 0.0
-ky = 2.221403788
+kx = kxc
+ky = 2.0*kyc
 eigs = [kx, ky]
+Ra = Rac
 
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0, 'vorticityz':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x

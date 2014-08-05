@@ -114,8 +114,8 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             tanchi = np.tan(eq_params['chi']*np.pi/180)
             G = eq_params['gamma']
-            kx = eigs[0]
-            ky = eigs[1]/2
+            kx = eigs[0]/2.0
+            ky = eigs[1]/2.0
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -210,7 +210,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
         tanchi = np.tan(eq_params['chi']*np.pi/180)
-        kx = eigs[0]
+        kx = eigs[0]/2.0
         ky = eigs[1]/2.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -274,8 +274,8 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
-        kx = eigs[0]
-        ky = eigs[1]/2
+        kx = eigs[0]/2.0
+        ky = eigs[1]/2.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
