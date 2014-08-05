@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQGPer/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
 
 // Project includes
 //

@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/Beta3DQGPer/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 
 // Project includes
 //

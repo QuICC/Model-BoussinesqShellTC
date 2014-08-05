@@ -99,12 +99,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqBeta3DQGModel();
+         BoussinesqBeta3DQGPerModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqBeta3DQGModel();
+         ~BoussinesqBeta3DQGPerModel();
    };
 
 }
