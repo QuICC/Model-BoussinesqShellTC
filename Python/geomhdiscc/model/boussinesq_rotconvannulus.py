@@ -111,10 +111,12 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             m = eigs[0]
+            a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            if bcId == 0: # No-slip conditions
+            # No-slip conditions
+            if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -135,11 +137,12 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:23}, 'z':{0:0}, 'priority':'n'}
+                        bc = {'r':{0:23, 'c':{'a':a, 'b':b}}, 'z':{0:0}, 'priority':'n'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
                         bc = {'r':{0:0}, 'z':{0:21}, 'priority':'n'}
 
-            elif bcId == 1: # Stress-free conditions
+            # Stress-free conditions
+            elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -152,17 +155,17 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'r':{0:20}, 'z':{0:21}}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'r':{0:24, 'c':{'a':a, 'b':b}}, 'z':{0:21}}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'r':{0:21}, 'z':{0:20}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:23}, 'z':{0:0}, 'priority':'n'}
+                        bc = {'r':{0:25, 'c':{'a':a, 'b':b}}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:0}, 'z':{0:21}, 'priority':'n'}
+                        bc = {'r':{0:0}, 'z':{0:22}, 'priority':'r'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

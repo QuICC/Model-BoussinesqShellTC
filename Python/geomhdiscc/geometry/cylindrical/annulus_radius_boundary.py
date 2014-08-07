@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
+import itertools
 
 
 def no_bc():
@@ -31,24 +32,40 @@ def constrain(mat, bc, location = 't'):
 def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
+    # Outer u = 0
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], 1, bc.get('c',None))
+    # Inner u = 0
     elif bc[0] == 11:
         cond = tau_value(mat.shape[0], -1, bc.get('c',None))
+    # Outer D u = 0
     elif bc[0] == 12:
         cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
+    # Inner D u = 0
     elif bc[0] == 13:
         cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+    # u = 0
     elif bc[0] == 20:
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
+    # D u = 0
     elif bc[0] == 21:
         cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+    # D^2 u = 0
     elif bc[0] == 22:
         cond = tau_diff2(mat.shape[0], 0, bc.get('c',None))
+    # 1/r D(r u) = 0
     elif bc[0] == 23:
         cond = tau_1rdr(mat.shape[0], 0, bc.get('c',None))
+    # 1/r D(u/r) = 0
+    elif bc[0] == 24:
+        cond = tau_1rd1r(mat.shape[0], 0, bc.get('c',None))
+    # D(1/r D(r u)) = 0
+    elif bc[0] == 25:
+        cond = tau_d1rdr(mat.shape[0], 0, bc.get('c',None))
+    # u = Du = 0
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
+    # u = D^2u = 0
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
 
@@ -68,13 +85,23 @@ def tau_value(nr, pos, coeffs = None):
     """Create the boundary value tau line(s)"""
 
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*norm_c(i) for i in np.arange(0,nr)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nr)])
@@ -85,13 +112,23 @@ def tau_diff(nr, pos, coeffs = None):
     """Create the first derivative tau line(s)"""
 
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*i**2 for i in np.arange(0,nr)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([(-1.0)**(i+1)*c*i**2 for i in np.arange(0,nr)])
@@ -102,13 +139,23 @@ def tau_diff2(nr, pos, coeffs = None):
     """Create the second deriviative tau line(s)"""
 
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
@@ -116,9 +163,29 @@ def tau_diff2(nr, pos, coeffs = None):
     return np.array(cond)
 
 def tau_1rdr(nr, pos, coeffs = None):
-    """Create the 1/r D_r tau line(s)"""
+    """Create the 1/r D(r u) tau line(s)"""
 
-    cond = tau_value(nr, pos, coeffs) + tau_diff(nr, pos, coeffs)
+    a = coeffs['a']
+    b = coeffs['b']
+    cond = tau_diff(nr, pos, 1/a) + tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+
+    return cond
+
+def tau_1rd1r(nr, pos, coeffs = None):
+    """Create the 1/r D(u/r) tau line(s)"""
+
+    a = coeffs['a']
+    b = coeffs['b']
+    cond = tau_diff(nr, pos, 1/a) - tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+
+    return cond
+
+def tau_d1rdr(nr, pos, coeffs = None):
+    """Create the D(1/r D(r u)) tau line(s)"""
+
+    a = coeffs['a']
+    b = coeffs['b']
+    cond = tau_diff2(nr, pos, 1/a) + tau_diff(nr, pos, [1/(a+b), 1/(a-b)])
 
     return cond
 

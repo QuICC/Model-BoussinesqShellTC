@@ -10,6 +10,8 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
+use_parity_bc = True
+
 def no_bc():
     """Get a no boundary condition flag"""
 
@@ -102,7 +104,7 @@ def tau_value(nx, pos, coeffs = None):
     if pos <= 0:
         cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nx)])
 
-    if pos == 10:
+    if use_parity_bc and pos == 0:
         t = cond[0]
         cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nx)]
         cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nx)]
@@ -113,18 +115,28 @@ def tau_diff(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 1st derivative"""
 
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*i**2 for i in np.arange(0,nx)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([(-1.0)**(i+1)*c*i**2 for i in np.arange(0,nx)])
 
-    if pos == 10:
+    if use_parity_bc and pos == 0:
         t = cond[0]
         cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nx)]
         cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nx)]
@@ -135,18 +147,28 @@ def tau_diff2(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero 2nd derivative"""
 
     if coeffs is None:
-        c = 1.0
+        it = itertools.cycle([1.0])
     else:
-        c = coeffs
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
 
     cond = []
+    c = next(it)
     if pos >= 0:
         cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        c = next(it)
 
     if pos <= 0:
         cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
-    if pos == 10:
+    if use_parity_bc and pos == 0:
         t = cond[0]
         cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nx)]
         cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nx)]
@@ -165,7 +187,7 @@ def tau_value_diff(nx, pos, coeffs = None):
         cond.append(list(tau_value(nx,-1,coeffs)[0]))
         cond.append(list(tau_diff(nx,-1,coeffs)[0]))
 
-    if pos == 10:
+    if use_parity_bc and pos == 0:
         tv = cond[0]
         td = cond[1]
         cond[0] = [(cond[0][i] + cond[2][i])/2 for i in np.arange(0,nx)]
@@ -187,7 +209,7 @@ def tau_value_diff2(nx, pos, coeffs = None):
         cond.append(list(tau_value(nx,-1,coeffs)[0]))
         cond.append(list(tau_diff2(nx,-1,coeffs)[0]))
 
-    if pos == 10:
+    if use_parity_bc and pos == 0:
         tv = cond[0]
         td = cond[1]
         cond[0] = [(cond[0][i] + cond[2][i])/2 for i in np.arange(0,nx)]
