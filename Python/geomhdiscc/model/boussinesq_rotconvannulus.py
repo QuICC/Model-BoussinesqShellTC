@@ -114,7 +114,32 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            if bcId == 0:
+            if bcId == 0: # No-slip conditions
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'r':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'r':{0:20}, 'z':{0:20}}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'r':{0:20}, 'z':{0:20}}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'r':{0:20}, 'z':{0:20}}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
+                        bc = {'r':{0:23}, 'z':{0:0}, 'priority':'n'}
+                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
+                        bc = {'r':{0:0}, 'z':{0:21}, 'priority':'n'}
+
+            elif bcId == 1: # Stress-free conditions
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}

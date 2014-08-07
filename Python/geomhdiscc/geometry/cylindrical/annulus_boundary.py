@@ -15,7 +15,7 @@ def no_bc():
 
     return {'r':radbc.no_bc(), 'z':c1dbc.no_bc()}
 
-def bid(n, q, d, bc):
+def bid(n, q, d, bc, location = 't'):
     """Create a boundary indentity"""
 
     if bc[0] < 0:
@@ -25,7 +25,11 @@ def bid(n, q, d, bc):
         diags = [[1]*(n-d)]
 
         mat = spsp.diags(diags, offsets).tolil()
-        mat[0:q,:] = 0
+        if location == 't':
+            mat[0:q,:] = 0
+        elif location == 'b':
+            if q > 0:
+                mat[-q:,:] = 0
 
     return mat.tocsr()
 
