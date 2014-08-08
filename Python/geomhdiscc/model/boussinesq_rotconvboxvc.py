@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq convection in a rotating box model"""
+"""Module provides the functions to generate the Boussinesq convection in a rotating box model (velocity-continuity)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,8 +12,8 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 
 
-class BoussinesqRotConvBox(base_model.BaseModel):
-    """Class to setup the Boussinesq convection in a rotating box model"""
+class BoussinesqRotConvBoxVC(base_model.BaseModel):
+    """Class to setup the Boussinesq convection in a rotating box model (velocity-continuity)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -33,14 +33,14 @@ class BoussinesqRotConvBox(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("temperature","")]
+        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("pressure",""), ("temperature","")]
+        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -114,57 +114,105 @@ class BoussinesqRotConvBox(base_model.BaseModel):
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            # No-slip conditions
+            # No-slip + velocity conditions
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-40, 'x':0}}
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'x':0}, 'z':{0:-20, 'x':0}}
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'z':{0:20}}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:20}, 'z':{0:20}}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:20}}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
-                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:23}, 'z':{0:0}, 'priority':'z'}
-                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:0}, 'z':{0:21}, 'priority':'z'}
-
-            # Stress-free conditions
-            elif bcId == 1:
-                if self.use_galerkin:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
-                    elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-40, 'x':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'x':0}, 'z':{0:-20, 'x':0}}
-
-                else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'z':{0:21}}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'z':{0:21}}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
 #                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
-#                        bc = {'x':{0:21}, 'z':{0:0}, 'priority':'x'}
+#                        bc = {'x':{0:14}, 'z':{0:0}, 'priority':'r'}
 #                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
-#                        bc = {'x':{0:0}, 'z':{0:22}, 'priority':'z'}
+#                        bc = {'x':{0:0}, 'z':{0:14}, 'priority':'r'}
+
+            # Stress-free + velocity conditions
+            elif bcId == 1:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'z'}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'x'}
+                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:14}, 'z':{0:0}, 'priority':'r'}
+                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:0}, 'z':{0:14}, 'priority':'r'}
+
+            # No-slip + pressure conditions
+            elif bcId == 2:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:14}, 'z':{0:0}, 'priority':'r'}
+                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:0}, 'z':{0:14}, 'priority':'r'}
+
+            # Stress-free + pressure conditions
+            elif bcId == 3:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'z'}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
                         bc = {'x':{0:14}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
@@ -301,20 +349,6 @@ class BoussinesqRotConvBox(base_model.BaseModel):
                 mat = c2d.i2j2(res[0], res[2], bc, Ra)
 
         elif field_row == ("pressure",""):
-#            if field_col == ("velocityx",""):
-#                mat = c2d.i2j2(res[0], res[2], bc, -1j*m*Ta**0.5)
-#
-#            elif field_col == ("velocityy",""):
-#                mat = c2d.i2j2div(res[0], res[2], bc, Ta**0.5)
-#
-#            elif field_col == ("velocityz",""):
-#                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
-#
-#            elif field_col == ("pressure",""):
-#                mat = c2d.i2j2lapl(res[0], res[2], m, bc, -1.0, 2.0)
-#
-#            elif field_col == ("temperature",""):
-#                mat = c2d.i2j2e1(res[0], res[2], bc, Ra, 2.0)
             if field_col == ("velocityx",""):
                 mat = c2d.i1j1d1d0(res[0], res[2], bc)
 
@@ -322,7 +356,7 @@ class BoussinesqRotConvBox(base_model.BaseModel):
                 mat = c2d.i1j1(res[0], res[2], bc, 1j*m)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i1j1d0d1(res[0], res[2], bc, 1.0)
+                mat = c2d.i1j1d0d1(res[0], res[2], bc)
 
             elif field_col == ("pressure",""):
                 mat = c2d.zblk(res[0], res[2], 1, 1, bc)
@@ -344,7 +378,7 @@ class BoussinesqRotConvBox(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2lapl(res[0], res[2], m, bc, 1.0)
+                mat = c2d.i2j2lapl(res[0], res[2], m, bc)
 
         return mat
 

@@ -1,20 +1,23 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating convection in a box model"""
+"""Script to run a marginal curve trace for the Boussinesq rotating convection in a box model (Velocity-continuity)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconvbox as mod
+import geomhdiscc.model.boussinesq_rotconvboxvc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRotConvBox()
+model = mod.BoussinesqRotConvBoxVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [10, 0, 10]
-eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':5.5, 'ro':1, 'rratio':0.35}
+res = [30, 0, 30]
+eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':5.5}
 eigs = [1]
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':1, 'velocityy':1, 'velocityz':1, 'temperature':0, 'pressure':1}
+bc_vel = 0 # 0: NS/NS + vel, 1: SF/SF + vel, 2: NS/NS + pressure, 3: SF/SF + pressure
+bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp, 'pressure':bc_vel}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
