@@ -10,7 +10,7 @@ import itertools
 import geomhdiscc.base.utils as utils
 
 
-use_parity_bc = True
+use_parity_bc = False
 
 def no_bc():
     """Get a no boundary condition flag"""
@@ -56,6 +56,8 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
     elif bc[0] == 13:
         cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+    elif bc[0] == 14:
+        cond = tau_integral(mat.shape[0], 1, bc.get('c',None))
     elif bc[0] == 20:
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
     elif bc[0] == 21:
@@ -172,6 +174,39 @@ def tau_diff2(nx, pos, coeffs = None):
         t = cond[0]
         cond[0] = [(cond[0][i] + cond[1][i])/2 for i in np.arange(0,nx)]
         cond[1] = [(t[i] - cond[1][i])/2 for i in np.arange(0,nx)]
+
+    return np.array(cond)
+
+def tau_integral(nx, pos, coeffs = None):
+    """Create the boundary integral tau line(s)"""
+
+    if coeffs is None:
+        it = itertools.cycle([1.0])
+    else:
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
+
+    cond = []
+    c = next(it)
+    if pos >= 0:
+        tmp = np.zeros((1,nx))
+        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2
+        cond.append(tmp[0,:])
+        c = next(it)
+
+    if pos <= 0:
+        tmp = np.zeros((1,nx))
+        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2
+        cond.append(tmp[0,:])
 
     return np.array(cond)
 

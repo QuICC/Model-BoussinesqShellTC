@@ -60,12 +60,47 @@ def zblk(nx, nz, qx, qz, bc):
     mat = spsp.kron(c1d.zblk(nz,bcz),c1d.zblk(nx,bcx))
     return c2dbc.constrain(mat, nx, nz, qx, qz, bc)
 
+def i1j1(nx, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral in X and 1st integral in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i1(nz,bcz), c1d.i1(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, 1, 1, bc)
+
+def i1j1d1d0(nx, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral of 1st derivative in X and 1st integral in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i1(nz,bcz), c1d.qid(nx,1,bcx))
+    return c2dbc.constrain(mat, nx, nz, 1, 1, bc)
+
+def i1j1d0d1(nx, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral in X and 1st integral of 1st derivative in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.qid(nz,1,bcz), c1d.i1(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, 1, 1, bc)
+
 def i2j1d0d1(nx, nz, bc, coeff = 1.0):
     """Create operator for 2nd integral in X and 1st integral of 1st derivative in Z"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz,1,bcz), c1d.i2(nx,bcx))
     return c2dbc.constrain(mat, nx, nz, 2, 1, bc)
+
+def i2j2d1d0(nx, nz, bc, coeff = 1.0):
+    """Create operator for 2nd integral of 1st derivative in X and 2nd integral in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i2(nz,bcz), c1d.i2d1(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, 2, 2, bc)
+
+def i2j2d0d1(nx, nz, bc, coeff = 1.0):
+    """Create operator for 2nd integral in X and 2nd integrazl of 1st derivative in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i2d1(nz,bcz), c1d.i2(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, 2, 2, bc)
 
 def i2j2d0d2(nx, nz, bc, coeff = 1.0):
     """Create operator for 2nd integral in X and 2nd integrazl of 2nd derivative in Z"""

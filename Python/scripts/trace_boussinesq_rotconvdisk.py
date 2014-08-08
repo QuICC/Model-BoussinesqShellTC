@@ -1,20 +1,20 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating convection in a cylindrical annulus model"""
+"""Script to run a marginal curve trace for the Boussinesq rotating convection in a disk model"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconvannulus as mod
+import geomhdiscc.model.boussinesq_rotconvdisk as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRotConvAnnulus()
+model = mod.BoussinesqRotConvDisk()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [10, 0, 10]
+res = [30, 0, 0]
 eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':5.5, 'ro':1, 'rratio':0.35}
 eigs = [1]
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':1, 'velocityy':1, 'velocityz':1, 'temperature':0, 'pressure':1}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':0, 'velocityy':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -38,7 +38,7 @@ if True:
     io.mmwrite("matrix_B.mtx", B)
 
 # Solve EVP with sptarn
-if True:
+if False:
     import geomhdiscc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)

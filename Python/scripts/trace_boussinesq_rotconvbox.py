@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating convection in a cylindrical annulus model"""
+"""Script to run a marginal curve trace for the Boussinesq rotating convection in a box model"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconvannulus as mod
+import geomhdiscc.model.boussinesq_rotconvbox as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRotConvAnnulus()
+model = mod.BoussinesqRotConvBox()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()

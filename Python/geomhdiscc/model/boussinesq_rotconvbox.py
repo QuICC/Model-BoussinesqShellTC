@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq convection in a rotating cylindrical annulus model"""
+"""Module provides the functions to generate the Boussinesq convection in a rotating box model"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,13 +7,13 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cylindrical.annulus as annulus
+import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
+from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 
 
-class BoussinesqRotConvAnnulus(base_model.BaseModel):
-    """Class to setup the Boussinesq convection in a rotating cylindrical annulus model"""
+class BoussinesqRotConvBox(base_model.BaseModel):
+    """Class to setup the Boussinesq convection in a rotating box model"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -57,20 +57,20 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         tau_n = res[0]*res[2]
         if self.use_galerkin:
             if field_row == ("velocityx","") or field_row == ("velocityy","") or field_row == ("velocityz","") or field_row == ("temperature",""):
-                shift_r = 2
+                shift_x = 2
                 shift_z = 2
             else:
-                shift_r = 0
+                shift_x = 0
                 shift_z = 0
 
-            gal_n = (res[0] - shift_r)*(res[2] - shift_z)
+            gal_n = (res[0] - shift_x)*(res[2] - shift_z)
 
         else:
             gal_n = tau_n
-            shift_r = 0
+            shift_x = 0
             shift_z = 0
 
-        block_info = (tau_n, gal_n, (shift_r,0,shift_z), 1)
+        block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -111,7 +111,6 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             m = eigs[0]
-            a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -119,71 +118,71 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-40, 'x':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-21, 'x':0}, 'z':{0:-20, 'x':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'x':{0:20}, 'z':{0:20}}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'x':{0:20}, 'z':{0:20}}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:20}, 'z':{0:20}}
+                        bc = {'x':{0:20}, 'z':{0:20}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:23, 'c':{'a':a, 'b':b}}, 'z':{0:0}, 'priority':'z'}
+                        bc = {'x':{0:23}, 'z':{0:0}, 'priority':'z'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:0}, 'z':{0:21}, 'priority':'z'}
+                        bc = {'x':{0:0}, 'z':{0:21}, 'priority':'z'}
 
             # Stress-free conditions
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-40, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-40, 'x':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-21, 'x':0}, 'z':{0:-20, 'x':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:20}, 'z':{0:21}}
+                        bc = {'x':{0:20}, 'z':{0:21}}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'r':{0:24, 'c':{'a':a, 'b':b}}, 'z':{0:21}}
+                        bc = {'x':{0:21}, 'z':{0:21}}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'r':{0:20}, 'z':{0:20}, 'priority':'r'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
 #                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
-#                        bc = {'r':{0:25, 'c':{'a':a, 'b':b}}, 'z':{0:0}, 'priority':'r'}
+#                        bc = {'x':{0:21}, 'z':{0:0}, 'priority':'x'}
 #                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
-#                        bc = {'r':{0:0}, 'z':{0:22}, 'priority':'z'}
+#                        bc = {'x':{0:0}, 'z':{0:22}, 'priority':'z'}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'r':{0:14, 'c':{'a':a, 'b':b}}, 'z':{0:0}, 'priority':'r'}
+                        bc = {'x':{0:14}, 'z':{0:0}, 'priority':'r'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'r':{0:0}, 'z':{0:14}, 'priority':'r'}
+                        bc = {'x':{0:0}, 'z':{0:14}, 'priority':'r'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
-                elif field_row == ("velocityz",""):
-                    bc['r']['r'] = 2
+                elif field_ror == ("velocityz",""):
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
 
         # Stencil:
@@ -192,29 +191,29 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocityx",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'x':0}, 'z':{0:-20, 'x':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-21, 'x':0}, 'z':{0:-20, 'x':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r']['r'] = 2
+                    bc['x']['r'] = 2
                     bc['z']['r'] = 2
 
         return bc
@@ -229,20 +228,18 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
-        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         elif field_row == ("velocityy",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         elif field_row == ("velocityz",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         elif field_row == ("temperature",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         return mat
 
@@ -252,115 +249,102 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, 1.0, 2.0)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = c2d.i2j2lapl(res[0], res[2], m, bc, 1.0)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, Ta**0.5)
+                mat = c2d.i2j2(res[0], res[2], bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, -1.0)
+                mat = c2d.i2j2d1d0(res[0], res[2], bc, -1.0)
 
             elif field_col == ("temperature",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, -Ta**0.5)
+                mat = c2d.i2j2(res[0], res[2], bc, -Ta**0.5)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, 1.0, 2.0)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = c2d.i2j2lapl(res[0], res[2], m, bc, 1.0)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m)
+                mat = c2d.i2j2(res[0], res[2], bc, -1j*m)
 
             elif field_col == ("temperature",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, 1.0, 2.0)
+                mat = c2d.i2j2lapl(res[0], res[2], m, bc, 1.0)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, 2.0)
+                mat = c2d.i2j2d0d1(res[0], res[2], bc, -1.0)
 
             elif field_col == ("temperature",""):
-                mat = annulus.i2j2x2(res[0], res[2], a, b, bc, Ra)
+                mat = c2d.i2j2(res[0], res[2], bc, Ra)
 
         elif field_row == ("pressure",""):
 #            if field_col == ("velocityx",""):
-#                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m*Ta**0.5)
+#                mat = c2d.i2j2(res[0], res[2], bc, -1j*m*Ta**0.5)
 #
 #            elif field_col == ("velocityy",""):
-#                mat = annulus.i2j2x2div(res[0], res[2], a, b, bc, Ta**0.5)
+#                mat = c2d.i2j2div(res[0], res[2], bc, Ta**0.5)
 #
 #            elif field_col == ("velocityz",""):
-#                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+#                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 #
 #            elif field_col == ("pressure",""):
-#                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, -1.0, 2.0)
+#                mat = c2d.i2j2lapl(res[0], res[2], m, bc, -1.0, 2.0)
 #
 #            elif field_col == ("temperature",""):
-#                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, Ra, 2.0)
+#                mat = c2d.i2j2e1(res[0], res[2], bc, Ra, 2.0)
             if field_col == ("velocityx",""):
-                mat = annulus.i1j1x1div(res[0], res[2], a, b, bc)
+                mat = c2d.i1j1d1d0(res[0], res[2], bc)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i1j1(res[0], res[2], a, b, bc, 1j*m)
+                mat = c2d.i1j1(res[0], res[2], bc, 1j*m)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.i1j1x1e1(res[0], res[2], a, b, bc, 1.0, 2.0)
+                mat = c2d.i1j1d0d1(res[0], res[2], bc, 1.0)
 
             elif field_col == ("pressure",""):
-                mat = annulus.zblk(res[0], res[2], 1, 1, bc)
+                mat = c2d.zblk(res[0], res[2], 1, 1, bc)
 
             elif field_col == ("temperature",""):
-                mat = annulus.zblk(res[0], res[2], 1, 1, bc)
+                mat = c2d.zblk(res[0], res[2], 1, 1, bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+                mat = c2d.i2j2(res[0], res[2], bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, 1.0, 2.0)
+                mat = c2d.i2j2lapl(res[0], res[2], m, bc, 1.0)
 
         return mat
 
@@ -370,23 +354,22 @@ class BoussinesqRotConvAnnulus(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("velocityy",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("velocityz",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("pressure",""):
-            mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+            mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("temperature",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         return mat

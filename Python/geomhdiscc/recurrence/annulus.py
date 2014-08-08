@@ -36,6 +36,21 @@ def i1x1d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i1x1div():
+    """Cylindrical annulus 1st integral of x radial divergence operator"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':1, 'p':1, 'd':1, 'c':1}, {'q':1, 'p':0, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i1x1():
     """Cylindrical annulus first integral of x operator"""
 

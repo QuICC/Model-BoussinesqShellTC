@@ -44,6 +44,9 @@ def apply_tau(mat, bc, location = 't'):
     # Inner D u = 0
     elif bc[0] == 13:
         cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+    # integral
+    elif bc[0] == 14:
+        cond = tau_integral(mat.shape[0], 1, bc.get('c',None))
     # u = 0
     elif bc[0] == 20:
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
@@ -105,6 +108,39 @@ def tau_value(nr, pos, coeffs = None):
 
     if pos <= 0:
         cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nr)])
+
+    return np.array(cond)
+
+def tau_integral(nr, pos, coeffs = None):
+    """Create the boundary integral tau line(s)"""
+
+    if coeffs is None:
+        it = itertools.cycle([1.0])
+    else:
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
+
+    cond = []
+    c = next(it)
+    if pos >= 0:
+        tmp = np.zeros((1,nr))
+        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,0] = tmp[0,0]/2
+        cond.append(tmp[0,:])
+        c = next(it)
+
+    if pos <= 0:
+        tmp = np.zeros((1,nr))
+        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,0] = tmp[0,0]/2
+        cond.append(tmp[0,:])
 
     return np.array(cond)
 

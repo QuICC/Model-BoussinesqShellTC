@@ -73,6 +73,31 @@ def i1x1d1(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i1x1div(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral x radial divergence T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a/2.0
+
+    # Generate diagonal
+    def d0(n):
+        return b
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a/2.0
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i1x1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 1st integral of x T_n(x)."""
 
