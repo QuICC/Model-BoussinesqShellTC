@@ -254,6 +254,17 @@ def i4(nx, xg):
     ssol = sy.integrate(sphys,x,x,x,x)
     test_forward(A, sphys, ssol, xg, 4)
 
+def i4d1(nx, xg):
+    """Accuracy test for i4d1 operator"""
+
+    print("i4d1:")
+    x = sy.Symbol('x')
+    A = c1d.i4d1(nx, c1d.c1dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.expand(sy.diff(sphys,x))
+    ssol = sy.integrate(ssol,x,x,x,x)
+    test_forward(A, sphys, ssol, xg, 4)
+
 def i4d2(nx, xg):
     """Accuracy test for i4d2 operator"""
 
@@ -442,7 +453,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 30
+    nx = 10
     xg = transf.grid(nx)
 
     # run hardcoded operator tests
@@ -460,6 +471,7 @@ if __name__ == "__main__":
     i2lapl(nx, xg)
     i2laplh(nx, xg)
     i4(nx, xg)
+    i4d1(nx, xg)
     i4d2(nx, xg)
     i4d4(nx, xg)
     i4lapl(nx, xg)

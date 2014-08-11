@@ -29,14 +29,16 @@ def tocheb(phys):
 def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""
 
+    phys = np.zeros(spec.shape)
+
     for i in range(spec.shape[0]):
-        spec.real[i,:] = tophys(spec.real[i,:])
-        spec.imag[i,:] = tophys(spec.imag[i,:])
+        phys.real[i,:] = tophys(spec.real[i,:])
+        phys.imag[i,:] = tophys(spec.imag[i,:])
     for j in range(spec.shape[1]):
-        spec.real[:,j] = tophys(spec.real[:,j])
-        spec.imag[:,j] = tophys(spec.imag[:,j])
+        phys.real[:,j] = tophys(phys.real[:,j])
+        phys.imag[:,j] = tophys(phys.imag[:,j])
     
-    return spec
+    return phys
 
 def tocheb2d(phys):
     """Transform 2D physical array to 2D spectral coefficients"""

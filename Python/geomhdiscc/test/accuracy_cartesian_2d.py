@@ -393,6 +393,20 @@ def i4j2laplh(nx,nz, xg, zg):
     ssol = sy.expand(ssol)
     test_forward(A, sphys, ssol, xg, zg, 4, 2)
 
+def i4j4d1d0(nx,nz, xg, zg):
+    """Accuracy test for i4j2d1d0 operator"""
+
+    print("i4j4d1d0:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = c2d.i4j4d1d0(nx,nz, c2d.c2dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.expand(sy.diff(sphys,x))
+    ssol = sy.integrate(ssol,x,x,x,x)
+    ssol = sy.expand(ssol)
+    ssol = sy.integrate(ssol,z,z,z,z)
+    test_forward(A, sphys, ssol, xg, zg, 4, 4)
+
 def i4j4lapl(nx,nz, xg, zg):
     """Accuracy test for i4j4lapl operator"""
 
@@ -725,6 +739,7 @@ if __name__ == "__main__":
     i4j2d0d2(nx, nz, xg, zg)
     i4j1laplh(nx, nz, xg, zg)
     i4j2laplh(nx, nz, xg, zg)
+    i4j4d1d0(nx, nz, xg, zg)
     i4j4lapl(nx, nz, xg, zg)
     i4j1lapl2h(nx, nz, xg, zg)
     i4j2lapl2h(nx, nz, xg, zg)

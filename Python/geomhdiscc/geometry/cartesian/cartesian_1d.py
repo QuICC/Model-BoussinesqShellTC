@@ -226,6 +226,35 @@ def i4(nx, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
+def i4d1(nx, bc, coeff = 1.0):
+    """Create operator for 4th integral in x of D_x T_n(x)"""
+
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-3,4,2)
+    nzrow = 3
+
+    # Generate 3rd subdiagonal
+    def d_2(n):
+        return 1.0/(8.0*n*(n - 2.0)*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -3.0/(8.0*n*(n - 2.0)*(n + 1.0)) 
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return 3.0/(8.0*n*(n - 1.0)*(n + 2.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -1.0/(8.0*n*(n + 1.0)*(n + 2.0)) 
+
+    ds = [d_2, d_1, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return c1dbc.constrain(mat, bc)
+
 def i4d2(nx, bc, coeff = 1.0):
     """Create operator for 4th integral in x of D_x^2 T_n(x)"""
 

@@ -127,8 +127,21 @@ def i4():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i4d1():
+    """Cartesian 4th integral of 1st derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':4, 'p':0, 'd':1, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i4d2():
-    """Cartesian fourth integral of second derivative operator"""
+    """Cartesian 4th integral of 2nd derivative operator"""
 
     # Setup terms in recurrence
     terms = [{'q':4, 'p':0, 'd':2, 'c':1}]

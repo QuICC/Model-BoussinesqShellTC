@@ -202,6 +202,13 @@ def i4j4(nx, nz, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), c1d.i4(nx,bcx))
     return c2dbc.constrain(mat, nx, nz, 4, 4, bc)
 
+def i4j4d1d0(nx, nz, bc, coeff = 1.0):
+    """Create operator for 4th integral of 1st derivative in X and 4th integral in Z"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i4(nz,bcz), c1d.i4d1(nx,bcx))
+    return c2dbc.constrain(mat, nx, nz, 4, 4, bc)
+
 def i4j1laplh(nx, nz, k, bc, coeff = 1.0):
     """Create operator for 4th integral in x 1st integral of z of horizontal Laplacian T_n(x)T_n(z)"""
 
