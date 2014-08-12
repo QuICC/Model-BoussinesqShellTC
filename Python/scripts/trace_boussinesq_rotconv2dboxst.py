@@ -12,7 +12,8 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.71461}
+#eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
+eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
 bc_str = 0 # 0: NS/NS + vel, 1: SF/SF + vel, 2: NS/NS + pressure, 3: SF/SF + pressure
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
@@ -48,37 +49,49 @@ if True:
 
     sol_s = evp_vec[0:res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
     sol_t = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
+    sol_u = (mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*evp_vec[0:res[0]*res[2],-1]).reshape(res[0], res[2], order = 'F')
+    sol_w = -(mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*evp_vec[0:res[0]*res[2],-1]).reshape(res[0], res[2], order = 'F')
+    sol_c = (mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*evp_vec[0:res[0]*res[2],-1] - mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*evp_vec[0:res[0]*res[2],-1]).reshape(res[0], res[2], order = 'F')
 
     import matplotlib.pylab as pl
-    pl.subplot(1,2,1)
+    pl.subplot(1,3,1)
     pl.imshow(np.log10(np.abs(sol_s)))
     pl.colorbar()
-    pl.subplot(1,2,2)
+    pl.title('Streamfunction')
+    pl.subplot(1,3,2)
     pl.imshow(np.log10(np.abs(sol_t)))
     pl.colorbar()
+    pl.title('T')
+    pl.subplot(1,3,3)
+    pl.imshow(np.log10(np.abs(sol_c)))
+    pl.colorbar()
+    pl.title('Continuity')
     pl.show()
     pl.close("all")
 
     import geomhdiscc.transform.cartesian as transf
     phys_s = transf.tophys2d(sol_s)
     phys_t = transf.tophys2d(sol_t)
-    pl.subplot(1,2,1)
-    pl.imshow(phys_s)
-    pl.colorbar()
-    pl.subplot(1,2,2)
-    pl.imshow(phys_t)
-    pl.colorbar()
-    pl.show()
-    pl.close("all")
-
+    phys_u = transf.tophys2d(sol_u)
+    phys_w = transf.tophys2d(sol_w)
+    phys_c = transf.tophys2d(sol_c)
     grid_x = transf.grid(res[0])
     grid_z = transf.grid(res[2])
 
-    pl.subplot(1,2,1)
+    pl.subplot(2,3,1)
     pl.contourf(grid_x, grid_z, phys_s, 50)
     pl.colorbar()
-    pl.subplot(1,2,2)
+    pl.subplot(2,3,2)
     pl.contourf(grid_x, grid_z, phys_t, 50)
+    pl.colorbar()
+    pl.subplot(2,3,3)
+    pl.contourf(grid_x, grid_z, phys_u, 50)
+    pl.colorbar()
+    pl.subplot(2,3,4)
+    pl.contourf(grid_x, grid_z, phys_w, 50)
+    pl.colorbar()
+    pl.subplot(2,3,5)
+    pl.contourf(grid_x, grid_z, phys_c, 50)
     pl.colorbar()
     pl.show()
     pl.close("all")

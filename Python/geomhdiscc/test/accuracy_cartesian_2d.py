@@ -87,6 +87,17 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     vis_error(err, 'Galerkin backward error')
     print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
+def d1d0(nx,nz, xg, zg):
+    """Accuracy test for d1d0 operator"""
+
+    print("d1d0:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = c2d.d1d0(nx, nz, 0, c2d.c2dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.expand(sy.diff(sphys,x))
+    test_forward(A, sphys, ssol, xg, zg, 1, 0)
+
 def d0d1(nx,nz, xg, zg):
     """Accuracy test for d0d1 operator"""
 
@@ -719,6 +730,7 @@ if __name__ == "__main__":
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
+    d1d0(nx, nz, xg, zg)
     d0d1(nx, nz, xg, zg)
     laplh(nx, nz, xg, zg)
     lapl2h(nx, nz, xg, zg)

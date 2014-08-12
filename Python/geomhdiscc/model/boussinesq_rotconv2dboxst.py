@@ -114,7 +114,7 @@ class BoussinesqRotConv2DBoxST(base_model.BaseModel):
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            # No-slip + velocity conditions
+            # No-slip
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("streamfunction",""):
@@ -127,6 +127,20 @@ class BoussinesqRotConv2DBoxST(base_model.BaseModel):
                         bc = {'x':{0:40}, 'z':{0:40}, 'priority':'x'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+
+            # stress-free
+            elif bcId == 1:
+                if self.use_galerkin:
+                    if field_col == ("streamfunction",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
+                        bc = {'x':{0:41}, 'z':{0:41}, 'priority':'x'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'x'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

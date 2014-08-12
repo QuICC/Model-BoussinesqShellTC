@@ -32,11 +32,18 @@ def convert_bc(bc):
 
     return (bcx, bcz)
 
+def d1d0(nx, nz, sz, bc, coeff = 1.0):
+    """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), c1d.d1(nx, bcx))
+    return c2dbc.constrain(mat, nx, nz, 1, sz, bc, location = 'b')
+
 def d0d1(nx, nz, sx, bc, coeff = 1.0):
     """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.d1(nz,bcz), c1d.sid(nx,sx,bcx))
+    mat = coeff*spsp.kron(c1d.d1(nz, bcz), c1d.sid(nx, sx, bcx))
     return c2dbc.constrain(mat, nx, nz, sx, 1, bc, location = 'b')
 
 def laplh(nx, nz, k, sz, bc, coeff = 1.0):
