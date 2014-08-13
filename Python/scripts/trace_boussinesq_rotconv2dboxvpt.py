@@ -11,9 +11,9 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [10, 0, 10]
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
-eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.71}
+eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
 bc_vel = 0 # 0: NS/NS + vel, 1: SF/SF + vel, 2: NS/NS + pressure, 3: SF/SF + pressure
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
@@ -27,10 +27,10 @@ A[3*res[0]*res[2],:] = 0
 A[3*res[0]*res[2],3*res[0]*res[2]] = 1
 #A[3*res[0]*res[2]+1,:] = 0
 #A[3*res[0]*res[2]+1,3*res[0]*res[2]+res[0]-1] = 1
-#A[3*res[0]*res[2]+res[0],:] = 0
-#A[3*res[0]*res[2]+res[0],-res[0]] = 1
-#A[3*res[0]*res[2]+res[0]+1,:] = 0
-#A[3*res[0]*res[2]+res[0]+1,-1] = 1
+#A[4*res[0]*res[2]-res[0],:] = 0
+#A[4*res[0]*res[2]-res[0],-res[0]] = 1
+#A[4*res[0]*res[2]-res[0]+1,:] = 0
+#A[4*res[0]*res[2]-res[0]+1,-1] = 1
 A = A.tocsr()
 
 # Generate the operator B for the generalized EVP Ax = sigm B x
@@ -73,10 +73,6 @@ if True:
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,3)
-    pl.imshow(np.log10(np.abs(sol_p)))
-    pl.colorbar()
-    pl.title("p")
-    pl.subplot(2,3,4)
     pl.imshow(np.log10(np.abs(sol_t)))
     pl.colorbar()
     pl.title("T")
@@ -84,6 +80,10 @@ if True:
     pl.imshow(np.log10(np.abs(sol_c)))
     pl.colorbar()
     pl.title("Continuity")
+    pl.subplot(2,3,6)
+    pl.imshow(np.log10(np.abs(sol_p)))
+    pl.colorbar()
+    pl.title("p")
     pl.show()
     pl.close("all")
 
@@ -105,16 +105,16 @@ if True:
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_p, 50)
-    pl.colorbar()
-    pl.title("p")
-    pl.subplot(2,3,4)
     pl.contourf(grid_x, grid_z, phys_t, 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, phys_c, 50)
+    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c)), 50)
     pl.colorbar()
     pl.title("Continuity")
+    pl.subplot(2,3,6)
+    pl.contourf(grid_x, grid_z, phys_p, 50)
+    pl.colorbar()
+    pl.title("p")
     pl.show()
     pl.close("all")

@@ -78,6 +78,10 @@ def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
             bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location), bcMat)
         elif bc['x']['kron'] == "d1":
             bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.d1(nz, c1dbc.no_bc()), bcMat)
+        elif bc['x']['kron'] == "i1":
+            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.i1(nz, c1dbc.no_bc()), bcMat)
+        elif bc['x']['kron'] == "q1":
+            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.qid(nz, 1, c1dbc.no_bc()), bcMat)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
@@ -87,6 +91,10 @@ def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
                 bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location))
             elif bc['z']['kron'] == "d1":
                 bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.d1(nx, c1dbc.no_bc()))
+            elif bc['z']['kron'] == "i1":
+                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.i1(nx, c1dbc.no_bc()))
+            elif bc['z']['kron'] == "q1":
+                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.qid(nx, 1, c1dbc.no_bc()))
 
         else:
             tmpB = c1dbc.constrain(bid(nx,0,0,c1dbc.no_bc(), location = location),bc['x'], location = location)

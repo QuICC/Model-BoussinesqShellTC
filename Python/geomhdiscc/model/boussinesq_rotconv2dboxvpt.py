@@ -132,11 +132,13 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("pressure","") and field_col == ("pressure",""):
-                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sz'}
-                    elif field_row == ("pressure","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:0}, 'z':{0:21, 'kron':'d1'}, 'priority':'sz'}
+                        #bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sz'}
+                        #bc = {'x':{0:0}, 'z':{0:21}, 'priority':'sz'}
+                       bc = {'x':{0:21}, 'z':{0:0}, 'priority':'x'}
+                    #elif field_row == ("pressure","") and field_col == ("velocityx",""):
+                    #    bc = {'x':{0:21}, 'z':{0:21, 'kron':'d1'}, 'priority':'sx'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21, 'kron':'d1'}, 'z':{0:0}, 'priority':'sz'}
+                        bc = {'x':{0:21, 'kron':'d1'}, 'z':{0:21}, 'priority':'x'}
 
             if bcId == 1:
                 if self.use_galerkin:
