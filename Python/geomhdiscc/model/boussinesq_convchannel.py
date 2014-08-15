@@ -128,6 +128,8 @@ class BoussinesqConvChannel(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {0:20}
+#                    elif field_row == ("pressure","") and field_col == ("velocityz",""):
+#                        bc = {0:12}
 
             # Stress-free / Fixed flux
             elif bcId == 1:
@@ -283,6 +285,22 @@ class BoussinesqConvChannel(base_model.BaseModel):
 
             elif field_col == ("temperature",""):
                 mat = c1d.i2lapl(res[0], k1, k2, bc)
+
+#        elif field_row == ("pressure",""):
+#            if field_col == ("velocityx",""):
+#                mat = c1d.i1(res[0], bc, 1j*k1)
+#
+#            elif field_col == ("velocityy",""):
+#                mat = c1d.i1(res[0], bc, 1j*k2)
+#
+#            elif field_col == ("velocityz",""):
+#                mat = c1d.i1d1(res[0], bc)
+#
+#            elif field_col == ("pressure",""):
+#                mat = c1d.zblk(res[0], bc)
+#
+#            elif field_col == ("temperature",""):
+#                mat = c1d.zblk(res[0], bc)
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):

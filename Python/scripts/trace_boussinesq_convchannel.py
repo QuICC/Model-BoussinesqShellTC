@@ -15,7 +15,6 @@ res = [100, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':1707.8}
 phi = 0
 kp = 3.117
-kp = 0
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]
@@ -78,8 +77,6 @@ if True:
     pl.semilogy(abs(sol_c))
     pl.title('Continuity')
     pl.show()
-
-    print(sol_c.shape)
 
     import geomhdiscc.transform.cartesian as transf
     phys_u = transf.tophys(sol_u.real)
