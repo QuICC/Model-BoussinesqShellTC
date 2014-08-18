@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [6, 0, 6]
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
 eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
@@ -25,12 +25,14 @@ A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
 A = A.tolil()
 A[3*res[0]*res[2],:] = 0
 A[3*res[0]*res[2],3*res[0]*res[2]] = 1
-#A[3*res[0]*res[2]+res[0]-2,:] = 0
-#A[3*res[0]*res[2]+res[0]-2,3*res[0]*res[2]] = 1
-#A[3*res[0]*res[2]+res[0]-1,:] = 0
-#A[3*res[0]*res[2]+res[0]-1,3*res[0]*res[2]+res[0]-1] = 1
-#A[3*res[0]*res[2]+res[0],:] = 0
-#A[3*res[0]*res[2]+res[0],-res[0]] = 1
+A[3*res[0]*res[2]+1,:] = 0
+A[3*res[0]*res[2]+1,3*res[0]*res[2]+res[0]-1] = 1
+
+A[3*res[0]*res[2]+res[0],:] = 0
+A[3*res[0]*res[2]+res[0],-res[0]] = 1
+A[3*res[0]*res[2]+res[0]+1,:] = 0
+A[3*res[0]*res[2]+res[0]+1,-1] = 1
+
 #A[3*res[0]*res[2]+res[0]+1,:] = 0
 #A[3*res[0]*res[2]+res[0]+1,-1] = 1
 #A[4*res[0]*res[2]-2*res[0],:] = 0

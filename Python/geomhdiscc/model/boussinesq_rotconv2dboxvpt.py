@@ -128,7 +128,7 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("pressure","") and field_col == ("pressure",""):
@@ -138,7 +138,8 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                         #bc = {'x':{0:21}, 'z':{0:0}, 'priority':'sx'}
                         #bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sz'}
                         #bc = {'x':{0:0}, 'z':{0:21}, 'priority':'sx'}
-                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sx'}
+                        #bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sx'}
+                        bc = {'x':{0:0}, 'z':{0:0}}
                     elif field_row == ("pressure","") and field_col == ("velocityx",""):
                         #bc = {'x':{0:20, 'c':-1.0, 'kron':'d2'}, 'z':{0:21, 'kron':'d1'}, 'priority':'x'}
                         #bc = {'x':{0:0}, 'z':{0:21, 'kron':'d1'}, 'priority':'sz'}
@@ -146,7 +147,8 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                         #bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
                         #bc = {'x':{0:22, 'c':-1/2}, 'z':{0:21, 'c':1/2, 'kron':'d1'}, 'priority':'sz'}
                         #bc = {'x':{0:21}, 'z':{0:21, 'c':1/2, 'kron':'d1'}, 'priority':'sx'}
-                        bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
+                        #bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
+                        bc = {'x':{0:21}, 'z':{0:0}, 'priority':'n'}
                     elif field_row == ("pressure","") and field_col == ("velocityz",""):
                         #bc = {'x':{0:21, 'kron':'d1'}, 'z':{0:20, 'c':-1.0, 'kron':'d2'}, 'priority':'x'}
                         #bc = {'x':{0:21, 'kron':'d1'}, 'z':{0:0}, 'priority':'sz'}
@@ -154,7 +156,8 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                         #bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
                         #bc = {'x':{0:21, 'c':1/2, 'kron':'d1'}, 'z':{0:22, 'c':-1/2}, 'priority':'sz'}
                         #bc = {'x':{0:0}, 'z':{0:22, 'c':-1/2}, 'priority':'sx'}
-                        bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
+                        #bc = {'x':{0:0}, 'z':{0:0}, 'priority':'x'}
+                        bc = {'x':{0:0}, 'z':{0:21}, 'priority':'n'}
 
             if bcId == 1:
                 if self.use_galerkin:

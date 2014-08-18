@@ -128,7 +128,7 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
 #                    elif field_row == ("pressure","") and field_col == ("pressure",""):
