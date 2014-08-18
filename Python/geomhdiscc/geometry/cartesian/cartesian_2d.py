@@ -46,6 +46,17 @@ def d0d1(nx, nz, sx, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.d1(nz, bcz), c1d.sid(nx, sx, bcx))
     return c2dbc.constrain(mat, nx, nz, sx, 1, bc, location = 'b')
 
+def lapl(nx, nz, bc, coeff = 1.0):
+    """Create operator for the 2nd X derivative and 2nd Z derivative T_n(x)T_n(z)"""
+
+    bcx, bcz = convert_bc(bc)
+    mat = spsp.kron(c1d.d2(nz, bcz), c1d.qid(nx, 2, bcx))
+    mat = mat + spsp.kron(c1d.qid(nz, 2, bcz), c1d.d2(nx, bcx))
+    bcx[0] = min(bcx[0], 0)
+    bcz[0] = min(bcz[0], 0)
+    mat = coeff*mat
+    return c2dbc.constrain(mat, nx, nz, 2, 2, bc, location = 'b')
+
 def laplh(nx, nz, k, sz, bc, coeff = 1.0):
     """Create operator for the horizontal Laplacian T_n(x)T_n(z)"""
 

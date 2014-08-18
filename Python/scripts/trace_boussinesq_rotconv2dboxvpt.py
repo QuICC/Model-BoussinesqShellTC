@@ -11,7 +11,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [6, 0, 6]
+res = [20, 0, 20]
+pN = 0
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
 eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
@@ -32,6 +33,9 @@ A[3*res[0]*res[2]+res[0],:] = 0
 A[3*res[0]*res[2]+res[0],-res[0]] = 1
 A[3*res[0]*res[2]+res[0]+1,:] = 0
 A[3*res[0]*res[2]+res[0]+1,-1] = 1
+
+A[-(res[0]+2),:] = 0
+A[-(res[0]+2),-(res[0]+2)] = 1
 
 #A[3*res[0]*res[2]+res[0]+1,:] = 0
 #A[3*res[0]*res[2]+res[0]+1,-1] = 1
@@ -72,7 +76,7 @@ if True:
     sol_u = evp_vec[0:res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
     sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
     sol_t = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_p = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
+    sol_p = evp_vec[3*res[0]*res[2]:,-1].reshape(res[0]-pN, res[2]-pN, order = 'F')
     sol_c = (mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*sol_u.reshape(res[0]*res[2], order ='F') + mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*sol_w.reshape(res[0]*res[2], order ='F')).reshape(res[0], res[2], order = 'F')
 
     import matplotlib.pylab as pl

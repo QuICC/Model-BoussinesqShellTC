@@ -247,6 +247,8 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
+        pN = 0
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
@@ -256,6 +258,8 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
+                bc['x']['cr'] = pN
+                bc['z']['cr'] = pN
                 mat = c2d.i2j2d1d0(res[0], res[2], bc, -1.0)
 
             elif field_col == ("temperature",""):
@@ -269,23 +273,12 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
 
             elif field_col == ("pressure",""):
+                bc['x']['cr'] = pN
+                bc['z']['cr'] = pN
                 mat = c2d.i2j2d0d1(res[0], res[2], bc, -1.0)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2(res[0], res[2], bc, Ra/16.0)
-
-        elif field_row == ("pressure",""):
-            if field_col == ("velocityx",""):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
-
-            elif field_col == ("velocityz",""):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
-
-            elif field_col == ("pressure",""):
-                mat = c2d.i2j2lapl(res[0], res[2], 0, bc, -1.0)
-
-            elif field_col == ("temperature",""):
-                mat = c2d.i2j2d0d1(res[0], res[2], bc, Ra/16.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -295,10 +288,31 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
                 mat = c2d.i2j2(res[0], res[2], bc)
 
             elif field_col == ("pressure",""):
+                bc['x']['cr'] = pN
+                bc['z']['cr'] = pN
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
+
+        elif field_row == ("pressure",""):
+            if field_col == ("velocityx",""):
+                bc['x']['rb'] = pN
+                bc['z']['rb'] = pN
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+
+            elif field_col == ("velocityz",""):
+                bc['x']['rb'] = pN
+                bc['z']['rb'] = pN
+                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+
+            elif field_col == ("pressure",""):
+                mat = c2d.i2j2lapl(res[0]-pN, res[2]-pN, 0, bc, -1.0)
+
+            elif field_col == ("temperature",""):
+                bc['x']['rb'] = pN
+                bc['z']['rb'] = pN
+                mat = c2d.i2j2d0d1(res[0], res[2], bc, Ra/16.0)
 
         return mat
 
@@ -308,6 +322,7 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        pN = 0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
@@ -317,7 +332,7 @@ class BoussinesqRotConv2DBoxVPT(base_model.BaseModel):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("pressure",""):
-            mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+            mat = c2d.zblk(res[0]-pN, res[2]-pN, 2, 2, bc)
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j2(res[0], res[2], bc)
