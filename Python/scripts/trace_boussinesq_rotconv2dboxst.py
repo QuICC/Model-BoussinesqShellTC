@@ -13,10 +13,10 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
-#eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
+#eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
+eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
-bc_str = 1 # 0: NS/NS + vel, 1: SF/SF + vel, 2: NS/NS + pressure, 3: SF/SF + pressure
+bc_str = 0 # 0: NS/NS + vel, 1: SF/SF + vel, 2: NS/NS + pressure, 3: SF/SF + pressure
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_str, 'temperature':bc_temp}

@@ -229,57 +229,41 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c2d.i2j2lapl(res[0], res[2]-1, 0, bc)
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
 
             elif field_col == ("velocityz",""):
-                bc['z']['rb'] = 1
-                bc['x']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                bc['z']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                bc['z']['rb'] = 1
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
                 mat = c2d.i2j2d1d0(res[0], res[2], bc, -1.0)
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
-                bc['z']['cr'] = 1
-                bc['x']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j2lapl(res[0]-1, res[2], 0, bc)
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
 
             elif field_col == ("temperature",""):
-                bc['x']['rb'] = 1
                 mat = c2d.i2j2(res[0], res[2], bc, Ra/16.0)
 
             elif field_col == ("pressure",""):
-                bc['x']['rb'] = 1
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
                 mat = c2d.i2j2d0d1(res[0], res[2], bc, -1.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
-                bc['z']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                bc['x']['cr'] = 1
                 mat = c2d.i2j2(res[0], res[2], bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
 
             elif field_col == ("pressure",""):
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("pressure",""):
@@ -287,27 +271,21 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
                 bc['x']['rt'] = 1
                 bc['x']['cr'] = 1
                 bc['z']['rt'] = 1
-                bc['z']['cr'] = 2
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
+                bc['z']['cr'] = 1
                 mat = c2d.i1j1d1d0(res[0]+1, res[2]+1, bc)
 
             elif field_col == ("velocityz",""):
                 bc['x']['rt'] = 1
-                bc['x']['cr'] = 2
+                bc['x']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
                 mat = c2d.i1j1d0d1(res[0]+1, res[2]+1, bc)
 
             elif field_col == ("temperature",""):
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 0, 0, bc)
 
             elif field_col == ("pressure",""):
-                mat = c2d.zblk(res[0]-1, res[2]-1, 0, 0, bc)
+                mat = c2d.zblk(res[0], res[2], 0, 0, bc)
 
         return mat
 

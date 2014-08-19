@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [6, 0, 6]
 pN = 0
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
 eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
@@ -73,42 +73,48 @@ if True:
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 
-    sol_u = evp_vec[0:res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_t = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],-1].reshape(res[0], res[2], order = 'F')
-    sol_p = evp_vec[3*res[0]*res[2]:,-1].reshape(res[0]-pN, res[2]-pN, order = 'F')
-    sol_c = (mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*sol_u.reshape(res[0]*res[2], order ='F') + mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*sol_w.reshape(res[0]*res[2], order ='F')).reshape(res[0], res[2], order = 'F')
+    sol_u = evp_vec[0:res[0]*res[2],-1]
+    sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1]
+    sol_t = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],-1]
+    sol_p = evp_vec[3*res[0]*res[2]:,-1]
+    sol_c = mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*sol_u + mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*sol_w
+
+    mat_u = sol_u.reshape(res[0], res[2], order = 'F')
+    mat_w = sol_w.reshape(res[0], res[2], order = 'F')
+    mat_t = sol_t.reshape(res[0], res[2], order = 'F')
+    mat_p = sol_p.reshape(res[0]-pN, res[2]-pN, order = 'F')
+    mat_c = sol_c.reshape(res[0], res[2], order = 'F')
 
     import matplotlib.pylab as pl
     pl.subplot(2,3,1)
-    pl.imshow(np.log10(np.abs(sol_u)))
+    pl.imshow(np.log10(np.abs(mat_u)))
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.imshow(np.log10(np.abs(sol_w)))
+    pl.imshow(np.log10(np.abs(mat_w)))
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,3)
-    pl.imshow(np.log10(np.abs(sol_t)))
+    pl.imshow(np.log10(np.abs(mat_t)))
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.imshow(np.log10(np.abs(sol_c)))
+    pl.imshow(np.log10(np.abs(mat_c)))
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.imshow(np.log10(np.abs(sol_p)))
+    pl.imshow(np.log10(np.abs(mat_p)))
     pl.colorbar()
     pl.title("p")
     pl.show()
     pl.close("all")
 
     import geomhdiscc.transform.cartesian as transf
-    phys_u = transf.tophys2d(sol_u)
-    phys_w = transf.tophys2d(sol_w)
-    phys_t = transf.tophys2d(sol_t)
-    phys_p = transf.tophys2d(sol_p)
-    phys_c = transf.tophys2d(sol_c)
+    phys_u = transf.tophys2d(mat_u)
+    phys_w = transf.tophys2d(mat_w)
+    phys_t = transf.tophys2d(mat_t)
+    phys_p = transf.tophys2d(mat_p)
+    phys_c = transf.tophys2d(mat_c)
     grid_x = transf.grid(res[0])
     grid_z = transf.grid(res[2])
 
