@@ -61,13 +61,18 @@ if True:
     poisson[0,0] = 1
     sol_p = splin.spsolve(poisson,rhs + bc)
 
+    sol_s = sol_s/np.max(sol_s)
+    sol_t = sol_t/np.max(sol_t)
+    sol_u = sol_u/np.max(sol_u)
+    sol_w = sol_w/np.max(sol_w)
+    sol_p = sol_p/np.max(sol_p)
+
     mat_s = sol_s.reshape(res[0], res[2], order = 'F')
     mat_t = sol_t.reshape(res[0], res[2], order = 'F')
     mat_u = sol_u.reshape(res[0], res[2], order = 'F')
     mat_w = sol_w.reshape(res[0], res[2], order = 'F')
     mat_c = sol_c.reshape(res[0], res[2], order = 'F')
     mat_p = sol_p.reshape(res[0], res[2], order = 'F')
-    #mat_p = (mod.c2d.i2j2lapl(res[0], res[2], 0, mod.no_bc())*sol_p - (eq_params['rayleigh']/16.)*mod.c2d.i2j2d0d1(res[0], res[2], mod.no_bc())*sol_t).reshape(res[0], res[2], order = 'F')
 
 
     import matplotlib.pylab as pl
@@ -104,7 +109,18 @@ if True:
     phys_u = transf.tophys2d(mat_u)
     phys_w = transf.tophys2d(mat_w)
     phys_c = transf.tophys2d(mat_c)
-    phys_p = transf.tophys2d(mat_p)
+    mat_tmp = mat_p.copy()
+    mat_tmp[0,0] = 0
+    mat_tmp[0,1] = 0
+    mat_tmp[1,0] = 0
+    mat_tmp[1,1] = 0
+    mat_tmp[-1,-1] = 0
+    mat_tmp[-2,-2] = 0
+    mat_tmp[-1,-2] = 0
+    mat_tmp[-2,-1] = 0
+    mat_tmp[0,-1] = 0
+    mat_tmp[-1,0] = 0
+    phys_p = transf.tophys2d(mat_p-mat_tmp)
     grid_x = transf.grid(res[0])
     grid_z = transf.grid(res[2])
 
