@@ -32,28 +32,28 @@ def convert_bc(bc):
 
     return (bcx, bcz)
 
-def d1d0(nx, nz, sz, bc, coeff = 1.0):
+def d1d0(nx, nz, bc, coeff = 1.0, sx = 1, sz = 0):
     """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), c1d.d1(nx, bcx))
-    return c2dbc.constrain(mat, nx, nz, 1, sz, bc, location = 'b')
+    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), c1d.d1(nx, bcx, zr = sx))
+    return c2dbc.constrain(mat, nx, nz, sx, sz, bc, location = 'b')
 
-def d0d1(nx, nz, sx, bc, coeff = 1.0):
+def d0d1(nx, nz, bc, coeff = 1.0, sx = 0, sz = 1):
     """Create operator for the 1st Z derivative T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.d1(nz, bcz), c1d.sid(nx, sx, bcx))
-    return c2dbc.constrain(mat, nx, nz, sx, 1, bc, location = 'b')
+    mat = coeff*spsp.kron(c1d.d1(nz, bcz, zr = sz), c1d.sid(nx, sx, bcx))
+    return c2dbc.constrain(mat, nx, nz, sx, sz, bc, location = 'b')
 
-def lapl(nx, nz, bc, coeff = 1.0):
+def lapl(nx, nz, k, bc, coeff = 1.0):
     """Create operator for the 2nd X derivative and 2nd Z derivative T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.d2(nz, bcz), c1d.qid(nx, 2, bcx))
-    mat = mat + spsp.kron(c1d.qid(nz, 2, bcz), c1d.d2(nx, bcx))
+    mat = spsp.kron(c1d.sid(nz, 2, bcz), c1d.laplh(nx, k, bcx))
     bcx[0] = min(bcx[0], 0)
     bcz[0] = min(bcz[0], 0)
+    mat = mat + spsp.kron(c1d.d2(nz, bcz), c1d.sid(nx, 2, bcx))
     mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, 2, 2, bc, location = 'b')
 
@@ -71,12 +71,12 @@ def lapl2h(nx, nz, k, sz, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.sid(nz,sz,bcz), c1d.lapl2h(nx,k,bcx))
     return c2dbc.constrain(mat, nx, nz, 4, sz, bc, location = 'b')
 
-def zblk(nx, nz, qx, qz, bc):
+def zblk(nx, nz, qx, qz, bc, location = 't'):
     """Create a block of zeros"""
 
     bcx, bcz = convert_bc(bc)
     mat = spsp.kron(c1d.zblk(nz,bcz),c1d.zblk(nx,bcx))
-    return c2dbc.constrain(mat, nx, nz, qx, qz, bc)
+    return c2dbc.constrain(mat, nx, nz, qx, qz, bc, location = location)
 
 def i1j1(nx, nz, bc, coeff = 1.0):
     """Create operator for 1st integral in X and 1st integral in Z"""

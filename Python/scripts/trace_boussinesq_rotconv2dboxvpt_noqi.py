@@ -1,17 +1,17 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating convection in a 2D box model (velocity-pressure-temperature)"""
+"""Script to run a marginal curve trace for the Boussinesq rotating convection in a 2D box model (velocity-pressure-temperature) without quasi-inverse"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rotconv2dboxvpt as mod
+import geomhdiscc.model.boussinesq_rotconv2dboxvpt_noqi as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRotConv2DBoxVPT()
+model = mod.BoussinesqRotConv2DBoxVPTNoQI()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [6, 0, 6]
+res = [20, 0, 20]
 pN = 0
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
 eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
@@ -40,18 +40,25 @@ A = A.tolil()
 #A[-(res[0]+2),-(res[0]+2)] = 1
 
 # BOTTOM CLEARED OUT
-A[-2*res[0],:] = 0
-A[-2*res[0],3*res[0]*res[2]] = 1
-A[-2*res[0]+1,:] = 0
-A[-2*res[0]+1,3*res[0]*res[2]+res[0]-1] = 1
+A[-res[0]-2,:] = 0
+A[:,-res[0]-2] = 0
+A[-res[0]-2,-res[0]-2] = 1
 
-A[-res[0],:] = 0
-A[-res[0],-res[0]] = 1
-A[-res[0]+1,:] = 0
-A[-res[0]+1,-1] = 1
+A[-res[0]-1,:] = 0
+A[:,-res[0]-1] = 0
+A[-res[0]-1,-res[0]-1] = 1
 
-A[-(res[0]+2),:] = 0
-A[-(res[0]+2),4*res[0]*res[2] - res[0] - 2] = 1
+A[-2,:] = 0
+A[:,-2] = 0
+A[-2,-2] = 1
+
+A[-1,:] = 0
+A[:,-1] = 0
+A[-1,-1] = 1
+
+A[3*res[0]*res[2],:] = 0
+A[:,3*res[0]*res[2]] = 0
+A[3*res[0]*res[2],3*res[0]*res[2]] = 1
 
 A = A.tocsr()
 

@@ -16,36 +16,36 @@ def zblk(nx, bc):
     mat = spsp.lil_matrix((nx,nx))
     return c1dbc.constrain(mat,bc)
 
-def d1(nx, bc, coeff = 1.0):
+def d1(nx, bc, coeff = 1.0, zr = 1):
     """Create operator for 1st derivative"""
 
     row = [2*j for j in range(0,nx)]
     mat = spsp.lil_matrix((nx,nx))
     for i in range(0,nx-1):
         mat[i,i+1:nx:2] = row[i+1:nx:2]
-    mat[-1:,:] = 0
+    mat[-zr:,:] = 0
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def d2(nx, bc, coeff = 1.0):
+def d2(nx, bc, coeff = 1.0, zr = 2):
     """Create operator for 2nd derivative"""
 
     mat = spsp.lil_matrix((nx,nx))
     for i in range(0,nx-2):
         mat[i,i+2:nx:2] = [j*(j**2 - i**2) for j in range(0,nx)][i+2:nx:2]
-    mat[-2:,:] = 0
+    mat[-zr:,:] = 0
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def d4(nx, bc, coeff = 1.0):
+def d4(nx, bc, coeff = 1.0, zr = 4):
     """Create operator for 4th derivative"""
 
     mat_d2 = d2(nx + 4, c1dbc.no_bc())
     mat = mat_d2*mat_d2
     mat = mat[0:-4, 0:-4]
-    mat[-4:,:] = 0
+    mat[-zr:,:] = 0
     
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')

@@ -12,7 +12,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [40, 0, 40]
 #eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':2340.687}
 eq_params = {'taylor':0, 'prandtl':1, 'rayleigh':5011.73}
 eigs = [1]
@@ -50,9 +50,9 @@ if True:
 
     sol_s = evp_vec[0:res[0]*res[2],-1]
     sol_t = evp_vec[res[0]*res[2]:2*res[0]*res[2],-1]
-    sol_u = mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*sol_s
-    sol_w = -mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*sol_s
-    sol_c = mod.c2d.d1d0(res[0], res[2], 0, mod.no_bc())*sol_u + mod.c2d.d0d1(res[0], res[2], 0, mod.no_bc())*sol_w
+    sol_u = mod.c2d.d0d1(res[0], res[2], mod.no_bc(), sx = 0)*sol_s
+    sol_w = -mod.c2d.d1d0(res[0], res[2], mod.no_bc(), sz = 0)*sol_s
+    sol_c = mod.c2d.d1d0(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + mod.c2d.d0d1(res[0], res[2], mod.no_bc(), sx = 0)*sol_w
 
     rhs = (eq_params['rayleigh']/16.)*mod.c2d.i2j2d0d1(res[0], res[2], mod.no_bc())*sol_t
     bc = mod.c2d.zblk(res[0], res[0], 2, 2, {'x':{0:22}, 'z':{0:0}, 'priority':'sx'})*sol_u + mod.c2d.zblk(res[0], res[0], 2, 2, {'x':{0:0}, 'z':{0:22}, 'priority':'sx'})*sol_w
@@ -77,28 +77,22 @@ if True:
 
     import matplotlib.pylab as pl
     pl.subplot(2,3,1)
-    pl.imshow(np.log10(np.abs(mat_u)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_u))
     pl.title('u')
     pl.subplot(2,3,2)
-    pl.imshow(np.log10(np.abs(mat_w)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_w))
     pl.title('w')
     pl.subplot(2,3,3)
-    pl.imshow(np.log10(np.abs(mat_t)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_t))
     pl.title('T')
     pl.subplot(2,3,4)
-    pl.imshow(np.log10(np.abs(mat_s)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_s))
     pl.title('Streamfunction')
     pl.subplot(2,3,5)
-    pl.imshow(np.log10(np.abs(mat_c)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_c))
     pl.title('Continuity')
     pl.subplot(2,3,6)
-    pl.imshow(np.log10(np.abs(mat_p)))
-    pl.colorbar()
+    pl.semilogy(np.abs(sol_p))
     pl.title('p')
     pl.show()
     pl.close("all")
@@ -109,18 +103,7 @@ if True:
     phys_u = transf.tophys2d(mat_u)
     phys_w = transf.tophys2d(mat_w)
     phys_c = transf.tophys2d(mat_c)
-    mat_tmp = mat_p.copy()
-    mat_tmp[0,0] = 0
-    mat_tmp[0,1] = 0
-    mat_tmp[1,0] = 0
-    mat_tmp[1,1] = 0
-    mat_tmp[-1,-1] = 0
-    mat_tmp[-2,-2] = 0
-    mat_tmp[-1,-2] = 0
-    mat_tmp[-2,-1] = 0
-    mat_tmp[0,-1] = 0
-    mat_tmp[-1,0] = 0
-    phys_p = transf.tophys2d(mat_p-mat_tmp)
+    phys_p = transf.tophys2d(mat_p)
     grid_x = transf.grid(res[0])
     grid_z = transf.grid(res[2])
 

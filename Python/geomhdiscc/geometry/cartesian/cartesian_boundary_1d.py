@@ -57,6 +57,10 @@ def apply_tau(mat, bc, location = 't'):
     elif bc[0] == 13:
         cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
     elif bc[0] == 14:
+        cond = tau_diff2(mat.shape[0], 1, bc.get('c',None))
+    elif bc[0] == 15:
+        cond = tau_diff2(mat.shape[0], -1, bc.get('c',None))
+    elif bc[0] == 16:
         cond = tau_integral(mat.shape[0], 1, bc.get('c',None))
     elif bc[0] == 20:
         cond = tau_value(mat.shape[0], 0, bc.get('c',None))
