@@ -27,21 +27,45 @@ def constrain(mat, bc, location = 't'):
     else:
         bc_mat = mat
 
-    # Top row(s) restriction if required
+    # top row(s) restriction if required
     if bc.get('rt', 0) > 0:
         bc_mat = restrict_eye(bc_mat.shape[0], 'rt', bc['rt'])*bc_mat
 
-    # Bottom row(s) restriction if required
+    # bottom row(s) restriction if required
     if bc.get('rb', 0) > 0:
         bc_mat = restrict_eye(bc_mat.shape[0], 'rb', bc['rb'])*bc_mat
 
-    # Left columns restriction if required
+    # left columns restriction if required
     if bc.get('cl', 0) > 0:
         bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cl', bc['cl'])
 
-    # Right columns restriction if required
+    # right columns restriction if required
     if bc.get('cr', 0) > 0:
         bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cr', bc['cr'])
+
+    # top row(s) zeroing if required
+    if bc.get('zt', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[0:bc['zt'],:] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # bottom row(s) zeroing if required
+    if bc.get('zb', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[-bc['zb']:,:] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # left columns zeroing if required
+    if bc.get('zl', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[:, 0:bc['zt']] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # right columns zeroing if required
+    if bc.get('zr', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[:, -bc['zr']:] = 0
+        bc_mat = bc_mat.tocoo()
 
     return bc_mat
 

@@ -201,14 +201,14 @@ def i2j2x2div(nr, nz, a, b, rg, zg):
     ssol = sy.integrate(ssol,z,z)
     test_forward(A, sphys, ssol, rg, zg, 2, 2)
 
-def i2j0x2laplh(nr, nz, a, b, rg, zg):
-    """Accuracy test for i2j0x2laplh operator"""
+def i2x2laplh(nr, nz, a, b, rg, zg):
+    """Accuracy test for i2x2laplh operator"""
 
-    print("i2j0x2laplh:")
+    print("i2x2laplh:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     m = np.random.randint(1, nr)
-    A = annulus.i2j0x2laplh(nr, nz, m, a, b, annulus.cylbc.no_bc())
+    A = annulus.i2x2laplh(nr, nz, m, a, b, annulus.cylbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(x*sy.diff(x*sy.diff(sphys,x),x) - m**2*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -259,14 +259,14 @@ def i4j4x4(nr, nz, a, b, rg, zg):
     ssol = sy.integrate(ssol,z,z,z,z)
     test_forward(A, sphys, ssol, rg, zg, 4, 4)
 
-def i4j0x4laplh(nr, nz, a, b, rg, zg):
-    """Accuracy test for i4j0x4laplh operator"""
+def i4x4laplh(nr, nz, a, b, rg, zg):
+    """Accuracy test for i4x4laplh operator"""
 
-    print("i4j0x4laplh:")
+    print("i4x4laplh:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     m = np.random.randint(1, nr)
-    A = annulus.i4j0x4laplh(nr, nz, m, a, b, annulus.cylbc.no_bc())
+    A = annulus.i4x4laplh(nr, nz, m, a, b, annulus.cylbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(x**3*sy.diff(x*sy.diff(sphys,x),x) - m**2*x**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -274,7 +274,7 @@ def i4j0x4laplh(nr, nz, a, b, rg, zg):
     test_forward(A, sphys, ssol, rg, zg, 4, 0)
 
 def i4j4x4lapl(nr, nz, a, b, rg, zg):
-    """Accuracy test for i4j1d0d1 operator"""
+    """Accuracy test for i4j4x4lapl operator"""
 
     print("i4j4x4lapl:")
     x = sy.Symbol('x')
@@ -288,14 +288,14 @@ def i4j4x4lapl(nr, nz, a, b, rg, zg):
     ssol = sy.integrate(ssol,z,z,z,z)
     test_forward(A, sphys, ssol, rg, zg, 4, 4)
 
-def i4j0x4lapl2h(nr, nz, a, b, rg, zg):
-    """Accuracy test for i4j0x4lapl2h operator"""
+def i4x4lapl2h(nr, nz, a, b, rg, zg):
+    """Accuracy test for i4x4lapl2h operator"""
 
-    print("i4j0x4lapl2h:")
+    print("i4x4lapl2h:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     m = np.random.randint(1, nr)
-    A = annulus.i4j0x4lapl2h(nr, nz, m, a, b, annulus.cylbc.no_bc())
+    A = annulus.i4x4lapl2h(nr, nz, m, a, b, annulus.cylbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2.0*x**3*sy.diff(sphys,x,x,x) - (1.0 + 2.0*m**2)*x**2*sy.diff(sphys,x,x) + (1.0 + 2.0*m**2)*x*sy.diff(sphys,x) + (m**2 - 4.0)*m**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -322,10 +322,10 @@ if __name__ == "__main__":
     i2j2x2d1(nr, nz, a, b, rg, zg)
     i2j2x2e1(nr, nz, a, b, rg, zg)
     i2j2x2div(nr, nz, a, b, rg, zg)
-    i2j0x2laplh(nr, nz, a, b, rg, zg)
+    i2x2laplh(nr, nz, a, b, rg, zg)
     i2j2x2lapl(nr, nz, a, b, rg, zg)
     i4j4(nr, nz, a, b, rg, zg)
     i4j4x4(nr, nz, a, b, rg, zg)
-    i4j0x4laplh(nr, nz, a, b, rg, zg)
+    i4x4laplh(nr, nz, a, b, rg, zg)
     i4j4x4lapl(nr, nz, a, b, rg, zg)
-    i4j0x4lapl2h(nr, nz, a, b, rg, zg)
+    i4x4lapl2h(nr, nz, a, b, rg, zg)

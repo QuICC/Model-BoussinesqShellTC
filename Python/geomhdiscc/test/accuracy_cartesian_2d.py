@@ -87,24 +87,24 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     vis_error(err, 'Galerkin backward error')
     print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
-def d1d0(nx,nz, xg, zg):
-    """Accuracy test for d1d0 operator"""
+def d1(nx,nz, xg, zg):
+    """Accuracy test for d1 operator"""
 
-    print("d1d0:")
+    print("d1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.d1d0(nx, nz, 0, c2d.c2dbc.no_bc())
+    A = c2d.d1(nx, nz, 0, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,x))
     test_forward(A, sphys, ssol, xg, zg, 1, 0)
 
-def d0d1(nx,nz, xg, zg):
-    """Accuracy test for d0d1 operator"""
+def e1(nx,nz, xg, zg):
+    """Accuracy test for e1 operator"""
 
-    print("d0d1:")
+    print("e1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.d0d1(nx, nz, 0, c2d.c2dbc.no_bc())
+    A = c2d.e1(nx, nz, 0, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z))
     test_forward(A, sphys, ssol, xg, zg, 0, 1)
@@ -133,13 +133,13 @@ def lapl2h(nx,nz, xg, zg):
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) - 2*k**2*sy.diff(sphys,x,x) + k**4*sphys)
     test_forward(A, sphys, ssol, xg, zg, 2, 0)
 
-def i2j1d0d1(nx,nz, xg, zg):
-    """Accuracy test for i2j1d0d1 operator"""
+def i2j1e1(nx,nz, xg, zg):
+    """Accuracy test for i2j1e1 operator"""
 
-    print("i2j1d0d1:")
+    print("i2j1e1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i2j1d0d1(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i2j1e1(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z))
     ssol = sy.integrate(ssol,x,x)
@@ -147,13 +147,13 @@ def i2j1d0d1(nx,nz, xg, zg):
     ssol = sy.integrate(ssol,z)
     test_forward(A, sphys, ssol, xg, zg, 2, 1)
 
-def i2j2d0d2(nx,nz, xg, zg):
-    """Accuracy test for i2j2d0d2 operator"""
+def i2j2e2(nx,nz, xg, zg):
+    """Accuracy test for i2j2e2 operator"""
 
-    print("i2j2d0d2:")
+    print("i2j2e2:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i2j2d0d2(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i2j2e2(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z,z))
     ssol = sy.integrate(ssol,x,x)
@@ -161,13 +161,13 @@ def i2j2d0d2(nx,nz, xg, zg):
     ssol = sy.integrate(ssol,z,z)
     test_forward(A, sphys, ssol, xg, zg, 2, 2)
 
-def i2j0(nx,nz, xg, zg):
-    """Accuracy test for i2j0 operator"""
+def i2(nx,nz, xg, zg):
+    """Accuracy test for i2 operator"""
 
-    print("i2j0:")
+    print("i2:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i2j0(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i2(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -224,14 +224,14 @@ def i2j2d2d2(nx,nz, xg, zg):
     sphys = sy.expand(sy.diff(sy.diff(ssol,x,x),z,z))
     test_backward_tau(A, B, sphys, ssol, xg, zg)
 
-def i2j0laplh(nx,nz, xg, zg):
-    """Accuracy test for i2j0laplh operator"""
+def i2laplh(nx,nz, xg, zg):
+    """Accuracy test for i2laplh operator"""
 
-    print("i2j0laplh:")
+    print("i2laplh:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     k = np.random.ranf()*nx
-    A = c2d.i2j0laplh(nx, nz, k, c2d.c2dbc.no_bc())
+    A = c2d.i2laplh(nx, nz, k, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,x,x) - k**2*sphys)
     ssol = sy.integrate(ssol,x,x)
@@ -240,8 +240,8 @@ def i2j0laplh(nx,nz, xg, zg):
 
     print("\tbc = 20, 0")
     k = np.random.ranf()*nx
-    A = c2d.i2j0laplh(nx, nz, k, {'x':{0:20}, 'z':{0:0}}).tocsr()
-    B = c2d.i2j0(nx, nz, c2d.c2dbc.no_bc()).tocsr()
+    A = c2d.i2laplh(nx, nz, k, {'x':{0:20}, 'z':{0:0}}).tocsr()
+    B = c2d.i2(nx, nz, c2d.c2dbc.no_bc()).tocsr()
     ssol = (1.0 - x**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol)
     test_backward_tau(A, B, sphys, ssol, xg, zg)
@@ -344,13 +344,13 @@ def i4j4(nx,nz, xg, zg):
     ssol = sy.integrate(ssol,z,z,z,z)
     test_forward(A, sphys, ssol, xg, zg, 4, 4)
 
-def i4j1d0d1(nx,nz, xg, zg):
-    """Accuracy test for i4j1d0d1 operator"""
+def i4j1e1(nx,nz, xg, zg):
+    """Accuracy test for i4j1e1 operator"""
 
-    print("i4j1d0d1:")
+    print("i4j1e1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i4j1d0d1(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i4j1e1(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -358,13 +358,13 @@ def i4j1d0d1(nx,nz, xg, zg):
     ssol = sy.integrate(ssol,z)
     test_forward(A, sphys, ssol, xg, zg, 4, 2)
 
-def i4j2d0d2(nx,nz, xg, zg):
-    """Accuracy test for i4j2d0d2 operator"""
+def i4j2e2(nx,nz, xg, zg):
+    """Accuracy test for i4j2e2 operator"""
 
-    print("i4j2d0d2:")
+    print("i4j2e2:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i4j2d0d2(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i4j2e2(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z,z))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -404,13 +404,13 @@ def i4j2laplh(nx,nz, xg, zg):
     ssol = sy.expand(ssol)
     test_forward(A, sphys, ssol, xg, zg, 4, 2)
 
-def i4j4d1d0(nx,nz, xg, zg):
-    """Accuracy test for i4j2d1d0 operator"""
+def i4j4d1(nx,nz, xg, zg):
+    """Accuracy test for i4j2d1 operator"""
 
-    print("i4j4d1d0:")
+    print("i4j4d1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i4j4d1d0(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i4j4d1(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,x))
     ssol = sy.integrate(ssol,x,x,x,x)
@@ -502,18 +502,18 @@ def i4j4lapl2(nx,nz, xg, zg):
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol + sy.diff(ssol,z,z))
     test_backward_tau(A, B, sphys, ssol, xg, zg)
 
-def i4j1_lapl2hd0d1_d0d1laplh(nx,nz, xg, zg):
-    """Accuracy test for coupled system lapl2hd0d1_d0d1laplh operator"""
+def i4j1_lapl2he1_e1laplh(nx,nz, xg, zg):
+    """Accuracy test for coupled system lapl2he1_e1laplh operator"""
 
-    print("i4j1_lapl2hd0d1_d0d1laplh:")
+    print("i4j1_lapl2he1_e1laplh:")
     print("\tbc = (40, 00), (20,20) (uncoupled)")
     import scipy.io as io
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     k = np.random.ranf()*nx
     A11 = c2d.i4j1lapl2h(nx, nz, k, {'x':{0:40}, 'z':{0:00}})
-    A12 = c2d.i4j1d0d1(nx, nz, {'x':{0:0}, 'z':{0:10, 'c':1.0}})
-    A21 = c2d.i2j1d0d1(nx, nz, {'x':{0:0}, 'z':{0:0}}, -1.0)
+    A12 = c2d.i4j1e1(nx, nz, {'x':{0:0}, 'z':{0:10, 'c':1.0}})
+    A21 = c2d.i2j1e1(nx, nz, {'x':{0:0}, 'z':{0:0}}, -1.0)
     A22 = c2d.i2j1laplh(nx, nz, k, {'x':{0:20}, 'z':{0:11}})
     A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
     B11 = c2d.i4j1(nx, nz, c2d.c2dbc.no_bc())
@@ -558,15 +558,15 @@ def i4j1_lapl2hd0d1_d0d1laplh(nx,nz, xg, zg):
     pl.colorbar()
     pl.show()
 
-    print("i4j1_lapl2hd0d1_d0d1laplh:")
+    print("i4j1_lapl2he1_e1laplh:")
     print("\tbc = (40, 20), (20,20) (coupled)")
     import scipy.io as io
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     k = np.random.ranf()*nx
     A11 = c2d.i4j1lapl2h(nx, nz, k, {'x':{0:40}, 'z':{0:10}})
-    A12 = c2d.i4j1d0d1(nx, nz, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
-    A21 = c2d.i2j1d0d1(nx, nz, {'x':{0:0}, 'z':{0:11}}, -1.0)
+    A12 = c2d.i4j1e1(nx, nz, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
+    A21 = c2d.i2j1e1(nx, nz, {'x':{0:0}, 'z':{0:11}}, -1.0)
     A22 = c2d.i2j1laplh(nx, nz, k, {'x':{0:20}, 'z':{0:11}})
     A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
     B11 = c2d.i4j1(nx, nz, c2d.c2dbc.no_bc())
@@ -611,18 +611,18 @@ def i4j1_lapl2hd0d1_d0d1laplh(nx,nz, xg, zg):
     pl.colorbar()
     pl.show()
 
-def lapl2hd0d1_d0d1laplh(nx,nz, xg, zg):
-    """Accuracy test for coupled system lapl2hd0d1_d0d1laplh operator"""
+def lapl2he1_e1laplh(nx,nz, xg, zg):
+    """Accuracy test for coupled system lapl2he1_e1laplh operator"""
 
-    print("lapl2hd0d1_d0d1laplh:")
+    print("lapl2he1_e1laplh:")
     print("\tbc = (40, 00), (20,20) (uncoupled)")
     import scipy.io as io
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     k = np.random.ranf()*nx
     A11 = c2d.lapl2h(nx, nz, k, 1, {'x':{0:40}, 'z':{0:0}})
-    A12 = c2d.d0d1(nx, nz, 4, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
-    A21 = c2d.d0d1(nx, nz, 2, {'x':{0:0}, 'z':{0:0}}, -1.0)
+    A12 = c2d.e1(nx, nz, 4, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
+    A21 = c2d.e1(nx, nz, 2, {'x':{0:0}, 'z':{0:0}}, -1.0)
     A22 = c2d.laplh(nx, nz, k, 1, {'x':{0:20}, 'z':{0:11}})
     A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
     B11 = c2d.sid(nx, nz, 4, 1, c2d.c2dbc.no_bc())
@@ -667,15 +667,15 @@ def lapl2hd0d1_d0d1laplh(nx,nz, xg, zg):
     pl.colorbar()
     pl.show()
 
-    print("lapl2hd0d1_d0d1laplh:")
+    print("lapl2he1_e1laplh:")
     print("\tbc = (40, 20), (20,20) (coupled)")
     import scipy.io as io
     x = sy.Symbol('x')
     z = sy.Symbol('z')
     k = np.random.ranf()*nx
     A11 = c2d.lapl2h(nx, nz, k, 1, {'x':{0:40}, 'z':{0:10}})
-    A12 = c2d.d0d1(nx, nz, 4, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
-    A21 = c2d.d0d1(nx, nz, 2, {'x':{0:0}, 'z':{0:11}}, -1.0)
+    A12 = c2d.e1(nx, nz, 4, {'x':{0:0}, 'z':{0:10, 'c':-1.0}})
+    A21 = c2d.e1(nx, nz, 2, {'x':{0:0}, 'z':{0:11}}, -1.0)
     A22 = c2d.laplh(nx, nz, k, 1, {'x':{0:20}, 'z':{0:11}})
     A = spsp.bmat([[A11,A12],[A21,A22]]).tocsr()
     B11 = c2d.sid(nx, nz, 4, 1, c2d.c2dbc.no_bc())
@@ -730,31 +730,31 @@ if __name__ == "__main__":
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
-    d1d0(nx, nz, xg, zg)
-    d0d1(nx, nz, xg, zg)
+    d1(nx, nz, xg, zg)
+    e1(nx, nz, xg, zg)
     laplh(nx, nz, xg, zg)
     lapl2h(nx, nz, xg, zg)
-    i2j1d0d1(nx, nz, xg, zg)
-    i2j2d0d2(nx, nz, xg, zg)
+    i2j1e1(nx, nz, xg, zg)
+    i2j2e2(nx, nz, xg, zg)
     i2j2d2d2(nx, nz, xg, zg)
-    i2j0(nx, nz, xg, zg)
+    i2(nx, nz, xg, zg)
     i2j1(nx, nz, xg, zg)
     i2j2(nx, nz, xg, zg)
-    i2j0laplh(nx, nz, xg, zg)
+    i2laplh(nx, nz, xg, zg)
     i2j1laplh(nx, nz, xg, zg)
     i2j2laplh(nx, nz, xg, zg)
     i2j2lapl(nx, nz, xg, zg)
     i4j1(nx, nz, xg, zg)
     i4j2(nx, nz, xg, zg)
     i4j4(nx, nz, xg, zg)
-    i4j1d0d1(nx, nz, xg, zg)
-    i4j2d0d2(nx, nz, xg, zg)
+    i4j1e1(nx, nz, xg, zg)
+    i4j2e2(nx, nz, xg, zg)
     i4j1laplh(nx, nz, xg, zg)
     i4j2laplh(nx, nz, xg, zg)
-    i4j4d1d0(nx, nz, xg, zg)
+    i4j4d1(nx, nz, xg, zg)
     i4j4lapl(nx, nz, xg, zg)
     i4j1lapl2h(nx, nz, xg, zg)
     i4j2lapl2h(nx, nz, xg, zg)
     i4j4lapl2(nx, nz, xg, zg)
-#    lapl2hd0d1_d0d1laplh(nx, nz, xg, zg)
-#    i4j1_lapl2hd0d1_d0d1laplh(nx, nz, xg, zg)
+#    lapl2he1_e1laplh(nx, nz, xg, zg)
+#    i4j1_lapl2he1_e1laplh(nx, nz, xg, zg)

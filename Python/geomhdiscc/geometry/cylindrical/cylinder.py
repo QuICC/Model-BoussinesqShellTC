@@ -17,15 +17,33 @@ def convert_bc(bc):
         bcr = bc['r']
     else:
         bcr = rad.radbc.no_bc()
-        bcr['r'] = bc['r'].get('r',0)
+        for key, val in bc['r'].items():
+            if key != 0:
+                bcr[key] = val
 
     if bc['z'][0] < 0:
         bcz = bc['z']
     else:
         bcz = c1d.c1dbc.no_bc()
-        bcz['r'] = bc['z'].get('r',0)
+        for key, val in bc['z'].items():
+            if key != 0:
+                bcz[key] = val
 
     return (bcr, bcz)
+
+def xdiv(nr, nz, m, bc, coeff = 1.0, sr = 1, sz = 0):
+    """Create a xdiv in R kronecker with an identity in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), rad.xdiv(nr, m, bcr, zr = sr))
+    return cylbc.constrain(mat, nr, nz, m, sr, sz, bc, location = 'b')
+
+def xe1(nr, nz, m, bc, coeff = 1.0, sr = 0, sz = 1):
+    """Create operator for x in R and 1st derivative in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.d1(nz, bcz, zr = sz), rad.x(nr, m, sr, bcr))
+    return cylbc.constrain(mat, nr, nz, m, sr, sz, bc, location = 'b')
 
 def zblk(nr, nz, m, qr, qz, bc):
     """Create a block of zeros"""
@@ -97,7 +115,7 @@ def i2j2x2div(nr, nz, m, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2div(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 1, 2, bc)
 
-def i2j0x2laplh(nr, nz, m, bc, coeff = 1.0):
+def i2x2laplh(nr, nz, m, bc, coeff = 1.0):
     """Create a i2x2laplh in R kronecker with identity in Z"""
 
     bcr, bcz = convert_bc(bc)
@@ -129,7 +147,7 @@ def i4j4x4(nr, nz, m, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i4(nz,bcz), rad.i4x4(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
-def i4j0x4laplh(nr, nz, m, bc, coeff = 1.0):
+def i4x4laplh(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
@@ -147,14 +165,14 @@ def i4j4x4lapl(nr, nz, m, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
-def i4j0x4lapl2g(nr, nz, m, bc, coeff = 1.0):
+def i4x4lapl2g(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl2 in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.qid(nz, 0, bcz), rad.i4x4lapl2h(nr, m, bcr))
     return cylbc.constrain(mat, nr, nz, m, 2, 4, bc)
 
-def i4j0x4lapl2h(nr, nz, m, bc, coeff = 1.0):
+def i4x4lapl2h(nr, nz, m, bc, coeff = 1.0):
     """Create a i4x4lapl2 in R kronecker with an i4 in Z"""
 
     bcr, bcz = convert_bc(bc)
