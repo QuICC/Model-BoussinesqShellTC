@@ -37,15 +37,23 @@ def constrain(mat, nr, nz, qr, qz, bc, location = 't'):
     """Contrain the matrix with the Tau boundary condition"""
 
     priority = bc.get('priority', 'r')
+    sr = 0
+    dr = 0
+    sz = 0
+    dz = 0
     if priority == 'r':
         sr = qr
-        sz = 0
     elif priority == 'z':
-        sr = 0
         sz = qz
     elif priority == 'n':
         sr = qr
         sz = qz
+    elif priority == 'sr':
+        sr = qr
+        dr = -qr
+    elif priority == 'sz':
+        sz = qz
+        dz = -qz
 
     bc_mat = mat
     if bc['r'][0] > 0:

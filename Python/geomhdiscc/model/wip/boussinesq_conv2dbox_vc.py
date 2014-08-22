@@ -412,8 +412,7 @@ class BoussinesqConv2DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 if k == 0:
                     bc['z']['zr'] = 1
-                mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc)
-                mat = mat.tolil()
+                mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc).tolil()
                 if k == 0:
                     mat[0,:] = 0
                     mat[-2*res[0]-3:-2*res[0]-1,:] = 0
@@ -427,8 +426,7 @@ class BoussinesqConv2DBoxVC(base_model.BaseModel):
                 bc['x']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
-                mat = c2d.i1j1(res[0]+1, res[2]+1, bc, 1j*k)
-                mat = mat.tolil()
+                mat = c2d.i1j1(res[0]+1, res[2]+1, bc, 1j*k).tolil()
                 if k == 0:
                     mat[0,:] = 0
                     mat[-2*res[0]-3:-2*res[0]-1,:] = 0
@@ -444,8 +442,7 @@ class BoussinesqConv2DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 if k == 0:
                     bc['x']['zr'] = 1
-                mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc)
-                mat = mat.tolil()
+                mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc).tolil()
                 if k == 0:
                     mat[0,:] = 0
                     mat[-2*res[0]-3:-2*res[0]-1,:] = 0

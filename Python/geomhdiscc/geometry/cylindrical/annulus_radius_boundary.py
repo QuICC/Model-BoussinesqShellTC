@@ -4,7 +4,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import numpy as np
+import scipy.sparse as spsp
 import itertools
+
+import geomhdiscc.base.utils as utils
 
 
 def no_bc():
@@ -22,10 +25,45 @@ def constrain(mat, bc, location = 't'):
     else:
         bc_mat = mat
 
-    # Restrict if required
-    if bc.get('r', 0) > 0:
-        assert bc[0] <= 0
-        bc_mat = stencil_eye(mat.shape[0], bc['r'])*bc_mat
+    # top row(s) restriction if required
+    if bc.get('rt', 0) > 0:
+        bc_mat = restrict_eye(bc_mat.shape[0], 'rt', bc['rt'])*bc_mat
+
+    # bottom row(s) restriction if required
+    if bc.get('rb', 0) > 0:
+        bc_mat = restrict_eye(bc_mat.shape[0], 'rb', bc['rb'])*bc_mat
+
+    # left columns restriction if required
+    if bc.get('cl', 0) > 0:
+        bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cl', bc['cl'])
+
+    # right columns restriction if required
+    if bc.get('cr', 0) > 0:
+        bc_mat = bc_mat*restrict_eye(bc_mat.shape[1], 'cr', bc['cr'])
+
+    # top row(s) zeroing if required
+    if bc.get('zt', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[0:bc['zt'],:] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # bottom row(s) zeroing if required
+    if bc.get('zb', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[-bc['zb']:,:] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # left columns zeroing if required
+    if bc.get('zl', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[:, 0:bc['zt']] = 0
+        bc_mat = bc_mat.tocoo()
+
+    # right columns zeroing if required
+    if bc.get('zr', 0) > 0:
+        bc_mat = bc_mat.tolil()
+        bc_mat[:, -bc['zr']:] = 0
+        bc_mat = bc_mat.tocoo()
 
     return bc_mat
 
@@ -103,11 +141,11 @@ def tau_value(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*norm_c(i) for i in np.arange(0,nr)])
+        cond.append([c*tau_c(i) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*norm_c(i)*(-1.0)**i for i in np.arange(0,nr)])
+        cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nr)])
 
     return np.array(cond)
 
@@ -258,7 +296,33 @@ def apply_galerkin(mat, bc):
 
     return mat
 
-def norm_c(n):
+def restrict_eye(nr, t, q):
+    """Create the non-square identity to restrict matrix"""
+
+    if t == 'rt':
+        offsets = [q]
+        diags = [[1]*(nr-q)]
+        nrows = nr - q
+        ncols = nr
+    elif t == 'rb':
+        offsets = [0]
+        diags = [[1]*(nr-q)]
+        nrows = nr - q
+        ncols = nr
+    elif t == 'cl':
+        offsets = [-q]
+        diags = [[1]*(nr-q)]
+        nrows = nr
+        ncols = nr - q
+    elif t == 'cr':
+        offsets = [0]
+        diags = [[1]*(nr-q)]
+        nrows = nr
+        ncols = nr - q
+
+    return spsp.diags(diags, offsets, (nrows, ncols))
+
+def tau_c(n):
     """Compute the chebyshev normalisation c factor"""
 
     if n > 0:

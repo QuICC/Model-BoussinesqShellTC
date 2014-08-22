@@ -46,8 +46,6 @@ def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
     priority = bc.get('priority', 'x')
     sx = 0
     dx = 0
-    sy = 0
-    dy = 0
     sz = 0
     dz = 0
     if priority == 'x':

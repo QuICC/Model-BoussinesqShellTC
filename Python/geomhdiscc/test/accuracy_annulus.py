@@ -75,6 +75,30 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, rg, zg):
     vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
 
+def x1div(nr, nz, a, b, rg, zg):
+    """Accuracy test for x1div operator"""
+
+    print("x1div:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = annulus.x1div(nr, nz, a, b, annulus.cylbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.expand(sy.diff(sphys*x,x))
+    ssol = sy.expand(ssol)
+    test_forward(A, sphys, ssol, rg, zg, 1, 1)
+
+def x1e1(nr, nz, a, b, rg, zg):
+    """Accuracy test for x1e1 operator"""
+
+    print("x1e1:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = annulus.x1e1(nr, nz, a, b, annulus.cylbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.expand(sy.diff(sphys*x,z))
+    ssol = sy.expand(ssol)
+    test_forward(A, sphys, ssol, rg, zg, 1, 1)
+
 def i1j1(nr, nz, a, b, rg, zg):
     """Accuracy test for i1j1 operator"""
 
@@ -98,6 +122,20 @@ def i1j1x1d1(nr, nz, a, b, rg, zg):
     A = annulus.i1j1x1d1(nr, nz, a, b, annulus.cylbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(x*sy.diff(sphys,x))
+    ssol = sy.integrate(ssol,x)
+    ssol = sy.expand(ssol)
+    ssol = sy.integrate(ssol,z)
+    test_forward(A, sphys, ssol, rg, zg, 1, 1)
+
+def i1j1x1div(nr, nz, a, b, rg, zg):
+    """Accuracy test for i1j1x1div operator"""
+
+    print("i1j1x1div:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = annulus.i1j1x1div(nr, nz, a, b, annulus.cylbc.no_bc())
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.expand(sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x)
     ssol = sy.expand(ssol)
     ssol = sy.integrate(ssol,z)
@@ -313,8 +351,12 @@ if __name__ == "__main__":
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
+    x1div(nr, nz, a, b, rg, zg)
+    x1e1(nr, nz, a, b, rg, zg)
+    i1j1(nr, nz, a, b, rg, zg)
     i1j1(nr, nz, a, b, rg, zg)
     i1j1x1d1(nr, nz, a, b, rg, zg)
+    i1j1x1div(nr, nz, a, b, rg, zg)
     i1j1x1e1(nr, nz, a, b, rg, zg)
     i2j2(nr, nz, a, b, rg, zg)
     i2j2x1(nr, nz, a, b, rg, zg)

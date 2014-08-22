@@ -41,6 +41,16 @@ def zblk(nr, a, b, rg):
     ssol = 0
     test_forward(A, sphys, ssol, rg, 0)
 
+def x1(nr, a, b, rg):
+    """Accuracy test for d1 operator"""
+
+    print("x1:")
+    x = sy.Symbol('x')
+    A = annulus.x1(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sphys*x
+    test_forward(A, sphys, ssol, rg, 0)
+
 def d1(nr, a, b, rg):
     """Accuracy test for d1 operator"""
 
@@ -49,6 +59,16 @@ def d1(nr, a, b, rg):
     A = annulus.d1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x)
+    test_forward(A, sphys, ssol, rg, 0)
+
+def x1div(nr, a, b, rg):
+    """Accuracy test for x1div operator"""
+
+    print("x1div:")
+    x = sy.Symbol('x')
+    A = annulus.x1div(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sy.diff(sphys*x,x))
     test_forward(A, sphys, ssol, rg, 0)
 
 def i1(nr, a, b, rg):
@@ -69,6 +89,17 @@ def i1x1d1(nr, a, b, rg):
     A = annulus.i1x1d1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys,x)*x)
+    ssol = sy.integrate(ssol,x)
+    test_forward(A, sphys, ssol, rg, 1)
+
+def i1x1div(nr, a, b, rg):
+    """Accuracy test for i1x1div operator"""
+
+    print("i1x1div:")
+    x = sy.Symbol('x')
+    A = annulus.i1x1div(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
 
@@ -215,9 +246,12 @@ if __name__ == "__main__":
 
     # run tests
     #zblk(nr, a, b, rg)
+    x1(nr, a, b, rg)
     d1(nr, a, b, rg)
+    x1div(nr, a, b, rg)
     i1(nr, a, b, rg)
     i1x1d1(nr, a, b, rg)
+    i1x1div(nr, a, b, rg)
     i1x1(nr, a, b, rg)
     i2(nr, a, b, rg)
     i2x1(nr, a, b, rg)

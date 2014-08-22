@@ -16,15 +16,48 @@ def zblk(nr, bc):
     mat = spsp.lil_matrix((nr,nr))
     return radbc.constrain(mat,bc)
 
-def d1(nr, a, b, bc, coeff = 1.0):
+def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
+    """Create operator for x multiplication"""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2)
+    nzrow = -1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a/2.0
+
+    # Generate diagonal
+    def d0(n):
+        return b
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a/2.0
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def d1(nr, a, b, bc, coeff = 1.0, zr = 1):
     """Create operator for 1st derivative"""
 
     row = [2*j for j in range(0,nr)]
     mat = spsp.lil_matrix((nr,nr))
     for i in range(0,nr-1):
         mat[i,i+1:nr:2] = row[i+1:nr:2]
+    if zr > 0:    
+        mat[-zr:,:] = 0
 
     mat = coeff*(1/a)*mat
+    return radbc.constrain(mat, bc)
+
+def x1div(nr, a, b, bc, coeff = 1.0, zr = 1):
+    """Create operator for x times radial divergence"""
+
+    mat = sid(nr, zr, radbc.no_bc(), coeff) + x1(nr, a, b, radbc.no_bc(), coeff, zr = 0)*d1(nr, a, b, radbc.no_bc(), coeff, zr = zr)
     return radbc.constrain(mat, bc)
 
 def i1(nr, a, b, bc, coeff = 1.0):
@@ -627,6 +660,15 @@ def qid(nr, q, bc, coeff = 1.0):
 
     offsets = [0]
     diags = [[0]*q + [1]*(nr-q)]
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def sid(nr, s, bc, coeff = 1.0):
+    """Create a identity block with last s rows zeroed"""
+
+    offsets = [0]
+    diags = [[1]*(nr-s) + [0]*s]
 
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)

@@ -31,18 +31,18 @@ def convert_bc(bc):
 
     return (bcr, bcz)
 
-def xdiv(nr, nz, a, b, bc, coeff = 1.0, sr = 1, sz = 0):
+def x1div(nr, nz, a, b, bc, coeff = 1.0, sr = 1, sz = 0):
     """Create a xdiv in R kronecker with an identity in Z"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), rad.xdiv(nr, a, b, bcr, zr = sr))
+    mat = coeff*spsp.kron(c1d.sid(nz, sz, bcz), rad.x1div(nr, a, b, bcr, zr = sr))
     return cylbc.constrain(mat, nr, nz, sr, sz, bc, location = 'b')
 
-def xe1(nr, nz, a, b, bc, coeff = 1.0, sr = 0, sz = 1):
+def x1e1(nr, nz, a, b, bc, coeff = 1.0, zscale = 1.0, sr = 0, sz = 1):
     """Create operator for x in R and 1st derivative in Z"""
 
     bcr, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.d1(nz, bcz, zr = sz), rad.x(nr, a, b, sr, bcr))
+    mat = zscale*coeff*spsp.kron(c1d.d1(nz, bcz, zr = sz), rad.x1(nr, a, b, bcr, zr = sr))
     return cylbc.constrain(mat, nr, nz, sr, sz, bc, location = 'b')
 
 def zblk(nr, nz, qr, qz, bc):
@@ -191,7 +191,7 @@ def i4j4x4lapl2(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, 4, 4, bc)
 
-def qid(nr, nz, m, qr, qz, bc, coeff = 1.0):
+def qid(nr, nz, qr, qz, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""
 
     bcr, bcz = convert_bc(bc)

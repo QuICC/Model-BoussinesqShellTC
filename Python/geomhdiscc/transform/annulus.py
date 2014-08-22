@@ -48,21 +48,24 @@ def tozcheb(phys):
 def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""
 
+    phys = spec.copy()
+
     for i in range(spec.shape[0]):
-        spec.real[i,:] = tozphys(spec.real[i,:])
-        spec.imag[i,:] = tozphys(spec.imag[i,:])
+        phys.real[i,:] = tozphys(spec.real[i,:])
+        phys.imag[i,:] = tozphys(spec.imag[i,:])
     for j in range(spec.shape[1]):
-        spec.real[:,j] = torphys(spec.real[:,j])
-        spec.imag[:,j] = torphys(spec.imag[:,j])
+        phys.real[:,j] = torphys(phys.real[:,j])
+        phys.imag[:,j] = torphys(phys.imag[:,j])
     
-    return spec
+    return phys
 
 def tocheb2d(phys):
     """Transform 2D physical array to 2D spectral coefficients"""
 
+    spec = phys.copy()
     for j in range(phys.shape[1]):
-        phys[:,j] = torcheb(phys[:,j])
+        spec[:,j] = torcheb(phys[:,j])
     for i in range(phys.shape[0]):
-        phys[i,:] = tozcheb(phys[i,:])
+        spec[i,:] = tozcheb(spec[i,:])
     
-    return phys
+    return spec

@@ -49,12 +49,14 @@ def tophys2d(spec):
 def tocheb2d(phys):
     """Transform 2D physical array to 2D spectral coefficients"""
 
+    spec = phys.copy()
+
     for j in range(phys.shape[1]):
-        phys[:,j] = tocheb(phys[:,j])
+        spec[:,j] = tocheb(phys[:,j])
     for i in range(phys.shape[0]):
-        phys[i,:] = tocheb(phys[i,:])
+        spec[i,:] = tocheb(spec[i,:])
     
-    return phys
+    return spec
 
 def tophys3d(spec):
     """Transform 3D spectral coefficients to 3D physical values"""
