@@ -130,13 +130,13 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
 
             # Stress-free/Stress-free/Stress-free, Fixed flux/Fixed flux/Fixed flux
             elif bcId == 1:
@@ -152,11 +152,11 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'sx'}
+                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'yx'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:21}, 'priority':'sx'}
 
@@ -174,13 +174,13 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'sx'}
+                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'yz'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
 
             # No-slip/Stress-free/Stress-free, Fixed temperature/Fixed flux/Fixed flux
             elif bcId == 3:
@@ -196,13 +196,13 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:21}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:21}, 'priority':'xy'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'z'}
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'zx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -321,10 +321,21 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
+        zero_x = c3d.qid(res[0], res[1], res[2], 0, res[1]-1, res[2]-1, no_bc())
+        idx_x = (np.ravel(zero_x.sum(axis=1)) == 1)
+        zero_y = c3d.qid(res[0], res[1], res[2], res[0]-1, 0, res[2]-1, no_bc())
+        idx_y = (np.ravel(zero_y.sum(axis=1)) == 1)
+        zero_z = c3d.qid(res[0], res[1], res[2], res[0]-1, res[1]-1, 0, no_bc())
+        idx_z = (np.ravel(zero_z.sum(axis=1)) == 1)
+        idx_p = np.logical_or(np.logical_or(idx_x, idx_y),idx_z)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat[idx_x,:] = 0
+                mat[:,idx_x] = 0
+                mat = mat + zero_x
 
             elif field_col == ("velocityy",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -336,7 +347,9 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0)
+                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0).tolil()
+                mat[idx_p,:] = 0
+                mat[:,idx_p] = 0
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
@@ -344,6 +357,9 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityy",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat[idx_y,:] = 0
+                mat[:,idx_y] = 0
+                mat = mat + zero_y
 
             elif field_col == ("velocityz",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -352,7 +368,9 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0)
+                mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0).tolil()
+                mat[idx_p,:] = 0
+                mat[:,idx_p] = 0
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
@@ -363,12 +381,17 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityz",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat[idx_z,:] = 0
+                mat[:,idx_z] = 0
+                mat = mat + zero_z
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0)
+                mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0).tolil()
+                mat[idx_p,:] = 0
+                mat[:,idx_p] = 0
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -378,7 +401,8 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc).tolil()
+                mat[:,idx_z] = 0
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
@@ -388,13 +412,34 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = c3d.i1j1k1d1(res[0], res[1], res[2], bc)
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat[:,idx_x] = 0
 
             elif field_col == ("velocityy",""):
-                mat = c3d.i1j1k1e1(res[0], res[1], res[2], bc)
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat[:,idx_y] = 0
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i1j1k1f1(res[0], res[1], res[2], bc)
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat[:,idx_z] = 0
 
             elif field_col == ("temperature",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
@@ -410,15 +455,29 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
+        zero_x = c3d.qid(res[0], res[1], res[2], 0, res[1]-1, res[2]-1, no_bc())
+        idx_x = (np.ravel(zero_x.sum(axis=1)) == 1)
+        zero_y = c3d.qid(res[0], res[1], res[2], res[0]-1, 0, res[2]-1, no_bc())
+        idx_y = (np.ravel(zero_y.sum(axis=1)) == 1)
+        zero_z = c3d.qid(res[0], res[1], res[2], res[0]-1, res[1]-1, 0, no_bc())
+        idx_z = (np.ravel(zero_z.sum(axis=1)) == 1)
+        idx_p = np.logical_or(np.logical_or(idx_x, idx_y),idx_z)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr).tolil()
+            mat[idx_x,:] = 0
+            mat[:,idx_x] = 0
 
         elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr).tolil()
+            mat[idx_y,:] = 0
+            mat[:,idx_y] = 0
 
         elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr).tolil()
+            mat[idx_z,:] = 0
+            mat[:,idx_z] = 0
 
         elif field_row == ("temperature",""):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc)

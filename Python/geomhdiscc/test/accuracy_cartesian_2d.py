@@ -202,13 +202,13 @@ def i2j2(nx,nz, xg, zg):
     ssol = sy.integrate(ssol,z,z)
     test_forward(A, sphys, ssol, xg, zg, 2, 2)
 
-def i2j2d2d2(nx,nz, xg, zg):
-    """Accuracy test for i2j2d2d2 operator"""
+def i2j2d2e2(nx,nz, xg, zg):
+    """Accuracy test for i2j2d2e2 operator"""
 
-    print("i2j2d2d2:")
+    print("i2j2d2e2:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.i2j2d2d2(nx,nz, c2d.c2dbc.no_bc())
+    A = c2d.i2j2d2e2(nx,nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sy.diff(sphys,x,x),z,z))
     ssol = sy.integrate(ssol,x,x)
@@ -218,7 +218,7 @@ def i2j2d2d2(nx,nz, xg, zg):
 
     print("\tbc = 20, 20")
     k = np.random.ranf()*nx
-    A = c2d.i2j2d2d2(nx,nz, {'x':{0:20}, 'z':{0:20}}).tocsr()
+    A = c2d.i2j2d2e2(nx,nz, {'x':{0:20}, 'z':{0:20}}).tocsr()
     B = c2d.i2j2(nx,nz, c2d.c2dbc.no_bc()).tocsr()
     ssol = (1.0 - x**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(sy.diff(ssol,x,x),z,z))
@@ -736,7 +736,7 @@ if __name__ == "__main__":
     lapl2h(nx, nz, xg, zg)
     i2j1e1(nx, nz, xg, zg)
     i2j2e2(nx, nz, xg, zg)
-    i2j2d2d2(nx, nz, xg, zg)
+    i2j2d2e2(nx, nz, xg, zg)
     i2(nx, nz, xg, zg)
     i2j1(nx, nz, xg, zg)
     i2j2(nx, nz, xg, zg)

@@ -68,16 +68,6 @@ if show_solution:
     sol_p = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],mode]
     # Extract continuity from velocity 
     sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + mod.c2d.e1(res[0], res[2], mod.no_bc(), sx = 0)*sol_w
-
-    n_u = res[0]*(res[2]-1)
-    n_w = (res[0]-1)*res[2]
-    n_t = res[0]*res[2]
-    n_p = (res[0]-1)*(res[2]-1)
-    sol_u = evp_vec[0:n_u,-1]
-    sol_w = evp_vec[n_u:n_u+n_w,-1]
-    sol_t = evp_vec[n_u+n_w:n_u+n_w+n_t,-1]
-    sol_p = evp_vec[n_u+n_w+n_t:n_u+n_w+n_t+n_p,-1]
-    sol_c = mod.c2d.d1(res[0], res[2], {'x':{0:0}, 'z':{0:0, 'cr':1}}, sz = 0)*sol_u + mod.c2d.e1(res[0], res[2], {'x':{0:0, 'cr':1}, 'z':{0:0}}, sx = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)

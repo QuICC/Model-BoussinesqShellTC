@@ -293,7 +293,7 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
                 mat = c2d.i1j1d1d0(res[0]+1, res[2]+1, bc)
                 mat = mat.tolil()
                 mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
+                mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
                 mat = mat.tocoo()
 #                mat = c2d.i1j1d1d0(res[0], res[2], bc)
@@ -308,7 +308,7 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
                 mat = c2d.i1j1d0d1(res[0]+1, res[2]+1, bc)
                 mat = mat.tolil()
                 mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
+                mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
                 mat = mat.tocoo()
 #                mat = c2d.i1j1d0d1(res[0], res[2], bc)
@@ -319,7 +319,7 @@ class BoussinesqRotConv2DBoxVCT(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 0, 0, bc)
                 mat = mat.tolil()
                 mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
+                mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
                 mat = mat.tocoo()
 

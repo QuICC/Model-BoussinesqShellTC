@@ -260,11 +260,11 @@ class BoussinesqConv1DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c1d.zblk(res[0], bc)
 
-            elif field_col == ("pressure",""):
-                mat = c1d.i2(res[0], bc, -1j*k1)
-
             elif field_col == ("temperature",""):
                 mat = c1d.zblk(res[0], bc)
+
+            elif field_col == ("pressure",""):
+                mat = c1d.i2(res[0], bc, -1j*k1)
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
@@ -276,11 +276,11 @@ class BoussinesqConv1DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c1d.zblk(res[0], bc)
 
-            elif field_col == ("pressure",""):
-                mat = c1d.i2(res[0], bc, -1j*k2)
-
             elif field_col == ("temperature",""):
                 mat = c1d.zblk(res[0], bc)
+
+            elif field_col == ("pressure",""):
+                mat = c1d.i2(res[0], bc, -1j*k2)
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
@@ -292,11 +292,11 @@ class BoussinesqConv1DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c1d.i2lapl(res[0], k1, k2, bc)
 
-            elif field_col == ("pressure",""):
-                mat = c1d.i2d1(res[0], bc, -1.0)
-
             elif field_col == ("temperature",""):
                 mat = c1d.i2(res[0], bc, Ra/16.)
+
+            elif field_col == ("pressure",""):
+                mat = c1d.i2d1(res[0], bc, -1.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -308,27 +308,45 @@ class BoussinesqConv1DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c1d.i2(res[0], bc)
 
-            elif field_col == ("pressure",""):
-                mat = c1d.zblk(res[0], bc)
-
             elif field_col == ("temperature",""):
                 mat = c1d.i2lapl(res[0], k1, k2, bc)
 
-        elif field_row == ("pressure",""):
-            if field_col == ("velocityx",""):
-                mat = c1d.i1(res[0], bc, 1j*k1)
-
-            elif field_col == ("velocityy",""):
-                mat = c1d.i1(res[0], bc, 1j*k2)
-
-            elif field_col == ("velocityz",""):
-                mat = c1d.i1d1(res[0], bc)
-
             elif field_col == ("pressure",""):
                 mat = c1d.zblk(res[0], bc)
 
+        elif field_row == ("pressure",""):
+            if field_col == ("velocityx",""):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = c1d.i1(res[0]+1, bc, 1j*k1)
+                mat = mat.tolil()
+                mat[-1,:] = 0
+                mat = mat.tocoo()
+
+            elif field_col == ("velocityy",""):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = c1d.i1(res[0]+1, bc, 1j*k2)
+                mat = mat.tolil()
+                mat[-1,:] = 0
+                mat = mat.tocoo()
+
+            elif field_col == ("velocityz",""):
+                bc['rt'] = 1
+                bc['cr'] = 1
+                mat = c1d.i1d1(res[0]+1, bc)
+                mat = mat.tolil()
+                mat[-1,:] = 0
+                mat = mat.tocoo()
+
             elif field_col == ("temperature",""):
                 mat = c1d.zblk(res[0], bc)
+
+            elif field_col == ("pressure",""):
+                mat = c1d.zblk(res[0], bc)
+                mat = mat.tolil()
+                mat[-1,-1] = 1
+                mat = mat.tocoo()
 
         return mat
 

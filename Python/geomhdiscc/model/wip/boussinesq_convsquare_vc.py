@@ -280,57 +280,55 @@ class BoussinesqConvSquareVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c2d.i2j2lapl(res[0], res[2]-1, 0, bc)
+                bc['z']['zr'] = 1
+                bc['z']['zb'] = 1
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
+                mat = mat + c2d.qid(res[0], res[2], 0, res[2]-1, no_bc())
 
             elif field_col == ("velocityz",""):
-                bc['z']['rb'] = 1
-                bc['x']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                bc['z']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                bc['z']['rb'] = 1
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
+                bc['x']['zr'] = 1
+                bc['z']['zb'] = 1
+                bc['z']['zr'] = 1
                 mat = c2d.i2j2d1(res[0], res[2], bc, -1.0)
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
-                bc['z']['cr'] = 1
-                bc['x']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j2lapl(res[0]-1, res[2], 0, bc)
+                bc['x']['zr'] = 1
+                bc['x']['zb'] = 1
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
+                mat = mat + c2d.qid(res[0], res[2], res[0]-1, 0, no_bc())
 
             elif field_col == ("temperature",""):
-                bc['x']['rb'] = 1
+                bc['x']['zb'] = 1
                 mat = c2d.i2j2(res[0], res[2], bc, Ra/16.0)
 
             elif field_col == ("pressure",""):
-                bc['x']['rb'] = 1
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
+                bc['x']['zr'] = 1
+                bc['x']['zb'] = 1
+                bc['z']['zr'] = 1
                 mat = c2d.i2j2e1(res[0], res[2], bc, -1.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
-                bc['z']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                bc['x']['cr'] = 1
+                bc['x']['zr'] = 1
                 mat = c2d.i2j2(res[0], res[2], bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc)
 
             elif field_col == ("pressure",""):
-                bc['x']['cr'] = 1
-                bc['z']['cr'] = 1
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("pressure",""):
@@ -338,49 +336,38 @@ class BoussinesqConvSquareVC(base_model.BaseModel):
                 bc['x']['rt'] = 1
                 bc['x']['cr'] = 1
                 bc['z']['rt'] = 1
-                bc['z']['cr'] = 2
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['zr'] = 1
                 mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc)
                 mat = mat.tolil()
                 mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
-                mat[-2:,:] = 0
+                mat[-2*res[0]-3:-2*res[0]-1,:] = 0
+                mat[-res[0]-3:-res[0]-1,:] = 0
                 mat = mat.tocoo()
 
             elif field_col == ("velocityz",""):
                 bc['x']['rt'] = 1
-                bc['x']['cr'] = 2
+                bc['x']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
+                bc['x']['zr'] = 1
                 mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc)
                 mat = mat.tolil()
                 mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
-                mat[-2:,:] = 0
+                mat[-2*res[0]-3:-2*res[0]-1,:] = 0
+                mat[-res[0]-3:-res[0]-1,:] = 0
                 mat = mat.tocoo()
 
             elif field_col == ("temperature",""):
-                bc['x']['rb'] = 1
-                bc['z']['rb'] = 1
                 mat = c2d.zblk(res[0], res[2], 0, 0, bc)
-                mat = mat.tolil()
-                mat[0,:] = 0
-                mat[-res[0]-2:-res[0]:,:] = 0
-                mat[-2:,:] = 0
-                mat = mat.tocoo()
 
             elif field_col == ("pressure",""):
-                mat = c2d.zblk(res[0]-1, res[2]-1, 0, 0, bc)
+                mat = c2d.zblk(res[0], res[2], 0, 0, bc)
                 mat = mat.tolil()
-                mat[0,:] = 0
                 mat[0,0] = 1
-                mat[-res[0]-2:-res[0],:] = 0
-                mat[-res[0]-2:-res[0],-res[0]-2:-res[0]] = spsp.eye(2)
-                mat[-2:,:] = 0
-                mat[-2:,-2:] = spsp.eye(2)
+                mat = mat + c2d.qid(res[0], res[2], res[0]-1, 0, no_bc())
+                mat = mat + c2d.qid(res[0], res[2], 0, res[2]-1, no_bc())
+                mat = mat + c2d.qid(res[0], res[2], res[0]-3, res[2]-3, no_bc())
                 mat = mat.tocoo()
 
         return mat
@@ -393,15 +380,19 @@ class BoussinesqConvSquareVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c2d.i2j2(res[0], res[2]-1, bc, 1.0/Pr)
+            bc['z']['zr'] = 1
+            bc['z']['zb'] = 1
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j2(res[0]-1, res[2], bc, 1.0/Pr)
+            bc['x']['zr'] = 1
+            bc['x']['zb'] = 1
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j2(res[0], res[2], bc)
 
         elif field_row == ("pressure",""):
-            mat = c2d.zblk(res[0]-1, res[2]-1, 1, 1, bc)
+            mat = c2d.zblk(res[0], res[2], 1, 1, bc)
 
         return mat

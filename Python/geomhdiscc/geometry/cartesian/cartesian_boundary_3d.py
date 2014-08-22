@@ -43,71 +43,50 @@ def bid(nx, q, d, bc, location = 't'):
 def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
     """Contrain the matrix with the Tau boundary condition"""
 
-    priority = bc.get('priority', 'x')
-    if priority == 'x':
-        sx = qx
-        dx = 0
-        sy = 0
-        dy = 0
-        sz = 0
-        dz = 0
-    elif priority == 'y':
-        sx = 0
-        dx = 0
-        sy = qy
-        dy = 0
-        sz = 0
-        dz = 0
-    elif priority == 'z':
-        sx = 0
-        dx = 0
-        sy = 0
-        dy = 0
-        sz = qz
-        dz = 0
+    priority = bc.get('priority', 'xz')
+    sx = 2*[0]
+    dx = 2*[0]
+    sy = 2*[0]
+    dy = 2*[0]
+    sz = 2*[0]
+    dz = 2*[0]
+    if priority == 'xy':
+        sx = [qx,qx]
+        sy = [0,qy]
+    elif priority == 'xz':
+        sx = [qx,qx]
+        sz = [0,qz]
+    elif priority == 'yx':
+        sx = [0,qx]
+        sy = [qy,qy]
+    elif priority == 'yz':
+        sy = [qy,qy]
+        sz = [qz,0]
+    elif priority == 'zx':
+        sx = [qx,0]
+        sz = [qz,qz]
+    elif priority == 'zy':
+        sy = [qy,0]
+        sz = [qz,qz]
     elif priority == 'n':
-        sx = qx
-        dx = 0
-        sy = qy
-        dy = 0
-        sz = qz
-        dz = 0
-    if priority == 'sx':
-        sx = qx
-        dx = -qx
-        sy = 0
-        dy = 0
-        sz = 0
-        dz = 0
-    elif priority == 'sy':
-        sx = 0
-        dx = 0
-        sy = qy
-        dy = -qy
-        sz = 0
-        dz = 0
-    elif priority == 'sz':
-        sx = 0
-        dx = 0
-        sy = 0
-        dy = 0
-        sz = qz
-        dz = -qz
+        sx = [qx,qx]
+        sy = [qy,qy]
+        sz = [qz,qz]
             
     bc_mat = mat
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'], location = location)
-        bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location), bcMat)
+        bc_mat = bc_mat + spsp.kron(bid(ny,sy[0],dy[0],bc['y'], location = location), spsp.kron(bid(nz,sz[0],dz[0],bc['z']),bcMat))
+
+    if bc['y'][0] > 0:
+        bcMat = spsp.lil_matrix((ny,ny))
+        bcMat = c1dbc.constrain(bcMat, bc['y'], location = location)
+        bc_mat = bc_mat + spsp.kron(bcMat, spsp.kron(bid(nz,sz[1],dz[1],bc['z']),bid(nx,sx[0],dx[0],bc['x'], location = location)))
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        if bc['x'][0] >= 0:
-            bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location))
-
-        else:
-            tmpB = c1dbc.constrain(bid(nx,0,0,c1dbc.no_bc(), location = location),bc['x'], location = location)
-            bc_mat = bc_mat + spsp.kron(bcMat, tmpB)
+        bc_mat = bc_mat + spsp.kron(bid(ny,sy[1],dy[1],bc['y'], location = location), spsp.kron(bcMat,bid(nx,sx[1],dx[1],bc['x'])))
 
     return bc_mat

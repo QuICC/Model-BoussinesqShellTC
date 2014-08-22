@@ -11,9 +11,9 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 0]
+res = [200, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':1707.8}
-phi = 0
+phi = 15
 kp = 3.117
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;

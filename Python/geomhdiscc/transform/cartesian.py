@@ -55,3 +55,49 @@ def tocheb2d(phys):
         phys[i,:] = tocheb(phys[i,:])
     
     return phys
+
+def tophys3d(spec):
+    """Transform 3D spectral coefficients to 3D physical values"""
+
+    phys = spec.copy()
+
+    if spec.dtype == 'complex_':
+        for i in range(spec.shape[0]):
+            for j in range(spec.shape[1]):
+                phys.real[i,j,:] = tophys(spec.real[i,j,:])
+                phys.imag[i,j,:] = tophys(spec.imag[i,j,:])
+        for i in range(spec.shape[0]):
+            for j in range(spec.shape[2]):
+                phys.real[i,:,j] = tophys(phys.real[i,:,j])
+                phys.imag[i,:,j] = tophys(phys.imag[i,:,j])
+        for i in range(spec.shape[1]):
+            for j in range(spec.shape[2]):
+                phys.real[:,i,j] = tophys(phys.real[:,i,j])
+                phys.imag[:,i,j] = tophys(phys.imag[:,i,j])
+    else:
+        for i in range(spec.shape[0]):
+            for j in range(spec.shape[1]):
+                phys[i,j,:] = tophys(spec[i,j,:])
+        for i in range(spec.shape[0]):
+            for j in range(spec.shape[2]):
+                phys[i,:,j] = tophys(phys[i,:,j])
+        for i in range(spec.shape[1]):
+            for j in range(spec.shape[2]):
+                phys[:,i,j] = tophys(phys[:,i,j])
+    
+    return phys
+
+def tocheb3d(phys):
+    """Transform 3D physical array to 3D spectral coefficients"""
+
+    for i in range(phys.shape[1]):
+        for j in range(phys.shape[2]):
+            phys[:,i,j] = tocheb(phys[:,i,j])
+    for i in range(phys.shape[0]):
+        for j in range(phys.shape[2]):
+            phys[i,:,j] = tocheb(phys[i,:,j])
+    for i in range(phys.shape[0]):
+        for j in range(phys.shape[1]):
+            phys[i,j,:] = tocheb(phys[i,j,:])
+    
+    return phys

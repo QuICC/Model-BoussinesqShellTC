@@ -43,14 +43,14 @@ def d1(nx, ny, nz, bc, coeff = 1.0, sx = 1, sy = 0, sz = 0):
     """Create operator for 1st X derivative of T_n(x)T_n(y)T_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.sid(ny, sy, bcy), c2d.d1(nx,nz,{'x':bcx,'z':bcz}, sx = sx, sz = sz))
+    mat = coeff*spsp.kron(c1d.sid(ny, sy, bcy), c2d.d1(nx, nz,{'x':bcx,'z':bcz}, sx = sx, sz = sz))
     return  c3dbc.constrain(mat, nx, ny, nz, sx, sy, sz, bc, location = 'b')
 
 def e1(nx, ny, nz, bc, coeff = 1.0, sx = 0, sy = 1, sz = 0):
     """Create operator for 1st Y derivative of T_n(x)T_n(y)T_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
-    mat = coeff*spsp.kron(c1d.d1(ny,bcy, zr = sy), c2d.d1(nx,nz,{'x':bcx,'z':bcz}, sx = sx, sz = sz))
+    mat = coeff*spsp.kron(c1d.d1(ny,bcy, zr = sy), c2d.sid(nx, nz, sx, sz, {'x':bcx,'z':bcz}))
     return  c3dbc.constrain(mat, nx, ny, nz, sx, sy, sz, bc, location = 'b')
 
 def f1(nx, ny, nz, bc, coeff = 1.0, sx = 0, sy = 0, sz = 1):
@@ -67,7 +67,28 @@ def zblk(nx, ny, nz, qx, qy, qz, bc, location = 't'):
     mat = spsp.kron(c1d.zblk(ny,bcy),spsp.kron(c1d.zblk(nz,bcz),c1d.zblk(nx,bcx)))
     return c3dbc.constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = location)
 
-def i2j2k2d2d2d2(nx, ny, nz, bc, coeff = 1.0):
+def i1j1k1d1(nx, ny, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral in x,y,z of T'_n(x)T_n(y)T_n(z)"""
+
+    bcx, bcy, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i1(ny,bcy), c2d.i1j1d1(nx,nz,{'x':bcx,'z':bcz}))
+    return  c3dbc.constrain(mat, nx, ny, nz, 1, 1, 1, bc)
+
+def i1j1k1e1(nx, ny, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral in x,y,z of T_n(x)T'_n(y)T_n(z)"""
+
+    bcx, bcy, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i1d1(ny,bcy), c2d.i1j1(nx,nz,{'x':bcx,'z':bcz}))
+    return  c3dbc.constrain(mat, nx, ny, nz, 1, 1, 1, bc)
+
+def i1j1k1f1(nx, ny, nz, bc, coeff = 1.0):
+    """Create operator for 1st integral in x,y,z of T_n(x)T_n(y)T'_n(z)"""
+
+    bcx, bcy, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i1(ny,bcy), c2d.i1j1e1(nx,nz,{'x':bcx,'z':bcz}))
+    return  c3dbc.constrain(mat, nx, ny, nz, 1, 1, 1, bc)
+
+def i2j2k2d2e2f2(nx, ny, nz, bc, coeff = 1.0):
     """Create a quasi identity block of order 2,2,2"""
 
     return qid(nx,ny,nz,2,2,2,bc,coeff)
@@ -80,21 +101,21 @@ def i2j2k2(nx, ny, nz, bc, coeff = 1.0):
     return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
 
 def i2j2k2d1(nx, ny, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x,y,z of Laplacian T'_n(x)T_n(y)T_n(z)"""
+    """Create operator for 2nd integral in x,y,z of T'_n(x)T_n(y)T_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(ny,bcy), c2d.i2j2d1(nx,nz,{'x':bcx,'z':bcz}))
     return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
 
 def i2j2k2e1(nx, ny, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T'_n(y)T_n(z)"""
+    """Create operator for 2nd integral in x,y,z of T_n(x)T'_n(y)T_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2d1(ny,bcy), c2d.i2j2(nx,nz,{'x':bcx,'z':bcz}))
     return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
 
 def i2j2k2f1(nx, ny, nz, bc, coeff = 1.0):
-    """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T_n(y)T'_n(z)"""
+    """Create operator for 2nd integral in x,y,z of T_n(x)T_n(y)T'_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i2(ny,bcy), c2d.i2j2e1(nx,nz,{'x':bcx,'z':bcz}))
