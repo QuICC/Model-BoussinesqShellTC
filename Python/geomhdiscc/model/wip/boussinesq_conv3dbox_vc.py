@@ -8,6 +8,7 @@ import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
 import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
@@ -321,13 +322,47 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        zero_x = c3d.qid(res[0], res[1], res[2], 0, res[1]-1, res[2]-1, no_bc())
-        idx_x = (np.ravel(zero_x.sum(axis=1)) == 1)
-        zero_y = c3d.qid(res[0], res[1], res[2], res[0]-1, 0, res[2]-1, no_bc())
-        idx_y = (np.ravel(zero_y.sum(axis=1)) == 1)
-        zero_z = c3d.qid(res[0], res[1], res[2], res[0]-1, res[1]-1, 0, no_bc())
-        idx_z = (np.ravel(zero_z.sum(axis=1)) == 1)
-        idx_p = np.logical_or(np.logical_or(idx_x, idx_y),idx_z)
+        zero_x = c3d.zblk(res[0], res[1], res[2], 0, 0, 0, no_bc())
+        zero_x = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_x = zero_x + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_x = zero_x + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        idx_x = (np.ravel(zero_x.sum(axis=1)) > 0)
+        zero_x = spsp.lil_matrix(zero_x.shape)
+        zero_x[idx_x,idx_x] = 1
+
+        zero_y = c3d.zblk(res[0], res[1], res[2], 0, 0, 0, no_bc())
+        zero_y = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_y = zero_y + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_y = zero_y + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_y = (np.ravel(zero_y.sum(axis=1)) > 0)
+        zero_y = spsp.lil_matrix(zero_y.shape)
+        zero_y[idx_y,idx_y] = 1
+
+        zero_z = c3d.zblk(res[0], res[1], res[2], 0, 0, 0, no_bc())
+        zero_z = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_z = zero_z + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_z = zero_z + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_z = (np.ravel(zero_z.sum(axis=1)) > 0)
+        zero_z = spsp.lil_matrix(zero_z.shape)
+        zero_z[idx_z,idx_z] = 1
+
+        zero_p = c3d.zblk(res[0], res[1], res[2], 0, 0, 0, no_bc())
+
+        # Highest 3 cube
+        zero_p = spsp.kron(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc())))
+
+        # Highest in each direction
+        zero_p = zero_p + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        
+        # 0,0,0 mode
+        zero_p = zero_p + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+
+        zero_p = zero_x + zero_y + zero_z + zero_p
+        idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
+        zero_p = spsp.lil_matrix(zero_p.shape)
+        zero_p[idx_p,idx_p] = 1
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
@@ -386,7 +421,8 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 mat = mat + zero_z
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0).tolil()
+                mat[idx_z,:] = 0
 
             elif field_col == ("pressure",""):
                 mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0).tolil()
@@ -420,6 +456,7 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
                 mat[:,idx_x] = 0
+                mat[idx_p,:] = 0
 
             elif field_col == ("velocityy",""):
                 bc['x']['rt'] = 1
@@ -430,6 +467,7 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
                 mat[:,idx_y] = 0
+                mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
                 bc['x']['rt'] = 1
@@ -440,12 +478,14 @@ class BoussinesqConv3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
                 mat[:,idx_z] = 0
+                mat[idx_p,:] = 0
 
             elif field_col == ("temperature",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc).tolil()
+                mat = mat + zero_p
 
         return mat
 

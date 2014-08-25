@@ -300,12 +300,17 @@ class BoussinesqConvAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
+#                bc['r']['zr'] = 1
+#                bc['r']['zb'] = 1
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = 2.0)
+#                mat = mat + annulus.qid(res[0], res[2], res[0]-1, 0, no_bc())
 
             elif field_col == ("temperature",""):
+#                bc['r']['zb'] = 1
                 mat = annulus.i2j2x2(res[0], res[2], a, b, bc, Ra)
 
             elif field_col == ("pressure",""):
+#                bc['r']['zb'] = 1
                 mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = 2.0)
 
         elif field_row == ("temperature",""):
@@ -316,6 +321,7 @@ class BoussinesqConvAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
+#                bc['r']['zr'] = 1
                 mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
             elif field_col == ("temperature",""):
@@ -330,27 +336,37 @@ class BoussinesqConvAnnulusVC(base_model.BaseModel):
                 bc['r']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
+#                bc['r']['zb'] = 1
                 mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc).tolil()
                 mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
+#                mat[-res[0]-3:-res[0],:] = 0
+#                mat[-3:,:] = 0
 
             elif field_col == ("velocityy",""):
                 bc['r']['rt'] = 1
                 bc['r']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
+#                bc['r']['zb'] = 1
                 mat = annulus.i1j1(res[0]+1, res[2]+1, a, b, bc, 1j*m).tolil()
                 mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
+#                mat[-res[0]-3:-res[0],:] = 0
+#                mat[-3:,:] = 0
 
             elif field_col == ("velocityz",""):
                 bc['r']['rt'] = 1
                 bc['r']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
+#                bc['r']['zr'] = 1
+#                bc['r']['zb'] = 1
                 mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = 2.0).tolil()
                 mat[-res[0]-2:-res[0],:] = 0
                 mat[-2:,:] = 0
+#                mat[-res[0]-3:-res[0],:] = 0
+#                mat[-3:,:] = 0
 
             elif field_col == ("temperature",""):
                 mat = annulus.zblk(res[0], res[2], 1, 1, bc)
@@ -358,6 +374,8 @@ class BoussinesqConvAnnulusVC(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = annulus.zblk(res[0], res[2], 1, 1, bc)
                 mat = mat + annulus.qid(res[0], res[2], res[0]-2, res[2]-2, no_bc())
+#                mat = mat + annulus.qid(res[0], res[2], res[0]-1, 0, no_bc())
+#                mat = mat + annulus.qid(res[0], res[2], res[0]-3, res[2]-3, no_bc())
 
         return mat
 
@@ -378,6 +396,8 @@ class BoussinesqConvAnnulusVC(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
 
         elif field_row == ("velocityz",""):
+#            bc['r']['zr'] = 1
+#            bc['r']['zb'] = 1
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
 
         elif field_row == ("temperature",""):
