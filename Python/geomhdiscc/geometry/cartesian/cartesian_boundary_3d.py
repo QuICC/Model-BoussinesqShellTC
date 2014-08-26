@@ -34,10 +34,10 @@ def bid(nx, q, d, bc, location = 't'):
                 mat[-q:,:] = 0
 
     tbc = c1dbc.no_bc()
-    tbc['cr'] = bc.get('cr', 0)
-    tbc['rb'] = bc.get('rb', 0)
-    tbc['cl'] = bc.get('cl', 0)
-    tbc['rt'] = bc.get('rt', 0)
+    for key, val in bc.items():
+        if key != 0:
+            tbc[key] = val
+
     return c1dbc.constrain(mat, tbc)
 
 def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):

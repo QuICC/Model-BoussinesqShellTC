@@ -39,6 +39,8 @@ def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
+    if zr > 0:
+        mat[-zr:,:] = 0
     return radbc.constrain(mat, bc)
 
 def d1(nr, a, b, bc, coeff = 1.0, zr = 1):

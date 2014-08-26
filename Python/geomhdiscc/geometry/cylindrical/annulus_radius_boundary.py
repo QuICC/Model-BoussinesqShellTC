@@ -7,8 +7,6 @@ import numpy as np
 import scipy.sparse as spsp
 import itertools
 
-import geomhdiscc.base.utils as utils
-
 
 def no_bc():
     """Get a no boundary condition flag"""

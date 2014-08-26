@@ -197,7 +197,7 @@ class BoussinesqRotConvShell(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
-        a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -268,7 +268,7 @@ class BoussinesqRotConvShell(base_model.BaseModel):
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        a, b = self.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -282,11 +282,3 @@ class BoussinesqRotConvShell(base_model.BaseModel):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc, Pr)
 
         return mat
-
-    def linear_r2x(self, ro, rratio):
-        """Calculat a and b for linear map r = a*x + b"""
-
-        b = (ro*rratio + ro)/2.0;
-        a = ro - b;
-
-        return (a, b)

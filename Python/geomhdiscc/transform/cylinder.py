@@ -51,14 +51,15 @@ def tozcheb(phys):
 def tophys2d(spec, parity):
     """Transform 2D spectral coefficients to 2D physical values"""
 
-    phys = np.zeros((2*spec.shape[0], spec.shape[1]))
+    tmp = spec.copy()
+    phys = 1j*np.zeros((2*spec.shape[0], spec.shape[1]))
 
     for i in range(spec.shape[0]):
-        phys.real[i,:] = tozphys(spec.real[i,:])
-        phys.imag[i,:] = tozphys(spec.imag[i,:])
+        tmp.real[i,:] = tozphys(spec.real[i,:])
+        tmp.imag[i,:] = tozphys(spec.imag[i,:])
     for j in range(phys.shape[1]):
-        phys.real[:,j] = torphys(phys.real[:,j], parity)
-        phys.imag[:,j] = torphys(phys.imag[:,j], parity)
+        phys.real[:,j] = torphys(tmp.real[:,j], parity)
+        phys.imag[:,j] = torphys(tmp.imag[:,j], parity)
     
     return phys
 

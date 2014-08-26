@@ -11,8 +11,9 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
-eq_params = {'prandtl':1, 'rayleigh':1711.5, 'zrratio':1.0}
+res = [6, 0, 6]
+eq_params = {'prandtl':1, 'rayleigh':2901.55, 'zrratio':1.0}
+#eq_params = {'prandtl':1, 'rayleigh':0., 'zrratio':1.0}
 eigs = [1]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
@@ -54,7 +55,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 
 if show_solution:
@@ -67,7 +68,7 @@ if show_solution:
     sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],mode]
     sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],mode]
     # Extract continuity from velocity 
-    sol_c = mod.cylinder.xdiv(res[0], res[2], eigs[0], mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.cylinder.xe1(res[0], res[2], eigs[0], mod.no_bc(), sr = 0)*sol_w
+    sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)
@@ -128,38 +129,38 @@ if show_solution:
     pl.close("all")
 
     # Compute physical space values
-    grid_x = transf.grid(res[0])
-    grid_z = transf.grid(res[2])
-    phys_u = transf.tophys2d(mat_u)
-    phys_v = transf.tophys2d(mat_v)
-    phys_w = transf.tophys2d(mat_w)
-    phys_t = transf.tophys2d(mat_t)
-    phys_p = transf.tophys2d(mat_p)
-    phys_c = transf.tophys2d(mat_c)
+    grid_r = transf.rgrid(res[0])
+    grid_z = transf.zgrid(res[2])
+    phys_u = transf.tophys2d(mat_u, (eigs[0]+1)%2)
+    phys_v = transf.tophys2d(mat_v, (eigs[0]+1)%2)
+    phys_w = transf.tophys2d(mat_w, eigs[0]%2)
+    phys_t = transf.tophys2d(mat_t, eigs[0]%2)
+    phys_p = transf.tophys2d(mat_p, eigs[0]%2)
+    phys_c = transf.tophys2d(mat_c, (eigs[0]+1)%2)
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u, 50)
+    pl.contourf(grid_z, grid_r, phys_u, 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v, 50)
+    pl.contourf(grid_z, grid_r, phys_v, 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w, 50)
+    pl.contourf(grid_z, grid_r, phys_w, 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t, 50)
+    pl.contourf(grid_z, grid_r, phys_t, 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c)), 50)
+    pl.contourf(grid_z, grid_r, np.log10(np.abs(phys_c)), 50)
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p, 50)
+    pl.contourf(grid_z, grid_r, phys_p, 50)
     pl.colorbar()
     pl.title("p")
     pl.show()

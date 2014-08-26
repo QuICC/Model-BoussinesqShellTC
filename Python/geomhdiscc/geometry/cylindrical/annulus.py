@@ -67,7 +67,7 @@ def i1j1x1d1(nr, nz, a, b, bc, coeff = 1.0):
     return cylbc.constrain(mat, nr, nz, 1, 1, bc)
 
 def i1j1x1div(nr, nz, a, b, bc, coeff = 1.0):
-    """Create a i1x1d1 in R kronecker with an i1 in Z"""
+    """Create a i1x1div in R kronecker with an i1 in Z"""
 
     bcr, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.i1(nz,bcz), rad.i1x1div(nr, a, b, bcr))
