@@ -133,7 +133,7 @@ class BoussinesqConv2DBoxVC(base_model.BaseModel):
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
+                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
 
             # Stress-free/Stress-free, Fixed flux/Fixed flux
             elif bcId == 1:
