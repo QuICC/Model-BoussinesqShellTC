@@ -1,15 +1,19 @@
 set(MHDPhysicalModels 
-   AnelasticFPlaneModel.hpp
-   BoussinesqAnnulusModel.hpp
    BoussinesqBeta3DQGModel.hpp
    BoussinesqBeta3DQGPerModel.hpp
-   BoussinesqCylinderModel.hpp
    BoussinesqFPlane3DQGModel.hpp
-   BoussinesqShellModel.hpp
-   BoussinesqSphereModel.hpp
-   CompressibleFPlaneModel.hpp
-   RayleighBenardModel.hpp
-   RotatingRBModel.hpp
+   #BoussinesqRB1DBoxVCModel.hpp
+   #BoussinesqRB2DBoxVCModel.hpp
+   #BoussinesqRB3DBoxVCModel.hpp
+   #BoussinesqRBAnnulusVCModel.hpp
+   #BoussinesqRBCylinderVCModel.hpp
+   #BoussinesqRRB1DBoxVCModel.hpp
+   #BoussinesqRRB2DBoxVCModel.hpp
+   #BoussinesqRRB3DBoxVCModel.hpp
+   #BoussinesqRRBAnnulusVCModel.hpp
+   #BoussinesqRRBCylinderVCModel.hpp
+   #BoussinesqShellModel.hpp
+   #BoussinesqSphereModel.hpp
    )
 
 set(MHDTestModels 

@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating convection in a 3D box (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_conv3dbox_vc as mod
+import geomhdiscc.model.wip.boussinesq_rb3dbox_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqConv3DBoxVC()
+model = mod.BoussinesqRB3DBoxVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()

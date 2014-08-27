@@ -1,11 +1,11 @@
 /** 
- * @file RayleighBenardModel.hpp
- * @brief Implementation of the Rayleigh-Benard physical model
+ * @file BoussinesqCylinderModel.hpp
+ * @brief Implementation of the Boussinesq Rayleigh-Benard cylinder (velocity-continuity formulation) model 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef RAYLEIGHBENARDMODEL_HPP
-#define RAYLEIGHBENARDMODEL_HPP
+#ifndef BOUSSINESQRBCYLINDERVCMODEL_HPP
+#define BOUSSINESQRBCYLINDERVCMODEL_HPP
 
 // Configuration includes
 //
@@ -22,14 +22,14 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/TFFScheme.hpp"
+#include "SpatialSchemes/3D/CFTScheme.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Rayleigh-Benard physical model
+    * @brief Implementation of the Boussinesq  Rayleigh-Benard cylinder (velocity-continuity formulation) model
     */
-   class RayleighBenardModel
+   class BoussinesqRBCylinderVCModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::TFFScheme SchemeType;
+         typedef Schemes::CFTScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -99,14 +99,27 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         RayleighBenardModel();
+         BoussinesqRBCylinderVCModel();
 
          /**
           * @brief Destructor
           */
-         ~RayleighBenardModel();
+         ~BoussinesqRBCylinderVCModel();
    };
 
 }
 
-#endif // RAYLEIGHBENARDMODEL_HPP
+// 
+// Block compilation of unusable parallelisation algorithms
+//
+#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
+#error "The SINGLE1D parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_SINGLE1D
+#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
+#error "The SINGLE2D parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_SINGLE2D
+#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#error "The TUBULAR parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_TUBULAR
+
+#endif // BOUSSINESQRBCYLINDERVCMODEL_HPP

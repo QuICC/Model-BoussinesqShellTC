@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_beta3dqg4 as mod
+import geomhdiscc.model.boussinesq_beta3dqg as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqBeta3DQG()

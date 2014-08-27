@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqAnnulusModel.cpp
- * @brief Source of the Boussinesq annulus physical model
+ * @file BoussinesqRBCylinderVCModel.cpp
+ * @brief Source of the Boussinesq Rayleigh-Benard cylinder (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqAnnulusModel.hpp"
+#include "PhysicalModels/BoussinesqRBCylinderVCModel.hpp"
 
 // Project includes
 //
@@ -24,44 +24,44 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusTransport.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVelocity.hpp"
-#include "Generator/States/AnnulusExactScalarState.hpp"
-#include "Generator/States/AnnulusExactVectorState.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderTransport.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVelocity.hpp"
+#include "Generator/States/CylinderExactScalarState.hpp"
+#include "Generator/States/CylinderExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqAnnulusModel::PYMODULE = "boussinesq_annulus";
+   const std::string BoussinesqRBCylinderVCModel::PYMODULE = "boussinesq_rbcylinder_vc";
 
-   const std::string BoussinesqAnnulusModel::PYCLASS = "BoussinesqAnnulus";
+   const std::string BoussinesqRBCylinderVCModel::PYCLASS = "BoussinesqRBCylinderVC";
 
-   void BoussinesqAnnulusModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRBCylinderVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqAnnulusTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqCylinderTransport>();
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVelocity>();
+      spSim->addVectorEquation<Equations::BoussinesqCylinderVelocity>();
    }
 
-   void BoussinesqAnnulusModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRBCylinderVCModel::addStates(SharedStateGenerator spGen)
    {
       // Shared pointer to equation
-      Equations::SharedAnnulusExactScalarState spSExact;
-      Equations::SharedAnnulusExactVectorState spVExact;
+      Equations::SharedCylinderExactScalarState spSExact;
+      Equations::SharedCylinderExactVectorState spVExact;
 
       // Add temperature initial state generator
-      spSExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
+      spSExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
       spSExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spSExact->setStateType(Equations::AnnulusExactScalarState::CONSTANT);
+      spSExact->setStateType(Equations::CylinderExactScalarState::CONSTANT);
 
       // Add temperature initial state generator
-      spVExact = spGen->addVectorEquation<Equations::AnnulusExactVectorState>();
+      spVExact = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
       spVExact->setIdentity(PhysicalNames::VELOCITY);
-      spVExact->setStateType(Equations::AnnulusExactVectorState::CONSTANT);
+      spVExact->setStateType(Equations::CylinderExactVectorState::CONSTANT);
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -70,7 +70,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqAnnulusModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCylinderVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -86,7 +86,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqAnnulusModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRBCylinderVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -98,7 +98,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqAnnulusModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCylinderVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -107,7 +107,7 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqAnnulusModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRBCylinderVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -122,7 +122,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqAnnulusModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRBCylinderVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

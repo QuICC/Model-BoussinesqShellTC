@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqCylinderModel.hpp
- * @brief Implementation of the Boussinesq cylinder model 
+ * @file BoussinesqRBAnnulusVCModel.hpp
+ * @brief Implementation of the Boussinesq Rayleigh-Benard annulus (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQCYLINDERMODEL_HPP
-#define BOUSSINESQCYLINDERMODEL_HPP
+#ifndef BOUSSINESQRBANNULUSVCMODEL_HPP
+#define BOUSSINESQRBANNULUSVCMODEL_HPP
 
 // Configuration includes
 //
@@ -22,14 +22,14 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/CFTScheme.hpp"
+#include "SpatialSchemes/3D/AFTScheme.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq cylinder model
+    * @brief Implementation of the Boussinesq Rayleigh-Benard annulus (velocity-continuity formulation) model
     */
-   class BoussinesqCylinderModel
+   class BoussinesqRBAnnulusVCModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::CFTScheme SchemeType;
+         typedef Schemes::AFTScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -99,12 +99,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqCylinderModel();
+         BoussinesqRBAnnulusVCModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqCylinderModel();
+         ~BoussinesqRBAnnulusVCModel();
    };
 
 }
@@ -122,4 +122,4 @@ namespace GeoMHDiSCC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
-#endif // BOUSSINESQCYLINDERMODEL_HPP
+#endif // BOUSSINESQRBANNULUSVCMODEL_HPP

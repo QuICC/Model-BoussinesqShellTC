@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq convection in a 3D box (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,8 +13,8 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
 
-class BoussinesqConv3DBoxVC(base_model.BaseModel):
-    """Class to setup the Boussinesq convection in a 3D box (velocity-continuity formulation)"""
+class BoussinesqRB3DBoxVC(base_model.BaseModel):
+    """Class to setup the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""

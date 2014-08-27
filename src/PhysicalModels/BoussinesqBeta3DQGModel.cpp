@@ -36,7 +36,7 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg4";
+   const std::string BoussinesqBeta3DQGModel::PYMODULE = "boussinesq_beta3dqg";
 
    const std::string BoussinesqBeta3DQGModel::PYCLASS = "BoussinesqBeta3DQG";
 

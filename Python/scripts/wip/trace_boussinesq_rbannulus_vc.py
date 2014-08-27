@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq convection in a cylindrical annulus model"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a cylindrical annulus model (velocity-continuity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_convannulus_vc as mod
+import geomhdiscc.model.wip.boussinesq_rbannulus_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqConvAnnulusVC()
+model = mod.BoussinesqRBAnnulusVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
