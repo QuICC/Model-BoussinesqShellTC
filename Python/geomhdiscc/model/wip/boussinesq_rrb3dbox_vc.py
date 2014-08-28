@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,13 +13,13 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
 
-class BoussinesqRB3DBoxVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
+class BoussinesqRRB3DBoxVC(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "zxratio", "yxratio"]
+        return ["prandtl", "rayleigh", "taylor", "zxratio", "yxratio"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -321,14 +321,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
 
         zscale = eq_params['zxratio']
         yscale = eq_params['yxratio']
 
 #        zero_u = c3d.zblk(res[0], res[1], res[2], 1,1,1, no_bc())
         zero_u = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_u = zero_u + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_u = zero_u + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
 #        zero_u = zero_u + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
@@ -336,8 +337,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
 #        zero_v = c3d.zblk(res[0], res[1], res[2], 1,1,1, no_bc())
         zero_v = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
 #        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
         zero_v = spsp.lil_matrix(zero_v.shape)
@@ -345,8 +346,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
 #        zero_w = c3d.zblk(res[0], res[1], res[2], 1,1,1, no_bc())
         zero_w = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_w = zero_w + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_w = zero_w + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
 #        zero_w = zero_w + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
@@ -377,7 +378,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = mat + zero_u
 
             elif field_col == ("velocityy",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -392,7 +393,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, -Ta**0.5)
 
             elif field_col == ("velocityy",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
@@ -452,38 +453,35 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-#                bc['x']['rt'] = 1
-#                bc['x']['cr'] = 1
-#                bc['y']['rt'] = 1
-#                bc['y']['cr'] = 1
-#                bc['z']['rt'] = 1
-#                bc['z']['cr'] = 1
-                #mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
-                mat = c3d.d1(res[0], res[1], res[2], bc).tolil()
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
                 mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityy",""):
-#                bc['x']['rt'] = 1
-#                bc['x']['cr'] = 1
-#                bc['y']['rt'] = 1
-#                bc['y']['cr'] = 1
-#                bc['z']['rt'] = 1
-#                bc['z']['cr'] = 1
-                #mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale).tolil()
-                mat = c3d.e1(res[0], res[1], res[2], bc).tolil()
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale).tolil()
                 mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
-#                bc['x']['rt'] = 1
-#                bc['x']['cr'] = 1
-#                bc['y']['rt'] = 1
-#                bc['y']['cr'] = 1
-#                bc['z']['rt'] = 1
-#                bc['z']['cr'] = 1
-                #mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale).tolil()
-                mat = c3d.f1(res[0], res[1], res[2], bc).tolil()
+                bc['x']['rt'] = 1
+                bc['x']['cr'] = 1
+                bc['y']['rt'] = 1
+                bc['y']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['cr'] = 1
+                mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
 

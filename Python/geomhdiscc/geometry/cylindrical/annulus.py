@@ -136,7 +136,7 @@ def i2j2x2lapl(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):
     mat = spsp.kron(c1d.i2(nz,bcz), rad.i2x2laplh(nr, m, a, b, bcr))
     bcr[0] = min(bcr[0], 0)
     bcz[0] = min(bcz[0], 0)
-    mat = mat + zscale**2*spsp.kron(c1d.i2d2(nz,bcz), rad.i2x2(nr, a, b, bcr))
+    mat = mat + spsp.kron(c1d.i2d2(nz,bcz,zscale**2), rad.i2x2(nr, a, b, bcr))
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 

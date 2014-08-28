@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,13 +12,13 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
 
 
-class BoussinesqRBAnnulusVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+class BoussinesqRRBAnnulusVC(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio", "zrratio"]
+        return ["prandtl", "rayleigh", "taylor", "ro", "rratio", "zrratio"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -249,6 +249,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
 
         zscale = 2.0*eq_params['zrratio']
 
@@ -265,6 +266,9 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
             elif field_col == ("velocityy",""):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, Ta**0.5)
 
             elif field_col == ("velocityz",""):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
@@ -278,6 +282,9 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, -Ta**0.5)
 
             elif field_col == ("velocityy",""):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)

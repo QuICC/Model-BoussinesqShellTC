@@ -215,12 +215,14 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
+        zscale = 2.0*eq_params['zrratio']
+
         m = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = 2.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
                 mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
@@ -242,7 +244,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.i2j2(res[0], res[2], (m+1)%2, bc, 2.0*1j*m)
 
             elif field_col == ("velocityy",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = 2.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
                 mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
@@ -264,13 +266,13 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = 2.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, Ra)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x2e1(res[0], res[2], m%2, bc, -1.0, zscale = 2.0)
+                mat = cylinder.i2j2x2e1(res[0], res[2], m%2, bc, -1.0, zscale = zscale)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -283,7 +285,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = 2.0)
+                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
 
             elif field_col == ("pressure",""):
                 mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
@@ -314,7 +316,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 bc['r']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['cr'] = 1
-                mat = cylinder.i1j1x1e1(res[0]+1, res[2]+1, m%2, bc, zscale = 2.0).tolil()
+                mat = cylinder.i1j1x1e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale).tolil()
                 mat[idx_p,:] = 0
 
             elif field_col == ("temperature",""):
