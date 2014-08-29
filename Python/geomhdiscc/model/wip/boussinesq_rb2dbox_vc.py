@@ -74,7 +74,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
         return block_info
 
-    version = 2
+    version = 1
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""

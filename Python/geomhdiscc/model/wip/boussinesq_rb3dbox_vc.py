@@ -135,9 +135,9 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'yx'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zx'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zx'}
+                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
 
             # Stress-free/Stress-free/Stress-free, Fixed flux/Fixed flux/Fixed flux
             elif bcId == 1:
@@ -339,7 +339,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         zero_cu = spsp.lil_matrix(zero_cu.shape)
         zero_ru[idx_ru,idx_ru] = 1
         zero_cu[idx_cu,idx_cu] = 1
-        # U: Handle overlaps T_000
+        # U: Handle overlaps T_000, T_N00, T_0N0, T_NN0, T_00N, T_N0N
         zero_rut = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
@@ -369,7 +369,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         zero_cv = spsp.lil_matrix(zero_cv.shape)
         zero_rv[idx_rv,idx_rv] = 1
         zero_cv[idx_cv,idx_cv] = 1
-        # V: Handle overlaps T_000
+        # V: Handle overlaps T_000, T_0N0, T_N00, T_NN0, T_00N, T_0NN
         zero_rvt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rvt = zero_rvt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rvt = zero_rvt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
@@ -399,13 +399,13 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         zero_cw = spsp.lil_matrix(zero_cw.shape)
         zero_rw[idx_rw,idx_rw] = 1
         zero_cw[idx_cw,idx_cw] = 1
-        # W: Handle overlaps T_000
+        # W: Handle overlaps T_000, T_00N, T_N00, T_N0N, T_0N0, T_0NN
         zero_rwt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         zero_cw = zero_cw - zero_rwt
         idx_rwt = (np.ravel(zero_rwt.sum(axis=1)) > 0)
         zero_rwt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-2, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
@@ -515,6 +515,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             if field_col == ("velocityx",""):
                 mat = c3d.i1j1k1d1(res[0], res[1], res[2], bc).tolil()
                 mat[:,idx_cu] = 0
+                mat[:,idx_cv] = 0
+                mat[:,idx_cw] = 0
                 mat[idx_cu,:] = 0
                 mat[idx_cv,:] = 0
                 mat[idx_cw,:] = 0
@@ -523,7 +525,9 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityy",""):
                 mat = c3d.i1j1k1e1(res[0], res[1], res[2], bc).tolil()
+                mat[:,idx_cu] = 0
                 mat[:,idx_cv] = 0
+                mat[:,idx_cw] = 0
                 mat[idx_cu,:] = 0
                 mat[idx_cv,:] = 0
                 mat[idx_cw,:] = 0
@@ -532,6 +536,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityz",""):
                 mat = c3d.i1j1k1f1(res[0], res[1], res[2], bc).tolil()
+                mat[:,idx_cu] = 0
+                mat[:,idx_cv] = 0
                 mat[:,idx_cw] = 0
                 mat[idx_cu,:] = 0
                 mat[idx_cv,:] = 0
