@@ -327,58 +327,105 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         yscale = eq_params['yxratio']
     
         # U: T_iNN
-        zero_u = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # U: T_0jk
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # U: T_i0k
-#        zero_u = zero_u + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # U: T_ij0
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-
-        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
-        zero_u = spsp.lil_matrix(zero_u.shape)
-        zero_u[idx_u,idx_u] = 1
+        zero_ru = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        # U: T_i0N
+        zero_cu = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        # U: T_iN0
+        zero_cu = zero_cu + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        # U: T_i00
+        zero_cu = zero_cu + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        idx_ru = (np.ravel(zero_ru.sum(axis=1)) > 0)
+        idx_cu = (np.ravel(zero_cu.sum(axis=1)) > 0)
+        zero_ru = spsp.lil_matrix(zero_ru.shape)
+        zero_cu = spsp.lil_matrix(zero_cu.shape)
+        zero_ru[idx_ru,idx_ru] = 1
+        zero_cu[idx_cu,idx_cu] = 1
+        # U: Handle overlaps T_000, T_N00, T_0N0, T_NN0, T_00N, T_N0N
+        zero_rut = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_cu = zero_cu - zero_rut
+        idx_rut = (np.ravel(zero_rut.sum(axis=1)) > 0)
+        zero_rut = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-2, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-2, c1d.c1dbc.no_bc())))
+        zero_rut = zero_rut + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-2, c1d.c1dbc.no_bc())))
+        idx_cut = (np.ravel(zero_rut.sum(axis=1)) > 0)
+        zero_rut = spsp.lil_matrix(zero_rut.shape)
+        #zero_rut[idx_cut,idx_rut] = 1
+        zero_rut[idx_rut,idx_rut] = 1
 
         # V: T_NjN
-        zero_v = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # V: T_0jk
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # V: T_i0k
-#        zero_v = zero_v + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        zero_v = zero_v + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # V: T_ij0
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
-        zero_v = spsp.lil_matrix(zero_v.shape)
-        zero_v[idx_v,idx_v] = 1
+        zero_rv = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # V: T_0jN
+        zero_cv = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # V: T_Nj0
+        zero_cv = zero_cv + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # V: T_0j0
+        zero_cv = zero_cv + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_rv = (np.ravel(zero_rv.sum(axis=1)) > 0)
+        idx_cv = (np.ravel(zero_cv.sum(axis=1)) > 0)
+        zero_rv = spsp.lil_matrix(zero_rv.shape)
+        zero_cv = spsp.lil_matrix(zero_cv.shape)
+        zero_rv[idx_rv,idx_rv] = 1
+        zero_cv[idx_cv,idx_cv] = 1
+        # V: Handle overlaps T_000, T_0N0, T_N00, T_NN0, T_00N, T_0NN
+        zero_rvt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_cv = zero_cv - zero_rvt
+        idx_rvt = (np.ravel(zero_rvt.sum(axis=1)) > 0)
+        zero_rvt = spsp.kron(c1d.sid(res[1], res[1]-2, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.sid(res[1], res[1]-2, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rvt = zero_rvt + spsp.kron(c1d.sid(res[1], res[1]-2, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_cvt = (np.ravel(zero_rvt.sum(axis=1)) > 0)
+        zero_rvt = spsp.lil_matrix(zero_rvt.shape)
+        #zero_rvt[idx_cvt,idx_rvt] = 1
+        zero_rvt[idx_rvt,idx_rvt] = 1
 
         # W: T_NNk
-        zero_w = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # W: T_0jk
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # W: T_i0k
-#        zero_w = zero_w + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # W: T_ij0
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
-        zero_w = spsp.lil_matrix(zero_w.shape)
-        zero_w[idx_w,idx_w] = 1
+        zero_rw = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # W: T_N0k
+        zero_cw = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # W: T_0Nk
+        zero_cw = zero_cw + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        # W: T_00k
+        zero_cw = zero_cw + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_rw = (np.ravel(zero_rw.sum(axis=1)) > 0)
+        idx_cw = (np.ravel(zero_cw.sum(axis=1)) > 0)
+        zero_rw = spsp.lil_matrix(zero_rw.shape)
+        zero_cw = spsp.lil_matrix(zero_cw.shape)
+        zero_rw[idx_rw,idx_rw] = 1
+        zero_cw[idx_cw,idx_cw] = 1
+        # W: Handle overlaps T_000, T_00N, T_N00, T_N0N, T_0N0, T_0NN
+        zero_rwt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_cw = zero_cw - zero_rwt
+        idx_rwt = (np.ravel(zero_rwt.sum(axis=1)) > 0)
+        zero_rwt = spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-2, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-2, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        zero_rwt = zero_rwt + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-2, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
+        idx_cwt = (np.ravel(zero_rwt.sum(axis=1)) > 0)
+        zero_rwt = spsp.lil_matrix(zero_rwt.shape)
+        #zero_rwt[idx_cwt,idx_rwt] = 1
+        zero_rwt[idx_rwt,idx_rwt] = 1
 
         # Pressure: T_iNN, T_NjN, T_NNk
-        zero_p = zero_u + zero_v + zero_w
-        zero_p = zero_p + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        zero_p = zero_p + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        zero_p = zero_p + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
+        zero_p = zero_ru + zero_rv + zero_rw + zero_cu + zero_cv + zero_cw
         # Pressure: T_{N-2:N,N-2:N,N-2:N}
         zero_p = zero_p + spsp.kron(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc())))
+        zero_p = zero_p + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc())))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc())))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         # Pressure: T_000
         zero_p = zero_p + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
         idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
@@ -389,9 +436,11 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
-                mat[idx_u,:] = 0
-                mat[:,idx_u] = 0
-                mat = mat + zero_u
+                mat[idx_ru,:] = 0
+                mat[idx_cu,:] = 0
+                mat[:,idx_ru] = 0
+                mat[:,idx_cu] = 0
+                mat = mat + zero_ru + zero_rut + zero_cu
 
             elif field_col == ("velocityy",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -404,7 +453,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0).tolil()
-                mat[idx_u,:] = 0
+                mat[idx_ru,:] = 0
+                mat[idx_cu,:] = 0
                 mat[:,idx_p] = 0
 
         elif field_row == ("velocityy",""):
@@ -413,9 +463,11 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityy",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
-                mat[idx_v,:] = 0
-                mat[:,idx_v] = 0
-                mat = mat + zero_v
+                mat[idx_rv,:] = 0
+                mat[idx_cv,:] = 0
+                mat[:,idx_rv] = 0
+                mat[:,idx_cv] = 0
+                mat = mat + zero_rv + zero_rvt + zero_cv
 
             elif field_col == ("velocityz",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -425,7 +477,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale).tolil()
-                mat[idx_v,:] = 0
+                mat[idx_rv,:] = 0
+                mat[idx_cv,:] = 0
                 mat[:,idx_p] = 0
 
         elif field_row == ("velocityz",""):
@@ -437,17 +490,21 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityz",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
-                mat[idx_w,:] = 0
-                mat[:,idx_w] = 0
-                mat = mat + zero_w
+                mat[idx_rw,:] = 0
+                mat[idx_cw,:] = 0
+                mat[:,idx_rw] = 0
+                mat[:,idx_cw] = 0
+                mat = mat + zero_rw + zero_rwt + zero_cw
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0).tolil()
-                mat[idx_w,:] = 0
+                mat[idx_rw,:] = 0
+                mat[idx_cw,:] = 0
 
             elif field_col == ("pressure",""):
                 mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0, zscale = zscale).tolil()
-                mat[idx_w,:] = 0
+                mat[idx_rw,:] = 0
+                mat[idx_cw,:] = 0
                 mat[:,idx_p] = 0
 
         elif field_row == ("temperature",""):
@@ -459,7 +516,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
             elif field_col == ("velocityz",""):
                 mat = c3d.i2j2k2(res[0], res[1], res[2], bc).tolil()
-                mat[:,idx_w] = 0
+                mat[:,idx_rw] = 0
+                mat[:,idx_cw] = 0
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
@@ -470,18 +528,36 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
                 mat = c3d.i1j1k1d1(res[0], res[1], res[2], bc).tolil()
-                mat[:,idx_u] = 0
+                mat = mat + spsp.kron(c1d.sid(res[1],res[1]-1,c1d.c1dbc.no_bc()), spsp.kron(c1d.i1(res[2], c1d.c1dbc.no_bc()), c1d.i1d1(res[0], c1d.c1dbc.no_bc())))
+                mat = mat + spsp.kron(c1d.i1(res[1],c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.i1d1(res[0], c1d.c1dbc.no_bc())))
+                #mat[:,idx_cu] = 0
+#                mat[idx_cu,:] = 0          
+#                mat[idx_cv,:] = 0          
+#                mat[idx_cw,:] = 0          
                 mat[idx_p,:] = 0
+#                mat = mat + zero_cu
 
             elif field_col == ("velocityy",""):
                 mat = c3d.i1j1k1e1(res[0], res[1], res[2], bc).tolil()
-                mat[:,idx_v] = 0
+                mat = mat + spsp.kron(c1d.i1d1(res[1],c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.i1(res[0], c1d.c1dbc.no_bc())))
+                mat = mat + spsp.kron(c1d.i1d1(res[1],c1d.c1dbc.no_bc()), spsp.kron(c1d.i1(res[2], c1d.c1dbc.no_bc()), c1d.sid(res[0],res[0]-1, c1d.c1dbc.no_bc())))
+                #mat[:,idx_cv] = 0
+#                mat[idx_cu,:] = 0
+#                mat[idx_cv,:] = 0
+#                mat[idx_cw,:] = 0
                 mat[idx_p,:] = 0
+#                mat = mat + zero_cv
 
             elif field_col == ("velocityz",""):
                 mat = c3d.i1j1k1f1(res[0], res[1], res[2], bc).tolil()
-                mat[:,idx_w] = 0
+                mat = mat + spsp.kron(c1d.sid(res[1],res[1]-1,c1d.c1dbc.no_bc()), spsp.kron(c1d.i1d1(res[2], c1d.c1dbc.no_bc()), c1d.i1(res[0],c1d.c1dbc.no_bc())))
+                mat = mat + spsp.kron(c1d.i1(res[1],c1d.c1dbc.no_bc()), spsp.kron(c1d.i1d1(res[2], c1d.c1dbc.no_bc()), c1d.sid(res[0],res[0]-1,c1d.c1dbc.no_bc())))
+                #mat[:,idx_cw] = 0
+#                mat[idx_cu,:] = 0
+#                mat[idx_cv,:] = 0
+#                mat[idx_cw,:] = 0
                 mat[idx_p,:] = 0
+#                mat = mat + zero_cw
 
             elif field_col == ("temperature",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
@@ -498,46 +574,13 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        # U: T_iNN
-        zero_u = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # U: T_0jk
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # U: T_i0k
-#        zero_u = zero_u + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # U: T_ij0
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_u = zero_u + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
-
-        # V: T_NjN
-        zero_v = spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # V: T_0jk
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # V: T_i0k
-#        zero_v = zero_v + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        zero_v = zero_v + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # V: T_ij0
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_v = zero_v + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # V: T_i0k
-        idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
-
-        # W: T_NNk
-        zero_w = spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # W: T_0jk
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc())))
-        # W: T_i0k
-#        zero_w = zero_w + spsp.kron(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        # W: T_ij0
-#        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        zero_w = zero_w + spsp.kron(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), spsp.kron(c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc())))
-        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
-
+        zero_u = c3d.qid(res[0], res[1], res[2], 0, res[1]-1, res[2]-1, no_bc())
+        idx_u = (np.ravel(zero_u.sum(axis=1)) == 1)
+        zero_v = c3d.qid(res[0], res[1], res[2], res[0]-1, 0, res[2]-1, no_bc())
+        idx_v = (np.ravel(zero_v.sum(axis=1)) == 1)
+        zero_w = c3d.qid(res[0], res[1], res[2], res[0]-1, res[1]-1, 0, no_bc())
+        idx_w = (np.ravel(zero_w.sum(axis=1)) == 1)
+        idx_p = np.logical_or(np.logical_or(idx_u, idx_v),idx_w)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):

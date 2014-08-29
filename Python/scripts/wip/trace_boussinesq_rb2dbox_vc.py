@@ -59,7 +59,7 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    mode = -1
+    mode = -2
 
     # Get solution vectors
     sol_u = evp_vec[0:res[0]*res[2],mode]

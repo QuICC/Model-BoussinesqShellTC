@@ -11,10 +11,9 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [8, 8, 8]
+res = [14, 14, 14]
 #eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio':1.0, 'yxratio':1.0}
-#eq_params = {'prandtl':1, 'rayleigh':5011.73, 'zxratio':1.0, 'yxratio':1.0}
-eq_params = {'prandtl':1, 'rayleigh':0, 'zxratio':1.0, 'yxratio':1.0}
+eq_params = {'prandtl':1, 'rayleigh':13011.73, 'zxratio':1.0, 'yxratio':1.0}
 eigs = []
 bc_vel = 0 # 0: NS/NS/NS, 1: SF/SF/SF, 2: SF/NS/NS, 3: SF/NS/NS
 bc_temp = 0 # 0: FT/FT/FT, 1: FF/FF/FF, 2: FF/FT/FT, 3: FT/FF/FF
@@ -22,9 +21,11 @@ bc_temp = 0 # 0: FT/FT/FT, 1: FF/FF/FF, 2: FF/FT/FT, 3: FT/FF/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
+print("Constructing matrix A")
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
 
 # Generate the operator B for the generalized EVP Ax = sigm B x
+print("Constructing matrix B")
 bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
@@ -36,6 +37,7 @@ show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
+    #import mayavi.mbab as ml
 
 if show_solution:
     import geomhdiscc.transform.cartesian as transf
@@ -55,12 +57,13 @@ if write_mtx:
 
 # Solve EVP with sptarn
 if solve_evp:
+    print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
 
 if show_solution:
-    mode = -1
+    mode = -2
 
     # Get solution vectors
     sol_u = evp_vec[0:res[0]*res[1]*res[2],mode]
@@ -89,6 +92,109 @@ if show_solution:
     pl.title("Continuity")
     pl.subplot(2,3,6)
     pl.semilogy(np.abs(sol_p))
+    pl.title("p")
+    pl.show()
+    pl.close("all")
+    
+    # Create solution matrices
+    mat_u = sol_u.reshape(res[0], res[1], res[2], order = 'F')
+    mat_v = sol_v.reshape(res[0], res[1], res[2], order = 'F')
+    mat_w = sol_w.reshape(res[0], res[1], res[2], order = 'F')
+    mat_t = sol_t.reshape(res[0], res[1], res[2], order = 'F')
+    mat_p = sol_p.reshape(res[0], res[1], res[2], order = 'F')
+    mat_c = sol_c.reshape(res[0], res[1], res[2], order = 'F')
+
+    # Compute physical space values
+    grid_x = transf.grid(res[0])
+    grid_y = transf.grid(res[1])
+    grid_z = transf.grid(res[2])
+    phys_u = transf.tophys3d(mat_u)
+    phys_v = transf.tophys3d(mat_v)
+    phys_w = transf.tophys3d(mat_w)
+    phys_t = transf.tophys3d(mat_t)
+    phys_p = transf.tophys3d(mat_p)
+    phys_c = transf.tophys3d(mat_c)
+
+    # Show physical contour plot
+    pl.subplot(2,3,1)
+    pl.contourf(grid_x, grid_z, phys_u[5,:,:], 50)
+    pl.colorbar()
+    pl.title("u")
+    pl.subplot(2,3,2)
+    pl.contourf(grid_x, grid_z, phys_v[5,:,:], 50)
+    pl.colorbar()
+    pl.title("v")
+    pl.subplot(2,3,3)
+    pl.contourf(grid_x, grid_z, phys_w[5,:,:], 50)
+    pl.colorbar()
+    pl.title("w")
+    pl.subplot(2,3,4)
+    pl.contourf(grid_x, grid_z, phys_t[5,:,:], 50)
+    pl.colorbar()
+    pl.title("T")
+    pl.subplot(2,3,5)
+    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[5,:,:])), 50)
+    pl.colorbar()
+    pl.title("Continuity")
+    pl.subplot(2,3,6)
+    pl.contourf(grid_x, grid_z, phys_p[5,:,:], 50)
+    pl.colorbar()
+    pl.title("p")
+    pl.show()
+    pl.close("all")
+
+    # Show physical contour plot
+    pl.subplot(2,3,1)
+    pl.contourf(grid_x, grid_z, phys_u[:,5,:], 50)
+    pl.colorbar()
+    pl.title("u")
+    pl.subplot(2,3,2)
+    pl.contourf(grid_x, grid_z, phys_v[:,5,:], 50)
+    pl.colorbar()
+    pl.title("v")
+    pl.subplot(2,3,3)
+    pl.contourf(grid_x, grid_z, phys_w[:,5,:], 50)
+    pl.colorbar()
+    pl.title("w")
+    pl.subplot(2,3,4)
+    pl.contourf(grid_x, grid_z, phys_t[:,5,:], 50)
+    pl.colorbar()
+    pl.title("T")
+    pl.subplot(2,3,5)
+    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,5,:])), 50)
+    pl.colorbar()
+    pl.title("Continuity")
+    pl.subplot(2,3,6)
+    pl.contourf(grid_x, grid_z, phys_p[:,5,:], 50)
+    pl.colorbar()
+    pl.title("p")
+    pl.show()
+    pl.close("all")
+
+    # Show physical contour plot
+    pl.subplot(2,3,1)
+    pl.contourf(grid_x, grid_z, phys_u[:,:,5], 50)
+    pl.colorbar()
+    pl.title("u")
+    pl.subplot(2,3,2)
+    pl.contourf(grid_x, grid_z, phys_v[:,:,5], 50)
+    pl.colorbar()
+    pl.title("v")
+    pl.subplot(2,3,3)
+    pl.contourf(grid_x, grid_z, phys_w[:,:,5], 50)
+    pl.colorbar()
+    pl.title("w")
+    pl.subplot(2,3,4)
+    pl.contourf(grid_x, grid_z, phys_t[:,:,5], 50)
+    pl.colorbar()
+    pl.title("T")
+    pl.subplot(2,3,5)
+    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,:,5])), 50)
+    pl.colorbar()
+    pl.title("Continuity")
+    pl.subplot(2,3,6)
+    pl.contourf(grid_x, grid_z, phys_p[:,:,5], 50)
+    pl.colorbar()
     pl.title("p")
     pl.show()
     pl.close("all")

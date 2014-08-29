@@ -74,8 +74,6 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
         return block_info
 
-    version = 1
-
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
@@ -335,10 +333,8 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         zero_rut = spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         idx_cut = (np.ravel(zero_rut.sum(axis=1)) > 0)
         zero_rut = spsp.lil_matrix(zero_rut.shape)
-        if self.version == 1:
-            zero_rut[idx_cut,idx_rut] = 1
-        elif self.version == 2:
-            zero_rut[idx_rut,idx_rut] = 1
+        zero_rut[idx_rut,idx_rut] = 1
+        #zero_rut[idx_cut,idx_rut] = 1
 
         # W: TNk
         zero_rw = spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
@@ -358,16 +354,11 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         zero_rwt = spsp.kron(c1d.sid(res[2], res[2]-2, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         idx_cwt = (np.ravel(zero_rwt.sum(axis=1)) > 0)
         zero_rwt = spsp.lil_matrix(zero_rwt.shape)
-        if self.version == 1:
-            zero_rwt[idx_cwt,idx_rwt] = 1
-        elif self.version == 2:
-            zero_rwt[idx_rwt,idx_rwt] = 1
+        zero_rwt[idx_rwt,idx_rwt] = 1
+        #zero_rwt[idx_cwt,idx_rwt] = 1
 
         # Pressure: T_iN, T_Nk
-        if self.version == 1:
-            zero_p = zero_ru + zero_rw
-        elif self.version == 2:
-            zero_p = zero_ru + zero_rw + zero_cu + zero_cw
+        zero_p = zero_ru + zero_rw + zero_cu + zero_cw
         # Pressure: T_{N-2:N,N-2:N}
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
         # Pressure: T_00
@@ -381,14 +372,11 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
             if field_col == ("velocityx",""):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, zscale = zscale).tolil()
                 mat[idx_ru,:] = 0;
-                if self.version == 2:
-                    mat[idx_cu,:] = 0;
+                #mat[idx_cu,:] = 0;
                 mat[:,idx_ru] = 0;
-                mat[:,idx_cu] = 0;
-                if self.version == 1:
-                    mat = mat + zero_ru + zero_rut
-                elif self.version == 2:
-                    mat = mat + zero_ru + zero_rut + zero_cu
+                #mat[:,idx_cu] = 0;
+                #mat = mat + zero_ru + zero_rut + zero_cu
+                mat = mat + zero_ru + zero_rut
 
             elif field_col == ("velocityy",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
@@ -402,8 +390,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
             elif field_col == ("pressure",""):
                 mat = c2d.i2j2d1(res[0], res[2], bc, -1.0).tolil()
                 mat[idx_ru,:] = 0
-                if self.version == 2:
-                    mat[idx_cu,:] = 0;
+                #mat[idx_cu,:] = 0;
                 mat[:,idx_p] = 0
 
         elif field_row == ("velocityy",""):
@@ -433,27 +420,22 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, zscale = zscale).tolil()
                 mat[idx_rw,:] = 0;
-                if self.version == 2:
-                    mat[idx_cw,:] = 0;
+                #mat[idx_cw,:] = 0;
                 mat[:,idx_rw] = 0;
-                mat[:,idx_cw] = 0;
-                if self.version == 1:
-                    mat = mat + zero_rw + zero_rwt
-                elif self.version == 2:
-                    mat = mat + zero_rw + zero_rwt + zero_cw
+                #mat[:,idx_cw] = 0;
+                #mat = mat + zero_rw + zero_rwt + zero_cw
+                mat = mat + zero_rw + zero_rwt
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2(res[0], res[2], bc, Ra/16.0).tolil()
                 mat[idx_rw,:] = 0;
-                if self.version == 2:
-                    mat[idx_cw,:] = 0;
+                #mat[idx_cw,:] = 0;
 
             elif field_col == ("pressure",""):
                 mat = c2d.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale).tolil()
-                mat[:,idx_p] = 0
                 mat[idx_rw,:] = 0
-                if self.version == 2:
-                    mat[idx_cw,:] = 0;
+                #mat[idx_cw,:] = 0;
+                mat[:,idx_p] = 0
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -465,7 +447,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = c2d.i2j2(res[0], res[2], bc).tolil()
                 mat[:,idx_rw] = 0;
-                mat[:,idx_cw] = 0;
+                #mat[:,idx_cw] = 0;
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc, zscale = zscale)
@@ -477,26 +459,20 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
             if field_col == ("velocityx",""):
                 mat = c2d.i1j1d1(res[0], res[2], bc).tolil()
                 mat[:,idx_cu] = 0
-                mat[idx_cu,:] = 0
-                mat[idx_cw,:] = 0
                 mat[idx_p,:] = 0
-                if self.version == 1:
-                    mat = mat + zero_cu
+                #if self.version == 1:
+                #    mat = mat + zero_cu
 
             elif field_col == ("velocityy",""):
                 mat = c2d.i1j1(res[0], res[2], bc, 1j*k).tolil()
-                mat[idx_cu,:] = 0
-                mat[idx_cw,:] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
                 mat = c2d.i1j1e1(res[0], res[2], bc, zscale = zscale).tolil()
                 mat[:,idx_cw] = 0
-                mat[idx_cu,:] = 0
-                mat[idx_cw,:] = 0
                 mat[idx_p,:] = 0
-                if self.version == 1:
-                    mat = mat + zero_cw
+                #if self.version == 1:
+                #    mat = mat + zero_cw
 
             elif field_col == ("temperature",""):
                 mat = c2d.zblk(res[0], res[2], 1, 1, bc)
@@ -528,8 +504,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         if field_row == ("velocityx",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
             mat[idx_ru,:] = 0
-            if self.version == 2:
-                mat[idx_cu,:] = 0
+            #mat[idx_cu,:] = 0
 
         elif field_row == ("velocityy",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
@@ -537,8 +512,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         elif field_row == ("velocityz",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
             mat[idx_rw,:] = 0
-            if self.version == 2:
-                mat[idx_cw,:] = 0
+            #mat[idx_cw,:] = 0
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j2(res[0], res[2], bc)
