@@ -401,17 +401,41 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = c2d.i1j1d1(res[0], res[2], bc).tolil()
+                bc['x']['cr'] = 1
+                bc['x']['rt'] = 1
+                bc['x']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc).tolil()
+
+#                mat = c2d.i1j1d1(res[0], res[2], bc).tolil()
                 mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityy",""):
-                mat = c2d.i1j1(res[0], res[2], bc, 1j*k).tolil()
+                bc['x']['cr'] = 1
+                bc['x']['rt'] = 1
+                bc['x']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = c2d.i1j1(res[0]+1, res[2]+1, bc, 1j*k).tolil()
+
+#                mat = c2d.i1j1(res[0], res[2], bc, 1j*k).tolil()
                 mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i1j1e1(res[0], res[2], bc, zscale = zscale).tolil()
+                bc['x']['cr'] = 1
+                bc['x']['rt'] = 1
+                bc['x']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc, zscale = zscale).tolil()
+
+#                mat = c2d.i1j1e1(res[0], res[2], bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
 
@@ -456,10 +480,12 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         return mat
 
     def zero_blocks(self, res, eigs):
+        """Build restriction matrices"""
 
         # U: TiN
-        zero_u = spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        zero_u = zero_u + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_u = c2d.zblk(res[0], res[2], 2, 2, no_bc())
+        zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        #zero_u = zero_u + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
@@ -475,8 +501,9 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         zero_v[idx_v,idx_v] = 1
 
         # W: TNk
-        zero_w = spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_w = zero_w + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        zero_w = c2d.zblk(res[0], res[2], 2, 2, no_bc())
+        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        #zero_w = zero_w + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
@@ -484,14 +511,16 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
 
         # Pressure: T_iN, T_Nk
         zero_p = c2d.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_p = zero_u + zero_v + zero_w
-        zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        #zero_p = zero_u + zero_v + zero_w
+        #zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Pressure: T_{N-2:N,N-2:N}
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
         #zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-2, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Pressure: T_00
-        zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        #zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
         zero_p = spsp.lil_matrix(zero_p.shape)

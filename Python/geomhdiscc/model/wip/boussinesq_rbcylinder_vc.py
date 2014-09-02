@@ -218,8 +218,9 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         zscale = 2.0*eq_params['zrratio']
-
         m = eigs[0]
+
+        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
@@ -339,15 +340,23 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         m = eigs[0]
 
+        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr).tolil()
+            mat[:,idx_u] = 0
+            mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr).tolil()
+            mat[:,idx_v] = 0
+            mat[idx_v,:] = 0
 
         elif field_row == ("velocityz",""):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr).tolil()
+            mat[:,idx_w] = 0
+            mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
             mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
@@ -356,3 +365,38 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
 
         return mat
+
+    def zero_blocks(self, res, eigs):
+        """Build restriction matrices"""
+
+        m = eigs[0]
+
+        # U:
+        zero_u = cylinder.zblk(res[0], res[1], (m+1)%2, 1, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
+        zero_u = spsp.lil_matrix(zero_u.shape)
+        zero_u[idx_u,idx_u] = 1
+
+        # V:
+        zero_v = cylinder.zblk(res[0], res[1], (m+1)%2, 1, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
+        zero_v = spsp.lil_matrix(zero_v.shape)
+        zero_v[idx_v,idx_v] = 1
+
+        # W:
+        zero_w = cylinder.zblk(res[0], res[1], m%2, 1, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
+        zero_w = spsp.lil_matrix(zero_w.shape)
+        zero_w[idx_w,idx_w] = 1
+
+        # P:
+        zero_p = cylinder.zblk(res[0], res[1], m%2, 1, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
+        zero_p = spsp.lil_matrix(zero_p.shape)
+        zero_p[idx_p,idx_p] = 1
+
+        return (zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p)
