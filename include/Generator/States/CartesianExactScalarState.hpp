@@ -33,26 +33,29 @@ namespace Equations {
    class CartesianExactScalarState: public IScalarEquation
    {
       public:
+         /// Polynomial approximation to Cosine
+         static const MHDFloat PCOS = 99999;
+
+         /// Polynomial approximation to Sine
+         static const MHDFloat PSIN = -99999;
+
          /**
           * @brief Enums for the avaialable exact states
           */
          enum StateTypeId {
+            // Special states
             CONSTANT = 0,  // All constant
+            // TTT states
             POLYPOLYPOLY = 10,  // Polynomial, Polynomial, Polynomial
+            // TFT states
             POLYCOSPOLY = 20, // Polynomial, Cosine, Polynomial
             POLYSINPOLY,      // Polynomial, Sine, Polynomial
+            // TFF states
             POLYCOSCOS = 30,  // Polynomial, Cosine, Cosine
             POLYSINSIN,       // Polynomial, Sine, Sine
             POLYSINCOS,       // Polynomial, Sine, Cosine
             POLYCOSSIN,       // Polynomial, Cosine, Sine
-            PSINCOSCOS,       // Sine(Polynomial), Cosine, Cosine
-            PCOSCOSCOS,       // CosinePolynomial), Cosine, Cosine
-            PSINCOSSIN,       // Sine(Polynomial), Cosine, Sine
-            PCOSCOSSIN,       // CosinePolynomial), Cosine, Sine
-            PSINSINSIN,       // Sine(Polynomial), Sine, Sine
-            PCOSSINSIN,       // CosinePolynomial), Sine, Sine
-            PSINSINCOS,       // Sine(Polynomial), Cosine, Cosine
-            PCOSSINCOS,       // CosinePolynomial), Cosine, Cosine
+            // FFF states
             COSCOSCOS = 50,   // Cosine, Cosine, Cosine
             SINSINSIN,        // Sine, Sine, Sine
             COSCOSSIN,        // Cosine, Cosine, Sine

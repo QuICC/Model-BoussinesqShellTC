@@ -76,7 +76,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator is complex
         is_complex = True
 
         # Implicit field coupling
@@ -255,13 +255,16 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
+        zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0).tolil()
+                mat[:,idx_u] = 0
 
             elif field_col == ("velocityy",""):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
@@ -274,6 +277,10 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, -1.0)
+            
+            # Zero rows
+            mat = mat.tolil()
+            mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
@@ -292,7 +299,8 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m)
+                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m).tolil()
+                mat[:,idx_p] = 0
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
@@ -302,18 +310,19 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-#                bc['r']['zr'] = 1
-#                bc['r']['zb'] = 1
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
-#                mat = mat + annulus.qid(res[0], res[2], res[0]-1, 0, no_bc())
+                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale).tolil()
+                mat[:,idx_w] = 0
 
             elif field_col == ("temperature",""):
-#                bc['r']['zb'] = 1
                 mat = annulus.i2j2x2(res[0], res[2], a, b, bc, Ra)
 
             elif field_col == ("pressure",""):
-#                bc['r']['zb'] = 1
-                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
+                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale).tolil()
+                mat[:,idx_p] = 0
+            
+            # Zero rows
+            mat = mat.tolil()
+            mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -323,8 +332,8 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-#                bc['r']['zr'] = 1
-                mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+                mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
+                mat[:,idx_w] = 0
 
             elif field_col == ("temperature",""):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
@@ -334,50 +343,23 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                bc['r']['rt'] = 1
-                bc['r']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['cr'] = 1
-#                bc['r']['zb'] = 1
-                mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc).tolil()
-                mat[-res[0]-2:-res[0],:] = 0
-                mat[-2:,:] = 0
-#                mat[-res[0]-3:-res[0],:] = 0
-#                mat[-3:,:] = 0
+                mat = annulus.i1j1x1div(res[0], res[2], a, b, bc).tolil()
 
             elif field_col == ("velocityy",""):
-                bc['r']['rt'] = 1
-                bc['r']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['cr'] = 1
-#                bc['r']['zb'] = 1
-                mat = annulus.i1j1(res[0]+1, res[2]+1, a, b, bc, 1j*m).tolil()
-                mat[-res[0]-2:-res[0],:] = 0
-                mat[-2:,:] = 0
-#                mat[-res[0]-3:-res[0],:] = 0
-#                mat[-3:,:] = 0
+                mat = annulus.i1j1(res[0], res[2], a, b, bc, 1j*m).tolil()
 
             elif field_col == ("velocityz",""):
-                bc['r']['rt'] = 1
-                bc['r']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['cr'] = 1
-#                bc['r']['zr'] = 1
-#                bc['r']['zb'] = 1
-                mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale).tolil()
-                mat[-res[0]-2:-res[0],:] = 0
-                mat[-2:,:] = 0
-#                mat[-res[0]-3:-res[0],:] = 0
-#                mat[-3:,:] = 0
+                mat = annulus.i1j1x1e1(res[0], res[2], a, b, bc, zscale = zscale).tolil()
 
             elif field_col == ("temperature",""):
                 mat = annulus.zblk(res[0], res[2], 1, 1, bc)
 
             elif field_col == ("pressure",""):
                 mat = annulus.zblk(res[0], res[2], 1, 1, bc)
-                mat = mat + annulus.qid(res[0], res[2], res[0]-2, res[2]-2, no_bc())
-#                mat = mat + annulus.qid(res[0], res[2], res[0]-1, 0, no_bc())
-#                mat = mat + annulus.qid(res[0], res[2], res[0]-3, res[2]-3, no_bc())
+            
+            # Zero rows
+            mat = mat.tolil()
+            mat[idx_p,:] = 0
 
         return mat
 
@@ -390,17 +372,19 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
+        zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr).tolil()
+            mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
 
         elif field_row == ("velocityz",""):
-#            bc['r']['zr'] = 1
-#            bc['r']['zb'] = 1
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr).tolil()
+            mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
@@ -409,3 +393,28 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
         return mat
+
+    def zero_blocks(self, res, eigs):
+
+        # U:
+        zero_u = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
+        zero_u = spsp.lil_matrix(zero_u.shape)
+        zero_u[idx_u,idx_u] = 1
+
+        # W:
+        zero_w = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
+        zero_w = spsp.lil_matrix(zero_w.shape)
+        zero_w[idx_w,idx_w] = 1
+
+        # P:
+        zero_p = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        # Cleanup and create indexes list
+        idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
+        zero_p = spsp.lil_matrix(zero_p.shape)
+        zero_p[idx_p,idx_p] = 1
+
+        return (zero_u, idx_u, zero_w, idx_w, zero_p, idx_p)

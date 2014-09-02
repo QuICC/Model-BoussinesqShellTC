@@ -50,12 +50,18 @@ def tophys2d(spec):
 
     phys = spec.copy()
 
-    for i in range(spec.shape[0]):
-        phys.real[i,:] = tozphys(spec.real[i,:])
-        phys.imag[i,:] = tozphys(spec.imag[i,:])
-    for j in range(spec.shape[1]):
-        phys.real[:,j] = torphys(phys.real[:,j])
-        phys.imag[:,j] = torphys(phys.imag[:,j])
+    if spec.dtype == 'complex_':
+        for i in range(spec.shape[0]):
+            phys.real[i,:] = tozphys(spec.real[i,:])
+            phys.imag[i,:] = tozphys(spec.imag[i,:])
+        for j in range(spec.shape[1]):
+            phys.real[:,j] = torphys(phys.real[:,j])
+            phys.imag[:,j] = torphys(phys.imag[:,j])
+    else:
+        for i in range(spec.shape[0]):
+            phys[i,:] = tozphys(spec[i,:])
+        for j in range(spec.shape[1]):
+            phys[:,j] = torphys(phys[:,j])
     
     return phys
 
@@ -63,9 +69,18 @@ def tocheb2d(phys):
     """Transform 2D physical array to 2D spectral coefficients"""
 
     spec = phys.copy()
-    for j in range(phys.shape[1]):
-        spec[:,j] = torcheb(phys[:,j])
-    for i in range(phys.shape[0]):
-        spec[i,:] = tozcheb(spec[i,:])
+
+    if spec.dtype == 'complex_':
+        for j in range(phys.shape[1]):
+            spec.real[:,j] = torcheb(phys.real[:,j])
+            spec.imag[:,j] = torcheb(phys.imag[:,j])
+        for i in range(phys.shape[0]):
+            spec.real[i,:] = tozcheb(spec.real[i,:])
+            spec.imag[i,:] = tozcheb(spec.imag[i,:])
+    else:
+        for j in range(phys.shape[1]):
+            spec[:,j] = torcheb(phys[:,j])
+        for i in range(phys.shape[0]):
+            spec[i,:] = tozcheb(spec[i,:])
     
     return spec

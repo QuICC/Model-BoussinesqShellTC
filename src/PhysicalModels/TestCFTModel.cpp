@@ -1,6 +1,6 @@
 /** 
- * @file TestTFFModel.cpp
- * @brief Source of the test model for the TFF scheme
+ * @file TestCFTModel.cpp
+ * @brief Source of the test model for the CFT scheme
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/TestTFFModel.hpp"
+#include "PhysicalModels/TestCFTModel.hpp"
 
 // Project includes
 //
@@ -27,17 +27,17 @@
 #include "Equations/Tests/TestLinearScalar.hpp"
 #include "Equations/Tests/TestNonlinearScalar.hpp"
 #include "Generator/States/RandomScalarState.hpp"
-#include "Generator/States/CartesianExactScalarState.hpp"
+#include "Generator/States/CylinderExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string TestTFFModel::PYMODULE = "test_tffscheme";
+   const std::string TestCFTModel::PYMODULE = "test_cftscheme";
 
-   const std::string TestTFFModel::PYCLASS = "TestTFFScheme";
+   const std::string TestCFTModel::PYCLASS = "TestCFTScheme";
 
-   void TestTFFModel::addEquations(SharedSimulation spSim)
+   void TestCFTModel::addEquations(SharedSimulation spSim)
    {
       // Create linear test problem
       if(true)
@@ -81,36 +81,36 @@ namespace GeoMHDiSCC {
       }
    }
 
-   void TestTFFModel::addStates(SharedStateGenerator spGen)
+   void TestCFTModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
       {
          // Shared pointer to equation
-         Equations::SharedCartesianExactScalarState spExact;
+         Equations::SharedCylinderExactScalarState spExact;
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CylinderExactScalarState::POLYCOSPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CylinderExactScalarState::POLYSINPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CylinderExactScalarState::POLYSINPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINSIN);
+         spExact->setStateType(Equations::CylinderExactScalarState::POLYSINPOLY);
          spExact->setModeOptions(1e0, 1.0, 1e0, 7.0, 1e0, 7.0);
 
       // Generate random spectrum
@@ -149,7 +149,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void TestTFFModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void TestCFTModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -183,7 +183,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void TestTFFModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void TestCFTModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create input state file for visualisation
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -198,7 +198,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void TestTFFModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void TestCFTModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -207,7 +207,7 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void TestTFFModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void TestCFTModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -222,7 +222,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void TestTFFModel::setInitialState(SharedSimulation spSim)
+   void TestCFTModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

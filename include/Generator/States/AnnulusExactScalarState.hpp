@@ -33,11 +33,21 @@ namespace Equations {
    class AnnulusExactScalarState: public IScalarEquation
    {
       public:
+         /// Polynomial approximation to Cosine
+         static const MHDFloat PCOS = 99999;
+
+         /// Polynomial approximation to Sine
+         static const MHDFloat PSIN = -99999;
+
          /**
           * @brief Enums for the avaialable exact states
           */
          enum StateTypeId {
-            CONSTANT,
+            // Special states
+            CONSTANT = 0,  // All constant
+            // AFT states
+            POLYCOSPOLY = 20, // Polynomial, Cosine, Polynomial
+            POLYSINPOLY,      // Polynomial, Sine, Polynomial
          };
 
          /**
@@ -80,6 +90,18 @@ namespace Equations {
           */
          void setStateType(const AnnulusExactScalarState::StateTypeId id);
 
+         /**
+          * @brief Set the options for the solution states
+          *
+          * @param a1   Amplitude of the first direction
+          * @param k1   Wave number of the first direction
+          * @param a2   Amplitude of the second direction
+          * @param k2   Wave number of the second direction
+          * @param a3   Amplitude of the second direction
+          * @param k3   Wave number of the second direction
+          */
+         void setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2, const MHDFloat a3, const MHDFloat k3);
+
       protected:
          /**
           * @brief Set variable requirements
@@ -93,9 +115,34 @@ namespace Equations {
 
       private:
          /**
+          * @brief Compute even periodic mode
+          */
+         MHDFloat cos(const int idx, const MHDFloat theta) const;
+
+         /**
+          * @brief Compute odd periodic mode
+          */
+         MHDFloat sin(const int idx, const MHDFloat theta) const;
+
+         /**
+          * @brief Compute polynomial mode
+          */
+         MHDFloat poly(const int idx, const MHDFloat x) const;
+
+         /**
           * @brief Type of the state to generate
           */
          StateTypeId mTypeId;
+
+         /**
+          * @brief Amplitude of the state
+          */
+         Array mModeA;
+
+         /**
+          * @brief Mode number of the state (wave number of polynomial order)
+          */
+         Array mModeK;
    };
 
    /// Typedef for a shared AnnulusExactScalarState

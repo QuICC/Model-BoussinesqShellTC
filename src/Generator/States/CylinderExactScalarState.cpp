@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CylinderExactScalarState::CylinderExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
+      : IScalarEquation(spEqParams), mTypeId(CONSTANT), mModeA(3), mModeK(3)
    {
    }
 
@@ -49,6 +49,17 @@ namespace Equations {
    void CylinderExactScalarState::setStateType(const CylinderExactScalarState::StateTypeId id)
    {
       this->mTypeId = id;
+   }
+
+   void CylinderExactScalarState::setModeOptions(const MHDFloat a1, const MHDFloat k1, const MHDFloat a2, const MHDFloat k2, const MHDFloat a3, const MHDFloat k3)
+   {
+      this->mModeA(0) = a1;
+      this->mModeA(1) = a2;
+      this->mModeA(2) = a3;
+
+      this->mModeK(0) = k1;
+      this->mModeK(1) = k2;
+      this->mModeK(2) = k3;
    }
 
    void CylinderExactScalarState::setCoupling()
@@ -103,6 +114,34 @@ namespace Equations {
 
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
+   }
+
+   MHDFloat CylinderExactScalarState::cos(const int idx, const MHDFloat theta) const
+   {
+      return this->mModeA(idx)*std::cos(this->mModeK(idx)*theta);
+   }
+
+   MHDFloat CylinderExactScalarState::sin(const int idx, const MHDFloat theta) const
+   {
+      return this->mModeA(idx)*std::sin(this->mModeK(idx)*theta);
+   }
+
+   MHDFloat CylinderExactScalarState::poly(const int idx, const MHDFloat x) const
+   {
+      MHDFloat val;
+
+      if(this->mModeK(idx) == CylinderExactScalarState::PCOS)
+      {
+         val = this->cos(idx,Math::PI*(x-1)/2.0);
+      } else if(this->mModeK(idx) == CylinderExactScalarState::PSIN)
+      {
+         val = this->sin(idx,Math::PI*(x-1)/2.0);
+      } else
+      {
+         val = this->mModeA(idx)*std::pow(x,this->mModeK(idx));
+      }
+
+      return val;
    }
 
 }

@@ -52,14 +52,21 @@ def tophys2d(spec, parity):
     """Transform 2D spectral coefficients to 2D physical values"""
 
     tmp = spec.copy()
-    phys = 1j*np.zeros((2*spec.shape[0], spec.shape[1]))
 
-    for i in range(spec.shape[0]):
-        tmp.real[i,:] = tozphys(spec.real[i,:])
-        tmp.imag[i,:] = tozphys(spec.imag[i,:])
-    for j in range(phys.shape[1]):
-        phys.real[:,j] = torphys(tmp.real[:,j], parity)
-        phys.imag[:,j] = torphys(tmp.imag[:,j], parity)
+    if spec.dtype == 'complex_':
+        phys = 1j*np.zeros((2*spec.shape[0], spec.shape[1]))
+        for i in range(spec.shape[0]):
+            tmp.real[i,:] = tozphys(spec.real[i,:])
+            tmp.imag[i,:] = tozphys(spec.imag[i,:])
+        for j in range(phys.shape[1]):
+            phys.real[:,j] = torphys(tmp.real[:,j], parity)
+            phys.imag[:,j] = torphys(tmp.imag[:,j], parity)
+    else:
+        phys = np.zeros((2*spec.shape[0], spec.shape[1]))
+        for i in range(spec.shape[0]):
+            tmp[i,:] = tozphys(spec[i,:])
+        for j in range(phys.shape[1]):
+            phys[:,j] = torphys(tmp[:,j], parity)
     
     return phys
 

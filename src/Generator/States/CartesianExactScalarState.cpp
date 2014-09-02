@@ -165,54 +165,6 @@ namespace Equations {
                         valJ = this->cos(1,j_);
                         valI = this->sin(2,i_);
 
-                     } else if(this->mTypeId == PSINCOSCOS)
-                     {
-                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->cos(1,j_);
-                        valI = this->cos(2,i_);
-
-                     } else if(this->mTypeId == PCOSCOSCOS)
-                     {
-                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->cos(1,j_);
-                        valI = this->cos(2,i_);
-
-                     } else if(this->mTypeId == PSINCOSSIN)
-                     {
-                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->cos(1,j_);
-                        valI = this->sin(2,i_);
-
-                     } else if(this->mTypeId == PCOSCOSSIN)
-                     {
-                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->cos(1,j_);
-                        valI = this->sin(2,i_);
-
-                     } else if(this->mTypeId == PSINSINSIN)
-                     {
-                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->sin(1,j_);
-                        valI = this->sin(2,i_);
-
-                     } else if(this->mTypeId == PCOSSINSIN)
-                     {
-                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->sin(1,j_);
-                        valI = this->sin(2,i_);
-
-                     } else if(this->mTypeId == PSINSINCOS)
-                     {
-                        valK = this->sin(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->sin(1,j_);
-                        valI = this->cos(2,i_);
-
-                     } else if(this->mTypeId == PCOSSINCOS)
-                     {
-                        valK = this->cos(0,Math::PI*(k_-1)/2.0);
-                        valJ = this->sin(1,j_);
-                        valI = this->cos(2,i_);
-
                      } else
                      {
                         throw Exception("Unknown exact state");
@@ -314,7 +266,20 @@ namespace Equations {
 
    MHDFloat CartesianExactScalarState::poly(const int idx, const MHDFloat x) const
    {
-      return this->mModeA(idx)*std::pow(x,this->mModeK(idx));
+      MHDFloat val;
+
+      if(this->mModeK(idx) == CartesianExactScalarState::PCOS)
+      {
+         val = this->cos(idx,Math::PI*(x-1)/2.0);
+      } else if(this->mModeK(idx) == CartesianExactScalarState::PSIN)
+      {
+         val = this->sin(idx,Math::PI*(x-1)/2.0);
+      } else
+      {
+         val = this->mModeA(idx)*std::pow(x,this->mModeK(idx));
+      }
+
+      return val;
    }
 
 }

@@ -13,7 +13,7 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [10, 0, 10]
 eq_params = {'prandtl':1, 'rayleigh':10412, 'ro':1, 'rratio':0.35, 'zrratio':1.0}
-eigs = [1]
+eigs = [0]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
