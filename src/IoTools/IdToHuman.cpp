@@ -240,9 +240,6 @@ namespace IoTools {
          case NonDimensional::GAMMA:
             return "gamma";
 
-         case NonDimensional::GAPWIDTH:
-            return "gapwidth";
-
          case NonDimensional::MAGEKMAN:
             return "magnetic_ekman";
 
@@ -260,6 +257,9 @@ namespace IoTools {
 
          case NonDimensional::ROSSBY:
             return "rossby";
+
+         case NonDimensional::RO:
+            return "ro";
 
          case NonDimensional::RRATIO:
             return "rratio";

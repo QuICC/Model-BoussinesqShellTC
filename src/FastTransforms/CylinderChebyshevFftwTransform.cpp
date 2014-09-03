@@ -120,7 +120,8 @@ namespace Transform {
 
    void CylinderChebyshevFftwTransform::initOperators()
    {
-      this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mDiffE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -133,19 +134,31 @@ namespace Transform {
       pValue = PyLong_FromLong(this->mspSetup->specSize());
       PyTuple_SetItem(pArgs, 0, pValue);
       // ... create boundray condition (none)
-      pValue = PyList_New(1);
-      PyList_SetItem(pValue, 0, PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0);
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 2, pValue);
+
+      // ... set even parity
+      pValue = PyLong_FromLong(0);
+      PyTuple_SetItem(pArgs, 1, pValue);
 
       // Call d1
       PythonWrapper::setFunction("d1");
       pValue = PythonWrapper::callFunction(pArgs);
 
       // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiff, pValue);
+      PythonWrapper::fillMatrix(this->mDiffE, pValue);
+
+      // ... set odd parity
+      pValue = PyLong_FromLong(1);
+      PyTuple_SetItem(pArgs, 1, pValue);
+
+      // Call d1
+      PythonWrapper::setFunction("d1");
+      pValue = PythonWrapper::callFunction(pArgs);
+
+      // Fill matrix and clenup
+      PythonWrapper::fillMatrix(this->mDiffO, pValue);
       PythonWrapper::finalize();
    }
 

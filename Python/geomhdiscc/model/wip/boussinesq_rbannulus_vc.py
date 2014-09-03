@@ -7,6 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cylindrical.annulus as annulus
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
@@ -266,9 +267,11 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0).tolil()
                 mat[:,idx_u] = 0
                 mat[idx_u,:] = 0
+                mat = mat + zero_u
 
             elif field_col == ("velocityy",""):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m).tolil()
+                mat[:,idx_v] = 0
                 mat[idx_u,:] = 0
 
             elif field_col == ("velocityz",""):
@@ -279,11 +282,13 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, -1.0).tolil()
+                mat[:,idx_p] = 0
                 mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m).tolil()
+                mat[:,idx_u] = 0
                 mat[idx_v,:] = 0
 
             elif field_col == ("velocityy",""):
@@ -293,6 +298,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0).tolil()
                 mat[:,idx_v] = 0
                 mat[idx_v,:] = 0
+                mat = mat + zero_v
 
             elif field_col == ("velocityz",""):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
@@ -316,6 +322,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_w,:] = 0
+                mat = mat + zero_w
 
             elif field_col == ("temperature",""):
                 mat = annulus.i2j2x2(res[0], res[2], a, b, bc, Ra).tolil()
@@ -345,15 +352,36 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         elif field_row == ("pressure",""):
             if field_col == ("velocityx",""):
-                mat = annulus.i1j1x1div(res[0], res[2], a, b, bc).tolil()
+                bc['r']['cr'] = 1
+                bc['r']['rt'] = 1
+        #        bc['r']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc).tolil()
+                mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i1j1(res[0], res[2], a, b, bc, 1j*m).tolil()
+                bc['r']['cr'] = 1
+                bc['r']['rt'] = 1
+                bc['r']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = annulus.i1j1(res[0]+1, res[2]+1, a, b, bc, 1j*m).tolil()
+                mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
-                mat = annulus.i1j1x1e1(res[0], res[2], a, b, bc, zscale = zscale).tolil()
+                bc['r']['cr'] = 1
+                bc['r']['rt'] = 1
+        #        bc['r']['zb'] = 1
+                bc['z']['cr'] = 1
+                bc['z']['rt'] = 1
+                bc['z']['zb'] = 1
+                mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale).tolil()
+                mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("temperature",""):
@@ -361,6 +389,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
             elif field_col == ("pressure",""):
                 mat = annulus.zblk(res[0], res[2], 1, 1, bc)
+                mat = mat + zero_p
 
         return mat
 
@@ -403,28 +432,35 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         """Build restriction matrices"""
 
         # U:
-        zero_u = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        zero_u = annulus.zblk(res[0], res[2], 2, 2, no_bc())
+        zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
         zero_u[idx_u,idx_u] = 1
 
         # V:
-        zero_v = annulus.zblk(res[0], res[1], 1, 2, no_bc())
+        zero_v = annulus.zblk(res[0], res[2], 1, 2, no_bc())
+        zero_v = zero_v + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        zero_v = zero_v + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
         zero_v = spsp.lil_matrix(zero_v.shape)
         zero_v[idx_v,idx_v] = 1
 
         # W:
-        zero_w = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        zero_w = annulus.zblk(res[0], res[2], 2, 2, no_bc())
+        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
         zero_w[idx_w,idx_w] = 1
 
         # P:
-        zero_p = annulus.zblk(res[0], res[1], 2, 2, no_bc())
+        zero_p = annulus.zblk(res[0], res[2], 2, 2, no_bc())
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
         zero_p = spsp.lil_matrix(zero_p.shape)

@@ -209,9 +209,14 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the even Chebyshev differentiation matrix
           */
-         SparseMatrix   mDiff;
+         SparseMatrix   mDiffE;
+
+         /**
+          * @brief Storage for the odd Chebyshev differentiation matrix
+          */
+         SparseMatrix   mDiffO;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -275,7 +280,7 @@ namespace Transform {
       // Compute first derivative
       if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize());
 
       // Compute simple projection
       } else
@@ -345,7 +350,7 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).real();
 
       // Compute simple projection of real part
       } else
@@ -364,7 +369,7 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).imag();
 
       // Compute simple projection of imaginary part
       } else

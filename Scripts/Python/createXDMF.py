@@ -60,7 +60,9 @@ def main(argv):
 
    # Open file
    xdmfHead = '<?xml version="1.0" ?>\n<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n<Xdmf Version="2.0">\n\t<Domain>'
-   xdmfVxVyVzGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DRectMesh" NumberOfElements="%(n1D)u %(n2D)u %(n3D)u"/>\n\t\t\t<Geometry GeometryType="VxVyVz">\n\t\t\t\t<DataItem Dimensions="%(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g3D)s\n\t\t\t\t</DataItem>\n\t\t\t\t<DataItem Dimensions="%(n2D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g2D)s\n\t\t\t\t</DataItem>\n\t\t\t\t<DataItem Dimensions="%(n1D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g1D)s\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
+   xdmfRevGrid = '\t\t\t\t<DataItem ItemType="Function" Function="-1.0*$0" Dimensions="%(nD)u">\n'
+   xdmfRevGridEnd = '\t\t\t\t</DataItem>\n'
+   xdmfVxVyVzGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DRectMesh" NumberOfElements="%(n1D)u %(n2D)u %(n3D)u"/>\n\t\t\t<Geometry GeometryType="VxVyVz">\n%(r3D)s\t\t\t\t<DataItem Dimensions="%(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g3D)s\n\t\t\t\t</DataItem>\n%(r3De)s%(r2D)s\t\t\t\t<DataItem Dimensions="%(n2D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g2D)s\n\t\t\t\t</DataItem>\n%(r2De)s%(r1D)s\t\t\t\t<DataItem Dimensions="%(n1D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g1D)s\n\t\t\t\t</DataItem>\n%(r1De)s\t\t\t</Geometry>'
    xdmfXYZGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DSMesh" NumberOfElements="%(n1D)u %(n2D)u %(n3D)u"/>\n\t\t\t<Geometry GeometryType="XYZ">\n\t\t\t\t<DataItem Dimensions="%(nN)u 3" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(gridfile)s.hdf5:/mesh/grid_%(g1D)s%(g2D)s%(g3D)s\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
    xdmfScalar ='\t\t\t<Attribute Name="%(sname)s" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="%(n1D)u %(n2D)u %(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/%(sname)s/%(sname)s\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
    xdmfTime = '\t\t\t<Time Value="%(time)e" />'
@@ -75,11 +77,15 @@ def main(argv):
    for fId in range(sId, sId+snapshots):
       current = basename+str(fId).zfill(4)+'.hdf5'
       h5_file = h5py.File(current, 'r')
-      if scheme in [b'TFT',b'TFF']:
+      if scheme in b'TFF':
          #if fId == sId:
          #   boxXYZ(h5_file)
          #print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}, file=out_file)
-         print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D}, file=out_file)
+         print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': '', 'r2De': '', 'r3D': '', 'r3De': ''}, file=out_file)
+      elif scheme in [b'TFT']:
+         print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': '', 'r2De': '', 'r3D': xdmfRevGrid % {'nD': n3D}, 'r3De': xdmfRevGridEnd}, file=out_file)
+      elif scheme in [b'TTT']:
+         print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': xdmfRevGrid % {'nD': n2D}, 'r2De': xdmfRevGridEnd, 'r3D': xdmfRevGrid % {'nD': n3D}, 'r3De': xdmfRevGridEnd}, file=out_file)
       elif scheme in [b'CFT']:
          if fId == sId:
             cylinderXYZ(h5_file)

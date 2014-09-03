@@ -26,9 +26,9 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   Array ShellChebyshevFftwTransform::generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio)
+   Array ShellChebyshevFftwTransform::generateGrid(const int size, const MHDFloat ro, const MHDFloat rRatio)
    {
-      if(gapWidth > 0 && rRatio >= 0)
+      if(ro > 0 && rRatio >= 0)
       {
          // Initialise grid storage
          Array grid(size);
@@ -38,7 +38,10 @@ namespace Transform {
          {
             grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
 
-            grid(k) = 0.5*gapWidth*grid(k) + 0.5*gapWidth*(1.+rRatio)/(1-rRatio);
+            MHDFloat b = (ro*rRatio + ro)/2.0;
+            MHDFloat a = ro - b;
+
+            grid(k) = a*grid(k) + b;
          }
 
          return grid;
@@ -49,7 +52,7 @@ namespace Transform {
    }
 
    ShellChebyshevFftwTransform::ShellChebyshevFftwTransform()
-      : mFPlan(NULL), mBPlan(NULL), mGapWidth(-1), mRRatio(-1)
+      : mFPlan(NULL), mBPlan(NULL), mRo(-1), mRRatio(-1)
    {
    }
 
@@ -79,21 +82,21 @@ namespace Transform {
 
    void ShellChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
    {
-      list.insert(NonDimensional::GAPWIDTH);
+      list.insert(NonDimensional::RO);
 
       list.insert(NonDimensional::RRATIO);
    }
 
    void ShellChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
    {
-      this->mGapWidth = options.find(NonDimensional::GAPWIDTH)->second;
+      this->mRo = options.find(NonDimensional::RO)->second;
 
       this->mRRatio = options.find(NonDimensional::RRATIO)->second;
    }
 
    Array ShellChebyshevFftwTransform::meshGrid() const
    {
-      return ShellChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize(), this->mGapWidth, this->mRRatio);
+      return ShellChebyshevFftwTransform::generateGrid(this->mspSetup->fwdSize(), this->mRo, this->mRRatio);
    }
 
    void ShellChebyshevFftwTransform::initFft()
@@ -136,17 +139,22 @@ namespace Transform {
 
       // Prepare arguments to d1(...) call
       PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(3);
+      pArgs = PyTuple_New(4);
       // ... get operator size
       pValue = PyLong_FromLong(this->mspSetup->specSize());
       PyTuple_SetItem(pArgs, 0, pValue);
+      // ... compute a, b factors
+      PyObject *pTmp = PyTuple_New(2);
+      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
+      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
+      PythonWrapper::setFunction("linear_r2x");
+      pValue = PythonWrapper::callFunction(pTmp);
+      PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
+      PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
       // ... create boundray condition (none)
-      pValue = PyList_New(1);
-      PyList_SetItem(pValue, 0, PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0);
-      PyTuple_SetItem(pArgs, 2, pValue);
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyTuple_SetItem(pArgs, 3, pValue);
 
       // Call d1
       PythonWrapper::setFunction("d1");

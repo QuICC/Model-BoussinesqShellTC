@@ -75,7 +75,7 @@ class TestCFTScheme(base_model.BaseModel):
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
             shift_z = 0
 
         block_info = (tau_n, gal_n, (shift_r,0,shift_z), 1)

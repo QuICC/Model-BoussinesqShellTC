@@ -42,10 +42,6 @@ namespace IoTools {
       {
          return NonDimensional::GAMMA;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::GAPWIDTH))
-      {
-         return NonDimensional::GAPWIDTH;
-
       } else if(id == IdToHuman::toTag(NonDimensional::MAGEKMAN))
       {
          return NonDimensional::MAGEKMAN;
@@ -73,6 +69,10 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(NonDimensional::RRATIO))
       {
          return NonDimensional::RRATIO;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::RO))
+      {
+         return NonDimensional::RO;
 
       } else if(id == IdToHuman::toTag(NonDimensional::TAYLOR))
       {

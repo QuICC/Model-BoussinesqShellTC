@@ -13,8 +13,8 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
 #eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio':1.0}
-eq_params = {'prandtl':1, 'rayleigh':5011.73, 'zxratio':1.0}
-eigs = [0]
+eq_params = {'prandtl':1, 'rayleigh':5011.73, 'zxratio':2.0}
+eigs = [1]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
@@ -55,33 +55,34 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -2e1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -3e1, np.inf)
     print("Found " + str(len(evp_lmb)) + " eigenvalues\n")
 
 if show_solution:
-    mode = -3
+    viz_mode = -2
     k = eigs[0]
+    zscale = eq_params['zxratio']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors
         sol_u = evp_vec[0:res[0]*res[2],mode]
         sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
+
         # Extract continuity from velocity 
-        sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + 1j*(k/2.0)*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), sx = 0)*sol_w
+        sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + 1j*(k/2.0)*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), zscale = zscale, sx = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
-    mode = -1
-    print("\nVisualizing mode: " + str(evp_lmb[mode]))
+    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    sol_u = evp_vec[0:res[0]*res[2],mode]
-    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
-    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
-    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],mode]
-    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],mode]
+    sol_u = evp_vec[0:res[0]*res[2],viz_mode]
+    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
+    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
+    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
+    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
 
     # Extract continuity from velocity 
-    sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + 1j*(k/2.0)*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), sx = 0)*sol_w
+    sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), sz = 0)*sol_u + 1j*(k/2.0)*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), zscale = zscale, sx = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)

@@ -74,28 +74,58 @@ namespace Equations {
 
       if(this->mTypeId == CONSTANT)
       {
-         int nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
-
-         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
-         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         Array zGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nZ);
-
-         for(int iR = 0; iR < nR; ++iR)
-         {
-            for(int iTh = 0; iTh < nTh; ++iTh)
-            {
-               Array funcZ = 2.*(5.*(Math::PI/2)*(1+zGrid.array())).array().sin();
-               Array funcR = 1 + rGrid.array() + rGrid.array().pow(3);
-               MHDFloat funcTh = std::cos(thGrid(iTh));
-
-               rNLComp.setProfile(funcZ*funcR(iR)*funcTh,iTh,iR);
-            }
-         }
+         rNLComp.rData().setConstant(this->mModeA(0)*this->mModeA(1)*this->mModeA(2));
       } else
       {
-         throw Exception("Unknown exact state");
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nT = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nZ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         Array gR = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR);
+         Array gT = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nT);
+         Array gZ = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nZ);
+
+         MHDFloat r_;
+         MHDFloat t_;
+         MHDFloat z_;
+
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r_ = gR(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nT = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iT = 0; iT < nT; ++iT)
+            {
+               t_ = gT(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iT, iR));
+               for(int iZ = 0; iZ < nZ; ++iZ)
+               {
+                  z_ = gZ(iZ);
+
+                  MHDFloat valZ = 0.0;
+                  MHDFloat valT = 0.0;
+                  MHDFloat valR = 0.0;
+
+                  if(this->mTypeId == POLYCOSPOLY)
+                  {
+                     valR = this->poly(0,r_);
+                     valT = this->cos(1,t_);
+                     valZ = this->poly(2,z_);
+
+                  } else if(this->mTypeId == POLYSINPOLY)
+                  {
+                     valR = this->poly(0,r_);
+                     valT = this->sin(1,t_);
+                     valZ = this->poly(2,z_);
+
+                  } else
+                  {
+                     throw Exception("Unknown exact state");
+                  }
+
+                  rNLComp.setPoint(valR*valT*valZ, iZ, iT, iR);
+               }
+            }
+         }
       }
    }
 

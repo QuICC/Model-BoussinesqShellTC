@@ -461,14 +461,17 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
+            mat[:,idx_u] = 0
             mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
+            mat[:,idx_v] = 0
             mat[idx_v,:] = 0
 
         elif field_row == ("velocityz",""):
             mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
+            mat[:,idx_w] = 0
             mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
@@ -511,14 +514,11 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
 
         # Pressure: T_iN, T_Nk
         zero_p = c2d.zblk(res[0], res[2], 2, 2, no_bc())
-        #zero_p = zero_u + zero_v + zero_w
-        #zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        # Pressure: T_{N-2:N,N-2:N}
-        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
-        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-2, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        # Pressure: T_{N-2:N,N-2:N}
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-2, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         # Pressure: T_00
         #zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list

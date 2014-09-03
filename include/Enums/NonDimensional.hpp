@@ -35,8 +35,6 @@ namespace GeoMHDiSCC {
             EKMAN,
             /// Gamma
             GAMMA,
-            /// Gap width R_o - R_i
-            GAPWIDTH,
             /// Magnetic Ekman number
             MAGEKMAN,
             /// Magnetic Prandtl number
@@ -49,6 +47,8 @@ namespace GeoMHDiSCC {
             ROBERTS,
             /// Rossby number
             ROSSBY,
+            /// Outer radius R_o
+            RO,
             /// Radii ratio R_i/R_o
             RRATIO,
             /// Taylor number

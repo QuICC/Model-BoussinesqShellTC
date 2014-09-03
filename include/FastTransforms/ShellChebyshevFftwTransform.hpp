@@ -81,7 +81,7 @@ namespace Transform {
          /**
           * @brief Generate a physical grid
           */
-         static Array generateGrid(const int size, const MHDFloat gapWidth, const MHDFloat rRatio); 
+         static Array generateGrid(const int size, const MHDFloat ro, const MHDFloat rRatio); 
 
          /**
           * @brief Very basic constructor
@@ -229,9 +229,9 @@ namespace Transform {
          void cleanupFft();
 
          /**
-          * @brief Storage for the gap width (R_o - R_i)
+          * @brief Storage for the outer radius R_o
           */
-         MHDFloat mGapWidth;
+         MHDFloat mRo;
 
          /**
           * @brief Storage for the ratio of the radii (R_i / R_o)

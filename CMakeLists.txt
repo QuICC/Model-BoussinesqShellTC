@@ -52,6 +52,9 @@ if(platformTest)
    # Python setup
    include(cmake.d/setup/Python.cmake)
 
+   # Scripts setup
+   include(cmake.d/setup/Scripts.cmake)
+
    # Debug setup
    include(cmake.d/setup/Debug.cmake)
 
