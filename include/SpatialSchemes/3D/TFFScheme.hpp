@@ -36,6 +36,11 @@ namespace Schemes {
    {
       public:
          /**
+          * @brief Tune the resolution
+          */
+         static void tuneResolution(SharedResolution spRes);
+
+         /**
           * @brief Interpret the configuration dimensions
           */
          static void interpretConfigDimensions(ArrayI& rDim);

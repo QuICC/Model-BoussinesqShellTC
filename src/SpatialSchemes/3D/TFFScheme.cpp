@@ -17,10 +17,18 @@
 
 // Project includes
 //
+#include "Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
+
+   void TFFScheme::tuneResolution(SharedResolution spRes)
+   {
+      SharedDoublePeriodicIndexCounter   spCounter(new DoublePeriodicIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
+   }
 
    void TFFScheme::interpretConfigDimensions(ArrayI& rDim)
    {
