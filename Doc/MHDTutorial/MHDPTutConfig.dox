@@ -1,41 +1,96 @@
-/** \page mhdPTutConfig Configure sources
- *  \section mhdSTutConfigBuild CMAKE_BUILD_TYPE
+/** \page mhdPTutConfig Configure
+ *
+ * CMake is used to generate the Makefile that will allow the compilation of the simulations. The build process uses an out-of-source approach to keep 
+ * the sources clean. The following steps are required to create and configure the build. To fix the notations, we assume:
+ *
+ *    - The sources are in: /home/myself/GeoMHDiSCC
+ *
+ *    - The binaries should be somewhere under: /scratch/myself
+ *
+ *    -# Create a new directory where you'll like all the binaries to be (Warning: directory might grow large!):
+ *
+ *       #$>mkdir /scratch/myself/GeoMHDiSCC
+ *
+ *    -# Binaries with different options/parallelisations need to have separate directories
+ *
+ *       #$>mkdir /scratch/myself/GeoMHDiSCC/Release-Serial #(serial version)
+ *
+ *       #$>mkdir /scratch/myself/GeoMHDiSCC/Release-Tubular #(tubular parallelisation)
+ *
+ *    -# Change into one of the newly create directories,as an example Release-Tubular/:
+ *
+ *       #$>cd /scratch/myself/GeoMHDiSCC/Release-Tubular
+ *
+ *    -# Initialise CMake and start the configuration process:
+ *
+ *       #$>ccmake /home/myself/GeoMHDiSCC
+ *
+ *    -# Set the build type and the platform. Press 'c' to reconfigure. More options should now be avaiable (depending on platform)
+ *
+ *    -# Configure the sources and press 'c' (possibly multiple times) and generate generate the Makefile by pressing 'g'
+ *
+ *    -# Once back to the shell, the build directory should be ready to compile the sources
+ *
+ *
+ *  \section mhdSTutCfgOptions Available options
+ *
+ *  <b>CMAKE_BUILD_TYPE</b>
+ *
  *    - Debug
  *    - Release
  *    - RelWithDebInfo
  *
- *  \section mhdSTutConfigPrefix CMAKE_INSTALL_PREFIX
+ *  <b>CMAKE_INSTALL_PREFIX</b>
+ *
  *     Leave at default values unless you know what you're doing.
  *
- *  \section mhdSTutConfigBM GEOMHDISCC_BOUNDARYMETHOD
+ *  <b>GEOMHDISCC_PLATFORM</b>
+ *    
+ *    - Desktop
+ *    - Fortytwo
+ *    - Garulfo
+ *    - Janus
+ *    - Lothlorien
+ *    - Theodosia
+ *
+ *  <b>GEOMHDISCC_BOUNDARYMETHOD</b>
+ *
  *    - Tau 
  *    - Galerkin
  *
- *  \section mhdSTutConfigCompiler GEOMHDISCC_COMPILER
+ *  <b>GEOMHDISCC_COMPILER</b>
+ *
  *    - GCC
  *    - (Intel)
- *    - (Clang)
+ *    - [Clang]
  *
- *  \section mhdSTutConfigFFT GEOMHDISCC_FFT
+ *  <b>GEOMHDISCC_FFT</b>
+ *
  *    - FFTW
+ *    - (cuFFT)
  *
- *  \section mhdSTutConfigFFTPlan GEOMHDISCC_FFTPLAN
+ *  <b>GEOMHDISCC_FFTPLAN</b>
+ *
  *    - Fast
  *    - Medium
  *    - Slow
  *
- *  \section mhdSTutConfigLargIO GEOMHDISCC_LARGEIO
+ *  <b>GEOMHDISCC_LARGEIO</b>
+ *
  *    - HDF5
  *
- *  \section mhdSTutConfigLinAlg GEOMHDISCC_LINALG
+ *  <b>GEOMHDISCC_LINALG</b>
+ *
  *    - Eigen
- *    - LAPACK
+ *    - [LAPACK]
  *
- *  \section mhdSTutConfigMemory GEOMHDISCC_MEMORYUSAGE
+ *  <b>GEOMHDISCC_MEMORYUSAGE</b>
+ *
  *    - High
- *    - Limited
+ *    - [Limited]
  *
- *  \section mhdSTutConfigMPI GEOMHDISCC_MPIALGO
+ *  <b>GEOMHDISCC_MPIALGO</b>
+ *
  *    - Auto
  *    - Fixed
  *    - Serial
@@ -43,49 +98,52 @@
  *    - Single2D
  *    - Tubular
  *
- *  \section mhdSTutConfigMP GEOMHDISCC_MULTPRECISION
- *    - ON 
+ *  <b>GEOMHDISCC_MULTPRECISION</b>
+ *    - [ON] 
  *    - OFF 
  *
- *  \section mhdSTutConfigPlatform GEOMHDISCC_PLATFORM
- *    - Desktop
- *    - Fortytwo
- *    - Janus
- *    - Lothlorien
+ *  <b>GEOMHDISCC_PROFILE</b>
  *
- *  \section mhdSTutConfigProf GEOMHDISCC_PROFILE
  *    - ON
  *    - OFF
  *
- *  \section mhdSTutConfigSmartPtr GEOMHDISCC_SMARTPTR
- *    - Boost
- *    - TR1
- *    - C++0x
+ *  <b>GEOMHDISCC_SMARTPTR</b>
  *
- *  \section mhdSTutConfigEVP GEOMHDISCC_SPEIGSOLVER
+ *    - (Boost)
+ *    - TR1
+ *    - (C++0x)
+ *
+ *  <b>GEOMHDISCC_SPEIGSOLVER</b>
+ *
  *    - ARPACK
  *
- *  \section mhdSTutConfigSpLinAlg GEOMHDISCC_SPLINALG
+ *  <b>GEOMHDISCC_SPLINALG</b>
+ *
  *    - UmfPack 
  *    - SuperLU
  *    - SparseLU
- *    - Pardiso
- *    - SPQR
- *    - SparseQR
- *    - BiCGStab
+ *    - [Pardiso]
+ *    - [SPQR]
+ *    - [SparseQR]
+ *    - [BiCGStab]
  *
- *  \section mhdSTutConfigStorageProf GEOMHDISCC_STORAGEPROFILE
+ *  <b>GEOMHDISCC_STORAGEPROFILE</b>
+ *
  *    - ON
  *    - OFF
  *
- *  \section mhdSTutConfigTest GEOMHDISCC_TEST
+ *  <b>GEOMHDISCC_TEST</b>
+ *
  *    - ON
  *    - OFF
  *
- *  \section mhdSTutConfigTime GEOMHDISCC_TIMESTEPPER
+ *  <b>GEOMHDISCC_TIMESTEPPER</b>
+ *
  *    - ImExRK3
+ *    - ImSBDF2
  *
- *  \section mhdSTutConfigGrouper GEOMHDISCC_TRANSGROUPER
+ *  <b>GEOMHDISCC_TRANSGROUPER</b>
+ *
  *    - Auto
  *    - Equation
  *    - Single1D

@@ -3,6 +3,8 @@
  * <center>
  * | \subpage mhdPTutGet |
  *   \subpage mhdPTutConfig |
+ *   \subpage mhdPTutCompile |
+ *   \subpage mhdPTutControl |
  *   \subpage mhdPTutModel |
  *   \subpage mhdPTutGeometry |
  * </center>

@@ -1,15 +1,37 @@
 /** \page mhdPNonlinear Nonlinear simulations
  *
  *    \mhdTable{
- *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
- *       <tr>\mhdStatNK<td>Not known if component can or will be implemented</td></tr>
- *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
- *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
- *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but is not yet fully tested</td></tr>
  *       <tr>\mhdStatTest<td>Component implementation is done and tested</td></tr>
+ *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but is not yet fully tested</td></tr>
+ *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
+ *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
+ *       <tr>\mhdStatNK<td>Not known if component can or will be implemented</td></tr>
+ *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
  *    }   
  *
+ *    \section mhdSNLBous Boussinesq simulations
+ *
+ *    \subsection mhdSSNLBousCar Cartesian geometry
+ *
  *    - \subpage mhdPNLBousBeta3DQG <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatDone, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Streamfunction (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Streamfunction (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vertical velocity (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vertical velocity (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vorticity (C++), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{Vorticity (Python), \mhdStatWip, \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *       }
+ *
+ *    - \subpage mhdPNLBousPerBeta3DQG <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -47,7 +69,7 @@
  *          \mhdStatus{Vorticity (Python), \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone, \mhdStatDone}
  *       }
  *
- *    - \subpage mhdPNLBousRotConvFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRB1DBox <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -63,9 +85,11 @@
  *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
- *    - \subpage mhdPNLAnelRotConvFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRB2DBox <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -81,9 +105,11 @@
  *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *
- *    - \subpage mhdPNLCompRotConvFPlane <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRB3DBox <em>(Work in progress)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -99,9 +125,73 @@
  *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
+ *
+ *    - \subpage mhdPNLBousRRB1DBox <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    - \subpage mhdPNLBousRRB2DBox <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    - \subpage mhdPNLBousRRB3DBox <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    \subsection mhdSSNLBousCyl Cylindrical geometry
  *          
- *    - \subpage mhdPNLBousRotConvCylinder <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRBCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -109,13 +199,19 @@
  *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
  *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
- *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
- *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
  *          
- *    - \subpage mhdPNLBousRotConvAnnulus <em>(Not started yet)</em>
+ *    - \subpage mhdPNLBousRBAnnulus <em>(Not started yet)</em>
  *
  *       \mhdTable{
  *          \mhdTableHeader
@@ -123,11 +219,59 @@
  *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
  *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
- *          \mhdStatus{Velocity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
- *          \mhdStatus{Velocity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
  *       }
+ *          
+ *    - \subpage mhdPNLBousRRBCylinder <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *          
+ *    - \subpage mhdPNLBousRRBAnnulus <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
+ *          \mhdStatus{Continuity (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Continuity (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    \subsection mhdSSNLBousSph Spherical geometry
  *
  *    - \subpage mhdPNLBousRotConvSphere <em>(Not started yet)</em>
  *
@@ -156,7 +300,31 @@
  *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNK, \mhdStatNK, \mhdStatNK}
  *       }
- *          
+ *
+ *    \section mhdSNLAnel Anelastic simulations
+ *
+ *    \subsection mhdSSNLAnelCar Cartesian geometry
+ *
+ *    - \subpage mhdPNLAnelRotConvFPlane <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    \subsection mhdSSNLAnelCyl Cylindrical geometry
+ *
  *    - \subpage mhdPNLAnelRotConvCylinder <em>(Not started yet)</em>
  *
  *       \mhdTable{
@@ -169,6 +337,8 @@
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
  *
+ *    \subsection mhdSSNLAnelSph Spherical geometry
+ *
  *    - \subpage mhdPNLAnelRotConvSphere <em>(Not started yet)</em>
  *
  *       \mhdTable{
@@ -180,6 +350,30 @@
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
+ *
+ *    \section mhdSNLComp Compressible simulations
+ *
+ *    \subsection mhdSSNLCompCar Cartesian geometry
+ *
+ *    - \subpage mhdPNLCompRotConvFPlane <em>(Not started yet)</em>
+ *
+ *       \mhdTable{
+ *          \mhdTableHeader
+ *          \mhdStatus{Simulation base, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Spectral operators (Python), \mhdStatWip, \mhdStatNA, \mhdStatNA, \mhdStatNA, \mhdStatNA}
+ *          \mhdStatus{State IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Visualization IO, \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity X (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Y (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Velocity Z (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (C++), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *          \mhdStatus{Temperature (Python), \mhdStatWip, \mhdStatNK, \mhdStatNA, \mhdStatNA, \mhdStatNK}
+ *       }
+ *
+ *    \subsection mhdSSNLCompCyl Cylindrical geometry
  *          
  *    - \subpage mhdPNLCompRotConvCylinder <em>(Not started yet)</em>
  *
@@ -192,6 +386,8 @@
  *       \mhdTable{
  *          \mhdStatus{Simulation base, \mhdStatTodo}
  *       }
+ *
+ *    \subsection mhdSSNLCompSph Spherical geometry
  *
  *    - \subpage mhdPNLCompRotConvSphere <em>(Not started yet)</em>
  *
