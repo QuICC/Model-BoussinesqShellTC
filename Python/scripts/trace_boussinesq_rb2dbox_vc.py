@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_rb2dbox_vc as mod
+import geomhdiscc.model.boussinesq_rb2dbox_vc as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRB2DBoxVC()

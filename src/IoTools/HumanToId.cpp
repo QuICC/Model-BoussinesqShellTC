@@ -70,6 +70,14 @@ namespace IoTools {
       {
          return NonDimensional::RRATIO;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::YXRATIO))
+      {
+         return NonDimensional::YXRATIO;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::ZXRATIO))
+      {
+         return NonDimensional::ZXRATIO;
+
       } else if(id == IdToHuman::toTag(NonDimensional::RO))
       {
          return NonDimensional::RO;

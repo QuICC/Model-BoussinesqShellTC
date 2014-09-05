@@ -24,12 +24,14 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqBoxTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqBoxVelocity.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityX.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityY.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityZ.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCContinuity.hpp"
+#include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
-#include "Generator/States/CartesianExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
-#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -41,41 +43,82 @@ namespace GeoMHDiSCC {
    void BoussinesqRB2DBoxVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqBoxTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRB2DBoxVCTransport>();
       
-      // Add Navier-Stokes equation
-      spSim->addScalarEquation<Equations::BoussinesqBoxVelocityX>();
-      spSim->addScalarEquation<Equations::BoussinesqBoxVelocityY>();
-      spSim->addScalarEquation<Equations::BoussinesqBoxVelocityZ>();
+      // Add Navier-Stokes equation (X,Y,Z components)
+      spSim->addScalarEquation<Equations::BoussinesqRB2DBoxVCVelocityX>();
+      spSim->addScalarEquation<Equations::BoussinesqRB2DBoxVCVelocityY>();
+      spSim->addScalarEquation<Equations::BoussinesqRB2DBoxVCVelocityZ>();
+
+      // Add continuity equation
+      spSim->addScalarEquation<Equations::BoussinesqRB2DBoxVCContinuity>();
    }
 
    void BoussinesqRB2DBoxVCModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedCartesianExactScalarState spSExact;
+      // Generate "exact" solutions (trigonometric or monomial)
+      if(false)
+      {
+         // Shared pointer to equation
+         Equations::SharedCartesianExactScalarState spExact;
 
-      // Add temperature initial state generator
-      spSExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spSExact->setStateType(Equations::CartesianExactScalarState::CONSTANT);
+         // Add scalar exact initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VELOCITYX);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 1.0);
 
-      // Add velocity initial state generators
-      spSExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spSExact->setIdentity(PhysicalNames::VELOCITYX);
-      spSExact->setStateType(Equations::CartesianExactScalarState::CONSTANT);
-      spSExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spSExact->setIdentity(PhysicalNames::VELOCITYY);
-      spSExact->setStateType(Equations::CartesianExactScalarState::CONSTANT);
-      spSExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-      spSExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spSExact->setStateType(Equations::CartesianExactScalarState::CONSTANT);
+         // Add scalar exact initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VELOCITYY);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
+
+         // Add scalar exact initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::VELOCITYZ);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
+
+         // Add scalar exact initial state generator
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::TEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+
+      // Generate random spectrum
+      } else
+      {
+         // Shared pointer to random initial state equation
+         Equations::SharedRandomScalarState spRand;
+
+         // Add scalar random initial state generator 
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VELOCITYX);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add scalar random initial state generator 
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VELOCITYY);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add scalar random initial state generator 
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::VELOCITYZ);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add scalar random initial state generator
+         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spRand->setIdentity(PhysicalNames::TEMPERATURE);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+      }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITYX);
       spOut->expect(PhysicalNames::VELOCITYY);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -103,6 +146,9 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITYX);
+      spOut->expect(PhysicalNames::VELOCITYY);
+      spOut->expect(PhysicalNames::VELOCITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

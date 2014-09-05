@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_rb3dbox_vc as mod
+import geomhdiscc.model.boussinesq_rb3dbox_vc as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRB3DBoxVC()
@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [16, 16, 16]
+res = [14, 14, 14]
 #eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio':1.0, 'yxratio':1.0}
 eq_params = {'prandtl':1, 'rayleigh':13011.73, 'zxratio':1.0, 'yxratio':1.0}
 eigs = []

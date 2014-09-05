@@ -51,6 +51,10 @@ namespace GeoMHDiSCC {
             RO,
             /// Radii ratio R_i/R_o
             RRATIO,
+            /// Axis lenght ratio Y/X
+            YXRATIO,
+            /// Axis lenght ratio Z/X
+            ZXRATIO,
             /// Taylor number
             TAYLOR,
             /// Theta

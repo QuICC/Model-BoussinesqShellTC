@@ -1,11 +1,11 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqBoxTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqBoxVelocityX.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqBoxVelocityY.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqBoxVelocityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityX.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityY.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCVelocityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCContinuity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
 )

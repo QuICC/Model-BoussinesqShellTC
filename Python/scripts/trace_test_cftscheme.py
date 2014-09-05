@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.test_cftscheme as mod
+import geomhdiscc.model.test_cftscheme as mod
 
 # Create the model and activate linearization
 model = mod.TestCFTScheme()

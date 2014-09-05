@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.test_aftscheme as mod
+import geomhdiscc.model.test_aftscheme as mod
 
 # Create the model and activate linearization
 model = mod.TestAFTScheme()

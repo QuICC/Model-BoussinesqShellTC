@@ -40,6 +40,8 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
+        print(field_row)
+
         fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
 
         return fields
@@ -54,23 +56,20 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[2]
+        tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocityx","") or field_row == ("velocityy","") or field_row == ("velocityz","") or field_row == ("temperature",""):
+            if field_row == ("velocityx","") or field_row == ("velocityy","") or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("pressure",""):
                 shift_x = 2
-                shift_z = 2
             else:
                 shift_x = 0
-                shift_z = 0
 
-            gal_n = (res[0] - shift_x)*(res[2] - shift_z)
+            gal_n = (res[0] - shift_x)
 
         else:
             gal_n = tau_n
             shift_x = 0
-            shift_z = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,shift_z), 1)
+        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -85,7 +84,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         ex_fields = self.explicit_fields(field_row)
 
         # Index mode: SLOWEST = 0, MODE = 1
-        index_mode = self.SLOWEST
+        index_mode = self.MODE
 
         # Compute block info
         block_info = self.block_size(res, field_row)
@@ -228,16 +227,19 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c1d.i2j2(res[0], res[2], bc)
+            mat = c1d.i2(res[0], bc)
 
         elif field_row == ("velocityy",""):
-            mat = c1d.i2j2(res[0], res[2], bc)
+            mat = c1d.i2(res[0], bc)
 
         elif field_row == ("velocityz",""):
-            mat = c1d.i2j2(res[0], res[2], bc)
+            mat = c1d.i2(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = c1d.i2j2(res[0], res[2], bc)
+            mat = c1d.i2(res[0], bc)
+
+        elif field_row == ("pressure",""):
+            mat = c1d.zblk(res[0], bc)
 
         return mat
 

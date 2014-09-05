@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.wip.test_tttscheme as mod
+import geomhdiscc.model.test_tttscheme as mod
 
 # Create the model and activate linearization
 model = mod.TestTTTScheme()
