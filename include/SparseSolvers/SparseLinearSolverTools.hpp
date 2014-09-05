@@ -31,7 +31,7 @@ namespace internal {
    /**
     * @brief Simpler wrapper around solver solve call
     */
-//   void solveWrapper(Matrix& rSolution, typename SparseSelector<SparseMatrix>::Type& solver, const Matrix& rhs);
+   void solveWrapper(Matrix& rSolution, typename SparseSelector<SparseMatrix>::Type& solver, const Matrix& rhs);
    void solveWrapper(MatrixZ& rSolution, typename SparseSelector<SparseMatrix>::Type& solver, const MatrixZ& rhs);
 //   void solveWrapper(MatrixZ& rSolution, typename SparseSelector<SparseMatrixZ>::Type& solver, const MatrixZ& rhs);
    void solveWrapper(DecoupledZMatrix& rSolution, typename SparseSelector<SparseMatrix>::Type& solver, const DecoupledZMatrix& rhs);
@@ -39,7 +39,7 @@ namespace internal {
    /**
     * @brief Simpler wrapper around solver solve call for shared pointer to solver
     */
-//   void solveWrapper(Matrix& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > solver, const Matrix& rhs);
+   void solveWrapper(Matrix& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > solver, const Matrix& rhs);
 //   void solveWrapper(MatrixZ& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > solver, const MatrixZ& rhs);
    void solveWrapper(MatrixZ& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrixZ>::Type > solver, const MatrixZ& rhs);
    void solveWrapper(DecoupledZMatrix& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > solver, const DecoupledZMatrix& rhs);
@@ -47,13 +47,13 @@ namespace internal {
 
 namespace internal {
 
-//   inline void solveWrapper(Matrix& rSolution, SparseSelector<SparseMatrix>::Type& solver, const Matrix& rhs)
-//   {
-//      rSolution = solver.solve(rhs);
-//
-//      // Safety assert for successful solve
-//      assert(solver.info() == Eigen::Success);
-//   }
+   inline void solveWrapper(Matrix& rSolution, SparseSelector<SparseMatrix>::Type& solver, const Matrix& rhs)
+   {
+      rSolution = solver.solve(rhs);
+
+      // Safety assert for successful solve
+      assert(solver.info() == Eigen::Success);
+   }
 
    inline void solveWrapper(MatrixZ& rSolution, SparseSelector<SparseMatrix>::Type& solver, const MatrixZ& rhs)
    {
@@ -92,13 +92,13 @@ namespace internal {
       assert(solver.info() == Eigen::Success);
    }
 
-//   inline void solveWrapper(Matrix& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > spSolver, const Matrix& rhs)
-//   {
-//      rSolution = spSolver->solve(rhs);
-//
-//      // Safety assert for successful solve
-//      assert(spSolver->info() == Eigen::Success);
-//   }
+   inline void solveWrapper(Matrix& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > spSolver, const Matrix& rhs)
+   {
+      rSolution = spSolver->solve(rhs);
+
+      // Safety assert for successful solve
+      assert(spSolver->info() == Eigen::Success);
+   }
 
 //   inline void solveWrapper(MatrixZ& rSolution, SharedPtrMacro<typename SparseSelector<SparseMatrix>::Type > spSolver, const MatrixZ& rhs)
 //   {

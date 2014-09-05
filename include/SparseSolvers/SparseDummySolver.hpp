@@ -41,6 +41,11 @@ namespace Solver {
           * @brief Dummy destructor
           */
          virtual ~SparseDummySolver() {};
+
+         /**
+          * @brief Dummy implementation 
+          */
+         void initStartRow() {};
          
       protected:
 
