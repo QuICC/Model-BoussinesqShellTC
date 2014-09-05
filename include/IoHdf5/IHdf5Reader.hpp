@@ -318,16 +318,19 @@ namespace IoHdf5 {
       //
       for(int i = 0; i < this->mCollIoRead; ++i)
       {
+         // Get storage index
+         int sidx = this->mFileOffsets.at(i).at(2);
+
          // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(i));
-         iDims[1] = std::tr1::get<0>(storage.at(i));
+         iDims[0] = std::tr1::get<1>(storage.at(sidx));
+         iDims[1] = std::tr1::get<0>(storage.at(sidx));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Select memory hyperslabs (i.e. minimum between file and memory spaces)
          // Check that at least one index is stored in file
          if(this->mFileOffsets.at(i).size() > 0)
          {
-            iDims[0] = std::min(std::tr1::get<1>(storage.at(i)), std::max(0,static_cast<int>(fDims[nDims-2]-this->mFileOffsets.at(i).at(1))));
+            iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), std::max(0,static_cast<int>(fDims[nDims-2]-this->mFileOffsets.at(i).at(1))));
          } else
          {
             iDims[0] = 0;
@@ -346,7 +349,7 @@ namespace IoHdf5 {
          H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
 
          // Read file hyperslab into memory hyperslab
-         H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(i)));
+         H5Dread(dataset, type, memspace, filespace, dsPList, std::tr1::get<2>(storage.at(sidx)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);
@@ -360,13 +363,16 @@ namespace IoHdf5 {
       //
       for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
       {
+         // Get storage index
+         int sidx = this->mFileOffsets.at(i).at(2);
+
          // Set full memory space
-         iDims[0] = std::tr1::get<1>(storage.at(i));
-         iDims[1] = std::tr1::get<0>(storage.at(i));
+         iDims[0] = std::tr1::get<1>(storage.at(sidx));
+         iDims[1] = std::tr1::get<0>(storage.at(sidx));
          memspace = H5Screate_simple(2, iDims, NULL);
 
          // Select memory hyperslabs
-         iDims[0] = std::min(std::tr1::get<1>(storage.at(i)), static_cast<int>(fDims[nDims-2]));
+         iDims[0] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
          iDims[1] = this->mBlock;
          H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
 
@@ -377,11 +383,11 @@ namespace IoHdf5 {
          }
 
          // Select corresponding hyperslab
-         dims[nDims-2] = std::min(std::tr1::get<1>(storage.at(i)), static_cast<int>(fDims[nDims-2]));
+         dims[nDims-2] = std::min(std::tr1::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
          H5Sselect_hyperslab(filespace, H5S_SELECT_SET, pOffset, NULL, dims, NULL);
 
          // Read file hyperslab into memory hyperslab and update offset
-         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(i)));
+         H5Dread(dataset, type, memspace, filespace, H5P_DEFAULT, std::tr1::get<2>(storage.at(sidx)));
 
          // Reset hyperslab to whole dataset
          H5Sselect_all(filespace);

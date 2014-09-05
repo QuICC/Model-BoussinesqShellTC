@@ -111,7 +111,7 @@ namespace GeoMHDiSCC {
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
-         spExact->setModeOptions(1e1, 10.0, 3e0, 10.0, -7e0, 10.0);
+         spExact->setModeOptions(1e1, 1.0, 3e0, 10.0, -7e0, 1.0);
 
       // Generate random spectrum
       } else

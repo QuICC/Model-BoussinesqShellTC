@@ -89,6 +89,7 @@ namespace GeoMHDiSCC {
 
       offV.push_back(0);
       offV.push_back(0);
+      offV.push_back(0);
       for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
       {
          int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
@@ -100,6 +101,9 @@ namespace GeoMHDiSCC {
 
             // Compute offset for second dimension
             offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+
+            // Store 3D index
+            offV.at(2) = i;
 
             offsets.push_back(offV);
          }

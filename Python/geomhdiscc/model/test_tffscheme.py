@@ -44,7 +44,7 @@ class TestTFFScheme(base_model.BaseModel):
 
         # Solve as coupled equations
         if self.solve_coupled:
-            fields = [("velocityx",""), ("velocityx",""), ("velocityz",""), ("temperature","")]
+            fields = [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature","")]
 
         # Solve as splitted equations
         else:

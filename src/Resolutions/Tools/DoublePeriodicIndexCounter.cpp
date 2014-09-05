@@ -17,7 +17,6 @@
 // Project includes
 //
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
    DoublePeriodicIndexCounter::DoublePeriodicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
@@ -90,19 +89,22 @@ namespace GeoMHDiSCC {
 
       offV.push_back(0);
       offV.push_back(0);
+      offV.push_back(0);
 
       // Select transform dimension depending on dimension space
       if(spaceId == Dimensions::Space::SPECTRAL)
       {
          // Get full slowest resolution resolution
          int dat3D = this->mspSim->dim(simId, Dimensions::Space::TRANSFORM);
+         int sim3D = this->mspSim->dim(simId,spaceId)/2 + 1;
          int ref3D = spRef->dim(simId,spaceId)/2 + 1;
+         int min3D = std::min(sim3D,ref3D);
 
          for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
          {
             int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
             // Check if value is available in file
-            if(i_ < ref3D)
+            if(i_ < min3D)
             {
                // Compute offset for third dimension
                offV.at(0) = i_;
@@ -110,9 +112,11 @@ namespace GeoMHDiSCC {
                // Compute offset for second dimension
                offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
+               // Store 3D index
+               offV.at(2) = i;
+
                offsets.push_back(offV);
-               std::cerr << i_ << std::endl;
-            } else if(dat3D - i_ < ref3D)
+            } else if(dat3D - i_ < min3D)
             {
                // Compute offset for third dimension
                offV.at(0) = i_ - (dat3D - spRef->dim(simId,spaceId));
@@ -120,8 +124,10 @@ namespace GeoMHDiSCC {
                // Compute offset for second dimension
                offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
+               // Store 3D index
+               offV.at(2) = i;
+
                offsets.push_back(offV);
-               std::cerr << i_ - (dat3D - spRef->dim(simId,spaceId)) << std::endl;
             }
          }
 
@@ -138,6 +144,9 @@ namespace GeoMHDiSCC {
 
                // Compute offset for second dimension
                offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+
+               // Store 3D index
+               offV.at(2) = i;
 
                offsets.push_back(offV);
             }
