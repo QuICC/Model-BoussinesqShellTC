@@ -17,6 +17,7 @@
 // Project includes
 //
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
    DoublePeriodicIndexCounter::DoublePeriodicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
@@ -110,15 +111,17 @@ namespace GeoMHDiSCC {
                offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
                offsets.push_back(offV);
+               std::cerr << i_ << std::endl;
             } else if(dat3D - i_ < ref3D)
             {
                // Compute offset for third dimension
-               offV.at(0) = i_;
+               offV.at(0) = i_ - (dat3D - spRef->dim(simId,spaceId));
 
                // Compute offset for second dimension
                offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
 
                offsets.push_back(offV);
+               std::cerr << i_ - (dat3D - spRef->dim(simId,spaceId)) << std::endl;
             }
          }
 
