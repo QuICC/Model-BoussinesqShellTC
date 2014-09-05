@@ -58,6 +58,9 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, true, false));
+
+      // Add Z velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, false));
    }
 
