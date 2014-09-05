@@ -53,7 +53,6 @@ namespace NoEigen {
 
    template <typename TEquation> std::vector<MHDFloat> getEigs(const TEquation& eq, const int matIdx)
    {
-      throw Exception("Not yet implemented!");
       std::vector<MHDFloat> eigs;
 
       return eigs;
