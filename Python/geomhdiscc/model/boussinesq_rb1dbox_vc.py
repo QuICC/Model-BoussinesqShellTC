@@ -40,8 +40,6 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        print(field_row)
-
         fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
 
         return fields

@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRB1DBoxVCVelocityY.cpp
- * @brief Source of the implementation of th momentum equation for the Y component in Rayleigh-Benard convection in 1D box
+ * @file BoussinesqRBAnnulusVCVelocityY.cpp
+ * @brief Source of the implementation of th momentum equation for the Y component in Rayleigh-Benard convection in a cylindrical annulus
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRB1DBoxVCVelocityY.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityY.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRB1DBoxVCVelocityY::BoussinesqRB1DBoxVCVelocityY(SharedEquationParameters spEqParams)
+   BoussinesqRBAnnulusVCVelocityY::BoussinesqRBAnnulusVCVelocityY(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRB1DBoxVCVelocityY::~BoussinesqRB1DBoxVCVelocityY()
+   BoussinesqRBAnnulusVCVelocityY::~BoussinesqRBAnnulusVCVelocityY()
    {
    }
 
-   void BoussinesqRB1DBoxVCVelocityY::setCoupling()
+   void BoussinesqRBAnnulusVCVelocityY::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
-   void BoussinesqRB1DBoxVCVelocityY::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRBAnnulusVCVelocityY::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -53,10 +53,10 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)u_y\f$
       ///
-      Physical::VelocityAdvection<FieldComponents::Physical::ONE,FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYX).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::ONE,FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::VELOCITYX).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYY).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqRB1DBoxVCVelocityY::setRequirements()
+   void BoussinesqRBAnnulusVCVelocityY::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITYY);

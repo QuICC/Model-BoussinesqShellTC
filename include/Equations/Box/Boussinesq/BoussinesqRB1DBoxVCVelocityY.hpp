@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRB1DOXVCVELOCITYY_HPP
-#define BOUSSINESQRB1DOXVCVELOCITYY_HPP
+#ifndef BOUSSINESQRB1DBOXVCVELOCITYY_HPP
+#define BOUSSINESQRB1DBOXVCVELOCITYY_HPP
 
 // Configuration includes
 //
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRB1DOXVCVELOCITYY_HPP
+#endif // BOUSSINESQRB1DBOXVCVELOCITYY_HPP

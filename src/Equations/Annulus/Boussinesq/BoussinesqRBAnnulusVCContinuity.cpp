@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRB3DBoxVCContinuity.cpp
- * @brief Source of the implementation of the continuity equation in Rayleigh-Benard convection in 3D box
+ * @file BoussinesqRBAnnulusVCContinuity.cpp
+ * @brief Source of the implementation of the continuity equation in Rayleigh-Benard convection in a cylindrical annulus
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRB3DBoxVCContinuity.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCContinuity.hpp"
 
 // Project includes
 //
@@ -27,29 +27,29 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRB3DBoxVCContinuity::BoussinesqRB3DBoxVCContinuity(SharedEquationParameters spEqParams)
+   BoussinesqRBAnnulusVCContinuity::BoussinesqRBAnnulusVCContinuity(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRB3DBoxVCContinuity::~BoussinesqRB3DBoxVCContinuity()
+   BoussinesqRBAnnulusVCContinuity::~BoussinesqRBAnnulusVCContinuity()
    {
    }
 
-   void BoussinesqRB3DBoxVCContinuity::setCoupling()
+   void BoussinesqRBAnnulusVCContinuity::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, true, false);
    }
 
-   void BoussinesqRB3DBoxVCContinuity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRBAnnulusVCContinuity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
    }
 
-   void BoussinesqRB3DBoxVCContinuity::setRequirements()
+   void BoussinesqRBAnnulusVCContinuity::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::PRESSURE);
@@ -57,7 +57,7 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add X component to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add pressure to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::PRESSURE, FieldRequirement(true, true, false, false));
    }
 

@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRB1DOXVCTRANSPORT_HPP
-#define BOUSSINESQRB1DOXVCTRANSPORT_HPP
+#ifndef BOUSSINESQRB1DBOXVCTRANSPORT_HPP
+#define BOUSSINESQRB1DBOXVCTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRB1DOXVCTRANSPORT_HPP
+#endif // BOUSSINESQRB1DBOXVCTRANSPORT_HPP

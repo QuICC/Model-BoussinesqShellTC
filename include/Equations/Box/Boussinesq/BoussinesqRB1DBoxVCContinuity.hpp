@@ -4,8 +4,8 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRB1DOXVCCONTINUITY_HPP
-#define BOUSSINESQRB1DOXVCCONTINUITY_HPP
+#ifndef BOUSSINESQRB1DBOXVCCONTINUITY_HPP
+#define BOUSSINESQRB1DBOXVCCONTINUITY_HPP
 
 // Configuration includes
 //
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRB1DOXVCCONTINUITY_HPP
+#endif // BOUSSINESQRB1DBOXVCCONTINUITY_HPP

@@ -22,6 +22,7 @@
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
+#include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCTransport.hpp"
@@ -169,11 +170,12 @@ namespace GeoMHDiSCC {
 
    void BoussinesqRB2DBoxVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
-      
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
+      // Create maximal continuity writer
+      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
+      spState->expect(PhysicalNames::VELOCITYX);
+      spState->expect(PhysicalNames::VELOCITYY);
+      spState->expect(PhysicalNames::VELOCITYZ);
+      spSim->addAsciiOutputFile(spState);
    }
 
    void BoussinesqRB2DBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)

@@ -22,6 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
+#include "PhysicalOperators/VelocityAdvection.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -40,13 +41,19 @@ namespace Equations {
 
    void BoussinesqRB1DBoxVCVelocityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
    }
 
    void BoussinesqRB1DBoxVCVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
+
+      /// 
+      /// Computation of the advection:
+      ///   \f$ \left(\vec u\cdot\nabla\right)u_z\f$
+      ///
+      Physical::VelocityAdvection<FieldComponents::Physical::ONE,FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYX).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqRB1DBoxVCVelocityZ::setRequirements()

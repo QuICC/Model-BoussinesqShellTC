@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqAnnulusTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq annulus model 
+ * @file BoussinesqRBAnnulusVCTransport.hpp
+ * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQANNULUSTRANSPORT_HPP
-#define BOUSSINESQANNULUSTRANSPORT_HPP
+#ifndef BOUSSINESQRBANNULUSVCTRANSPORT_HPP
+#define BOUSSINESQRBANNULUSVCTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,22 +28,22 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for the Boussinesq annulus model 
+    * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
     */
-   class BoussinesqAnnulusTransport: public IScalarEquation
+   class BoussinesqRBAnnulusVCTransport: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param spEqParams    Shared equation parameters
           */
-         BoussinesqAnnulusTransport(SharedEquationParameters spEqParams);
+         BoussinesqRBAnnulusVCTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqAnnulusTransport();
+         virtual ~BoussinesqRBAnnulusVCTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQANNULUSTRANSPORT_HPP
+#endif // BOUSSINESQRBANNULUSVCTRANSPORT_HPP
