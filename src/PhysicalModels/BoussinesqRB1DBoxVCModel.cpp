@@ -135,13 +135,13 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYX);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYY);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add output file

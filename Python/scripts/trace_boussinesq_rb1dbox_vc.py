@@ -13,7 +13,7 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [200, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':1707.8}
-phi = 15
+phi = 0
 kp = 3.117
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
@@ -106,22 +106,22 @@ if show_solution:
     phys_ci = transf.tophys(sol_c.imag)
     
     # Show physical plot
-    pl.subplot(3,3,1)
+    pl.subplot(2,3,1)
     pl.plot(grid_x, phys_u)
     pl.title('u')
-    pl.subplot(3,3,2)
+    pl.subplot(2,3,2)
     pl.plot(grid_x, phys_v)
     pl.title('v')
-    pl.subplot(3,3,3)
+    pl.subplot(2,3,3)
     pl.plot(grid_x, phys_w)
     pl.title('w')
-    pl.subplot(3,3,4)
+    pl.subplot(2,3,4)
     pl.plot(grid_x, phys_t)
     pl.title('T')
-    pl.subplot(3,3,8)
+    pl.subplot(2,3,5)
     pl.plot(grid_x, phys_cr)
     pl.title('Continuity (real)')
-    pl.subplot(3,3,9)
+    pl.subplot(2,3,6)
     pl.plot(grid_x, phys_ci)
     pl.title('Continuity (imag)')
     pl.show()
