@@ -50,18 +50,18 @@ def d4(nx, bc, coeff = 1.0, zr = 4):
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def laplh(nx, k, bc, coeff = 1.0):
+def laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for horizontal laplacian"""
 
-    mat = d2(nx, bc) - k**2*sid(nx,2,bc)
+    mat = d2(nx, bc, cscale**2) - k**2*sid(nx,2,bc)
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def lapl2h(nx, k, bc, coeff = 1.0):
+def lapl2h(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for horizontal bilaplacian"""
 
-    mat = d4(nx, bc) - 2.0*k**2*sid(nx,4,bc)*d2(nx,bc) + k**4*sid(nx,4,bc) 
+    mat = d4(nx, bc, cscale**4) - 2.0*k**2*sid(nx,4,bc)*d2(nx,bc, cscale**2) + k**4*sid(nx,4,bc) 
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
@@ -143,7 +143,7 @@ def i2d1(nx, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i2lapl(nx, k, l, bc, coeff = 1.0):
+def i2lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 2nd integral in x of Laplacian T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -156,7 +156,7 @@ def i2lapl(nx, k, l, bc, coeff = 1.0):
 
     # Generate main diagonal
     def d0(n):
-        return (k**2 + l**2 + 2*n**2 - 2)/(2*(n - 1)*(n + 1))
+        return (k**2 + l**2 + (2*n**2 - 2)*cscale**2)/(2*(n - 1)*(n + 1))
 
     # Generate 2nd superdiagonal
     def d2(n):
@@ -168,7 +168,7 @@ def i2lapl(nx, k, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i2laplh(nx, k, bc, coeff = 1.0):
+def i2laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 2nd integral in x of horizontal Laplacian T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -181,7 +181,7 @@ def i2laplh(nx, k, bc, coeff = 1.0):
 
     # Generate main diagonal
     def d0(n):
-        return (k**2 + 2*n**2 - 2)/(2*(n - 1)*(n + 1))
+        return (k**2 + (2*n**2 - 2)*cscale**2)/(2*(n - 1)*(n + 1))
 
     # Generate 2nd superdiagonal
     def d2(n):
@@ -285,7 +285,7 @@ def i4d4(nx, bc, coeff = 1.0):
 
     return qid(nx,4, bc, coeff)
 
-def i4lapl(nx, k, l, bc, coeff = 1.0):
+def i4lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of Laplacian T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -298,15 +298,15 @@ def i4lapl(nx, k, l, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return (k**2 + l**2 + n**2 - 2*n - 3)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return (k**2 + l**2 + (n**2 - 2*n - 3)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
 
     # Generate main diagonal
     def d0(n):
-        return -(3*k**2 + 3*l**2 + 4*n**2 - 16)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return -(3*k**2 + 3*l**2 + (4*n**2 - 16)*cscale**2)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return (k**2 + l**2 + n**2 + 2*n - 3)/(4*n*(n - 1)*(n + 1)*(n + 3))
+        return (k**2 + l**2 + (n**2 + 2*n - 3)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3))
 
     # Generate 4th superdiagonal
     def d4(n):
@@ -318,7 +318,7 @@ def i4lapl(nx, k, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4laplh(nx, k, bc, coeff = 1.0):
+def i4laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of horizontal Laplacian T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -331,15 +331,15 @@ def i4laplh(nx, k, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return (k**2 + n**2 - 2*n - 3)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return (k**2 + (n**2 - 2*n - 3)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
 
     # Generate main diagonal
     def d0(n):
-        return -(3*k**2 + 4*n**2 - 16)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return -(3*k**2 + (4*n**2 - 16)*cscale**2)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return (k**2 + n**2 + 2*n - 3)/(4*n*(n - 1)*(n + 1)*(n + 3))
+        return (k**2 + (n**2 + 2*n - 3)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3))
 
     # Generate 4th superdiagonal
     def d4(n):
@@ -351,7 +351,7 @@ def i4laplh(nx, k, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4lapl2(nx, k, l, bc, coeff = 1.0):
+def i4lapl2(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of Laplacian^2 T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -364,15 +364,15 @@ def i4lapl2(nx, k, l, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -(k**2 + l**2)*(k**2 + l**2 + 2*n**2 - 4*n - 6)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return -(k**2 + l**2)*(k**2 + l**2 + (2*n**2 - 4*n - 6)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
 
     # Generate main diagonal
     def d0(n):
-        return (3*k**4 + 6*k**2*l**2 + 8*k**2*n**2 - 32*k**2 + 3*l**4 + 8*l**2*n**2 - 32*l**2 + 8*n**4 - 40*n**2 + 32)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return (3*k**4 + 6*k**2*l**2 + 3*l**4 + (8*k**2*n**2 - 32*k**2 + 8*l**2*n**2 - 32*l**2)*cscale**2 + (8*n**4 - 40*n**2 + 32)*cscale**4)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -(k**2 + l**2)*(k**2 + l**2 + 2*n**2 + 4*n - 6)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+        return -(k**2 + l**2)*(k**2 + l**2 + (2*n**2 + 4*n - 6)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
 
     # Generate 4th superdiagonal
     def d4(n):
@@ -384,7 +384,7 @@ def i4lapl2(nx, k, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4lapl2h(nx, k, bc, coeff = 1.0):
+def i4lapl2h(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of horizontal Laplacian^2 T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -397,15 +397,15 @@ def i4lapl2h(nx, k, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -k**2*(k**2 + 2*n**2 - 4*n - 6)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return -k**2*(k**2 + (2*n**2 - 4*n - 6)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
 
     # Generate main diagonal
     def d0(n):
-        return (3*k**4 + 8*k**2*n**2 - 32*k**2 + 8*n**4 - 40*n**2 + 32)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return (3*k**4 + (8*k**2*n**2 - 32*k**2)*cscale**2 + (8*n**4 - 40*n**2 + 32)*cscale**4)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -k**2*(k**2 + 2*n**2 + 4*n - 6)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+        return -k**2*(k**2 + (2*n**2 + 4*n - 6)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
 
     # Generate 4th superdiagonal
     def d4(n):

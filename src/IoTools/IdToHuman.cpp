@@ -270,6 +270,15 @@ namespace IoTools {
          case NonDimensional::ZXRATIO:
             return "zxratio";
 
+         case NonDimensional::XSCALE:
+            return "xscale";
+
+         case NonDimensional::YSCALE:
+            return "yscale";
+
+         case NonDimensional::ZSCALE:
+            return "zscale";
+
          case NonDimensional::TAYLOR:
             return "taylor";
 

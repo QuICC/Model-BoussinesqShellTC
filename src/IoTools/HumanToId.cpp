@@ -78,6 +78,18 @@ namespace IoTools {
       {
          return NonDimensional::ZXRATIO;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::XSCALE))
+      {
+         return NonDimensional::XSCALE;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::YSCALE))
+      {
+         return NonDimensional::YSCALE;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::ZSCALE))
+      {
+         return NonDimensional::ZSCALE;
+
       } else if(id == IdToHuman::toTag(NonDimensional::RO))
       {
          return NonDimensional::RO;

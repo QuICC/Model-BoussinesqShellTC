@@ -11,9 +11,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [14, 14, 14]
-#eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio':1.0, 'yxratio':1.0}
-eq_params = {'prandtl':1, 'rayleigh':13011.73, 'zxratio':1.0, 'yxratio':1.0}
+res = [12, 12, 12]
+eq_params = {'prandtl':1, 'rayleigh':5508.0, 'yxratio':1.0, 'zxratio':1.0, 'xscale':2.0, 'yscale':2.0, 'zscale':2.0}
 eigs = []
 bc_vel = 0 # 0: NS/NS/NS, 1: SF/SF/SF, 2: SF/NS/NS, 3: SF/NS/NS
 bc_temp = 0 # 0: FT/FT/FT, 1: FF/FF/FF, 2: FF/FT/FT, 3: FT/FF/FF
@@ -64,6 +63,9 @@ if solve_evp:
 
 if show_solution:
     viz_mode = -1
+    xscale = eq_params['xscale']
+    yscale = eq_params['yxratio']*eq_params['yscale']
+    zscale = eq_params['zxratio']*eq_params['zscale']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors
@@ -71,7 +73,7 @@ if show_solution:
         sol_v = evp_vec[res[0]*res[1]*res[2]:2*res[0]*res[1]*res[2],mode]
         sol_w = evp_vec[2*res[0]*res[1]*res[2]:3*res[0]*res[1]*res[2],mode]
         # Extract continuity from velocity 
-        sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), sx = 0, sy = 0)*sol_w
+        sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
@@ -82,7 +84,7 @@ if show_solution:
     sol_t = evp_vec[3*res[0]*res[1]*res[2]:4*res[0]*res[1]*res[2],viz_mode]
     sol_p = evp_vec[4*res[0]*res[1]*res[2]:5*res[0]*res[1]*res[2],viz_mode]
     # Extract continuity from velocity 
-    sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), sx = 0, sy = 0)*sol_w
+    sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)

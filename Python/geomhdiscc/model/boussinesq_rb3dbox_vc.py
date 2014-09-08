@@ -20,7 +20,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "zxratio", "yxratio"]
+        return ["prandtl", "rayleigh", "zxratio", "yxratio", "xscale", "zscale", "zscale"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -326,15 +326,16 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        zscale = eq_params['zxratio']
-        yscale = eq_params['yxratio']
+        xscale = eq_params['xscale']
+        zscale = eq_params['zxratio']*eq_params['yscale']
+        yscale = eq_params['yxratio']*eq_params['zscale']
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_u,:] = 0
                 mat[:,idx_u] = 0
                 mat = mat + zero_u
@@ -349,7 +350,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0).tolil()
+                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale).tolil()
                 mat[idx_u,:] = 0
                 mat[:,idx_p] = 0
 
@@ -358,7 +359,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_v,:] = 0
                 mat[:,idx_v] = 0
                 mat = mat + zero_v
@@ -382,13 +383,13 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_w,:] = 0
                 mat[:,idx_w] = 0
                 mat = mat + zero_w
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0).tolil()
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra).tolil()
                 mat[idx_w,:] = 0
 
             elif field_col == ("pressure",""):
@@ -408,7 +409,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat[:,idx_w] = 0
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
 
             elif field_col == ("pressure",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -424,7 +425,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['zb'] = 1
-                mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale).tolil()
                 mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
 
@@ -438,7 +439,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['zb'] = 1
-                mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale).tolil()
                 mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
 
@@ -452,7 +453,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
                 bc['z']['zb'] = 1
-                mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc).tolil()
+                mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
 
@@ -469,7 +470,6 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 

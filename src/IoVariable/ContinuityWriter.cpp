@@ -79,6 +79,12 @@ namespace IoVariable {
 
          sIt.push_back(it);
       }
+   
+      #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
+         MHDFloat zscale = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::ZSCALE))->second;
+      #else
+         MHDFloat zscale = 1.0;
+      #endif //GEOMHDISCC_SPATIALSCHEME_TFF
 
       MHDFloat continuity = (sIt.at(0)->second->dom(0).grad().comp(comp.at(0)).data() + sIt.at(1)->second->dom(0).grad().comp(comp.at(1)).data() + sIt.at(2)->second->dom(0).grad().comp(comp.at(2)).data()).array().abs().maxCoeff();
 

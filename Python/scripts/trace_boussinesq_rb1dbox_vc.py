@@ -11,8 +11,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [200, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':1707.8}
+res = [30, 0, 0]
+eq_params = {'prandtl':1, 'rayleigh':1800.0, 'zscale':2.0}
 phi = 0
 kp = 3.117
 kx = kp*np.cos(phi*np.pi/180.0);
@@ -60,20 +60,32 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e2, np.inf)
     print(evp_lmb)
 
 if show_solution:
-    mode = -1
+    viz_mode = -1
+    zscale = eq_params['zscale']
 
+    for mode in range(0,len(evp_lmb)):
+        # Get solution vectors
+        sol_u = evp_vec[0:res[0],mode]
+        sol_v = evp_vec[res[0]:2*res[0],mode]
+        sol_w = evp_vec[2*res[0]:3*res[0],mode]
+
+        # Extract continuity from velocity
+        sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
+        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
+
+    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    sol_u = evp_vec[0:res[0],mode]
-    sol_v = evp_vec[res[0]:2*res[0],mode]
-    sol_w = evp_vec[2*res[0]:3*res[0],mode]
-    sol_t = evp_vec[3*res[0]:4*res[0],mode]
-    sol_p = evp_vec[4*res[0]:5*res[0],mode]
+    sol_u = evp_vec[0:res[0],viz_mode]
+    sol_v = evp_vec[res[0]:2*res[0],viz_mode]
+    sol_w = evp_vec[2*res[0]:3*res[0],viz_mode]
+    sol_t = evp_vec[3*res[0]:4*res[0],viz_mode]
+    sol_p = evp_vec[4*res[0]:5*res[0],viz_mode]
     # Extract continuity from velocity
-    sol_c = 1j*(kx/2.0)*sol_u + 1j*(ky/2.0)*sol_v + mod.c1d.d1(res[0], mod.no_bc())*sol_w
+    sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
 
     # Create spectrum plots
     pl.subplot(2,3,1)

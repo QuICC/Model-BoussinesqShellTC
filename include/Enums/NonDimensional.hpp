@@ -55,6 +55,12 @@ namespace GeoMHDiSCC {
             YXRATIO,
             /// Axis lenght ratio Z/X
             ZXRATIO,
+            /// X axis scale
+            XSCALE,
+            /// Y axis scale
+            YSCALE,
+            /// Z axis scale
+            ZSCALE,
             /// Taylor number
             TAYLOR,
             /// Theta

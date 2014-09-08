@@ -90,8 +90,8 @@ def i2lapl():
     """Cartesian second integral of laplacian operator"""
 
     # Setup terms in recurrence
-    k, l = sympy.symbols('k l')
-    terms = [{'q':2, 'p':0, 'd':2, 'c':1},{'q':2, 'p':0, 'd':0, 'c':-k**2},{'q':2, 'p':0, 'd':0, 'c':-l**2}]
+    k, l, cs = sympy.symbols('k l cs')
+    terms = [{'q':2, 'p':0, 'd':2, 'c':cs**2},{'q':2, 'p':0, 'd':0, 'c':-k**2},{'q':2, 'p':0, 'd':0, 'c':-l**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -104,8 +104,8 @@ def i2laplh():
     """Cartesian second integral of horizontal laplacian operator"""
 
     # Setup terms in recurrence
-    k = sympy.Symbol('k')
-    terms = [{'q':2, 'p':0, 'd':2, 'c':1},{'q':2, 'p':0, 'd':0, 'c':-k**2}]
+    k, cs = sympy.symbols('k cs')
+    terms = [{'q':2, 'p':0, 'd':2, 'c':cs**2},{'q':2, 'p':0, 'd':0, 'c':-k**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -157,8 +157,8 @@ def i4lapl():
     """Cartesian fourth integral of laplacian operator"""
 
     # Setup terms in recurrence
-    k, l = sympy.symbols('k l')
-    terms = [{'q':4, 'p':0, 'd':2, 'c':1},{'q':4, 'p':0, 'd':0, 'c':-k**2},{'q':4, 'p':0, 'd':0, 'c':-l**2}]
+    k, l, cs = sympy.symbols('k l cs')
+    terms = [{'q':4, 'p':0, 'd':2, 'c':cs**2},{'q':4, 'p':0, 'd':0, 'c':-k**2},{'q':4, 'p':0, 'd':0, 'c':-l**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -171,8 +171,8 @@ def i4laplh():
     """Cartesian fourth integral of horizontal laplacian operator"""
 
     # Setup terms in recurrence
-    k = sympy.Symbol('k')
-    terms = [{'q':4, 'p':0, 'd':2, 'c':1},{'q':4, 'p':0, 'd':0, 'c':-k**2}]
+    k, cs = sympy.symbols('k cs')
+    terms = [{'q':4, 'p':0, 'd':2, 'c':cs**2},{'q':4, 'p':0, 'd':0, 'c':-k**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -185,8 +185,8 @@ def i4lapl2():
     """Cartesian fourth integral of bilaplacian operator"""
 
     # Setup terms in recurrence
-    k, l = sympy.symbols('k l')
-    terms = [{'q':4, 'p':0, 'd':4, 'c':1},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':0, 'c':l**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2},{'q':4, 'p':0, 'd':2, 'c':-2*l**2},{'q':4, 'p':0, 'd':0, 'c':2*k**2*l**2}]
+    k, l, cs = sympy.symbols('k l cs')
+    terms = [{'q':4, 'p':0, 'd':4, 'c':cs**4},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':0, 'c':l**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2*cs**2},{'q':4, 'p':0, 'd':2, 'c':-2*l**2*cs**2},{'q':4, 'p':0, 'd':0, 'c':2*k**2*l**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -199,8 +199,8 @@ def i4lapl2h():
     """Cartesian fourth integral of horizontal bilaplacian operator"""
 
     # Setup terms in recurrence
-    k = sympy.Symbol('k')
-    terms = [{'q':4, 'p':0, 'd':4, 'c':1},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2}]
+    k, cs = sympy.symbols('k cs')
+    terms = [{'q':4, 'p':0, 'd':4, 'c':cs**4},{'q':4, 'p':0, 'd':0, 'c':k**4},{'q':4, 'p':0, 'd':2, 'c':-2*k**2*cs**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 

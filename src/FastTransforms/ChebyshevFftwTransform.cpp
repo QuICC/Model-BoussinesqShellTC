@@ -136,7 +136,7 @@ namespace Transform {
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
       // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0);
+      pValue = PyFloat_FromDouble(2.0);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Call d1
