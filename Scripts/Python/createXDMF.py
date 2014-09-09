@@ -13,21 +13,24 @@ def main(argv):
     inputfile = ''
     outputfile = ''
     snapshots = 1 
+    with_components = False
     try:
-        opts, args = getopt.getopt(argv,"hi:o:n:")
+        opts, args = getopt.getopt(argv,"hi:o:n:", ['with-components'])
     except getopt.GetoptError:
-        print('Single file: createXDMF.py -i <inputfile> -o <outputfile>')
-        print('Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>')
+        print('Single file: createXDMF.py (--with-components) -i <inputfile> -o <outputfile>')
+        print('Timeseries: createXDMF.py (--with-components) -i <inputfile> -o <outputfile> -n <number of snapshots>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('Single file: createXDMF.py -i <inputfile> -o <outputfile>')
-            print('Timeseries: createXDMF.py -i <inputfile> -o <outputfile> -n <number of snapshots>')
+            print('Single file: createXDMF.py (--with-components) -i <inputfile> -o <outputfile>')
+            print('Timeseries: createXDMF.py (--with-components) -i <inputfile> -o <outputfile> -n <number of snapshots>')
             sys.exit()
         elif opt in ("-i"):
             inputfile = arg
         elif opt in ("-o"):
             outputfile = arg
+        elif opt in ("--with-components"):
+            with_components = True
         elif opt in ("-n"):
             snapshots = int(arg)
     # Extract file information
@@ -108,11 +111,12 @@ def main(argv):
         for s in list(h5_file):
             if s in list(h5_file[s]):
                 print(xdmfScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'sname': s, 'fid': fId, 'basename': basename}, file=out_file)
-        # Create vectors as scalars
-        for v in list(h5_file):
-            for ext in [g1D, g2D, g3D]:
-                if v +  '_' + ext in list(h5_file[v]):
-                    print(xdmfVScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'vname': v, 'sname': v +  '_' + ext, 'fid': fId, 'basename': basename}, file=out_file)
+        # Create vectors as scalars if requested
+        if with_components:
+            for v in list(h5_file):
+                for ext in [g1D, g2D, g3D]:
+                    if v +  '_' + ext in list(h5_file[v]):
+                        print(xdmfVScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'vname': v, 'sname': v +  '_' + ext, 'fid': fId, 'basename': basename}, file=out_file)
         time = h5_file['run']['time'].value
         print(xdmfTime % {'time': time}, file=out_file)
         if snapshots > 1:
