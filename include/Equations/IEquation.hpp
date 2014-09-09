@@ -411,6 +411,31 @@ namespace Equations {
 
          // Apply operator to field
          internal::addExplicitWrapper(eqField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+      {
+         assert(matIdx == 0);
+
+         /// \mhdBug very bad and slow implementation!
+         Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
+         int l = 0;
+         for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            for(int j = 0; j < explicitField.slice(k).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(k).cols(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(l) = explicitField.point(i,j,k);
+
+                  // increase storage counter
+                  l++;
+               }
+            }
+         }
+
+         // Apply operator to field
+         internal::addExplicitWrapper(eqField, eqStart, *op, tmp);
       }
    }
 

@@ -19,7 +19,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "zxratio", "xscale", "zscale"]
+        return ["prandtl", "rayleigh", "ratio31", "scale1d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -85,7 +85,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST = 0, MODE = 1
+        # Index mode: 
         index_mode = self.SLOWEST
 
         # Compute block info
@@ -319,8 +319,8 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        xscale = eq_params['xscale']
-        zscale = eq_params['zxratio']*eq_params['zscale']
+        xscale = eq_params['scale1d']
+        zscale = eq_params['ratio31']*eq_params['scale3d']
 
         k = eigs[0]
 

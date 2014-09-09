@@ -62,14 +62,14 @@ namespace Transform {
       this->initDerivative();
    }
 
-   void AssociatedLegendreTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void AssociatedLegendreTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void AssociatedLegendreTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void AssociatedLegendreTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options

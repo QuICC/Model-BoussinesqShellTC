@@ -11,11 +11,12 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [12, 12, 12]
-eq_params = {'prandtl':1, 'rayleigh':5508.0, 'yxratio':1.0, 'zxratio':1.0, 'xscale':2.0, 'yscale':2.0, 'zscale':2.0}
+res = [30, 30, 30]
+#eq_params = {'prandtl':1, 'rayleigh':6797.8, 'ratio21':1.0, 'ratio31':1.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':3388.6, 'ratio21':1.0, 'ratio31':1.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
 eigs = []
-bc_vel = 0 # 0: NS/NS/NS, 1: SF/SF/SF, 2: SF/NS/NS, 3: SF/NS/NS
-bc_temp = 0 # 0: FT/FT/FT, 1: FF/FF/FF, 2: FF/FT/FT, 3: FT/FF/FF
+bc_vel = 0 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -31,7 +32,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = False
 write_mtx = True
-solve_evp = True
+solve_evp = False
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
@@ -63,9 +64,9 @@ if solve_evp:
 
 if show_solution:
     viz_mode = -1
-    xscale = eq_params['xscale']
-    yscale = eq_params['yxratio']*eq_params['yscale']
-    zscale = eq_params['zxratio']*eq_params['zscale']
+    xscale = eq_params['scale1d']
+    yscale = eq_params['ratio21']*eq_params['scale2d']
+    zscale = eq_params['ratio31']*eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors

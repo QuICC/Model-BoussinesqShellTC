@@ -12,8 +12,8 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-#eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio':1.0}
-eq_params = {'prandtl':1, 'rayleigh':1708.0, 'zxratio':1.0, 'xscale':2.0, 'zscale':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio31':1.0, 'scale1d':2.0, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1708.0, 'ratio31':1.0, 'scale1d':2.0, 'scale3d':2.0}
 eigs = [3]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
@@ -61,8 +61,8 @@ if solve_evp:
 if show_solution:
     viz_mode = -2
     k = eigs[0]
-    xscale = eq_params['xscale']
-    zscale = eq_params['zxratio']*eq_params['zscale']
+    xscale = eq_params['scale1d']
+    zscale = eq_params['ratio31']*eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors

@@ -12,7 +12,7 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [30, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':1800.0, 'zscale':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1800.0, 'scale1d':2.0}
 phi = 0
 kp = 3.117
 kx = kp*np.cos(phi*np.pi/180.0);
@@ -65,7 +65,7 @@ if solve_evp:
 
 if show_solution:
     viz_mode = -1
-    zscale = eq_params['zscale']
+    zscale = eq_params['scale1d']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors

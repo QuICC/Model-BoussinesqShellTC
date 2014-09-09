@@ -20,7 +20,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "zxratio", "yxratio", "xscale", "zscale", "zscale"]
+        return ["prandtl", "rayleigh", "ratio21", "ratio31", "scale1d", "scale2d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -89,8 +89,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST = 0, MODE = 1
-        index_mode = self.SLOWEST
+        # Index mode:
+        index_mode = self.SINGLE
 
         # Compute block info
         block_info = self.block_size(res, field_row)
@@ -140,71 +140,27 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
 
-            # Stress-free/Stress-free/Stress-free, Fixed flux/Fixed flux/Fixed flux
-            elif bcId == 1:
+            # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
+            elif bcId == 4:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'yz'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zx'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:21}, 'priority':'sx'}
-
-            # Stress-free/No-slip/No-slip, Fixed flux/Fixed temperature/Fixed temperature
-            elif bcId == 2:
-                if self.use_galerkin:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-
-                else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'xz'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'yz'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
-
-            # No-slip/Stress-free/Stress-free, Fixed temperature/Fixed flux/Fixed flux
-            elif bcId == 3:
-                if self.use_galerkin:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-
-                else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:21}, 'priority':'yx'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'zx'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xz'}
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -239,35 +195,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
 
-                elif bcId == 1:
+                elif bcId == 4:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-
-                elif bcId == 2:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-
-                elif bcId == 3:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -302,15 +238,20 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row):
         """Create the quasi-inverse operator"""
 
+        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc).tolil()
+            mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc).tolil()
+            mat[idx_v,:] = 0
 
         elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc).tolil()
+            mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
@@ -326,9 +267,9 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        xscale = eq_params['xscale']
-        zscale = eq_params['zxratio']*eq_params['yscale']
-        yscale = eq_params['yxratio']*eq_params['zscale']
+        xscale = eq_params['scale1d']
+        yscale = eq_params['ratio21']*eq_params['scale2d']
+        zscale = eq_params['ratio31']*eq_params['scale3d']
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
@@ -338,7 +279,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_u,:] = 0
                 mat[:,idx_u] = 0
-                mat = mat + zero_u
+                if bcs["bcType"] == self.SOLVER_HAS_BC:
+                    mat = mat + zero_u
 
             elif field_col == ("velocityy",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -362,7 +304,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_v,:] = 0
                 mat[:,idx_v] = 0
-                mat = mat + zero_v
+                if bcs["bcType"] == self.SOLVER_HAS_BC:
+                    mat = mat + zero_v
 
             elif field_col == ("velocityz",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -386,7 +329,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
                 mat[idx_w,:] = 0
                 mat[:,idx_w] = 0
-                mat = mat + zero_w
+                if bcs["bcType"] == self.SOLVER_HAS_BC:
+                    mat = mat + zero_w
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra).tolil()
@@ -415,54 +359,57 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
         elif field_row == ("pressure",""):
-            if field_col == ("velocityx",""):
-                bc['x']['cr'] = 1
-                bc['x']['rt'] = 1
-                bc['x']['zb'] = 1
-                bc['y']['cr'] = 1
-                bc['y']['rt'] = 1
-                bc['y']['zb'] = 1
-                bc['z']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['zb'] = 1
-                mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale).tolil()
-                mat[:,idx_u] = 0
-                mat[idx_p,:] = 0
+            if bcs["bcType"] == self.SOLVER_NO_TAU:
+                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
+            else:
+                if field_col == ("velocityx",""):
+                    bc['x']['cr'] = 1
+                    bc['x']['rt'] = 1
+                    bc['x']['zb'] = 1
+                    bc['y']['cr'] = 1
+                    bc['y']['rt'] = 1
+                    bc['y']['zb'] = 1
+                    bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
+                    bc['z']['zb'] = 1
+                    mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale).tolil()
+                    mat[:,idx_u] = 0
+                    mat[idx_p,:] = 0
 
-            elif field_col == ("velocityy",""):
-                bc['x']['cr'] = 1
-                bc['x']['rt'] = 1
-                bc['x']['zb'] = 1
-                bc['y']['cr'] = 1
-                bc['y']['rt'] = 1
-                bc['y']['zb'] = 1
-                bc['z']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['zb'] = 1
-                mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale).tolil()
-                mat[:,idx_v] = 0
-                mat[idx_p,:] = 0
+                elif field_col == ("velocityy",""):
+                    bc['x']['cr'] = 1
+                    bc['x']['rt'] = 1
+                    bc['x']['zb'] = 1
+                    bc['y']['cr'] = 1
+                    bc['y']['rt'] = 1
+                    bc['y']['zb'] = 1
+                    bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
+                    bc['z']['zb'] = 1
+                    mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale).tolil()
+                    mat[:,idx_v] = 0
+                    mat[idx_p,:] = 0
 
-            elif field_col == ("velocityz",""):
-                bc['x']['cr'] = 1
-                bc['x']['rt'] = 1
-                bc['x']['zb'] = 1
-                bc['y']['cr'] = 1
-                bc['y']['rt'] = 1
-                bc['y']['zb'] = 1
-                bc['z']['cr'] = 1
-                bc['z']['rt'] = 1
-                bc['z']['zb'] = 1
-                mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale).tolil()
-                mat[:,idx_w] = 0
-                mat[idx_p,:] = 0
+                elif field_col == ("velocityz",""):
+                    bc['x']['cr'] = 1
+                    bc['x']['rt'] = 1
+                    bc['x']['zb'] = 1
+                    bc['y']['cr'] = 1
+                    bc['y']['rt'] = 1
+                    bc['y']['zb'] = 1
+                    bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
+                    bc['z']['zb'] = 1
+                    mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale).tolil()
+                    mat[:,idx_w] = 0
+                    mat[idx_p,:] = 0
 
-            elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+                elif field_col == ("temperature",""):
+                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
-            elif field_col == ("pressure",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc).tolil()
-                mat = mat + zero_p
+                elif field_col == ("pressure",""):
+                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc).tolil()
+                    mat = mat + zero_p
 
         return mat
 

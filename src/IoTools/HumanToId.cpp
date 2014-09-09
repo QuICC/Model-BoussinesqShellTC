@@ -70,25 +70,25 @@ namespace IoTools {
       {
          return NonDimensional::RRATIO;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::YXRATIO))
+      } else if(id == IdToHuman::toTag(NonDimensional::RATIO21))
       {
-         return NonDimensional::YXRATIO;
+         return NonDimensional::RATIO21;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::ZXRATIO))
+      } else if(id == IdToHuman::toTag(NonDimensional::RATIO31))
       {
-         return NonDimensional::ZXRATIO;
+         return NonDimensional::RATIO31;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::XSCALE))
+      } else if(id == IdToHuman::toTag(NonDimensional::SCALE1D))
       {
-         return NonDimensional::XSCALE;
+         return NonDimensional::SCALE1D;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::YSCALE))
+      } else if(id == IdToHuman::toTag(NonDimensional::SCALE2D))
       {
-         return NonDimensional::YSCALE;
+         return NonDimensional::SCALE2D;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::ZSCALE))
+      } else if(id == IdToHuman::toTag(NonDimensional::SCALE3D))
       {
-         return NonDimensional::ZSCALE;
+         return NonDimensional::SCALE3D;
 
       } else if(id == IdToHuman::toTag(NonDimensional::RO))
       {

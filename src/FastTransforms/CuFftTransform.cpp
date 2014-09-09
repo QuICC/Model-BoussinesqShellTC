@@ -64,14 +64,14 @@ namespace Transform {
       this->initFft();
    }
 
-   void CuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void CuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void CuFftTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void CuFftTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options

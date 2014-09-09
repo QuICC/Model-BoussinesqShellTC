@@ -51,16 +51,16 @@ namespace GeoMHDiSCC {
             RO,
             /// Radii ratio R_i/R_o
             RRATIO,
-            /// Axis lenght ratio Y/X
-            YXRATIO,
-            /// Axis lenght ratio Z/X
-            ZXRATIO,
-            /// X axis scale
-            XSCALE,
-            /// Y axis scale
-            YSCALE,
-            /// Z axis scale
-            ZSCALE,
+            /// Axis lenght ratio 2D/1D
+            RATIO21,
+            /// Axis lenght ratio 3D/1D
+            RATIO31,
+            /// 1D axis scale
+            SCALE1D,
+            /// 2D axis scale
+            SCALE2D,
+            /// 3D axis scale
+            SCALE3D,
             /// Taylor number
             TAYLOR,
             /// Theta

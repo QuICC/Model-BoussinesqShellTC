@@ -24,7 +24,8 @@ class BaseModel:
 
     SLOWEST = 0
     MODE = 1
-    GEOMETRIC_1D_3D = 2
+    SINGLE = 2
+    GEOMETRIC_1D_3D = 3
 
     def time(self, res, eq_params, eigs, bcs, fields):
         """Create the time derivative operator"""

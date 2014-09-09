@@ -238,6 +238,29 @@ namespace Equations {
             // increase linear storage counter
             k++;
          }
+
+      } else if(this->couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+      {
+         assert(matIdx == 0);
+
+         // Copy data
+         int l = solStart;
+         for(int k = 0; k < this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            int rows = this->unknown().dom(0).perturbation().slice(k).rows();
+            int cols = this->unknown().dom(0).perturbation().slice(k).cols();
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy timestep output into field
+                  this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, l),i,j,k);
+
+                  // increase linear storage counter
+                  l++;
+               }
+            }
+         }
       }
    }
 
@@ -320,6 +343,39 @@ namespace Equations {
 
             // increase storage counter
             k++;
+         }
+
+      // There is a single matrix
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+      {
+         assert(matIdx == 0);
+
+         //Safety assertion
+         assert(start >= 0);
+
+         int zeroBlock = 0;
+         if(useShift)
+         {
+            zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+         }
+
+         // Copy data
+         int l = start;
+         for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Copy field value into storage
+                  Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().point(i,j,k));
+
+                  // increase storage counter
+                  l++;
+               }
+            }
          }
       }
    }
@@ -413,6 +469,35 @@ namespace Equations {
                // increase storage counter
                k++;
             }
+
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+         {
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+
+            //Safety assertion
+            assert(matIdx == 0);
+            assert(start >= 0);
+
+            // Set data to zero
+            int l = start;
+            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
+               int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Set value to zero
+                     Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
+
+                     // increase storage counter
+                     l++;
+                  }
+               }
+            }
          }
       }
    }
@@ -470,6 +555,37 @@ namespace Equations {
 
                // increase storage counter
                k++;
+            }
+
+         // There is a single matrix
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+         {
+            assert(matIdx == 0);
+
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Copy data
+            int l = start;
+            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
+               int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Add source value
+                     Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
+
+                     // increase storage counter
+                     l++;
+                  }
+               }
             }
          }
       }

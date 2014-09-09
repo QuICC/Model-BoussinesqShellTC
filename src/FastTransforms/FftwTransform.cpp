@@ -64,14 +64,14 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
-   void FftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void FftwTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void FftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void FftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options

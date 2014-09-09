@@ -196,12 +196,12 @@ namespace GeoMHDiSCC {
 
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::requiredOptions(std::set<NonDimensional::Id>& list) const
    {
-      this->mTransform1D.requiredOptions(list);
+      this->mTransform1D.requiredOptions(list, Dimensions::Transform::TRA1D);
    }
 
   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
    {
-      this->mTransform1D.setOptions(options);
+      this->mTransform1D.setOptions(options, Dimensions::Transform::TRA1D);
    }
 
    template <typename T1D, typename TCommunicator> std::vector<Array> Transform1DCoordinator<T1D,TCommunicator>::mesh()

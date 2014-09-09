@@ -69,14 +69,14 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
-   void CylinderChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void CylinderChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       //
       // No possible options
       //
    }
 
-   void CylinderChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void CylinderChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       //
       // No possible options

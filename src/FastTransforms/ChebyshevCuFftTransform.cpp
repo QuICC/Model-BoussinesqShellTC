@@ -40,7 +40,7 @@ namespace Transform {
    }
 
    ChebyshevCuFftTransform::ChebyshevCuFftTransform()
-      : mFPlan(), mBPlan()
+      : mFPlan(), mBPlan(), mCScale(0.0)
    {
    }
 
@@ -68,18 +68,38 @@ namespace Transform {
       this->initOperators();
    }
 
-   void ChebyshevCuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void ChebyshevCuFftTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
-      //
-      // No possible options
-      //
+      if(dimId == Dimensions::Transform::TRA1D)
+      {
+         list.insert(NonDimensional::SCALE1D);
+
+      } else if(dimId == Dimensions::Transform::TRA2D)
+      {
+         list.insert(NonDimensional::SCALE2D);
+         list.insert(NonDimensional::RATIO21);
+
+      } else if(dimId == Dimensions::Transform::TRA3D)
+      {
+         list.insert(NonDimensional::SCALE3D);
+         list.insert(NonDimensional::RATIO31);
+      }
    }
 
-   void ChebyshevCuFftTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void ChebyshevCuFftTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
-      //
-      // No possible options
-      //
+      if(dimId == Dimensions::Transform::TRA1D)
+      {
+         this->mCScale = options.find(NonDimensional::SCALE1D)->second;
+
+      } else if(dimId == Dimensions::Transform::TRA2D)
+      {
+         this->mCScale = options.find(NonDimensional::SCALE2D)->second*options.find(NonDimensional::RATIO21)->second;
+
+      } else if(dimId == Dimensions::Transform::TRA3D)
+      {
+         this->mCScale = options.find(NonDimensional::SCALE3D)->second*options.find(NonDimensional::RATIO31)->second;
+      }
    }
 
    Array ChebyshevCuFftTransform::meshGrid() const
@@ -142,7 +162,7 @@ namespace Transform {
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 1, pValue);
       // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(1.0);
+      pValue = PyFloat_FromDouble(this->mCScale);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Call d1

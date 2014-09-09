@@ -222,7 +222,7 @@ namespace Equations {
       // Set source flags: has source term?
       infoIt.first->second.setSource(hasSource);
 
-      // Set index type: SLOWEST or MODE
+      // Set index type: SLOWEST, MODE, SINGLE, GEOMETRIC_1D_3D
       infoIt.first->second.setIndexType(static_cast<CouplingInformation::IndexType>(indexMode));
 
       // Create implicit field coupling

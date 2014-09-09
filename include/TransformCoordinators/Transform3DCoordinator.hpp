@@ -162,7 +162,7 @@ namespace GeoMHDiSCC {
       // Get list from 2 other dimensions
       Transform2DCoordinator<T1D,T2D, TCommunicator>::requiredOptions(list);
 
-      this->mTransform3D.requiredOptions(list);
+      this->mTransform3D.requiredOptions(list, Dimensions::Transform::TRA3D);
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> void Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
@@ -170,7 +170,7 @@ namespace GeoMHDiSCC {
       // Get list from 2 other dimensions
       Transform2DCoordinator<T1D,T2D, TCommunicator>::setOptions(options);
 
-      this->mTransform3D.setOptions(options);
+      this->mTransform3D.setOptions(options, Dimensions::Transform::TRA3D);
    }
 
    template <typename T1D, typename T2D, typename T3D, typename TCommunicator> std::vector<Array> Transform3DCoordinator<T1D, T2D, T3D, TCommunicator>::mesh()

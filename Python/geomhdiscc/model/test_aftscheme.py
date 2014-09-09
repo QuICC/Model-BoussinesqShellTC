@@ -99,7 +99,7 @@ class TestAFTScheme(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, GEOMETRIC_1D_3D
+        # Index mode: 
         index_mode = self.SLOWEST
 
         # Compute block info

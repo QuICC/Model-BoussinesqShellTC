@@ -18,7 +18,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "zscale"]
+        return ["prandtl", "rayleigh", "scale1d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -81,7 +81,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST = 0, MODE = 1
+        # Index mode: 
         index_mode = self.MODE
 
         # Compute block info
@@ -224,6 +224,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         """Create the quasi-inverse operator"""
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
             mat = c1d.i2(res[0], bc).tolil()
@@ -250,7 +251,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        zscale = eq_params['zscale']
+        zscale = eq_params['scale1d']
 
         k1 = eigs[0]
         k2 = eigs[1]

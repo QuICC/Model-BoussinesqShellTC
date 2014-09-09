@@ -26,6 +26,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
@@ -102,12 +103,12 @@ namespace Transform {
          /**
           * @brief set list of required options
           */
-         void requiredOptions(std::set<NonDimensional::Id>& list) const;
+         void requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const;
 
          /**
           * @brief Set the required options
           */
-         void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options);
+         void setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId);
 
          /**
           * @brief Get the physical grid

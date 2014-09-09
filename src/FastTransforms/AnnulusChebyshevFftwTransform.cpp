@@ -80,14 +80,14 @@ namespace Transform {
       FftwLibrary::registerFft();
    }
 
-   void AnnulusChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list) const
+   void AnnulusChebyshevFftwTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
    {
       list.insert(NonDimensional::RO);
 
       list.insert(NonDimensional::RRATIO);
    }
 
-   void AnnulusChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options)
+   void AnnulusChebyshevFftwTransform::setOptions(const std::map<NonDimensional::Id, MHDFloat>& options, const Dimensions::Transform::Id dimId)
    {
       this->mRo = options.find(NonDimensional::RO)->second;
 

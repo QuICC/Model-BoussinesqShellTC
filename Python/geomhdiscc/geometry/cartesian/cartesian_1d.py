@@ -16,7 +16,7 @@ def zblk(nx, bc):
     mat = spsp.lil_matrix((nx,nx))
     return c1dbc.constrain(mat,bc)
 
-def d1(nx, bc, coeff = 1.0, zr = 1):
+def d1(nx, bc, coeff = 1.0, cscale = 1.0, zr = 1):
     """Create operator for 1st derivative"""
 
     row = [2*j for j in range(0,nx)]
@@ -25,10 +25,10 @@ def d1(nx, bc, coeff = 1.0, zr = 1):
         mat[i,i+1:nx:2] = row[i+1:nx:2]
     mat[-zr:,:] = 0
 
-    mat = coeff*mat
+    mat = coeff*cscale*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def d2(nx, bc, coeff = 1.0, zr = 2):
+def d2(nx, bc, coeff = 1.0, cscale = 1.0, zr = 2):
     """Create operator for 2nd derivative"""
 
     mat = spsp.lil_matrix((nx,nx))
@@ -36,10 +36,10 @@ def d2(nx, bc, coeff = 1.0, zr = 2):
         mat[i,i+2:nx:2] = [j*(j**2 - i**2) for j in range(0,nx)][i+2:nx:2]
     mat[-zr:,:] = 0
 
-    mat = coeff*mat
+    mat = coeff*cscale**2*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def d4(nx, bc, coeff = 1.0, zr = 4):
+def d4(nx, bc, coeff = 1.0, cscale = 1.0, zr = 4):
     """Create operator for 4th derivative"""
 
     mat_d2 = d2(nx + 4, c1dbc.no_bc())
@@ -47,13 +47,13 @@ def d4(nx, bc, coeff = 1.0, zr = 4):
     mat = mat[0:-4, 0:-4]
     mat[-zr:,:] = 0
     
-    mat = coeff*mat
+    mat = coeff*cscale**4*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
 def laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for horizontal laplacian"""
 
-    mat = d2(nx, bc, cscale**2) - k**2*sid(nx,2,bc)
+    mat = d2(nx, bc, cscale = cscale) - k**2*sid(nx,2,bc)
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
@@ -61,20 +61,20 @@ def laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
 def lapl2h(nx, k, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for horizontal bilaplacian"""
 
-    mat = d4(nx, bc, cscale**4) - 2.0*k**2*sid(nx,4,bc)*d2(nx,bc, cscale**2) + k**4*sid(nx,4,bc) 
+    mat = d4(nx, bc, cscale = cscale) - 2.0*k**2*sid(nx,4,bc)*d2(nx,bc, cscale = cscale) + k**4*sid(nx,4,bc) 
 
     mat = coeff*mat
     return c1dbc.constrain(mat, bc, location = 'b')
 
-def i1d1(nx, bc, coeff = 1.0):
+def i1d1(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create a quasi identity block of order 1"""
 
-    return qid(nx,1, bc, coeff)
+    return qid(nx,1, bc, coeff*cscale)
 
-def i2d2(nx, bc, coeff = 1.0):
+def i2d2(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create a quasi identity block of order 2"""
 
-    return qid(nx,2, bc, coeff)
+    return qid(nx,2, bc, coeff*cscale**2)
 
 def i1(nx, bc, coeff = 1.0):
     """Create operator for 1st integral in x of T_n(x)"""
@@ -122,7 +122,7 @@ def i2(nx, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i2d1(nx, bc, coeff = 1.0):
+def i2d1(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 2nd integral in x of T_n(x)"""
     
     ns = np.arange(0, nx, 1)
@@ -140,7 +140,7 @@ def i2d1(nx, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff**cscale*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
 def i2lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
@@ -226,7 +226,7 @@ def i4(nx, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4d1(nx, bc, coeff = 1.0):
+def i4d1(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of D_x T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -252,10 +252,10 @@ def i4d1(nx, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*cscale*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4d2(nx, bc, coeff = 1.0):
+def i4d2(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of D_x^2 T_n(x)"""
 
     ns = np.arange(0, nx, 1)
@@ -277,13 +277,13 @@ def i4d2(nx, bc, coeff = 1.0):
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*cscale**2*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
-def i4d4(nx, bc, coeff = 1.0):
+def i4d4(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create a quasi identity block of order 4"""
 
-    return qid(nx,4, bc, coeff)
+    return qid(nx,4, bc, coeff*cscale**4)
 
 def i4lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 4th integral in x of Laplacian T_n(x)"""
