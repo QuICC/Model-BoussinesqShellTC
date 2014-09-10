@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqCylinderVelocity.hpp
- * @brief Implementation of the Navier-Stokes equation for the Boussinesq cylinder model 
+ * @file BoussinesqRBCylinderVCContinuity.hpp
+ * @brief Implementation of the continuity equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQCYLINDERVELOCITY_HPP
-#define BOUSSINESQCYLINDERVELOCITY_HPP
+#ifndef BOUSSINESQRBCYLINDERVCCONTINUITY_HPP
+#define BOUSSINESQRBCYLINDERVCCONTINUITY_HPP
 
 // Configuration includes
 //
@@ -21,29 +21,29 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IVectorEquation.hpp"
+#include "Equations/IScalarEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the Navier-Stokes equation for the Boussinesq cylinder model 
+    * @brief Implementation of the continuity equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
     */
-   class BoussinesqCylinderVelocity: public IVectorEquation
+   class BoussinesqRBCylinderVCContinuity: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams  Shared equation parameters
+          * @param spEqParams    Shared equation parameters
           */
-         BoussinesqCylinderVelocity(SharedEquationParameters spEqParams);
+         BoussinesqRBCylinderVCContinuity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqCylinderVelocity();
+         virtual ~BoussinesqRBCylinderVCContinuity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQCYLINDERVELOCITY_HPP
+#endif // BOUSSINESQRBCYLINDERVCCONTINUITY_HPP

@@ -1,7 +1,11 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderVelocity.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderVCTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityX.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityY.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqAnnulusVCContinuity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CylinderExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
 )

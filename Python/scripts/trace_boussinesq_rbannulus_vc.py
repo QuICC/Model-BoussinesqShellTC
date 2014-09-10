@@ -1,19 +1,18 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a cylinder model (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a cylindrical annulus model (velocity-continuity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.wip.boussinesq_rbcylinder_vc as mod
+import geomhdiscc.model.boussinesq_rbannulus_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCylinderVC()
+model = mod.BoussinesqRBAnnulusVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [6, 0, 6]
-eq_params = {'prandtl':1, 'rayleigh':2901.55, 'ratio31':1.0}
-#eq_params = {'prandtl':1, 'rayleigh':0., 'ratio31':1.0}
+res = [20, 0, 20]
+eq_params = {'prandtl':1, 'rayleigh':10412, 'ro':1, 'rratio':0.35, 'ratio31':1.0, 'scale3d':2.0}
 eigs = [1]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
@@ -36,11 +35,10 @@ if show_spy or show_solution:
     import matplotlib.pylab as pl
 
 if show_solution:
-    import geomhdiscc.transform.cylinder as transf
+    import geomhdiscc.transform.annulus as transf
 
 # Show the "spy" of the two matrices
 if show_spy:
-    import matplotlib.pylab as pl
     pl.spy(A, markersize=0.2)
     pl.show()
     pl.spy(B, markersize=0.2)
@@ -59,16 +57,29 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    mode = -1
+    viz_mode = -1
+    zscale = eq_params['ratio31']*eq_params['scale3d']
 
+    for mode in range(0,len(evp_lmb)):
+        # Get solution vectors
+        sol_u = evp_vec[0:res[0]*res[2],mode]
+        sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
+        sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
+        # Extract continuity from velocity 
+        a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
+
+    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    sol_u = evp_vec[0:res[0]*res[2],mode]
-    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
-    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
-    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],mode]
-    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],mode]
+    sol_u = evp_vec[0:res[0]*res[2],viz_mode]
+    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
+    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
+    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
+    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
-    sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0)*sol_w
+    a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+    sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)
@@ -129,14 +140,14 @@ if show_solution:
     pl.close("all")
 
     # Compute physical space values
-    grid_r = transf.rgrid(res[0])
+    grid_r = transf.rgrid(res[0], a, b)
     grid_z = transf.zgrid(res[2])
-    phys_u = transf.tophys2d(mat_u, (eigs[0]+1)%2)
-    phys_v = transf.tophys2d(mat_v, (eigs[0]+1)%2)
-    phys_w = transf.tophys2d(mat_w, eigs[0]%2)
-    phys_t = transf.tophys2d(mat_t, eigs[0]%2)
-    phys_p = transf.tophys2d(mat_p, eigs[0]%2)
-    phys_c = transf.tophys2d(mat_c, (eigs[0]+1)%2)
+    phys_u = transf.tophys2d(mat_u)
+    phys_v = transf.tophys2d(mat_v)
+    phys_w = transf.tophys2d(mat_w)
+    phys_t = transf.tophys2d(mat_t)
+    phys_p = transf.tophys2d(mat_p)
+    phys_c = transf.tophys2d(mat_c)
 
     # Show physical contour plot
     pl.subplot(2,3,1)
