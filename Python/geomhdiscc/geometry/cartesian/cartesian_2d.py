@@ -55,14 +55,14 @@ def lapl(nx, nz, k, bc, coeff = 1.0, xscale = 1.0, zscale = 1.0):
     mat = coeff*mat
     return c2dbc.constrain(mat, nx, nz, 2, 2, bc, location = 'b')
 
-def laplh(nx, nz, k, sz, bc, coeff = 1.0):
+def laplh(nx, nz, k, sz, bc, coeff = 1.0, xscale = 1.0):
     """Create operator for the horizontal Laplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)
     mat = coeff*spsp.kron(c1d.sid(nz,sz,bcz), c1d.laplh(nx,k,bcx, cscale = xscale))
     return c2dbc.constrain(mat, nx, nz, 2, sz, bc, location = 'b')
 
-def lapl2h(nx, nz, k, sz, bc, coeff = 1.0):
+def lapl2h(nx, nz, k, sz, bc, coeff = 1.0, xscale = 1.0):
     """Create operator for the horizontal bilaplacian T_n(x)T_n(z)"""
 
     bcx, bcz = convert_bc(bc)

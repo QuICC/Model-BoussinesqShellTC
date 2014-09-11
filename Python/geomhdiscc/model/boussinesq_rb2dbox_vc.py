@@ -136,30 +136,8 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
 
-            # Stress-free/Stress-free, Fixed flux/Fixed flux
-            elif bcId == 1:
-                if self.use_galerkin:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-
-                else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sx'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sx'}
-
             # Stress-free/No-slip, Fixed flux/Fixed temperature
-            elif bcId == 2:
+            elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -174,34 +152,12 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
                         bc = {'x':{0:20}, 'z':{0:20}, 'priority':'x'}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'sx'}
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
-            # No-slip/Stress-free, Fixed temperature/Fixed flux
-            elif bcId == 3:
-                if self.use_galerkin:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-
-                else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {'x':{0:20}, 'z':{0:20}, 'priority':'z'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'x'}
-            
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
@@ -240,26 +196,6 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-
-                elif bcId == 2:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-
-                elif bcId == 3:
-                    if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -524,7 +460,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Pressure: T_{N-2:N,N-2:N}
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+#        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
         # Pressure: T_00
         if eigs[0] == 0:
             zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))

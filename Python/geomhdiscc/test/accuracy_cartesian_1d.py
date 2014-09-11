@@ -41,8 +41,12 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     sol = transf.tocheb(t)
     pl.semilogy(np.abs(sol))
     err = np.abs(rhs - sol)
+    if q > 0:
+        err[0:q] = 0
+    elif q < 0:
+        err[q:] = 0
     vis_error(err, 'Forward error')
-    print("\t\tMax forward error: " + str(np.max(err[q:])))
+    print("\t\tMax forward error: " + str(np.max(err)))
 
 def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     """Perform a tau backward operation test"""
@@ -86,7 +90,7 @@ def d1(nx, xg):
     A = c1d.d1(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x)
-    test_forward(A, sphys, ssol, xg, 1)
+    test_forward(A, sphys, ssol, xg, -1)
 
 def d2(nx, xg):
     """Accuracy test for d2 operator"""
@@ -96,7 +100,7 @@ def d2(nx, xg):
     A = c1d.d2(nx, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x,x)
-    test_forward(A, sphys, ssol, xg, 2)
+    test_forward(A, sphys, ssol, xg, -2)
 
 def d4(nx, xg):
     """Accuracy test for d4 operator"""
@@ -104,10 +108,9 @@ def d4(nx, xg):
     print("d4:")
     x = sy.Symbol('x')
     A = c1d.d4(nx, c1d.c1dbc.no_bc())
-    print(A.todense())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x,x,x,x)
-    test_forward(A, sphys, ssol, xg, 4)
+    test_forward(A, sphys, ssol, xg, -4)
 
 def laplh(nx, xg):
     """Accuracy test for laplh operator"""
@@ -118,7 +121,7 @@ def laplh(nx, xg):
     A = c1d.laplh(nx, k, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.diff(sphys,x,x) - k**2*sphys
-    test_forward(A, sphys, ssol, xg, 2)
+    test_forward(A, sphys, ssol, xg, -2)
 
 def lapl2h(nx, xg):
     """Accuracy test for lapl2h operator"""
@@ -129,7 +132,7 @@ def lapl2h(nx, xg):
     A = c1d.lapl2h(nx, k, c1d.c1dbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
     ssol = sy.expand(sy.diff(sphys,x,x,x,x) - 2.0*k**2*sy.diff(sphys,x,x) + k**4*sphys)
-    test_forward(A, sphys, ssol, xg, 4)
+    test_forward(A, sphys, ssol, xg, -4)
 
 def i1(nx, xg):
     """Accuracy test for i1 operator"""
@@ -436,7 +439,7 @@ def genxp(nx, q, p, xg, ntrunc = -1):
     A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*x**p
-    test_forward(A, sphys, ssol, xg, 1)
+    test_forward(A, sphys, ssol, xg, 0)
 
 def genlinxp(nx, q, p, xg, ntrunc = -1):
     """Accuracy test for gen_linxp operator"""
@@ -448,7 +451,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
     A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
     sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
     ssol = sphys*(1+x)**p
-    test_forward(A, sphys, ssol, xg, 1)
+    test_forward(A, sphys, ssol, xg, 0)
 
 
 if __name__ == "__main__":

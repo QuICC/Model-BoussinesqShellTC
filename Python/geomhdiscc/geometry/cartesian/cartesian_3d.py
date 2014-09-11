@@ -121,6 +121,18 @@ def i2j2k2f1(nx, ny, nz, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*spsp.kron(c1d.i2(ny,bcy), c2d.i2j2e1(nx,nz,{'x':bcx,'z':bcz}, zscale = zscale))
     return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
 
+def i2j2k2laplh(nx, ny, nz, bc, coeff = 1.0, xscale = 1.0, yscale = 1.0):
+    """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T_n(y)T_n(z)"""
+
+    bcx, bcy, bcz = convert_bc(bc)
+    mat = spsp.kron(c1d.i2(ny,bcy),spsp.kron(c1d.i2(nz,bcz),c1d.i2d2(nx,bcx, cscale = xscale)))
+    bcx[0] = min(bcx[0], 0)
+    bcy[0] = min(bcy[0], 0)
+    bcz[0] = min(bcz[0], 0)
+    mat = mat + spsp.kron(c1d.i2d2(ny,bcy, cscale = yscale),spsp.kron(c1d.i2(nz,bcz),c1d.i2(nx,bcx)))
+    mat = coeff*mat
+    return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
+
 def i2j2k2lapl(nx, ny, nz, bc, coeff = 1.0, xscale = 1.0, yscale = 1.0, zscale = 1.0):
     """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T_n(y)T_n(z)"""
 

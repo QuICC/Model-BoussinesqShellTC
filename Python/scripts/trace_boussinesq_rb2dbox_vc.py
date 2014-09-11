@@ -13,10 +13,10 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
 #eq_params = {'prandtl':1, 'rayleigh':2340.687, 'zxratio31':1.0, 'scale1d':2.0, 'scale3d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':1708.0, 'ratio31':1.0, 'scale1d':2.0, 'scale3d':2.0}
-eigs = [3]
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+eq_params = {'prandtl':1, 'rayleigh':1500.0/27.0, 'ratio31':1.0/3.0, 'scale1d':2.0, 'scale3d':2.0}
+eigs = [0]
+bc_vel = 1 # 0: NS/NS, 1: SF/NS
+bc_temp = 1 # 0: FT/FT, 1: FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -55,7 +55,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e1, np.inf)
     print("Found " + str(len(evp_lmb)) + " eigenvalues\n")
 
 if show_solution:

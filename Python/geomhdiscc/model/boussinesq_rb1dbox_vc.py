@@ -434,7 +434,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         zero_w = spsp.lil_matrix(zero_w.shape)
         zero_w[idx_w,idx_w] = 1
 
-        # Pressure: T_iN, T_Nk
+        # Pressure: T_N
         zero_p = c1d.zblk(res[0], no_bc())
         zero_p = zero_p + c1d.qid(res[0], res[0]-1, no_bc())
         # Cleanup and create indexes list

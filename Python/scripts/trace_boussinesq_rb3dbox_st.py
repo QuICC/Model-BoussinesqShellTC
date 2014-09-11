@@ -1,23 +1,23 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a 3D box (streamfunction formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rb3dbox_vc as mod
+import geomhdiscc.model.boussinesq_rb3dbox_st as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRB3DBoxVC()
+model = mod.BoussinesqRB3DBoxST()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [10, 10, 10]
+res = [14, 14, 14]
 eq_params = {'prandtl':1, 'rayleigh':1500.0/27.0, 'ratio21':1.0/3.0, 'ratio31':1.0/3.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
 eigs = []
-bc_vel = 4 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_str = 4 # 0: NS/NS/NS, 4: SF/SF/NS
 bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_str, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 print("Constructing matrix A")
@@ -32,7 +32,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 show_spy = False
 write_mtx = True
 solve_evp = True
-show_solution = (True and solve_evp)
+show_solution = (False and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl

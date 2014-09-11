@@ -93,7 +93,7 @@ def d1(nx,nz, xg, zg):
     print("d1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.d1(nx, nz, 0, c2d.c2dbc.no_bc())
+    A = c2d.d1(nx, nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,x))
     test_forward(A, sphys, ssol, xg, zg, 1, 0)
@@ -104,7 +104,7 @@ def e1(nx,nz, xg, zg):
     print("e1:")
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    A = c2d.e1(nx, nz, 0, c2d.c2dbc.no_bc())
+    A = c2d.e1(nx, nz, c2d.c2dbc.no_bc())
     sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
     ssol = sy.expand(sy.diff(sphys,z))
     test_forward(A, sphys, ssol, xg, zg, 0, 1)
@@ -723,8 +723,8 @@ def lapl2he1_e1laplh(nx,nz, xg, zg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 30
-    nz = 30
+    nx = 10
+    nz = 10
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 

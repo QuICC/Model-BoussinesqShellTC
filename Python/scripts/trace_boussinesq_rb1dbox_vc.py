@@ -12,7 +12,7 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [30, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':1800.0, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1707.7619, 'scale1d':2.0}
 phi = 0
 kp = 3.117
 kx = kp*np.cos(phi*np.pi/180.0);

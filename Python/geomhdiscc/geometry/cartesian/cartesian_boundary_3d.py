@@ -68,6 +68,14 @@ def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
     elif priority == 'zy':
         sy = [qy,0]
         sz = [qz,qz]
+    elif priority == 'xsz':
+        sx = [qx,qx]
+        sz = [0,qz]
+        dz = [0,-qz]
+    elif priority == 'ysz':
+        sy = [qy,qy]
+        sz = [qz,0]
+        dz = [-qz,0]
     elif priority == 'zsx':
         sx = [qx,0]
         dx = [-qx,0]
