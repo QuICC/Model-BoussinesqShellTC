@@ -142,9 +142,9 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
 
                 else:
                     if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
-                        bc = {'x':{0:40}, 'y':{0:40}, 'z':{0:40}, 'priority':'xy'}
+                        bc = {'x':{0:41}, 'y':{0:41}, 'z':{0:40}, 'priority':'zsx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -213,8 +213,8 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']
-        yscale = eq_params['ratio21']*eq_params['scale2d']
-        zscale = eq_params['ratio31']*eq_params['scale3d']
+        yscale = eq_params['ratio21']*eq_params['scale2d']*3.0
+        zscale = eq_params['ratio31']*eq_params['scale3d']*3.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -239,8 +239,8 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
         Pr = eq_params['prandtl']
 
         xscale = eq_params['scale1d']
-        yscale = eq_params['ratio21']*eq_params['scale2d']
-        zscale = eq_params['ratio31']*eq_params['scale3d']
+        yscale = eq_params['ratio21']*eq_params['scale2d']*3.0
+        zscale = eq_params['ratio31']*eq_params['scale3d']*3.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):

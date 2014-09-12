@@ -68,10 +68,18 @@ def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
     elif priority == 'zy':
         sy = [qy,0]
         sz = [qz,qz]
+    elif priority == 'xsy':
+        sx = [qx,qx]
+        sy = [0,qy]
+        dy = [0,-qy]
     elif priority == 'xsz':
         sx = [qx,qx]
         sz = [0,qz]
         dz = [0,-qz]
+    elif priority == 'ysx':
+        sx = [0,qx]
+        dx = [0,-qx]
+        sy = [qy,qy]
     elif priority == 'ysz':
         sy = [qy,qy]
         sz = [qz,0]
@@ -88,6 +96,8 @@ def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
         sx = [qx,qx]
         sy = [qy,qy]
         sz = [qz,qz]
+    else:
+        raise RuntimeError("Unknown boundary condition priority!")
             
     bc_mat = mat
     if bc['x'][0] > 0:

@@ -59,6 +59,27 @@ def test_forward(op, res_expr, sol_expr, grid_x, grid_y, grid_z, qx, qy, qz):
     vis_error(err, 'Forward error')
     print("\t\tMax forward error: " + str(np.max(err)))
 
+def test_backward_tau(opA, opB, res_expr, sol_expr, grid_x, grid_y, grid_z):
+    """Perform a tau backward operation test"""
+
+    print("\tBackward tau test")
+    x = sy.Symbol('x')
+    y = sy.Symbol('y')
+    z = sy.Symbol('z')
+    nx = len(grid_x)
+    ny = len(grid_y)
+    nz = len(grid_x)
+    rhs = xyz_to_phys(res_expr, grid_x, grid_z, grid_y)
+    rhs = transf.tocheb3d(rhs)
+    rhs = rhs.reshape(nx*ny*nz, order='F')
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    lhs = lhs.reshape(nx,nz,ny, order = 'F')
+    sol = xyz_to_phys(sol_expr, grid_x, grid_z, grid_y)
+    sol = transf.tocheb3d(sol)
+    err = np.abs(lhs - sol)
+    vis_error(err, 'Tau backward error')
+    print("\t\tMax tau backward error: " + str(np.max(err)))
+
 def d1(nx, ny, nz, xg, yg, zg):
     """Accuracy test for d1 operator"""
 
@@ -233,7 +254,7 @@ def i2j2k2f1(nx, ny, nz, xg, yg, zg):
 def i2j2k2lapl(nx, ny, nz, xg, yg, zg):
     """Accuracy test for i2j2k2lapl operator"""
 
-    print("i2j2k2lapl:")
+#    print("i2j2k2lapl:")
     x = sy.Symbol('x')
     y = sy.Symbol('y')
     z = sy.Symbol('z')
@@ -246,6 +267,63 @@ def i2j2k2lapl(nx, ny, nz, xg, yg, zg):
     ssol = sy.expand(ssol)
     ssol = sy.integrate(ssol,z,z)
     test_forward(A, sphys, ssol, xg, yg, zg, 2, 2, 2)
+
+    print("\tbc = 20, 20 ,20")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xy'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)*(1.0 - y**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-2,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 20, 20, 21")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:20}, 'z':{0:21}, 'priority':'xy'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)*(1.0 - y**2)*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-4,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 20, 21, 20")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'xz'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)*(1.0 - y**2)**2*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-2,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 21, 20, 20")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**2*(1.0 - y**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-2,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 21, 21, 20")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-2,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 21, 20, 21")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'ysx'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**2*(1.0 - y**2)*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-4,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 20, 21, 21")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xsz'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 21, 21, 21")
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:21}, 'z':{0:21}, 'priority':'sxsz'}).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
+    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+    
 
 def i4j4k4(nx, ny, nz, xg, yg, zg):
     """Accuracy test for i4j4k4 operator"""
@@ -287,40 +365,96 @@ def i4j4k4lapl2(nx, ny, nz, xg, yg, zg):
     x = sy.Symbol('x')
     y = sy.Symbol('y')
     z = sy.Symbol('z')
-    A = c3d.i4j4k4lapl2(nx, ny, nz, c3d.c3dbc.no_bc())
-    sphys = np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,ny,1)]) for k in np.arange(0,nz,1)])
-    ssol = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
-    ssol = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
-    ssol = sy.integrate(ssol,x,x,x,x)
-    ssol = sy.expand(ssol)
-    ssol = sy.integrate(ssol,y,y,y,y)
-    ssol = sy.expand(ssol)
-    ssol = sy.integrate(ssol,z,z,z,z)
-    test_forward(A, sphys, ssol, xg, yg, zg, 4, 4, 4)
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, c3d.c3dbc.no_bc())
+#    sphys = np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,ny,1)]) for k in np.arange(0,nz,1)])
+#    ssol = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    ssol = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    ssol = sy.integrate(ssol,x,x,x,x)
+#    ssol = sy.expand(ssol)
+#    ssol = sy.integrate(ssol,y,y,y,y)
+#    ssol = sy.expand(ssol)
+#    ssol = sy.integrate(ssol,z,z,z,z)
+#    test_forward(A, sphys, ssol, xg, yg, zg, 4, 4, 4)
+#
+#    print("\tbc = 40, 40 ,40")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:40}, 'z':{0:40}, 'priority':'xy'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#
+#    print("\tbc = 40, 40 ,41")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:40}, 'z':{0:41}, 'priority':'xy'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-6,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#
+#    print("\tbc = 40, 41 ,40")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:41}, 'z':{0:40}, 'priority':'xz'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**2*(1.0 - y**2)**3*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-4,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#
+#    print("\tbc = 41, 40 ,40")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:40}, 'z':{0:40}, 'priority':'yz'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**3*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 41, 41 ,40")
+    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:41}, 'z':{0:40}, 'priority':'zsx'}).tocsr()
+    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**3*(1.0 - y**2)**3*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-4,1)])
+    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 41, 40 ,41")
+    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:40}, 'z':{0:41}, 'priority':'ysz'}).tocsr()
+    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**3*(1.0 - y**2)**2*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-6,1)])
+    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+
+    print("\tbc = 40, 41 ,41")
+    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:41}, 'z':{0:41}, 'priority':'xsy'}).tocsr()
+    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)**2*(1.0 - y**2)**3*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-6,1)])
+    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 10
-    ny = 10
-    nz = 10
+    nx = 8
+    ny = 8
+    nz = 8
     xg = transf.grid(nx)
     yg = transf.grid(nx)
     zg = transf.grid(nz)
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
-    d1(nx, ny, nz, xg, yg, zg)
-    e1(nx, ny, nz, xg, yg, zg)
-    f1(nx, ny, nz, xg, yg, zg)
-    i1j1k1d1(nx, ny, nz, xg, yg, zg)
-    i1j1k1e1(nx, ny, nz, xg, yg, zg)
-    i1j1k1f1(nx, ny, nz, xg, yg, zg)
-    i2j2k2d2e2f2(nx, ny, nz, xg, yg, zg)
-    i2j2k2(nx, ny, nz, xg, yg, zg)
-    i2j2k2d1(nx, ny, nz, xg, yg, zg)
-    i2j2k2e1(nx, ny, nz, xg, yg, zg)
-    i2j2k2f1(nx, ny, nz, xg, yg, zg)
-    i2j2k2lapl(nx, ny, nz, xg, yg, zg)
-    i4j4k4(nx, ny, nz, xg, yg, zg)
-    i4j4k4lapl(nx, ny, nz, xg, yg, zg)
+#    d1(nx, ny, nz, xg, yg, zg)
+#    e1(nx, ny, nz, xg, yg, zg)
+#    f1(nx, ny, nz, xg, yg, zg)
+#    i1j1k1d1(nx, ny, nz, xg, yg, zg)
+#    i1j1k1e1(nx, ny, nz, xg, yg, zg)
+#    i1j1k1f1(nx, ny, nz, xg, yg, zg)
+#    i2j2k2d2e2f2(nx, ny, nz, xg, yg, zg)
+#    i2j2k2(nx, ny, nz, xg, yg, zg)
+#    i2j2k2d1(nx, ny, nz, xg, yg, zg)
+#    i2j2k2e1(nx, ny, nz, xg, yg, zg)
+#    i2j2k2f1(nx, ny, nz, xg, yg, zg)
+#    i2j2k2lapl(nx, ny, nz, xg, yg, zg)
+#    i4j4k4(nx, ny, nz, xg, yg, zg)
+#    i4j4k4lapl(nx, ny, nz, xg, yg, zg)
     i4j4k4lapl2(nx, ny, nz, xg, yg, zg)

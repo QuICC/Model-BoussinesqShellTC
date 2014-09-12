@@ -61,6 +61,8 @@ def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
     elif priority == 'sz':
         sz = qz
         dz = -qz
+    else:
+        raise RuntimeError("Unknown boundary condition priority!")
             
     bc_mat = mat
     if bc['x'][0] > 0:

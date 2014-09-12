@@ -11,8 +11,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [10, 10, 10]
-eq_params = {'prandtl':1, 'rayleigh':1500.0/27.0, 'ratio21':1.0/3.0, 'ratio31':1.0/3.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
+res = [12, 12, 12]
+eq_params = {'prandtl':1, 'rayleigh':1500.0, 'ratio21':1.0, 'ratio31':1.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
 eigs = []
 bc_vel = 4 # 0: NS/NS/NS, 4: SF/SF/NS
 bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
@@ -58,7 +58,7 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e1, np.inf)
     print(evp_lmb)
 
 if show_solution:

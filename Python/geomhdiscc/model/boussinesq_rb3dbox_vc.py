@@ -271,6 +271,10 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         yscale = eq_params['ratio21']*eq_params['scale2d']
         zscale = eq_params['ratio31']*eq_params['scale3d']
 
+        xscale = eq_params['scale1d']*3.0
+        yscale = eq_params['scale2d']*3.0
+        zscale = eq_params['scale3d']
+
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
