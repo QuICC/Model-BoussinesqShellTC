@@ -20,7 +20,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ratio21", "ratio31", "scale1d", "scale2d", "scale3d"]
+        return ["prandtl", "rayleigh", "scale1d", "scale2d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -213,8 +213,8 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']
-        yscale = eq_params['ratio21']*eq_params['scale2d']*3.0
-        zscale = eq_params['ratio31']*eq_params['scale3d']*3.0
+        yscale = eq_params['scale2d']
+        zscale = eq_params['scale3d']
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -222,7 +222,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
                 mat = c3d.i4j4k4lapl2(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i4j4k4(res[0], res[1], res[2], bc, -Ra)
+                mat = c3d.i4j4k4(res[0], res[1], res[2], bc, -Ra/16.0)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -239,8 +239,8 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
         Pr = eq_params['prandtl']
 
         xscale = eq_params['scale1d']
-        yscale = eq_params['ratio21']*eq_params['scale2d']*3.0
-        zscale = eq_params['ratio31']*eq_params['scale3d']*3.0
+        yscale = eq_params['scale2d']
+        zscale = eq_params['scale3d']
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):

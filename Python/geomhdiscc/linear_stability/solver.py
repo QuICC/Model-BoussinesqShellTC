@@ -68,7 +68,7 @@ def sort_no_inf(vec, lmb):
     return (vec[:,idx], lmb[idx])
 
 
-def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 100, maxmul = 10):
+def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 200, maxmul = 10):
     """Compute eigenvalues in a given interval for the generalized eigenvalue problem using the shift-invert Arnoldi algorithm"""
 
     mode = 0

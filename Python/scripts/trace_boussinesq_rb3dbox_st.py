@@ -11,10 +11,13 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [14, 14, 14]
-eq_params = {'prandtl':1, 'rayleigh':1500.0, 'ratio21':1.0, 'ratio31':1.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
+res = [30, 30, 14]
+#eq_params = {'prandtl':1, 'rayleigh':5555.993, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
+#eq_params = {'prandtl':1, 'rayleigh':1886.5, 'scale1d':1.0/(12.0**0.5), 'scale2d':1.0/(12.0**0.5), 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
+eq_params = {'prandtl':1, 'rayleigh':1780.0, 'scale1d':1.0/5.0, 'scale2d':1.0/5.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
+#eq_params = {'prandtl':1, 'rayleigh':3542.97, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FT/FT/FT
 eigs = []
-bc_str = 4 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_str = 0 # 0: NS/NS/NS, 4: SF/SF/NS
 bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_str, 'temperature':bc_temp}
@@ -32,7 +35,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 show_spy = False
 write_mtx = True
 solve_evp = True
-show_solution = (False and solve_evp)
+show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -51,6 +54,7 @@ if show_spy:
 # Export the two matrices to matrix market format
 if write_mtx:
     import scipy.io as io
+    print("Writing matrices to file")
     io.mmwrite("matrix_A.mtx", A)
     io.mmwrite("matrix_B.mtx", B)
 
@@ -58,155 +62,73 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, 10.0)
     print(evp_lmb)
 
 if show_solution:
     viz_mode = -1
     xscale = eq_params['scale1d']
-    yscale = eq_params['ratio21']*eq_params['scale2d']*3.0
-    zscale = eq_params['ratio31']*eq_params['scale3d']*3.0
-
-    for mode in range(0,len(evp_lmb)):
-        # Get solution vectors
-        sol_u = evp_vec[0:res[0]*res[1]*res[2],mode]
-        sol_v = evp_vec[res[0]*res[1]*res[2]:2*res[0]*res[1]*res[2],mode]
-        sol_w = evp_vec[2*res[0]*res[1]*res[2]:3*res[0]*res[1]*res[2],mode]
-        # Extract continuity from velocity 
-        sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
-        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
+    yscale = eq_params['scale2d']
+    zscale = eq_params['scale3d']
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    sol_u = evp_vec[0:res[0]*res[1]*res[2],viz_mode]
-    sol_v = evp_vec[res[0]*res[1]*res[2]:2*res[0]*res[1]*res[2],viz_mode]
-    sol_w = evp_vec[2*res[0]*res[1]*res[2]:3*res[0]*res[1]*res[2],viz_mode]
-    sol_t = evp_vec[3*res[0]*res[1]*res[2]:4*res[0]*res[1]*res[2],viz_mode]
-    sol_p = evp_vec[4*res[0]*res[1]*res[2]:5*res[0]*res[1]*res[2],viz_mode]
-    # Extract continuity from velocity 
-    sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
+    sol_s = evp_vec[0:res[0]*res[1]*res[2],viz_mode]
+    sol_t = evp_vec[res[0]*res[1]*res[2]:2*res[0]*res[1]*res[2],viz_mode]
     
     # Create spectrum plots
-    pl.subplot(2,3,1)
-    pl.semilogy(np.abs(sol_u))
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.semilogy(np.abs(sol_v))
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.semilogy(np.abs(sol_w))
-    pl.title("w")
-    pl.subplot(2,3,4)
+    pl.subplot(1,2,1)
+    pl.semilogy(np.abs(sol_s))
+    pl.title("Streamfunction")
+    pl.subplot(1,2,2)
     pl.semilogy(np.abs(sol_t))
     pl.title("T")
-    pl.subplot(2,3,5)
-    pl.semilogy(np.abs(sol_c))
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.semilogy(np.abs(sol_p))
-    pl.title("p")
     pl.show()
     pl.close("all")
     
     # Create solution matrices
-    mat_u = sol_u.reshape(res[0], res[1], res[2], order = 'F')
-    mat_v = sol_v.reshape(res[0], res[1], res[2], order = 'F')
-    mat_w = sol_w.reshape(res[0], res[1], res[2], order = 'F')
+    mat_s = sol_s.reshape(res[0], res[1], res[2], order = 'F')
     mat_t = sol_t.reshape(res[0], res[1], res[2], order = 'F')
-    mat_p = sol_p.reshape(res[0], res[1], res[2], order = 'F')
-    mat_c = sol_c.reshape(res[0], res[1], res[2], order = 'F')
 
     # Compute physical space values
     grid_x = transf.grid(res[0])
     grid_y = transf.grid(res[1])
     grid_z = transf.grid(res[2])
-    phys_u = transf.tophys3d(mat_u)
-    phys_v = transf.tophys3d(mat_v)
-    phys_w = transf.tophys3d(mat_w)
+    phys_s = transf.tophys3d(mat_s)
     phys_t = transf.tophys3d(mat_t)
-    phys_p = transf.tophys3d(mat_p)
-    phys_c = transf.tophys3d(mat_c)
 
     # Show physical contour plot
-    pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[res[0]//2,:,:], 50)
+    pl.subplot(1,2,1)
+    pl.contourf(grid_z, grid_y, phys_s[res[0]//2,:,:], 50)
     pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[res[0]//2,:,:], 50)
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[res[0]//2,:,:], 50)
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[res[0]//2,:,:], 50)
+    pl.title("Streamfunction")
+    pl.subplot(1,2,2)
+    pl.contourf(grid_z, grid_y, phys_t[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("T")
-    pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[res[0]//2,:,:])), 50)
-    pl.colorbar()
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[res[0]//2,:,:], 50)
-    pl.colorbar()
-    pl.title("p")
     pl.show()
     pl.close("all")
 
     # Show physical contour plot
-    pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[:,res[1]//2,:], 50)
+    pl.subplot(1,2,1)
+    pl.contourf(grid_z, grid_x, phys_s[:,res[1]//2,:], 50)
     pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[:,res[1]//2,:], 50)
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[:,res[1]//2,:], 50)
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[:,res[1]//2,:], 50)
+    pl.title("Streamfunction")
+    pl.subplot(1,2,2)
+    pl.contourf(grid_z, grid_x, phys_t[:,res[1]//2,:], 50)
     pl.colorbar()
     pl.title("T")
-    pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,res[1]//2,:])), 50)
-    pl.colorbar()
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[:,res[1]//2,:], 50)
-    pl.colorbar()
-    pl.title("p")
     pl.show()
     pl.close("all")
 
     # Show physical contour plot
-    pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[:,:,res[2]//2], 50)
+    pl.subplot(1,2,1)
+    pl.contourf(grid_y, grid_x, phys_s[:,:,res[2]//2], 50)
     pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[:,:,res[2]//2], 50)
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[:,:,res[2]//2], 50)
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[:,:,res[2]//2], 50)
+    pl.title("Streamfunction")
+    pl.subplot(1,2,2)
+    pl.contourf(grid_y, grid_x, phys_t[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("T")
-    pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,:,res[2]//2])), 50)
-    pl.colorbar()
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[:,:,res[2]//2], 50)
-    pl.colorbar()
-    pl.title("p")
     pl.show()
     pl.close("all")

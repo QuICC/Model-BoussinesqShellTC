@@ -12,10 +12,11 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [12, 12, 12]
-eq_params = {'prandtl':1, 'rayleigh':1500.0, 'ratio21':1.0, 'ratio31':1.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':5555.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
+eq_params = {'prandtl':1, 'rayleigh':3542.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
 eigs = []
-bc_vel = 4 # 0: NS/NS/NS, 4: SF/SF/NS
-bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
+bc_vel = 0 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_temp = 0 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -58,14 +59,14 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -2e0, np.inf)
     print(evp_lmb)
 
 if show_solution:
     viz_mode = -1
     xscale = eq_params['scale1d']
-    yscale = eq_params['ratio21']*eq_params['scale2d']
-    zscale = eq_params['ratio31']*eq_params['scale3d']
+    yscale = eq_params['scale2d']
+    zscale = eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors
@@ -129,27 +130,27 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_u[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_v[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_w[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_t[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[res[0]//2,:,:])), 50)
+    pl.contourf(grid_y, grid_z, np.log10(np.abs(phys_c[res[0]//2,:,:])), 50)
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_p[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("p")
     pl.show()
@@ -185,27 +186,27 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_u[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_v[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_w[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_t[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,:,res[2]//2])), 50)
+    pl.contourf(grid_x, grid_y, np.log10(np.abs(phys_c[:,:,res[2]//2])), 50)
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_p[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("p")
     pl.show()

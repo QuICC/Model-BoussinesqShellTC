@@ -20,7 +20,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ratio21", "ratio31", "scale1d", "scale2d", "scale3d"]
+        return ["prandtl", "rayleigh", "scale1d", "scale2d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -268,11 +268,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']
-        yscale = eq_params['ratio21']*eq_params['scale2d']
-        zscale = eq_params['ratio31']*eq_params['scale3d']
-
-        xscale = eq_params['scale1d']*3.0
-        yscale = eq_params['scale2d']*3.0
+        yscale = eq_params['scale2d']
         zscale = eq_params['scale3d']
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
@@ -337,7 +333,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     mat = mat + zero_w
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra).tolil()
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0).tolil()
                 mat[idx_w,:] = 0
 
             elif field_col == ("pressure",""):
