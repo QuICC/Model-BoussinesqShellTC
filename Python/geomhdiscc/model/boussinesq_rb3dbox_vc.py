@@ -161,6 +161,28 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
+
+            # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
+            elif bcId == 6:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xsz'}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'ysz'}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -264,7 +286,6 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']

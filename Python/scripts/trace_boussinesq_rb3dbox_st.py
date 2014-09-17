@@ -11,13 +11,14 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [30, 30, 14]
+res = [16, 16, 16]
+eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':5555.993, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':1886.5, 'scale1d':1.0/(12.0**0.5), 'scale2d':1.0/(12.0**0.5), 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
-eq_params = {'prandtl':1, 'rayleigh':1780.0, 'scale1d':1.0/5.0, 'scale2d':1.0/5.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
+#eq_params = {'prandtl':1, 'rayleigh':1780.0, 'scale1d':1.0/5.0, 'scale2d':1.0/5.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':3542.97, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FT/FT/FT
 eigs = []
-bc_str = 0 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_str = 4 # 0: NS/NS/NS, 4: SF/SF/NS
 bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_str, 'temperature':bc_temp}
@@ -62,7 +63,7 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, 10.0)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     print(evp_lmb)
 
 if show_solution:
@@ -87,8 +88,8 @@ if show_solution:
     pl.close("all")
     
     # Create solution matrices
-    mat_s = sol_s.reshape(res[0], res[1], res[2], order = 'F')
-    mat_t = sol_t.reshape(res[0], res[1], res[2], order = 'F')
+    mat_s = sol_s.reshape(res[0], res[2], res[1], order = 'F')
+    mat_t = sol_t.reshape(res[0], res[2], res[1], order = 'F')
 
     # Compute physical space values
     grid_x = transf.grid(res[0])
@@ -99,11 +100,11 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(1,2,1)
-    pl.contourf(grid_z, grid_y, phys_s[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_s[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("Streamfunction")
     pl.subplot(1,2,2)
-    pl.contourf(grid_z, grid_y, phys_t[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_t[res[0]//2,:,:], 50)
     pl.colorbar()
     pl.title("T")
     pl.show()
@@ -111,11 +112,11 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(1,2,1)
-    pl.contourf(grid_z, grid_x, phys_s[:,res[1]//2,:], 50)
+    pl.contourf(grid_y, grid_x, phys_s[:,res[1]//2,:], 50)
     pl.colorbar()
     pl.title("Streamfunction")
     pl.subplot(1,2,2)
-    pl.contourf(grid_z, grid_x, phys_t[:,res[1]//2,:], 50)
+    pl.contourf(grid_y, grid_x, phys_t[:,res[1]//2,:], 50)
     pl.colorbar()
     pl.title("T")
     pl.show()
@@ -123,11 +124,11 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(1,2,1)
-    pl.contourf(grid_y, grid_x, phys_s[:,:,res[2]//2], 50)
+    pl.contourf(grid_z, grid_x, phys_s[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("Streamfunction")
     pl.subplot(1,2,2)
-    pl.contourf(grid_y, grid_x, phys_t[:,:,res[2]//2], 50)
+    pl.contourf(grid_z, grid_x, phys_t[:,:,res[2]//2], 50)
     pl.colorbar()
     pl.title("T")
     pl.show()

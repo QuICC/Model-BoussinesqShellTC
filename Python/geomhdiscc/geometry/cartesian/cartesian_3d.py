@@ -122,7 +122,7 @@ def i2j2k2f1(nx, ny, nz, bc, coeff = 1.0, zscale = 1.0):
     return  c3dbc.constrain(mat, nx, ny, nz, 2, 2, 2, bc)
 
 def i2j2k2laplh(nx, ny, nz, bc, coeff = 1.0, xscale = 1.0, yscale = 1.0):
-    """Create operator for 2nd integral in x,y,z of Laplacian T_n(x)T_n(y)T_n(z)"""
+    """Create operator for 2nd integral in x,y,z of horizontal Laplacian T_n(x)T_n(y)T_n(z)"""
 
     bcx, bcy, bcz = convert_bc(bc)
     mat = spsp.kron(c1d.i2(ny,bcy),spsp.kron(c1d.i2(nz,bcz),c1d.i2d2(nx,bcx, cscale = xscale)))

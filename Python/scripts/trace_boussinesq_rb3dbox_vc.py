@@ -11,12 +11,13 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [12, 12, 12]
+res = [14, 14, 14]
 #eq_params = {'prandtl':1, 'rayleigh':5555.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
-eq_params = {'prandtl':1, 'rayleigh':3542.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
+#eq_params = {'prandtl':1, 'rayleigh':1886.5, 'scale1d':1.0/(12**0.5), 'scale2d':1.0/(12**0.5), 'scale3d':1.0}
+eq_params = {'prandtl':1, 'rayleigh':1558.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
 eigs = []
-bc_vel = 0 # 0: NS/NS/NS, 4: SF/SF/NS
-bc_temp = 0 # 0: FT/FT/FT, 4: FF/FF/FT
+bc_vel = 6 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_temp = 6 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -59,7 +60,7 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -2e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     print(evp_lmb)
 
 if show_solution:

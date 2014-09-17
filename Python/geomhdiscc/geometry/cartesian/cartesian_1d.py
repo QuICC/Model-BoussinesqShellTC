@@ -140,7 +140,7 @@ def i2d1(nx, bc, coeff = 1.0, cscale = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff**cscale*spsp.diags(diags, offsets)
+    mat = coeff*cscale*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
 def i2lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
