@@ -12,12 +12,22 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [14, 14, 14]
-#eq_params = {'prandtl':1, 'rayleigh':5555.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
-#eq_params = {'prandtl':1, 'rayleigh':1886.5, 'scale1d':1.0/(12**0.5), 'scale2d':1.0/(12**0.5), 'scale3d':1.0}
-eq_params = {'prandtl':1, 'rayleigh':1558.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0}
+#eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':1315.02, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':3044.03, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|0, m = 0|2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':4208.07, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|1, m = 1|2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':8876.4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2, m = 2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':10520.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 2, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':10823.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|0, m = 0|3, n = 1, aspect ration 1:1:1
+eq_params = {'prandtl':1, 'rayleigh':12965.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|1, m = 1|3, n = 1, aspect ration 1:1:1
+# SF/SF/SF, FF/FF/FT, Aspect ration 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = , m = , n = , aspect ratio 3:1:1
+# SF/SF/SF, FF/FF/FT, Aspect ration 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = , m = , n = , aspect ratio 1:3:1
+# SF/SF/SF, FF/FF/FT, Aspect ration 1:1:3
 eigs = []
-bc_vel = 6 # 0: NS/NS/NS, 4: SF/SF/NS
-bc_temp = 6 # 0: FT/FT/FT, 4: FF/FF/FT
+bc_vel = 6 # 0: NS/NS/NS, 4: SF/SF/NS, 6: SF/SF/SF
+bc_temp = 6 # 0: FT/FT/FT, 4: FF/FF/FT, 6: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -64,7 +74,7 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = -1
+    viz_mode = 2
     xscale = eq_params['scale1d']
     yscale = eq_params['scale2d']
     zscale = eq_params['scale3d']
@@ -131,19 +141,19 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_y, grid_z, phys_u[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_u[res[0]//3,:,:], 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_y, grid_z, phys_v[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_v[res[0]//3,:,:], 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_y, grid_z, phys_w[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_w[res[0]//3,:,:], 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_y, grid_z, phys_t[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_t[res[0]//3,:,:], 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
@@ -151,7 +161,7 @@ if show_solution:
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_y, grid_z, phys_p[res[0]//2,:,:], 50)
+    pl.contourf(grid_y, grid_z, phys_p[res[0]//3,:,:], 50)
     pl.colorbar()
     pl.title("p")
     pl.show()
@@ -159,27 +169,27 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_z, phys_u[:,res[1]//2,:], 50)
+    pl.contourf(grid_x, grid_z, phys_u[:,res[1]//3,:], 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_z, phys_v[:,res[1]//2,:], 50)
+    pl.contourf(grid_x, grid_z, phys_v[:,res[1]//3,:], 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_z, phys_w[:,res[1]//2,:], 50)
+    pl.contourf(grid_x, grid_z, phys_w[:,res[1]//3,:], 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_z, phys_t[:,res[1]//2,:], 50)
+    pl.contourf(grid_x, grid_z, phys_t[:,res[1]//3,:], 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
-    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,res[1]//2,:])), 50)
+    pl.contourf(grid_x, grid_z, np.log10(np.abs(phys_c[:,res[1]//3,:])), 50)
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_z, phys_p[:,res[1]//2,:], 50)
+    pl.contourf(grid_x, grid_z, phys_p[:,res[1]//3,:], 50)
     pl.colorbar()
     pl.title("p")
     pl.show()
@@ -187,19 +197,19 @@ if show_solution:
 
     # Show physical contour plot
     pl.subplot(2,3,1)
-    pl.contourf(grid_x, grid_y, phys_u[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_u[:,:,res[2]//3], 50)
     pl.colorbar()
     pl.title("u")
     pl.subplot(2,3,2)
-    pl.contourf(grid_x, grid_y, phys_v[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_v[:,:,res[2]//3], 50)
     pl.colorbar()
     pl.title("v")
     pl.subplot(2,3,3)
-    pl.contourf(grid_x, grid_y, phys_w[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_w[:,:,res[2]//3], 50)
     pl.colorbar()
     pl.title("w")
     pl.subplot(2,3,4)
-    pl.contourf(grid_x, grid_y, phys_t[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_t[:,:,res[2]//3], 50)
     pl.colorbar()
     pl.title("T")
     pl.subplot(2,3,5)
@@ -207,7 +217,7 @@ if show_solution:
     pl.colorbar()
     pl.title("Continuity")
     pl.subplot(2,3,6)
-    pl.contourf(grid_x, grid_y, phys_p[:,:,res[2]//2], 50)
+    pl.contourf(grid_x, grid_y, phys_p[:,:,res[2]//3], 50)
     pl.colorbar()
     pl.title("p")
     pl.show()

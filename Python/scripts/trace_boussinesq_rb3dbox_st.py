@@ -11,15 +11,12 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [16, 16, 16]
-eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
-#eq_params = {'prandtl':1, 'rayleigh':5555.993, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
-#eq_params = {'prandtl':1, 'rayleigh':1886.5, 'scale1d':1.0/(12.0**0.5), 'scale2d':1.0/(12.0**0.5), 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
-#eq_params = {'prandtl':1, 'rayleigh':1780.0, 'scale1d':1.0/5.0, 'scale2d':1.0/5.0, 'scale3d':1.0} # Sol for NS/NS/NS, FF/FF/FT
-#eq_params = {'prandtl':1, 'rayleigh':3542.97, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Sol for NS/NS/NS, FT/FT/FT
+res = [12, 12, 12]
+# SF/SF/SF, FF/FF/FT, Aspect ration 1:1:1
+eq_params = {'prandtl':1, 'rayleigh':0.273, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
 eigs = []
-bc_str = 4 # 0: NS/NS/NS, 4: SF/SF/NS
-bc_temp = 4 # 0: FT/FT/FT, 4: FF/FF/FT
+bc_str = 6 # 0: NS/NS/NS, 4: SF/SF/NS
+bc_temp = 6 # 0: FT/FT/FT, 4: FF/FF/FT
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':bc_str, 'temperature':bc_temp}
 
