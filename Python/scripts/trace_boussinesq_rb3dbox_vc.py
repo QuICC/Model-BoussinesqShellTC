@@ -11,25 +11,60 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [14, 14, 14]
-#eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':1315.02, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':3044.03, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|0, m = 0|2, n = 1, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':4208.07, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|1, m = 1|2, n = 1, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':8876.4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2, m = 2, n = 1, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':10520.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 2, aspect ration 1:1:1
-#eq_params = {'prandtl':1, 'rayleigh':10823.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|0, m = 0|3, n = 1, aspect ration 1:1:1
-eq_params = {'prandtl':1, 'rayleigh':12965.2, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|1, m = 1|3, n = 1, aspect ration 1:1:1
-# SF/SF/SF, FF/FF/FT, Aspect ration 3:1:1
-#eq_params = {'prandtl':1, 'rayleigh':, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = , m = , n = , aspect ratio 3:1:1
-# SF/SF/SF, FF/FF/FT, Aspect ration 1:3:1
-#eq_params = {'prandtl':1, 'rayleigh':, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = , m = , n = , aspect ratio 1:3:1
-# SF/SF/SF, FF/FF/FT, Aspect ration 1:1:3
-eigs = []
-bc_vel = 6 # 0: NS/NS/NS, 4: SF/SF/NS, 6: SF/SF/SF
-bc_temp = 6 # 0: FT/FT/FT, 4: FF/FF/FT, 6: FF/FF/FT
+res = [16, 16, 16]
+
+# SF/SF/SF, FF/FF/FT
+#bc_vel = 6 
+#bc_temp = 4 
+# SF/SF/SF, FF/FF/FT, Aspect ratio 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':3044.034095, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|0, m = 0|2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':4208.072733, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2|1, m = 1|2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':8876.403420, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2, m = 2, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':10520.18183, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 2, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':10823.23234, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|0, m = 0|3, n = 1, aspect ration 1:1:1
+#eq_params = {'prandtl':1, 'rayleigh':12965.15002, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 3|1, m = 1|3, n = 1, aspect ration 1:1:1
+# SF/SF/SF, FF/FF/FT, Aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':660.5178179, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2, m = 0, n = 1, aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 0|3, m = 1|0, n = 1, aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':824.8505622, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 0, n = 1, aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':985.0066489, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 2, m = 1, n = 1, aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':1174.395870, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 4, m = 0, n = 1, aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':1202.581371, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 0, n = 1, aspect ratio 3:1:1
+# SF/SF/SF, FF/FF/FT, Aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':660.5178179, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 0, m = 2, n = 1, aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 1|0, m = 0|3, n = 1, aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':824.8505622, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 0, m = 1, n = 1, aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':985.0066489, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 1, m = 2, n = 1, aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':1174.395870, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 0, m = 4, n = 1, aspect ratio 1:3:1
+#eq_params = {'prandtl':1, 'rayleigh':1202.581371, 'scale1d':1.0, 'scale2d':1.0/3.0, 'scale3d':1.0} # l = 0, m = 1, n = 1, aspect ratio 1:3:1
+# SF/SF/SF, FF/FF/FT, Aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':133.6201523, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 0|1, m = 1|0, n = 1, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':293.5634746, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 0|1, m = 1|0, n = 2, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':458.2503123, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 1, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':711.3936909, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 2, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 0|1, m = 1|0, n = 3, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 3, aspect ratio 1:1:3
+
+# SF/SF/NS, FF/FF/FT
+#bc_vel = 4 
+#bc_temp = 4 
+# SF/SF/NS, FF/FF/FT, Aspect ratio 3:1:1
+#eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+#eq_params = {'prandtl':1, 'rayleigh':2000.0, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+
+# SF/SF/NS, FF/FF/FT
+bc_vel = 0 
+bc_temp = 4
+# NS/NS/NS, FF/FF/FT
+eq_params = {'prandtl':1, 'rayleigh':1755.2, 'scale1d':1.0/6.0, 'scale2d':1.0/6.0, 'scale3d':1.0} # Michael Watson's thesis
+#eq_params = {'prandtl':1, 'rayleigh':1813.0, 'scale1d':1.0/4.0, 'scale2d':1.0/4.0, 'scale3d':1.0} # Michael Watson's thesis
+#eq_params = {'prandtl':1, 'rayleigh':2084.9, 'scale1d':1.0/2.0, 'scale2d':1.0/2.0, 'scale3d':1.0} # Michael Watson's thesis
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+
+eigs = []
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 print("Constructing matrix A")
@@ -43,7 +78,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = False
 write_mtx = True
-solve_evp = True
+solve_evp = False
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
@@ -63,6 +98,7 @@ if show_spy:
 # Export the two matrices to matrix market format
 if write_mtx:
     import scipy.io as io
+    print("Writing MTX files")
     io.mmwrite("matrix_A.mtx", A)
     io.mmwrite("matrix_B.mtx", B)
 
@@ -70,7 +106,7 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e-1, np.inf)
     print(evp_lmb)
 
 if show_solution:

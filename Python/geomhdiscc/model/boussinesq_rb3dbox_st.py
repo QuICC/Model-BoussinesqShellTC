@@ -145,6 +145,16 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
                         bc = {'x':{0:41}, 'y':{0:41}, 'z':{0:40}, 'priority':'zsx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
+
+            # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
+            elif bcId == 6:
+                if self.use_galerkin:
+                    if field_col == ("streamfunction",""):
+                        bc = {'x':{0:-41, 'r':0}, 'y':{0:-41, 'r':0}, 'z':{0:-40, 'r':0}}
+
+                else:
+                    if field_row == ("streamfunction","") and field_col == ("streamfunction",""):
+                        bc = {'x':{0:41}, 'y':{0:41}, 'z':{0:41}, 'priority':'zsx'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

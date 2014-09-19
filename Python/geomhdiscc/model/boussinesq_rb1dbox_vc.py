@@ -249,12 +249,11 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         zscale = eq_params['scale1d']
 
-        k1 = eigs[0]
-        k2 = eigs[1]
+        k1 = eigs[0]/2.0
+        k2 = eigs[1]/2.0
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
@@ -318,10 +317,10 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                     mat = mat + zero_w 
 
             elif field_col == ("temperature",""):
-                mat = c1d.i2(res[0], bc, Ra)
+                mat = c1d.i2(res[0], bc, Ra/16.0)
 
             elif field_col == ("pressure",""):
-                mat = c1d.i2d1(res[0], bc, -zscale).tolil()
+                mat = c1d.i2d1(res[0], bc, -1.0, cscale = zscale).tolil()
                 mat[:,idx_p] = 0
                 mat[idx_w,:] = 0
 
@@ -364,7 +363,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 elif field_col == ("velocityz",""):
                     bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = c1d.i1d1(res[0]+1, bc, zscale).tolil()
+                    mat = c1d.i1d1(res[0]+1, bc, cscale = zscale).tolil()
                     mat[:,idx_w] = 0
                     mat[idx_p,:] = 0
 

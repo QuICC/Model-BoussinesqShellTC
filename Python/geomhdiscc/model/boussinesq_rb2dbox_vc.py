@@ -19,7 +19,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ratio31", "scale1d", "scale3d"]
+        return ["prandtl", "rayleigh", "scale1d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -158,6 +158,24 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
 
+            # Stress-free/Stress-free, Fixed flux/Fixed temperature
+            elif bcId == 2:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {'x':{0:20}, 'z':{0:21}, 'priority':'sx'}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {'x':{0:21}, 'z':{0:21}, 'priority':'sz'}
+                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        bc = {'x':{0:21}, 'z':{0:20}, 'priority':'z'}
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
@@ -196,6 +214,14 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+
+                elif bcId == 2:
+                    if field_col == ("velocityx",""):
+                        bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
+                    elif field_col == ("velocityy",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
+                    elif field_col == ("velocityz",""):
+                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -252,13 +278,12 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
         xscale = eq_params['scale1d']
-        zscale = eq_params['ratio31']*eq_params['scale3d']
+        zscale = eq_params['scale3d']
 
-        k = eigs[0]
+        k = eigs[0]/2.0
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
@@ -322,7 +347,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                     mat = mat + zero_w 
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2(res[0], res[2], bc, Ra).tolil()
+                mat = c2d.i2j2(res[0], res[2], bc, Ra/16.).tolil()
                 mat[idx_w,:] = 0
 
             elif field_col == ("pressure",""):
@@ -431,7 +456,6 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         # U: TiN
         zero_u = c2d.zblk(res[0], res[2], 2, 2, no_bc())
         zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        #zero_u = zero_u + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
@@ -449,7 +473,6 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         # W: TNk
         zero_w = c2d.zblk(res[0], res[2], 2, 2, no_bc())
         zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        #zero_w = zero_w + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
@@ -460,7 +483,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
         # Pressure: T_{N-2:N,N-2:N}
-#        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
         # Pressure: T_00
         if eigs[0] == 0:
             zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))

@@ -171,8 +171,6 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
                     elif field_col == ("velocityz",""):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
-                        bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
@@ -181,8 +179,6 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'ysz'}
                     elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:

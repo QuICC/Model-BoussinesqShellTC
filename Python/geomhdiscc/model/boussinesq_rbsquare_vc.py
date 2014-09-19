@@ -19,7 +19,7 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ratio31", "scale3d"]
+        return ["prandtl", "rayleigh", "scale1d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -204,8 +204,6 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
                     if field_col == ("velocityx",""):
                         bc = {'x':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
         # Field values to RHS:
