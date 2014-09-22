@@ -293,7 +293,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale).tolil()
                 mat[idx_u,:] = 0
                 mat[:,idx_u] = 0
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -318,7 +318,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale).tolil()
                 mat[idx_v,:] = 0
                 mat[:,idx_v] = 0
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -343,7 +343,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale).tolil()
                 mat[idx_w,:] = 0
                 mat[:,idx_w] = 0
                 if bcs["bcType"] == self.SOLVER_HAS_BC:

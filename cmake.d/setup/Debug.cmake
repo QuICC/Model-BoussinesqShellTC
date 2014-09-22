@@ -26,6 +26,8 @@ endif(GEOMHDISCC_DEBUG)
 
 if(GEOMHDISCC_DEBUG)
    add_definitions("-DGEOMHDISCC_DEBUG")
+else(GEOMHDISCC_DEBUG)
+   add_definitions("-DGEOMHDISCC_NO_DEBUG")
 endif(GEOMHDISCC_DEBUG)
 
 ###################################################
