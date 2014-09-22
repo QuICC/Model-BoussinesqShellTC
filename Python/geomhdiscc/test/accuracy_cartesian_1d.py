@@ -8,6 +8,7 @@ import sympy as sy
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 import matplotlib.pylab as pl
+import scipy.io as io
 
 import geomhdiscc.transform.cartesian as transf
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
@@ -456,7 +457,7 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 10
+    nx = 20
     xg = transf.grid(nx)
 
     # run hardcoded operator tests

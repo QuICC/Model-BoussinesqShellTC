@@ -7,6 +7,7 @@ import numpy as np
 import sympy as sy
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
+import scipy.io as io
 if True:
     import matplotlib.pylab as pl
     has_error_plot = True
@@ -73,9 +74,12 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid_x, grid_y, grid_z):
     rhs = transf.tocheb3d(rhs)
     rhs = rhs.reshape(nx*ny*nz, order='F')
     lhs = spsplin.spsolve(opA,opB*rhs)
+    io.mmwrite("bilaplacian3D_A.mtx", opA)
+    io.mmwrite("bilaplacian3D_rhs.mtx", (opB*rhs).reshape(rhs.shape[0],1))
     lhs = lhs.reshape(nx,nz,ny, order = 'F')
     sol = xyz_to_phys(sol_expr, grid_x, grid_z, grid_y)
     sol = transf.tocheb3d(sol)
+    io.mmwrite("bilaplacian3D_sol.mtx", sol.reshape(opA.shape[0],1, order='F'))
     err = np.abs(lhs - sol)
     vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
@@ -415,28 +419,28 @@ def i4j4k4lapl2(nx, ny, nz, xg, yg, zg):
     sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
     sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
     test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
-
-    print("\tbc = 41, 40 ,41")
-    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:40}, 'z':{0:41}, 'priority':'ysz'}).tocsr()
-    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
-    ssol = (1.0 - x**2)**3*(1.0 - y**2)**2*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-6,1)])
-    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
-    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
-    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
-
-    print("\tbc = 40, 41 ,41")
-    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:41}, 'z':{0:41}, 'priority':'xsy'}).tocsr()
-    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
-    ssol = (1.0 - x**2)**2*(1.0 - y**2)**3*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-6,1)])
-    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
-    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
-    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#
+#    print("\tbc = 41, 40 ,41")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:40}, 'z':{0:41}, 'priority':'ysz'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**3*(1.0 - y**2)**2*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-6,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#
+#    print("\tbc = 40, 41 ,41")
+#    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:40}, 'y':{0:41}, 'z':{0:41}, 'priority':'xsy'}).tocsr()
+#    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**2*(1.0 - y**2)**3*(1.0 - z**2)**3*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-6,1)])
+#    sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
+#    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 8
-    ny = 8
-    nz = 8
+    nx = 20
+    ny = 20
+    nz = 20
     xg = transf.grid(nx)
     yg = transf.grid(nx)
     zg = transf.grid(nz)

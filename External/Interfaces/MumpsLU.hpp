@@ -19,6 +19,8 @@
 #include <dmumps_c.h>
 #include <zmumps_c.h>
 
+#include "Framework/FrameworkMacro.h"
+
 namespace Eigen {
 
    #define MUMPS_FORTRAN_COMM -987654
@@ -202,7 +204,11 @@ namespace Eigen {
          void init()
          {
             m_id.job = -1;
-            m_id.comm_fortran = MUMPS_FORTRAN_COMM;
+            #ifdef GEOMDHDISCC_MPI
+               m_id.comm_fortran = MPI_Comm_c2f(FrameworkMacro::spectralComm());
+            #else
+               m_id.comm_fortran = MUMPS_FORTRAN_COMM;
+            #endif // GEOMDHDISCC_MPI
             m_id.par = 1;
             m_id.sym = 0;
             #ifdef GEOMHDISCC_NO_DEBUG

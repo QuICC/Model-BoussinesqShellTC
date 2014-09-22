@@ -68,4 +68,35 @@ namespace GeoMHDiSCC {
       MPI_Finalize();
    }
 
+   MPI_Group MpiFramework::spectralGroup()
+   {
+      return MpiFramework::mSpecGroup;
+   }
+
+   MPI_Comm MpiFramework::spectralComm()
+   {
+      return MpiFramework::mSpecComm;
+   }
+
+   void setSpectralComm(const std::vector<int>& ranks)
+   {
+      if(ranks.size() > 0)
+      {
+         MPI_Group   world;
+         MPI_Comm_group(MPI_COMM_WORLD, &world);
+
+         // Create spectral group
+         MPI_Group_incl(world, ranks.size(), &ranks.front(), &MpiFramework::mSpecGroup);
+
+         // Create spectral communicator
+         MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::mSpecGroup, &MpiFramework::mSpecComm);
+      
+      // Spectral MPI group and communicator are WORLD
+      } else
+      {
+         MPI_Comm_group(MPI_COMM_WORLD, &MpiFramework::mSpecGroup);
+         MpiFramework::mSpecComm = MPI_COMM_WORLD;
+      }
+   }
+
 }

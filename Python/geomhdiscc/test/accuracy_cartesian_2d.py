@@ -7,6 +7,7 @@ import numpy as np
 import sympy as sy
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
+import scipy.io as io
 if True:
     import matplotlib.pylab as pl
     has_error_plot = True
@@ -723,8 +724,8 @@ def lapl2he1_e1laplh(nx,nz, xg, zg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 10
-    nz = 10
+    nx = 50
+    nz = 50
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 

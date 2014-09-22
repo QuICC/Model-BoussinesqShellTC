@@ -45,6 +45,21 @@ namespace GeoMHDiSCC {
           * @brief Finalise the MPI system
           */
          static void finalize();
+
+         /**
+          * @brief Spectral CPUs MPI group
+          */
+         static MPI_Group spectralGroup();
+
+         /**
+          * @brief Spectral CPUs MPI communicator
+          */
+         static MPI_Comm spectralComm();
+
+         /**
+          * @brief Set the spectral MPI group and communicator
+          */
+         static void setSpectralComm();
          
       protected:
 
@@ -58,6 +73,16 @@ namespace GeoMHDiSCC {
           * @brief Destructor
           */
          ~MpiFramework();
+
+         /**
+          * @brief Storage for the spectral MPI group
+          */
+         static MPI_Group mSpecGroup;  
+
+         /**
+          * @brief Storage for the spectral MPI communicator
+          */
+         static MPI_Comm mSpecComm;  
    };
 
 }
