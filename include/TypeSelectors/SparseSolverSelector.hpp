@@ -161,6 +161,24 @@
    }
 #endif //GEOMHDISCC_SPLINALG_MKLPARDISO
 
+// MUMPS Version
+#ifdef GEOMHDISCC_SPLINALG_MUMPS
+   // Include the right header
+   #include "../External/Interfaces/MumpsLU.hpp"
+
+   namespace GeoMHDiSCC {
+      namespace Solver {
+         /**
+          * @brief Selector for the different implementations of the sparse solvers. Sets up the MUMPS version. 
+          */
+         template<typename TMatrix> struct SparseSelector
+         {
+            typedef Eigen::MumpsLU<TMatrix> Type;
+         };
+      }
+   }
+#endif //GEOMHDISCC_SPLINALG_MUMPS
+
 // BiCGSTAB Version
 #ifdef GEOMHDISCC_SPLINALG_BICGSTAB
    // Include the right header

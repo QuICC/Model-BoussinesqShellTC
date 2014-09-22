@@ -20,7 +20,7 @@ class TestTTTScheme(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh"]
+        return ["prandtl", "rayleigh", "scale1d", "scale2d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""

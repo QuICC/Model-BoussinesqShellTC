@@ -264,12 +264,6 @@ namespace IoTools {
          case NonDimensional::RRATIO:
             return "rratio";
 
-         case NonDimensional::RATIO21:
-            return "ratio21";
-
-         case NonDimensional::RATIO31:
-            return "ratio31";
-
          case NonDimensional::SCALE1D:
             return "scale1d";
 

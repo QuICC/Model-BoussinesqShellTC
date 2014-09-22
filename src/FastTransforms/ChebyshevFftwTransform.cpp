@@ -77,12 +77,10 @@ namespace Transform {
       } else if(dimId == Dimensions::Transform::TRA2D)
       {
          list.insert(NonDimensional::SCALE2D);
-         list.insert(NonDimensional::RATIO21);
 
       } else if(dimId == Dimensions::Transform::TRA3D)
       {
          list.insert(NonDimensional::SCALE3D);
-         list.insert(NonDimensional::RATIO31);
       }
    }
 
@@ -94,11 +92,11 @@ namespace Transform {
 
       } else if(dimId == Dimensions::Transform::TRA2D)
       {
-         this->mCScale = options.find(NonDimensional::SCALE2D)->second*options.find(NonDimensional::RATIO21)->second;
+         this->mCScale = options.find(NonDimensional::SCALE2D)->second;
 
       } else if(dimId == Dimensions::Transform::TRA3D)
       {
-         this->mCScale = options.find(NonDimensional::SCALE3D)->second*options.find(NonDimensional::RATIO31)->second;
+         this->mCScale = options.find(NonDimensional::SCALE3D)->second;
       }
    }
 

@@ -41,7 +41,7 @@ set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "Pardiso" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "Pardiso" "SPQR" "SparseQR" "Mumps" "BiCGSTAB" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
@@ -49,6 +49,7 @@ set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_PARDISO "pardiso412-GNU450-X86-64" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_PARDISO "/usr/local/share/Pardiso/lib" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
