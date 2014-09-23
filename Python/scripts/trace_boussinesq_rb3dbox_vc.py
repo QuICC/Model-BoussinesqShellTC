@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [16, 16, 16]
+res = [32, 32, 32]
 
 # SF/SF/SF, FF/FF/FT
 #bc_vel = 6 

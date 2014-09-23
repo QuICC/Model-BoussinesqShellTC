@@ -1,0 +1,8 @@
+/** \page mhdPDevTSSolveComp Performance comparison for sparse solvers
+ *
+ * \section v1.0.0
+ *
+ * ![](laplacian1D_factor.jpg)
+ * ![](bilaplacian1D_factor.jpg)
+ *
+ */
