@@ -204,16 +204,13 @@ namespace Eigen {
          void init()
          {
             m_id.job = -1;
-            #ifdef GEOMDHDISCC_MPI
+            #ifdef GEOMHDISCC_MPI
                m_id.comm_fortran = MPI_Comm_c2f(FrameworkMacro::spectralComm());
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
-            #endif // GEOMDHDISCC_MPI
+            #endif // GEOMHDISCC_MPI
             m_id.par = 1;
             m_id.sym = 0;
-            #ifdef GEOMHDISCC_NO_DEBUG
-               m_id.icntl[4-1] = 0;
-            #endif // GEOMHDISCC_NO_DEBUG
 
             m_info = InvalidInput;
             m_isInitialized  = false;
@@ -221,6 +218,12 @@ namespace Eigen {
 
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.info[1-1];
+            #ifdef GEOMHDISCC_NO_DEBUG
+               m_id.icntl[1-1] = 0;
+               m_id.icntl[2-1] = 0;
+               m_id.icntl[3-1] = 0;
+               m_id.icntl[4-1] = 0;
+            #endif // GEOMHDISCC_NO_DEBUG
          }
 
          void copyInput(const MatrixType& mat, const bool freeMemory)

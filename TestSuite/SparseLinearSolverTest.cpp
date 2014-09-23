@@ -12,10 +12,12 @@
 //
 #include <Eigen/SparseExtra>
 #include <iostream>
+#include <sstream>
 
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Timers/TimerMacro.h"
 #include "TypeSelectors/SparseSolverSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -25,27 +27,39 @@ namespace TestSuite {
    /**
     * @brief Solve real problem
     */
-   int solveProblem(const SparseMatrix& mat, const Array& sol, const Array& rhs)
+   Array solveProblem(const SparseMatrix& mat, const Array& sol, const Array& rhs)
    {
+      TimerMacro  timer;
+      Array timing = Array::Zero(2);
+
       // Create solver
       Solver::SparseSelector<SparseMatrix>::Type   solver;
    
       // Factorize
+      timer.start();
       solver.compute(mat);
+      timer.stop();
+      timing(0) = timer.time();
 
       Array lhs(sol.rows());
+      timer.start();
       lhs = solver.solve(rhs);
+      timer.stop();
+      timing(1) = timer.time();
 
-      std::cout << "Max absolute error: " << (sol - lhs).array().abs().maxCoeff() << std::endl;
+      MHDFloat absError = (sol - lhs).array().abs().maxCoeff();
 
-      return 1;
+      return timing;
    }
 
    /**
     * @brief Solve complex problem
     */
-   int solveProblem(const SparseMatrixZ& mat, const ArrayZ& sol, const ArrayZ& rhs)
+   Array solveProblem(const SparseMatrixZ& mat, const ArrayZ& sol, const ArrayZ& rhs)
    {
+      TimerMacro  timer;
+      Array timing = Array::Zero(2);
+
       // Create solver
       Solver::SparseSelector<SparseMatrixZ>::Type   solver;
    
@@ -57,54 +71,7 @@ namespace TestSuite {
 
       MHDFloat absError = (sol - lhs).array().abs().maxCoeff();
 
-      std::cout << "Max absolute error: " << absError << std::endl;
-
-      return 1;
-   }
-
-   /**
-    * @brief Setup problem 1
-    * 
-    * Simple real problem take from Pardiso example
-    */
-   void setupProblem1(SparseMatrix& mat, Array& sol, Array& rhs)
-   {
-      // Resize provided storage
-      mat.resize(8,8);
-      sol.resize(8);
-      rhs.resize(8);
-
-      // Build test matrix from triplets
-      typedef Eigen::Triplet<MHDFloat> T;
-      std::vector<T> tripletList;
-      tripletList.reserve(20);
-      tripletList.push_back(T(0,0,7.0));
-      tripletList.push_back(T(0,2,1.0));
-      tripletList.push_back(T(0,5,2.0));
-      tripletList.push_back(T(0,6,7.0));
-      tripletList.push_back(T(1,1,-4.0));
-      tripletList.push_back(T(1,2,8.0));
-      tripletList.push_back(T(1,4,2.0));
-      tripletList.push_back(T(2,2,1.0));
-      tripletList.push_back(T(2,7,5.0));
-      tripletList.push_back(T(3,3,7.0));
-      tripletList.push_back(T(3,6,9.0));
-      tripletList.push_back(T(4,1,-4.0));
-      tripletList.push_back(T(5,2,7.0));
-      tripletList.push_back(T(5,5,3.0));
-      tripletList.push_back(T(5,7,8.0));
-      tripletList.push_back(T(6,1,1.0));
-      tripletList.push_back(T(6,6,11.0));
-      tripletList.push_back(T(7,2,-3.0));
-      tripletList.push_back(T(7,6,2.0));
-      tripletList.push_back(T(7,7,5.0));
-      mat.setFromTriplets(tripletList.begin(), tripletList.end());
-
-      // Build RHS
-      rhs.setLinSpaced(8,0.,7.);
-
-      // Build exact solution
-      sol(0) = -1.153896103896104;sol(1) = -1;sol(2) = -0.9318181818181819;sol(3) = -0.3896103896103896;sol(4) = 2.227272727272728;sol(5) = 2.277272727272727;sol(6) = 0.6363636363636364;sol(7) = 0.5863636363636366;
+      return timing;
    }
 
    /**
@@ -112,12 +79,13 @@ namespace TestSuite {
     */
    void loadProblem(SparseMatrix& mat, Array& sol, Array& rhs, const std::string& name)
    {
-      mat.resize(0,0);
-      rhs.resize(0);
-      sol.resize(0);
-      Eigen::loadMarket(mat, name+"_A.mtx");
-      Eigen::loadMarketVector(sol, name + "_sol.mtx");
-      Eigen::loadMarketVector(rhs, name + "_rhs.mtx");
+      rhs.resize(mat.rows());
+      sol.resize(mat.cols());
+      std::ostringstream   oss;
+      oss << mat.rows();
+      Eigen::loadMarket(mat, name +"_A_" + oss.str() + ".mtx");
+      Eigen::loadMarketVector(sol, name + "_sol_" + oss.str() + ".mtx");
+      Eigen::loadMarketVector(rhs, name + "_rhs_" + oss.str() + ".mtx");
    }
 
    /**
@@ -127,29 +95,105 @@ namespace TestSuite {
    {  
       // Test counter
       int passedTests = 0;
+      int timeLoop = 10;
 
       // Storage
       SparseMatrix mat;
       Array sol;
       Array rhs;
 
-      setupProblem1(mat, sol, rhs);
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+      std::vector<int> ns1D;
+      ns1D.push_back(16); ns1D.push_back(32); ns1D.push_back(64); ns1D.push_back(128); ns1D.push_back(256); ns1D.push_back(512);
 
-      loadProblem(mat, sol, rhs, "laplacian1D");
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+      std::vector<int> ns2D;
+      ns2D.push_back(8*8); ns2D.push_back(16*16); ns2D.push_back(24*24); ns2D.push_back(32*32); ns2D.push_back(48*48);
 
-      loadProblem(mat, sol, rhs, "bilaplacian1D");
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+      std::vector<int> ns3D;
+      ns3D.push_back(8*8*8); ns3D.push_back(10*10*10); ns3D.push_back(12*12*12); ns3D.push_back(14*14*14); ns3D.push_back(16*16*16);
+      std::vector<int>::iterator it;
 
-      loadProblem(mat, sol, rhs, "laplacian2D");
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+      std::cerr << "#Laplacian1D: " << std::endl;
+      for(it = ns1D.begin(); it != ns1D.end(); ++it)
+      {
+         mat.resize(*it,*it);
 
-      loadProblem(mat, sol, rhs, "bilaplacian2D");
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+         loadProblem(mat, sol, rhs, "laplacian1D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
 
-      loadProblem(mat, sol, rhs, "bilaplacian3D");
-      passedTests = passedTests + solveProblem(mat, sol, rhs);
+      std::cerr << "#Bilaplacian1D: " << std::endl;
+      for(it = ns1D.begin(); it != ns1D.end(); ++it)
+      {
+         mat.resize(*it,*it);
+
+         loadProblem(mat, sol, rhs, "bilaplacian1D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
+
+      std::cerr << "#Laplacian2D: " << std::endl;
+      for(it = ns2D.begin(); it != ns2D.end(); ++it)
+      {
+         mat.resize(*it,*it);
+
+         loadProblem(mat, sol, rhs, "laplacian2D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
+
+      std::cerr << "#Bilaplacian2D: " << std::endl;
+      for(it = ns2D.begin(); it != ns2D.end(); ++it)
+      {
+         mat.resize(*it,*it);
+         loadProblem(mat, sol, rhs, "bilaplacian2D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
+
+      std::cerr << "#Laplacian3D: " << std::endl;
+      for(it = ns3D.begin(); it != ns3D.end(); ++it)
+      {
+         mat.resize(*it,*it);
+
+         loadProblem(mat, sol, rhs, "laplacian3D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
+
+      std::cerr << "#Bilaplacian3D: " << std::endl;
+      for(it = ns3D.begin(); it != ns3D.end(); ++it)
+      {
+         mat.resize(*it,*it);
+
+         loadProblem(mat, sol, rhs, "bilaplacian3D");
+         Array timing = Array::Zero(2);
+         for(int k = 0; k < timeLoop; k++)
+         {
+            timing = timing + solveProblem(mat, sol, rhs);
+         }
+         std::cerr << *it << "\t" << timing(0)/timeLoop << "\t" << timing(1)/timeLoop << std::endl;
+      }
 
       return passedTests;
    }
