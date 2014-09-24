@@ -109,6 +109,8 @@ namespace Eigen {
 
          inline void setIterativeRefinement(const int iterations) { m_id.icntl[10 - 1] = iterations; }
 
+         inline void setMemoryRelaxation(const int percent) { m_id.icntl[14 - 1] = percent; }
+
          /** \brief Reports whether previous computation was successful.
           *
           * \returns \c Success if computation was succesful,
