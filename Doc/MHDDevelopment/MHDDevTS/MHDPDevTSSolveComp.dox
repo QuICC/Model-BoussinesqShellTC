@@ -3,20 +3,34 @@
  * v1.0.0
  * ======
  *
- * ![](ts_laplacian1D.jpg)
- * ![](ts_laplacian2D.jpg)
- * ![](ts_laplacian3D.jpg)
- * ![](ts_rb1dboxvc.jpg)
- * ![](ts_rb2dboxvc.jpg)
- * ![](ts_rb3dboxvc.jpg)
- * ![](ts_rbannulusvc.jpg)
- * ![](ts_rbcylindervc.jpg)
- * ![](ts_rrb1dboxvc.jpg)
- * ![](ts_rrb2dboxvc.jpg)
- * ![](ts_rrb3dboxvc.jpg)
- * ![](ts_rrbannulusvc.jpg)
- * ![](ts_rrbcylindervc.jpg)
- * ![](ts_fplane3DQG.jpg)
- * ![](ts_beta3DQG.jpg)
+ * ![1D laplacian and bilaplacian](ts_laplacian1D.jpg)
+ *
+ * ![2D laplacian and bilaplacian](ts_laplacian2D.jpg)
+ *
+ * ![3D laplacian and bilaplacian](ts_laplacian3D.jpg)
+ *
+ * ![Rayleigh-Benard in a 1D box](ts_rb1dboxvc.jpg)
+ *
+ * ![Rayleigh-Benard in a 2D box](ts_rb2dboxvc.jpg)
+ *
+ * ![Rayleigh-Benard in a 3D box](ts_rb3dboxvc.jpg)
+ *
+ * ![Rayleigh-Benard in an annulus](ts_rbannulusvc.jpg)
+ *
+ * ![Rayleigh-Benard in an cylinder](ts_rbcylindervc.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 1D box](ts_rrb1dboxvc.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 2D box](ts_rrb2dboxvc.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 3D box](ts_rrb3dboxvc.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an annulus](ts_rrbannulusvc.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an cylinder](ts_rrbcylindervc.jpg)
+ *
+ * ![F-plane 3DQG](ts_fplane3DQG.jpg)
+ *
+ * ![Beta 3DQG](ts_beta3DQG.jpg)
  *
  */
