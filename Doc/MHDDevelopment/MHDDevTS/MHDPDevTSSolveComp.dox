@@ -1,8 +1,22 @@
 /** \page mhdPDevTSSolveComp Performance comparison for sparse solvers
  *
- * \section v1.0.0
+ * v1.0.0
+ * ======
  *
- * ![](laplacian1D_factor.jpg)
- * ![](bilaplacian1D_factor.jpg)
+ * ![](ts_laplacian1D.jpg)
+ * ![](ts_laplacian2D.jpg)
+ * ![](ts_laplacian3D.jpg)
+ * ![](ts_rb1dboxvc.jpg)
+ * ![](ts_rb2dboxvc.jpg)
+ * ![](ts_rb3dboxvc.jpg)
+ * ![](ts_rbannulusvc.jpg)
+ * ![](ts_rbcylindervc.jpg)
+ * ![](ts_rrb1dboxvc.jpg)
+ * ![](ts_rrb2dboxvc.jpg)
+ * ![](ts_rrb3dboxvc.jpg)
+ * ![](ts_rrbannulusvc.jpg)
+ * ![](ts_rrbcylindervc.jpg)
+ * ![](ts_fplane3DQG.jpg)
+ * ![](ts_beta3DQG.jpg)
  *
  */
