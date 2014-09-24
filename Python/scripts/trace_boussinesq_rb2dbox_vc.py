@@ -112,7 +112,7 @@ if solve_evp:
 
 if show_solution:
     viz_mode = 0
-    k = eigs[0]
+    k = eigs[0]/2.
     xscale = eq_params['scale1d']
     zscale = eq_params['scale3d']
 
