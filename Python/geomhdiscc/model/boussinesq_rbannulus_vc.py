@@ -19,7 +19,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio", "ratio31", "scale3d"]
+        return ["prandtl", "rayleigh", "ro", "rratio", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -260,7 +260,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         m = eigs[0]
 
-        zscale = eq_params['ratio31']*eq_params['scale3d']
+        zscale = eq_params['scale3d']
 
         a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
@@ -272,7 +272,8 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0).tolil()
+                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = mat.tolil()
                 mat[:,idx_u] = 0
                 mat[idx_u,:] = 0
                 mat = mat + zero_u
@@ -303,7 +304,8 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0).tolil()
+                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = mat.tolil()
                 mat[:,idx_v] = 0
                 mat[idx_v,:] = 0
                 mat = mat + zero_v
@@ -362,10 +364,10 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             if field_col == ("velocityx",""):
                 bc['r']['cr'] = 1
                 bc['r']['rt'] = 1
-        #        bc['r']['zb'] = 1
+                bc['r']['zb'] = 1
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
-        #        bc['z']['zb'] = 1
+                bc['z']['zb'] = 1
                 mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc).tolil()
                 mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
@@ -373,10 +375,10 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             elif field_col == ("velocityy",""):
                 bc['r']['cr'] = 1
                 bc['r']['rt'] = 1
-        #        bc['r']['zb'] = 1
+                bc['r']['zb'] = 1
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
-        #        bc['z']['zb'] = 1
+                bc['z']['zb'] = 1
                 mat = annulus.i1j1(res[0]+1, res[2]+1, a, b, bc, 1j*m).tolil()
                 mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
@@ -384,10 +386,10 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 bc['r']['cr'] = 1
                 bc['r']['rt'] = 1
-        #        bc['r']['zb'] = 1
+                bc['r']['zb'] = 1
                 bc['z']['cr'] = 1
                 bc['z']['rt'] = 1
-        #        bc['z']['zb'] = 1
+                bc['z']['zb'] = 1
                 mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
@@ -442,6 +444,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         # U:
         zero_u = annulus.zblk(res[0], res[2], 2, 2, no_bc())
         zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        zero_u = zero_u + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
@@ -450,7 +453,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
         # V:
         zero_v = annulus.zblk(res[0], res[2], 1, 2, no_bc())
         zero_v = zero_v + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        #zero_v = zero_v + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_v = zero_v + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
         zero_v = spsp.lil_matrix(zero_v.shape)
@@ -458,7 +461,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         # W:
         zero_w = annulus.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
@@ -466,9 +469,9 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         # P:
         zero_p = annulus.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
-        #zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-4, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-5, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-6, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
         zero_p = spsp.lil_matrix(zero_p.shape)
