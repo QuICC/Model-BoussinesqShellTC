@@ -1,21 +1,23 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a cylindrical annulus model (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus model (velocity-continuity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbannulus_vc as mod
+import geomhdiscc.model.boussinesq_rrbannulus_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBAnnulusVC()
+model = mod.BoussinesqRRBAnnulusVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [30, 0, 30]
-eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
-eigs = [1]
+res = [40, 0, 40]
+eq_params = {'prandtl':7, 'rayleigh':3.440597e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
+eigs = [8]
+eq_params = {'prandtl':7, 'rayleigh':3.56674e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
+eigs = [7]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
@@ -57,7 +59,7 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = -1
+    viz_mode = 0
     zscale = eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):

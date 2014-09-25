@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,13 +13,13 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
 
 
-class BoussinesqRBAnnulusVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+class BoussinesqRRBAnnulusVC(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio", "scale3d"]
+        return ["prandtl", "rayleigh", "taylor", "ro", "rratio", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -159,9 +159,9 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:21}, 'priority':'sr'}
-            
+
             # Stress-free/No-slip, Fixed flux/Fixed temperature
-            elif bcId == 1:
+            elif bcId == 2:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -181,7 +181,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
-
+            
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
@@ -278,8 +278,9 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
+        T = Ta**0.5
         m = eigs[0]
 
         zscale = eq_params['scale3d']
@@ -301,7 +302,11 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = mat + zero_u
 
             elif field_col == ("velocityy",""):
-                mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m).tolil()
+                mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, T)
+                mat = mat.tolil()
                 mat[:,idx_v] = 0
                 mat[idx_u,:] = 0
 
@@ -318,7 +323,11 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m).tolil()
+                mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, -T)
+                mat = mat.tolil()
                 mat[:,idx_u] = 0
                 mat[idx_v,:] = 0
 
