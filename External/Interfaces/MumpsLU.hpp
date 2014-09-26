@@ -207,7 +207,7 @@ namespace Eigen {
          {
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
-               m_id.comm_fortran = MPI_Comm_c2f(FrameworkMacro::spectralComm());
+               m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::spectralComm());
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
             #endif // GEOMHDISCC_MPI

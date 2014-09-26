@@ -78,7 +78,7 @@ namespace GeoMHDiSCC {
       return MpiFramework::mSpecComm;
    }
 
-   void setSpectralComm(const std::vector<int>& ranks)
+   void MpiFramework::setSpectralComm(const std::vector<int>& ranks)
    {
       if(ranks.size() > 0)
       {
@@ -98,5 +98,9 @@ namespace GeoMHDiSCC {
          MpiFramework::mSpecComm = MPI_COMM_WORLD;
       }
    }
+
+   MPI_Group MpiFramework::mSpecGroup = 0;
+
+   MPI_Comm MpiFramework::mSpecComm = 0;
 
 }

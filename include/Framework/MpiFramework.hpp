@@ -10,6 +10,7 @@
 // System includes
 //
 #include <mpi.h>
+#include <vector>
 
 // External includes
 //
@@ -59,7 +60,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Set the spectral MPI group and communicator
           */
-         static void setSpectralComm();
+         static void setSpectralComm(const std::vector<int>& ranks);
          
       protected:
 
