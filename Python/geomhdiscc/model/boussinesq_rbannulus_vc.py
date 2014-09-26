@@ -260,11 +260,11 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
             mat[idx_v,:] = 0
 
         elif field_row == ("velocityz",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
             mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
@@ -278,7 +278,6 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         m = eigs[0]
 

@@ -18,7 +18,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ratio31", "scale3d"]
+        return ["prandtl", "rayleigh", "ro", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -200,15 +200,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc)
+            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc).tolil()
             mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc)
+            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc).tolil()
             mat[idx_v,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc).tolil()
             mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
@@ -222,11 +222,10 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         m = eigs[0]
 
-        zscale = eq_params['ratio31']*eq_params['scale3d']
+        zscale = eq_params['scale3d']
 
         zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
 
@@ -236,7 +235,8 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0).tolil()
+                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
+                mat = mat.tolil()
                 mat[:,idx_u] = 0
                 mat[idx_u,:] = 0
 
@@ -265,7 +265,8 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0).tolil()
+                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
+                mat = mat.tolil()
                 mat[:,idx_v] = 0
                 mat[idx_v,:] = 0
 
@@ -353,8 +354,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc).tolil()
-                mat[idx_p,:] = 0
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
                 mat = mat + zero_p
 
         return mat
@@ -363,7 +363,6 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
 
         m = eigs[0]
 

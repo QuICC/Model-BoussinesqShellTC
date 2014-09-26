@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [40, 0, 40]
+res = [30, 0, 30]
 eq_params = {'prandtl':7, 'rayleigh':3.440597e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
 eigs = [8]
 eq_params = {'prandtl':7, 'rayleigh':3.56674e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}

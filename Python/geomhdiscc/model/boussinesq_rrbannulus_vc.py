@@ -260,11 +260,11 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
             mat[idx_u,:] = 0
 
         elif field_row == ("velocityy",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
             mat[idx_v,:] = 0
 
         elif field_row == ("velocityz",""):
-            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
             mat[idx_w,:] = 0
 
         elif field_row == ("temperature",""):
@@ -491,7 +491,6 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
         # W:
         zero_w = annulus.zblk(res[0], res[2], 2, 2, no_bc())
-        #zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
