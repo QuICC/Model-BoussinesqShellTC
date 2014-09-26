@@ -7,6 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
+import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cylindrical.cylinder as cylinder
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
@@ -239,9 +240,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = mat.tolil()
                 mat[:,idx_u] = 0
                 mat[idx_u,:] = 0
+                mat = mat + zero_u
 
             elif field_col == ("velocityy",""):
                 mat = cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -2.0*1j*m).tolil()
+                mat[:,idx_v] = 0
                 mat[idx_u,:] = 0
 
             elif field_col == ("velocityz",""):
@@ -269,6 +272,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = mat.tolil()
                 mat[:,idx_v] = 0
                 mat[idx_v,:] = 0
+                mat = mat + zero_v
 
             elif field_col == ("velocityz",""):
                 mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
@@ -292,6 +296,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale).tolil()
                 mat[:,idx_w] = 0
                 mat[idx_w,:] = 0
+                mat = mat + zero_w
 
             elif field_col == ("temperature",""):
                 mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, Ra).tolil()
@@ -328,6 +333,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['zb'] = 1
                 mat = cylinder.i1j1x1div(res[0]+1, res[2]+1, (m+1)%2, bc).tolil()
+                mat[:,idx_u] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityy",""):
@@ -338,6 +344,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['zb'] = 1
                 mat = cylinder.i1j1(res[0]+1, res[2]+1, (m%1)%2, bc, 1j*m).tolil()
+                mat[:,idx_v] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("velocityz",""):
@@ -348,13 +355,14 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 bc['z']['cr'] = 1
                 bc['z']['zb'] = 1
                 mat = cylinder.i1j1x1e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale).tolil()
+                mat[:,idx_w] = 0
                 mat[idx_p,:] = 0
 
             elif field_col == ("temperature",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
                 mat = mat + zero_p
 
         return mat
@@ -398,28 +406,37 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         m = eigs[0]
 
         # U:
-        zero_u = cylinder.zblk(res[0], res[1], (m+1)%2, 1, 2, no_bc())
+        zero_u = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, no_bc())
+        zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+#        zero_u = zero_u + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
         zero_u = spsp.lil_matrix(zero_u.shape)
         zero_u[idx_u,idx_u] = 1
 
         # V:
-        zero_v = cylinder.zblk(res[0], res[1], (m+1)%2, 1, 2, no_bc())
+        zero_v = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, no_bc())
+        zero_v = zero_v + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+#        zero_v = zero_v + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
         zero_v = spsp.lil_matrix(zero_v.shape)
         zero_v[idx_v,idx_v] = 1
 
         # W:
-        zero_w = cylinder.zblk(res[0], res[1], m%2, 1, 2, no_bc())
+        zero_w = cylinder.zblk(res[0], res[2], m%2, 1, 2, no_bc())
+#        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
+        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
         zero_w = spsp.lil_matrix(zero_w.shape)
         zero_w[idx_w,idx_w] = 1
 
         # P:
-        zero_p = cylinder.zblk(res[0], res[1], m%2, 1, 2, no_bc())
+        zero_p = cylinder.zblk(res[0], res[2], m%2, 1, 2, no_bc())
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-2, c1d.c1dbc.no_bc()))
         # Cleanup and create indexes list
         idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
         zero_p = spsp.lil_matrix(zero_p.shape)
