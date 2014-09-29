@@ -1,6 +1,6 @@
 /**
  * @file MumpsLU.hpp
- * @brief Declarations needed to use the Mumps routines in the C++ 
+ * @brief Eigen wrapper to use the Mumps solver 
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -94,14 +94,22 @@ namespace Eigen {
 
          ~MumpsLU()
          {
+            GeoMHDiSCC::FrameworkMacro::synchronize();
             m_id.job = -2;
 
-            free(m_id.irn);
-            free(m_id.jcn);
-            free(m_id.a);
+            #ifdef GEOMHDISCC_MPI
+               free(m_id.irn_loc);
+               free(m_id.jcn_loc);
+               free(m_id.a_loc);
+            #else 
+               free(m_id.irn);
+               free(m_id.jcn);
+               free(m_id.a);
+            #endif //GEOMHDISCC_MPI
             free(m_id.rhs);
 
             MumpsLU_mumps(&m_id, Scalar());
+            GeoMHDiSCC::FrameworkMacro::synchronize();
          }
 
          inline Index rows() const { return m_id.n; }
@@ -164,6 +172,8 @@ namespace Eigen {
           */
          void analyzePattern(const MatrixType& matrix)
          {
+            GeoMHDiSCC::FrameworkMacro::synchronize();
+
             m_id.job = 1;
             copyInput(matrix, true);
 
@@ -174,6 +184,7 @@ namespace Eigen {
             m_info = m_error ? InvalidInput : Success;
             m_analysisIsOk = m_error ? false : true;
             m_factorizationIsOk = false;
+            GeoMHDiSCC::FrameworkMacro::synchronize();
          }
 
          /** Performs a numeric decomposition of \a matrix
@@ -184,6 +195,8 @@ namespace Eigen {
           */
          void factorize(const MatrixType& matrix)
          {
+            GeoMHDiSCC::FrameworkMacro::synchronize();
+
             eigen_assert(m_analysisIsOk && "MumpsLU: you must first call analyzePattern()");
 
             m_id.job = 2;
@@ -194,6 +207,7 @@ namespace Eigen {
 
             m_info = m_error ? NumericalIssue : Success;
             m_factorizationIsOk = m_error ? false : true;
+            GeoMHDiSCC::FrameworkMacro::synchronize();
          }
 
          #ifndef EIGEN_PARSED_BY_DOXYGEN
@@ -205,6 +219,8 @@ namespace Eigen {
 
          void init()
          {
+            GeoMHDiSCC::FrameworkMacro::synchronize();
+
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
                m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::spectralComm());
@@ -221,11 +237,25 @@ namespace Eigen {
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.info[1-1];
             #ifdef GEOMHDISCC_NO_DEBUG
-               m_id.icntl[1-1] = 0;
-               m_id.icntl[2-1] = 0;
-               m_id.icntl[3-1] = 0;
-               m_id.icntl[4-1] = 0;
+               //m_id.icntl[1-1] = 0;
+               //m_id.icntl[2-1] = 0;
+               //m_id.icntl[3-1] = 0;
+               //m_id.icntl[4-1] = 0;
             #endif // GEOMHDISCC_NO_DEBUG
+
+            #ifdef GEOMHDISCC_MPI
+               // Matrix distribution
+               m_id.icntl[18-1] = 3;
+               // RHS dense
+               m_id.icntl[20-1] = 0;
+               // Solution distribution
+               m_id.icntl[21-1] = 0;
+            #endif // GEOMHDISCC_MPI
+
+            // increase memory relaxation
+            m_id.icntl[14-1] = 35;
+
+            GeoMHDiSCC::FrameworkMacro::synchronize();
          }
 
          void copyInput(const MatrixType& mat, const bool freeMemory)
@@ -234,52 +264,93 @@ namespace Eigen {
 
             if(m_id.a != 0 && freeMemory)
             {
-               free(m_id.irn);
-               free(m_id.jcn);
-               free(m_id.a);
+               #ifdef GEOMHDISCC_MPI
+                  free(m_id.irn_loc);
+                  free(m_id.jcn_loc);
+                  free(m_id.a_loc);
+                  m_id.irn_loc = 0;
+                  m_id.jcn_loc = 0;
+                  m_id.a_loc = 0;
+               #else
+                  free(m_id.irn);
+                  free(m_id.jcn);
+                  free(m_id.a);
+                  m_id.irn = 0;
+                  m_id.jcn = 0;
+                  m_id.a = 0;
+               #endif //GEOMHDISCC_MPI
+
                free(m_id.rhs);
-               m_id.irn = 0;
-               m_id.jcn = 0;
-               m_id.a = 0;
                m_id.rhs = 0;
             }
-            if(m_id.a == 0)
+
+            bool needCopy;
+            #ifdef GEOMHDISCC_MPI
+               needCopy = (m_id.a_loc == 0);
+            #else 
+               needCopy = (m_id.a == 0);
+            #endif //GEOMHDISCC_MPI
+
+            if(needCopy)
             {
+               int *pRow;
+               int *pCol;
+               MumpsScalar *pValue;
+
                m_id.n = mat.rows();
-               m_id.nz = mat.nonZeros();
-               m_id.irn = (int *) malloc(sizeof(int)*m_id.nz);
-               m_id.jcn = (int *) malloc(sizeof(int)*m_id.nz);
-               // Mumps requires a different format for complex values
-               m_id.a = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.nz);
+               #ifdef GEOMHDISCC_MPI
+                  m_id.nz_loc = mat.nonZeros();
+                  m_id.irn_loc = (int *) malloc(sizeof(int)*m_id.nz_loc);
+                  m_id.jcn_loc = (int *) malloc(sizeof(int)*m_id.nz_loc);
+
+                  // Mumps requires a different format for complex values
+                  m_id.a_loc = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.nz_loc);
+
+                  // Set pointers to copy data
+                  pRow = m_id.irn_loc;
+                  pCol = m_id.jcn_loc;
+                  pValue = m_id.a_loc;
+               #else
+                  m_id.nz = mat.nonZeros();
+                  m_id.irn = (int *) malloc(sizeof(int)*m_id.nz);
+                  m_id.jcn = (int *) malloc(sizeof(int)*m_id.nz);
+
+                  // Mumps requires a different format for complex values
+                  m_id.a = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.nz);
+
+                  // Set pointers to copy data
+                  pRow = m_id.irn;
+                  pCol = m_id.jcn;
+                  pValue = m_id.a;
+               #endif //GEOMHDISCC_MPI
                // Also allocate memory for rhs, assumes single rhs
                m_id.rhs = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.n);
-            }
 
-            int *pRow = m_id.irn;
-            int *pCol = m_id.jcn;
-            MumpsScalar *pValue = m_id.a;
-            for(int k = 0; k < mat.outerSize(); ++k)
-            {
-               for(typename MatrixType::InnerIterator it(mat,k); it; ++it)
+               for(int k = 0; k < mat.outerSize(); ++k)
                {
-                  // Convert index to fortran numbering (1 based vs 0 based)
-                  *pRow = it.row() + 1;
-                  *pCol = it.col() + 1;
-                  // Convert value to compatible data type
-                  *pValue = MumpsLU_convert(it.value());
+                  for(typename MatrixType::InnerIterator it(mat,k); it; ++it)
+                  {
+                     // Convert index to fortran numbering (1 based vs 0 based)
+                     *pRow = it.row() + 1;
+                     *pCol = it.col() + 1;
+                     // Convert value to compatible data type
+                     *pValue = MumpsLU_convert(it.value());
 
-                  // Increment pointers
-                  ++pRow;
-                  ++pCol;
-                  ++pValue;
+                     // Increment pointers
+                     ++pRow;
+                     ++pCol;
+                     ++pValue;
+                  }
                }
             }
          }
 
          void copyRhs(const Scalar* pRhs) const
          {
+            int nK = m_id.nrhs*m_id.lrhs;
             MumpsScalar * pVal = m_id.rhs;
-            for(int k = 0; k < m_id.nrhs*m_id.lrhs; ++pRhs,++pVal,++k)
+
+            for(int k = 0; k < nK; ++pRhs,++pVal,++k)
             {
                *pVal = MumpsLU_convert(*pRhs);
             }
@@ -287,8 +358,10 @@ namespace Eigen {
 
          void copySolution(Scalar* pSol) const
          {
+            int nK = m_id.nrhs*m_id.lrhs;
             MumpsScalar * pVal = m_id.rhs;
-            for(int k = 0; k < m_id.nrhs*m_id.lrhs; ++pSol,++pVal,++k)
+
+            for(int k = 0; k < nK; ++pSol,++pVal,++k)
             {
                *pSol = MumpsLU_convert(*pVal);
             }
@@ -315,6 +388,9 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
    eigen_assert((XDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major result yet");
    eigen_assert(b.cols() == 1 && "MumpsLU is implemented for a single RHS");
+   #ifdef GEOMHDISCC_MPI
+      eigen_assert(b.derived().data() != x.derived().data() && "Parallel execution does not allow x and b to be the same");
+   #endif //GEOMHDISCC_MPI
 
    m_id.job = 3;
    m_id.nrhs = rhsCols;
