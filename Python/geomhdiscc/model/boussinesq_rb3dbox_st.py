@@ -205,7 +205,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return c3d.stencil(res[0], res[2], bc)
 
-    def qi(self, res, eq_params, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -217,7 +217,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -243,7 +243,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
 
         return mat
 
-    def time_block(self, res, eq_params, eigs, bcs, field_row):
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']

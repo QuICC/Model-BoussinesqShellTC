@@ -311,7 +311,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return c2d.stencil(res[0], res[2], bc)
 
-    def qi(self, res, eq_params, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -329,7 +329,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block of linear operator"""
 
         Pr = eq_params['prandtl']
@@ -396,7 +396,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return mat
 
-    def time_block(self, res, eq_params, eigs, bcs, field_row):
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
         k = eigs[0]/2

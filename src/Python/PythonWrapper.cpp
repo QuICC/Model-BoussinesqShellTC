@@ -250,6 +250,34 @@ namespace GeoMHDiSCC {
       return pTuple;
    }
 
+   PyObject* PythonWrapper::makeList(const std::vector<int>& val)
+   {
+      PyObject *pList, *pValue;
+
+      pList = PyList_New(val.size());
+      for(unsigned int i = 0; i < val.size(); i++)
+      {
+         pValue = PyLong_FromLong(val.at(i));
+         PyList_SetItem(pList, i, pValue); 
+      }
+
+      return pList;
+   }
+
+   PyObject* PythonWrapper::makeList(const std::vector<std::vector<int> >& val)
+   {
+      PyObject *pList, *pValue;
+
+      pList = PyList_New(val.size());
+      for(unsigned int i = 0; i < val.size(); i++)
+      {
+         pValue = PythonWrapper::makeList(val.at(i));
+         PyList_SetItem(pList, i, pValue); 
+      }
+
+      return pList;
+   }
+
    PyObject* PythonWrapper::makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val)
    {
       PyObject *pDict, *pKey, *pValue;

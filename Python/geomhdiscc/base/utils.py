@@ -39,24 +39,24 @@ def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None, has_wrap = True
 
     return diags
 
-def build_block_matrix(fields, func, func_args):
+def build_block_matrix(fields, func, func_args, restriction = None):
 
     tmp = []
     for field_row in fields:
         row = []
         for field_col in fields:
             args = func_args + (field_row,field_col)
-            row.append(func(*args))
+            row.append(func(*args, restriction = restriction))
         tmp.append(row)
 
     return spsp.bmat(tmp)
 
-def build_diag_matrix(fields, func, func_args):
+def build_diag_matrix(fields, func, func_args, restriction = None):
 
     tmp = []
     for field_row in fields:
         args = func_args + (field_row,)
-        tmp.append(func(*args))
+        tmp.append(func(*args, restriction = restriction))
    
     return spsp.block_diag(tmp)
 
@@ -72,7 +72,7 @@ def restricted_kron_2d(A, B, restriction = None):
         mat = spsp.kron(A, B)
 
     else:
-        diag = lil_matrix((1,A.shape[0]))
+        diag = spsp.lil_matrix((1,A.shape[0]))
         diag[0,restriction] = 1.0
         S = spsp.diags(diag.todense(), [0], shape = A.shape)
 
@@ -87,24 +87,31 @@ def restricted_kron_3d(A, B, C, restriction = None):
         mat = spsp.kron(A, spsp.kron(B, C))
 
     else:
+        A = spsp.csr_matrix(A)
         output_shape = (B.shape[0]*C.shape[0], A.shape[1]*B.shape[1]*C.shape[1])
         itSlow = iter(restriction[0])
         itFast = iter(restriction[1])
-        row = itSlow.next()
-        lines = itFast.next()
+        row = next(itSlow)
+        lines = next(itFast)
         if row == 0:
-            mat = spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))
-            row = itSlow.next()
-            lines = itFast.next()
+            mat = spsp.kron(A[0,:], restricted_kron_2d(B, C, lines))
+            row = next(itSlow)
+            lines = next(itFast)
         else:
             mat = spsp.coo_matrix(output_shape)
 
-        for i in range(1, AA.shape[0]):
-            if i == row:
-                mat = spsp.vstack([mat, spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))])
-                row = itSlow.next()
-                lines = itFast.next()
-            else:
-                mat = spsp.vstack([mat, spsp.coo_matrix(output_shape)])
+        try:
+            for i in range(1, A.shape[0]):
+                if i == row:
+                    mat = spsp.vstack([mat, spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))])
+                    row = next(itSlow)
+                    lines = next(itFast)
+                else:
+                    mat = spsp.vstack([mat, spsp.coo_matrix(output_shape)])
+        except:
+            pass
+        if mat.shape[0] < A.shape[0]*B.shape[0]*C.shape[0]:
+            zrows = (A.shape[0]*B.shape[0]*C.shape[0] - mat.shape[0])
+            mat = spsp.vstack([mat, spsp.coo_matrix((zrows,A.shape[1]*B.shape[1]*C.shape[1]))])
 
     return mat

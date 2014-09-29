@@ -107,64 +107,120 @@ def writeTest(opA, rhs, sol, name):
     io.mmwrite(save_path + name + '_rhs_' +  str(nn) + '.mtx', rhs)
     io.mmwrite(save_path + name + '_sol_' +  str(nn) + '.mtx', sol)
 
-def laplacian1D(nx):
+def laplacian1D(nx, ny, nz, restriction = None):
     """Accuracy test for i2lapl operator"""
+
+    k = nx/2
+    l = nx/3
+    A = c1d.i2lapl(nx, k, l, {0:20}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
+
+    return (A, B)
+
+def bilaplacian1D(nx, ny, nz, restriction = None):
+    """Accuracy test for i4lapl2 operator"""
+
+    k = nx/2
+    l = nx/3
+    A = c1d.i4lapl2(nx, k, l, {0:40}).tocsr()
+    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+
+    return (A, B)
+
+def laplacian2D(nx, ny, nz, restriction = None):
+    """Accuracy test for i2j2lapl operator"""
+
+    k = nx/3
+    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}}, restriction = restriction).tocsr()
+    B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc(), restriction = restriction).tocsr()
+
+    return (A, B)
+
+def bilaplacian2D(nx, ny, nz, restriction = None):
+    """Accuracy test for i4j4lapl2 operator"""
+
+    k = nx/3
+    A = c2d.i4j4lapl2(nx, nz, k, {'x':{0:40}, 'z':{0:40}}, restriction = restriction).tocsr()
+    B = c2d.i4j4(nx, nz, c2d.c2dbc.no_bc(), restriction = restriction).tocsr()
+
+    return (A, B)
+
+def laplacian3D(nx, ny, nz, restriction = None):
+    """Accuracy test for i2j2k2lapl operator"""
+
+    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xy'}, restriction = restriction).tocsr()
+    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc(), restriction = restriction).tocsr()
+
+    return (A, B)
+
+def bilaplacian3D(nx, ny, nz, restriction = None):
+    """Accuracy test for i4j4k4lapl2 operator"""
+
+    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:41}, 'z':{0:40}, 'priority':'zsx'}, restriction = restriction).tocsr()
+    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc(), restriction = restriction).tocsr()
+
+    return (A, B)
+
+def laplacian1D_exact(nx, ny, nz, restriction = None):
+    """Accuracy test for i2lapl operator"""
+
+    A, B = laplacian1D(nx, ny, nx, restriction = restriction)
 
     xg = transf.grid(nx)
 
     x = sy.Symbol('x')
-    k, l = np.random.rand(2)*nx
-    A = c1d.i2lapl(nx, k, l, {0:20}).tocsr()
-    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
+    k = nx/2
+    l = nx/3
     ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol - l**2*ssol)
     rhs, sol = build1DSol(B, sphys, ssol, xg)
 
     return (A, rhs, sol)
 
-def bilaplacian1D(nx):
+def bilaplacian1D_exact(nx, ny, nz, restriction = None):
     """Accuracy test for i4lapl2 operator"""
+
+    A, B = bilaplacian1D(nx, ny, nz, restriction = restriction)
 
     xg = transf.grid(nx)
 
     x = sy.Symbol('x')
-    k, l = np.random.rand(2)*nx
-    A = c1d.i4lapl2(nx, k, l, {0:40}).tocsr()
-    B = c1d.i4(nx, c1d.c1dbc.no_bc()).tocsr()
+    k = nx/2
+    l = nx/3
     ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]))
     sphys = sy.expand(sy.diff(ssol,x,x,x,x) + k**4*ssol + l**4*ssol - 2*k**2*sy.diff(ssol,x,x) - 2*l**2*sy.diff(ssol,x,x) + 2*k**2*l**2*ssol)
     rhs, sol = build1DSol(B, sphys, ssol, xg)
 
     return (A, rhs, sol)
 
-def laplacian2D(nx,nz, restriction = None):
+def laplacian2D_exact(nx, ny, nz, restriction = None):
     """Accuracy test for i2j2lapl operator"""
+
+    A, B = laplacian2D(nx, ny, nz, restriction = restriction)
 
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    k = np.random.ranf()*nx
-    A = c2d.i2j2lapl(nx, nz, k, {'x':{0:20}, 'z':{0:20}}, restriction = restriction).tocsr()
-    B = c2d.i2j2(nx, nz, c2d.c2dbc.no_bc(), restriction = restriction).tocsr()
+    k = nx/3
     ssol = (1.0 - x**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol + sy.diff(ssol,z,z))
     rhs, sol = build2DSol(B, sphys, ssol, xg, zg)
 
     return (A, rhs, sol)
 
-def bilaplacian2D(nx,nz, restriction = None):
+def bilaplacian2D_exact(nx, ny, nz, restriction = None):
     """Accuracy test for i4j4lapl2 operator"""
+
+    A, B = bilaplacian2D(nx, ny, nz, restriction = restriction)
 
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 
     x = sy.Symbol('x')
     z = sy.Symbol('z')
-    k = np.random.ranf()*nx
-    A = c2d.i4j4lapl2(nx, nz, k, {'x':{0:40}, 'z':{0:40}}, restriction = restriction).tocsr()
-    B = c2d.i4j4(nx, nz, c2d.c2dbc.no_bc(), restriction = restriction).tocsr()
+    k = nx/3
     ssol = (1.0 - x**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,nz-4,1)])
     sphys = sy.expand(sy.diff(ssol,x,x) - k**2*ssol + sy.diff(ssol,z,z))
     sphys = sy.expand(sy.diff(sphys,x,x) - k**2*sphys + sy.diff(sphys,z,z))
@@ -172,8 +228,10 @@ def bilaplacian2D(nx,nz, restriction = None):
 
     return (A, rhs, sol)
 
-def laplacian3D(nx, ny, nz, restriction = None):
+def laplacian3D_exact(nx, ny, nz, restriction = None):
     """Accuracy test for i2j2k2lapl operator"""
+
+    A, B = laplacian3D(nx, ny, nz, restriction = None)
 
     xg = transf.grid(nx)
     yg = transf.grid(ny)
@@ -183,16 +241,22 @@ def laplacian3D(nx, ny, nz, restriction = None):
     y = sy.Symbol('y')
     z = sy.Symbol('z')
 
-    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xy'}, restriction = restriction).tocsr()
-    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc(), restriction = restriction).tocsr()
     ssol = (1.0 - x**2)*(1.0 - y**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
     rhs, sol = build3DSol(B, sphys, ssol, xg, yg, zg)
 
+    A, B = laplacian3D(nx, ny, nz, restriction = restriction)
+    #R = c3d.qid(nx, ny, nz, 0, 0, 0, restriction)
+    #rhs = R*rhs
+    #sol = R*sol
+
+
     return (A, rhs, sol)
 
-def bilaplacian3D(nx, ny, nz, restriction = None):
+def bilaplacian3D_exact(nx, ny, nz, restriction = None):
     """Accuracy test for i4j4k4lapl2 operator"""
+
+    A, B = bilaplacian3D(nx, ny, nz, restriction = None)
 
     xg = transf.grid(nx)
     yg = transf.grid(ny)
@@ -202,16 +266,18 @@ def bilaplacian3D(nx, ny, nz, restriction = None):
     y = sy.Symbol('y')
     z = sy.Symbol('z')
 
-    A = c3d.i4j4k4lapl2(nx, ny, nz, {'x':{0:41}, 'y':{0:41}, 'z':{0:40}, 'priority':'zsx'}, restriction = restriction).tocsr()
-    B = c3d.i4j4k4(nx, ny, nz, c3d.c3dbc.no_bc(), restriction = restriction).tocsr()
     ssol = (1.0 - x**2)**3*(1.0 - y**2)**3*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-4,1)])
     sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
     sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
     rhs, sol = build3DSol(B, sphys, ssol, xg, yg, zg)
+    A, B = bilaplacian3D(nx, ny, nz, restriction = restriction)
+    #R = c3d.qid(nx, ny, nz, 0, 0, 0, restriction)
+    #rhs = R*rhs
+    #sol = R*sol
 
     return (A, rhs, sol)
 
-def rb1dboxvc(nx):
+def rb1dboxvc(nx, ny, nz, restriction = None):
     """Accuracy test for rb1dboxvc operator"""
 
     import geomhdiscc.model.boussinesq_rb1dbox_vc as mod
@@ -235,7 +301,7 @@ def rb1dboxvc(nx):
 
     return (A, B)
 
-def rrb1dboxvc(nx):
+def rrb1dboxvc(nx, ny, nz, restriction = None):
     """Accuracy test for rrb1dboxvc operator"""
 
     import geomhdiscc.model.boussinesq_rrb1dbox_vc as mod
@@ -257,7 +323,7 @@ def rrb1dboxvc(nx):
 
     return (A, B)
 
-def rb2dboxvc(nx, nz, restriction = None):
+def rb2dboxvc(nx, ny, nz, restriction = None):
     """Accuracy test for rb2dboxvc operator"""
 
     import geomhdiscc.model.boussinesq_rb2dbox_vc as mod
@@ -271,13 +337,13 @@ def rb2dboxvc(nx, nz, restriction = None):
     eigs = [3]
     eq_params = {'prandtl':1, 'rayleigh':10823.2, 'scale1d':1.0, 'scale3d':1.0} # m = 3, n = 1, aspect ration 1:1
     bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
-    A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+    A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
-    B = model.time(res, eq_params, eigs, bcs, fields)
+    B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
 
     return (A, B)
 
-def rrb2dboxvc(nx, nz, restriction = None):
+def rrb2dboxvc(nx, ny, nz, restriction = None):
     """Accuracy test for rrb2dboxvc operator"""
 
     import geomhdiscc.model.boussinesq_rrb2dbox_vc as mod
@@ -291,9 +357,9 @@ def rrb2dboxvc(nx, nz, restriction = None):
     eigs = [5]
     eq_params = {'prandtl':1, 'rayleigh':1e5, 'taylor':1e3, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
     bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
-    A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+    A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
-    B = model.time(res, eq_params, eigs, bcs, fields)
+    B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
 
     return (A, B)
 
@@ -311,9 +377,9 @@ def rb3dboxvc(nx, ny, nz, restriction = None):
     eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
     bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
     eigs = []
-    A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+    A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
-    B = model.time(res, eq_params, eigs, bcs, fields)
+    B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
 
     return (A, B)
 
@@ -331,9 +397,9 @@ def rrb3dboxvc(nx, ny, nz, restriction = None):
     eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'taylor':1e3, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
     bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
     eigs = []
-    A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+    A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
-    B = model.time(res, eq_params, eigs, bcs, fields)
+    B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
 
     return (A, B)
 
@@ -341,24 +407,21 @@ if __name__ == "__main__":
     # Set test parameters
     ns = [16, 32, 64, 128, 256, 512]
     for nn in ns:
-        A, rhs, sol = laplacian1D(nn)
+        A, rhs, sol = laplacian1D_exact(nn, 0, 0)
         writeTest(A, rhs, sol, 'laplacian1D')
-        A, rhs, sol = bilaplacian1D(nn)
+        A, rhs, sol = bilaplacian1D_exact(nn, 0, 0)
         writeTest(A, rhs, sol, 'bilaplacian1D')
-        utils.triplets(A)
-        utils.triplets(rhs)
-        utils.triplets(sol)
 
     ns = [8, 16, 24, 32, 48]
     for nn in ns:
-        laplacian2D(nn, nn)
-        A, rhs, sol = writeTest(A, rhs, sol, 'laplacian2D')
-        bilaplacian2D(nn, nn)
-        A, rhs, sol = writeTest(A, rhs, sol, 'bilaplacian2D')
+        A, rhs, sol = laplacian2D_eaxt(nn, 0, nn)
+        writeTest(A, rhs, sol, 'laplacian2D')
+        A, rhs, sol = bilaplacian2D_exact(nn, 0, nn)
+        writeTest(A, rhs, sol, 'bilaplacian2D')
 
     ns = [8, 10, 12, 14, 16]
     for nn in ns:
-        A, rhs, sol = laplacian3D(nn, nn, nn)
+        A, rhs, sol = laplacian3D_exact(nn, nn, nn)
         writeTest(A, rhs, sol, 'laplacian3D')
-        A, rhs, sol = bilaplacian3D(nn, nn, nn)
+        A, rhs, sol = bilaplacian3D_exact(nn, nn, nn)
         writeTest(A, rhs, sol, 'bilaplacian3D')

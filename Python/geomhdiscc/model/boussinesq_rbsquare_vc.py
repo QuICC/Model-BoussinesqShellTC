@@ -229,7 +229,7 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return c2d.stencil(res[0], res[2], bc)
 
-    def qi(self, res, eq_params, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
         zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
@@ -251,7 +251,7 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -351,7 +351,7 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
 
         return mat
 
-    def time_block(self, res, eq_params, eigs, bcs, field_row):
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']
@@ -377,7 +377,7 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs):
+    def zero_blocks(self, res, eigs, restriction = None):
         """Build restriction matrices"""
 
         # U: TiN

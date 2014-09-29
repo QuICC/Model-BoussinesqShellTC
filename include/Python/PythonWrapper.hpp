@@ -93,6 +93,16 @@ namespace GeoMHDiSCC {
          static PyObject* makeTuple(const std::vector<MHDFloat>& val);
 
          /**
+          * @brief Make a list from vector of int
+          */
+         static PyObject* makeList(const std::vector<int>& val);
+
+         /**
+          * @brief Make a list of list from vector of vector of int
+          */
+         static PyObject* makeList(const std::vector<std::vector<int> >& val);
+
+         /**
           * @brief Make a dictironary
           */
          static PyObject* makeDict(const std::vector<std::string>& key, const std::vector<MHDFloat>& val);
