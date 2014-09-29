@@ -74,12 +74,9 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid_x, grid_y, grid_z):
     rhs = transf.tocheb3d(rhs)
     rhs = rhs.reshape(nx*ny*nz, order='F')
     lhs = spsplin.spsolve(opA,opB*rhs)
-    io.mmwrite("laplacian3D_A.mtx", opA)
-    io.mmwrite("laplacian3D_rhs.mtx", (opB*rhs).reshape(rhs.shape[0],1))
     lhs = lhs.reshape(nx,nz,ny, order = 'F')
     sol = xyz_to_phys(sol_expr, grid_x, grid_z, grid_y)
     sol = transf.tocheb3d(sol)
-    io.mmwrite("laplacian3D_sol.mtx", sol.reshape(opA.shape[0],1, order='F'))
     err = np.abs(lhs - sol)
     vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
@@ -321,12 +318,12 @@ def i2j2k2lapl(nx, ny, nz, xg, yg, zg):
     sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
     test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
 
-    print("\tbc = 21, 21, 21")
-    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:21}, 'z':{0:21}, 'priority':'sxsz'}).tocsr()
-    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
-    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
-    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
-    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
+#    print("\tbc = 21, 21, 21")
+#    A = c3d.i2j2k2lapl(nx, ny, nz, {'x':{0:21}, 'y':{0:21}, 'z':{0:21}, 'priority':'sxsz'}).tocsr()
+#    B = c3d.i2j2k2(nx, ny, nz, c3d.c3dbc.no_bc()).tocsr()
+#    ssol = (1.0 - x**2)**2*(1.0 - y**2)**2*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-4,1)]) for j in np.arange(0,ny-4,1)]) for k in np.arange(0,nz-4,1)])
+#    sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
+#    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
     
 
 def i4j4k4(nx, ny, nz, xg, yg, zg):
@@ -438,27 +435,27 @@ def i4j4k4lapl2(nx, ny, nz, xg, yg, zg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 20
-    ny = 20
-    nz = 20
+    nx = 8
+    ny = 8
+    nz = 8
     xg = transf.grid(nx)
     yg = transf.grid(nx)
     zg = transf.grid(nz)
 
     # run hardcoded operator tests
     print('Hard coded exact operators')
-#    d1(nx, ny, nz, xg, yg, zg)
-#    e1(nx, ny, nz, xg, yg, zg)
-#    f1(nx, ny, nz, xg, yg, zg)
-#    i1j1k1d1(nx, ny, nz, xg, yg, zg)
-#    i1j1k1e1(nx, ny, nz, xg, yg, zg)
-#    i1j1k1f1(nx, ny, nz, xg, yg, zg)
-#    i2j2k2d2e2f2(nx, ny, nz, xg, yg, zg)
-#    i2j2k2(nx, ny, nz, xg, yg, zg)
-#    i2j2k2d1(nx, ny, nz, xg, yg, zg)
-#    i2j2k2e1(nx, ny, nz, xg, yg, zg)
-#    i2j2k2f1(nx, ny, nz, xg, yg, zg)
+    d1(nx, ny, nz, xg, yg, zg)
+    e1(nx, ny, nz, xg, yg, zg)
+    f1(nx, ny, nz, xg, yg, zg)
+    i1j1k1d1(nx, ny, nz, xg, yg, zg)
+    i1j1k1e1(nx, ny, nz, xg, yg, zg)
+    i1j1k1f1(nx, ny, nz, xg, yg, zg)
+    i2j2k2d2e2f2(nx, ny, nz, xg, yg, zg)
+    i2j2k2(nx, ny, nz, xg, yg, zg)
+    i2j2k2d1(nx, ny, nz, xg, yg, zg)
+    i2j2k2e1(nx, ny, nz, xg, yg, zg)
+    i2j2k2f1(nx, ny, nz, xg, yg, zg)
     i2j2k2lapl(nx, ny, nz, xg, yg, zg)
-#    i4j4k4(nx, ny, nz, xg, yg, zg)
-#    i4j4k4lapl(nx, ny, nz, xg, yg, zg)
-#    i4j4k4lapl2(nx, ny, nz, xg, yg, zg)
+    i4j4k4(nx, ny, nz, xg, yg, zg)
+    i4j4k4lapl(nx, ny, nz, xg, yg, zg)
+    i4j4k4lapl2(nx, ny, nz, xg, yg, zg)

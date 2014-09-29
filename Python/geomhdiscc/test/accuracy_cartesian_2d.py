@@ -724,8 +724,8 @@ def lapl2he1_e1laplh(nx,nz, xg, zg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 50
-    nz = 50
+    nx = 10
+    nz = 10
     xg = transf.grid(nx)
     zg = transf.grid(nz)
 

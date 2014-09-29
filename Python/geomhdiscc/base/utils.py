@@ -64,3 +64,47 @@ def triplets(mat):
     mat = mat.tocoo();
 
     return list(zip(mat.row,mat.col,mat.data))
+
+def restricted_kron_2d(A, B, restriction = None):
+    """Compute a double Kronecker product with possible restrictions"""
+
+    if restriction == None or A.nnz == 0 or B.nnz == 0:
+        mat = spsp.kron(A, B)
+
+    else:
+        diag = lil_matrix((1,A.shape[0]))
+        diag[0,restriction] = 1.0
+        S = spsp.diags(diag.todense(), [0], shape = A.shape)
+
+        mat = spsp.kron(S*A, B)
+
+    return mat
+
+def restricted_kron_3d(A, B, C, restriction = None):
+    """Compute a triple Kronecker product with possible restrictions"""
+
+    if restriction == None or A.nnz == 0 or B.nnz == 0 or C.nnz == 0:
+        mat = spsp.kron(A, spsp.kron(B, C))
+
+    else:
+        output_shape = (B.shape[0]*C.shape[0], A.shape[1]*B.shape[1]*C.shape[1])
+        itSlow = iter(restriction[0])
+        itFast = iter(restriction[1])
+        row = itSlow.next()
+        lines = itFast.next()
+        if row == 0:
+            mat = spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))
+            row = itSlow.next()
+            lines = itFast.next()
+        else:
+            mat = spsp.coo_matrix(output_shape)
+
+        for i in range(1, AA.shape[0]):
+            if i == row:
+                mat = spsp.vstack([mat, spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))])
+                row = itSlow.next()
+                lines = itFast.next()
+            else:
+                mat = spsp.vstack([mat, spsp.coo_matrix(output_shape)])
+
+    return mat

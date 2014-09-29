@@ -10,6 +10,7 @@ import scipy.sparse as spsp
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.transform.cartesian as phys
+import geomhdiscc.base.utils as utils
 
 
 def no_bc():
@@ -40,7 +41,7 @@ def bid(nx, q, d, bc, location = 't'):
 
     return c1dbc.constrain(mat, tbc)
 
-def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
+def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't', restriction = None):
     """Contrain the matrix with the Tau boundary condition"""
 
     priority = bc.get('priority', 'xz')
@@ -103,16 +104,16 @@ def constrain(mat, nx, ny, nz, qx, qy, qz, bc, location = 't'):
     if bc['x'][0] > 0:
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'], location = location)
-        bc_mat = bc_mat + spsp.kron(bid(ny,sy[0],dy[0],bc['y'], location = location), spsp.kron(bid(nz,sz[0],dz[0],bc['z']),bcMat))
+        bc_mat = bc_mat + utils.restricted_kron_3d(bid(ny,sy[0],dy[0],bc['y'], location = location), bid(nz,sz[0],dz[0],bc['z']), bcMat, restriction = restriction)
 
     if bc['y'][0] > 0:
         bcMat = spsp.lil_matrix((ny,ny))
         bcMat = c1dbc.constrain(bcMat, bc['y'], location = location)
-        bc_mat = bc_mat + spsp.kron(bcMat, spsp.kron(bid(nz,sz[1],dz[1],bc['z']),bid(nx,sx[0],dx[0],bc['x'], location = location)))
+        bc_mat = bc_mat + utils.restricted_kron_3d(bcMat, bid(nz,sz[1],dz[1], bc['z']), bid(nx,sx[0],dx[0],bc['x'], location = location), restriction = restriction)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        bc_mat = bc_mat + spsp.kron(bid(ny,sy[1],dy[1],bc['y'], location = location), spsp.kron(bcMat,bid(nx,sx[1],dx[1],bc['x'])))
+        bc_mat = bc_mat + utils.restricted_kron_3d(bid(ny,sy[1],dy[1],bc['y'], location = location), bcMat, bid(nx,sx[1],dx[1],bc['x']), restriction = restriction)
 
     return bc_mat

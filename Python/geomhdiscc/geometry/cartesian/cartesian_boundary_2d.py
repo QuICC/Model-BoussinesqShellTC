@@ -10,6 +10,7 @@ import scipy.sparse as spsp
 import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
 import geomhdiscc.geometry.cartesian.cartesian_boundary_1d as c1dbc
 import geomhdiscc.transform.cartesian as phys
+import geomhdiscc.base.utils as utils
 
 
 def no_bc():
@@ -40,7 +41,7 @@ def bid(nx, q, d, bc, location = 't'):
 
     return c1dbc.constrain(mat, tbc)
 
-def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
+def constrain(mat, nx, nz, qx, qz, bc, location = 't', restriction = None):
     """Contrain the matrix with the Tau boundary condition"""
 
     priority = bc.get('priority', 'x')
@@ -69,33 +70,33 @@ def constrain(mat, nx, nz, qx, qz, bc, location = 't'):
         bcMat = spsp.lil_matrix((nx,nx))
         bcMat = c1dbc.constrain(bcMat, bc['x'], location = location)
         if bc['x'].get('kron',0) == 0 or bc['x']['kron'] == "id":
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location), bcMat)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bid(nz,sz,dz,bc['z'], location = location), bcMat, restriction = restriction)
         elif bc['x']['kron'] == "d1":
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.d1(nz, c1dbc.no_bc()), bcMat)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bid(nz,sz,dz,bc['z'], location = location)*c1d.d1(nz, c1dbc.no_bc()), bcMat, restriction = restriction)
         elif bc['x']['kron'] == "d2":
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.d2(nz, c1dbc.no_bc()), bcMat)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bid(nz,sz,dz,bc['z'], location = location)*c1d.d2(nz, c1dbc.no_bc()), bcMat, restriction = restriction)
         elif bc['x']['kron'] == "i1":
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.i1(nz, c1dbc.no_bc()), bcMat)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bid(nz,sz,dz,bc['z'], location = location)*c1d.i1(nz, c1dbc.no_bc()), bcMat, restriction = restriction)
         elif bc['x']['kron'] == "q1":
-            bc_mat = bc_mat + spsp.kron(bid(nz,sz,dz,bc['z'], location = location)*c1d.qid(nz, 1, c1dbc.no_bc()), bcMat)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bid(nz,sz,dz,bc['z'], location = location)*c1d.qid(nz, 1, c1dbc.no_bc()), bcMat, restriction = restriction)
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
         if bc['x'][0] >= 0:
             if bc['z'].get('kron',0) == 0 or bc['z']['kron'] == "id":
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location))
+                bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, bid(nx,sx,dx,bc['x'], location = location), restriction = restriction)
             elif bc['z']['kron'] == "d1":
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.d1(nx, c1dbc.no_bc()))
+                bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.d1(nx, c1dbc.no_bc()), restriction = restriction)
             elif bc['z']['kron'] == "d2":
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.d2(nx, c1dbc.no_bc()))
+                bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.d2(nx, c1dbc.no_bc()), restriction = restriction)
             elif bc['z']['kron'] == "i1":
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.i1(nx, c1dbc.no_bc()))
+                bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.i1(nx, c1dbc.no_bc()), restriction = restriction)
             elif bc['z']['kron'] == "q1":
-                bc_mat = bc_mat + spsp.kron(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.qid(nx, 1, c1dbc.no_bc()))
+                bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, bid(nx,sx,dx,bc['x'], location = location)*c1d.qid(nx, 1, c1dbc.no_bc()), restriction = restriction)
 
         else:
             tmpB = c1dbc.constrain(bid(nx,0,0,c1dbc.no_bc(), location = location),bc['x'], location = location)
-            bc_mat = bc_mat + spsp.kron(bcMat, tmpB)
+            bc_mat = bc_mat + utils.restricted_kron_2d(bcMat, tmpB, restriction = restriction)
 
     return bc_mat
