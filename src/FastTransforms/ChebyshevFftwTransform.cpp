@@ -163,6 +163,7 @@ namespace Transform {
 
       // Fill matrix and clenup
       PythonWrapper::fillMatrix(this->mDiff, pValue);
+      Py_DECREF(pValue);
       PythonWrapper::finalize();
    }
 

@@ -188,6 +188,7 @@ namespace Equations {
       int rhsSize = PyLong_AsLong(pTmp);
       pTmp = PyTuple_GetItem(pArgs, 4);
       int systemSize = PyLong_AsLong(pTmp);
+      Py_DECREF(pValue);
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();
@@ -319,6 +320,7 @@ namespace Equations {
          PyTuple_SetItem(pTmp, 1, pValue);
 
          PyList_Append(pList, pTmp);
+         Py_DECREF(pTmp);
       }
       PyTuple_SetItem(pArgs, 4, pList);
 
@@ -329,6 +331,7 @@ namespace Equations {
 
       // Convert Python matrix into triplets
       PythonModelWrapper::fillMatrix(rModelMatrix, pValue);
+      Py_DECREF(pValue);
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();
@@ -357,6 +360,7 @@ namespace Equations {
 
       // Convert Python matrix into triplets
       PythonModelWrapper::fillMatrix(mat, pValue);
+      Py_DECREF(pValue);
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();
@@ -385,6 +389,7 @@ namespace Equations {
 
       // Convert Python matrix into triplets
       PythonModelWrapper::fillMatrix(mat, pValue);
+      Py_DECREF(pValue);
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();
@@ -421,6 +426,7 @@ namespace Equations {
 
       // Convert Python matrix into triplets
       PythonModelWrapper::fillMatrix(mat, pValue);
+      Py_DECREF(pValue);
 
       // Finalise Python interpreter
       PythonModelWrapper::cleanup();

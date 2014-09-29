@@ -120,6 +120,7 @@ namespace GeoMHDiSCC {
       if(pTmp)
       {
          PythonWrapper::mpFunc = PyObject_GetAttrString(pTmp, func.c_str());
+         Py_DECREF(pTmp);
 
          // Check for successfully loading function
          if(! (PythonWrapper::mpFunc && PyCallable_Check(PythonWrapper::mpFunc)))
@@ -259,6 +260,8 @@ namespace GeoMHDiSCC {
          pKey = PyUnicode_FromString(key.at(i).c_str());
          pValue = PyFloat_FromDouble(val.at(i));
          PyDict_SetItem(pDict, pKey, pValue);
+         Py_DECREF(pValue);
+         Py_DECREF(pKey);
       }
 
       return pDict;
@@ -275,6 +278,8 @@ namespace GeoMHDiSCC {
          pKey = PyUnicode_FromString(mapIt->first.c_str());
          pValue = PyLong_FromLong(mapIt->second);
          PyDict_SetItem(pDict, pKey, pValue);
+         Py_DECREF(pValue);
+         Py_DECREF(pKey);
       }
 
       return pDict;
@@ -306,6 +311,7 @@ namespace GeoMHDiSCC {
 
          pTmp = PyUnicode_AsASCIIString(pValue);
          NonDimensional::Id nd = IoTools::HumanToId::toNd(std::string(PyBytes_AsString(pTmp)));
+         Py_DECREF(pTmp);
 
          rList.push_back(nd);
       }
@@ -322,6 +328,7 @@ namespace GeoMHDiSCC {
 
          pTmp = PyUnicode_AsASCIIString(pValue);
          PhysicalNames::Id phys = IoTools::HumanToId::toPhys(std::string(PyBytes_AsString(pTmp)));
+         Py_DECREF(pTmp);
 
          rList.push_back(phys);
       }
@@ -339,10 +346,12 @@ namespace GeoMHDiSCC {
          pTmp = PyTuple_GetItem(pValue,0);
          pTmp2 = PyUnicode_AsASCIIString(pTmp);
          PhysicalNames::Id phys = IoTools::HumanToId::toPhys(std::string(PyBytes_AsString(pTmp2)));
+         Py_DECREF(pTmp2);
 
          pTmp = PyTuple_GetItem(pValue,1);
          pTmp2 = PyUnicode_AsASCIIString(pTmp);
          FieldComponents::Spectral::Id comp = IoTools::HumanToId::toComp(std::string(PyBytes_AsString(pTmp2)));
+         Py_DECREF(pTmp2);
 
          rList.push_back(std::make_pair(phys, comp));
       }
@@ -356,9 +365,11 @@ namespace GeoMHDiSCC {
       pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
       long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
       long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+      Py_DECREF(pValue);
 
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
+      Py_INCREF(pPyMat);
       PyTuple_SetItem(pArgs, 0, pPyMat);
       PythonWrapper::setFunction("triplets", "utils");
       pValue = PythonWrapper::callFunction(pArgs);
@@ -393,9 +404,11 @@ namespace GeoMHDiSCC {
       pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
       long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
       long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+      Py_DECREF(pValue);
 
       // Convert Python matrix into triplets
       pArgs = PyTuple_New(1);
+      Py_INCREF(pPyMat);
       PyTuple_SetItem(pArgs, 0, pPyMat);
       PythonWrapper::setFunction("triplets", "utils");
       pValue = PythonWrapper::callFunction(pArgs);

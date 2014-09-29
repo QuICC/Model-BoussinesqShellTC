@@ -148,6 +148,7 @@ namespace Transform {
 
       // Fill matrix and clenup
       PythonWrapper::fillMatrix(this->mDiffE, pValue);
+      Py_DECREF(pValue);
 
       // ... set odd parity
       pValue = PyLong_FromLong(1);
@@ -156,6 +157,7 @@ namespace Transform {
       // Call d1
       PythonWrapper::setFunction("d1");
       pValue = PythonWrapper::callFunction(pArgs);
+      Py_DECREF(pValue);
 
       // Fill matrix and clenup
       PythonWrapper::fillMatrix(this->mDiffO, pValue);

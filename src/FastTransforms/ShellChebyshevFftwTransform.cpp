@@ -158,6 +158,7 @@ namespace Transform {
 
       // Call d1
       PythonWrapper::setFunction("d1");
+      Py_DECREF(pValue);
       pValue = PythonWrapper::callFunction(pArgs);
 
       // Fill matrix and clenup
