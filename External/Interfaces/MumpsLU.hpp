@@ -20,6 +20,7 @@
 #include <zmumps_c.h>
 
 #include "Framework/FrameworkMacro.h"
+#include "Base/MpiTypes.hpp"
 
 namespace Eigen {
 
@@ -118,6 +119,9 @@ namespace Eigen {
          inline void setIterativeRefinement(const int iterations) { m_id.icntl[10 - 1] = iterations; }
 
          inline void setMemoryRelaxation(const int percent) { m_id.icntl[14 - 1] = percent; }
+
+         inline int getMaxMemory() { return m_id.infog[16 - 1]; }
+         inline int getTotalMemory() { return m_id.infog[17 - 1]; }
 
          /** \brief Reports whether previous computation was successful.
           *
@@ -224,8 +228,12 @@ namespace Eigen {
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
                m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::spectralComm());
+               int rank;
+               MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               m_isHost = (rank == 0);
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
+               m_isHost = 1;
             #endif // GEOMHDISCC_MPI
             m_id.par = 1;
             m_id.sym = 0;
@@ -237,10 +245,10 @@ namespace Eigen {
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.info[1-1];
             #ifdef GEOMHDISCC_NO_DEBUG
-               //m_id.icntl[1-1] = 0;
-               //m_id.icntl[2-1] = 0;
-               //m_id.icntl[3-1] = 0;
-               //m_id.icntl[4-1] = 0;
+               m_id.icntl[1-1] = 0;
+               m_id.icntl[2-1] = 0;
+               m_id.icntl[3-1] = 0;
+               m_id.icntl[4-1] = 0;
             #endif // GEOMHDISCC_NO_DEBUG
 
             #ifdef GEOMHDISCC_MPI
@@ -323,8 +331,12 @@ namespace Eigen {
                   pCol = m_id.jcn;
                   pValue = m_id.a;
                #endif //GEOMHDISCC_MPI
-               // Also allocate memory for rhs, assumes single rhs
-               m_id.rhs = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.n);
+
+               // Also allocate memory for rhs on host, assumes single rhs
+               if(m_isHost)
+               {
+                  m_id.rhs = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.n);
+               }
 
                for(int k = 0; k < mat.outerSize(); ++k)
                {
@@ -345,26 +357,47 @@ namespace Eigen {
             }
          }
 
-         void copyRhs(const Scalar* pRhs) const
+         void copyRhs(const Scalar* pData) const
          {
-            int nK = m_id.nrhs*m_id.lrhs;
-            MumpsScalar * pVal = m_id.rhs;
+            const Scalar* pRhs;
 
-            for(int k = 0; k < nK; ++pRhs,++pVal,++k)
+            #ifdef GEOMHDISCC_MPI
+               mTmp.resize(m_id.lrhs, m_id.nrhs);
+               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::spectralComm()); 
+               pRhs = mTmp.data();
+            #else
+               pRhs = pData;
+            #endif //GEOMHDISCC_MPI
+
+            if(m_isHost)
             {
-               *pVal = MumpsLU_convert(*pRhs);
+               int nK = m_id.nrhs*m_id.lrhs;
+               MumpsScalar * pVal = m_id.rhs;
+
+               for(int k = 0; k < nK; ++pRhs,++pVal,++k)
+               {
+                  *pVal = MumpsLU_convert(*pRhs);
+               }
             }
          }
 
-         void copySolution(Scalar* pSol) const
+         void copySolution(Scalar* pData) const
          {
             int nK = m_id.nrhs*m_id.lrhs;
-            MumpsScalar * pVal = m_id.rhs;
-
-            for(int k = 0; k < nK; ++pSol,++pVal,++k)
+            if(m_isHost)
             {
-               *pSol = MumpsLU_convert(*pVal);
+               Scalar* pSol = pData;
+               MumpsScalar * pVal = m_id.rhs;
+
+               for(int k = 0; k < nK; ++pSol,++pVal,++k)
+               {
+                  *pSol = MumpsLU_convert(*pVal);
+               }
             }
+
+            #ifdef GEOMHDISCC_MPI
+               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::spectralComm());
+            #endif //GEOMHDISCC_MPI
          }
 
          mutable ComputationInfo m_info;
@@ -375,7 +408,11 @@ namespace Eigen {
          mutable int m_error;
          mutable typename MumpsStrucType<Scalar>::StrucType m_id;
 
+         int m_isHost;
+
       private:
+         mutable Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>   mTmp;
+
          MumpsLU(MumpsLU& ) { }
 
    };
@@ -384,6 +421,8 @@ template<typename MatrixType>
 template<typename BDerived,typename XDerived>
 bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDerived> &x) const
 {
+   GeoMHDiSCC::FrameworkMacro::synchronize();
+
    int rhsCols = b.cols();
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
    eigen_assert((XDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major result yet");
@@ -400,21 +439,17 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
       m_id.icntl[11-1] = 1;
    #endif // GEOMHDISCC_DEBUG
 
-   if(b.derived().data() == x.derived().data())
-   {
-      copyRhs(b.derived().data());
-      MumpsLU_mumps(&m_id, Scalar());
-   } else
-   {
-      copyRhs(b.derived().data());
-      MumpsLU_mumps(&m_id, Scalar());
-   }
+   copyRhs(b.derived().data());
+
+   MumpsLU_mumps(&m_id, Scalar());
    m_error = m_id.info[1-1];
 
    if (m_error!=0)
       return false;
 
    copySolution(x.derived().data());
+
+   GeoMHDiSCC::FrameworkMacro::synchronize();
 
    return true;
 }

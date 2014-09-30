@@ -65,6 +65,98 @@ def triplets(mat):
 
     return list(zip(mat.row,mat.col,mat.data))
 
+def rows_kron_2d(A, B, restriction):
+    """Compute a row restriction of a 2D kronecker product"""
+
+    diag = spsp.lil_matrix((1,A.shape[0]))
+    diag[0,restriction] = 1.0
+    S = spsp.diags(diag.todense(), [0], shape = A.shape)
+
+    mat = spsp.kron(S*A, B)
+
+    return mat
+
+def rows_kron_3d(A, B, C, restriction):
+    """Compute a row restriction of a 3D kronecker product"""
+    
+    out_rows = B.shape[0]*C.shape[0]
+    out_cols = A.shape[1]*B.shape[1]*C.shape[1]
+
+    A = spsp.csr_matrix(A)
+    itSlow = iter(restriction[0])
+    itFast = iter(restriction[1])
+    row = next(itSlow)
+    lines = next(itFast)
+    if row == 0:
+        mat = spsp.kron(A[0,:], rows_kron_2d(B, C, lines))
+        row = next(itSlow)
+        lines = next(itFast)
+    else:
+        mat = spsp.coo_matrix((out_rows, out_cols))
+
+    try:
+        for i in range(1, A.shape[0]):
+            if i == row:
+                mat = spsp.vstack([mat, spsp.kron(A[i,:], rows_kron_2d(B, C, lines))])
+                row = next(itSlow)
+                lines = next(itFast)
+            else:
+                mat = spsp.vstack([mat, spsp.coo_matrix((out_rows, out_cols))])
+    except:
+        pass
+
+    if mat.shape[0] < A.shape[0]*B.shape[0]*C.shape[0]:
+        zrows = (A.shape[0]*B.shape[0]*C.shape[0] - mat.shape[0])
+        mat = spsp.vstack([mat, spsp.coo_matrix((zrows, out_cols))])
+
+    return mat
+
+def cols_kron_3d(A, B, C, restriction):
+    """Compute a column restriction of a 3D kronecker product"""
+    
+    out_rows = A.shape[0]*B.shape[0]*C.shape[0]
+    out_cols = B.shape[1]*C.shape[1]
+
+    A = spsp.csc_matrix(A)
+    itSlow = iter(restriction[0])
+    itFast = iter(restriction[1])
+    col = next(itSlow)
+    lines = next(itFast)
+    if col == 0:
+        mat = spsp.kron(A[:,0], cols_kron_2d(B, C, lines))
+        col = next(itSlow)
+        lines = next(itFast)
+    else:
+        mat = spsp.coo_matrix((out_rows, out_cols))
+
+    try:
+        for i in range(1, A.shape[1]):
+            if i == col:
+                mat = spsp.hstack([mat, spsp.kron(A[:,i], cols_kron_2d(B, C, lines))])
+                col = next(itSlow)
+                lines = next(itFast)
+            else:
+                mat = spsp.hstack([mat, spsp.coo_matrix((out_rows, out_cols))])
+    except:
+        pass
+
+    if mat.shape[1] < A.shape[1]*B.shape[1]*C.shape[1]:
+        zcols = (A.shape[1]*B.shape[1]*C.shape[1] - mat.shape[1])
+        mat = spsp.hstack([mat, spsp.coo_matrix((out_rows, zcols))])
+
+    return mat
+
+def cols_kron_2d(A, B, restriction):
+    """Compute a column restriction of a 2D kronecker product"""
+
+    diag = spsp.lil_matrix((1,A.shape[0]))
+    diag[0,restriction] = 1.0
+    S = spsp.diags(diag.todense(), [0], shape = A.shape)
+
+    mat = spsp.kron(A*S, B)
+
+    return mat
+
 def restricted_kron_2d(A, B, restriction = None):
     """Compute a double Kronecker product with possible restrictions"""
 
@@ -72,11 +164,7 @@ def restricted_kron_2d(A, B, restriction = None):
         mat = spsp.kron(A, B)
 
     else:
-        diag = spsp.lil_matrix((1,A.shape[0]))
-        diag[0,restriction] = 1.0
-        S = spsp.diags(diag.todense(), [0], shape = A.shape)
-
-        mat = spsp.kron(S*A, B)
+        mat = cols_kron_2d(A, B, restriction)
 
     return mat
 
@@ -87,31 +175,6 @@ def restricted_kron_3d(A, B, C, restriction = None):
         mat = spsp.kron(A, spsp.kron(B, C))
 
     else:
-        A = spsp.csr_matrix(A)
-        output_shape = (B.shape[0]*C.shape[0], A.shape[1]*B.shape[1]*C.shape[1])
-        itSlow = iter(restriction[0])
-        itFast = iter(restriction[1])
-        row = next(itSlow)
-        lines = next(itFast)
-        if row == 0:
-            mat = spsp.kron(A[0,:], restricted_kron_2d(B, C, lines))
-            row = next(itSlow)
-            lines = next(itFast)
-        else:
-            mat = spsp.coo_matrix(output_shape)
-
-        try:
-            for i in range(1, A.shape[0]):
-                if i == row:
-                    mat = spsp.vstack([mat, spsp.kron(A[i,:], restricted_kron_2d(B, C, lines))])
-                    row = next(itSlow)
-                    lines = next(itFast)
-                else:
-                    mat = spsp.vstack([mat, spsp.coo_matrix(output_shape)])
-        except:
-            pass
-        if mat.shape[0] < A.shape[0]*B.shape[0]*C.shape[0]:
-            zrows = (A.shape[0]*B.shape[0]*C.shape[0] - mat.shape[0])
-            mat = spsp.vstack([mat, spsp.coo_matrix((zrows,A.shape[1]*B.shape[1]*C.shape[1]))])
+        mat = cols_kron_3d(A, B, C, restriction)
 
     return mat

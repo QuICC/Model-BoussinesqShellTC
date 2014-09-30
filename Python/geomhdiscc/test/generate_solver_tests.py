@@ -241,15 +241,16 @@ def laplacian3D_exact(nx, ny, nz, restriction = None):
     y = sy.Symbol('y')
     z = sy.Symbol('z')
 
+    np.random.seed(42)
+
     ssol = (1.0 - x**2)*(1.0 - y**2)*(1.0 - z**2)*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]) for j in np.arange(0,ny-2,1)]) for k in np.arange(0,nz-2,1)])
     sphys = sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z))
     rhs, sol = build3DSol(B, sphys, ssol, xg, yg, zg)
 
     A, B = laplacian3D(nx, ny, nz, restriction = restriction)
-    #R = c3d.qid(nx, ny, nz, 0, 0, 0, restriction)
-    #rhs = R*rhs
-    #sol = R*sol
-
+    R = c3d.qid(nx, ny, nz, 0, 0, 0, {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, restriction = restriction)
+    rhs = R*rhs
+#    sol = R*sol
 
     return (A, rhs, sol)
 
@@ -266,14 +267,17 @@ def bilaplacian3D_exact(nx, ny, nz, restriction = None):
     y = sy.Symbol('y')
     z = sy.Symbol('z')
 
+    np.random.seed(42)
+
     ssol = (1.0 - x**2)**3*(1.0 - y**2)**3*(1.0 - z**2)**2*np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-6,1)]) for j in np.arange(0,ny-6,1)]) for k in np.arange(0,nz-4,1)])
     sphys = sy.expand(sy.expand(sy.diff(ssol,x,x)) + sy.expand(sy.diff(ssol,y,y)) + sy.expand(sy.diff(ssol,z,z)))
     sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
     rhs, sol = build3DSol(B, sphys, ssol, xg, yg, zg)
     A, B = bilaplacian3D(nx, ny, nz, restriction = restriction)
-    #R = c3d.qid(nx, ny, nz, 0, 0, 0, restriction)
-    #rhs = R*rhs
-    #sol = R*sol
+
+    R = c3d.qid(nx, ny, nz, 0, 0, 0, {'x':{0:0}, 'y':{0:0}, 'z':{0:0}}, restriction = restriction)
+    rhs = R*rhs
+#    sol = R*sol
 
     return (A, rhs, sol)
 
