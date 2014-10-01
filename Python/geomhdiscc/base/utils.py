@@ -3,6 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
+import numpy as np
 import scipy.sparse as spsp
 
 
@@ -149,9 +150,9 @@ def cols_kron_3d(A, B, C, restriction):
 def cols_kron_2d(A, B, restriction):
     """Compute a column restriction of a 2D kronecker product"""
 
-    diag = spsp.lil_matrix((1,A.shape[0]))
+    diag = np.zeros((1,A.shape[0]))
     diag[0,restriction] = 1.0
-    S = spsp.diags(diag.todense(), [0], shape = A.shape)
+    S = spsp.diags(diag, [0], shape = A.shape)
 
     mat = spsp.kron(A*S, B)
 
@@ -178,3 +179,48 @@ def restricted_kron_3d(A, B, C, restriction = None):
         mat = cols_kron_3d(A, B, C, restriction)
 
     return mat
+
+def id_from_idx(idx, n):
+    """Create a sparse identity from indexes"""
+
+    d = np.zeros((1,n))
+    d[0,idx] = 1.0
+
+    return spsp.diags(d, [0], 2*(n,))
+
+def qid_from_idx(idx, n):
+    """Create a sparse identity from zero indexes indexes"""
+
+    d = np.ones((1,n))
+    d[0,idx] = 0.0
+
+    return spsp.diags(d, [0], 2*(n,))
+
+def idx_kron_2d(nA, nB, idxA, idxB):
+    """Compute nonzero diagonal indexex for a 2D sparse kronecker identity"""
+    
+    idx = idxA.repeat(len(idxB))
+    idx *= nB
+    idx = idx.reshape(-1,len(idxB))
+    idx += idxB
+    idx = idx.reshape(-1)
+
+    return idx
+
+def idx_kron_3d(nA, nB, nC, idxA, idxB, idxC):
+    """Compute nonzero diagonal indexex for a 3D sparse kronecker identity"""
+
+    idxD = idx_kron_2d(nB, nC, idxB, idxC)
+    idx = idx_kron_2d(nA, nB*nC, idxA, idxD)
+
+    return idx
+
+def qidx(nx, q):
+    """Create index of nonzero for sparse array with q zeros at the top"""
+
+    return np.arange(q, nx)
+
+def sidx(nx, s):
+    """Create index of nonzero for sparse array with s zeros at the bottom"""
+
+    return np.arange(0, nx-s)

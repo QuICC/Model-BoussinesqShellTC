@@ -256,20 +256,20 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction).tolil()
-            mat[idx_u,:] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+            mat = utils.qid_from_idx(idx_u, np.prod(res))*mat
 
         elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction).tolil()
-            mat[idx_v,:] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+            mat = utils.qid_from_idx(idx_v, np.prod(res))*mat
 
         elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction).tolil()
-            mat[idx_w,:] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+            mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
         elif field_row == ("temperature",""):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
@@ -288,16 +288,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         yscale = eq_params['scale2d']
         zscale = eq_params['scale3d']
 
-        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction).tolil()
-                mat[idx_u,:] = 0
-                mat[:,idx_u] = 0
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + zero_u
+                    mat = mat + utils.id_from_idx(idx_u, np.prod(res))
 
             elif field_col == ("velocityy",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -309,20 +308,18 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale, restriction = restriction).tolil()
-                mat[idx_u,:] = 0
-                mat[:,idx_p] = 0
+                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction).tolil()
-                mat[idx_v,:] = 0
-                mat[:,idx_v] = 0
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + zero_v
+                    mat = mat + utils.id_from_idx(idx_v, np.prod(res))
 
             elif field_col == ("velocityz",""):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
@@ -331,9 +328,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale, restriction = restriction).tolil()
-                mat[idx_v,:] = 0
-                mat[:,idx_p] = 0
+                mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
@@ -343,20 +339,18 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction).tolil()
-                mat[idx_w,:] = 0
-                mat[:,idx_w] = 0
+                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + zero_w
+                    mat = mat + utils.id_from_idx(idx_w, np.prod(res))
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0, restriction = restriction).tolil()
-                mat[idx_w,:] = 0
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0, restriction = restriction)
+                mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0, zscale = zscale, restriction = restriction).tolil()
-                mat[idx_w,:] = 0
-                mat[:,idx_p] = 0
+                mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0, zscale = zscale, restriction = restriction)
+                mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
@@ -366,8 +360,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction).tolil()
-                mat[:,idx_w] = 0
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+                mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
@@ -389,9 +383,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction).tolil()
-                    mat[:,idx_u] = 0
-                    mat[idx_p,:] = 0
+                    mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
+                    mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
                 elif field_col == ("velocityy",""):
                     bc['x']['cr'] = 1
@@ -403,9 +396,8 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction).tolil()
-                    mat[:,idx_v] = 0
-                    mat[idx_p,:] = 0
+                    mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
+                    mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
                 elif field_col == ("velocityz",""):
                     bc['x']['cr'] = 1
@@ -417,16 +409,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction).tolil()
-                    mat[:,idx_w] = 0
-                    mat[idx_p,:] = 0
+                    mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction)
+                    mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
 
                 elif field_col == ("temperature",""):
                     mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc).tolil()
-                    mat = mat + zero_p
+                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+                    mat = mat + utils.id_from_idx(idx_p, np.prod(res))
 
         return mat
 
@@ -435,23 +426,23 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction).tolil()
-            mat[idx_u,:] = 0
-            mat[:,idx_u] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            S = utils.qid_from_idx(idx_u, np.prod(res))
+            mat = S*mat*S
 
         elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction).tolil()
-            mat[idx_v,:] = 0
-            mat[:,idx_v] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            S = utils.qid_from_idx(idx_v, np.prod(res))
+            mat = S*mat*S
 
         elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction).tolil()
-            mat[idx_w,:] = 0
-            mat[:,idx_w] = 0
+            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            S = utils.qid_from_idx(idx_w, np.prod(res))
+            mat = S*mat*S
 
         elif field_row == ("temperature",""):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
@@ -465,42 +456,26 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         """Build restriction matrices"""
     
         # U:
-        zero_u = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
-        zero_u = zero_u + utils.restricted_kron_3d(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        zero_u = zero_u + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
-        zero_u = spsp.lil_matrix(zero_u.shape)
-        zero_u[idx_u,idx_u] = 1
+        idx_u = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0))
+        idx_u = np.union1d(idx_u, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
 
         # V:
-        zero_v = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
-        zero_v = zero_v + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_v = zero_v + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        idx_v = (np.ravel(zero_v.sum(axis=1)) > 0)
-        zero_v = spsp.lil_matrix(zero_v.shape)
-        zero_v[idx_v,idx_v] = 1
+        idx_v = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+        idx_v = np.union1d(idx_v, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
 
         # W:
-        zero_w = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
-        zero_w = zero_w + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_w = zero_w + utils.restricted_kron_3d(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
-        zero_w = spsp.lil_matrix(zero_w.shape)
-        zero_w[idx_w,idx_w] = 1
+        idx_w = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+        idx_w = np.union1d(idx_w,  utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
 
         # Pressure: T_iNN, T_NjN, T_NNk
-        zero_p = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], res[1]-1, c1d.c1dbc.no_bc()), c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        idx_p = utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-1), utils.qidx(res[2], 0), utils.qidx(res[0], 0)))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
         # Pressure: T_{N-2:N,N-2:N,N-2:N}
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], 0, c1d.c1dbc.no_bc()), c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), c1d.qid(res[2],res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.qid(res[1], res[1]-3, c1d.c1dbc.no_bc()), c1d.qid(res[2],0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], 0), utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-3)))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-3), utils.qidx(res[2], res[2]-3), utils.qidx(res[0], 0)))
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.qidx(res[1], res[1]-3), utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-3)))
         # Pressure: T_000
-        zero_p = zero_p + utils.restricted_kron_3d(c1d.sid(res[1], res[1]-1, c1d.c1dbc.no_bc()), c1d.sid(res[2],res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
-        zero_p = spsp.lil_matrix(zero_p.shape)
-        zero_p[idx_p,idx_p] = 1
+        idx_p = np.union1d(idx_p, utils.idx_kron_3d(res[1], res[2], res[0], utils.sidx(res[1], res[1]-1), utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
-        return (zero_u, idx_u, zero_v, idx_v, zero_w, idx_w, zero_p, idx_p)
+        return (idx_u, idx_v, idx_w, idx_p)

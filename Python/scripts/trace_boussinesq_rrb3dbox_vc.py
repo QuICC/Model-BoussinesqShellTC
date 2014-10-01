@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [32, 32, 32]
+res = [12, 12, 12]
 
 # SF/SF/SF, FF/FF/FT
 bc_vel = 6 
@@ -35,7 +35,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = False
 write_mtx = True
-solve_evp = False
+solve_evp = True
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
