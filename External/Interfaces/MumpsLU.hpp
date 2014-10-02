@@ -98,15 +98,17 @@ namespace Eigen {
             GeoMHDiSCC::FrameworkMacro::synchronize();
             m_id.job = -2;
 
-            #ifdef GEOMHDISCC_MPI
+            if(m_isParallel)
+            {
                free(m_id.irn_loc);
                free(m_id.jcn_loc);
                free(m_id.a_loc);
-            #else 
+            } else
+            {
                free(m_id.irn);
                free(m_id.jcn);
                free(m_id.a);
-            #endif //GEOMHDISCC_MPI
+            }
             free(m_id.rhs);
 
             MumpsLU_mumps(&m_id, Scalar());
@@ -231,9 +233,12 @@ namespace Eigen {
                int rank;
                MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
                m_isHost = (rank == 0);
+               MPI_Comm_size(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               m_isParallel = (rank > 1);
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
-               m_isHost = 1;
+               m_isHost = true;
+               m_isParallel = false;
             #endif // GEOMHDISCC_MPI
             m_id.par = 1;
             m_id.sym = 0;
@@ -251,14 +256,15 @@ namespace Eigen {
                m_id.icntl[4-1] = 0;
             #endif // GEOMHDISCC_NO_DEBUG
 
-            #ifdef GEOMHDISCC_MPI
+            if(m_isParallel)
+            {
                // Matrix distribution
                m_id.icntl[18-1] = 3;
                // RHS dense
                m_id.icntl[20-1] = 0;
                // Solution distribution
                m_id.icntl[21-1] = 0;
-            #endif // GEOMHDISCC_MPI
+            }
 
             // increase memory relaxation
             m_id.icntl[14-1] = 35;
@@ -270,34 +276,38 @@ namespace Eigen {
          {
             eigen_assert(mat.rows() == mat.cols() && "MumpsLU requires a square matrix");
 
-            if(m_id.a != 0 && freeMemory)
+            if((!m_isParallel && m_id.a != 0 && freeMemory) || (m_isParallel && m_id.a_loc != 0 && freeMemory))
             {
-               #ifdef GEOMHDISCC_MPI
+               if(m_isParallel)
+               {
                   free(m_id.irn_loc);
                   free(m_id.jcn_loc);
                   free(m_id.a_loc);
                   m_id.irn_loc = 0;
                   m_id.jcn_loc = 0;
                   m_id.a_loc = 0;
-               #else
+               } else
+               {
                   free(m_id.irn);
                   free(m_id.jcn);
                   free(m_id.a);
                   m_id.irn = 0;
                   m_id.jcn = 0;
                   m_id.a = 0;
-               #endif //GEOMHDISCC_MPI
+               }
 
                free(m_id.rhs);
                m_id.rhs = 0;
             }
 
             bool needCopy;
-            #ifdef GEOMHDISCC_MPI
+            if(m_isParallel)
+            {
                needCopy = (m_id.a_loc == 0);
-            #else 
+            } else
+            {
                needCopy = (m_id.a == 0);
-            #endif //GEOMHDISCC_MPI
+            }
 
             if(needCopy)
             {
@@ -306,7 +316,8 @@ namespace Eigen {
                MumpsScalar *pValue;
 
                m_id.n = mat.rows();
-               #ifdef GEOMHDISCC_MPI
+               if(m_isParallel)
+               {
                   m_id.nz_loc = mat.nonZeros();
                   m_id.irn_loc = (int *) malloc(sizeof(int)*m_id.nz_loc);
                   m_id.jcn_loc = (int *) malloc(sizeof(int)*m_id.nz_loc);
@@ -318,7 +329,8 @@ namespace Eigen {
                   pRow = m_id.irn_loc;
                   pCol = m_id.jcn_loc;
                   pValue = m_id.a_loc;
-               #else
+               } else
+               {
                   m_id.nz = mat.nonZeros();
                   m_id.irn = (int *) malloc(sizeof(int)*m_id.nz);
                   m_id.jcn = (int *) malloc(sizeof(int)*m_id.nz);
@@ -330,7 +342,7 @@ namespace Eigen {
                   pRow = m_id.irn;
                   pCol = m_id.jcn;
                   pValue = m_id.a;
-               #endif //GEOMHDISCC_MPI
+               }
 
                // Also allocate memory for rhs on host, assumes single rhs
                if(m_isHost)
@@ -362,9 +374,15 @@ namespace Eigen {
             const Scalar* pRhs;
 
             #ifdef GEOMHDISCC_MPI
+            if(m_isParallel)
+            {
                mTmp.resize(m_id.lrhs, m_id.nrhs);
                MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::spectralComm()); 
                pRhs = mTmp.data();
+            } else
+            {
+               pRhs = pData;
+            }
             #else
                pRhs = pData;
             #endif //GEOMHDISCC_MPI
@@ -396,7 +414,10 @@ namespace Eigen {
             }
 
             #ifdef GEOMHDISCC_MPI
+            if(m_isParallel)
+            {
                MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::spectralComm());
+            }
             #endif //GEOMHDISCC_MPI
          }
 
@@ -408,7 +429,8 @@ namespace Eigen {
          mutable int m_error;
          mutable typename MumpsStrucType<Scalar>::StrucType m_id;
 
-         int m_isHost;
+         bool m_isHost;
+         bool m_isParallel;
 
       private:
          mutable Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>   mTmp;

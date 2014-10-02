@@ -11,19 +11,19 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 0, 0]
+res = [14, 0, 0]
 
 # SF, FT,
 bc_vel = 1
 bc_temp = 0
 ## kx = 0, ky = 2
-#kx = 0
-#ky = 2
-#eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'scale1d':1.0}
-# kx = 0, ky = 1
 kx = 0
-ky = 1
-eq_params = {'prandtl':1, 'rayleigh':1284.225280, 'scale1d':1.0}
+ky = 2
+eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'scale1d':1.0}
+# kx = 0, ky = 1
+#kx = 0
+#ky = 1
+#eq_params = {'prandtl':1, 'rayleigh':1284.225280, 'scale1d':1.0}
 ## kx = 0, ky = 5.35
 #kx = 0
 #ky = 5.35
@@ -52,6 +52,9 @@ eq_params = {'prandtl':1, 'rayleigh':1284.225280, 'scale1d':1.0}
 #kx = kp*np.cos(phi*np.pi/180.0);
 #ky = (kp**2-kx**2)**0.5;
 #eq_params = {'prandtl':1, 'rayleigh':10520.18183, 'scale1d':1.0}
+#kx = 1.31
+#ky = 1.52
+#eq_params = {'prandtl':1, 'rayleigh':833.12, 'scale1d':1.0}
 
 eigs = [kx, ky]
 
@@ -93,7 +96,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -4.1e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -20.1e0, np.inf)
     print(evp_lmb)
 
 if show_solution:
