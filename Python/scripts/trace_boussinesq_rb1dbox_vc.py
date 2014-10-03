@@ -11,15 +11,15 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [14, 0, 0]
+res = [10, 0, 0]
 
 # SF, FT,
 bc_vel = 1
 bc_temp = 0
 ## kx = 0, ky = 2
-kx = 0
-ky = 2
-eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'scale1d':1.0}
+#kx = 0
+#ky = 2
+#eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'scale1d':1.0}
 # kx = 0, ky = 1
 #kx = 0
 #ky = 1
@@ -55,6 +55,12 @@ eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'scale1d':1.0}
 #kx = 1.31
 #ky = 1.52
 #eq_params = {'prandtl':1, 'rayleigh':833.12, 'scale1d':1.0}
+# Minimum n = 2: k_ = 4.442882938
+phi = 35
+kp = 4.442882938
+kx = kp*np.cos(phi*np.pi/180.0);
+ky = (kp**2-kx**2)**0.5;
+eq_params = {'prandtl':1, 'rayleigh':10520.18183, 'scale1d':1.0}
 
 eigs = [kx, ky]
 

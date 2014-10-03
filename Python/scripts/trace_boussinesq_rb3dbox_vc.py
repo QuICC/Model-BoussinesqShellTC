@@ -46,21 +46,26 @@ bc_temp = 4
 #eq_params = {'prandtl':1, 'rayleigh':711.3936909, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 2, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 0|1, m = 1|0, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 3, aspect ratio 1:1:3
+#eq_params = {'prandtl':1, 'rayleigh':(216./5.)*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Paper
+eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0/8.0, 'scale2d':1.0, 'scale3d':1.0} # Paper
+eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/8.0} # Paper
+eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0/8.0, 'scale2d':1.0, 'scale3d':1.0}/8.0 # Paper
 
 # SF/SF/NS, FF/FF/FT
-bc_vel = 4 
-bc_temp = 4 
+#bc_vel = 4 
+#bc_temp = 4 
 # SF/SF/NS, FF/FF/FT, Aspect ratio 3:1:1
-eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
+#eq_params = {'prandtl':1, 'rayleigh':1500.0, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 #eq_params = {'prandtl':1, 'rayleigh':2000.0, 'scale1d':1.0/3.0, 'scale2d':1.0, 'scale3d':1.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 
-# SF/SF/NS, FF/FF/FT
+# NS/NS/NS, FF/FF/FT
 #bc_vel = 0 
 #bc_temp = 4
 # NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':1755.2, 'scale1d':1.0/6.0, 'scale2d':1.0/6.0, 'scale3d':1.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':1813.0, 'scale1d':1.0/4.0, 'scale2d':1.0/4.0, 'scale3d':1.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':2084.9, 'scale1d':1.0/2.0, 'scale2d':1.0/2.0, 'scale3d':1.0} # Michael Watson's thesis
+#eq_params = {'prandtl':1, 'rayleigh':3390.0, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Primary bifurcation???
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -77,7 +82,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = True
+write_mtx = False
 solve_evp = True
 show_solution = (True and solve_evp)
 
@@ -106,7 +111,7 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -5e-1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -3e0, np.inf)
     print(evp_lmb)
 
 if show_solution:

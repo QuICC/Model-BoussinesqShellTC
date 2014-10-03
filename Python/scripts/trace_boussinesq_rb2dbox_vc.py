@@ -11,11 +11,14 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+#res = [12, 0, 12]
+#res = [16, 0, 16]
+#res = [24, 0, 24]
+res = [32, 0, 32]
 
-## SF/SF, FF/FT, k = 0
-#bc_vel = 2
-#bc_temp = 1
+# SF/SF, FF/FT, k = 0
+bc_vel = 2
+bc_temp = 1
 #eigs = [0]
 ## SF/SF, FF/FT, Aspect ratio 1:1
 #eq_params = {'prandtl':1, 'rayleigh':779.273, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
@@ -36,11 +39,21 @@ res = [20, 0, 20]
 #eq_params = {'prandtl':1, 'rayleigh':1692.07, 'scale1d':1.0, 'scale3d':1.0/3.0} # m = 2, n = 1, aspect ratio 1:3
 #eq_params = {'prandtl':1, 'rayleigh':2087.81, 'scale1d':1.0, 'scale3d':1.0/3.0} # m = 1, n = 4, aspect ratio 1:3
 #eq_params = {'prandtl':1, 'rayleigh':2137.92, 'scale1d':1.0, 'scale3d':1.0/3.0} # m = 2, n = 2, aspect ratio 1:3
+#eigs = [np.pi]
+#eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'scale1d':1.0, 'scale3d':1.0} #
+#eigs = [0]
+#eq_params = {'prandtl':7, 'rayleigh':8*np.pi**4, 'scale1d':1.0, 'scale3d':1.0/2.0} #
+#eigs = [(np.sqrt(7.)/2.)*np.pi]
+#eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'scale1d':1.0/2.0, 'scale3d':1.0} #
+#eigs = [0]
+#eq_params = {'prandtl':7, 'rayleigh':(389017./262144.)*np.pi**4, 'scale1d':1.0, 'scale3d':1.0/8.0} #
+eigs = [(np.sqrt(31)/8.)*np.pi]
+eq_params = {'prandtl':1, 'rayleigh':(63./8.)*np.pi**4, 'scale1d':1.0/8.0, 'scale3d':1.0} #
 
 # SF/SF, FF/FT, k = 1.0
-bc_vel = 2
-bc_temp = 1
-eigs = [1.0]
+#bc_vel = 2
+#bc_temp = 1
+#eigs = [1.0]
 # SF/SF, FF/FT, Aspect ratio 1:1
 #eq_params = {'prandtl':1, 'rayleigh':820.6591462, 'scale1d':1.0, 'scale3d':1.0} # l = 1, n = 1, aspect ration 1:1
 #eq_params = {'prandtl':1, 'rayleigh':1284.225280, 'scale1d':1.0, 'scale3d':1.0} # l = 0, n = 1, aspect ration 1:1
@@ -50,16 +63,16 @@ eigs = [1.0]
 #eq_params = {'prandtl':1, 'rayleigh':12628.25262, 'scale1d':1.0, 'scale3d':1.0} # l = 2, n = 2, aspect ration 1:1
 
 # SF/SF, FF/FT, k = 5.35
-bc_vel = 2
-bc_temp = 1
-eigs = [5.35]
+#bc_vel = 2
+#bc_temp = 1
+#eigs = [5.35]
 # SF/SF, FF/FT, Aspect ratio 1:1
 #eq_params = {'prandtl':1, 'rayleigh':1992.541617, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
 #eq_params = {'prandtl':1, 'rayleigh':2938.551173, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
 #eq_params = {'prandtl':1, 'rayleigh':6960.466725, 'scale1d':1.0, 'scale3d':1.0} # m = 2, n = 1, aspect ration 1:1
 #eq_params = {'prandtl':1, 'rayleigh':17572.19000, 'scale1d':1.0, 'scale3d':1.0} # m = 3, n = 1, aspect ration 1:1
 #eq_params = {'prandtl':1, 'rayleigh':12314.58187, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 2, aspect ration 1:1
-eq_params = {'prandtl':1, 'rayleigh':18282.41677, 'scale1d':1.0, 'scale3d':1.0} # m = 2, n = 2, aspect ration 1:1
+#eq_params = {'prandtl':1, 'rayleigh':18282.41677, 'scale1d':1.0, 'scale3d':1.0} # m = 2, n = 2, aspect ration 1:1
 
 ## SF/NS, FF/FT
 #bc_vel = 1 
@@ -80,9 +93,9 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = True
+write_mtx = False
 solve_evp = True
-show_solution = (True and solve_evp)
+show_solution = (False and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -110,8 +123,6 @@ if solve_evp:
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     print("Found " + str(len(evp_lmb)) + " eigenvalues\n")
 
-if show_solution:
-    viz_mode = 0
     k = eigs[0]/2.
     xscale = eq_params['scale1d']
     zscale = eq_params['scale3d']
@@ -125,6 +136,9 @@ if show_solution:
         # Extract continuity from velocity 
         sol_c = mod.c2d.d1(res[0], res[2], mod.no_bc(), xscale = xscale, sz = 0)*sol_u + 1j*k*sol_v + mod.c2d.e1(res[0], res[2], mod.no_bc(), zscale = zscale, sx = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
+
+if show_solution:
+    viz_mode = 0
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
