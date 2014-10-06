@@ -100,7 +100,6 @@ def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 300, maxmul = 10):
         t = t/nplin.norm(t,np.inf)
         v = F(t)
         fact = nplin.norm(v,np.inf)*np.max(np.abs(C)*np.ones((n,1)))
-        print(fact)
 
         # If factor is too large try new shift
         if fact > 1e-2/np.spacing(1):

@@ -283,7 +283,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
         xscale = eq_params['scale1d']
         zscale = eq_params['scale3d']
 
-        k = eigs[0]/2.0
+        k = eigs[0]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -342,7 +342,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                     mat = mat + utils.id_from_idx(idx_w, res[0]*res[2])
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2(res[0], res[2], bc, Ra/16.)
+                mat = c2d.i2j2(res[0], res[2], bc, Ra)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
@@ -357,8 +357,11 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j2(res[0], res[2], bc)
-                mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                if self.linearize:
+                    mat = c2d.i2j2(res[0], res[2], bc)
+                    mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                else:
+                    mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)

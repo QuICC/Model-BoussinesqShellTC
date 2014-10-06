@@ -18,7 +18,7 @@ bc_vel = 2
 bc_temp = 1
 eigs = [5]
 ## SF/SF, FF/FT, Aspect ratio 1:1
-eq_params = {'prandtl':1, 'rayleigh':1e5, 'taylor':1e3, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
+eq_params = {'prandtl':1, 'rayleigh':1e5, 'taylor':1e3, 'scale1d':2.0, 'scale3d':2.0} # m = 1, n = 1, aspect ration 1:1
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
@@ -64,7 +64,7 @@ if solve_evp:
 
 if show_solution:
     viz_mode = 0
-    k = eigs[0]/2.
+    k = eigs[0]
     xscale = eq_params['scale1d']
     zscale = eq_params['scale3d']
 

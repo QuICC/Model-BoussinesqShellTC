@@ -284,7 +284,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
 
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
-        T = (Ta/16.)**0.5
+        T = Ta**0.5
 
         xscale = eq_params['scale1d']
         yscale = eq_params['scale2d']
@@ -349,7 +349,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
                     mat = mat + utils.id_from_idx(idx_w, np.prod(res))
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0, restriction = restriction)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
             elif field_col == ("pressure",""):
@@ -364,8 +364,11 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
-                mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
+                if self.linearize:
+                    mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+                    mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
+                else:
+                    mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
@@ -420,7 +423,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
                     mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc).tolil()
+                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
                     mat = mat + utils.id_from_idx(idx_p, np.prod(res))
 
         return mat

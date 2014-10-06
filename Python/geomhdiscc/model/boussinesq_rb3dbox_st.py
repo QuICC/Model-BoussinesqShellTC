@@ -232,7 +232,7 @@ class BoussinesqRB3DBoxST(base_model.BaseModel):
                 mat = c3d.i4j4k4lapl2(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i4j4k4(res[0], res[1], res[2], bc, -Ra/16.0)
+                mat = c3d.i4j4k4(res[0], res[1], res[2], bc, -Ra)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):

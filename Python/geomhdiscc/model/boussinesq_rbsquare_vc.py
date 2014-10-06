@@ -232,16 +232,16 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c2d.i2j2(res[0], res[2], bc).tolil()
-            mat[idx_u,:] = 0;
+            mat = c2d.i2j2(res[0], res[2], bc)
+            mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j2(res[0], res[2], bc).tolil()
-            mat[idx_w,:] = 0;
+            mat = c2d.i2j2(res[0], res[2], bc)
+            mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
         elif field_row == ("temperature",""):
             mat = c2d.i2j2(res[0], res[2], bc)
@@ -259,16 +259,15 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
         xscale = eq_params['scale1d']
         zscale = eq_params['scale3d']
 
-        zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c2d.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale).tolil()
-                mat[:,idx_u] = 0;
-                mat[idx_u,:] = 0
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
+                mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + zero_u
+                    mat = mat + utils.id_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocityz",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
@@ -277,37 +276,37 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c2d.i2j2d1(res[0], res[2], bc, -1.0, xscale = xscale).tolil()
-                mat[idx_u,:] = 0
-                mat[:,idx_p] = 0
+                mat = c2d.i2j2d1(res[0], res[2], bc, -1.0, xscale = xscale)
+                mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale).tolil()
-                mat[:,idx_w] = 0;
-                mat[idx_w,:] = 0
+                mat = c2d.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + zero_w 
+                    mat = mat + utils.id_from_idx(idx_w, res[0]*res[2])
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2(res[0], res[2], bc, Ra/16.).tolil()
-                mat[idx_w,:] = 0
+                mat = c2d.i2j2(res[0], res[2], bc, Ra)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = c2d.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale).tolil()
-                mat[:,idx_p] = 0
-                mat[idx_w,:] = 0
+                mat = c2d.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale)
+                mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j2(res[0], res[2], bc).tolil()
-                mat[:,idx_w] = 0
+                if self.linearize:
+                    mat = c2d.i2j2(res[0], res[2], bc)
+                    mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                else:
+                    mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2lapl(res[0], res[2], 0, bc, xscale = xscale, zscale = zscale)
@@ -324,9 +323,8 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc, xscale = xscale).tolil()
-                    mat[:,idx_u] = 0
-                    mat[idx_p,:] = 0
+                    mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc, xscale = xscale)
+                    mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocityz",""):
                     bc['x']['cr'] = 1
@@ -335,16 +333,15 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc, zscale = zscale).tolil()
-                    mat[:,idx_w] = 0
-                    mat[idx_p,:] = 0
+                    mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc, zscale = zscale)
+                    mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
                     mat = c2d.zblk(res[0], res[2], 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c2d.zblk(res[0], res[2], 1, 1, bc).tolil()
-                    mat = mat + zero_p
+                    mat = c2d.zblk(res[0], res[2], 1, 1, bc)
+                    mat = mat + utils.id_from_idx(idx_p, res[0]*res[2])
             else:
                 mat = c2d.zblk(res[0], res[2], 1, 1, no_bc())
 
@@ -356,21 +353,21 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        zero_u, idx_u, zero_w, idx_w, zero_p, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
-            mat[:,idx_u] = 0
-            mat[idx_u,:] = 0
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
+            S = utils.qid_from_idx(idx_u, res[0]*res[2])
+            mat = S*mat*S
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr).tolil()
-            mat[:,idx_w] = 0
-            mat[idx_w,:] = 0
+            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
+            S = utils.qid_from_idx(idx_w, res[0]*res[2])
+            mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j2(res[0], res[2], bc).tolil()
+            mat = c2d.i2j2(res[0], res[2], bc)
 
         elif field_row == ("pressure",""):
             mat = c2d.zblk(res[0], res[2], 1, 1, bc)
@@ -381,32 +378,17 @@ class BoussinesqRBSquareVC(base_model.BaseModel):
         """Build restriction matrices"""
 
         # U: TiN
-        zero_u = c2d.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_u = zero_u + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
-        # Cleanup and create indexes list
-        idx_u = (np.ravel(zero_u.sum(axis=1)) > 0)
-        zero_u = spsp.lil_matrix(zero_u.shape)
-        zero_u[idx_u,idx_u] = 1
+        idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 
         # W: TNk
-        zero_w = c2d.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_w = zero_w + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        # Cleanup and create indexes list
-        idx_w = (np.ravel(zero_w.sum(axis=1)) > 0)
-        zero_w = spsp.lil_matrix(zero_w.shape)
-        zero_w[idx_w,idx_w] = 1
+        idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
 
         # Pressure: T_iN, T_Nk
-        zero_p = c2d.zblk(res[0], res[2], 2, 2, no_bc())
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], 0, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.qid(res[0], 0, c1d.c1dbc.no_bc()))
+        idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0)))
         # Pressure: T_{N-2:N,N-2:N}
-        zero_p = zero_p + spsp.kron(c1d.qid(res[2], res[2]-3, c1d.c1dbc.no_bc()), c1d.qid(res[0], res[0]-3, c1d.c1dbc.no_bc()))
+        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-3)))
         # Pressure: T_00
-        zero_p = zero_p + spsp.kron(c1d.sid(res[2], res[2]-1, c1d.c1dbc.no_bc()), c1d.sid(res[0], res[0]-1, c1d.c1dbc.no_bc()))
-        # Cleanup and create indexes list
-        idx_p = (np.ravel(zero_p.sum(axis=1)) > 0)
-        zero_p = spsp.lil_matrix(zero_p.shape)
-        zero_p[idx_p,idx_p] = 1
+        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
-        return (zero_u, idx_u, zero_w, idx_w, zero_p, idx_p)
+        return (idx_u, idx_w, idx_p)

@@ -18,7 +18,7 @@ bc_vel = 1
 bc_temp = 0
 kx = 0
 ky = 3.710
-eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'scale1d':1.0}
+eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'scale1d':2.0}
 
 eigs = [kx, ky]
 
@@ -74,7 +74,7 @@ if show_solution:
         sol_w = evp_vec[2*res[0]:3*res[0],mode]
 
         # Extract continuity from velocity
-        sol_c = 1j*(kx/2.0)*sol_u + 1j*(ky/2.0)*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
+        sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
@@ -85,7 +85,7 @@ if show_solution:
     sol_t = evp_vec[3*res[0]:4*res[0],viz_mode]
     sol_p = evp_vec[4*res[0]:5*res[0],viz_mode]
     # Extract continuity from velocity
-    sol_c = 1j*(kx/2.0)*sol_u + 1j*(ky/2.0)*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
+    sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
 
     # Create spectrum plots
     pl.subplot(2,3,1)

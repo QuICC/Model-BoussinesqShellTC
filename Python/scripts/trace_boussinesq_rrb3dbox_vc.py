@@ -17,7 +17,7 @@ res = [12, 12, 12]
 bc_vel = 6 
 bc_temp = 4 
 # SF/SF/SF, FF/FF/FT, Aspect ratio 1:1:1
-eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'taylor':1e3, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
+eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'taylor':1e3, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 

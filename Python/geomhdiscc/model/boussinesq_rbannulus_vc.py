@@ -372,8 +372,11 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
-                mat[:,idx_w] = 0
+                if self.linearize:
+                    mat = annulus.i2j2x2(res[0], res[2], a, b, bc).tolil()
+                    mat[:,idx_w] = 0
+                else:
+                    mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)

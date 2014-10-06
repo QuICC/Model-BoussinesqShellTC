@@ -252,11 +252,11 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
 
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
-        T = (Ta/16.)**0.5
+        T = Ta**0.5
         zscale = eq_params['scale1d']
 
-        k1 = eigs[0]/2.0
-        k2 = eigs[1]/2.0
+        k1 = eigs[0]
+        k2 = eigs[1]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -317,7 +317,7 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
                     mat = mat + utils.id_from_idx(idx_w, res[0])
 
             elif field_col == ("temperature",""):
-                mat = c1d.i2(res[0], bc, Ra/16.0)
+                mat = c1d.i2(res[0], bc, Ra)
 
             elif field_col == ("pressure",""):
                 mat = c1d.i2d1(res[0], bc, -1.0, cscale = zscale)
@@ -331,8 +331,11 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
                 mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i2(res[0], bc)
-                mat = mat*utils.qid_from_idx(idx_w, res[0])
+                if self.linearize:
+                    mat = c1d.i2(res[0], bc)
+                    mat = mat*utils.qid_from_idx(idx_w, res[0])
+                else:
+                    mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
                 mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)

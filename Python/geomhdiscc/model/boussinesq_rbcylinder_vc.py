@@ -315,8 +315,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = cylinder.i2j2x2(res[0], res[2], m%2, bc).tolil()
-                mat[:,idx_w] = 0
+                if self.linearize:
+                    mat = cylinder.i2j2x2(res[0], res[2], m%2, bc).tolil()
+                    mat[:,idx_w] = 0
+                else:
+                    mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)

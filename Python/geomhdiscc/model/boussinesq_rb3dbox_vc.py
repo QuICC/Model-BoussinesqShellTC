@@ -345,7 +345,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     mat = mat + utils.id_from_idx(idx_w, np.prod(res))
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra/16.0, restriction = restriction)
+                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
             elif field_col == ("pressure",""):
@@ -360,8 +360,11 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
-                mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
+                if self.linearize:
+                    mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+                    mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
+                else:
+                    mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
