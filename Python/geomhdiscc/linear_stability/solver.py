@@ -68,7 +68,7 @@ def sort_no_inf(vec, lmb):
     return (vec[:,idx], lmb[idx])
 
 
-def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 200, maxmul = 10):
+def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 300, maxmul = 10):
     """Compute eigenvalues in a given interval for the generalized eigenvalue problem using the shift-invert Arnoldi algorithm"""
 
     mode = 0
@@ -100,6 +100,7 @@ def sptarn(A, B, lb, ub, tolconv = 100*np.spacing(1), jmax = 200, maxmul = 10):
         t = t/nplin.norm(t,np.inf)
         v = F(t)
         fact = nplin.norm(v,np.inf)*np.max(np.abs(C)*np.ones((n,1)))
+        print(fact)
 
         # If factor is too large try new shift
         if fact > 1e-2/np.spacing(1):

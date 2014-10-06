@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [30, 0, 30]
+res = [40, 0, 40]
 eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
 eigs = [1]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
@@ -55,9 +55,6 @@ if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
     evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
-
-if show_solution:
-    viz_mode = -1
     zscale = eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):
@@ -70,6 +67,8 @@ if show_solution:
         sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
+if show_solution:
+    viz_mode = 0
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
     sol_u = evp_vec[0:res[0]*res[2],viz_mode]

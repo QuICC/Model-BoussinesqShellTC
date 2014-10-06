@@ -11,7 +11,12 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [12, 12, 12]
+#res = [12, 12, 12]
+#res = [14, 14, 14]
+#res = [16, 16, 16]
+#res = [18, 18, 18]
+#res = [20, 20, 20]
+res = [18, 18, 30]
 
 # SF/SF/SF, FF/FF/FT
 bc_vel = 6 
@@ -47,9 +52,9 @@ bc_temp = 4
 #eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 0|1, m = 1|0, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/3.0} # l = 1, m = 1, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':(216./5.)*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # Paper
-eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0/8.0, 'scale2d':1.0, 'scale3d':1.0} # Paper
-eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/8.0} # Paper
-eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0/8.0, 'scale2d':1.0, 'scale3d':1.0}/8.0 # Paper
+eq_params = {'prandtl':1, 'rayleigh':(35937./8192.)*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/8.0} # Paper
+#eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0/8.0} # Paper
+#eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':1.0/8.0, 'scale2d':1.0, 'scale3d':1.0}/8.0 # Paper
 
 # SF/SF/NS, FF/FF/FT
 #bc_vel = 4 
@@ -82,9 +87,9 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = False
-solve_evp = True
-show_solution = (True and solve_evp)
+write_mtx = True
+solve_evp = False
+show_solution = (False and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -111,11 +116,9 @@ if write_mtx:
 if solve_evp:
     print("Solve EVP")
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -3e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
     print(evp_lmb)
 
-if show_solution:
-    viz_mode = 2
     xscale = eq_params['scale1d']
     yscale = eq_params['scale2d']
     zscale = eq_params['scale3d']
@@ -129,6 +132,8 @@ if show_solution:
         sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
+if show_solution:
+    viz_mode = 2
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
     sol_u = evp_vec[0:res[0]*res[1]*res[2],viz_mode]

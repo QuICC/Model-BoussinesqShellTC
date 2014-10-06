@@ -12,7 +12,7 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-eq_params = {'prandtl':1, 'rayleigh':2901.55, 'ratio31':1.0, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':5901.55, 'ratio31':1.0, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':0., 'ratio31':1.0}
 eigs = [1]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS

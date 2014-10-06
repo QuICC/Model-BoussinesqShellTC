@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [10, 0, 0]
+res = [12, 0, 0]
 
 # SF, FT,
 bc_vel = 1
@@ -77,7 +77,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 show_spy = False
 write_mtx = True
 solve_evp = True
-show_solution = (True and solve_evp)
+show_solution = (False and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -102,11 +102,9 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -20.1e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -80.1e0, np.inf)
     print(evp_lmb)
 
-if show_solution:
-    viz_mode = 0
     zscale = eq_params['scale1d']
 
     for mode in range(0,len(evp_lmb)):
@@ -119,6 +117,8 @@ if show_solution:
         sol_c = 1j*(kx/2.0)*sol_u + 1j*(ky/2.0)*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
+if show_solution:
+    viz_mode = 0
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
     sol_u = evp_vec[0:res[0],viz_mode]
