@@ -8,6 +8,10 @@
  *
  *    #$>git clone git@garulfo.dyndns.org:GeoMHDiSCC.git
  *
+ * -# Go into new diretory
+ *
+ *    #$>cd GeoMHDiSCC
+ *
  * -# Get external modules (currently only Eigen):
  *
  *    #$>git submodule init
@@ -15,8 +19,6 @@
  *    #$>git submodule update
  *
  * -# Switch to correct remote branch:
- *
- *    #$>cd GeoMHDiSCC
  *
  *    #$>git checkout \-\-track -b python_equation origin/python_equation
  *

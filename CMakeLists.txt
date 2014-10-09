@@ -2,6 +2,10 @@
 # Project information
 #
 project(GeoMHDiSCC CXX)
+include(cmake.d/MacroOutOfSourceBuild.cmake)
+MACRO_ENSURE_OUT_OF_SOURCE_BUILD(
+   "${CMAKE_PROJECT_NAME} requires an out of source build. Delete CMakeCache.txt and CMakeFiles/"
+)
 
 #
 # Check for minimal version for CMake
