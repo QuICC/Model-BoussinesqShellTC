@@ -20,7 +20,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "theta"]
+        return ["prandtl", "rayleigh", "theta", "scale1d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -215,6 +215,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        zscale = eq_params['scale1d']
         eta2 = np.sin(np.pi*eq_params['theta']/180)
         eta3 = np.cos(np.pi*eq_params['theta']/180)
         kx = eigs[0]
@@ -226,7 +227,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat = c1d.i1(res[0], bc, (kx**2 + (1/eta3**2)*ky**2)**2)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1d1(res[0], bc, 2*eta3)
+                mat = c1d.i1d1(res[0], bc, eta3, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = c1d.zblk(res[0], bc)
@@ -239,7 +240,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c1d.i1d1(res[0], bc, -2*eta3)
+                mat = c1d.i1d1(res[0], bc, -eta3, cscale = zscale)
 
             elif field_col == ("velocityz",""):
                 mat = c1d.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
