@@ -16,11 +16,11 @@ fields = model.stability_fields()
 #res = [16, 16, 16]
 #res = [18, 18, 18]
 #res = [20, 20, 20]
-res = [18, 18, 30]
+res = [18, 18, 18]
 
 # SF/SF/SF, FF/FF/FT
-bc_vel = 6 
-bc_temp = 4 
+#bc_vel = 6 
+#bc_temp = 4 
 # SF/SF/SF, FF/FF/FT, Aspect ratio 1:1:1
 #eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
 #eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
@@ -52,7 +52,7 @@ bc_temp = 4
 #eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/3.0} # l = 0|1, m = 1|0, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/3.0} # l = 1, m = 1, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':(216./5.)*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Paper
-eq_params = {'prandtl':1, 'rayleigh':(35937./8192.)*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/8.0} # Paper
+#eq_params = {'prandtl':1, 'rayleigh':(35937./8192.)*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/8.0} # Paper
 #eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/8.0} # Paper
 #eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':2.0/8.0, 'scale2d':2.0, 'scale3d':2.0}/8.0 # Paper
 
@@ -64,13 +64,13 @@ eq_params = {'prandtl':1, 'rayleigh':(35937./8192.)*np.pi**4, 'scale1d':2.0, 'sc
 #eq_params = {'prandtl':1, 'rayleigh':2000.0, 'scale1d':2.0/3.0, 'scale2d':2.0, 'scale3d':2.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 
 # NS/NS/NS, FF/FF/FT
-#bc_vel = 0 
-#bc_temp = 4
+bc_vel = 0 
+bc_temp = 4
 # NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':1755.2, 'scale1d':2.0/6.0, 'scale2d':2.0/6.0, 'scale3d':2.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':1813.0, 'scale1d':2.0/4.0, 'scale2d':2.0/4.0, 'scale3d':2.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':2084.9, 'scale1d':2.0/2.0, 'scale2d':2.0/2.0, 'scale3d':2.0} # Michael Watson's thesis
-#eq_params = {'prandtl':1, 'rayleigh':3390.0, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Primary bifurcation???
+eq_params = {'prandtl':1, 'rayleigh':1e4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Primary bifurcation???
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 

@@ -75,14 +75,14 @@ namespace Physical {
                                                                               
          rS.addData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() + uZ.data().array()).matrix());
+         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       } else
       {
          rS.setData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
 
          rS.addData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() + uZ.data().array()).matrix());
+         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       }
    }
 
@@ -94,14 +94,14 @@ namespace Physical {
                                                                               
          rS.addData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() + uZ.data().array()).matrix());
+         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       } else
       {
          rS.addData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
 
          rS.addData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() + uZ.data().array()).matrix());
+         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       }
    }
 
@@ -113,14 +113,14 @@ namespace Physical {
                                                                               
          rS.subData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.subData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array()+ uZ.data().array()).matrix());
+         rS.subData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       } else
       {
          rS.subData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
 
          rS.subData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
 
-         rS.subData((uZ.data().array()*gradQ.comp(TZComp).data().array() + uZ.data().array()).matrix());
+         rS.subData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
       }
    }
 }
