@@ -714,6 +714,7 @@ INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.hpp \
                          *.h \
                          *.cpp \
+                         *.markdown \
                          *.dox
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
