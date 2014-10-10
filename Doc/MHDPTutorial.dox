@@ -4,8 +4,10 @@
  * | \subpage mhdPTutGet |
  *   \subpage mhdPTutConfig |
  *   \subpage mhdPTutCompile |
- *   \subpage mhdPTutControl |
- *   \subpage mhdPTutModel |
+ *   \subpage mhdPTutIO |
+ *   \subpage mhdPTutParam |
+ *   \subpage mhdPTutLinStab |
+ *   \subpage mhdPTutNewModel |
  *   \subpage mhdPTutGeometry |
  * </center>
  */
