@@ -4,9 +4,14 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
+
 // System includes
 //
 #include <set>
+#include <vector>
 
 // External includes
 //
@@ -17,6 +22,7 @@
 
 // Project includes
 //
+#include "Resolutions/Tools/RegularIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -25,6 +31,25 @@ namespace Schemes {
    std::string TTTScheme::type()
    {
       return "TTT";
+   }
+
+   void TTTScheme::tuneResolution(SharedResolution spRes)
+   {
+      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
+
+      // Create single rank communicator
+      #ifdef GEOMHDISCC_MPI
+         std::vector<int>  ranks;
+
+         // Make single core communicator unless MPI sparse solver is used
+         #ifndef GEOMHDISCC_MPISPSOLVE
+            ranks.push_back(FrameworkMacro::id());
+         #endif //GEOMHDISCC_MPISPSOLVE
+
+         FrameworkMacro::setSpectralComm(ranks);
+      #endif //GEOMHDISCC_MPI
    }
 
    void TTTScheme::addTransformSetups(SharedResolution spRes) const

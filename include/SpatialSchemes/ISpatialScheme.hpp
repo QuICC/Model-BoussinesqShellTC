@@ -131,6 +131,11 @@ namespace Schemes {
           */
          int dims() const;
 
+         /**
+          * @brief Tune resolution with MPI related conditions
+          */
+         static void tuneMpiResolution();
+
       private:
          /**
           * @brief Dimension of the domain

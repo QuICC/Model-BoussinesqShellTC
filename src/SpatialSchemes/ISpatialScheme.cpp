@@ -4,8 +4,13 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
+
 // System includes
 //
+#include <vector>
 
 // External includes
 //
@@ -31,6 +36,8 @@ namespace Schemes {
       SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
 
       spRes->setIndexCounter(spCounter);
+
+      ISpatialScheme::tuneMpiResolution();
    }
 
    ISpatialScheme::ISpatialScheme(const int dims)
@@ -104,6 +111,16 @@ namespace Schemes {
    int ISpatialScheme::dims() const
    {
       return this->mDims;
+   }
+
+   void ISpatialScheme::tuneMpiResolution()
+   {
+      // Create single rank communicator
+      #ifdef GEOMHDISCC_MPI
+         std::vector<int>  ranks;
+         ranks.push_back(FrameworkMacro::id());
+         FrameworkMacro::setSpectralComm(ranks);
+      #endif //GEOMHDISCC_MPI
    }
 
 }

@@ -28,6 +28,8 @@ namespace Schemes {
       SharedDoublePeriodicIndexCounter   spCounter(new DoublePeriodicIndexCounter(spRes->sim(), spRes->cpu()));
 
       spRes->setIndexCounter(spCounter);
+
+      ISpatialScheme::tuneMpiResolution();
    }
 
    void TFFScheme::interpretConfigDimensions(ArrayI& rDim)

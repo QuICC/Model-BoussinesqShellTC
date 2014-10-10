@@ -29,6 +29,8 @@ namespace Schemes {
       SharedSphericalHarmonicIndexCounter   spCounter(new SphericalHarmonicIndexCounter(spRes->sim(), spRes->cpu()));
 
       spRes->setIndexCounter(spCounter);
+
+      ISpatialScheme::tuneMpiResolution();
    }
 
    const int IRegularSHScheme::DIMENSIONS = 3;
