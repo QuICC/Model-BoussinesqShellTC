@@ -10,7 +10,7 @@ set(MHDPhysicalModels
    #BoussinesqRBCylinderVCModel.hpp
    #BoussinesqRRB1DBoxVCModel.hpp
    #BoussinesqRRB2DBoxVCModel.hpp
-   #BoussinesqRRB3DBoxVCModel.hpp
+   BoussinesqRRB3DBoxVCModel.hpp
    #BoussinesqRRBAnnulusVCModel.hpp
    #BoussinesqRRBCylinderVCModel.hpp
    #BoussinesqShellModel.hpp
