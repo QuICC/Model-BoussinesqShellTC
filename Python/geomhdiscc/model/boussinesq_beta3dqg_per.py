@@ -18,7 +18,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "gamma", "chi"]
+        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -114,8 +114,8 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             tanchi = np.tan(eq_params['chi']*np.pi/180)
             G = eq_params['gamma']
-            kx = eigs[0]/2.0
-            ky = eigs[1]/2.0
+            kx = eigs[0]
+            ky = eigs[1]
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -210,8 +210,10 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         Ra = eq_params['rayleigh']
         G = eq_params['gamma']
         tanchi = np.tan(eq_params['chi']*np.pi/180)
-        kx = eigs[0]/2.0
-        ky = eigs[1]/2.0
+        zscale = eq_params['scale1d']
+
+        kx = eigs[0]
+        ky = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -229,7 +231,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c1d.i1d1(res[0], bc, (-1.0/G**2))
+                mat = c1d.i1d1(res[0], bc, (-1.0/G**2), cscale = zscale)
 
             elif field_col == ("velocityz",""):
                 mat = c1d.i1(res[0], bc, -(kx**2 + ky**2))
@@ -261,7 +263,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
                 mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocityz",""):
-                mat = c1d.i1d1(res[0], bc)
+                mat = c1d.i1d1(res[0], bc, cscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = c1d.i1(res[0], bc, 1j*ky*(Ra/(16.0*Pr)))
@@ -273,9 +275,6 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
-
-        kx = eigs[0]/2.0
-        ky = eigs[1]/2.0
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):

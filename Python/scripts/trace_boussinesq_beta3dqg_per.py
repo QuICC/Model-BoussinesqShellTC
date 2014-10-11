@@ -10,10 +10,10 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 0, 0]
-chi = 45
+res = [60, 0, 0]
+chi = 60
 Pr = 1
-G = 1e-2
+G = 1e-3
 tanchi = np.tan(chi*np.pi/180.)
 beta = tanchi/G
 
@@ -26,12 +26,12 @@ print("k_c = " + str(kyc))
 print("f_c = " + str(fc))
 
 # Set wave number
-kx = kxc
-ky = 2.0*kyc
+kx = 0
+ky = 14.4046937485972/2.0
 eigs = [kx, ky]
-Ra = Rac
+Ra = 192407.5882
 
-eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi}
+eq_params = {'prandtl':Pr, 'rayleigh':Ra, 'gamma':G, 'chi':chi, 'scale1d':1}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0, 'vorticityz':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
@@ -58,5 +58,5 @@ if True:
 # Solve EVP with sptarn
 if True:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, 1)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
     print(evp_lmb)
