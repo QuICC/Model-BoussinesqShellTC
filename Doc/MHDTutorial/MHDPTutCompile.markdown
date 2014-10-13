@@ -103,6 +103,15 @@ Visualize state files
          This command will look for files visState0000.hdf5 through visState0009.hdf5.
 
       - To use Vapor VDF files have to be generated
+         
+         1. Generate a NetCDF compatible HDF5 file (flat structure)
 
-         #$>bash Scripts/Bash/createVapor.py visState0000.hdf5 vis_me.vdf
+            #$>python Scripts/Python/createVaporHDF5.py -i visState0000.hdf5 -o vaporVisState0000.hdf5
 
+         2. Create the VDF file
+
+            #$>ncdfvdfcreate vaporVisState0000.hdf5 vis_me.vdf
+
+         3. Populate NC data
+            
+            #$>ncdf2vdf -ts 0 vaporVisState0000.hdf5 vis_me.vdf
