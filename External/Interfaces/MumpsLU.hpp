@@ -183,6 +183,11 @@ namespace Eigen {
             m_id.job = 1;
             copyInput(matrix, true);
 
+            #ifdef GEOMHDISCC_DEBUG
+               // Write matrix to file
+               strncpy(m_id.write_problem, "timestep_matrix", sizeof(m_id.write_problem));
+            #endif //GEOMHDISCC_DEBUG
+
             MumpsLU_mumps(&m_id, Scalar());
             m_error = m_id.info[1-1];
 
@@ -267,7 +272,7 @@ namespace Eigen {
             }
 
             // increase memory relaxation
-            m_id.icntl[14-1] = 35;
+            m_id.icntl[14-1] = 45;
 
             GeoMHDiSCC::FrameworkMacro::synchronize();
          }

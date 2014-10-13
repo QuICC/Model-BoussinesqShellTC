@@ -180,11 +180,53 @@ def restricted_kron_3d(A, B, C, restriction = None):
 
     return mat
 
-def id_from_idx(idx, n):
-    """Create a sparse identity from indexes"""
+def id_from_idx_1d(idx, n):
+    """Create a sparse identity from indexes for 1D matrix"""
 
     d = np.zeros((1,n))
-    d[0,idx] = 1.0
+    if idx.size > 0:
+        d[0,idx] = 1.0
+
+    return spsp.diags(d, [0], 2*(n,))
+
+def id_from_idx_2d(idx, nA, nB, restriction = None):
+    """Create a sparse identity from indexes for 2D matrix"""
+
+    if restriction != None:
+        tmp = idx.tolist()
+        ridx = []
+        for i,s in enumerate(restriction):
+                r = s*nB
+                for k in range(0, nB):
+                    if tmp.count(r + k) > 0:
+                        ridx.append(r + k)
+        idx = np.array(ridx)
+
+    n = nA*nB
+    d = np.zeros((1,n))
+    if idx.size > 0:
+        d[0,idx] = 1.0
+
+    return spsp.diags(d, [0], 2*(n,))
+
+def id_from_idx_3d(idx, nA, nB, nC, restriction = None):
+    """Create a sparse identity from indexes for 3D matrix"""
+
+    if restriction != None:
+        tmp = idx.tolist()
+        ridx = []
+        for i,s in enumerate(restriction[0]):
+            for m in restriction[1][i]:
+                r = s*nB*nC + m*nC
+                for k in range(0, nC):
+                    if tmp.count(r + k) > 0:
+                        ridx.append(r + k)
+        idx = np.array(ridx)
+
+    n = nA*nB*nC
+    d = np.zeros((1,n))
+    if idx.size > 0:
+        d[0,idx] = 1.0
 
     return spsp.diags(d, [0], 2*(n,))
 
