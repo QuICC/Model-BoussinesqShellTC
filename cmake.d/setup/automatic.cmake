@@ -54,9 +54,6 @@ geomhdiscc_link_external(GEOMHDISCC_LINALG)
 # Sparse linear algebra libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_SPLINALG)
 
-# Sparse eigen solver libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_SPEIGSOLVER)
-
 # Large IO format libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_LARGEIO)
 

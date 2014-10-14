@@ -59,16 +59,6 @@ if(splinalgTest)
 endif(splinalgTest)
 
 ###################################################
-#------ SPARSE EIGEN SOLVER IMPLEMENTATION -------#
-###################################################
-
-geomhdiscc_provide_choice(GEOMHDISCC_SPEIGSOLVERS "Sparse eigen solver" GEOMHDISCC_SPEIGSOLVER speigsolverTest)
-
-if(speigsolverTest)
-   geomhdiscc_add_definition(GEOMHDISCC_SPEIGSOLVER)
-endif(speigsolverTest)
-
-###################################################
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 

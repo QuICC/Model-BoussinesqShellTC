@@ -49,13 +49,6 @@ set(GEOMHDISCC_LIBRARIES_PARDISO "/usr/local/Pardiso-4.1.2/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
-#-------- AVAILABLE SPARSE EIGEN SOLVERS ---------#
-###################################################
-
-set(GEOMHDISCC_SPEIGSOLVERS "ARPACK" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_ARPACK "arpack" PARENT_SCOPE)
-
-###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

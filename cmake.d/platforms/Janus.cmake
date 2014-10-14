@@ -56,12 +56,6 @@ set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SR
 set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib" PARENT_SCOPE)
 
 ###################################################
-#-------- AVAILABLE SPARSE EIGEN SOLVERS ---------#
-###################################################
-
-set(GEOMHDISCC_SPEIGSOLVERS "ARPACK" PARENT_SCOPE)
-
-###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

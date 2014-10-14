@@ -45,13 +45,6 @@ set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
-#-------- AVAILABLE SPARSE EIGEN SOLVERS ---------#
-###################################################
-
-set(GEOMHDISCC_SPEIGSOLVERS "ARPACK" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_ARPACK "arpack" PARENT_SCOPE)
-
-###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 
