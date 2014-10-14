@@ -482,19 +482,24 @@ namespace Equations {
 
             // Set data to zero
             int l = start;
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            int k_;
+            int j_;
+            int i_;
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->idx3D<Dimensions::Data::DAT3D>(Dimensions::Transform::TRA1D, k);
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx3D<Dimensions::Data::DAT2D>(j,k);
+                  for(int i = 0; i < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(k); i++)
                   {
+                     i_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx3D<Dimensions::Data::DAT2D>(i,k);
+                     
+                     // Compute correct position
+                     l = start + k_ + j_ + i_;
+
                      // Set value to zero
                      Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }
