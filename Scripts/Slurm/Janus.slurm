@@ -9,14 +9,14 @@
 
 module load python/anaconda-2.0.0
 module load intel/intel-13.0.0
-module load openmpi/openmpi-1.6.4_intel-13.0.0_ib
-module load hdf5/hdf5-1.8.11_szip-2.1_zlib-1.2.78_jpeglib-8d_openmpi-1.6.4_intel-13.0.0_ib
-module load fftw/fftw-3.3.3_openmpi-1.6.4_intel-13.0.0_double_ib
+module load openmpi/openmpi-1.8.2_intel-13.0.0
+module load hdf5/hdf5-1.8.13_szip-2.1_zlib-1.2.8_jpeglib-9a_openmpi-1.8.2_intel-13.0.0
+module load fftw/fftw-3.3.4_openmpi-1.8.2_intel-13.0.0_double
 
 #module load python/anaconda-2.0.0
-#module load gcc/gcc-4.7.2
-#module load openmpi/openmpi-1.6.4_gcc-4.7.2_ib
-#module load hdf5/hdf5-1.8.11_szip-2.1_zlib-1.2.78_jpeglib-8d_openmpi-1.6.4_gcc-4.7.2_ib
-#module load fftw/fftw-3.3.3_openmpi-1.6.4_gcc-4.7.2_double_ib
+#module load gcc/gcc-4.9.1
+#module load openmpi/openmpi-1.8.2_gcc-4.9.1
+#module load hdf5/hdf5-1.8.13_szip-2.1_zlib-1.2.8_jpeglib-9a_openmpi-1.8.2_gcc-4.9.1
+#module load fftw/fftw-3.3.4_openmpi-1.8.2_gcc-4.9.1_double
 
 mpirun ./BoussinesqFPlane3DQGModel
