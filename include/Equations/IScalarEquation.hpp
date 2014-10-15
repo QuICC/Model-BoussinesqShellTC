@@ -353,7 +353,6 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
       {
          assert(matIdx == 0);
-         assert(!useShift && "Current version does not support galerkin basis");
 
          //Safety assertion
          assert(start >= 0);
