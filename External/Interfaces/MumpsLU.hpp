@@ -274,6 +274,10 @@ namespace Eigen {
             // increase memory relaxation
             m_id.icntl[14-1] = 45;
 
+            // Set drop threshold
+            m_id.cntl[1-1] = 0.1;
+
+
             GeoMHDiSCC::FrameworkMacro::synchronize();
          }
 

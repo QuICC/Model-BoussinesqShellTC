@@ -345,7 +345,7 @@ namespace Equations {
                pTmp = PythonModelWrapper::makeList(slow);
             }
 
-            PyTuple_SetItem(pArgs, 5, pTmp)
+            PyTuple_SetItem(pArgs, 5, pTmp);
          #else
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
@@ -436,7 +436,7 @@ namespace Equations {
                pTmp = PythonModelWrapper::makeList(slow);
             }
 
-            PyTuple_SetItem(pArgs, 5, pTmp)
+            PyTuple_SetItem(pArgs, 5, pTmp);
          #else
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
@@ -506,7 +506,7 @@ namespace Equations {
                pTmp = PythonModelWrapper::makeList(slow);
             }
 
-            PyTuple_SetItem(pArgs, 6, pTmp)
+            PyTuple_SetItem(pArgs, 6, pTmp);
          #else
             // MPI code with serial sparse solver
             Py_INCREF(Py_None);
