@@ -244,20 +244,24 @@ namespace Equations {
          assert(matIdx == 0);
 
          // Copy data
-         int l = solStart;
-         for(int k = 0; k < this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         int l = start;
+         int k_;
+         int j_;
+         int dimK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int dimJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         for(int k = 0; k < this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
-            int rows = this->unknown().dom(0).perturbation().slice(k).rows();
-            int cols = this->unknown().dom(0).perturbation().slice(k).cols();
-            for(int j = 0; j < cols; j++)
+            k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            for(int j = 0; j < this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               for(int i = 0; i < rows; i++)
+               j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               for(int i = 0; i < this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
+                  // Compute correct position
+                  l = start + k_ + j_ + i;
+
                   // Copy timestep output into field
                   this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, l),i,j,k);
-
-                  // increase linear storage counter
-                  l++;
                }
             }
          }
@@ -349,31 +353,30 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
       {
          assert(matIdx == 0);
+         assert(!useShift && "Current version does not support galerkin basis");
 
          //Safety assertion
          assert(start >= 0);
 
-         int zeroBlock = 0;
-         if(useShift)
-         {
-            zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
-         }
-
          // Copy data
          int l = start;
-         for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         int k_;
+         int j_;
+         int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
-            int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
-            int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
-            for(int j = zeroCol; j < cols; j++)
+            k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               for(int i = zeroRow; i < rows; i++)
+               j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
+                  // Compute correct position
+                  l = start + k_ + j_ + i;
+
                   // Copy field value into storage
                   Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().point(i,j,k));
-
-                  // increase storage counter
-                  l++;
                }
             }
          }
@@ -384,6 +387,7 @@ namespace Equations {
    {
       // Assert scalar
       assert(compId == FieldComponents::Spectral::SCALAR);
+      assert((!eq.couplingInfo(compId).isGalerkin() || eq.couplingInfo(compId).indexType() != CouplingInformation::SINGLE) && "Current version does not support galerkin basis");
 
       // Check if a nonlinear computation took place and a quasi-inverse has to be applied
       if(eq.couplingInfo(compId).hasNonlinear() && eq.couplingInfo(compId).hasQuasiInverse())
@@ -472,29 +476,29 @@ namespace Equations {
 
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
          {
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
-
             //Safety assertion
             assert(matIdx == 0);
             assert(start >= 0);
 
             // Set data to zero
             int l = start;
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            int k_;
+            int j_;
+            int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+            int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
                      // Set value to zero
                      Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }
@@ -569,21 +573,25 @@ namespace Equations {
             //Safety assertion
             assert(start >= 0);
 
-            // Copy data
+            // Add source data
             int l = start;
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            int k_;
+            int j_;
+            int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+            int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
                      // Add source value
                      Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }

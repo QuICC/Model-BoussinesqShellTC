@@ -39,7 +39,7 @@ namespace GeoMHDiSCC {
        * @brief Specialialised IndexConverterSelector for the second transform
        */
       // Configure index converter on spherical harmonics basis
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
       #include "Communicators/Converters/SHIndexConv.hpp"
 
       namespace GeoMHDiSCC {
