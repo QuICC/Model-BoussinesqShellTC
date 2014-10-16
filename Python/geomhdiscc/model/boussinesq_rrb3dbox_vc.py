@@ -290,7 +290,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
         yscale = eq_params['scale2d']
         zscale = eq_params['scale3d']
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
@@ -433,7 +433,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs, restriction = restriction)
+        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
@@ -459,7 +459,7 @@ class BoussinesqRRB3DBoxVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs, restriction = None):
+    def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
     
         # U:

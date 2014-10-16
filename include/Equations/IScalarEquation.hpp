@@ -244,7 +244,7 @@ namespace Equations {
          assert(matIdx == 0);
 
          // Copy data
-         int l = start;
+         int l;
          int k_;
          int j_;
          int dimK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -258,7 +258,7 @@ namespace Equations {
                for(int i = 0; i < this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
                   // Compute correct position
-                  l = start + k_ + j_ + i;
+                  l = solStart + k_ + j_ + i;
 
                   // Copy timestep output into field
                   this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, l),i,j,k);
@@ -358,7 +358,7 @@ namespace Equations {
          assert(start >= 0);
 
          // Copy data
-         int l = start;
+         int l;
          int k_;
          int j_;
          int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -480,7 +480,7 @@ namespace Equations {
             assert(start >= 0);
 
             // Set data to zero
-            int l = start;
+            int l;
             int k_;
             int j_;
             int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
@@ -573,7 +573,7 @@ namespace Equations {
             assert(start >= 0);
 
             // Add source data
-            int l = start;
+            int l;
             int k_;
             int j_;
             int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);

@@ -191,7 +191,10 @@ namespace Solver {
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
 
             // Safety assert for successful factorisation
-            assert(this->mSolver.at(i)->info() == Eigen::Success);
+            if(this->mSolver.at(i)->info() != Eigen::Success)
+            {
+               throw Exception("Matrix factorization failed!");
+            }
          }
       }
    }

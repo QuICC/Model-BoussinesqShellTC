@@ -275,7 +275,7 @@ namespace Eigen {
             m_id.icntl[14-1] = 45;
 
             // Set drop threshold
-            m_id.cntl[1-1] = 0.1;
+            //m_id.cntl[1-1] = 1.0;
 
 
             GeoMHDiSCC::FrameworkMacro::synchronize();
