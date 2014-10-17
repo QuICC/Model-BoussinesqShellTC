@@ -46,7 +46,7 @@ Generate an initial state file
 
    3. Generate state file:
 
-      #$>Executables/GenerateState
+      #$>Executables/SimNameState
 
    4. A new HDF5 file name state0000.hdf5 should have been written. It can be used as initial state for a simulation if renamed to state_initial.hdf5.
 
