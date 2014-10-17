@@ -60,7 +60,7 @@ set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib"
 ###################################################
 
 set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#
