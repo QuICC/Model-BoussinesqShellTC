@@ -76,13 +76,15 @@ Run a simulation
 Visualize state files
 ---------------------
 
+   0. Make sure the \<time\> tag is set to -1. Otherwise, the visualization files can not be used to create a movie.
+
    1. compile the "Visu" executable:
 
       #$>make -j 6 SimNameVisu #(Assuming you want 6 compilations in parallel)
 
    2. Edit the parameters.cfg file
 
-   3. Provide a state file to be converted. It has to be name state4Visu.hdf5. There is no need to copy the file a symbolic link is sufficient
+   3. Provide a state file to be converted. It has to be named state4Visu.hdf5. There is no need to copy the file a symbolic link is sufficient
 
       #$>ln -s state0123.hdf5 state4Visu.hdf5
 
@@ -90,28 +92,32 @@ Visualize state files
 
       #$>Executables/SimNameVisu
 
-   5. A new file named visState0000.hdf5 has been written. And addition step is required to visualize it:
+   5. A new file named visState0000.hdf5 has been written. An additional step is required to visualize it:
 
       - To use ParaView an XDMF file has to be generated:
 
-         #$>python Scripts/Python/createXDFM.py -i visState0000.hdf5 -o vis_me.xdmf
+         #$>python Scripts/Python/createXDMF.py -i visState0000.hdf5 -o vis_me.xdmf
 
       - To use ParaView with a timeseries an XDMF file has to be generated:
 
-         #$>python Scripts/Python/createXDFM.py -i visState0000.hdf5 -n 20 -o vis_series_me.xdmf
+         #$>python Scripts/Python/createXDMF.py -i visState0000.hdf5 -n 10 -o vis_series_me.xdmf
 
          This command will look for files visState0000.hdf5 through visState0009.hdf5.
 
       - To use Vapor VDF files have to be generated
          
-         1. Generate a NetCDF compatible HDF5 file (flat structure)
+         1. Generate a NetCDF compatible HDF5 file (flat structure) and grid files
 
             #$>python Scripts/Python/createVaporHDF5.py -i visState0000.hdf5 -o vaporVisState0000.hdf5
 
          2. Create the VDF file
-
-            #$>ncdfvdfcreate vaporVisState0000.hdf5 vis_me.vdf
+            2.1 *TFF* scheme 
+               #$>ncdfvdfcreate -periodic 1:1:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
+            2.2 *TFT* scheme 
+               #$>ncdfvdfcreate -periodic 0:1:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
+            2.3 *TTT* scheme 
+               #$>ncdfvdfcreate -periodic 0:0:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
 
          3. Populate NC data
             
-            #$>ncdf2vdf -ts 0 vaporVisState0000.hdf5 vis_me.vdf
+            #$>ncdf2vdf -level 3 vaporVisState0000.hdf5 vis_me.vdf
