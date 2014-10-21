@@ -39,6 +39,25 @@ def xyz_to_phys(expr, grid_x, grid_z, grid_y):
     vx, vz, vy = np.meshgrid(grid_x, grid_z, grid_y, indexing = 'ij')
     return func(vx, vz, vy)
 
+def test_value(op, res_expr, sol, grid_x, grid_y, grid_z):
+    """Perform a forward operation test"""
+
+    print("\tValue test")
+    x = sy.Symbol('x')
+    y = sy.Symbol('y')
+    z = sy.Symbol('z')
+    nx = len(grid_x)
+    ny = len(grid_y)
+    nz = len(grid_x)
+    mesh = xyz_to_phys(res_expr, grid_x, grid_z, grid_y)
+    lhs = transf.tocheb3d(mesh)
+    lhs = lhs.reshape(nx*ny*nz, order = 'F')
+    rhs = op*lhs
+    print(rhs)
+    print(sol)
+    err = np.abs(rhs - sol)
+    print("\t\tValue error: " + str(err))
+
 def test_forward(op, res_expr, sol_expr, grid_x, grid_y, grid_z, qx, qy, qz):
     """Perform a forward operation test"""
 
@@ -433,6 +452,32 @@ def i4j4k4lapl2(nx, ny, nz, xg, yg, zg):
 #    sphys = sy.expand(sy.expand(sy.diff(sphys,x,x)) + sy.expand(sy.diff(sphys,y,y)) + sy.expand(sy.diff(sphys,z,z)))
 #    test_backward_tau(A, B, sphys, ssol, xg, yg, zg)
 
+def volumeAvg(nx, ny, nz, xg, yg, zg):
+    """Accuracy test for volume average"""
+
+    print("volumeAvg:")
+    x = sy.Symbol('x')
+    y = sy.Symbol('y')
+    z = sy.Symbol('z')
+    A = c3d.volumeAvg(nx, ny, nz)
+    sphys = np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,ny,1)]) for k in np.arange(0,nz,1)])
+    ssol = sy.integrate(sy.expand(sphys/8),(x,-1,1),(y,-1,1), (z,-1,1))
+    test_value(A, sphys, ssol, xg, yg, zg)
+
+def avgFlux_z(nx, ny, nz, xg, yg, zg):
+    """Accuracy test for volume average"""
+
+    print("avgFlux_z:")
+    x = sy.Symbol('x')
+    y = sy.Symbol('y')
+    z = sy.Symbol('z')
+    A = c3d.avgFlux_z(nx, ny, nz, zscale = 2.0)
+    sphys = np.sum([np.random.ranf()*z**k*np.sum([np.random.ranf()*y**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,ny,1)]) for k in np.arange(0,nz,1)])
+    tmp = sy.integrate(sy.expand(sphys/4),(x,-1,1),(y,-1,1))
+    func = sy.utilities.lambdify(z, sy.expand(sy.diff(tmp,z)))
+    ssol = func(1.0)
+    test_value(A, sphys, ssol, xg, yg, zg)
+
 if __name__ == "__main__":
     # Set test parameters
     nx = 8
@@ -459,3 +504,7 @@ if __name__ == "__main__":
     i4j4k4(nx, ny, nz, xg, yg, zg)
     i4j4k4lapl(nx, ny, nz, xg, yg, zg)
     i4j4k4lapl2(nx, ny, nz, xg, yg, zg)
+
+    # Run average operator tests
+    volumeAvg(nx, ny, nz, xg, yg, zg)
+    avgFlux_z(nx, ny, nz, xg, yg, zg)

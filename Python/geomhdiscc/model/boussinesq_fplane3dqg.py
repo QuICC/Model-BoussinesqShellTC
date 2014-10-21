@@ -204,7 +204,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
         elif field_row == ("dz_meantemperature",""):
             if eigs[0] == 0 and eigs[1] == 0:
-                mat = (c1d.qid(res[0],0, bc) - c1d.avg(res[0]))
+                mat = (c1d.qid(res[0],0, bc) - spsp.eye(res[0], 1)*c1d.avg(res[0]))
             else:
                 mat = c1d.zblk(res[0], bc)
 

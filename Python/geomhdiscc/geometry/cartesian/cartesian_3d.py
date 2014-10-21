@@ -189,3 +189,15 @@ def qid(nx, ny, nz, qx, qy, qz, bc, coeff = 1.0, restriction = None):
     bcx, bcy, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_3d(c1d.qid(ny,qy,bcy), c1d.qid(nz,qz,bcz), c1d.qid(nx,qx,bcx), restriction = restriction)
     return c3dbc.constrain(mat, nx, ny, nz, qx, qy, qz, bc, restriction = restriction)
+
+def volumeAvg(nx, ny, nz):
+    """Compute a volume average"""
+
+    mat = c1d.avg(ny)*spsp.kron(c1d.qid(ny, 0, c1d.c1dbc.no_bc()), c2d.surfaceAvg(nx, nz))
+    return mat
+
+def avgFlux_z(nx, ny, nz, zscale = 1.0):
+    """Compute average flux through Z surface"""
+
+    mat = spsp.kron(c1d.avg(ny), spsp.kron(c1d.surfaceFlux(nz, cscale = zscale), c1d.avg(nx)))
+    return mat

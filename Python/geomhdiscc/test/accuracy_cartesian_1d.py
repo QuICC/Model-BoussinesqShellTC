@@ -49,6 +49,18 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     vis_error(err, 'Forward error')
     print("\t\tMax forward error: " + str(np.max(err)))
 
+def test_value(op, res_expr, sol, grid):
+    """Perform a value operation test"""
+
+    print("\tValue test")
+    x = sy.Symbol('x')
+    lhs = transf.tocheb(x_to_phys(res_expr,grid))
+    rhs = op*lhs
+    print(rhs)
+    print(sol)
+    err = np.abs(rhs - sol)
+    print("\t\tValue error: " + str(err))
+
 def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     """Perform a tau backward operation test"""
 
@@ -454,6 +466,26 @@ def genlinxp(nx, q, p, xg, ntrunc = -1):
     ssol = sphys*(1+x)**p
     test_forward(A, sphys, ssol, xg, 0)
 
+def avg(nx, xg):
+    """Accuracy test for average calculation"""
+
+    print("avg:")
+    x = sy.Symbol('x')
+    A = c1d.avg(nx)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.integrate(sy.expand(sphys/2), (x, -1, 1))
+    test_value(A, sphys, ssol, xg)
+
+def surfaceFlux(nx, xg):
+    """Accuracy test for surface flux"""
+
+    print("surfaceFlux:")
+    x = sy.Symbol('x')
+    A = c1d.surfaceFlux(nx, cscale = 2.0)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    func = sy.utilities.lambdify(x, sy.expand(sy.diff(sphys,x)))
+    ssol = func(1.0)
+    test_value(A, sphys, ssol, xg)
 
 if __name__ == "__main__":
     # Set test parameters
@@ -495,3 +527,7 @@ if __name__ == "__main__":
     genlinxp(nx, 0, 2, xg)
     genlinxp(nx, 0, 1.3, xg)
     genlinxp(nx, 0, 1.3, xg, 10)
+
+    # Run average operator tests
+    avg(nx, xg)
+    surfaceFlux(nx, xg)
