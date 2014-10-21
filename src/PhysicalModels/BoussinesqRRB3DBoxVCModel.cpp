@@ -23,6 +23,7 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
+#include "IoVariable/NusseltCubicWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRRB3DBoxVCTransport.hpp"
@@ -171,11 +172,16 @@ namespace GeoMHDiSCC {
    void BoussinesqRRB3DBoxVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITYX);
-      spState->expect(PhysicalNames::VELOCITYY);
-      spState->expect(PhysicalNames::VELOCITYZ);
-      spSim->addAsciiOutputFile(spState);
+      IoVariable::SharedContinuityWriter spCont(new IoVariable::ContinuityWriter(SchemeType::type()));
+      spCont->expect(PhysicalNames::VELOCITYX);
+      spCont->expect(PhysicalNames::VELOCITYY);
+      spCont->expect(PhysicalNames::VELOCITYZ);
+      spSim->addAsciiOutputFile(spCont);
+
+      // Create cubic Nusselt number writer
+      IoVariable::SharedNusseltCubicWriter spNusselt(new IoVariable::NusseltCubicWriter(SchemeType::type()));
+      spNusselt->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
    }
 
    void BoussinesqRRB3DBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)
