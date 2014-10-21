@@ -130,22 +130,22 @@ namespace GeoMHDiSCC {
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VORTICITYZ);
 
       // Add output file
