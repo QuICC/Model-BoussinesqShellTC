@@ -56,8 +56,8 @@ def test_value(op, res_expr, sol, grid):
     x = sy.Symbol('x')
     lhs = transf.tocheb(x_to_phys(res_expr,grid))
     rhs = op*lhs
-    print(rhs)
-    print(sol)
+    print("Matrix integral: " + str(rhs))
+    print("Sympy integral: " + str(sol))
     err = np.abs(rhs - sol)
     print("\t\tValue error: " + str(err))
 
@@ -472,8 +472,8 @@ def avg(nx, xg):
     print("avg:")
     x = sy.Symbol('x')
     A = c1d.avg(nx)
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-    ssol = sy.integrate(sy.expand(sphys/2), (x, -1, 1))
+    sphys = ((1+x)/2)**6
+    ssol = (1/2)*sy.integrate(sy.expand(sphys), (x, -1, 1))
     test_value(A, sphys, ssol, xg)
 
 def surfaceFlux(nx, xg):
@@ -482,8 +482,8 @@ def surfaceFlux(nx, xg):
     print("surfaceFlux:")
     x = sy.Symbol('x')
     A = c1d.surfaceFlux(nx, cscale = 2.0)
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
-    func = sy.utilities.lambdify(x, sy.expand(sy.diff(sphys,x)))
+    sphys = ((1+x)/2)**7
+    func = sy.utilities.lambdify(x, sy.expand(2*sy.diff(sphys,x)))
     ssol = func(1.0)
     test_value(A, sphys, ssol, xg)
 

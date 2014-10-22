@@ -117,9 +117,9 @@ namespace IoVariable {
          MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, GeoMHDiSCC::FramworkMacro::spectralComm());
       #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
-      Matrix nusselt = this->mNusseltOp*field;
-
+      Matrix nusselt = -this->mNusseltOp*field;
       assert(nusselt.rows() == nusselt.cols() && nusselt.rows() == 1);
+      nusselt(0,0) += 1;
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())

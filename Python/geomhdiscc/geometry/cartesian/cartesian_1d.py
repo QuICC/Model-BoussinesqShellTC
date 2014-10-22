@@ -454,6 +454,6 @@ def surfaceFlux(nx, cscale = 1.0):
     """Compute the flux through boundary"""
 
     mat = c1dbc.constrain(spsp.lil_matrix((1, nx)), {0:12})
-    mat = cscale*mat
+    mat = 2.0*cscale*mat
 
     return mat
