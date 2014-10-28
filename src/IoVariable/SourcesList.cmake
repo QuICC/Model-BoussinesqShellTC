@@ -3,7 +3,6 @@ set(MHDSources
    ContinuityTags.cpp
    ContinuityWriter.cpp
    NusseltTags.cpp
-   NusseltCubicWriter.cpp
    NusseltWriter.cpp
    StateFileTags.cpp
    StateFileWriter.cpp
