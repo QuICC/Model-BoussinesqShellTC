@@ -41,7 +41,19 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGVelocityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
+   }
+
+   void BoussinesqFPlane3DQGVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   {
+      // Assert on scalar component is used
+      assert(id == FieldComponents::Physical::SCALAR);
+
+      /// 
+      /// Computation of the jacobian:
+      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
+      ///
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqFPlane3DQGVelocityZ::setRequirements()
@@ -53,7 +65,10 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, true));
+
+      // Set non orthogonal streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, true, true));
    }
 
 }

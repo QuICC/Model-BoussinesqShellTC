@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqFPlane3DQGNoVorticityZ.cpp
- * @brief Source of the implementation of the non orthogonal vertical vorticity computation in the F-plane 3DQG model
+ * @file BoussinesqFPlane3DQGVorticityZ.cpp
+ * @brief Source of the implementation of the vertical vorticity computation in the F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGNoVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.hpp"
 
 // Project includes
 //
@@ -26,32 +26,32 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGNoVorticityZ::BoussinesqFPlane3DQGNoVorticityZ(SharedEquationParameters spEqParams)
+   BoussinesqFPlane3DQGVorticityZ::BoussinesqFPlane3DQGVorticityZ(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGNoVorticityZ::~BoussinesqFPlane3DQGNoVorticityZ()
+   BoussinesqFPlane3DQGVorticityZ::~BoussinesqFPlane3DQGVorticityZ()
    {
    }
 
-   void BoussinesqFPlane3DQGNoVorticityZ::setCoupling()
+   void BoussinesqFPlane3DQGVorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false, false);
    }
 
-   void BoussinesqFPlane3DQGNoVorticityZ::setRequirements()
+   void BoussinesqFPlane3DQGVorticityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::NO_VORTICITYZ);
+      this->setName(PhysicalNames::VORTICITYZ);
 
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::NO_VORTICITYZ, FieldRequirement(true, true, true, true));
+      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, true));
    }
 
 }

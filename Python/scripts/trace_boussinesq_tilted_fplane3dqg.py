@@ -1,22 +1,22 @@
-"""Script to run a marginal curve trace for the Boussinesq F-plane 3DQG model"""
+"""Script to run a marginal curve trace for the Boussinesq tilted F-plane 3DQG model"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_tilted_fplane3dqg as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqFPlane3DQG()
+model = mod.BoussinesqTiltedFPlane3DQG()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [40, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
+res = [50, 0, 0]
+eq_params = {'prandtl':1, 'rayleigh':6.6648, 'theta':35, 'scale1d':2.0}
 
 # Set wave number
 phi = 0
-kp = 1.3048
+kp = 1.2209
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]

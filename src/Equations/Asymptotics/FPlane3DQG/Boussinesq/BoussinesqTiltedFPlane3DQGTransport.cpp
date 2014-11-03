@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqFPlane3DQGTransport.cpp
- * @brief Source of the implementation of the transport equation in the F-plane 3DQG model
+ * @file BoussinesqTiltedFPlane3DQGTransport.cpp
+ * @brief Source of the implementation of the transport equation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGTransport.hpp"
 
 // Project includes
 //
@@ -28,32 +28,35 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGTransport::BoussinesqFPlane3DQGTransport(SharedEquationParameters spEqParams)
+   BoussinesqTiltedFPlane3DQGTransport::BoussinesqTiltedFPlane3DQGTransport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGTransport::~BoussinesqFPlane3DQGTransport()
+   BoussinesqTiltedFPlane3DQGTransport::~BoussinesqTiltedFPlane3DQGTransport()
    {
    }
 
-   void BoussinesqFPlane3DQGTransport::setCoupling()
+   void BoussinesqTiltedFPlane3DQGTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
    }
 
-   void BoussinesqFPlane3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqTiltedFPlane3DQGTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
+
+      // Get parameters
+      MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
 
       /// 
       /// Computation of the jacobian:
       ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\theta\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0);
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::NO_STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3);
 
       ///
       /// Computation of the mean temperature feedback
@@ -61,7 +64,7 @@ namespace Equations {
       rNLComp.addData((this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::DZ_MEANTEMPERATURE).dom(0).phys().data().array()).matrix());
    }
 
-   void BoussinesqFPlane3DQGTransport::setRequirements()
+   void BoussinesqTiltedFPlane3DQGTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
@@ -73,7 +76,7 @@ namespace Equations {
       this->mRequirements.addField(PhysicalNames::TEMPERATURE, FieldRequirement(true, true, false, true));
 
       // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, true, false, true));
+      this->mRequirements.addField(PhysicalNames::NO_STREAMFUNCTION, FieldRequirement(true, true, false, true));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, false, true, false));

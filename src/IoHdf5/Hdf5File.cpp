@@ -52,6 +52,9 @@ namespace IoHdf5 {
 
             // Create the MPI IO access property
             H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, info);
+
+            // Free info
+            MPI_Info_free(&info);
          #else
             // Create the MPI IO access property
             H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
