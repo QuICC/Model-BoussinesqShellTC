@@ -19,7 +19,6 @@
 //
 #include "Exceptions/Exception.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoHdf5 {
@@ -44,8 +43,6 @@ namespace IoHdf5 {
 
    void IHdf5Reader::open()
    {
-      std::cerr << " ~~~~~~~~~~~~~~~~~~~~~~~ OPENING HDF5 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
       // Open file
       hid_t fId = H5Fopen(this->filename().c_str(), H5F_ACC_RDONLY, this->filePList());
 
@@ -66,7 +63,6 @@ namespace IoHdf5 {
 
    void IHdf5Reader::close()
    {
-      std::cerr << " ~~~~~~~~~~~~~~~~~~~~~~~ CLOSING HDF5 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
       hid_t fPList = H5Fget_access_plist(this->file());
 
       // Close file
