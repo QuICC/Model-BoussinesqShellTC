@@ -23,6 +23,7 @@
 #include "TypeSelectors/TimeSchemeSelector.hpp"
 #include "SparseSolvers/SparseLinearSolver.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Timestep {
@@ -388,6 +389,7 @@ namespace Timestep {
 
       template <typename TOperator,typename TData> inline void computeRHSNoFieldMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, std::vector<TData>& rOldNL, TData& rTmp)
       {
+         std::cerr << rRHS << std::endl;
          // Store RHS at t_n
          rTmp = rRHS;
 

@@ -11,12 +11,12 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [50, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':6.6648, 'theta':35, 'scale1d':2.0}
+res = [40, 0, 0]
+eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 
 # Set wave number
 phi = 0
-kp = 1.2209
+kp = 1.3048
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]

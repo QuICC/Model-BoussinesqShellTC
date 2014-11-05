@@ -56,7 +56,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         if field_row == ("streamfunction",""):
             fields = [("no_streamfunction",""),("no_velocityz","")]
 
-        if field_row == ("velocityz",""):
+        elif field_row == ("velocityz",""):
             fields = [("no_streamfunction",""),("no_velocityz","")]
 
         elif field_row == ("no_streamfunction",""):
@@ -233,10 +233,10 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                 mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("no_streamfunction",""):
-                mat = c1d.i1(res[0],0, bc, -eta3)
+                mat = c1d.i1(res[0], bc, -eta3)
 
             elif field_col == ("no_velocityz",""):
-                mat = c1d.i1(res[0],0, bc, -1j*eta2*kx)
+                mat = c1d.i1(res[0], bc, -1j*eta2*kx)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
