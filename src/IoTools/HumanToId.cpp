@@ -141,6 +141,10 @@ namespace IoTools {
       {
          return PhysicalNames::DZ_MEANTEMPERATURE;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::DX_MEANTEMPERATURE))
+      {
+         return PhysicalNames::DX_MEANTEMPERATURE;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::ENTROPY))
       {
          return PhysicalNames::ENTROPY;

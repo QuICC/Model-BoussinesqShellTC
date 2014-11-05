@@ -225,6 +225,25 @@ namespace Equations {
                      {
                         throw Exception("Unknown exact state");
                      }
+
+                  } else if(this->mTypeId == SPECIAL1)
+                  {
+                     valK = 3.31 + this->poly(0,k_);
+                     valJ = 2.71 + this->cos(1,j_) + this->sin(1,j_);
+                     valI = -1.3 + this->cos(2,i_) + this->sin(2,i_);
+
+                  } else if(this->mTypeId == SPECIAL2)
+                  {
+                     valK = 3.31 + this->poly(0,k_);
+                     valJ = 2.71 + this->cos(1,j_) - this->sin(1,j_);
+                     valI = -1.3 + this->cos(2,i_) - this->sin(2,i_);
+
+                  } else if(this->mTypeId == SPECIAL3)
+                  {
+                     valK = 3.31 + this->poly(0,k_);
+                     valJ = 2.71 + this->cos(1,j_) + this->sin(1,j_);
+                     valI = -1.3 + this->cos(2,i_) + this->sin(2,i_);
+
                   } else
                   {
                      throw Exception("Unknown exact state");

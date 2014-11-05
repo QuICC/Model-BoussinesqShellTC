@@ -134,12 +134,12 @@ namespace GeoMHDiSCC {
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file

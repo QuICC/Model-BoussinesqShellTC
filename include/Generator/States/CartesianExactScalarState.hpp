@@ -64,6 +64,10 @@ namespace Equations {
             SINCOSCOS,        // Sine, Cosine, Cosine
             COSSINCOS,        // Cosine, Sine, Cosine
             SINCOSSIN,        // Sine, Cosine, Sine
+            // Special
+            SPECIAL1 = 1000,  // Kind of a place holder for tests
+            SPECIAL2,         // Kind of a place holder for tests
+            SPECIAL3,         // Kind of a place holder for tests
          };
 
          /**

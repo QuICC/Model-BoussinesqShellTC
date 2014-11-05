@@ -35,6 +35,8 @@ namespace GeoMHDiSCC {
          CODENSITY = 0,
          /// Density field
          DENSITY,
+         /// X derivative of mean temperature field
+         DX_MEANTEMPERATURE,
          /// Z derivative of mean temperature field
          DZ_MEANTEMPERATURE,
          /// Entropy field

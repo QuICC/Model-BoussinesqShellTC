@@ -40,6 +40,9 @@ namespace IoTools {
          case PhysicalNames::DZ_MEANTEMPERATURE:
             return "D_z mean temperature";
 
+         case PhysicalNames::DX_MEANTEMPERATURE:
+            return "D_x mean temperature";
+
          case PhysicalNames::ENTROPY:
             return "Entropy";
 
@@ -105,6 +108,9 @@ namespace IoTools {
 
          case PhysicalNames::DZ_MEANTEMPERATURE:
             return "dz_meantemperature";
+
+         case PhysicalNames::DX_MEANTEMPERATURE:
+            return "dx_meantemperature";
 
          case PhysicalNames::ENTROPY:
             return "entropy";

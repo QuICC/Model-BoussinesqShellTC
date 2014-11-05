@@ -201,6 +201,12 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif field_row == ("vorticityz",""):
             mat = c1d.i1(res[0], bc)
 
+        elif field_row == ("dx_meantemperature",""):
+            if eigs[1] == 0:
+                mat = c1d.avg(res[0])
+            else:
+                mat = c1d.zblk(res[0], bc)
+
         return mat
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
