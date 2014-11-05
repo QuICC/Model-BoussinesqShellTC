@@ -316,13 +316,13 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+            mat = c2d.i2(res[0],res[2], bc)
 
         elif field_row == ("velocityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+            mat = c2d.i2(res[0],res[2], bc)
 
         elif field_row == ("vorticityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
@@ -345,7 +345,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j0laplh(res[0],res[2], k, bc, -1.0, xscale = xscale)
+                mat = c2d.i2laplh(res[0],res[2], k, bc, -1.0, xscale = xscale)
 
             elif field_col == ("velocityz",""):
                 mat = c2d.zblk(res[0],res[2], 2, 0, bc)
@@ -354,11 +354,11 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("vorticityz",""):
-                mat = c2d.i2j0(res[0],res[2], bc)
+                mat = c2d.i2(res[0],res[2], bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j1d0d1(res[0],res[2], bc, (-1.0/G**2), zscale = zscale)
+                mat = c2d.i2j1e1(res[0],res[2], bc, (-1.0/G**2), zscale = zscale)
 
             elif field_col == ("velocityz",""):
                 mat = c2d.i2j1laplh(res[0],res[2], k, bc, xscale = xscale)
@@ -372,7 +372,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
                 if self.linearize:
-                    mat = c2d.i2j0(res[0],res[2], bc, 1j*k)
+                    mat = c2d.i2(res[0],res[2], bc, 1j*k)
                 else:
                     mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
@@ -380,7 +380,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c2d.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j0laplh(res[0],res[2],k, bc, (1/Pr), xscale = xscale)
+                mat = c2d.i2laplh(res[0],res[2],k, bc, (1/Pr), xscale = xscale)
 
             elif field_col == ("vorticityz",""):
                 mat = c2d.zblk(res[0],res[2], 2, 0, bc)
@@ -390,7 +390,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
                 mat = c2d.zblk(res[0],res[2], 2, 1, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j1d0d1(res[0],res[2], bc, zscale = zscale)
+                mat = c2d.i2j1e1(res[0],res[2], bc, zscale = zscale)
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16.0*Pr)))
@@ -411,7 +411,7 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
             mat = c2d.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j0(res[0],res[2], bc)
+            mat = c2d.i2(res[0],res[2], bc)
 
         elif field_row == ("vorticityz",""):
             mat = c2d.i2j1(res[0],res[2], bc)
