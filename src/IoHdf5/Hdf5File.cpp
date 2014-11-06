@@ -159,5 +159,10 @@ namespace IoHdf5 {
    const std::string Hdf5File::TYPE_TAG = "type";
 
    const std::string Hdf5File::VERSION_TAG = "version";
+
+   void finalizeHdf5()
+   {
+      H5close();
+   }
 }
 }

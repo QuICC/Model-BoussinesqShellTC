@@ -182,6 +182,11 @@ namespace IoHdf5 {
          hid_t  mFile;
    };
 
+         /**
+          * @brief Finalize HDF5 library data
+          */
+         void finalizeHdf5();
+
 }
 }
 

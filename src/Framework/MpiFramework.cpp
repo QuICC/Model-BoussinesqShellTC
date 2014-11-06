@@ -22,6 +22,7 @@
 // Project includes
 //
 #include "Base/Precision.hpp"
+#include "IoHdf5/Hdf5File.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -63,6 +64,9 @@ namespace GeoMHDiSCC {
    {
       // Make sure all finished and are synchronised
       MPI_Barrier(MPI_COMM_WORLD);
+
+      // Finalize HDF5 MPI data
+      IoHdf5::finalizeHdf5();
 
       // Finalise MPI system
       MPI_Finalize();
