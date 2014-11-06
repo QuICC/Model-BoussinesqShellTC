@@ -94,6 +94,8 @@ Visualize state files
 
    5. A new file named visState0000.hdf5 has been written. An additional step is required to visualize it:
 
+      **For ParaView**
+
       - To use ParaView an XDMF file has to be generated:
 
          #$>python Scripts/Python/createXDMF.py -i visState0000.hdf5 -o vis_me.xdmf
@@ -104,20 +106,30 @@ Visualize state files
 
          This command will look for files visState0000.hdf5 through visState0009.hdf5.
 
+      **For Vapor**
+
       - To use Vapor VDF files have to be generated
          
          1. Generate a NetCDF compatible HDF5 file (flat structure) and grid files
 
             #$>python Scripts/Python/createVaporHDF5.py -i visState0000.hdf5 -o vaporVisState0000.hdf5
 
-         2. Create the VDF file
-            2.1 *TFF* scheme 
+         2. The next points use tools from Vapor make sure the *vapor-setup.sh* file has been sourced. 
+
+         3. Create the VDF file
+
+            1. *TFF* scheme 
+
                #$>ncdfvdfcreate -periodic 1:1:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
-            2.2 *TFT* scheme 
+
+            2. *TFT* scheme
+
                #$>ncdfvdfcreate -periodic 0:1:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
-            2.3 *TTT* scheme 
+
+            3. *TTT* scheme 
+
                #$>ncdfvdfcreate -periodic 0:0:0 -level 3 -xcoords visState0000_vapor_z.dat -ycoords visState0000_vapor_y.dat -zcoords visState0000_vapor_x.dat vaporVisState0000.hdf5 vis_me.vdf
 
-         3. Populate NC data
+         4. Populate NC data
             
             #$>ncdf2vdf -level 3 vaporVisState0000.hdf5 vis_me.vdf
