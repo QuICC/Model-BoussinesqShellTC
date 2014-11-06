@@ -73,6 +73,9 @@ namespace GeoMHDiSCC {
          NO_VELOCITYZ,
          /// Non orthogonal vertical vorticity field
          NO_VORTICITYZ,
+
+         /// Kinetic energy: u \cdot u
+         KINETIC_ENERGY,
       };
    };
 

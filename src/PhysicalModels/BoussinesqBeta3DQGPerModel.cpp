@@ -23,6 +23,7 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/NusseltBeta3DQGPerWriter.hpp"
+#include "IoVariable/KineticEnergyBeta3DQGPerWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerStreamfunction.hpp"
@@ -30,6 +31,7 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerKineticNRG.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -58,6 +60,8 @@ namespace GeoMHDiSCC {
       
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanHeat>();
+      // Add kinetic energy computation
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerKineticNRG>();
    }
 
    void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
@@ -191,9 +195,15 @@ namespace GeoMHDiSCC {
    void BoussinesqBeta3DQGPerModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltBeta3DQGPerWriter spState(new IoVariable::NusseltBeta3DQGPerWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::DX_MEANTEMPERATURE);
-      spSim->addAsciiOutputFile(spState);
+      IoVariable::SharedNusseltBeta3DQGPerWriter spNusselt(new IoVariable::NusseltBeta3DQGPerWriter(SchemeType::type()));
+      spNusselt->expect(PhysicalNames::TEMPERATURE);
+      spNusselt->expect(PhysicalNames::DX_MEANTEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
+
+      // Create kinetic energy writer
+      IoVariable::SharedKineticEnergyBeta3DQGPerWriter spKinetic(new IoVariable::KineticEnergyBeta3DQGPerWriter(SchemeType::type()));
+      spKinetic->expect(PhysicalNames::KINETIC_ENERGY);
+      spSim->addAsciiOutputFile(spKinetic);
    }
 
    void BoussinesqBeta3DQGPerModel::addHdf5OutputFiles(SharedSimulation spSim)

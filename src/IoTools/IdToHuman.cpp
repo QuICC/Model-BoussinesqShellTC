@@ -91,6 +91,9 @@ namespace IoTools {
          case PhysicalNames::NO_VORTICITYZ:
             return "Non orthogonal vorticityZ";
 
+         case PhysicalNames::KINETIC_ENERGY:
+            return "Kinetic energy";
+
          default:
             throw Exception("Unknown ID to string conversion requested (PhysicalNames)");
       }
@@ -159,6 +162,9 @@ namespace IoTools {
 
          case PhysicalNames::NO_VORTICITYZ:
             return "no_vorticityz";
+
+         case PhysicalNames::KINETIC_ENERGY:
+            return "kinetic_energy";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (PhysicalNames)");

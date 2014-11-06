@@ -207,6 +207,9 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
             else:
                 mat = c1d.zblk(res[0], bc)
 
+        elif field_row == ("kinetic_energy",""):
+            mat = c1d.avg(res[0])
+
         return mat
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):

@@ -1,11 +1,11 @@
 /** 
- * @file NusseltBeta3DQGPerWriter.hpp
- * @brief Implementation of the ASCII Nusselt number writer for the Beta 3DQG model
+ * @file KineticEnergyBeta3DQGPerWriter.hpp
+ * @brief Implementation of the ASCII kinetic energy writer for the Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef NUSSELTBETA3DQGPERWRITER_HPP
-#define NUSSELTBETA3DQGPERWRITER_HPP
+#ifndef KINETICENERGYBETA3DQGPERWRITER_HPP
+#define KINETICENERGYBETA3DQGPERWRITER_HPP
 
 // Configuration includes
 //
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII Nusselt number writer for the Beta 3DQG model
     */
-   class NusseltBeta3DQGPerWriter: public IVariableAsciiEWriter
+   class KineticEnergyBeta3DQGPerWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -39,17 +39,12 @@ namespace IoVariable {
           *
           * @param type Type of the file (typically scheme name)
           */
-         NusseltBeta3DQGPerWriter(std::string type);
+         KineticEnergyBeta3DQGPerWriter(std::string type);
 
          /**
           * @brief Destructor
           */
-         virtual ~NusseltBeta3DQGPerWriter();
-
-         /**
-          * @brief Initialise the operator and file
-          */
-         virtual void init();
+         virtual ~KineticEnergyBeta3DQGPerWriter();
 
          /**
           * @brief Write State to file
@@ -59,17 +54,13 @@ namespace IoVariable {
       protected:
 
       private:
-         /**
-          * @brief Nusselt calculation operator
-          */
-         SparseMatrix   mNusseltOp;
 
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef SharedPtrMacro<NusseltBeta3DQGPerWriter> SharedNusseltBeta3DQGPerWriter;
+   typedef SharedPtrMacro<KineticEnergyBeta3DQGPerWriter> SharedKineticEnergyBeta3DQGPerWriter;
 
 }
 }
 
-#endif // NUSSELTBETA3DQGPERWRITER_HPP
+#endif // KINETICENERGYBETA3DQGPERWRITER_HPP

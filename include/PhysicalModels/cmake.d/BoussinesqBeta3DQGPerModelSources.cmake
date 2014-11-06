@@ -4,7 +4,9 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVelocityZ.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerTransport.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerKineticNRG.cpp
    ${GEOMHDISCC_SRC_DIR}/IoVariable/NusseltBeta3DQGPerWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/KineticEnergyBeta3DQGPerWriter.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp

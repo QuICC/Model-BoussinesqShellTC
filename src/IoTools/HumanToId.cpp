@@ -209,6 +209,10 @@ namespace IoTools {
       {
          return PhysicalNames::NO_VORTICITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::KINETIC_ENERGY))
+      {
+         return PhysicalNames::KINETIC_ENERGY;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (PhysicalNames)");

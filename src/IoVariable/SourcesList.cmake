@@ -4,6 +4,7 @@ set(MHDSources
    ContinuityWriter.cpp
    NusseltTags.cpp
    NusseltWriter.cpp
+   KineticEnergyTags.cpp
    StateFileTags.cpp
    StateFileWriter.cpp
    StateFileReader.cpp
