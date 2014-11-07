@@ -122,7 +122,7 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << 1.0 - nusselt(0)/(1 + nusselt(1)) << std::endl;
+         this->mFile << std::setprecision(16) << this->mTime << "\t" << 1.0 + nusselt(0)/(1 - nusselt(1)) << std::endl;
       }
 
       // Close file
