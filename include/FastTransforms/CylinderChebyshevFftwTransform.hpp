@@ -46,8 +46,12 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** Enum of projector IDs:
+          *    - PROJ: projection
+          *    - DIFF: derivative
+          *    - DIVR: division by R
+          */
+         enum Id {PROJ,  DIFF, DIVR};
       };
 
       /**
@@ -220,6 +224,16 @@ namespace Transform {
          SparseMatrix   mDiffO;
 
          /**
+          * @brief Storage for the even division by R matrix
+          */
+         SparseMatrix   mDivRE;
+
+         /**
+          * @brief Storage for the odd division by R matrix
+          */
+         SparseMatrix   mDivRO;
+
+         /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
           */
          void initFft();
@@ -282,6 +296,11 @@ namespace Transform {
       if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize());
+
+      // Compute division by R
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRO*chebVal.topRows(this->mspSetup->specSize());
 
       // Compute simple projection
       } else
@@ -353,6 +372,11 @@ namespace Transform {
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).real();
 
+      // Compute division by R of real part
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRO*chebVal.topRows(this->mspSetup->specSize()).real();
+
       // Compute simple projection of real part
       } else
       {
@@ -371,6 +395,11 @@ namespace Transform {
       if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).imag();
+
+      // Compute division by R of imaginary part
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRO*chebVal.topRows(this->mspSetup->specSize()).imag();
 
       // Compute simple projection of imaginary part
       } else

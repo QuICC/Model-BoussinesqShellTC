@@ -131,7 +131,10 @@ namespace Transform {
 
    void AnnulusChebyshevFftwTransform::initOperators()
    {
+      // First derivative
       this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      // Division by R
+      this->mDivR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();

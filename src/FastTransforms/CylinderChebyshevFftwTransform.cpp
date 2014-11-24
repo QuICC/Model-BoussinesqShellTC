@@ -120,8 +120,12 @@ namespace Transform {
 
    void CylinderChebyshevFftwTransform::initOperators()
    {
+      // First derivative
       this->mDiffE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
       this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      // Division by R
+      this->mDivRE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mDivRO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();

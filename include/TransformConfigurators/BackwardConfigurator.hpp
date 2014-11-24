@@ -21,7 +21,7 @@
 //
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/TransformSteps.hpp"
+#include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
 

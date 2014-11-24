@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import sympy as sy
 import numpy as np
 import scipy.sparse as spsp
+import scipy.sparse.linalg as spsplin
 
 import geomhdiscc.transform.cylinder as transf
 import geomhdiscc.geometry.cylindrical.cylinder_radius as cylinder
@@ -33,9 +34,35 @@ def test_forward(op, parity, res_expr, sol_expr, grid, q):
     t = x_to_phys(sol_expr,grid)
     sol = transf.torcheb(t, psol)
     err = np.abs(rhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr)
+    print("\t\tMax forward relative error: " + str(np.max(relerr)))
+
+def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
+    """Perform a tau backward operation test"""
+
+    try:
+        pres, psol = parity
+    except:
+        pres = parity
+        psol = parity
+
+    x = sy.Symbol('x')
+    rhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    sol = transf.torcheb(x_to_phys(sol_expr,grid), psol)
+    err = np.abs(lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
+    if np.max(err) > 10*np.spacing(1):
+        print(err)
+    print("\t\tMax tau backward error: " + str(np.max(err)))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr)
+    print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
 
 def zblk(nr, rg):
     """Accuracy test for zblk operator"""
@@ -350,30 +377,76 @@ def qid(nr, rg):
         ssol = sphys
         test_forward(A, parity, sphys, ssol, rg, 3)
 
+def mvss_1_x(nr, rg):
+    """Accuracy test for 1/r operator vs r solve operator"""
+
+    print("mvss_1_x:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        Am = cylinder.x1(nr, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(sphys/x)
+        test_forward(Am, (parity,(parity+1)%2), sphys, ssol, rg, 0)
+        As = cylinder.x1(nr, parity, cylinder.radbc.no_bc())
+        As = As.tocsr()
+        Bs = cylinder.qid(nr, parity, 0, cylinder.radbc.no_bc())
+        test_backward_tau(As, Bs, ((parity+1)%2,parity), sphys, ssol, rg)
+
+def mvss_d1(nr, rg):
+    """Accuracy test for d1 operator vs quasi-inverse solve"""
+
+    print("mvss_d1:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        Am = cylinder.d1(nr, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys,x))
+        test_forward(Am, (parity,(parity+1)%2), sphys, ssol, rg, 0)
+        if (nr%2 == 0 and parity == 1) or (nr%2 == 1 and parity == 0):
+            As = cylinder.i1(nr, parity, {0:99})
+            Bs = cylinder.qid(nr, parity, 1, cylinder.radbc.no_bc())
+        else:
+            As = cylinder.i1(nr, parity, cylinder.radbc.no_bc())
+            Bs = cylinder.qid(nr, parity, 0, cylinder.radbc.no_bc())
+        As = As.tocsr()
+        test_backward_tau(As, Bs, ((parity+1)%2,parity), sphys, ssol, rg)
+
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 20
+    nr = 51
     rg = transf.rgrid(nr)
 
     # run tests
     #zblk(nr, rg)
-    x1(nr, rg)
-    d1(nr, rg)
-    x1div(nr, rg)
-    i1(nr, rg)
-    i1x1d1(nr, rg)
-    i1x1div(nr, rg)
-    i1x1(nr, rg)
-    i2(nr, rg)
-    i2x1(nr, rg)
-    i2x2(nr, rg)
-    i2x2d2(nr, rg)
-    i2x2d1(nr, rg)
-    i2x2div(nr, rg)
-    i2x2laplh(nr, rg)
-    i4(nr, rg)
-    i4x4(nr, rg)
-    i4x4laplh(nr, rg)
-    i4x4lapl2h(nr, rg)
-    qid(nr, rg)
+#    x1(nr, rg)
+#    d1(nr, rg)
+#    x1div(nr, rg)
+#    i1(nr, rg)
+#    i1x1d1(nr, rg)
+#    i1x1div(nr, rg)
+#    i1x1(nr, rg)
+#    i2(nr, rg)
+#    i2x1(nr, rg)
+#    i2x2(nr, rg)
+#    i2x2d2(nr, rg)
+#    i2x2d1(nr, rg)
+#    i2x2div(nr, rg)
+#    i2x2laplh(nr, rg)
+#    i4(nr, rg)
+#    i4x4(nr, rg)
+#    i4x4laplh(nr, rg)
+#    i4x4lapl2h(nr, rg)
+#    qid(nr, rg)
+
+    # Matmult vs Solve operators
+    mvss_1_x(nr, rg)
+    mvss_d1(nr, rg)

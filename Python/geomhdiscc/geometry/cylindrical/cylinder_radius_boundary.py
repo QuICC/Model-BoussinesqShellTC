@@ -66,13 +66,19 @@ def constrain(mat, parity, bc, location = 't'):
 
 def apply_tau(mat, parity, bc, location = 't'):
     """Add Tau lines to the matrix"""
-
+    
+    # u = 0
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], parity, bc.get('c',None))
+    # D u = 0
     elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], parity, bc.get('c',None))
+    # 1/r D u = 0
     elif bc[0] == 13:
         cond = tau_1rdr(mat.shape[0], parity, bc.get('c',None))
+    # Last mode is zero
+    elif bc[0] == 99:
+        cond = tau_last(mat.shape[0], parity)
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -131,6 +137,14 @@ def tau_1rdr(nr, parity, coeffs = None):
     cond = tau_value(nr, parity, coeffs) + tau_diff(nr, parity, coeffs)
 
     return cond
+
+def tau_last(nr, parity):
+    """Create the zero last mode tau line(s)"""
+
+    cond = []
+    cond.append([0 for i in np.arange(parity, 2*(nr-1), 2)] + [norm_c(2*nr)])
+
+    return np.array(cond)
 
 def apply_galerkin(mat, parity, bc):
     """Apply a Galerkin stencil on the matrix"""

@@ -46,8 +46,12 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** Enum of projector IDs:
+          *    - PROJ: projection
+          *    - DIFF: derivative
+          *    - DIVR: division by R
+          */
+         enum Id {PROJ,  DIFF, DIVR};
       };
 
       /**
@@ -215,6 +219,11 @@ namespace Transform {
          SparseMatrix   mDiff;
 
          /**
+          * @brief Storage for the division by R matrix
+          */
+         SparseMatrix   mDivR;
+
+         /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
           */
          void initFft();
@@ -288,6 +297,11 @@ namespace Transform {
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
 
+      // Compute division by R
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize());
+
       // Compute simple projection
       } else
       {
@@ -358,6 +372,11 @@ namespace Transform {
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
 
+      // Compute division by R of real part
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).real();
+
       // Compute simple projection of real part
       } else
       {
@@ -376,6 +395,11 @@ namespace Transform {
       if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFF)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+
+      // Compute division by R of imaginary part
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).imag();
 
       // Compute simple projection of imaginary part
       } else
