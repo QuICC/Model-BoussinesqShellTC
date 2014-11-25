@@ -31,8 +31,7 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 #------- AVAILABLE LINEAR ALGEBRA LIBRARIES ------#
 ###################################################
 
-set(GEOMHDISCC_LINALGS "LAPACK" "Eigen" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
+set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
@@ -47,6 +46,12 @@ set(GEOMHDISCC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_PARDISO "/usr/local/Pardiso-4.1.2/lib" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
+
+###################################################
+#--------- AVAILABLE TRANSFORM OPERATORS ---------#
+###################################################
+
+set(GEOMHDISCC_TRANSOPS "Forward" "Backward" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#

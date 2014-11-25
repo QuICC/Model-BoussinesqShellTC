@@ -140,33 +140,82 @@ namespace Transform {
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cylindrical.annulus_radius");
 
-      // Prepare arguments to d1(...) call
-      PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(4);
-      // ... get operator size
-      pValue = PyLong_FromLong(this->mspSetup->specSize());
-      PyTuple_SetItem(pArgs, 0, pValue);
-      // ... compute a, b factors
-      PyObject *pTmp = PyTuple_New(2);
-      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
-      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
-      PythonWrapper::setFunction("linear_r2x");
-      pValue = PythonWrapper::callFunction(pTmp);
-      PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
-      PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
-      // ... create boundary condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 3, pValue);
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Prepare arguments to d1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(4);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... compute a, b factors
+         PyObject *pTmp = PyTuple_New(2);
+         PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
+         PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
+         PythonWrapper::setFunction("linear_r2x");
+         pValue = PythonWrapper::callFunction(pTmp);
+         PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
+         PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
+         // ... create boundary condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 3, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
+         // Call d1
+         PythonWrapper::setFunction("d1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiff, pValue);
+         Py_DECREF(pValue);
+      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Prepare arguments to i1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(4);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... compute a, b factors
+         PyObject *pTmp = PyTuple_New(2);
+         PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
+         PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
+         PythonWrapper::setFunction("linear_r2x");
+         pValue = PythonWrapper::callFunction(pTmp);
+         PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
+         PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
+         // ... create boundary condition (last mode zero)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(99));
+         PyTuple_SetItem(pArgs, 3, pValue);
 
-      // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiff, pValue);
-      Py_DECREF(pValue);
+         // Call i1
+         PythonWrapper::setFunction("i1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiff, pValue);
+         Py_DECREF(pValue);
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      // Fill matrix and cleanup
       PythonWrapper::finalize();
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Factorize differentiation matrix and free memory
+         this->mSDiff.compute(this->mDiff);
+         // Check for successful factorisation
+         if(this->mSDiff.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward differentiation failed!");
+         }
+         this->mDiff.resize(0,0);
+
+         // Factorize division matrix and free memory
+         this->mSDivR.compute(this->mDivR);
+         // Check for successful factorisation
+         if(this->mSDivR.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward division failed!");
+         }
+         this->mDivR.resize(0,0);
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    void AnnulusChebyshevFftwTransform::cleanupFft()

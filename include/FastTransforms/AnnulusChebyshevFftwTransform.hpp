@@ -27,10 +27,13 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -223,6 +226,23 @@ namespace Transform {
           */
          SparseMatrix   mDivR;
 
+         #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         /**
+          * @brief Storage for the sparse solver for differentiation
+          */
+         Solver::SparseSelector<SparseMatrix>::Type mSDiff;
+
+         /**
+          * @brief Storage for the sparse solver for division by R
+          */
+         Solver::SparseSelector<SparseMatrix>::Type mSDivR;
+
+         /**
+          * @brief Storage for the backward operators data
+          */
+         Matrix mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
           */
@@ -295,12 +315,26 @@ namespace Transform {
       // Compute first derivative
       if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize());
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection
       } else
@@ -370,12 +404,26 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R of real part
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).real();
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).real();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of real part
       } else
@@ -394,12 +442,26 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R of imaginary part
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            this->mTmpS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of imaginary part
       } else
