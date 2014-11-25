@@ -35,6 +35,7 @@
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/TiltedScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -135,26 +136,61 @@ namespace GeoMHDiSCC {
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedTiltedScalarFieldVisualizer spTilted;
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
+      
+      // Add streamfunction field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::NO_STREAMFUNCTION);
       
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::NO_VELOCITYZ);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+
+      // Add transport field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::TEMPERATURE);
+      spTilted->setIdentity(PhysicalNames::TILTED_TEMPERATURE);
+      
+      // Add nonorthogonal streamfunction field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_STREAMFUNCTION);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_STREAMFUNCTION);
+      
+      // Add nonorthogonal vertical velocity field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_VELOCITYZ);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_VELOCITYZ);
+      
+      // Add nonorthogonal vertical vorticity field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_VORTICITYZ);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_VORTICITYZ);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -162,6 +198,9 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
+      spOut->expect(PhysicalNames::NO_VELOCITYZ);
+      spOut->expect(PhysicalNames::NO_VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

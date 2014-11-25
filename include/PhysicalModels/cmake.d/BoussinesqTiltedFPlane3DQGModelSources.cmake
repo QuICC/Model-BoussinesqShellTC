@@ -10,4 +10,5 @@ set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/TiltedScalarFieldVisualizer.cpp
 )

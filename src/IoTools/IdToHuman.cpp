@@ -91,6 +91,24 @@ namespace IoTools {
          case PhysicalNames::NO_VORTICITYZ:
             return "Non orthogonal vorticityZ";
 
+         case PhysicalNames::TILTED_TEMPERATURE:
+            return "Tilted temperature";
+
+         case PhysicalNames::TILTED_NO_STREAMFUNCTION:
+            return "Tilted non orthogonal streamfunction";
+
+         case PhysicalNames::TILTED_NO_VELOCITYZ:
+            return "Tilted non orthogonal velocityZ";
+
+         case PhysicalNames::TILTED_NO_VORTICITYZ:
+            return "Tilted non orthogonal vorticityZ";
+
+         case PhysicalNames::TILTED_STREAMFUNCTION:
+            return "Tilted vertical streamfunction";
+
+         case PhysicalNames::TILTED_VELOCITYZ:
+            return "Tilted vertical velocityZ";
+
          case PhysicalNames::KINETIC_ENERGY:
             return "Kinetic energy";
 
@@ -162,6 +180,24 @@ namespace IoTools {
 
          case PhysicalNames::NO_VORTICITYZ:
             return "no_vorticityz";
+
+         case PhysicalNames::TILTED_TEMPERATURE:
+            return "tilted_temperature";
+
+         case PhysicalNames::TILTED_NO_STREAMFUNCTION:
+            return "tilted_no_streamfunction";
+
+         case PhysicalNames::TILTED_NO_VELOCITYZ:
+            return "tilted_no_velocityz";
+
+         case PhysicalNames::TILTED_NO_VORTICITYZ:
+            return "tilted_no_vorticityz";
+
+         case PhysicalNames::TILTED_STREAMFUNCTION:
+            return "tilted_streamfunction";
+
+         case PhysicalNames::TILTED_VELOCITYZ:
+            return "tilted_velocityz";
 
          case PhysicalNames::KINETIC_ENERGY:
             return "kinetic_energy";
