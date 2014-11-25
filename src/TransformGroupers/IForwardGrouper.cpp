@@ -20,13 +20,18 @@
 
 // Project includes
 //
+#include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    IForwardGrouper::IForwardGrouper()
-      : split(Splitting::Locations::NONE), mcScalarPacks1D(1), mcScalarPacks2D(1), mcVectorPacks1D(3), mcVectorPacks2D(3)
+      : split(Splitting::Locations::NONE),
+        mcScalarPacks1D(TransformSteps::Forward<Dimensions::Transform::TRA1D>::SCALAR_VARIABLES), 
+        mcVectorPacks1D(TransformSteps::Forward<Dimensions::Transform::TRA1D>::VECTOR_VARIABLES),
+        mcScalarPacks2D(TransformSteps::Forward<Dimensions::Transform::TRA2D>::SCALAR_VARIABLES),
+        mcVectorPacks2D(TransformSteps::Forward<Dimensions::Transform::TRA2D>::VECTOR_VARIABLES)
    {
    }
 
@@ -38,7 +43,6 @@ namespace Transform {
    {
       // Create list of packet sizes
       std::set<int>  list;
-
       int count = 0;
 
       // loop over all variable information

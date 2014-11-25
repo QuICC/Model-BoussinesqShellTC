@@ -7,18 +7,18 @@
 #ifndef TRANSFORMSTEPSMACRO_H
 #define TRANSFORMSTEPSMACRO_H
 
-#if defined GEOMHDISCC_CARTESIAN
-   // include transform steps
+#if defined GEOMHDISCC_SPATIALSCHEME_TTT || GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+   // include transform steps for cartesian geometry
    #include "TransformConfigurators/CartesianTransformSteps.hpp"
 
-#elif defined GEOMHDISCC_CYLINDRICAL
-   // include transform steps
-   #include "TransformConfigurators/CartesianTransformSteps.hpp"
+#elif defined GEOMHDISCC_SPATIALSCHEME_CFT || GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+   // include transform steps for cylindrical geometry
+   #include "TransformConfigurators/CylindricalTransformSteps.hpp"
 
-#elif defined GEOMHDISCC_SPHERICAL
-   // include transform steps
-   #include "TransformConfigurators/CartesianTransformSteps.hpp"
+#elif defined GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+   // include transform steps for spherical geometry
+   #include "TransformConfigurators/SphericalTransformSteps.hpp"
 
-#endif // defined GEOMHDISCC_CARTESIAN
+#endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_TFF || defined GEOMHDISCC_SPATIALSCHEME_FFF
 
 #endif // TRANSFORMSTEPSMACRO_H

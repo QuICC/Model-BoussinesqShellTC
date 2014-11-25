@@ -20,13 +20,22 @@
 
 // Project includes
 //
+#include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    IBackwardGrouper::IBackwardGrouper()
-      : split(Splitting::Locations::NONE), mcScalarPacks1D(1), mcGradientPacks1D(2), mcVectorPacks1D(3), mcCurlPacks1D(3), mcScalarPacks2D(1), mcGradientPacks2D(2), mcVectorPacks2D(3), mcCurlPacks2D(3)
+      : split(Splitting::Locations::NONE), 
+        mcScalarPacks1D(TransformSteps::Backward<Dimensions::Transform::TRA1D>::SCALAR_VARIABLES), 
+        mcGradientPacks1D(TransformSteps::Backward<Dimensions::Transform::TRA1D>::GRAD_VARIABLES), 
+        mcVectorPacks1D(TransformSteps::Backward<Dimensions::Transform::TRA1D>::VECTOR_VARIABLES), 
+        mcCurlPacks1D(TransformSteps::Backward<Dimensions::Transform::TRA1D>::CURL_VARIABLES), 
+        mcScalarPacks2D(TransformSteps::Backward<Dimensions::Transform::TRA2D>::SCALAR_VARIABLES),
+        mcGradientPacks2D(TransformSteps::Backward<Dimensions::Transform::TRA2D>::GRAD_VARIABLES),
+        mcVectorPacks2D(TransformSteps::Backward<Dimensions::Transform::TRA2D>::VECTOR_VARIABLES),
+        mcCurlPacks2D(TransformSteps::Backward<Dimensions::Transform::TRA2D>::CURL_VARIABLES)
    {
    }
 
@@ -123,7 +132,7 @@ namespace Transform {
          {
             if(infoIt->second.isScalar())
             {
-               counter += this->mcGradientPacks2D + 1;
+               counter += this->mcGradientPacks2D;
             } else
             {
                counter += this->mcCurlPacks2D;
