@@ -86,8 +86,7 @@ if show_solution:
     import geomhdiscc.transform.cartesian as transf
 
 # Show the "spy" of the two matrices
-if False:
-    import matplotlib.pylab as pl
+if show_spy:
     pl.spy(A, markersize=0.2)
     pl.show()
     pl.spy(B, markersize=0.2)

@@ -35,6 +35,8 @@ namespace GeoMHDiSCC {
          CODENSITY = 0,
          /// Density field
          DENSITY,
+         /// X derivative of mean temperature field
+         DX_MEANTEMPERATURE,
          /// Z derivative of mean temperature field
          DZ_MEANTEMPERATURE,
          /// Entropy field
@@ -71,6 +73,22 @@ namespace GeoMHDiSCC {
          NO_VELOCITYZ,
          /// Non orthogonal vertical vorticity field
          NO_VORTICITYZ,
+   
+         /// Temperature field in tilted box
+         TILTED_TEMPERATURE,
+         /// Vertical streamfunction field in tilted box
+         TILTED_STREAMFUNCTION,
+         /// vertical velocity field in tilted box
+         TILTED_VELOCITYZ,
+         /// Non orthogonal streamfunction field in tilted box
+         TILTED_NO_STREAMFUNCTION,
+         /// Non orthogonal vertical velocity field in tilted box
+         TILTED_NO_VELOCITYZ,
+         /// Non orthogonal vertical vorticity field in tilted box
+         TILTED_NO_VORTICITYZ,
+
+         /// Kinetic energy: u \cdot u
+         KINETIC_ENERGY,
       };
    };
 

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqFPlane3DQGVelocityZ.hpp
- * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane 3DQG model
+ * @file BoussinesqBeta3DQGPerMeanHeat.hpp
+ * @brief Implementation of the mean heat equation for the periodic Boussinesq Beta 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQFPLANE3DQGVELOCITYZ_HPP
-#define BOUSSINESQFPLANE3DQGVELOCITYZ_HPP
+#ifndef BOUSSINESQBETA3DQGPERMEANHEAT_HPP
+#define BOUSSINESQBETA3DQGPERMEANHEAT_HPP
 
 // Configuration includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the upright vertical velocity equation for the Boussinesq F-plane 3DQG model
+    * @brief Implementation of the mean heat equation for the periodic Boussinesq Beta 3DQG model
     */
-   class BoussinesqFPlane3DQGVelocityZ: public IScalarEquation
+   class BoussinesqBeta3DQGPerMeanHeat: public IScalarEquation
    {
       public:
          /**
           * @brief Simple constructor
           *
-          * @param spEqParams Shared equation parameters
+          * @param spEqParams    Shared equation parameters
           */
-         BoussinesqFPlane3DQGVelocityZ(SharedEquationParameters spEqParams);
+         BoussinesqBeta3DQGPerMeanHeat(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqFPlane3DQGVelocityZ();
-         
+         virtual ~BoussinesqBeta3DQGPerMeanHeat();
+
          /**
           * @brief Compute the nonlinear interaction term
           *
@@ -52,7 +52,7 @@ namespace Equations {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
-         
+
       protected:
          /**
           * @brief Set variable requirements
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQFPLANE3DQGVELOCITYZ_HPP
+#endif // BOUSSINESQBETA3DQGPERMEANHEAT_HPP

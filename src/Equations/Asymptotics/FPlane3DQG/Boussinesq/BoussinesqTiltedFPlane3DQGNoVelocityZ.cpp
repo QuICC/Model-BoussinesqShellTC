@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqFPlane3DQGNoStreamfunction.cpp
- * @brief Source of the implementation of the non orthogonal streamfuntion computation in the F-plane 3DQG model
+ * @file BoussinesqTiltedFPlane3DQGNoVelocityZ.cpp
+ * @brief Source of the implementation of the non orthogonal vertical velocity computation in the tilted F-plane 3DQG model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -14,7 +14,7 @@
 
 // Class include
 //
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGNoStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVelocityZ.hpp"
 
 // Project includes
 //
@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqFPlane3DQGNoStreamfunction::BoussinesqFPlane3DQGNoStreamfunction(SharedEquationParameters spEqParams, const SolveTiming::Id time)
+   BoussinesqTiltedFPlane3DQGNoVelocityZ::BoussinesqTiltedFPlane3DQGNoVelocityZ(SharedEquationParameters spEqParams, const SolveTiming::Id time)
       : IScalarEquation(spEqParams)
    {
       // Set solver timing
@@ -37,11 +37,11 @@ namespace Equations {
       this->setRequirements();
    }
 
-   BoussinesqFPlane3DQGNoStreamfunction::~BoussinesqFPlane3DQGNoStreamfunction()
+   BoussinesqTiltedFPlane3DQGNoVelocityZ::~BoussinesqTiltedFPlane3DQGNoVelocityZ()
    {
    }
 
-   void BoussinesqFPlane3DQGNoStreamfunction::setCoupling()
+   void BoussinesqTiltedFPlane3DQGNoVelocityZ::setCoupling()
    {
       if(this->solveTiming() == SolveTiming::BEFORE)
       {
@@ -52,31 +52,31 @@ namespace Equations {
       }
    }
 
-   void BoussinesqFPlane3DQGNoStreamfunction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqTiltedFPlane3DQGNoVelocityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
-      // Get paramters
+      // Get parameters
       MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
 
       /// 
       /// Computation of the jacobian:
-      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\nabla^2_{\perp}\psi\f$
+      ///   \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)w\f$
       ///
-      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->unknown().dom(0).grad(), this->scalar(PhysicalNames::NO_VORTICITYZ).dom(0).grad(), 1.0/eta3);
+      Physical::StreamAdvection<FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::NO_STREAMFUNCTION).dom(0).grad(), this->unknown().dom(0).grad(), 1.0/eta3);
    }
 
-   void BoussinesqFPlane3DQGNoStreamfunction::setRequirements()
+   void BoussinesqTiltedFPlane3DQGNoVelocityZ::setRequirements()
    {
       // Set streamfunction as equation unknown
-      this->setName(PhysicalNames::NO_STREAMFUNCTION);
+      this->setName(PhysicalNames::NO_VELOCITYZ);
+
+      // Set non orthogonal vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
+      this->mRequirements.addField(PhysicalNames::NO_VELOCITYZ, FieldRequirement(true, true, true, true));
 
       // Set non orthogonal streamfunction requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::NO_STREAMFUNCTION, FieldRequirement(true, true, true, true));
-
-      // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::NO_VORTICITYZ, FieldRequirement(true, true, true, true));
    }
 
 }

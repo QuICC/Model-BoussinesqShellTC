@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqFPlane3DQGModel.cpp
- * @brief Source of the Boussinesq F-plane 3DQG physical model
+ * @file BoussinesqTiltedFPlane3DQGModel.cpp
+ * @brief Source of the Boussinesq tilted F-plane 3DQG physical model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqFPlane3DQGModel.hpp"
+#include "PhysicalModels/BoussinesqTiltedFPlane3DQGModel.hpp"
 
 // Project includes
 //
@@ -25,43 +25,58 @@
 #include "IoVariable/NusseltWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGStreamfunction.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVelocityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.hpp"
-#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGTransport.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoStreamfunction.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVelocityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGNoVorticityZ.hpp"
+#include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqTiltedFPlane3DQGMeanHeat.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/TiltedScalarFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqFPlane3DQGModel::PYMODULE = "boussinesq_fplane3dqg";
+   const std::string BoussinesqTiltedFPlane3DQGModel::PYMODULE = "boussinesq_tilted_fplane3dqg";
 
-   const std::string BoussinesqFPlane3DQGModel::PYCLASS = "BoussinesqFPlane3DQG";
+   const std::string BoussinesqTiltedFPlane3DQGModel::PYCLASS = "BoussinesqTiltedFPlane3DQG";
 
-   void BoussinesqFPlane3DQGModel::addEquations(SharedSimulation spSim)
+   void BoussinesqTiltedFPlane3DQGModel::addEquations(SharedSimulation spSim)
    {
       // Add upright streamfunction equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGStreamfunction>();
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGStreamfunction>();
       
       // Add upright vertical velocity equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVelocityZ>();
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGVelocityZ>();
       
       // Add upright transport equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGTransport>();
 
 
-      // Add vertical vorticity equation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGVorticityZ>();
+      // Add non orthogonal streamfunction equation
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoStreamfunction>(SolveTiming::BEFORE);
+
+      // Add non orthogonal vertical velocity equation
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVelocityZ>(SolveTiming::BEFORE);
+
+      // Add non orthogonal streamfunction equation
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoStreamfunction>(SolveTiming::AFTER);
+
+      // Add non orthogonal vertical velocity equation
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVelocityZ>(SolveTiming::AFTER);
+
+      // Add non orthogonal vertical vorticity equation
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVorticityZ>();
 
       
       // Add mean heat computation
-      spSim->addScalarEquation<Equations::BoussinesqFPlane3DQGMeanHeat>();
+      spSim->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGMeanHeat>();
    }
 
-   void BoussinesqFPlane3DQGModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqTiltedFPlane3DQGModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -73,19 +88,19 @@ namespace GeoMHDiSCC {
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-         spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setModeOptions(1e0, 4.0, -1e0, 4.0, 1e0, 4.0);
 
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setModeOptions(2e0, 3.0, 1e0, 3.0, 1e0, 3.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
          spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSCOS);
-         spExact->setModeOptions(1e0, 2.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setModeOptions(1e0, -2.0, 1e0, 5.0, 7e0, 4.0);
 
       // Generate random spectrum
       } else
@@ -117,19 +132,27 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqFPlane3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqTiltedFPlane3DQGModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedTiltedScalarFieldVisualizer spTilted;
+
+      // Add non orthogonal streamfunction equation
+      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoStreamfunction>(SolveTiming::AFTER);
+      // Add non orthogonal vertical velocity equation
+      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVelocityZ>(SolveTiming::AFTER);
+      // Add non orthogonal vertical vorticity equation
+      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVorticityZ>();
 
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
       
       // Add vertical velocity field visualization
@@ -137,10 +160,56 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
       
+      // Add streamfunction field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::NO_STREAMFUNCTION);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::NO_VELOCITYZ);
+      
       // Add vertical velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+
+      // Add transport field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::TEMPERATURE);
+      spTilted->setIdentity(PhysicalNames::TILTED_TEMPERATURE);
+      
+      // Add nonorthogonal streamfunction field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_STREAMFUNCTION);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_STREAMFUNCTION);
+      
+      // Add nonorthogonal vertical velocity field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_VELOCITYZ);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_VELOCITYZ);
+      
+      // Add nonorthogonal vertical vorticity field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::NO_VORTICITYZ);
+      spTilted->setIdentity(PhysicalNames::TILTED_NO_VORTICITYZ);
+      
+      // Add nonorthogonal streamfunction field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::STREAMFUNCTION);
+      spTilted->setIdentity(PhysicalNames::TILTED_STREAMFUNCTION);
+      
+      // Add nonorthogonal vertical velocity field visualization
+      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+      spTilted->setFields(true, false);
+      spTilted->setDataField(PhysicalNames::VELOCITYZ);
+      spTilted->setIdentity(PhysicalNames::TILTED_VELOCITYZ);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -148,10 +217,18 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
+      spOut->expect(PhysicalNames::NO_VELOCITYZ);
+      spOut->expect(PhysicalNames::NO_VORTICITYZ);
+      spOut->expect(PhysicalNames::TILTED_NO_STREAMFUNCTION);
+      spOut->expect(PhysicalNames::TILTED_NO_VELOCITYZ);
+      spOut->expect(PhysicalNames::TILTED_NO_VORTICITYZ);
+      spOut->expect(PhysicalNames::TILTED_STREAMFUNCTION);
+      spOut->expect(PhysicalNames::TILTED_VELOCITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqFPlane3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqTiltedFPlane3DQGModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -166,7 +243,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqTiltedFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
       IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
@@ -174,7 +251,7 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqTiltedFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -193,7 +270,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqFPlane3DQGModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqTiltedFPlane3DQGModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

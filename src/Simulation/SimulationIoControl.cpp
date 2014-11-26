@@ -76,6 +76,9 @@ namespace GeoMHDiSCC {
       {
          this->mspStdOut->finalize();
       }
+
+      // Finalize ASCII and HDF5 writers
+      this->finalizeWriters();
    }
 
    void SimulationIoControl::addAsciiOutputFile(IoVariable::SharedIVariableAsciiEWriter spOutFile)
@@ -141,6 +144,7 @@ namespace GeoMHDiSCC {
       {
          (*itAscii)->finalize();
       }
+      this->mAsciiWriters.clear();
 
       // Iterate over all HDF5 writer
       SimulationIoControl::hdf5_iterator itHdf5;
@@ -148,6 +152,7 @@ namespace GeoMHDiSCC {
       {
          (*itHdf5)->finalize();
       }
+      this->mHdf5Writers.clear();
    }
 
    void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
