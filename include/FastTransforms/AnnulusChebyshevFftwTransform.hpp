@@ -238,9 +238,14 @@ namespace Transform {
          Solver::SparseSelector<SparseMatrix>::Type mSDivR;
 
          /**
-          * @brief Storage for the backward operators data
+          * @brief Storage for the backward operators input data
           */
-         Matrix mTmpS;
+         Matrix mTmpInS;
+
+         /**
+          * @brief Storage for the backward operators output data
+          */
+         Matrix mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
          /**
@@ -318,10 +323,10 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R
@@ -330,10 +335,9 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize());
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection
@@ -407,10 +411,10 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R of real part
@@ -419,10 +423,9 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).real();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of real part
@@ -445,10 +448,10 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDiff, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R of imaginary part
@@ -457,10 +460,9 @@ namespace Transform {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).imag();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            this->mTmpS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpS, this->mSDivR, this->mTmpS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpS;
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of imaginary part

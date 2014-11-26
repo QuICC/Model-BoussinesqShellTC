@@ -195,7 +195,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward differentiation failed!");
          }
-         this->mDiff.resize(0,0);
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 

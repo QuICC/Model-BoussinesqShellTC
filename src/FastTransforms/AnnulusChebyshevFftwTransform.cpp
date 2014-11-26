@@ -192,6 +192,16 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDiff, pValue);
          Py_DECREF(pValue);
+
+         // ... create boundary condition (none)
+         pValue = PyTuple_GetItem(pArgs, 3);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         // Call x1
+         PythonWrapper::setFunction("x1");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDivR, pValue);
+         Py_DECREF(pValue);
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Fill matrix and cleanup
@@ -205,7 +215,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward differentiation failed!");
          }
-         this->mDiff.resize(0,0);
 
          // Factorize division matrix and free memory
          this->mSDivR.compute(this->mDivR);
@@ -214,7 +223,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward division failed!");
          }
-         this->mDivR.resize(0,0);
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 

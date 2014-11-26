@@ -210,6 +210,9 @@ namespace Transform {
    /// Specialised 2D projection to compute gradient (hold input data)
    template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::START_GRAD>(TransformCoordinatorType& coord);
 
+   /// Specialised 2D projection to compute gradient
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord);
+
 
    /// Specialised 3D projection to do nothing
    template <> void BackwardConfigurator::project3D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord);

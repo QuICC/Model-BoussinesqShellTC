@@ -7,7 +7,7 @@ set(MHDPhysicalModels
    BoussinesqRB2DBoxVCModel.hpp
    BoussinesqRB3DBoxVCModel.hpp
    BoussinesqNC3DBoxVCModel.hpp
-   #BoussinesqRBAnnulusVCModel.hpp
+   BoussinesqRBAnnulusVCModel.hpp
    #BoussinesqRBCylinderVCModel.hpp
    #BoussinesqRRB1DBoxVCModel.hpp
    #BoussinesqRRB2DBoxVCModel.hpp

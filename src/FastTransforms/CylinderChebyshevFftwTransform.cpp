@@ -214,7 +214,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward even differentiation failed!");
          }
-         this->mDiffE.resize(0,0);
          // Factorize matrix and free memory
          this->mSDiffO.compute(this->mDiffO);
          // Check for successful factorisation
@@ -222,7 +221,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward odd differentiation failed!");
          }
-         this->mDiffO.resize(0,0);
 
          // Factorize division matrix and free memory
          this->mSDivRE.compute(this->mDivRE);
@@ -231,7 +229,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward even division failed!");
          }
-         this->mDivRE.resize(0,0);
          // Factorize division matrix and free memory
          this->mSDivRO.compute(this->mDivRO);
          // Check for successful factorisation
@@ -239,7 +236,6 @@ namespace Transform {
          {
             throw Exception("Factorization of backward odd division failed!");
          }
-         this->mDivRO.resize(0,0);
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
