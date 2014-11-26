@@ -63,10 +63,11 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, true, false, false);
    }
 
-   void TiltedScalarFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId)
+   void TiltedScalarFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       // Get paramters
       MHDFloat eta3 = std::cos((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
+      MHDFloat eta2 = std::sin((Math::PI/180.)*this->eqParams().nd(NonDimensional::THETA));
 
       // Initialize FFT
       Transform::Fft::FftSelector   transform;
@@ -88,21 +89,26 @@ namespace Equations {
       nK = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       for(int iK = 0; iK < nK; ++iK)
       {
-         k_ = gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iK));
+         k_ = (1.0 - gK(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iK)))/2.0;
          nJ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iK);
          for(int iJ = 0; iJ < nJ; ++iJ)
          {
             nI = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATB1D>(iK);
             for(int iI = 0; iI < nI; ++iI)
             {
-               tmp(iI, m) = std::exp(MHDComplex(0.0, -k_*eta3*iI))*tmp(iI,m);
-               m++;
+               tmp(iI, m) = std::exp(MHDComplex(0.0, -k_*iI*(eta2/eta3)))*tmp(iI,m);
             }
+            m++;
          }
       }
 
       // Compute backward transform
-      transform.project<Arithmetics::SET>(this->rUnknown().rDom(0).rPhys().rData(), tmp, Transform::FftIds::Projectors::PROJ);
+      transform.project<Arithmetics::SET>(rNLComp.rData(), tmp, Transform::FftIds::Projectors::PROJ);
+   }
+
+   void TiltedScalarFieldVisualizer::useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId)
+   {  
+      this->rUnknown().rDom(0).rPhys().rData() = rNLComp.data();
    }
 
    void TiltedScalarFieldVisualizer::setRequirements()

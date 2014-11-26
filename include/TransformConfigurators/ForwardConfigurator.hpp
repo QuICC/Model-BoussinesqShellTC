@@ -117,6 +117,9 @@ namespace Transform {
       // Compute nonlinear term component
       spEquation->computeNonlinear(rNLComp, TComponent);
 
+      // Compute nonlinear term component
+      spEquation->useNonlinear(rNLComp, TComponent);
+
       // Transfer physical storage to next step
       coord.communicator().holdPhysical(rNLComp);
 

@@ -66,7 +66,15 @@ namespace Equations {
           * @param rNLComp Nonlinear term component
           * @param compId  ID of the component (allows for a more general implementation)
           */
-         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId);
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const;
+
+         /**
+          * @brief Copy nonlinear calculation back into physical field
+          *
+          * @param rNLComp Nonlinear term component
+          * @param compId  ID of the component (allows for a more general implementation)
+          */
+         virtual void useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId);
 
       protected:
          /**

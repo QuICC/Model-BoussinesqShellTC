@@ -456,6 +456,11 @@ namespace Equations {
       throw Exception("Activated nonlinear term without implementation!");
    }
 
+   void IEquation::useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id)
+   {
+      // DO NOTHING IN GENERAL!
+   }
+
    Datatypes::SpectralScalarType::PointType IEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
    {
       // This implementation should never get called!

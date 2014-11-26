@@ -104,6 +104,14 @@ namespace Equations {
          virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const;
 
          /**
+          * @brief Use the nonlinear computation as physical field values
+          *
+          * @param rNLComp Nonlinear term component
+          * @param id      ID of the component (allows for a more general implementation)
+          */
+         virtual void useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id);
+
+         /**
           * @brief Compute the source term
           *
           * @param compId  ID of the spectral component
