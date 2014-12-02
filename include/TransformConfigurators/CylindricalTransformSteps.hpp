@@ -108,6 +108,16 @@ namespace GeoMHDiSCC {
             static const Step STEP_VECTOR_THREE = NOTHING;
 
 
+            /// Transform step for the first component of a vector "gradient"
+            static const Step STEP_VGRAD_ONE = NOTHING;
+
+            /// Transform step for the second component of a vector "gradient"
+            static const Step STEP_VGRAD_TWO = NOTHING;
+
+            /// Transform step for the third component of a vector "gradient"
+            static const Step STEP_VGRAD_THREE = NOTHING;
+
+
             /// Transform step for the first component of a curl
             static const Step STEP_CURL_ONE = NOTHING;
 
@@ -201,6 +211,16 @@ namespace GeoMHDiSCC {
 
             /// Third physical field component used for vector
             static const FieldComponents::Physical::Id VECTOR_THREE = FieldComponents::Physical::NOTUSED;
+
+
+            /// First physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_ONE = FieldComponents::Physical::NOTUSED;
+
+            /// Second physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_TWO = FieldComponents::Physical::NOTUSED;
+
+            /// Third physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_THREE = FieldComponents::Physical::NOTUSED;
 
 
             /// First physical field component used for curl
