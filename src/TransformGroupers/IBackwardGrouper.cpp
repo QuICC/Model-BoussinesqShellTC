@@ -66,7 +66,7 @@ namespace Transform {
          }
 
          // add physical differential field packs for first exchange
-         if(infoIt->second.needPhysicalDiff())
+         if(infoIt->second.needPhysicalGradient())
          {
             if(infoIt->second.isScalar())
             {
@@ -128,7 +128,7 @@ namespace Transform {
          }
 
          // add physical differential field packs for second exchange
-         if(infoIt->second.needPhysicalDiff())
+         if(infoIt->second.needPhysicalGradient())
          {
             if(infoIt->second.isScalar())
             {

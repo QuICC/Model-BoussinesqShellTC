@@ -37,7 +37,7 @@ namespace Transform {
       BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_SCALAR>(coord);
    }
 
-   void BackwardSingle1DConfigurator::firstPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::firstPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // Prepare computation of projection
       BackwardConfigurator::prepareProjection(rScalar, coord);
@@ -96,7 +96,7 @@ namespace Transform {
       BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_VECTOR_THREE>(coord);
    }
 
-   void BackwardSingle1DConfigurator::firstPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // Prepare computation of projection
       BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPECURL_ONE>(rVector, coord);
@@ -137,7 +137,7 @@ namespace Transform {
       BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_SCALAR>(coord);
    }
 
-   void BackwardSingle1DConfigurator::lastPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::lastPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // Compute second backward transform for first gradient component
       BackwardConfigurator::project2D<TransformSteps::Backward<Dimensions::Transform::TRA2D>::STEP_GRAD_ONE>(coord);
@@ -183,7 +183,7 @@ namespace Transform {
       BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_VECTOR_THREE>(coord);
    }
 
-   void BackwardSingle1DConfigurator::lastPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // Compute second backward transform for first curl component
       BackwardConfigurator::project2D<TransformSteps::Backward<Dimensions::Transform::TRA2D>::STEP_CURL_ONE>(coord);
@@ -211,7 +211,7 @@ namespace Transform {
       // No need for second step
    }
 
-   void BackwardSingle1DConfigurator::secondPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::secondPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // No need for second step
    }
@@ -221,7 +221,7 @@ namespace Transform {
       // No need for second step
    }
 
-   void BackwardSingle1DConfigurator::secondPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSingle1DConfigurator::secondPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // No need for second step
    }

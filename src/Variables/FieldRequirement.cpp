@@ -20,8 +20,16 @@
 
 namespace GeoMHDiSCC {
 
-   FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needDiff)
-      : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedDiff(needDiff)
+   FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl)
+      : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(needPhysical), mNeedGradient(needGradient), mNeedCurl(needCurl), mPhysicalComps(3), mGradientComps(3), mCurlComps(3)
+   {
+      this->mPhysicalComps.setConstant(this->mNeedPhysical);
+      this->mGradientComps.setConstant(this->mNeedGradient);
+      this->mCurlComps.setConstant(this->mNeedCurl);
+   }
+
+   FieldRequirement::FieldRequirement(const bool isScalar, const bool needSpectral, const ArrayB& physicalComps, const ArrayB& gradientComps, const ArrayB& curlComps)
+      : mIsScalar(isScalar), mNeedSpectral(needSpectral), mNeedPhysical(physicalComps.any()), mNeedGradient(gradientComps.any()), mNeedCurl(curlComps.any()), mPhysicalComps(physicalComps), mGradientComps(gradientComps), mCurlComps(curlComps)
    {
    }
 
@@ -44,9 +52,29 @@ namespace GeoMHDiSCC {
       return this->mNeedPhysical;
    }
 
-   bool FieldRequirement::needPhysicalDiff() const
+   bool FieldRequirement::needPhysicalGradient() const
    {
-      return this->mNeedDiff;
+      return this->mNeedGradient;
+   }
+
+   bool FieldRequirement::needPhysicalCurl() const
+   {
+      return this->mNeedCurl;
+   }
+
+   const ArrayB& FieldRequirement::physicalComps() const
+   {
+      return this->mPhysicalComps;
+   }
+
+   const ArrayB& FieldRequirement::gradientComps() const
+   {
+      return this->mGradientComps;
+   }
+
+   const ArrayB& FieldRequirement::curlComps() const
+   {
+      return this->mCurlComps;
    }
 
    void FieldRequirement::merge(const FieldRequirement& req)
@@ -60,8 +88,20 @@ namespace GeoMHDiSCC {
       // Do OR operation on physical requirement
       this->mNeedPhysical = this->mNeedPhysical || req.needPhysical(); 
 
-      // Do OR operation on physical differential requirement
-      this->mNeedDiff = this->mNeedDiff || req.needPhysicalDiff(); 
+      // Do OR operation on physical gradient requirement
+      this->mNeedGradient = this->mNeedGradient || req.needPhysicalGradient(); 
+
+      // Do OR operation on physical curl requirement
+      this->mNeedCurl = this->mNeedCurl || req.needPhysicalCurl(); 
+
+      // Do OR operation of physical components requirement
+      this->mPhysicalComps = this->mPhysicalComps + req.physicalComps();
+
+      // Do OR operation of physical gradient components requirement
+      this->mGradientComps = this->mGradientComps + req.gradientComps();
+
+      // Do OR operation of physical curl components requirement
+      this->mCurlComps = this->mCurlComps + req.curlComps();
    }
 
 }

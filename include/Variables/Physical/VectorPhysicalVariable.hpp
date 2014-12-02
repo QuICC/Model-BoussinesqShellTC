@@ -60,6 +60,16 @@ namespace Datatypes {
          VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rPhys();
 
          /**
+          * @brief Get the physical "gradient" values
+          */
+         const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   grad() const;
+
+         /**
+          * @brief Set the physical "gradient" values
+          */
+         VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rGrad();
+
+         /**
           * @brief Get the physical curl values
           */
          const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   curl() const;
@@ -80,14 +90,24 @@ namespace Datatypes {
          void initPhysical();
 
          /**
+          * @brief Initialise the physical gradient storage
+          */
+         void initPhysicalGradient();
+
+         /**
           * @brief Initialise the physical curl storage
           */
-         void initPhysicalDiff();
+         void initPhysicalCurl();
 
          /**
           * @brief Check if variable has physical data setup
           */
          bool hasPhys() const;
+
+         /**
+          * @brief Check if variable has "gradient" data setup
+          */
+         bool hasGrad() const;
 
          /**
           * @brief Check if variable has curl data setup
@@ -110,6 +130,11 @@ namespace Datatypes {
          SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspPhys;
 
          /**
+          * @brief Smart pointer for the physical "gradient" values
+          */
+         SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspGrad;
+
+         /**
           * @brief Smart pointer for the physical curl values
           */
          SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspCurl;
@@ -118,6 +143,11 @@ namespace Datatypes {
    template <typename TScalar, int COMPONENTS> inline bool VectorPhysicalVariable<TScalar,COMPONENTS>::hasPhys() const
    {
       return this->mspPhys;
+   }
+
+   template <typename TScalar, int COMPONENTS> inline bool VectorPhysicalVariable<TScalar,COMPONENTS>::hasGrad() const
+   {
+      return this->mspGrad;
    }
 
    template <typename TScalar, int COMPONENTS> inline bool VectorPhysicalVariable<TScalar,COMPONENTS>::hasCurl() const
@@ -139,6 +169,22 @@ namespace Datatypes {
       assert(this->mspPhys);
 
       return *this->mspPhys;
+   }
+
+   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::grad() const
+   {
+      // Safety assertion
+      assert(this->mspGrad);
+
+      return *this->mspGrad;
+   }
+
+   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::rGrad()
+   {
+      // Safety assertion
+      assert(this->mspGrad);
+
+      return *this->mspGrad;
    }
 
    template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar,COMPONENTS>::curl() const
@@ -174,6 +220,12 @@ namespace Datatypes {
          this->rPhys().setZeros();
       }
 
+      // Initialise "gradient" values to zero if required
+      if(this->mspGrad)
+      {
+         this->rGrad().setZeros();
+      }
+
       // Initialise curl values to zero if required
       if(this->mspCurl)
       {
@@ -186,7 +238,12 @@ namespace Datatypes {
       this->mspPhys = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initPhysicalDiff()
+   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initPhysicalGradient()
+   {
+      this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
+   }
+
+   template <typename TScalar, int COMPONENTS> void VectorPhysicalVariable<TScalar,COMPONENTS>::initPhysicalCurl()
    {
       this->mspCurl = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }
@@ -200,6 +257,12 @@ namespace Datatypes {
       if(this->mspPhys)
       {
          mem += this->phys().requiredStorage();
+      }
+
+      // Physical "gradient" storage
+      if(this->mspGrad)
+      {
+         mem += this->grad().requiredStorage();
       }
 
       // Physical curl storage

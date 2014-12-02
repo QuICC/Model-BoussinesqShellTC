@@ -103,7 +103,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Need to compute backward transform to physical differential values (gradient or curl)?
           */
-         bool needPhysicalDiff(PhysicalNames::Id name);
+         bool needPhysicalGradient(PhysicalNames::Id name);
 
          /**
           * @brief Get grid array(s) of the mesh
@@ -151,9 +151,9 @@ namespace GeoMHDiSCC {
       return this->mVarInfo.field(name).needPhysical();
    }
 
-   template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysicalDiff(PhysicalNames::Id name)
+   template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysicalGradient(PhysicalNames::Id name)
    {
-      return this->mVarInfo.field(name).needPhysicalDiff();
+      return this->mVarInfo.field(name).needPhysicalGradient();
    }
 
    template <typename T1D, typename TCommunicator> Transform1DCoordinator<T1D,TCommunicator>::Transform1DCoordinator()

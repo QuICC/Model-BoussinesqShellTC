@@ -71,9 +71,14 @@ namespace Datatypes {
          void initPhysical();
 
          /**
-          * @brief Initialise the physical differential values storage
+          * @brief Initialise the physical gradient values storage
           */
-         void initPhysicalDiff();
+         void initPhysicalGradient();
+
+         /**
+          * @brief Initialise the physical curl values storage
+          */
+         void initPhysicalCurl();
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -138,12 +143,21 @@ namespace Datatypes {
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalDiff()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient()
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initPhysicalDiff();
+         this->mDomains.at(i).initPhysicalGradient();
+      }
+   }
+
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalCurl()
+   {
+      // Loop over all domains
+      for(size_t i = 0; i < this->mDomains.size(); i++)
+      {
+         this->mDomains.at(i).initPhysicalCurl();
       }
    }
 

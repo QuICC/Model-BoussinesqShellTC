@@ -43,7 +43,7 @@ namespace Transform {
       BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_SCALAR>(coord);
    }
 
-   void BackwardSerialConfigurator::firstPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::firstPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // Prepare computation of projection
       BackwardConfigurator::prepareProjection(rScalar, coord);
@@ -138,7 +138,7 @@ namespace Transform {
       BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_VECTOR_THREE>(coord);
    }
 
-   void BackwardSerialConfigurator::firstPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // Prepare computation of projection
       BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPECURL_ONE>(rVector, coord);
@@ -193,7 +193,7 @@ namespace Transform {
       // No need for a second step
    }
 
-   void BackwardSerialConfigurator::secondPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::secondPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
@@ -203,7 +203,7 @@ namespace Transform {
       // No need for a second step
    }
 
-   void BackwardSerialConfigurator::secondPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::secondPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // No need for a second step
    }
@@ -213,7 +213,7 @@ namespace Transform {
       // No need for a last step
    }
 
-   void BackwardSerialConfigurator::lastPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::lastPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }
@@ -223,7 +223,7 @@ namespace Transform {
       // No need for a last step
    }
 
-   void BackwardSerialConfigurator::lastPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   void BackwardSerialConfigurator::lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }

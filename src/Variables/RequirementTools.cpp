@@ -85,16 +85,29 @@ namespace GeoMHDiSCC {
                }
             }
 
-            // Initialise the physical differential values if required (gradient or curl)
-            if(infoIt->second.needPhysicalDiff())
+            // Initialise the physical gradient values if required
+            if(infoIt->second.needPhysicalGradient())
             {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  rScalarVars.at(infoIt->first)->initPhysicalDiff();
+                  rScalarVars.at(infoIt->first)->initPhysicalGradient();
                } else
                {
-                  rVectorVars.at(infoIt->first)->initPhysicalDiff();
+                  rVectorVars.at(infoIt->first)->initPhysicalGradient();
+               }
+            }
+
+            // Initialise the physical curl values if required
+            if(infoIt->second.needPhysicalCurl())
+            {
+               // Separate scalar and vector fields
+               if(infoIt->second.isScalar())
+               {
+                  throw Exception("Can't initialise curl on scalar field!");
+               } else
+               {
+                  rVectorVars.at(infoIt->first)->initPhysicalCurl();
                }
             }
 
@@ -146,7 +159,7 @@ namespace GeoMHDiSCC {
             }
 
             // Set scalar variable as additional scalar field
-            if((*scalEqIt)->requirements(scalIt->first).needPhysical() || (*scalEqIt)->requirements(scalIt->first).needPhysicalDiff())
+            if((*scalEqIt)->requirements(scalIt->first).needPhysical() || (*scalEqIt)->requirements(scalIt->first).needPhysicalGradient())
             {
                (*scalEqIt)->setField(scalIt->first, scalarVars.at(scalIt->first));
             }
@@ -157,7 +170,7 @@ namespace GeoMHDiSCC {
          for(vectEqIt = rVectorEqs.begin(); vectEqIt < rVectorEqs.end(); vectEqIt++)
          {
             // Set scalar variable as additional scalar field
-            if((*vectEqIt)->requirements(scalIt->first).needPhysical() || (*vectEqIt)->requirements(scalIt->first).needPhysicalDiff())
+            if((*vectEqIt)->requirements(scalIt->first).needPhysical() || (*vectEqIt)->requirements(scalIt->first).needPhysicalGradient())
             {
                (*vectEqIt)->setField(scalIt->first, scalarVars.at(scalIt->first));
             }
@@ -173,7 +186,7 @@ namespace GeoMHDiSCC {
          for(scalEqIt = rScalarEqs.begin(); scalEqIt < rScalarEqs.end(); scalEqIt++)
          {
             // Set vector variable as additional vector field
-            if((*scalEqIt)->requirements(vectIt->first).needPhysical() || (*scalEqIt)->requirements(vectIt->first).needPhysicalDiff())
+            if((*scalEqIt)->requirements(vectIt->first).needPhysical() || (*scalEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*scalEqIt)->requirements(vectIt->first).needPhysicalCurl())
             {
                (*scalEqIt)->setField(vectIt->first, vectorVars.at(vectIt->first));
             }
@@ -199,7 +212,7 @@ namespace GeoMHDiSCC {
             }
 
             // Set vector variable as additional vector field
-            if((*vectEqIt)->requirements(vectIt->first).needPhysical() || (*vectEqIt)->requirements(vectIt->first).needPhysicalDiff())
+            if((*vectEqIt)->requirements(vectIt->first).needPhysical() || (*vectEqIt)->requirements(vectIt->first).needPhysicalGradient() || (*vectEqIt)->requirements(vectIt->first).needPhysicalCurl())
             {
                (*vectEqIt)->setField(vectIt->first, vectorVars.at(vectIt->first));
             }

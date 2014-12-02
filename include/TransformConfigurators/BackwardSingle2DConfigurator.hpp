@@ -101,12 +101,12 @@ namespace Transform {
          static void firstPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the first step of the backward (gradient) transform for a scalar variable
+          * @brief Compute the first step of the backward gradient transform for a scalar variable
           *
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void firstPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void firstPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the first step of the backward transform for a vector variable
@@ -117,12 +117,12 @@ namespace Transform {
          static void firstPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the first step of the backward (curl) transform for a vector variable
+          * @brief Compute the first step of the backward gradient transform for a vector variable
           *
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void firstPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step of the backward transform for a scalar variable
@@ -133,12 +133,12 @@ namespace Transform {
          static void secondPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the second step of the backward (gradient) transform for a scalar variable
+          * @brief Compute the second step of the backward gradient transform for a scalar variable
           *
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void secondPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void secondPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step of the backward transform for a vector variable
@@ -149,12 +149,12 @@ namespace Transform {
          static void secondPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the second step of the backward (curl) transform for a vector variable
+          * @brief Compute the second step of the backward gradient transform for a vector variable
           *
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void secondPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void secondPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step of the backward transform for a scalar variable
@@ -165,12 +165,12 @@ namespace Transform {
          static void lastPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the last step of the backward (gradient) transform for a scalar variable
+          * @brief Compute the last step of the backward gradient transform for a scalar variable
           *
           * @param rScalar Scalar variable
           * @param coord   Transform coordinator
           */
-         static void lastPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+         static void lastPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step of the backward transform for a vector variable
@@ -181,12 +181,12 @@ namespace Transform {
          static void lastPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the last step of the backward (curl) transform for a vector variable
+          * @brief Compute the last step of the backward gradient transform for a vector variable
           *
           * @param rVector Vector variable
           * @param coord   Transform coordinator
           */
-         static void lastPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+         static void lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -209,10 +209,10 @@ namespace Transform {
          BackwardSingle2DConfigurator::firstPhysical(rVariable, coord);
       }
 
-      // Compute physical differential projection (gradient or curl) if required
-      if(coord.needPhysicalDiff(name))
+      // Compute physical gradient projection if required
+      if(coord.needPhysicalGradient(name))
       {
-         BackwardSingle2DConfigurator::firstPhysicalDiff(rVariable, coord);
+         BackwardSingle2DConfigurator::firstPhysicalGradient(rVariable, coord);
       }
    }
 
@@ -228,10 +228,10 @@ namespace Transform {
          BackwardSingle2DConfigurator::lastPhysical(rVariable, coord);
       }
 
-      // Compute physical differential projection (gradient or curl) if required
-      if(coord.needPhysicalDiff(name))
+      // Compute physical gradient projection if required
+      if(coord.needPhysicalGradient(name))
       {
-         BackwardSingle2DConfigurator::lastPhysicalDiff(rVariable, coord);
+         BackwardSingle2DConfigurator::lastPhysicalGradient(rVariable, coord);
       }
    }
 

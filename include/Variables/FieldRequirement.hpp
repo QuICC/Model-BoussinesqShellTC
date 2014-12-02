@@ -15,6 +15,7 @@
 
 // Project includes
 //
+#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -25,9 +26,14 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
-          * @brief Constructor
+          * @brief General constructor without detailed field components
           */
-         FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needDiff);
+         FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl = false);
+
+         /**
+          * @brief Constructor requiring detailed field components requirements
+          */
+         FieldRequirement(const bool isScalar, const bool needSpectral, const ArrayB& physicalComps, const ArrayB& gradientComps, const ArrayB& curlComps);
 
          /**
           * @brief Destructor
@@ -45,14 +51,34 @@ namespace GeoMHDiSCC {
          bool needSpectral() const;
 
          /**
-          * @brief Get spectral requirement
+          * @brief Get physical field requirement
           */
          bool needPhysical() const;
 
          /**
-          * @brief Get spectral requirement
+          * @brief Get physical gradient requirement
           */
-         bool needPhysicalDiff() const;
+         bool needPhysicalGradient() const;
+
+         /**
+          * @brief Get physical curl requirement
+          */
+         bool needPhysicalCurl() const;
+
+         /**
+          * @brief Get the physical field components requirements
+          */
+         const ArrayB& physicalComps() const;
+
+         /**
+          * @brief Get the physical gradient components requirements
+          */
+         const ArrayB& gradientComps() const;
+
+         /**
+          * @brief Get the physical curl components requirements
+          */
+         const ArrayB& curlComps() const;
 
          /**
           * @brief Merge information from other requirements
@@ -80,9 +106,29 @@ namespace GeoMHDiSCC {
          bool  mNeedPhysical;
 
          /**
-          * @brief Storage for physical differential storage requirements
+          * @brief Storage for physical gradient storage requirements
           */
-         bool  mNeedDiff;
+         bool  mNeedGradient;
+
+         /**
+          * @brief Storage for physical curl storage requirements
+          */
+         bool  mNeedCurl;
+
+         /**
+          * @brief Detailed requirements for physical field components
+          */
+         ArrayB mPhysicalComps;
+
+         /**
+          * @brief Detailed requirements for gradient field components
+          */
+         ArrayB mGradientComps;
+
+         /**
+          * @brief Detailed requirements for curl field components
+          */
+         ArrayB mCurlComps;
    };
 
 }

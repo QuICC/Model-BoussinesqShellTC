@@ -82,7 +82,7 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical gradient storage
           */
-         void initPhysicalDiff();
+         void initPhysicalGradient();
 
          /**
           * @brief Check if variable has physical data setup
@@ -186,7 +186,7 @@ namespace Datatypes {
       this->mspPhys = SharedPtrMacro<TScalar>(new TScalar(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysicalDiff()
+   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysicalGradient()
    {
       this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
    }
