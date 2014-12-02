@@ -286,6 +286,20 @@ def mvss_d1(nr, a, b, rg):
     Bs = annulus.qid(nr, 1, annulus.radbc.no_bc())
     test_backward_tau(As, Bs, sphys, ssol, rg)
 
+def mvss_x1div(nr, a, b, rg):
+    """Accuracy test for radial divergence operator vs quasi inverse solve"""
+
+    print("mvss_x1div:")
+    x = sy.Symbol('x')
+    Am = annulus.x1div(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sy.diff(sphys*x,x))
+    test_forward(Am, sphys, ssol, rg, 0)
+    As = annulus.i1(nr, a, b, {0:99})
+    As = As.tocsr()
+    Bs = annulus.qid(nr, 1, annulus.radbc.no_bc())*annulus.x1(nr, a, b, annulus.radbc.no_bc())
+    test_backward_tau(As, Bs, sphys, ssol, rg)
+
 
 if __name__ == "__main__":
     # Set test parameters
@@ -317,3 +331,4 @@ if __name__ == "__main__":
     # Matmult vs Solve operators
     mvss_1_x(nr, a, b, rg)
     mvss_d1(nr, a, b, rg)
+    mvss_x1div(nr, a, b, rg)
