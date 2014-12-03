@@ -2,10 +2,10 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbannulus_vc as mod
+import geomhdiscc.model.wip.boussinesq_rbaxis_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBAnnulusVC()
+model = mod.BoussinesqRBAxisVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
@@ -13,10 +13,10 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [8, 0, 8]
 eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
-eigs = [3]
+eigs = [0]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -60,11 +60,10 @@ if solve_evp:
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors
         sol_u = evp_vec[0:res[0]*res[2],mode]
-        sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
-        sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
+        sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
         # Extract continuity from velocity 
         a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
 if show_solution:
@@ -72,21 +71,17 @@ if show_solution:
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
     sol_u = evp_vec[0:res[0]*res[2],viz_mode]
-    sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
-    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
-    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
-    sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
+    sol_w = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
+    sol_t = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
+    sol_p = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
     a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-    sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+    sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)
     pl.semilogy(np.abs(sol_u))
     pl.title("u")
-    pl.subplot(2,3,2)
-    pl.semilogy(np.abs(sol_v))
-    pl.title("v")
     pl.subplot(2,3,3)
     pl.semilogy(np.abs(sol_w))
     pl.title("w")
@@ -104,7 +99,6 @@ if show_solution:
     
     # Create solution matrices
     mat_u = sol_u.reshape(res[0], res[2], order = 'F')
-    mat_v = sol_v.reshape(res[0], res[2], order = 'F')
     mat_w = sol_w.reshape(res[0], res[2], order = 'F')
     mat_t = sol_t.reshape(res[0], res[2], order = 'F')
     mat_p = sol_p.reshape(res[0], res[2], order = 'F')
@@ -115,10 +109,6 @@ if show_solution:
     pl.imshow(np.log10(np.abs(mat_u)))
     pl.colorbar()
     pl.title("u")
-    pl.subplot(2,3,2)
-    pl.imshow(np.log10(np.abs(mat_v)))
-    pl.colorbar()
-    pl.title("v")
     pl.subplot(2,3,3)
     pl.imshow(np.log10(np.abs(mat_w)))
     pl.colorbar()
@@ -142,7 +132,6 @@ if show_solution:
     grid_r = transf.rgrid(res[0], a, b)
     grid_z = transf.zgrid(res[2])
     phys_u = transf.tophys2d(mat_u)
-    phys_v = transf.tophys2d(mat_v)
     phys_w = transf.tophys2d(mat_w)
     phys_t = transf.tophys2d(mat_t)
     phys_p = transf.tophys2d(mat_p)
@@ -153,10 +142,6 @@ if show_solution:
     pl.contourf(grid_z, grid_r, phys_u, 50)
     pl.colorbar()
     pl.title("u")
-    pl.subplot(2,3,2)
-    pl.contourf(grid_z, grid_r, phys_v, 50)
-    pl.colorbar()
-    pl.title("v")
     pl.subplot(2,3,3)
     pl.contourf(grid_z, grid_r, phys_w, 50)
     pl.colorbar()
