@@ -16,6 +16,35 @@ def zblk(nr, bc):
     mat = spsp.lil_matrix((nr,nr))
     return radbc.constrain(mat,bc)
 
+def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
+    """Create operator for x multiplication"""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2)
+    nzrow = -1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a/2.0
+
+    # Generate diagonal
+    def d0(n):
+        return b
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a/2.0
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    if zr > 0:
+        mat = mat.tolil()
+        mat[-zr:,:] = 0
+        mat = mat.tocsr()
+    return radbc.constrain(mat, bc)
+
 def d1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 1st derivative"""
 
@@ -25,6 +54,27 @@ def d1(nr, a, b, bc, coeff = 1.0):
         mat[i,i+1:nr:2] = row[i+1:nr:2]
 
     mat = coeff*(1/a)*mat
+    return radbc.constrain(mat, bc)
+
+def i1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-1,2,2)
+    nzrow = 0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a/(2.0*n)
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_1(n)
+
+    ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
 def i2x2(nr, a, b, bc, coeff = 1.0):

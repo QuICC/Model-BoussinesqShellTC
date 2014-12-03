@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "StaticAsserts/StaticAssert.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
@@ -166,6 +167,10 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDiff, pValue);
          Py_DECREF(pValue);
+
+         // Free memory for 1/r
+         this->mDivR.resize(0,0);
+         Debug::StaticAssert<false && "Not all forward operators are available!">();
       #elif defined GEOMHDISCC_TRANSOP_BACKWARD
          // Prepare arguments to i1(...) call
          PyObject *pArgs, *pValue;
@@ -204,7 +209,7 @@ namespace Transform {
          Py_DECREF(pValue);
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
-      // Fill matrix and cleanup
+      // Cleanup
       PythonWrapper::finalize();
 
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
