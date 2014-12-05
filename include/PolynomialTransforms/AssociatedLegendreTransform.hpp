@@ -185,12 +185,12 @@ namespace Transform {
          /**
           * @brief Projector matrix
           */
-         std::vector<Matrix>  mProjector;
+         std::vector<Matrix>  mProj;
 
          /**
           * @brief Derivative matrix
           */
-         std::vector<Matrix>  mDerivative;
+         std::vector<Matrix>  mDiff;
    };
 
    template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator)
@@ -212,11 +212,11 @@ namespace Transform {
       // Compute integration
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
-      for(size_t i = 0; i < this->mProjector.size(); i++)
+      for(size_t i = 0; i < this->mProj.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         int specRows = this->mProjector.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mProjector.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+         int specRows = this->mProj.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
          start += cols;
       }
    }
@@ -238,11 +238,11 @@ namespace Transform {
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDerivative.size(); i++)
+         for(size_t i = 0; i < this->mDiff.size(); i++)
          {
             int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDerivative.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDerivative.at(i)*specVal.block(0,start, specRows, cols);
+            int specRows = this->mDiff.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*specVal.block(0,start, specRows, cols);
             start += cols;
          }
 
@@ -251,11 +251,11 @@ namespace Transform {
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mProjector.size(); i++)
+         for(size_t i = 0; i < this->mProj.size(); i++)
          {
             int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProjector.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProjector.at(i)*specVal.block(0,start, specRows, cols);
+            int specRows = this->mProj.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*specVal.block(0,start, specRows, cols);
             start += cols;
          }
       }

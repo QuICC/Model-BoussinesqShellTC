@@ -103,7 +103,7 @@ namespace Transform {
    void AssociatedLegendreTransform::initProjector()
    {
       // Reserve storage for the projectors
-      this->mProjector.reserve(this->mspSetup->slow().size());
+      this->mProj.reserve(this->mspSetup->slow().size());
 
       // Loop over harmonic orders
       for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
@@ -111,7 +111,7 @@ namespace Transform {
          int m = this->mspSetup->slow()(iM);
 
          // Allocate memory for the projector
-         this->mProjector.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mProj.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
 
          // Loop over harmonic degrees
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
@@ -121,7 +121,7 @@ namespace Transform {
             // Loop over grid points
             for(int iG = 0; iG < this->mThGrid.size(); iG++)
             {
-               this->mProjector.at(iM)(iG,iL) = std::tr1::sph_legendre(l,m,this->mThGrid(iG));
+               this->mProj.at(iM)(iG,iL) = std::tr1::sph_legendre(l,m,this->mThGrid(iG));
             }
          }
       }
@@ -130,7 +130,7 @@ namespace Transform {
    void AssociatedLegendreTransform::initDerivative()
    {
       // Reserve storage for the derivative
-      this->mDerivative.reserve(this->mspSetup->slow().size());
+      this->mDiff.reserve(this->mspSetup->slow().size());
 
       // Loop over harmonic orders
       for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
@@ -138,7 +138,7 @@ namespace Transform {
          int m = this->mspSetup->slow()(iM);
 
          // Allocate memory for the derivative
-         this->mDerivative.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mDiff.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
 
          // Loop over harmonic degrees
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
@@ -150,16 +150,16 @@ namespace Transform {
             {
                if(l == 0 && m == 0)
                {
-                  this->mDerivative.at(iM)(iG,iL) = 0.0;
+                  this->mDiff.at(iM)(iG,iL) = 0.0;
                } else if(m == 0)
                {
-                  this->mDerivative.at(iM)(iG,iL) = -0.5*std::sqrt(static_cast<MHDFloat>(l*(l+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG));
+                  this->mDiff.at(iM)(iG,iL) = -0.5*std::sqrt(static_cast<MHDFloat>(l*(l+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG));
                } else if(m == l)
                {
-                  this->mDerivative.at(iM)(iG,iL) = 0.5*std::sqrt(static_cast<MHDFloat>(2*l))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG));
+                  this->mDiff.at(iM)(iG,iL) = 0.5*std::sqrt(static_cast<MHDFloat>(2*l))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG));
                } else
                {
-                  this->mDerivative.at(iM)(iG,iL) = 0.5*(std::sqrt(static_cast<MHDFloat>((l+m)*(l-m+1)))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG)) - std::sqrt(static_cast<MHDFloat>((l-m)*(l+m+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG)));
+                  this->mDiff.at(iM)(iG,iL) = 0.5*(std::sqrt(static_cast<MHDFloat>((l+m)*(l-m+1)))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG)) - std::sqrt(static_cast<MHDFloat>((l-m)*(l+m+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG)));
                }
             }
          }
@@ -177,15 +177,15 @@ namespace Transform {
       mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mWeights.size();
 
       // Storage for the projector
-      for(size_t i = 0; i < this->mProjector.size(); i++)
+      for(size_t i = 0; i < this->mProj.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mProjector.at(i).rows()*this->mProjector.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mProj.at(i).rows()*this->mProj.at(i).cols();
       }
 
       // Storage for the derivative
-      for(size_t i = 0; i < this->mDerivative.size(); i++)
+      for(size_t i = 0; i < this->mDiff.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDerivative.at(i).rows()*this->mDerivative.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDiff.at(i).rows()*this->mDiff.at(i).cols();
       }
 
       return mem;
