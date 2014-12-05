@@ -128,7 +128,7 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void StateFileReader::readSpectralVector(const std::string& name, std::vector<Datatypes::SpectralScalarType>& rVector)
+   void StateFileReader::readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector)
    {
       // Open the magnetic field group
       hid_t group = H5Gopen(this->file(), name.c_str(), H5P_DEFAULT);
@@ -137,25 +137,26 @@ namespace IoVariable {
       std::vector<std::tr1::tuple<int,int, Datatypes::SpectralScalarType::PointType *> > fieldInfo;
 
       // Check for data regularity
+      std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::iterator it;
       if(this->mIsRegular)
       {
-         for(size_t i = 0; i < rVector.size(); i++)
-         { 
+         for(it = rVector.begin(); it != rVector.end(); ++it)
+         {
             // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(rVector.at(i));
+            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
             // Read component from file 
-            this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->readRegularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
          }
       } else
       {
-         for(size_t i = 0; i < rVector.size(); i++)
+         for(it = rVector.begin(); it != rVector.end(); ++it)
          {
             // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(rVector.at(i));
+            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
             // Read component from file 
-            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->readIrregularField(group,name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
          }
       }
       

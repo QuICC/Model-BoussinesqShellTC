@@ -16,6 +16,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/FieldIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -26,14 +27,9 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
-          * @brief General constructor without detailed field components
+          * @brief General constructor with default requirements
           */
          FieldRequirement(const bool isScalar, const bool needSpectral, const bool needPhysical, const bool needGradient, const bool needCurl = false);
-
-         /**
-          * @brief Constructor requiring detailed field components requirements
-          */
-         FieldRequirement(const bool isScalar, const bool needSpectral, const ArrayB& physicalComps, const ArrayB& gradientComps, const ArrayB& curlComps);
 
          /**
           * @brief Destructor
@@ -73,12 +69,52 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the physical gradient components requirements
           */
-         const ArrayB& gradientComps() const;
+         const ArrayB& gradientComps(const FieldComponents::Physical::Id id) const;
 
          /**
           * @brief Get the physical curl components requirements
           */
          const ArrayB& curlComps() const;
+
+         /**
+          * @brief Get vector of spectral field components
+          */
+         const std::vector<FieldComponents::Spectral::Id>&  spectralIds() const;
+
+         /**
+          * @brief Get vector of physical field components
+          */
+         const std::vector<FieldComponents::Physical::Id>& physicalIds() const;
+
+         /**
+          * @brief Get map for physical components to field requirements
+          */
+         std::map<FieldComponents::Physical::Id,bool> mapPhysicalComps() const;
+
+         /**
+          * @brief Get map for gradient components to field requirements
+          */
+         std::map<FieldComponents::Physical::Id,bool> mapGradientComps(const FieldComponents::Physical::Id id) const;
+
+         /**
+          * @brief Get map for curl components to field requirements
+          */
+         std::map<FieldComponents::Physical::Id,bool> mapCurlComps() const;
+
+         /**
+          * @brief Update the physical component requirements
+          */
+         void updatePhysical(const ArrayB& comps);
+
+         /**
+          * @brief Update the gradient component requirements
+          */
+         void updateGradient(const std::map<FieldComponents::Physical::Id,ArrayB>& comps);
+
+         /**
+          * @brief Update the curl component requirements
+          */
+         void updateCurl(const ArrayB& comps);
 
          /**
           * @brief Merge information from other requirements
@@ -90,6 +126,11 @@ namespace GeoMHDiSCC {
       protected:
 
       private:
+         /**
+          * @brief Initialise defaut spectral and physical IDs
+          */
+         void initDefaultIds();
+
          /**
           * @brief Is field a scalar field?
           */
@@ -116,6 +157,16 @@ namespace GeoMHDiSCC {
          bool  mNeedCurl;
 
          /**
+          * @brief List of spectral field components
+          */
+         std::vector<FieldComponents::Spectral::Id>  mSpectralIds;
+
+         /**
+          * @brief List of physical field components
+          */
+         std::vector<FieldComponents::Physical::Id>  mPhysicalIds;
+
+         /**
           * @brief Detailed requirements for physical field components
           */
          ArrayB mPhysicalComps;
@@ -123,7 +174,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Detailed requirements for gradient field components
           */
-         ArrayB mGradientComps;
+         std::map<FieldComponents::Physical::Id,ArrayB> mGradientComps;
 
          /**
           * @brief Detailed requirements for curl field components

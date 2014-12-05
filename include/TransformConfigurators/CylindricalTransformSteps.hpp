@@ -51,23 +51,24 @@ namespace GeoMHDiSCC {
 
 
             /// Transform step for the first component of a vector
-            static const Step STEP_VECTOR_ONE = NOTHING;
+            static const Step STEP_VECTOR_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a vector
-            static const Step STEP_VECTOR_TWO = NOTHING;
+            static const Step STEP_VECTOR_TWO = DO_SCALAR;
 
             /// Transform step for the third component of a vector
-            static const Step STEP_VECTOR_THREE = NOTHING;
+            static const Step STEP_VECTOR_THREE = DO_SCALAR;
 
 
             /// First spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::ONE;
 
             /// Second spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::TWO;
 
             /// Third spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::THREE;
+
 
             /// Number of variable to transfer to next stage for scalar
             static const int SCALAR_VARIABLES = 1;
@@ -99,13 +100,13 @@ namespace GeoMHDiSCC {
 
 
             /// Transform step for the first component of a vector
-            static const Step STEP_VECTOR_ONE = NOTHING;
+            static const Step STEP_VECTOR_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a vector
-            static const Step STEP_VECTOR_TWO = NOTHING;
+            static const Step STEP_VECTOR_TWO = DO_SCALAR;
 
             /// Transform step for the third component of a vector
-            static const Step STEP_VECTOR_THREE = NOTHING;
+            static const Step STEP_VECTOR_THREE = DO_SCALAR;
 
 
             /// Transform step for the first component of a vector "gradient"
@@ -129,13 +130,23 @@ namespace GeoMHDiSCC {
 
 
             /// First spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::ONE;
 
             /// Second spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::TWO;
 
             /// Third spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::THREE;
+
+
+            /// First spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_ONE = FieldComponents::Spectral::NOTUSED;
+
+            /// Second spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_TWO = FieldComponents::Spectral::NOTUSED;
+
+            /// Third spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_THREE = FieldComponents::Spectral::NOTUSED;
 
 
             /// First spectral field component used for curl
@@ -246,6 +257,16 @@ namespace GeoMHDiSCC {
 
             /// Third physical field component used for gradient
             static const FieldComponents::Physical::Id GRAD_THREE = FieldComponents::Physical::THREE;
+
+
+            /// First physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_ONE = FieldComponents::Physical::ONE;
+
+            /// Second physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_TWO = FieldComponents::Physical::TWO;
+
+            /// Third physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_THREE = FieldComponents::Physical::THREE;
          };
 
          /**
@@ -262,8 +283,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = FINISH_SCALAR;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
 
          /**
@@ -280,8 +305,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = DO_SCALAR;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
 
          /**
@@ -298,8 +327,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = DO_GRAD;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
       }
    }

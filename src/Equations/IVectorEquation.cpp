@@ -63,12 +63,12 @@ namespace Equations {
 
    int IVectorEquation::nSpectral() const
    {
-      return this->mSpectralIds.size();
+      return this->mRequirements.field(this->name()).spectralIds().size();
    }
 
    IVectorEquation::SpectralComponent_range IVectorEquation::spectralRange() const
    {
-      return std::make_pair(this->mSpectralIds.begin(), this->mSpectralIds.end());
+      return std::make_pair(this->mRequirements.field(this->name()).spectralIds().begin(), this->mRequirements.field(this->name()).spectralIds().end());
    }
 
    void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId)
@@ -86,7 +86,9 @@ namespace Equations {
       // Store the boundary condition list
       this->mspBcIds = spBcIds;
 
-      for(SpectralComponent_iterator it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
+      IVectorEquation::SpectralComponent_range range = this->spectralRange();
+
+      for(SpectralComponent_iterator it = range.first; it != range.second; ++it)
       {
          // Make sure it is safe to do nothing
          bool needInit = this->couplingInfo(*it).hasQuasiInverse();

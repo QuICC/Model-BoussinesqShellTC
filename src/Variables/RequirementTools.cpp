@@ -66,10 +66,12 @@ namespace GeoMHDiSCC {
             {
                // Create the shared scalar variable
                rScalarVars.insert(std::make_pair(infoIt->first, Datatypes::SharedScalarVariableType(new Datatypes::ScalarVariableType(spRes))));
+               rScalarVars.find(infoIt->first)->second->initSpectral(infoIt->second.spectralIds());
             } else
             {
                // Create the shared vector variable
                rVectorVars.insert(std::make_pair(infoIt->first, Datatypes::SharedVectorVariableType(new Datatypes::VectorVariableType(spRes))));
+               rVectorVars.find(infoIt->first)->second->initSpectral(infoIt->second.spectralIds());
             }
 
             // Initialise the physical values if required
@@ -78,10 +80,10 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  rScalarVars.at(infoIt->first)->initPhysical();
+                  rScalarVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
                } else
                {
-                  rVectorVars.at(infoIt->first)->initPhysical();
+                  rVectorVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
                }
             }
 
@@ -91,10 +93,14 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  rScalarVars.at(infoIt->first)->initPhysicalGradient();
+                  rScalarVars.at(infoIt->first)->initPhysicalGradient(FieldComponents::Physical::NOTUSED, infoIt->second.mapGradientComps(FieldComponents::Physical::NOTUSED));
                } else
                {
-                  rVectorVars.at(infoIt->first)->initPhysicalGradient();
+                  std::vector<FieldComponents::Physical::Id>::const_iterator it;
+                  for(it = infoIt->second.physicalIds().begin(); it != infoIt->second.physicalIds().end(); ++it)
+                  {
+                     rVectorVars.at(infoIt->first)->initPhysicalGradient(*it, infoIt->second.mapGradientComps(*it));
+                  }
                }
             }
 
@@ -107,7 +113,7 @@ namespace GeoMHDiSCC {
                   throw Exception("Can't initialise curl on scalar field!");
                } else
                {
-                  rVectorVars.at(infoIt->first)->initPhysicalCurl();
+                  rVectorVars.at(infoIt->first)->initPhysicalCurl(infoIt->second.mapCurlComps());
                }
             }
 

@@ -142,11 +142,6 @@ namespace Equations {
           */
          Datatypes::VectorVariableType& rUnknown();
 
-         /**
-          * @brief List of the avaiable vector components
-          */
-         std::vector<FieldComponents::Spectral::Id>   mSpectralIds;
-
       private:
          /**
           * @brief Storage for the shared scalar variable

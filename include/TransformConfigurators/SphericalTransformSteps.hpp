@@ -262,8 +262,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the second component of a gradient
             static const Step STEP_GRAD_TWO = FINISH_DIVR;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 2;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 6;
          };
 
          /**
@@ -280,8 +284,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = FINISH_SCALAR;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
 
          /**
@@ -298,8 +306,12 @@ namespace GeoMHDiSCC {
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = DO_GRAD;
 
+
             /// Number of variable to transfer to next stage for gradient
             static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
       }
    }

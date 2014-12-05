@@ -37,21 +37,21 @@ namespace Physical {
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          template <int COMPONENTS> static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Add primitive velocity advection product to S
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          template <int COMPONENTS> static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract primitive velocity advection product from S
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          template <int COMPONENTS> static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
          
       protected:
 
@@ -67,7 +67,7 @@ namespace Physical {
          ~VelocityAdvection();
    };
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> template <int COMPONENTS> void VelocityAdvection<TXComp,TYComp,TZComp>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityAdvection<TXComp,TYComp,TZComp>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -86,7 +86,7 @@ namespace Physical {
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> template <int COMPONENTS> void VelocityAdvection<TXComp,TYComp,TZComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityAdvection<TXComp,TYComp,TZComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -105,7 +105,7 @@ namespace Physical {
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> template <int COMPONENTS> void VelocityAdvection<TXComp,TYComp,TZComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityAdvection<TXComp,TYComp,TZComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {

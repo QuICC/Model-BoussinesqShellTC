@@ -67,7 +67,7 @@ namespace IoVariable {
           * @param name    Name of the field
           * @param vector  Vector of components
           */
-         void writeSpectralVector(const std::string& name, const std::vector<Datatypes::SpectralScalarType>& vector);
+         void writeSpectralVector(const std::string& name, const std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& vector);
 
       private:
 

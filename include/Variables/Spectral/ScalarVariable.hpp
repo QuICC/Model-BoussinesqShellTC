@@ -29,7 +29,7 @@ namespace Datatypes {
    /**
     * @brief Implementation of scalar field variable
     */
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class ScalarVariable: public ScalarPhysicalVariable<TPScalar, PCOMPONENTS>
+   template <typename TSScalar, typename TPScalar> class ScalarVariable: public ScalarPhysicalVariable<TPScalar>
    {
       public:
          /**
@@ -69,6 +69,11 @@ namespace Datatypes {
           */
          void setZeros();
 
+         /**
+          * @brief Initialise the spectral values storage
+          */
+         void initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
          * @brief Get the memory requirements
@@ -85,50 +90,54 @@ namespace Datatypes {
       private:
    };
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const TSScalar& ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::perturbation() const
+   template <typename TSScalar, typename TPScalar> inline const TSScalar& ScalarVariable<TSScalar,TPScalar>::perturbation() const
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline TSScalar& ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rPerturbation()
+   template <typename TSScalar, typename TPScalar> inline TSScalar& ScalarVariable<TSScalar,TPScalar>::rPerturbation()
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const TSScalar& ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::total() const
+   template <typename TSScalar, typename TPScalar> inline const TSScalar& ScalarVariable<TSScalar,TPScalar>::total() const
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline TSScalar& ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rTotal()
+   template <typename TSScalar, typename TPScalar> inline TSScalar& ScalarVariable<TSScalar,TPScalar>::rTotal()
    {
       return this->mPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::ScalarVariable(SharedResolution spRes)
-      : ScalarPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(spRes->spSpectralSetup())
+   template <typename TSScalar, typename TPScalar> ScalarVariable<TSScalar,TPScalar>::ScalarVariable(SharedResolution spRes)
+      : ScalarPhysicalVariable<TPScalar>(spRes), mPerturbation(spRes->spSpectralSetup())
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::~ScalarVariable()
+   template <typename TSScalar, typename TPScalar> ScalarVariable<TSScalar,TPScalar>::~ScalarVariable()
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::setZeros()
+   template <typename TSScalar, typename TPScalar> void ScalarVariable<TSScalar,TPScalar>::setZeros()
    {
       // initialise the physical components to zero
-      ScalarPhysicalVariable<TPScalar,PCOMPONENTS>::setZeros();
+      ScalarPhysicalVariable<TPScalar>::setZeros();
 
       // initialise scalar field to zero
       this->rPerturbation().setZeros();
    }
 
+   template <typename TSScalar, typename TPScalar> void ScalarVariable<TSScalar,TPScalar>::initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps)
+   {
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> MHDFloat ScalarVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::requiredStorage() const
+   template <typename TSScalar, typename TPScalar> MHDFloat ScalarVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
-      mem += ScalarPhysicalVariable<TPScalar,PCOMPONENTS>::requiredStorage();
+      mem += ScalarPhysicalVariable<TPScalar>::requiredStorage();
 
       mem += this->mPerturbation.requiredStorage();
 

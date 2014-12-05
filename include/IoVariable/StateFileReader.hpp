@@ -103,7 +103,7 @@ namespace IoVariable {
           * @param name    Name of the vector field
           * @param rVector Storage for the field
           */
-         void readSpectralVector(const std::string& name, std::vector<Datatypes::SpectralScalarType>& rVector);
+         void readSpectralVector(const std::string& name, std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& rVector);
 
          /**
           * @brief Read vector field component from file

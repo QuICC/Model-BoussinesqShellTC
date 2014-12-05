@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
 
 namespace GeoMHDiSCC {
@@ -66,19 +67,24 @@ namespace Datatypes {
          void setZeros();
 
          /**
+          * @brief Initialise the spectral values storage
+          */
+         void initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps);
+
+         /**
           * @brief Initialise the physical values storage
           */
-         void initPhysical();
+         void initPhysical(const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Initialise the physical gradient values storage
           */
-         void initPhysicalGradient();
+         void initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Initialise the physical curl values storage
           */
-         void initPhysicalCurl();
+         void initPhysicalCurl(const std::map<FieldComponents::Physical::Id,bool>& comps);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -134,30 +140,39 @@ namespace Datatypes {
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysical()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps)
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initPhysical();
+         this->mDomains.at(i).initSpectral(comps);
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysical(const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initPhysicalGradient();
+         this->mDomains.at(i).initPhysical(comps);
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalCurl()
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
-         this->mDomains.at(i).initPhysicalCurl();
+         this->mDomains.at(i).initPhysicalGradient(id, comps);
+      }
+   }
+
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalCurl(const std::map<FieldComponents::Physical::Id,bool>& comps)
+   {
+      // Loop over all domains
+      for(size_t i = 0; i < this->mDomains.size(); i++)
+      {
+         this->mDomains.at(i).initPhysicalCurl(comps);
       }
    }
 

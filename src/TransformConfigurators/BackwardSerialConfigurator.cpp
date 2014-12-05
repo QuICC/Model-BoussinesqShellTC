@@ -141,6 +141,56 @@ namespace Transform {
    void BackwardSerialConfigurator::firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // Prepare computation of projection
+      BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPEVGRAD_ONE>(rVector, coord);
+
+      // Prepare computation of nonlinear interactions
+      BackwardConfigurator::prepareCurl<TransformSteps::Physical::VGRAD_ONE>(rVector, coord);
+
+      // Compute first backward transform for first vector gradient component
+      BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_VGRAD_ONE>(coord);
+
+      // Compute second backward transform for first vector gradient component
+      BackwardConfigurator::project2D<TransformSteps::Backward<Dimensions::Transform::TRA2D>::STEP_VGRAD_ONE>(coord);
+
+      // Compute third backward transform for first vector gradient component
+      BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_VGRAD_ONE>(coord);
+
+
+      // Prepare computation of projection
+      BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPEVGRAD_TWO>(rVector, coord);
+
+      // Prepare computation of nonlinear interactions
+      BackwardConfigurator::prepareCurl<TransformSteps::Physical::GRAD_TWO>(rVector, coord);
+
+      // Compute first backward transform of for second  vector gradient components
+      BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_VGRAD_TWO>(coord);
+
+      // Compute second backward transform for second vector gradient component
+      BackwardConfigurator::project2D<TransformSteps::Backward<Dimensions::Transform::TRA2D>::STEP_VGRAD_TWO>(coord);
+
+      // Compute third backward transform for second vector gradient component
+      BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_VGRAD_TWO>(coord);
+
+
+      // Prepare computation of projection
+      BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPEVGRAD_THREE>(rVector, coord);
+
+      // Prepare computation of nonlinear interactions
+      BackwardConfigurator::prepareCurl<TransformSteps::Physical::VGRAD_THREE>(rVector, coord);
+
+      // Compute first backward transform of for third vector gradient components
+      BackwardConfigurator::project1D<TransformSteps::Backward<Dimensions::Transform::TRA1D>::STEP_VGRAD_THREE>(coord);
+
+      // Compute second backward transform for third vector gradient component
+      BackwardConfigurator::project2D<TransformSteps::Backward<Dimensions::Transform::TRA2D>::STEP_VGRAD_THREE>(coord);
+
+      // Compute third backward transform for third vector gradient component
+      BackwardConfigurator::project3D<TransformSteps::Backward<Dimensions::Transform::TRA3D>::STEP_VGRAD_THREE>(coord);
+   }
+
+   void BackwardSerialConfigurator::firstPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   {
+      // Prepare computation of projection
       BackwardConfigurator::prepareProjection<TransformSteps::Backward<Dimensions::Transform::TRA1D>::SPECURL_ONE>(rVector, coord);
 
       // Prepare computation of nonlinear interactions
@@ -208,6 +258,11 @@ namespace Transform {
       // No need for a second step
    }
 
+   void BackwardSerialConfigurator::secondPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   {
+      // No need for a second step
+   }
+
    void BackwardSerialConfigurator::lastPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
    {
       // No need for a last step
@@ -224,6 +279,11 @@ namespace Transform {
    }
 
    void BackwardSerialConfigurator::lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
+   {
+      // No need for a last step
+   }
+
+   void BackwardSerialConfigurator::lastPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord)
    {
       // No need for a last step
    }

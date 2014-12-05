@@ -108,6 +108,14 @@ namespace Transform {
          static void firstPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
+          * @brief Compute the first step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
+          *
+          * @param rScalar Scalar variable
+          * @param coord   Transform coordinator
+          */
+         static void firstPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+
+         /**
           * @brief Compute the first step of the backward transform for a vector variable
           *
           * @param rVector Vector variable
@@ -122,6 +130,14 @@ namespace Transform {
           * @param coord   Transform coordinator
           */
          static void firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Compute the first step of the backward curl transform for a vector variable
+          *
+          * @param rVector Vector variable
+          * @param coord   Transform coordinator
+          */
+         static void firstPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step of the backward transform for a scalar variable
@@ -140,6 +156,14 @@ namespace Transform {
          static void secondPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
+          * @brief Compute the second step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
+          *
+          * @param rScalar Scalar variable
+          * @param coord   Transform coordinator
+          */
+         static void secondPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+
+         /**
           * @brief Compute the second step of the backward transform for a vector variable
           *
           * @param rVector Vector variable
@@ -154,6 +178,14 @@ namespace Transform {
           * @param coord   Transform coordinator
           */
          static void secondPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Compute the second step of the backward curl transform for a vector variable
+          *
+          * @param rVector Vector variable
+          * @param coord   Transform coordinator
+          */
+         static void secondPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step of the backward transform for a scalar variable
@@ -172,6 +204,14 @@ namespace Transform {
          static void lastPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
 
          /**
+          * @brief Compute the last step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
+          *
+          * @param rScalar Scalar variable
+          * @param coord   Transform coordinator
+          */
+         static void lastPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
+
+         /**
           * @brief Compute the last step of the backward transform for a vector variable
           *
           * @param rVector Vector variable
@@ -186,6 +226,14 @@ namespace Transform {
           * @param coord   Transform coordinator
           */
          static void lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Compute the last step of the backward curl transform for a vector variable
+          *
+          * @param rVector Vector variable
+          * @param coord   Transform coordinator
+          */
+         static void lastPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
 
          /**
           * @brief Empty constructor
@@ -229,6 +277,12 @@ namespace Transform {
       {
          BackwardSerialConfigurator::firstPhysicalGradient(rVariable, coord);
       }
+
+      // Compute physical curl projection if required
+      if(coord.needPhysicalCurl(name))
+      {
+         BackwardSerialConfigurator::firstPhysicalCurl(rVariable, coord);
+      }
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::secondStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
@@ -238,6 +292,14 @@ namespace Transform {
    template <typename TVariable> void BackwardSerialConfigurator::lastStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
    {
    }
+
+   // DUMMY implementations
+   inline void BackwardSerialConfigurator::firstPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   {}
+   inline void BackwardSerialConfigurator::secondPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   {}
+   inline void BackwardSerialConfigurator::lastPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
+   {}
 
 }
 }

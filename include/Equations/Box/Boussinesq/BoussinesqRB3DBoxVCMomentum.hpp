@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRB2DBoxVCVelocity.hpp
- * @brief Implementation of the momentum equation for Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
+ * @file BoussinesqRB3DBoxVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRB2DBOXVCVELOCITY_HPP
-#define BOUSSINESQRB2DBOXVCVELOCITY_HPP
+#ifndef BOUSSINESQRB3DBOXVCMOMENTUM_HPP
+#define BOUSSINESQRB3DBOXVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)
     */
-   class BoussinesqRB2DBoxVCVelocity: public IVectorEquation
+   class BoussinesqRB3DBoxVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRB2DBoxVCVelocity(SharedEquationParameters spEqParams);
+         BoussinesqRB3DBoxVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRB2DBoxVCVelocity();
+         virtual ~BoussinesqRB3DBoxVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRB2DBOXVCVELOCITY_HPP
+#endif // BOUSSINESQRB3DBOXVCMOMENTUM_HPP

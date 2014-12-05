@@ -44,7 +44,7 @@ namespace GeoMHDiSCC {
     * @name Array types typedefs
     */
    //@{
-   /// Typedef for an array of boolean values
+   /// Typedef for an array of integer values
    typedef Eigen::Matrix<bool, Eigen::Dynamic, 1>   ArrayB;
    /// Typedef for an array of integer values
    typedef Eigen::Matrix<int, Eigen::Dynamic, 1>   ArrayI;
@@ -70,6 +70,8 @@ namespace GeoMHDiSCC {
     * @name Matrix types typedefs
     */
    //@{
+   /// Typedef for an matrix of boolean values
+   typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic>   MatrixB;
    /// Typedef for a matrix of int values
    typedef Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>   MatrixI;
    /// Typedef for a matrix of float values

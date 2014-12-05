@@ -123,7 +123,7 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::vector<Datatypes::PhysicalScalarType>& vector)
+   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector)
    {
       // Create the Magnetic Field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -131,13 +131,14 @@ namespace IoVariable {
       // Storage for the field information
       std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
 
-      for(size_t i = 0; i < vector.size(); i++)
+      std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>::const_iterator it;
+      for(it = vector.begin(); it != vector.end(); ++it)
       {
          // create component field information
-         fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+         fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
          // Write the vector field
-         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), fieldInfo);
+         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
       }
       
       // close group
