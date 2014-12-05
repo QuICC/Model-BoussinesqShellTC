@@ -161,7 +161,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                         bc = {'r':{0:21}, 'z':{0:21}, 'priority':'sr'}
             
             # Stress-free/No-slip, Fixed flux/Fixed temperature
-            elif bcId == 1:
+            elif bcId == 2:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
                         bc = {'r':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -271,7 +271,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+            mat = annulus.zblk(res[0], res[2], 1, 1, bc)
 
         return mat
 
@@ -467,7 +467,6 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         # W: T_Nk, T_N-1K
         idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2))
-#        idx_w = []
 
         # Pressure: T_iN, T_Nk
         idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
