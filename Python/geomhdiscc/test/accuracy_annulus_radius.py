@@ -11,6 +11,7 @@ import scipy.sparse.linalg as spsplin
 import geomhdiscc.transform.annulus as transf
 import geomhdiscc.geometry.cylindrical.annulus_radius as annulus
 
+rand_amplitude = 1e6
 
 def x_to_phys(expr, grid):
     """Convert sympy expression to grid values"""
@@ -29,12 +30,13 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     sol = transf.torcheb(t)
     err = np.abs(rhs - sol)
     relerr = err/(1.0 + np.abs(sol))
+    print(sol)
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
-    if np.max(relerr) > 10*np.spacing(1):
+    if np.max(relerr[q:]) > 10*np.spacing(1):
         print(relerr)
-    print("\t\tMax forward relative error: " + str(np.max(relerr)))
+    print("\t\tMax forward relative error: " + str(np.max(relerr[q:])))
 
 def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     """Perform a tau backward operation test"""
@@ -58,7 +60,7 @@ def zblk(nr, a, b, rg):
     print("zblk:")
     x = sy.Symbol('x')
     A = annulus.zblk(nr, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**i for i in np.arange(0,nr,1)])
     ssol = 0
     test_forward(A, sphys, ssol, rg, 0)
 
@@ -68,7 +70,7 @@ def x1(nr, a, b, rg):
     print("x1:")
     x = sy.Symbol('x')
     A = annulus.x1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sphys*x
     test_forward(A, sphys, ssol, rg, 0)
 
@@ -78,7 +80,7 @@ def d1(nr, a, b, rg):
     print("d1:")
     x = sy.Symbol('x')
     A = annulus.d1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x)
     test_forward(A, sphys, ssol, rg, 0)
 
@@ -88,7 +90,10 @@ def x1div(nr, a, b, rg):
     print("x1div:")
     x = sy.Symbol('x')
     A = annulus.x1div(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([(1e-20)**x**(i) for i in np.arange(0,8,1)] + [(1e10*x**(20.0))]) 
+    sphys = (1e10*x**(10.0)) 
+    print(sphys)
     ssol = sy.expand(sy.diff(sphys*x,x))
     test_forward(A, sphys, ssol, rg, 0)
 
@@ -98,7 +103,7 @@ def i1(nr, a, b, rg):
     print("i1:")
     x = sy.Symbol('x')
     A = annulus.i1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.integrate(sphys,x)
     test_forward(A, sphys, ssol, rg, 1)
 
@@ -108,7 +113,7 @@ def i1x1d1(nr, a, b, rg):
     print("i1x1d1:")
     x = sy.Symbol('x')
     A = annulus.i1x1d1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys,x)*x)
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -119,7 +124,7 @@ def i1x1div(nr, a, b, rg):
     print("i1x1div:")
     x = sy.Symbol('x')
     A = annulus.i1x1div(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -130,7 +135,7 @@ def i1x1(nr, a, b, rg):
     print("i1x1:")
     x = sy.Symbol('x')
     A = annulus.i1x1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x)
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -141,7 +146,7 @@ def i2(nr, a, b, rg):
     print("i2:")
     x = sy.Symbol('x')
     A = annulus.i2(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
@@ -151,7 +156,7 @@ def i2x1(nr, a, b, rg):
     print("i2x1:")
     x = sy.Symbol('x')
     A = annulus.i2x1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
@@ -162,7 +167,7 @@ def i2x2d1(nr, a, b, rg):
     print("i2x2d1:")
     x = sy.Symbol('x')
     A = annulus.i2x2d1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys,x)*x**2)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
@@ -173,7 +178,7 @@ def i2x2d2(nr, a, b, rg):
     print("i2x2d2:")
     x = sy.Symbol('x')
     A = annulus.i2x2d2(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys,x,x)*x**2)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
@@ -184,7 +189,7 @@ def i2x2(nr, a, b, rg):
     print("i2x2:")
     x = sy.Symbol('x')
     A = annulus.i2x2(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**2)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
@@ -195,7 +200,7 @@ def i2x2div(nr, a, b, rg):
     print("i2x2div:")
     x = sy.Symbol('x')
     A = annulus.i2x2div(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x*sphys)
     ssol = sy.expand(x*sy.diff(ssol,x))
     ssol = sy.integrate(ssol,x,x)
@@ -208,7 +213,7 @@ def i2x2laplh(nr, a, b, rg):
     x = sy.Symbol('x')
     m = np.random.randint(1, nr)
     A = annulus.i2x2laplh(nr, m, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x,x) + x*sy.diff(sphys,x) - m**2*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
@@ -219,7 +224,7 @@ def i4x4(nr, a, b, rg):
     print("i4x4:")
     x = sy.Symbol('x')
     A = annulus.i4x4(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys*x**4)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
@@ -231,7 +236,7 @@ def i4x4laplh(nr, a, b, rg):
     x = sy.Symbol('x')
     m = np.random.randint(1, nr)
     A = annulus.i4x4laplh(nr, m, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x) + x**3*sy.diff(sphys,x) - m**2*x**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
@@ -243,7 +248,7 @@ def i4x4lapl2h(nr, a, b, rg):
     x = sy.Symbol('x')
     m = np.random.randint(1, nr)
     A = annulus.i4x4lapl2h(nr, m, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**4*sy.diff(sphys,x,x,x,x) + 2*x**3*sy.diff(sphys,x,x,x) - (1+2*m**2)*x**2*sy.diff(sphys,x,x) + (1+2*m**2)*x*sy.diff(sphys,x) + (m**2 - 4)*m**2*sphys)
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
@@ -254,7 +259,7 @@ def qid(nr, a, b, xg):
     print("qid:")
     x = sy.Symbol('x')
     A = annulus.qid(nr, 3, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**i for i in np.arange(0,nr,1)])
     ssol = sphys
     test_forward(A, sphys, ssol, xg, 3)
 
@@ -264,7 +269,7 @@ def mvss_1_x(nr, a, b, rg):
     print("mvss_1_x:")
     x = sy.Symbol('x')
     Am = annulus.x1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sphys/x)
     test_forward(Am, sphys, ssol, rg, 0)
     As = annulus.x1(nr, a, b, annulus.radbc.no_bc())
@@ -278,7 +283,7 @@ def mvss_d1(nr, a, b, rg):
     print("mvss_d1:")
     x = sy.Symbol('x')
     Am = annulus.d1(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys,x))
     test_forward(Am, sphys, ssol, rg, 0)
     As = annulus.i1(nr, a, b, {0:99})
@@ -292,7 +297,7 @@ def mvss_x1div(nr, a, b, rg):
     print("mvss_x1div:")
     x = sy.Symbol('x')
     Am = annulus.x1div(nr, a, b, annulus.radbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(sy.diff(sphys*x,x))
     test_forward(Am, sphys, ssol, rg, 0)
     As = annulus.i1(nr, a, b, {0:99})
@@ -306,12 +311,13 @@ if __name__ == "__main__":
     nr = 50
     a, b = annulus.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
+    print(rg)
 
     # run tests
     #zblk(nr, a, b, rg)
-#    x1(nr, a, b, rg)
-#    d1(nr, a, b, rg)
-#    x1div(nr, a, b, rg)
+    x1(nr, a, b, rg)
+    d1(nr, a, b, rg)
+    x1div(nr, a, b, rg)
 #    i1(nr, a, b, rg)
 #    i1x1d1(nr, a, b, rg)
 #    i1x1div(nr, a, b, rg)
@@ -329,6 +335,6 @@ if __name__ == "__main__":
 #    qid(nr, a, b, rg)
 
     # Matmult vs Solve operators
-    mvss_1_x(nr, a, b, rg)
-    mvss_d1(nr, a, b, rg)
-    mvss_x1div(nr, a, b, rg)
+#    mvss_1_x(nr, a, b, rg)
+#    mvss_d1(nr, a, b, rg)
+#    mvss_x1div(nr, a, b, rg)
