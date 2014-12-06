@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBAnnulusVCModel.cpp
- * @brief Source of the Boussinesq Rayleigh-Benard annulus (velocity-continuity formulation) model
+ * @file BoussinesqRRBAnnulusVCModel.cpp
+ * @brief Source of the Boussinesq rotating Rayleigh-Benard annulus (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRBAnnulusVCModel.hpp"
+#include "PhysicalModels/BoussinesqRRBAnnulusVCModel.hpp"
 
 // Project includes
 //
@@ -25,11 +25,11 @@
 #include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCTransport.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityX.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityY.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityZ.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCContinuity.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCTransport.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityX.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityY.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityZ.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/AnnulusExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -37,25 +37,25 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRBAnnulusVCModel::PYMODULE = "boussinesq_rbannulus_vc";
+   const std::string BoussinesqRRBAnnulusVCModel::PYMODULE = "boussinesq_rrbannulus_vc";
 
-   const std::string BoussinesqRBAnnulusVCModel::PYCLASS = "BoussinesqRBAnnulusVC";
+   const std::string BoussinesqRRBAnnulusVCModel::PYCLASS = "BoussinesqRRBAnnulusVC";
 
-   void BoussinesqRBAnnulusVCModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRRBAnnulusVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityX>();
-      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityY>();
-      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityZ>();
+      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityX>();
+      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityY>();
+      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityZ>();
 
       // Add continuity equation
-      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCContinuity>();
    }
 
-   void BoussinesqRBAnnulusVCModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRRBAnnulusVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -123,7 +123,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBAnnulusVCModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRRBAnnulusVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -153,7 +153,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRBAnnulusVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRRBAnnulusVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -168,7 +168,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRBAnnulusVCModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRRBAnnulusVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
@@ -178,7 +178,7 @@ namespace GeoMHDiSCC {
       spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRBAnnulusVCModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRRBAnnulusVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -193,7 +193,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRBAnnulusVCModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRRBAnnulusVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
