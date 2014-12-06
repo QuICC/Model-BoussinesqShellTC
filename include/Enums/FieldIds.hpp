@@ -106,16 +106,60 @@ namespace GeoMHDiSCC {
           * @brief Enum for physical field vector components
           */
          enum Id {
-            /// First vector component
-            ONE,
-            /// Second vector component
-            TWO,
-            /// Third vector component
-            THREE,
+            /// X component of cartesian field
+            X,
+            /// Radial component of cylindrical or spherical field
+            R,
+
+            /// Y component of cartesian field
+            Y,
+            /// Theta component of cylindrical or spherical field
+            THETA,
+
+            /// Z component of cartesian field
+            Z,
+            /// Phi component of spherical field
+            PHI,
+
             /// Is a scalar
             SCALAR,
+
+            // Define generic enums for cartesian geometry
+            #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+            /// First vector component
+            ONE = X,
+            /// Second vector component
+            TWO = Y,
+            /// Third vector component
+            THREE = Z,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+            /// First vector component
+            ONE = Z,
+            /// Second vector component
+            TWO = X,
+            /// Third vector component
+            THREE = Y,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = Z,
+
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+            /// First vector component
+            ONE = R,
+            /// Second vector component
+            TWO = THETA,
+            /// Third vector component
+            THREE = PHI,
+
+            #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
+
             /// Is not used
-            NOTUSED
+            NOTUSED,
          };
       };
 
@@ -128,16 +172,81 @@ namespace GeoMHDiSCC {
           * @brief Enum for Spectral field vector components
           */
          enum Id {
-            /// First spectral vector component
-            ONE,
-            /// Second spectral vector component
-            TWO,
-            /// Third spectral vector component
-            THREE,
+            /// X component of cartesian field
+            X,
+            /// Radial component of cylindrical or spherical field
+            R,
+            /// Toroidal component
+            TOR,
+            /// Q component of Spheroidal/Toroidal
+            Q,
+
+            /// Y component of cartesian field
+            Y,
+            /// Theta component of cylindrical or spherical field
+            THETA,
+            /// Poloidal component of Toroidal/Poloidal
+            POL,
+            /// S component of Spheroidal/Toroidal
+            S,
+
+            /// Z component of cartesian field
+            Z,
+            /// Phi component of spherical field
+            PHI,
+            /// T component of spheroidal/toroidal field
+            T,
+
             /// Is spectral scalar
             SCALAR,
+
+            // Define generic enums for cartesian geometry
+            #if defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF 
+               /// First vector component
+               ONE = X,
+               /// Second vector component
+               TWO = Y,
+               /// Third vector component
+               THREE = Z,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_TFF
+               /// First vector component
+               ONE = Z,
+               /// Second vector component
+               TWO = X,
+               /// Third vector component
+               THREE = Y,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = Z,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+               /// First vector component
+               ONE = TOR,
+               /// Second vector component
+               TWO = POL,
+               /// Third vector component
+               THREE = NOTUSED,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLF_QST || defined GEOMHDISCC_SPATIALSCHEME_BLF_QST || defined GEOMHDISCC_SPATIALSCHEME_WLF_QST
+               /// First vector component
+               ONE = Q,
+               /// Second vector component
+               TWO = S,
+               /// Third vector component
+               THREE = T,
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+               /// First vector component
+               ONE = R,
+               /// Second vector component
+               TWO = THETA,
+               /// Third vector component
+               THREE = PHI,
+            #endif // defined GEOMHDISCC_SPATIALSCHEME_TTT || defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_FFF
+
             /// Is not used
-            NOTUSED
+            NOTUSED,
          };
       };
    };

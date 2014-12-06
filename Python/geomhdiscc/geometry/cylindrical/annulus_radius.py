@@ -40,7 +40,9 @@ def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     mat = coeff*spsp.diags(diags, offsets)
     if zr > 0:
+        mat = mat.tolil()
         mat[-zr:,:] = 0
+        mat = mat.tocsr()
     return radbc.constrain(mat, bc)
 
 def d1(nr, a, b, bc, coeff = 1.0, zr = 1):

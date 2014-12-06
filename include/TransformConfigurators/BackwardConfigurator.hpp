@@ -21,7 +21,7 @@
 //
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/TransformSteps.hpp"
+#include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
 
@@ -191,6 +191,12 @@ namespace Transform {
    /// Specialised 1D projection to compute gradient (hold input data)
    template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::START_GRAD>(TransformCoordinatorType& coord);
 
+   /// Specialised 1D projection to compute division by R (from recoverd data and hold input data)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::CONTINUE_DIVR>(TransformCoordinatorType& coord);
+
+   /// Specialised 1D projection to compute division by R (from recoverd data)
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::FINISH_DIVR>(TransformCoordinatorType& coord);
+
 
    /// Specialised 2D projection to do nothing
    template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord);
@@ -203,6 +209,9 @@ namespace Transform {
 
    /// Specialised 2D projection to compute gradient (hold input data)
    template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::START_GRAD>(TransformCoordinatorType& coord);
+
+   /// Specialised 2D projection to compute gradient
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord);
 
 
    /// Specialised 3D projection to do nothing

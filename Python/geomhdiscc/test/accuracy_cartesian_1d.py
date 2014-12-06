@@ -431,6 +431,17 @@ def qid(nx, xg):
     ssol = sphys
     test_forward(A, sphys, ssol, xg, 3)
 
+def gen1_x(nx, q, p, xg, ntrunc = -1):
+    """Accuracy test for gen1_x operator"""
+
+    print("gen1_x:")
+    x = sy.Symbol('x')
+    expr = 'x**(-1)'
+    A = cg1d.generic(nx, q, expr, x, c1d.c1dbc.no_bc(), 1.0, ntrunc)
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-1,1)])
+    ssol = sphys/x
+    test_forward(A, sphys, ssol, xg, 0)
+
 def genxp(nx, q, p, xg, ntrunc = -1):
     """Accuracy test for genxp operator"""
 
@@ -486,6 +497,7 @@ if __name__ == "__main__":
 
     # run generic operator tests
     print('Generic operator generator')
+    gen1_x(nx, 0, 1, xg)
     genxp(nx, 0, 1, xg)
     genxp(nx, 0, 2, xg)
     genxp(nx, 0, 3, xg)

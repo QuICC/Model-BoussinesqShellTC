@@ -48,6 +48,7 @@ if(linalgTest)
    geomhdiscc_add_definition(GEOMHDISCC_LINALG)
 endif(linalgTest)
 
+
 ###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
@@ -57,6 +58,18 @@ geomhdiscc_provide_choice(GEOMHDISCC_SPLINALGS "Sparse linear algebra" GEOMHDISC
 if(splinalgTest)
    geomhdiscc_add_definition(GEOMHDISCC_SPLINALG)
 endif(splinalgTest)
+
+
+###################################################
+#---- FORWARD OR BACKWARD TRANSFORM OPERATOR -----#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_TRANSOPS "Forward/Backward transform operators" GEOMHDISCC_TRANSOP transopTest)
+
+if(transopTest)
+   geomhdiscc_add_definition(GEOMHDISCC_TRANSOP)
+endif(transopTest)
+
 
 ###################################################
 #------------------ LARGE IO FORMAT --------------#

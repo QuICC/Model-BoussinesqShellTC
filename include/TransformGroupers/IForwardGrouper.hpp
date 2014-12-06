@@ -70,14 +70,14 @@ namespace Transform {
          const int mcScalarPacks1D;
 
          /**
-          * @brief Constant number of second exchange packets required for a scalar
-          */
-         const int mcScalarPacks2D;
-
-         /**
           * @brief Constant number of first exchange packets required for a vector field
           */
          const int mcVectorPacks1D;
+
+         /**
+          * @brief Constant number of second exchange packets required for a scalar
+          */
+         const int mcScalarPacks2D;
 
          /**
           * @brief Constant number of second exchange packets required for a vector field

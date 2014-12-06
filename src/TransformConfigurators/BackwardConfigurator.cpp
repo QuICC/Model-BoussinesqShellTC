@@ -124,7 +124,7 @@ namespace Transform {
       // Get the input data from hold
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-      // Get the transfered input data
+      // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
@@ -139,6 +139,58 @@ namespace Transform {
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
    }
+
+#if defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT || defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::CONTINUE_DIVR>(TransformCoordinatorType& coord)
+   {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
+
+      // Get the input data from hold
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::ProjectorType::DIVR);
+
+      // Hold spectral input
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rInVar);
+
+      // Transfer output data to next step
+      coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
+   }
+
+   template <> void BackwardConfigurator::project1D<TransformSteps::BackwardBase::FINISH_DIVR>(TransformCoordinatorType& coord)
+   {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
+
+      // Get the input data from hold
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::ProjectorType::DIVR);
+
+      // Free spectral input
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+
+      // Transfer output data to next step
+      coord.communicator().transferForward<Dimensions::Transform::TRA1D>(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1D);
+   }
+
+#endif //defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_WFT || defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
 
    template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::NOTHING>(TransformCoordinatorType& coord)
    {
@@ -211,6 +263,30 @@ namespace Transform {
 
       // Hold temporary storage
       coord.communicator().storage<Dimensions::Transform::TRA2D>().holdBwd(rInComp);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);
+   }
+
+   template <> void BackwardConfigurator::project2D<TransformSteps::BackwardBase::DO_GRAD>(TransformCoordinatorType& coord)
+   {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD2D);
+
+      // Get the transfered input data
+      TransformCoordinatorType::CommunicatorType::Bwd2DType &rInComp = coord.communicator().receiveBackward<Dimensions::Transform::TRA2D>();
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutComp = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
+
+      // Compute projection transform for second dimension 
+      coord.transform2D().project<Arithmetics::SET>(rOutComp.rData(), rInComp.data(), TransformCoordinatorType::Transform2DType::ProjectorType::DIFF);
+
+      // Free temporary input storage
+      coord.communicator().storage<Dimensions::Transform::TRA2D>().freeBwd(rInComp);
+
+      // Transfer output data to next step
+      coord.communicator().transferForward<Dimensions::Transform::TRA2D>(rOutComp);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWD2D);

@@ -98,7 +98,7 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void StateFileWriter::writeSpectralVector(const std::string& name, const std::vector<Datatypes::SpectralScalarType>& vector)
+   void StateFileWriter::writeSpectralVector(const std::string& name, const std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>& vector)
    {
       // Create the vector field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -107,25 +107,26 @@ namespace IoVariable {
       std::vector<std::tr1::tuple<int,int, const Datatypes::SpectralScalarType::PointType *> > fieldInfo;
 
       // Check for data regularity
+      std::map<FieldComponents::Spectral::Id,Datatypes::SpectralScalarType>::const_iterator it;
       if(this->mIsRegular)
       {
-         for(size_t i = 0; i < vector.size(); i++)
+         for(it = vector.begin(); it != vector.end(); ++it)
          {
             // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
             // Write vector component
-            this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
          }
       } else
       {
-         for(size_t i = 0; i < vector.size(); i++)
+         for(it = vector.begin(); it != vector.end(); ++it)
          {
             // create component field information
-            fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+            fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
             // Write vector component
-            this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Spectral::Id>(i)), fieldInfo);
+            this->writeIrregularField(group, name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
          }
       }
       

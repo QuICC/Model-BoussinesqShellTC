@@ -30,7 +30,7 @@ namespace Datatypes {
    /**
     * @brief Implementation of vector variable
     */
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class VectorVariable: public VectorPhysicalVariable<TPScalar, PCOMPONENTS>
+   template <typename TSScalar, typename TPScalar> class VectorVariable: public VectorPhysicalVariable<TPScalar>
    {
       public:
          /**
@@ -48,27 +48,32 @@ namespace Datatypes {
          /**
           * @brief Get spectral vector field (perturbation part)
           */
-         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  perturbation() const;
+         const VectorField<TSScalar,FieldComponents::Spectral::Id>&  perturbation() const;
 
          /**
           * @brief Set spectral vector field (perturbation part)
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rPerturbation();
+         VectorField<TSScalar,FieldComponents::Spectral::Id>&  rPerturbation();
 
          /**
           * @brief Get spectral vector field (total field)
           */
-         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  total() const;
+         const VectorField<TSScalar,FieldComponents::Spectral::Id>&  total() const;
 
          /**
           * @brief Set spectral vector field (total field)
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rTotal();
+         VectorField<TSScalar,FieldComponents::Spectral::Id>&  rTotal();
 
          /**
           * @brief initialise to zeros
           */
          void setZeros();
+
+         /**
+          * @brief Initialise the spectral values storage
+          */
+         void initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -82,57 +87,71 @@ namespace Datatypes {
          /**
           * @brief Spectral vector of the field
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>   mPerturbation;
+         SharedPtrMacro<VectorField<TSScalar,FieldComponents::Spectral::Id> > mspPerturbation;
 
       private:
    };
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::perturbation() const
+   template <typename TSScalar, typename TPScalar> inline const VectorField<TSScalar,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,TPScalar>::perturbation() const
    {
-      return this->mPerturbation;
+      return *this->mspPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rPerturbation()
+   template <typename TSScalar, typename TPScalar> inline VectorField<TSScalar,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,TPScalar>::rPerturbation()
    {
-      return this->mPerturbation;
+      return *this->mspPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::total() const
+   template <typename TSScalar, typename TPScalar> inline const VectorField<TSScalar,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,TPScalar>::total() const
    {
-      return this->mPerturbation;
+      return *this->mspPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::rTotal()
+   template <typename TSScalar, typename TPScalar> inline VectorField<TSScalar,FieldComponents::Spectral::Id>& VectorVariable<TSScalar,TPScalar>::rTotal()
    {
-      return this->mPerturbation;
+      return *this->mspPerturbation;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::VectorVariable(SharedResolution spRes)
-      : VectorPhysicalVariable<TPScalar,PCOMPONENTS>(spRes), mPerturbation(spRes->spSpectralSetup())
-   {
-   }
-
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::~VectorVariable()
+   template <typename TSScalar, typename TPScalar> VectorVariable<TSScalar,TPScalar>::VectorVariable(SharedResolution spRes)
+      : VectorPhysicalVariable<TPScalar>(spRes)
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::setZeros()
+   template <typename TSScalar, typename TPScalar> VectorVariable<TSScalar,TPScalar>::~VectorVariable()
+   {
+   }
+
+   template <typename TSScalar, typename TPScalar> void VectorVariable<TSScalar,TPScalar>::setZeros()
    {
       // initialise the physical components to zero
-      VectorPhysicalVariable<TPScalar,PCOMPONENTS>::setZeros();
+      VectorPhysicalVariable<TPScalar>::setZeros();
 
       // initialise vector field to zero
       this->rPerturbation().setZeros();
    }
 
+   template <typename TSScalar, typename TPScalar> void VectorVariable<TSScalar,TPScalar>::initSpectral(const std::vector<FieldComponents::Spectral::Id>& comps)
+   {
+      // Safety assert
+      assert(! this->mspPerturbation);
+
+      std::map<FieldComponents::Spectral::Id,bool> map;
+      for(int i = 0; i < comps.size(); i++)
+      {
+         map.insert(std::make_pair(comps.at(i), true));
+      }
+
+      this->mspPerturbation = SharedPtrMacro<VectorField<TSScalar,FieldComponents::Spectral::Id> >(new VectorField<TSScalar,FieldComponents::Spectral::Id>(this->spRes()->spSpectralSetup(), map));
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> MHDFloat VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS>::requiredStorage() const
+   template <typename TSScalar, typename TPScalar> MHDFloat VectorVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
-      mem += VectorPhysicalVariable<TPScalar,PCOMPONENTS>::requiredStorage();
+      mem += VectorPhysicalVariable<TPScalar>::requiredStorage();
 
-      mem += this->mPerturbation.requiredStorage();
+      mem += this->mspPerturbation->requiredStorage();
 
       return mem;
    }

@@ -25,11 +25,11 @@
 #include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVCTransport.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVCVelocityX.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVCVelocityY.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVCVelocityZ.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqAnnulusVCContinuity.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCTransport.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityX.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityY.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityZ.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/AnnulusExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -44,21 +44,21 @@ namespace GeoMHDiSCC {
    void BoussinesqRBAnnulusVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqAnnulusVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVCVelocityX>();
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVCVelocityY>();
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVCVelocityZ>();
+      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityX>();
+      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityY>();
+      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCVelocityZ>();
 
       // Add continuity equation
-      spSim->addVectorEquation<Equations::BoussinesqAnnulusVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRBAnnulusVCContinuity>();
    }
 
    void BoussinesqRBAnnulusVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedAnnulusExactScalarState spExact;
@@ -72,20 +72,20 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
+         spExact->setStateType(Equations::AnnulusExactScalarState::POLYCOSPOLY);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
          spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
+         spExact->setModeOptions(1e0, 1.0, 1e0, 3.0, 1e0, 0.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spExact->setStateType(Equations::AnnulusExactScalarState::POLYCOSPOLY);
+         spExact->setModeOptions(1e0, 2.0, 1e0, 2.0, 1e0, 0.0);
 
       // Generate random spectrum
       } else
@@ -130,18 +130,18 @@ namespace GeoMHDiSCC {
 
       // Add temperature field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYX);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYY);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
+      spField->setFields(true, true);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add output file

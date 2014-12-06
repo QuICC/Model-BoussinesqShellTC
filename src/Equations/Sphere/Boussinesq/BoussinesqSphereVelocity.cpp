@@ -30,10 +30,6 @@ namespace Equations {
    BoussinesqSphereVelocity::BoussinesqSphereVelocity(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
-      // Vector equation has two components, ie Toroidal/Poloidal
-      this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
-      this->mSpectralIds.push_back(FieldComponents::Spectral::TWO);
-
       // Set the variable requirements
       this->setRequirements();
    }
@@ -59,7 +55,7 @@ namespace Equations {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
 
-      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(,need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, false, false));
    }
 

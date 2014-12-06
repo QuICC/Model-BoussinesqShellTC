@@ -272,7 +272,7 @@ namespace Equations {
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
 
-      // Get a restricted stencil matrixstencil matrix
+      // Get a restricted stencil matrix
       SparseMatrix stencil = eq.galerkinStencil(compId, matIdx).topRows(eq.couplingInfo(compId).galerkinN(matIdx));
       stencil.makeCompressed();
 

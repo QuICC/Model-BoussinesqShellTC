@@ -29,7 +29,7 @@ namespace Datatypes {
    /**
     * @brief Implementation of vector variable with an imposed component
     */
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> class ImposedVectorVariable: public VectorVariable<TSScalar,SCOMPONENTS,TPScalar,PCOMPONENTS> 
+   template <typename TSScalar, typename TPScalar> class ImposedVectorVariable: public VectorVariable<TSScalar,TPScalar> 
    {
       public:
          /**
@@ -47,22 +47,22 @@ namespace Datatypes {
          /**
           * @brief Get spectral vector field (total field)
           */
-         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  total() const;
+         const VectorField<TSScalar,FieldComponents::Spectral::Id>&  total() const;
 
          /**
           * @brief Set spectral vector field (total field)
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rTotal();
+         VectorField<TSScalar,FieldComponents::Spectral::Id>&  rTotal();
 
          /**
           * @brief Get spectral vector imposed field
           */
-         const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  imposed() const;
+         const VectorField<TSScalar,FieldComponents::Spectral::Id>&  imposed() const;
 
          /**
           * @brief Set spectral vector imposed field 
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>&  rImposed();
+         VectorField<TSScalar,FieldComponents::Spectral::Id>&  rImposed();
 
          /**
           * @brief initialise to zeros
@@ -81,46 +81,46 @@ namespace Datatypes {
          /**
           * @brief Spectral vector imposed field
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>    mImposed;
+         VectorField<TSScalar,FieldComponents::Spectral::Id>    mImposed;
 
          /**
           * @brief Spectral vector total field
           */
-         VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>    mTotal;
+         VectorField<TSScalar,FieldComponents::Spectral::Id>    mTotal;
 
       private:
    };
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::total() const
+   template <typename TSScalar, typename TPScalar> inline const VectorField<TSScalar,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,TPScalar>::total() const
    {
       return this->mTotal;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::rTotal()
+   template <typename TSScalar, typename TPScalar> inline VectorField<TSScalar,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,TPScalar>::rTotal()
    {
       return this->mTotal;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline const VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::imposed() const
+   template <typename TSScalar, typename TPScalar> inline const VectorField<TSScalar,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,TPScalar>::imposed() const
    {
       return this->mImposed;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> inline VectorField<TSScalar,SCOMPONENTS,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::rImposed()
+   template <typename TSScalar, typename TPScalar> inline VectorField<TSScalar,FieldComponents::Spectral::Id>& ImposedVectorVariable<TSScalar,TPScalar>::rImposed()
    {
       return this->mImposed;
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::ImposedVectorVariable(SharedResolution spRes)
+   template <typename TSScalar, typename TPScalar> ImposedVectorVariable<TSScalar,TPScalar>::ImposedVectorVariable(SharedResolution spRes)
       : VectorVariable(spRes), mImposed(spRes->backwardSetup()), mTotal(spRes->backwardSetup())
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::~ImposedVectorVariable()
+   template <typename TSScalar, typename TPScalar> ImposedVectorVariable<TSScalar,TPScalar>::~ImposedVectorVariable()
    {
    }
 
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> void ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::setZeros()
+   template <typename TSScalar, typename TPScalar> void ImposedVectorVariable<TSScalar,TPScalar>::setZeros()
    {
       // initialise the perturbation field to zero
       VectorVariable::setZeros();
@@ -133,7 +133,7 @@ namespace Datatypes {
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TSScalar, int SCOMPONENTS, typename TPScalar, int PCOMPONENTS> MHDFloat ImposedVectorVariable<TSScalar,SCOMPONENTS, TPScalar, PCOMPONENTS>::requiredStorage() const
+   template <typename TSScalar, typename TPScalar> MHDFloat ImposedVectorVariable<TSScalar,TPScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

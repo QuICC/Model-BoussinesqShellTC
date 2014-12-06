@@ -107,6 +107,9 @@ def apply_tau(mat, bc, location = 't'):
     # u = D^2u = 0
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
+    # Last mode is zero
+    elif bc[0] == 99:
+        cond = tau_last(mat.shape[0])
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -286,6 +289,14 @@ def tau_value_diff2(nr, pos, coeffs = None):
     if pos <= 0:
         cond.append(list(tau_value(nr,-1,coeffs)[0]))
         cond.append(list(tau_diff2(nr,-1,coeffs)[0]))
+
+    return np.array(cond)
+
+def tau_last(nr):
+    """Create the boundary value tau line(s)"""
+
+    cond = []
+    cond.append([0 for i in np.arange(0,nr-1)] +  [tau_c(nr)])
 
     return np.array(cond)
 

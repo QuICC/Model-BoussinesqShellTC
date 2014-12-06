@@ -120,48 +120,123 @@ namespace Transform {
 
    void CylinderChebyshevFftwTransform::initOperators()
    {
+      // First derivative
       this->mDiffE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
       this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      // Division by R
+      this->mDivRE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mDivRO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius");
 
-      // Prepare arguments to d1(...) call
-      PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(3);
-      // ... get operator size
-      pValue = PyLong_FromLong(this->mspSetup->specSize());
-      PyTuple_SetItem(pArgs, 0, pValue);
-      // ... create boundray condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 2, pValue);
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Prepare arguments to d1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(3);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... create boundray condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 2, pValue);
 
-      // ... set even parity
-      pValue = PyLong_FromLong(0);
-      PyTuple_SetItem(pArgs, 1, pValue);
+         // ... set even parity
+         pValue = PyLong_FromLong(0);
+         PyTuple_SetItem(pArgs, 1, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
+         // Call d1
+         PythonWrapper::setFunction("d1");
+         pValue = PythonWrapper::callFunction(pArgs);
 
-      // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiffE, pValue);
-      Py_DECREF(pValue);
+         // Fill matrix and clenup
+         PythonWrapper::fillMatrix(this->mDiffE, pValue);
+         Py_DECREF(pValue);
 
-      // ... set odd parity
-      pValue = PyLong_FromLong(1);
-      PyTuple_SetItem(pArgs, 1, pValue);
+         // ... set odd parity
+         pValue = PyLong_FromLong(1);
+         PyTuple_SetItem(pArgs, 1, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
-      Py_DECREF(pValue);
+         // Call d1
+         PythonWrapper::setFunction("d1");
+         pValue = PythonWrapper::callFunction(pArgs);
 
-      // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiffO, pValue);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiffO, pValue);
+         Py_DECREF(pValue);
+      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Prepare arguments to i1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(3);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... create boundray condition (last mode zero)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(99));
+         PyTuple_SetItem(pArgs, 2, pValue);
+
+         // ... set even parity
+         pValue = PyLong_FromLong(0);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call i1
+         PythonWrapper::setFunction("i1");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix and clenup
+         PythonWrapper::fillMatrix(this->mDiffE, pValue);
+         Py_DECREF(pValue);
+
+         // ... set odd parity
+         pValue = PyLong_FromLong(1);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call i1
+         PythonWrapper::setFunction("i1");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiffO, pValue);
+         Py_DECREF(pValue);
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      // Fill matrix and cleanup
       PythonWrapper::finalize();
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Factorize matrix and free memory
+         this->mSDiffE.compute(this->mDiffE);
+         // Check for successful factorisation
+         if(this->mSDiffE.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward even differentiation failed!");
+         }
+         // Factorize matrix and free memory
+         this->mSDiffO.compute(this->mDiffO);
+         // Check for successful factorisation
+         if(this->mSDiffO.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward odd differentiation failed!");
+         }
+
+         // Factorize division matrix and free memory
+         this->mSDivRE.compute(this->mDivRE);
+         // Check for successful factorisation
+         if(this->mSDivRE.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward even division failed!");
+         }
+         // Factorize division matrix and free memory
+         this->mSDivRO.compute(this->mDivRO);
+         // Check for successful factorisation
+         if(this->mSDivRO.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward odd division failed!");
+         }
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    void CylinderChebyshevFftwTransform::cleanupFft()

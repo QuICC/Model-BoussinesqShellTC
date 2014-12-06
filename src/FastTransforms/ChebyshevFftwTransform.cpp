@@ -137,34 +137,65 @@ namespace Transform {
 
    void ChebyshevFftwTransform::initOperators()
    {
+      // Storage for the differentiation operator
       this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
 
-      // Prepare arguments to d1(...) call
-      PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(3);
-      // ... get operator size
-      pValue = PyLong_FromLong(this->mspSetup->specSize());
-      PyTuple_SetItem(pArgs, 0, pValue);
-      // ... create boundray condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 1, pValue);
-      // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(this->mCScale);
-      PyTuple_SetItem(pArgs, 2, pValue);
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Prepare arguments to d1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(3);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... create boundray condition (none)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         PyTuple_SetItem(pArgs, 1, pValue);
+         // ... set coefficient to scale factor
+         pValue = PyFloat_FromDouble(this->mCScale);
+         PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
+         // Call d1
+         PythonWrapper::setFunction("d1");
+         pValue = PythonWrapper::callFunction(pArgs);
+      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Prepare arguments to i1(...) call
+         PyObject *pArgs, *pValue;
+         pArgs = PyTuple_New(3);
+         // ... get operator size
+         pValue = PyLong_FromLong(this->mspSetup->specSize());
+         PyTuple_SetItem(pArgs, 0, pValue);
+         // ... create boundray condition (last mode is zero)
+         pValue = PyDict_New();
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(99));
+         PyTuple_SetItem(pArgs, 1, pValue);
+         // ... set coefficient to 1.0
+         pValue = PyFloat_FromDouble(1.0);
+         PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Fill matrix and clenup
+         // Call i1
+         PythonWrapper::setFunction("i1");
+         pValue = PythonWrapper::callFunction(pArgs);
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      // Fill matrix and cleanup
       PythonWrapper::fillMatrix(this->mDiff, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Factorize matrix and free memory
+         this->mSDiff.compute(this->mDiff);
+         // Check for successful factorisation
+         if(this->mSDiff.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward differentiation failed!");
+         }
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    void ChebyshevFftwTransform::cleanupFft()

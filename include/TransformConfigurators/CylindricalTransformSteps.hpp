@@ -1,14 +1,11 @@
 /** 
- * @file TransformSteps.hpp
- * @brief Definition of some useful enums for steps involved in a full transform
+ * @file CylindricalTransformSteps.hpp
+ * @brief Definition of some useful enums for steps involved in a full cylindrical transform
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- *
- *  \mhdBug Needs documentation and splitting out model/scheme part
- *  \mhdBug Might depend on model/scheme
  */
 
-#ifndef TRANSFORMSTEPS_HPP
-#define TRANSFORMSTEPS_HPP
+#ifndef CYLINDRICALTRANSFORMSTEPS_HPP
+#define CYLINDRICALTRANSFORMSTEPS_HPP
 
 // Configuration includes
 //
@@ -54,23 +51,30 @@ namespace GeoMHDiSCC {
 
 
             /// Transform step for the first component of a vector
-            static const Step STEP_VECTOR_ONE = NOTHING;
+            static const Step STEP_VECTOR_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a vector
-            static const Step STEP_VECTOR_TWO = NOTHING;
+            static const Step STEP_VECTOR_TWO = DO_SCALAR;
 
             /// Transform step for the third component of a vector
-            static const Step STEP_VECTOR_THREE = NOTHING;
+            static const Step STEP_VECTOR_THREE = DO_SCALAR;
 
 
             /// First spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::ONE;
 
             /// Second spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::TWO;
 
             /// Third spectral field component used for vector transform
-            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::THREE;
+
+
+            /// Number of variable to transfer to next stage for scalar
+            static const int SCALAR_VARIABLES = 1;
+
+            /// Number of variable to transfer to next stage for vector
+            static const int VECTOR_VARIABLES = 3;
          };
 
          /**
@@ -79,7 +83,7 @@ namespace GeoMHDiSCC {
          struct BackwardBase
          {
             /// Enum of the possible steps
-            enum Step {NOTHING, DO_SCALAR, FINISH_SCALAR, START_GRAD, DO_GRAD};
+            enum Step {NOTHING, DO_SCALAR, FINISH_SCALAR, CONTINUE_DIVR, FINISH_DIVR, START_GRAD, DO_GRAD};
 
             /// Transform step for a scalar
             static const Step STEP_SCALAR = DO_SCALAR;
@@ -96,13 +100,23 @@ namespace GeoMHDiSCC {
 
 
             /// Transform step for the first component of a vector
-            static const Step STEP_VECTOR_ONE = NOTHING;
+            static const Step STEP_VECTOR_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a vector
-            static const Step STEP_VECTOR_TWO = NOTHING;
+            static const Step STEP_VECTOR_TWO = DO_SCALAR;
 
             /// Transform step for the third component of a vector
-            static const Step STEP_VECTOR_THREE = NOTHING;
+            static const Step STEP_VECTOR_THREE = DO_SCALAR;
+
+
+            /// Transform step for the first component of a vector "gradient"
+            static const Step STEP_VGRAD_ONE = NOTHING;
+
+            /// Transform step for the second component of a vector "gradient"
+            static const Step STEP_VGRAD_TWO = NOTHING;
+
+            /// Transform step for the third component of a vector "gradient"
+            static const Step STEP_VGRAD_THREE = NOTHING;
 
 
             /// Transform step for the first component of a curl
@@ -116,13 +130,23 @@ namespace GeoMHDiSCC {
 
 
             /// First spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::ONE;
 
             /// Second spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::TWO;
 
             /// Third spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::NOTUSED;
+            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::THREE;
+
+
+            /// First spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_ONE = FieldComponents::Spectral::NOTUSED;
+
+            /// Second spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_TWO = FieldComponents::Spectral::NOTUSED;
+
+            /// Third spectral field component used for vector gradient
+            static const FieldComponents::Spectral::Id SPEVGRAD_THREE = FieldComponents::Spectral::NOTUSED;
 
 
             /// First spectral field component used for curl
@@ -133,6 +157,15 @@ namespace GeoMHDiSCC {
 
             /// Third spectral field component used for curl
             static const FieldComponents::Spectral::Id SPECURL_THREE = FieldComponents::Spectral::NOTUSED;
+
+            /// Number of variable to transfer to next stage for scalar
+            static const int SCALAR_VARIABLES = 1;
+
+            /// Number of variable to transfer to next stage for vector
+            static const int VECTOR_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for curl
+            static const int CURL_VARIABLES = 3;
          };
 
          /**
@@ -191,6 +224,16 @@ namespace GeoMHDiSCC {
             static const FieldComponents::Physical::Id VECTOR_THREE = FieldComponents::Physical::NOTUSED;
 
 
+            /// First physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_ONE = FieldComponents::Physical::NOTUSED;
+
+            /// Second physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_TWO = FieldComponents::Physical::NOTUSED;
+
+            /// Third physical field component used for vector "gradient"
+            static const FieldComponents::Physical::Id VGRAD_THREE = FieldComponents::Physical::NOTUSED;
+
+
             /// First physical field component used for curl
             static const FieldComponents::Physical::Id CURL_ONE = FieldComponents::Physical::NOTUSED;
 
@@ -214,6 +257,16 @@ namespace GeoMHDiSCC {
 
             /// Third physical field component used for gradient
             static const FieldComponents::Physical::Id GRAD_THREE = FieldComponents::Physical::THREE;
+
+
+            /// First physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_ONE = FieldComponents::Physical::ONE;
+
+            /// Second physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_TWO = FieldComponents::Physical::TWO;
+
+            /// Third physical field component used for vector
+            static const FieldComponents::Physical::Id VECTOR_THREE = FieldComponents::Physical::THREE;
          };
 
          /**
@@ -225,7 +278,17 @@ namespace GeoMHDiSCC {
             static const Step STEP_GRAD_ONE = START_GRAD;
 
             /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = FINISH_SCALAR;
+            static const Step STEP_GRAD_TWO = CONTINUE_DIVR;
+
+            /// Transform step for the third component of a gradient
+            static const Step STEP_GRAD_THREE = FINISH_SCALAR;
+
+
+            /// Number of variable to transfer to next stage for gradient
+            static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
 
          /**
@@ -237,10 +300,17 @@ namespace GeoMHDiSCC {
             static const Step STEP_GRAD_ONE = DO_SCALAR;
 
             /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = START_GRAD;
+            static const Step STEP_GRAD_TWO = DO_GRAD;
 
             /// Transform step for the third component of a gradient
-            static const Step STEP_GRAD_THREE = FINISH_SCALAR;
+            static const Step STEP_GRAD_THREE = DO_SCALAR;
+
+
+            /// Number of variable to transfer to next stage for gradient
+            static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
 
          /**
@@ -256,9 +326,16 @@ namespace GeoMHDiSCC {
 
             /// Transform step for the third component of a gradient
             static const Step STEP_GRAD_THREE = DO_GRAD;
+
+
+            /// Number of variable to transfer to next stage for gradient
+            static const int GRAD_VARIABLES = 3;
+
+            /// Number of variable to transfer to next stage for vector gradient
+            static const int VGRAD_VARIABLES = 9;
          };
       }
    }
 }
 
-#endif // TRANSFORMSTEPS_HPP
+#endif // CYLINDRICALTRANSFORMSTEPS_HPP
