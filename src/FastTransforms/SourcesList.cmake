@@ -11,10 +11,12 @@ if(GEOMHDISCC_FFT STREQUAL "FFTW")
       )
    if(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
       list(APPEND MHDSources 
+         ChebyshevFftwTransform.cpp
          AnnulusChebyshevFftwTransform.cpp
          )
    elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CFT")
       list(APPEND MHDSources 
+         ChebyshevFftwTransform.cpp
          CylinderChebyshevFftwTransform.cpp
          )
    elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLF")

@@ -48,81 +48,115 @@ namespace TransformSteps {
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardScalar()
+   std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::SCALAR, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::SCALAR);
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::SCALAR));
 
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardGradient()
+   std::vector<ProjectorBranch>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::SCALAR, TransformBranch::Proj1DType::DIFF, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::SCALAR, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::SCALAR, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT);
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT));
+      }
+
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT));
+      }
+
+      if(req.find(FieldComponents::Physical::THREE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::SCALAR, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT));
+      }
 
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardVector()
+   std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::VECTOR);
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::VECTOR);
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::VECTOR);
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::ONE, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::VECTOR));
+      }
+
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TWO, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::VECTOR));
+      }
+
+      if(req.find(FieldComponents::Physical::THREE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THREE, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::VECTOR));
+      }
 
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardVGradient()
+   std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::DIFF, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT);
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT));
+      }
 
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::DIFF, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT);
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT));
+      }
 
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::DIFF, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT);
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT);
+      if(req.find(FieldComponents::Physical::THREE)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT));
+      }
 
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardCurl()
+   std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::TWO, FieldType::CURL);
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::CURL);
+      if(req.find(FieldComponents::Physical::ONE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TWO, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::ONE, FieldType::CURL));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THREE, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::CURL));
+      }
 
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::ONE, FieldType::CURL);
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::DIVRDIFFR, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::CURL);
+      if(req.find(FieldComponents::Physical::TWO)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::ONE, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::TWO, FieldType::CURL));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::THREE, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::CURL));
+      }
 
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::CURL);
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::DIFF, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::CURL);
+      if(req.find(FieldComponents::Physical::THREE)->second)
+      {
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::ONE, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::CURL));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::TWO, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::CURL));
+      }
 
       return transform;
    }
 
-   std::vector<TransformBranch>  backwardDivergence()
+   std::vector<ProjectorBranch>  backwardDivergence()
    {
-      std::vector<TransformBranch> transform;
+      std::vector<ProjectorBranch> transform;
 
-      transform.push_back(FieldComponents::Spectral::ONE, TransformBranch::Proj1DType::DIVRDIFFR, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE);
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::ONE, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
-      transform.push_back(FieldComponents::Spectral::TWO, TransformBranch::Proj1DType::DIVR, TransformBranch::Proj2DType::DIFF, TransformBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE);
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::TWO, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
-      transform.push_back(FieldComponents::Spectral::THREE, TransformBranch::Proj1DType::PROJ, TransformBranch::Proj2DType::PROJ, TransformBranch::Proj3DType::DIFF, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE);
+      transform.push_back(ProjectorBranch(FieldComponents::Spectral::THREE, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::SCALAR, FieldType::DIVERGENCE));
 
       return transform;
    }

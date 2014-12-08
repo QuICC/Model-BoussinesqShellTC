@@ -51,10 +51,11 @@ namespace Transform {
       {
          /** Enum of projector IDs:
           *    - PROJ: projection
-          *    - DIFF: derivative
-          *    - DIVR: division by R
+          *    - DIFF: D
+          *    - DIVR: 1/r
+          *    - DIVRDIFFR: 1/r D r
           */
-         enum Id {PROJ,  DIFF, DIVR};
+         enum Id {PROJ,  DIFF, DIVR, DIVRDIFFR};
       };
 
       /**
@@ -156,8 +157,6 @@ namespace Transform {
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projectors should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
@@ -170,8 +169,6 @@ namespace Transform {
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
-          *
-          * \mhdTodo Projectors should be converted to Python
           *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
@@ -350,6 +347,11 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      // Compute 1/r D r
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         throw Exception("DIVRDIFFR operator is not yet implemented");
+
       // Compute simple projection
       } else
       {
@@ -438,6 +440,11 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      // Compute 1/r D r
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         throw Exception("DIVRDIFFR operator is not yet implemented");
+
       // Compute simple projection of real part
       } else
       {
@@ -474,6 +481,11 @@ namespace Transform {
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRO, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      // Compute 1/r D r
+      } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         throw Exception("DIVRDIFFR operator is not yet implemented");
 
       // Compute simple projection of imaginary part
       } else
