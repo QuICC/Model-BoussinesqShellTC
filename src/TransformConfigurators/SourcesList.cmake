@@ -5,6 +5,9 @@ set(MHDSources
    ProjectorBranch.cpp
    ProjectorTree.cpp
    ProjectorTreeTools.cpp
+   IntegratorBranch.cpp
+   IntegratorTree.cpp
+   IntegratorTreeTools.cpp
 )
 
 if(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")

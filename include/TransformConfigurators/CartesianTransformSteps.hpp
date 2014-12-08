@@ -20,6 +20,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "TransformConfigurators/ProjectorBranch.hpp"
+#include "TransformConfigurators/IntegratorBranch.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -27,15 +28,19 @@ namespace GeoMHDiSCC {
 
       /**
        * @brief Struct to contain the full field transform steps
-       *
-       * The steps should respect the following naming structure:
-       *    DO_???         : Step receives data, does computation, frees input and transfers output
-       *    START_???      : Step receives data, does computation, holds input data and transfers output
-       *    CONTINUE_???   : Step recovers data, does computations, holds input and transfers output
-       *    FINISH_???     : Step recovers data, does computations, frees input and transfers output
        */
       namespace TransformSteps
       {
+         /**
+          * @brief Generate the list of branches in scalar integration transform
+          */
+         std::vector<IntegratorBranch>  forwardScalar();
+
+         /**
+          * @brief Generate the list of branches in vector integration transform
+          */
+         std::vector<IntegratorBranch>  forwardVector();
+
          /**
           * @brief Generate the list of branches in scalar projection transform
           */

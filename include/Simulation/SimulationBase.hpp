@@ -327,11 +327,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transform coordinator
           *
-          * @param varInfo          Global variable requirements
+          * @param integratorTree   Transform integrator tree
           * @param projectorTree    Transform projector tree
-          * @param nonInfo Global   nonlinear requirements
           */
-         void initTransformCoordinator(const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo);
+         void initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
 
          /**
           * @brief Initialise the equations (generate operators, etc)

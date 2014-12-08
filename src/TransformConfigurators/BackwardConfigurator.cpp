@@ -59,7 +59,7 @@ namespace Transform {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);
 
-      // Puy scalar into temporary hold storage
+      // Put scalar into temporary hold storage
       if(edge.fieldId() == FieldType::SCALAR)
       {
          coord.communicator().holdPhysical(rScalar.rDom(0).rPhys());
@@ -111,7 +111,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.projector());
+      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.opId());
 
       // Hold spectral input
       if(hold)
@@ -152,7 +152,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
 
       // Compute projection transform for second dimension 
-      coord.transform2D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.projector());
+      coord.transform2D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
 
       // Hold temporary storage
       if(hold)
@@ -194,7 +194,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().recoverFwd();
 
       // Compute projection transform for third dimension 
-      coord.transform3D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.projector());
+      coord.transform3D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
 
       // Hold temporary storage
       if(hold)

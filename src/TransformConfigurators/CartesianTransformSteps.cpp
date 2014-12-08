@@ -26,6 +26,28 @@ namespace Transform {
 
 namespace TransformSteps {
 
+   std::vector<IntegratorBranch>  forwardScalar()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::SPECTRAL::SCALAR, FieldType::SCALAR));
+
+      return transform;
+   }
+
+   std::vector<IntegratorBranch>  forwardVector()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Proj1DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj3DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
+
+      return transform;
+   }
+
    std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
       std::vector<ProjectorBranch> transform;

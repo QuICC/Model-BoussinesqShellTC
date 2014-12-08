@@ -36,6 +36,7 @@ namespace Transform {
       public:
          /// Typedef for field and component ID
          typedef std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> FieldIdType;
+
          /**
           * @brief Setup the full backward transform structure
           *
@@ -48,14 +49,14 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree) = 0;
 
@@ -78,28 +79,28 @@ namespace Transform {
          /**
           * @brief Get and set the name pack numbers for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          ArrayI namePacks1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get and set the named pack numbers for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          ArrayI namePacks2D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          ArrayI groupPacks1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
          ArrayI groupPacks2D(const std::vector<ProjectorTree>& projectorTree);
 

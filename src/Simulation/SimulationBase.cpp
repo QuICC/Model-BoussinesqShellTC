@@ -85,23 +85,20 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("init",0);
 
-      // Storage for the variable info
-      VariableRequirement varInfo;
-
       // Transform projector tree
       std::vector<Transform::ProjectorTree> projectorTree;
 
       // Initialise the variables and set general variable requirements
-      RequirementTools::initVariables(varInfo, projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
+      RequirementTools::initVariables(projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
-      // Storage for the nonlinear requirement info
-      std::set<PhysicalNames::Id>   nonInfo;
+      // Transform integrator tree
+      std::vector<Transform::IntegratorTree> integratorTree;
 
       // Map variables to the equations and set nonlinear requirements
-      RequirementTools::mapEquationVariables(nonInfo, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
+      RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
 
       // Initialise the transform coordinator
-      this->initTransformCoordinator(varInfo, projectorTree, nonInfo);
+      this->initTransformCoordinator(integratorTree, projectorTree);
 
       // Initialise the equations (generate operators, etc)
       this->setupEquations(spBcs);
@@ -325,7 +322,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
       
-   void SimulationBase::initTransformCoordinator(const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo)
+   void SimulationBase::initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
    {
       // Extract the run options for the equation parameters
       std::map<NonDimensional::Id,MHDFloat> runOptions;
@@ -337,7 +334,7 @@ namespace GeoMHDiSCC {
       }
 
       // Initialise the transform coordinator
-      Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, projectorTree, nonInfo, this->mspRes, runOptions);
+      Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, integratorTree, projectorTree, this->mspRes, runOptions);
    }
 
    void SimulationBase::setupEquations(const SharedSimulationBoundary spBcs)

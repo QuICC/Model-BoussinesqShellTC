@@ -49,9 +49,9 @@ namespace Transform {
          ~TransformEdge();
 
          /**
-          * @brief Get projector operator ID
+          * @brief Get operator ID
           */
-         TOpA projector() const;
+         TOpA opId() const;
 
          /**
           * @brief Get the number of edges
@@ -102,14 +102,19 @@ namespace Transform {
          ~TransformEdge();
 
          /**
-          * @brief Get projector operator ID
+          * @brief Get operator ID
           */
-         TOpA projector() const;
+         TOpA opId() const;
 
          /**
           * @brief Get Physical component
           */
           FieldComponents::Physical::Id physId() const;
+
+         /**
+          * @brief Get spectral component
+          */
+          FieldComponents::Spectral::Id specId() const;
 
           /**
            * @brief Get the field type
@@ -120,6 +125,11 @@ namespace Transform {
           * @brief Set Physical component
           */
          void setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type);
+
+         /**
+          * @brief Set Spectral component
+          */
+         void setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type);
 
       private:
          /**
@@ -141,6 +151,11 @@ namespace Transform {
           * @brief Physical output component
           */
          FieldComponents::Physical::Id mPhysId;
+
+         /**
+          * @brief Spectral output component
+          */
+         FieldComponents::Spectral::Id mSpecId;
    };
 
 
@@ -162,7 +177,7 @@ namespace Transform {
    {
    }
 
-   template <typename TOpA, typename TOpB, typename TOpC> TOpA TransformEdge<TOpA,TOpB,TOpC>::projector() const
+   template <typename TOpA, typename TOpB, typename TOpC> TOpA TransformEdge<TOpA,TOpB,TOpC>::opId() const
    {
       return this->mOpId;
    }
@@ -184,7 +199,7 @@ namespace Transform {
       return this->mEdges.back();
    }
 
-   template <typename TOpA> TOpA TransformEdge<TOpA,void,void>::projector() const
+   template <typename TOpA> TOpA TransformEdge<TOpA,void,void>::opId() const
    {
       return this->mOpId;
    }
@@ -194,9 +209,21 @@ namespace Transform {
       return this->mPhysId;
    }
 
+   template <typename TOpA> FieldComponents::Spectral::Id TransformEdge<TOpA,void,void>::specId() const
+   {
+      return this->mSpecId;
+   }
+
    template <typename TOpA> FieldType::Id TransformEdge<TOpA,void,void>::fieldId() const
    {
       return this->mFieldId;
+   }
+
+   template <typename TOpA> void TransformEdge<TOpA,void,void>::setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type)
+   {
+      this->mSpecId = id;
+
+      this->mFieldId = type;
    }
 
    template <typename TOpA> void TransformEdge<TOpA,void,void>::setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type)

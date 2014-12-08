@@ -32,8 +32,10 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void RequirementTools::initVariables(VariableRequirement& varInfo, std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
+   void RequirementTools::initVariables(std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
    {
+      VariableRequirement varInfo;
+
       // Iterator over info
       VariableRequirement::const_iterator infoIt;
 
@@ -161,8 +163,11 @@ namespace GeoMHDiSCC {
       Transform::ProjectorTreeTools::generateTrees(projectorTree, branches);
    }
 
-   void RequirementTools::mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)
+   void RequirementTools::mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)
    {
+      std::vector<Transform::IntegratorBranch> tmpBranches;
+      std::map<PhysicalNames::Id, std::vector<Transform::IntegratorBranch> > branches;
+
       // Loop over all scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::const_iterator scalIt;
       for(scalIt = scalarVars.begin(); scalIt != scalarVars.end(); scalIt++)
@@ -182,7 +187,12 @@ namespace GeoMHDiSCC {
                // Check for nonlinear requirements
                if((*scalEqIt)->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
                {
-                  nonInfo.insert((*scalEqIt)->name());
+                  // Initialise transform branch
+                  branches.insert(std::make_pair(scalIt->first, std::vector<Transform::IntegratorBranch>()));
+
+                  // Create scalar forward transform
+                  tmpBranches = Transform::TransformSteps::forwardScalar();
+                  branches.find(scalIt->first)->second.insert(branches.find(scalIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                }
             }
 
@@ -235,7 +245,12 @@ namespace GeoMHDiSCC {
                // Check for nonlinear requirements
                if((*vectEqIt)->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
                {
-                  nonInfo.insert((*vectEqIt)->name());
+                  // Initialise transform branch
+                  branches.insert(std::make_pair(vectIt->first, std::vector<Transform::IntegratorBranch>()));
+
+                  // Create scalar forward transform
+                  tmpBranches = Transform::TransformSteps::forwardScalar();
+                  branches.find(vectIt->first)->second.insert(branches.find(vectIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                }
             }
 
@@ -246,5 +261,8 @@ namespace GeoMHDiSCC {
             }
          }
       }
+
+      // Create the integrator tree(s)
+      Transform::IntegratorTreeTools::generateTrees(integratorTree, branches);
    }
 }
