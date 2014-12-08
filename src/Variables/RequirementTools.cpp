@@ -21,6 +21,9 @@
 #include "TransformConfigurators/ProjectorBranch.hpp"
 #include "TransformConfigurators/ProjectorTree.hpp"
 #include "TransformConfigurators/ProjectorTreeTools.hpp"
+#include "TransformConfigurators/IntegratorBranch.hpp"
+#include "TransformConfigurators/IntegratorTree.hpp"
+#include "TransformConfigurators/IntegratorTreeTools.hpp"
 
 namespace GeoMHDiSCC {
 

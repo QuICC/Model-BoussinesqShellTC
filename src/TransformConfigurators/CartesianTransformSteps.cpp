@@ -30,7 +30,7 @@ namespace TransformSteps {
    {
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::SPECTRAL::SCALAR, FieldType::SCALAR));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
 
       return transform;
    }
@@ -39,11 +39,11 @@ namespace TransformSteps {
    {
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Proj1DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj3DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Proj3DType::INTG, IntegratorBranch::Proj2DType::INTG, IntegratorBranch::Proj1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
 
       return transform;
    }

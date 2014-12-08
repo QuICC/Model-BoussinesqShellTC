@@ -73,15 +73,7 @@ namespace Transform {
           * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
           */
-         static void updateEquation(const IntegratorTree::Integrator1DEdge& edge, Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Update equation variable from dealiased data for a vector field
-          *
-          * @param spEquation Equation providing the variable
-          * @param coord      Transform coordinator
-          */
-         static void updateEquation(const IntegratorTree::Integrator1DEdge& edge, Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Empty constructor
@@ -95,6 +87,32 @@ namespace Transform {
 
       private: 
    };
+
+   template <typename TSharedEquation> void ForwardConfigurator::updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
+   {
+      // Start profiler
+      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
+
+      // Recover temporary storage
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Compute linear term component
+      spEquation->updateDealiasedUnknown(rInVar, edge.specId());
+
+      // Hold temporary storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(rInVar);
+
+      // Free the temporary storage
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+      }
+
+      // Stop profiler
+      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
+   }
 
 }
 }

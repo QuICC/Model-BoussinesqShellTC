@@ -80,6 +80,7 @@ namespace Transform {
          void setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
 
       private: 
+         template <typename TSharedEquation> typename std::vector<TSharedEquation>::iterator findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name);
    };
 
    template <typename TConfigurator> ForwardEquationGrouper<TConfigurator>::ForwardEquationGrouper()
@@ -89,6 +90,20 @@ namespace Transform {
 
    template <typename TConfigurator> ForwardEquationGrouper<TConfigurator>::~ForwardEquationGrouper()
    {
+   }
+
+   template <typename TConfigurator> template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator ForwardEquationGrouper<TConfigurator>::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
+   {
+      typename std::vector<TSharedEquation>::iterator eqIt;
+      for(eqIt = eqs.begin(); eqIt != eqs.end(); ++eqIt)
+      {
+         if((*eqIt)->name() == name)
+         {
+            break;
+         }
+      }
+
+      return eqIt;
    }
 
    template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
@@ -105,73 +120,63 @@ namespace Transform {
          // Transform scalar equation variable
          if(it->comp() == FieldComponents::Physical::SCALAR)
          {
-//            scalEqIt = scalEqs.find(it->name());
+            scalEqIt = findEquation(scalEqs,it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
+            // Presolve might not provide all equations
+            if(scalEqIt != scalEqs.end())
+            {
+               // Sychronize 
+               FrameworkMacro::synchronize();
 
-            // Setup the first exchange communication step for scalar fields
-            this->setupGrouped1DCommunication(*it, coord);
-            // Setup the second exchange communication step for scalar fields
-            this->setupGrouped2DCommunication(*it, coord);
+               // Setup the first exchange communication step for scalar fields
+               this->setupGrouped2DCommunication(*it, coord);
+               // Setup the second exchange communication step for scalar fields
+               this->setupGrouped1DCommunication(*it, coord);
 
-            // Compute first step of transform for scalar fields
-            TConfigurator::firstStep(*it, *scalEqIt, coord);
-            // Initiate the first exchange communication step for scalar fields
-            TConfigurator::initiate1DCommunication(coord);
+               // Compute first step of transform for scalar fields
+               TConfigurator::firstStep(*it, *scalEqIt, coord);
+               // Initiate the first exchange communication step for scalar fields
+               TConfigurator::initiate2DCommunication(coord);
 
-            // Compute second step of transform for scalar fields
-            TConfigurator::secondStep(*it, *scalEqIt, coord);
-            // Initiate the second exchange communication step for scalar fields
-            TConfigurator::initiate2DCommunication(coord);
+               // Compute second step of transform for scalar fields
+               TConfigurator::secondStep(*it, *scalEqIt, coord);
+               // Initiate the second exchange communication step for scalar fields
+               TConfigurator::initiate1DCommunication(coord);
 
-            // Compute last step of transform for scalar fields
-            TConfigurator::lastStep(*it, *scalEqIt, coord);
+               // Compute last step of transform for scalar fields
+               TConfigurator::lastStep(*it, *scalEqIt, coord);
+            }
 
          // Transform vector equation
          } else
          {
-//            vectEqIt = vectEqs.find(it->name());
+            vectEqIt = findEquation(vectEqs,it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
+            // Presolve might not provide all equations
+            if(vectEqIt != vectEqs.end())
+            {
+               // Sychronize 
+               FrameworkMacro::synchronize();
 
-            // Setup the first exchange communication step for vector fields
-            this->setupGrouped1DCommunication(*it, coord);
-            // Setup the second exchange communication step for vector fields
-            this->setupGrouped2DCommunication(*it, coord);
+               // Setup the first exchange communication step for vector fields
+               this->setupGrouped2DCommunication(*it, coord);
+               // Setup the second exchange communication step for vector fields
+               this->setupGrouped1DCommunication(*it, coord);
 
-            // Compute first step of transform for vector fields
-            TConfigurator::firstStep(*it, *vectEqIt, coord);
-            // Initiate the first exchange communication step for vector fields
-            TConfigurator::initiate1DCommunication(coord);
+               // Compute first step of transform for vector fields
+               TConfigurator::firstStep(*it, *vectEqIt, coord);
+               // Initiate the first exchange communication step for vector fields
+               TConfigurator::initiate2DCommunication(coord);
 
-            // Compute second step of transform for vector fields
-            TConfigurator::secondStep(*it, *vectEqIt, coord);
-            // Initiate the second exchange communication step for vector fields
-            TConfigurator::initiate2DCommunication(coord);
+               // Compute second step of transform for vector fields
+               TConfigurator::secondStep(*it, *vectEqIt, coord);
+               // Initiate the second exchange communication step for vector fields
+               TConfigurator::initiate1DCommunication(coord);
 
-            // Compute last step of transform for vector fields
-            TConfigurator::lastStep(*it, *vectEqIt, coord);
+               // Compute last step of transform for vector fields
+               TConfigurator::lastStep(*it, *vectEqIt, coord);
+            }
          }
-      }
-
-      //
-      // Update equation variable after transforms
-      //
-
-      // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt != scalEqs.end(); scalEqIt++)
-      {
-         // Update equation variable after transforms for scalar equation
-         TConfigurator::updateEquation(*scalEqIt, coord);
-      }
-
-      // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt != vectEqs.end(); vectEqIt++)
-      {
-         // Update equation variable after transforms for vector equation
-         TConfigurator::updateEquation(*vectEqIt, coord);
       }
    }
 

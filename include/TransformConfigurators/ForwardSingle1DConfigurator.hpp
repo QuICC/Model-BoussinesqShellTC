@@ -40,52 +40,28 @@ namespace Transform {
          static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::FIRST;
 
          /**
-          * @brief First step in transform, including the nonlinear interaction for a scalar field
+          * @brief First step in transform, including the nonlinear interaction
           *
-          * @param spEquation Scalar equation
+          * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         static void firstStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
-          * @brief First step in transform, including the nonlinear interaction for a vector field
+          * @brief Second step in transform
           *
-          * @param spEquation Vector equation
+          * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         static void firstStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
-          * @brief Second step in transform for a scalar field
+          * @brief Last step in transform
           *
-          * @param spEquation Scalar equation
+          * @param spEquation Shared equation
           * @param coord      Transform coordinator
           */
-         static void secondStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Second step in transform for a vector field
-          *
-          * @param spEquation Vector equation
-          * @param coord      Transform coordinator
-          */
-         static void secondStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Last step in transform for a scalar field
-          *
-          * @param spEquation Scalar equation
-          * @param coord      Transform coordinator
-          */
-         static void lastStep(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Last step in transform for a vector field
-          *
-          * @param spEquation Vector equation
-          * @param coord      Transform coordinator
-          */
-         static void lastStep(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief First exchange communication setup
@@ -149,6 +125,87 @@ namespace Transform {
 
    inline void ForwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
+   }
+
+   template <typename TSharedEquation> void ForwardSingle1DConfigurator::firstStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // Iterators for the three transforms
+      IntegratorTree::Integrator2DEdge_iterator it2D;
+      IntegratorTree::Integrator3DEdge_iterator it3D;
+
+      // Ranges for the vector of edges for the three transforms
+      IntegratorTree::Integrator2DEdge_range range2D;
+      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+
+      // Compute the nonlinear interaction
+      ForwardConfigurator::nonlinearTerm(tree, spEquation, coord);
+
+      // Start profiler
+      ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
+
+      // Loop over first transform
+      int hold3D = std::distance(range3D.first, range3D.second) - 1;
+      for(it3D = range3D.first; it3D != range3D.second; ++it3D, --hold3D)
+      {
+         // Compute third transform
+         ForwardConfigurator::integrate3D(*it3D, coord, hold3D);
+
+         range2D = it3D->edgeRange();
+         int recover2D = 0;
+         int hold2D = std::distance(range2D.first, range2D.second) - 1;
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         {
+            // Compute second transform
+            ForwardConfigurator::integrate2D(*it2D, coord, recover2D, hold2D);
+         }
+      }
+
+      // Stop profiler
+      ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
+   }
+
+   template <typename TSharedEquation> void ForwardSingle1DConfigurator::secondStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // No need for a second step
+   }
+   
+   template <typename TSharedEquation> void ForwardSingle1DConfigurator::lastStep(const IntegratorTree& tree, TSharedEquation spEquation, TransformCoordinatorType& coord)
+   {
+      // Iterators for the three transforms
+      IntegratorTree::Integrator1DEdge_iterator it1D;
+      IntegratorTree::Integrator2DEdge_iterator it2D;
+      IntegratorTree::Integrator3DEdge_iterator it3D;
+
+      // Ranges for the vector of edges for the three transforms
+      IntegratorTree::Integrator1DEdge_range range1D;
+      IntegratorTree::Integrator2DEdge_range range2D;
+      IntegratorTree::Integrator3DEdge_range range3D = tree.edgeRange();
+
+      // Start profiler
+      ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
+
+      // Loop over first transform
+      for(it3D = range3D.first; it3D != range3D.second; ++it3D)
+      {
+         range2D = it3D->edgeRange();
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D)
+         {
+            range1D = it2D->edgeRange();
+            int recover1D = 0;
+            int hold1D = std::distance(range1D.first, range1D.second) - 1;
+            for(it1D = range1D.first; it1D != range1D.second; ++it1D, ++recover1D, --hold1D)
+            {
+               // Compute third transform
+               ForwardConfigurator::integrate1D(*it1D, coord, recover1D, hold1D);
+
+               // Update equation
+               ForwardConfigurator::updateEquation(*it1D, spEquation, coord, hold1D);
+            }
+         }
+      }
+
+      // Stop profiler
+      ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
 
 }

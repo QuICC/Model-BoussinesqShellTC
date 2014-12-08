@@ -17,7 +17,7 @@
 //
 #include "TransformConfigurators/IntegratorTree.hpp"
 
-// Project includes
+// Intgect includes
 //
 
 namespace GeoMHDiSCC {
@@ -51,7 +51,7 @@ namespace Transform {
    int IntegratorTree::nEdges2D() const
    {
       int n = 0;
-      Projector3DEdge_iterator it;
+      Integrator3DEdge_iterator it;
       for(it = this->mTree.begin(); it != this->mTree.end(); ++it)
       {
          n += it->nEdges();
@@ -60,14 +60,14 @@ namespace Transform {
       return n;
    }
 
-   IntegratorTree::Projector3DEdge_range IntegratorTree::edgeRange() const
+   IntegratorTree::Integrator3DEdge_range IntegratorTree::edgeRange() const
    {
       return std::make_pair(this->mTree.begin(), this->mTree.end());
    }
 
-   IntegratorTree::Projector3DEdge& IntegratorTree::addEdge(const IntegratorTree::Proj3DId op, const int n)
+   IntegratorTree::Integrator3DEdge& IntegratorTree::addEdge(const IntegratorTree::Intg3DId op, const int n)
    {
-      this->mTree.push_back(Projector3DEdge(op, n));
+      this->mTree.push_back(Integrator3DEdge(op, n));
 
       return this->mTree.back();
    }

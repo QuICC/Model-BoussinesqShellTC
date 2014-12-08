@@ -27,7 +27,7 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    IForwardGrouper::IForwardGrouper()
-      : split(Splitting::Locations::NONE),
+      : split(Splitting::Locations::NONE)
    {
    }
 
@@ -39,7 +39,6 @@ namespace Transform {
    {
       // Create list of packet sizes
       std::set<int>  list;
-      int count = 0;
 
       std::vector<IntegratorTree>::const_iterator treeIt;
       for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
@@ -102,7 +101,7 @@ namespace Transform {
       packs.resize(1);
       packs.setConstant(0);
 
-      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks1D.begin(); it != this->mNamedPacks1D.end(); ++it)
+      for(std::map<FieldIdType, int>::const_iterator it = this->mNamedPacks1D.begin(); it != this->mNamedPacks1D.end(); ++it)
       {
          packs(0) = packs(0) + it->second;
       }
@@ -119,7 +118,7 @@ namespace Transform {
       packs.resize(1);
       packs.setConstant(0);
 
-      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks2D.begin(); it != this->mNamedPacks2D.end(); ++it)
+      for(std::map<FieldIdType, int>::const_iterator it = this->mNamedPacks2D.begin(); it != this->mNamedPacks2D.end(); ++it)
       {
          packs(0) = packs(0) + it->second;
       }

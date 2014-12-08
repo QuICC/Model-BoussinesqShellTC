@@ -43,42 +43,6 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator::updateEquation(const IntegratorTree::Integrator1DEdge& edge, Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-
-      // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Compute linear term component
-      spEquation->updateDealiasedUnknown(rComp, edge.specId());
-
-      // Free the temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rComp);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-   }
-
-   void ForwardConfigurator::updateEquation(const IntegratorTree::Integrator1DEdge& edge, Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Start profiler
-      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-
-      // Recover temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-      // Compute linear term component
-      spEquation->updateDealiasedUnknown(rScalar, FieldComponents::Spectral::SCALAR);
-
-      // Free the temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
-
-      // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-   }
-
    void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Start detailed profiler
