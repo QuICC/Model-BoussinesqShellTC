@@ -21,6 +21,7 @@
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,13 +35,14 @@ namespace GeoMHDiSCC {
           * @brief Initialise variables and variable requirements from equations
           *
           * @param varInfo       Variable requirements
+          * @param projectorTree Transform tree for backward projection
           * @param rScalarVars   Scalar variables
           * @param rVectorVars   Vector variables
           * @param scalarEqs     Scalar equations
           * @param vectorEqs     Vector equations
           * @param spRes      Shared resolution
           */
-         static void initVariables(VariableRequirement& varInfo, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes);
+         static void initVariables(VariableRequirement& varInfo, std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes);
 
          /**
           * @brief Map variables to the corresponding equation 

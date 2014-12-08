@@ -88,8 +88,11 @@ namespace GeoMHDiSCC {
       // Storage for the variable info
       VariableRequirement varInfo;
 
+      // Transform projector tree
+      std::vector<Transform::ProjectorTree> projectorTree;
+
       // Initialise the variables and set general variable requirements
-      RequirementTools::initVariables(varInfo, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
+      RequirementTools::initVariables(varInfo, projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
       // Storage for the nonlinear requirement info
       std::set<PhysicalNames::Id>   nonInfo;
@@ -98,7 +101,7 @@ namespace GeoMHDiSCC {
       RequirementTools::mapEquationVariables(nonInfo, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
 
       // Initialise the transform coordinator
-      this->initTransformCoordinator(varInfo, nonInfo);
+      this->initTransformCoordinator(varInfo, projectorTree, nonInfo);
 
       // Initialise the equations (generate operators, etc)
       this->setupEquations(spBcs);
@@ -322,7 +325,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
       
-   void SimulationBase::initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   void SimulationBase::initTransformCoordinator(const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo)
    {
       // Extract the run options for the equation parameters
       std::map<NonDimensional::Id,MHDFloat> runOptions;
@@ -334,7 +337,7 @@ namespace GeoMHDiSCC {
       }
 
       // Initialise the transform coordinator
-      Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, nonInfo, this->mspRes, runOptions);
+      Transform::TransformCoordinatorTools::init(this->mTransformCoordinator, this->mspFwdGrouper, this->mspBwdGrouper, varInfo, projectorTree, nonInfo, this->mspRes, runOptions);
    }
 
    void SimulationBase::setupEquations(const SharedSimulationBoundary spBcs)

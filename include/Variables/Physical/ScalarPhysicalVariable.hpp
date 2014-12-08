@@ -82,7 +82,7 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical gradient storage
           */
-         void initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
+         void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Check if variable has physical data setup
@@ -189,11 +189,11 @@ namespace Datatypes {
       this->mspPhys = SharedPtrMacro<TScalar>(new TScalar(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
+   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
       // Safety assert
       assert(! this->mspGrad);
-      assert(id == FieldComponents::Physical::NOTUSED);
+      assert(id == FieldComponents::Spectral::SCALAR);
 
       this->mspGrad = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
    }

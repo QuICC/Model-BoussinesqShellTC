@@ -152,7 +152,7 @@ function (geomhdiscc_add_path MHDList MHDPath)
 endfunction()
 
 #
-# Creat executable
+# Create executable
 #
 function (geomhdiscc_add_executable MHDModel MHDScheme MHDPostfix MHDExecSrc MHDModelSrcs MHDAllSrcs)
    # Create new name for executable

@@ -34,6 +34,7 @@
 #include "TypeSelectors/ParallelSelector.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 #include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
@@ -326,10 +327,11 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transform coordinator
           *
-          * @param varInfo Global variable requirements
-          * @param nonInfo Global nonlinear requirements
+          * @param varInfo          Global variable requirements
+          * @param projectorTree    Transform projector tree
+          * @param nonInfo Global   nonlinear requirements
           */
-         void initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         void initTransformCoordinator(const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo);
 
          /**
           * @brief Initialise the equations (generate operators, etc)

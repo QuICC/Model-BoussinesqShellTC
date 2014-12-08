@@ -65,9 +65,6 @@ if(platformTest)
    # Automatic setup
    include(cmake.d/setup/automatic.cmake)
 
-   # DEBUG STATEMENT TO COMPILE EVERYTHING
-   include(cmake.d/setup/AllSrc.cmake)
-
    # Executables setup
    include(cmake.d/setup/Executables.cmake)
 

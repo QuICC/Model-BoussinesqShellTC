@@ -56,27 +56,27 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo);
+         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo);
+         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
 
       protected:
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord);
 
       private: 
    };
@@ -95,78 +95,84 @@ namespace Transform {
       //
       // Compute backward transform
       //
-      
-      // First treat the scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
-      for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
-      {
-         // Sychronize 
-         FrameworkMacro::synchronize();
-
-         // Setup the first exchange communication step for scalar fields
-         this->setupGrouped1DCommunication(scalIt->first, coord);
-         // Setup the second exchange communication step for scalar fields
-         this->setupGrouped2DCommunication(scalIt->first, coord);
-
-         // Compute first step of transform for scalar fields
-         TConfigurator::firstStep(scalIt->first, *(scalIt->second), coord);
-         // Initiate the first exchange communication step for scalar fields
-         TConfigurator::initiate1DCommunication(coord);
-
-         // Compute second step of transform for scalar fields
-         TConfigurator::secondStep(scalIt->first, *(scalIt->second), coord);
-         // Initiate the second exchange communication step for scalar fields
-         TConfigurator::initiate2DCommunication(coord);
-
-         // Compute last step of transform for scalar fields
-         TConfigurator::lastStep(scalIt->first, *(scalIt->second), coord);
-      }
-      
-      // .. then the vector variables
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
-      for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
+      std::vector<Transform::ProjectorTree>::const_iterator it;
+      for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
-         // Sychronize 
-         FrameworkMacro::synchronize();
+         // Transform scalar variable
+         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         {
+            scalIt = scalars.find(it->name());
 
-         // Setup the first exchange communication step for vector fields
-         this->setupGrouped1DCommunication(vectIt->first, coord);
-         // Setup the second exchange communication step for vector fields
-         this->setupGrouped2DCommunication(vectIt->first, coord);
+            // Sychronize 
+            FrameworkMacro::synchronize();
 
-         // Compute first step of transform for vector fields
-         TConfigurator::firstStep(vectIt->first, *(vectIt->second), coord);
-         // Initiate the first exchange communication step for vector fields
-         TConfigurator::initiate1DCommunication(coord);
+            // Setup the first exchange communication step for scalar fields
+            this->setupGrouped1DCommunication(*it, coord);
+            // Setup the second exchange communication step for scalar fields
+            this->setupGrouped2DCommunication(*it, coord);
 
-         // Compute second step of transform for vector fields
-         TConfigurator::secondStep(vectIt->first, *(vectIt->second), coord);
-         // Initiate the second exchange communication step for vector fields
-         TConfigurator::initiate2DCommunication(coord);
+            // Compute first step of transform for scalar fields
+            TConfigurator::firstStep(*it, *(scalIt->second), coord);
+            // Initiate the first exchange communication step for scalar fields
+            TConfigurator::initiate1DCommunication(coord);
 
-         // Compute last step of transform for vector fields
-         TConfigurator::lastStep(vectIt->first, *(vectIt->second), coord);
+            // Compute second step of transform for scalar fields
+            TConfigurator::secondStep(*it, *(scalIt->second), coord);
+            // Initiate the second exchange communication step for scalar fields
+            TConfigurator::initiate2DCommunication(coord);
+
+            // Compute last step of transform for scalar fields
+            TConfigurator::lastStep(*it, *(scalIt->second), coord);
+
+         // Transform vector variable
+         } else
+         {
+            vectIt = vectors.find(it->name());
+
+            // Sychronize 
+            FrameworkMacro::synchronize();
+
+            // Setup the first exchange communication step for vector fields
+            this->setupGrouped1DCommunication(*it, coord);
+            // Setup the second exchange communication step for vector fields
+            this->setupGrouped2DCommunication(*it, coord);
+
+            // Compute first step of transform for vector fields
+            TConfigurator::firstStep(*it, *(vectIt->second), coord);
+            // Initiate the first exchange communication step for vector fields
+            TConfigurator::initiate1DCommunication(coord);
+
+            // Compute second step of transform for vector fields
+            TConfigurator::secondStep(*it, *(vectIt->second), coord);
+            // Initiate the second exchange communication step for vector fields
+            TConfigurator::initiate2DCommunication(coord);
+
+            // Compute last step of transform for vector fields
+            TConfigurator::lastStep(*it, *(vectIt->second), coord);
+         }
       }
    }
 
-   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(id), coord);
+      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp())), coord);
    }
 
-   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const PhysicalNames::Id id, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const ProjectorTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(id), coord);
+      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp())), coord);
    }
 
-   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<ProjectorTree>& projectorTree)
    {
-      return this->namePacks1D(varInfo);
+      return this->namePacks1D(projectorTree);
    }
 
-   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
    {
-      return this->namePacks2D(varInfo);
+      return this->namePacks2D(projectorTree);
    }
 
 }

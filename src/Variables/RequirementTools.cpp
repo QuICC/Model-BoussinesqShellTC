@@ -17,6 +17,10 @@
 
 // Project includes
 //
+#include "TransformConfigurators/TransformStepsMacro.h"
+#include "TransformConfigurators/ProjectorBranch.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
+#include "TransformConfigurators/ProjectorTreeTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -28,7 +32,7 @@ namespace GeoMHDiSCC {
    {
    }
 
-   void RequirementTools::initVariables(VariableRequirement& varInfo, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
+   void RequirementTools::initVariables(VariableRequirement& varInfo, std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes)
    {
       // Iterator over info
       VariableRequirement::const_iterator infoIt;
@@ -52,8 +56,10 @@ namespace GeoMHDiSCC {
       }
 
       // 
-      // Create the required variables
+      // Create the required variables and corresponding transform branches
       //
+      std::vector<Transform::ProjectorBranch> tmpBranches;
+      std::map<PhysicalNames::Id, std::vector<Transform::ProjectorBranch> > branches;
 
       // Initialise variables
       for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
@@ -74,6 +80,9 @@ namespace GeoMHDiSCC {
                rVectorVars.find(infoIt->first)->second->initSpectral(infoIt->second.spectralIds());
             }
 
+            // Initialise transform branch
+            branches.insert(std::make_pair(infoIt->first, std::vector<Transform::ProjectorBranch>()));
+
             // Initialise the physical values if required
             if(infoIt->second.needPhysical())
             {
@@ -81,9 +90,13 @@ namespace GeoMHDiSCC {
                if(infoIt->second.isScalar())
                {
                   rScalarVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
+                  tmpBranches = Transform::TransformSteps::backwardScalar(infoIt->second.mapPhysicalComps());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                } else
                {
                   rVectorVars.at(infoIt->first)->initPhysical(infoIt->second.mapPhysicalComps());
+                  tmpBranches = Transform::TransformSteps::backwardVector(infoIt->second.mapPhysicalComps());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                }
             }
 
@@ -93,13 +106,17 @@ namespace GeoMHDiSCC {
                // Separate scalar and vector fields
                if(infoIt->second.isScalar())
                {
-                  rScalarVars.at(infoIt->first)->initPhysicalGradient(FieldComponents::Physical::NOTUSED, infoIt->second.mapGradientComps(FieldComponents::Physical::NOTUSED));
+                  rScalarVars.at(infoIt->first)->initPhysicalGradient(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradientComps(FieldComponents::Spectral::SCALAR));
+                  tmpBranches = Transform::TransformSteps::backwardGradient(infoIt->second.mapGradientComps(FieldComponents::Spectral::SCALAR));
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                } else
                {
-                  std::vector<FieldComponents::Physical::Id>::const_iterator it;
-                  for(it = infoIt->second.physicalIds().begin(); it != infoIt->second.physicalIds().end(); ++it)
+                  std::vector<FieldComponents::Spectral::Id>::const_iterator it;
+                  for(it = infoIt->second.spectralIds().begin(); it != infoIt->second.spectralIds().end(); ++it)
                   {
                      rVectorVars.at(infoIt->first)->initPhysicalGradient(*it, infoIt->second.mapGradientComps(*it));
+                     tmpBranches = Transform::TransformSteps::backwardVGradient(*it, infoIt->second.mapGradientComps(*it));
+                     branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                   }
                }
             }
@@ -114,6 +131,8 @@ namespace GeoMHDiSCC {
                } else
                {
                   rVectorVars.at(infoIt->first)->initPhysicalCurl(infoIt->second.mapCurlComps());
+                  tmpBranches = Transform::TransformSteps::backwardCurl(infoIt->second.mapCurlComps());
+                  branches.find(infoIt->first)->second.insert(branches.find(infoIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                }
             }
 
@@ -137,6 +156,9 @@ namespace GeoMHDiSCC {
             }
          }
       }
+
+      // Create the projector tree(s)
+      Transform::ProjectorTreeTools::generateTrees(projectorTree, branches);
    }
 
    void RequirementTools::mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)

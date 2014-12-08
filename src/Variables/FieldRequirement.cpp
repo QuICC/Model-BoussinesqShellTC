@@ -33,10 +33,10 @@ namespace GeoMHDiSCC {
       this->mCurlComps.setConstant(this->mNeedCurl);
 
       // Set default physical, gradient and curl needs
-      std::vector<FieldComponents::Physical::Id>::const_iterator it;
+      std::vector<FieldComponents::Spectral::Id>::const_iterator it;
       ArrayB arr(3);
       arr.setConstant(this->mNeedGradient);
-      for(it = this->mPhysicalIds.begin(); it != this->mPhysicalIds.end(); ++it)
+      for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
       {
          this->mGradientComps.insert(std::make_pair(*it, arr));
       }
@@ -115,7 +115,7 @@ namespace GeoMHDiSCC {
       return this->mPhysicalComps;
    }
 
-   const ArrayB& FieldRequirement::gradientComps(const FieldComponents::Physical::Id id) const
+   const ArrayB& FieldRequirement::gradientComps(const FieldComponents::Spectral::Id id) const
    {
       return this->mGradientComps.find(id)->second;
    }
@@ -137,7 +137,7 @@ namespace GeoMHDiSCC {
       return comps;
    }
 
-   std::map<FieldComponents::Physical::Id,bool> FieldRequirement::mapGradientComps(const FieldComponents::Physical::Id id) const
+   std::map<FieldComponents::Physical::Id,bool> FieldRequirement::mapGradientComps(const FieldComponents::Spectral::Id id) const
    {
       std::map<FieldComponents::Physical::Id,bool> comps;
 
@@ -178,12 +178,12 @@ namespace GeoMHDiSCC {
       this->mNeedPhysical = this->mPhysicalComps.any();
    }
 
-   void FieldRequirement::updateGradient(const std::map<FieldComponents::Physical::Id,ArrayB>& comps)
+   void FieldRequirement::updateGradient(const std::map<FieldComponents::Spectral::Id,ArrayB>& comps)
    {
       this->mGradientComps = comps;
 
       // Update gradient need
-      std::map<FieldComponents::Physical::Id,ArrayB>::const_iterator it;
+      std::map<FieldComponents::Spectral::Id,ArrayB>::const_iterator it;
       for(it = this->mGradientComps.begin(); it != this->mGradientComps.end(); ++it)
       {
          this->mNeedGradient = this->mNeedGradient || it->second.any();
@@ -218,8 +218,8 @@ namespace GeoMHDiSCC {
       this->mPhysicalComps = this->mPhysicalComps + req.physicalComps();
 
       // Do OR operation of physical gradient components requirement
-      std::vector<FieldComponents::Physical::Id>::const_iterator it;
-      for(it = this->mPhysicalIds.begin(); it != this->mPhysicalIds.end(); ++it)
+      std::vector<FieldComponents::Spectral::Id>::const_iterator it;
+      for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
       {
          this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second + req.gradientComps(*it);
       }

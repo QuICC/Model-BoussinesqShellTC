@@ -19,6 +19,7 @@
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 #include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -37,11 +38,12 @@ namespace Transform {
           * @param spFwdGrouper  Forward transform communication grouper
           * @param spBwdGrouper  Backward transform communication grouper
           * @param varInfo       Variable requirements
+          * @param projectorTree    Transform projector tree
           * @param nonInfo       Nonlinear computation requirements
           * @param spRes         Shared resolution
           * @param runOptions    Available run options map
           */
-         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions);
+         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions);
          
       protected:
 

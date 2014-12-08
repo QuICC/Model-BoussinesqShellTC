@@ -8,12 +8,28 @@ if(GEOMHDISCC_FFT STREQUAL "FFTW")
       FftwLibrary.cpp
       FftwTools.cpp
       FftwTransform.cpp
-      ChebyshevFftwTransform.cpp
-      SphereChebyshevFftwTransform.cpp
-      ShellChebyshevFftwTransform.cpp
-      CylinderChebyshevFftwTransform.cpp
-      AnnulusChebyshevFftwTransform.cpp
       )
+   if(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+      list(APPEND MHDSources 
+         AnnulusChebyshevFftwTransform.cpp
+         )
+   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CFT")
+      list(APPEND MHDSources 
+         CylinderChebyshevFftwTransform.cpp
+         )
+   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLF")
+      list(APPEND MHDSources 
+         ShellChebyshevFftwTransform.cpp
+         )
+   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLF")
+      list(APPEND MHDSources 
+         SphereChebyshevFftwTransform.cpp
+         )
+   else(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+      list(APPEND MHDSources 
+         ChebyshevFftwTransform.cpp
+         )
+   endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
 endif(GEOMHDISCC_FFT STREQUAL "FFTW")
 
 # Select cuFFT transforms

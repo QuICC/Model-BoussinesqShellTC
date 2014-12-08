@@ -79,7 +79,7 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical gradient values storage
           */
-         void initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
+         void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Initialise the physical curl values storage
@@ -158,7 +158,7 @@ namespace Datatypes {
       }
    }
 
-   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient(const FieldComponents::Physical::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
       // Loop over all domains
       for(size_t i = 0; i < this->mDomains.size(); i++)

@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
+#include "TransformConfigurators/ProjectorBranch.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,8 +36,37 @@ namespace GeoMHDiSCC {
        */
       namespace TransformSteps
       {
+         /**
+          * @brief Generate the list of branches in scalar projection transform
+          */
+         std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
+          * @brief Generate the list of branches in scalar gradient transform
+          */
+         std::vector<ProjectorBranch>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
+          * @brief Generate the list of branches in vector projection transform
+          */
+         std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
+          * @brief Generate the list of branches in vector gradient transform
+          */
+         std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
+          * @brief Generate the list of branches in vector curl transform
+          */
+         std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req);
+
+         /**
+          * @brief Generate the list of branches in vector divergence transform
+          */
+         std::vector<ProjectorBranch>  backwardDivergence();
+
          template <Dimensions::Transform::Id TId> struct Forward;
-         template <Dimensions::Transform::Id TId> struct Backward;
 
          /**
           * @brief Simple struct holding the forward transform steps for the first dimension
@@ -75,97 +105,6 @@ namespace GeoMHDiSCC {
 
             /// Number of variable to transfer to next stage for vector
             static const int VECTOR_VARIABLES = 3;
-         };
-
-         /**
-          * @brief Simple struct holding the backward transform steps for the second dimension
-          */
-         struct BackwardBase
-         {
-            /// Enum of the possible steps
-            enum Step {NOTHING, DO_SCALAR, FINISH_SCALAR, CONTINUE_DIVR, FINISH_DIVR, START_GRAD, DO_GRAD};
-
-            /// Transform step for a scalar
-            static const Step STEP_SCALAR = DO_SCALAR;
-
-
-            /// Transform step for the first component of a gradient
-            static const Step STEP_GRAD_ONE = NOTHING;
-
-            /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = NOTHING;
-
-            /// Transform step for the third component of a gradient
-            static const Step STEP_GRAD_THREE = NOTHING;
-
-
-            /// Transform step for the first component of a vector
-            static const Step STEP_VECTOR_ONE = DO_SCALAR;
-
-            /// Transform step for the second component of a vector
-            static const Step STEP_VECTOR_TWO = DO_SCALAR;
-
-            /// Transform step for the third component of a vector
-            static const Step STEP_VECTOR_THREE = DO_SCALAR;
-
-
-            /// Transform step for the first component of a vector gradient
-            static const Step STEP_VGRAD_ONE = NOTHING;
-
-            /// Transform step for the second component of a vector gradient
-            static const Step STEP_VGRAD_TWO = NOTHING;
-
-            /// Transform step for the third component of a vector gradient
-            static const Step STEP_VGRAD_THREE = NOTHING;
-
-
-            /// Transform step for the first component of a curl
-            static const Step STEP_CURL_ONE = NOTHING;
-
-            /// Transform step for the second component of a curl
-            static const Step STEP_CURL_TWO = NOTHING;
-
-            /// Transform step for the third component of a curl
-            static const Step STEP_CURL_THREE = NOTHING;
-
-
-            /// First spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_ONE = FieldComponents::Spectral::ONE;
-
-            /// Second spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_TWO = FieldComponents::Spectral::TWO;
-
-            /// Third spectral field component used for vector
-            static const FieldComponents::Spectral::Id SPECTOR_THREE = FieldComponents::Spectral::THREE;
-
-
-            /// First spectral field component used for vector gradient
-            static const FieldComponents::Spectral::Id SPEVGRAD_ONE = FieldComponents::Spectral::NOTUSED;
-
-            /// Second spectral field component used for vector gradient
-            static const FieldComponents::Spectral::Id SPEVGRAD_TWO = FieldComponents::Spectral::NOTUSED;
-
-            /// Third spectral field component used for vector gradient
-            static const FieldComponents::Spectral::Id SPEVGRAD_THREE = FieldComponents::Spectral::NOTUSED;
-
-
-            /// First spectral field component used for curl
-            static const FieldComponents::Spectral::Id SPECURL_ONE = FieldComponents::Spectral::NOTUSED;
-
-            /// Second spectral field component used for curl
-            static const FieldComponents::Spectral::Id SPECURL_TWO = FieldComponents::Spectral::NOTUSED;
-
-            /// Third spectral field component used for curl
-            static const FieldComponents::Spectral::Id SPECURL_THREE = FieldComponents::Spectral::NOTUSED;
-
-            /// Number of variable to transfer to next stage for scalar
-            static const int SCALAR_VARIABLES = 1;
-
-            /// Number of variable to transfer to next stage for vector
-            static const int VECTOR_VARIABLES = 3;
-
-            /// Number of variable to transfer to next stage for curl
-            static const int CURL_VARIABLES = 3;
          };
 
          /**
@@ -267,78 +206,6 @@ namespace GeoMHDiSCC {
 
             /// Third physical field component used for vector
             static const FieldComponents::Physical::Id VECTOR_THREE = FieldComponents::Physical::THREE;
-         };
-
-         /**
-          * @brief Simple struct holding the backward transform steps for the first dimension
-          */
-         template<>  struct Backward<Dimensions::Transform::TRA1D>: public BackwardBase
-         {
-            /// Transform step for the first component of a gradient
-            static const Step STEP_GRAD_ONE = START_GRAD;
-
-            /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = FINISH_SCALAR;
-
-
-            /// Number of variable to transfer to next stage for gradient
-            static const int GRAD_VARIABLES = 2;
-
-            /// Number of variable to transfer to next stage for vector gradient
-            static const int VGRAD_VARIABLES = 6;
-
-            /// Number of variable to transfer to next stage for curl
-            static const int CURL_VARIABLES = 5;
-         };
-
-         /**
-          * @brief Simple struct holding the backward transform steps for the second dimension
-          */
-         template<>  struct Backward<Dimensions::Transform::TRA2D>: public BackwardBase
-         {
-            /// Transform step for the first component of a gradient
-            static const Step STEP_GRAD_ONE = DO_SCALAR;
-
-            /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = START_GRAD;
-
-            /// Transform step for the third component of a gradient
-            static const Step STEP_GRAD_THREE = FINISH_SCALAR;
-
-
-            /// Number of variable to transfer to next stage for gradient
-            static const int GRAD_VARIABLES = 3;
-
-            /// Number of variable to transfer to next stage for vector gradient
-            static const int VGRAD_VARIABLES = 6;
-
-            /// Number of variable to transfer to next stage for curl
-            static const int CURL_VARIABLES = 9;
-         };
-
-         /**
-          * @brief Simple struct holding the backward transform steps for the third dimension
-          */
-         template<>  struct Backward<Dimensions::Transform::TRA3D>: public BackwardBase
-         {
-            /// Transform step for the first component of a gradient
-            static const Step STEP_GRAD_ONE = DO_SCALAR;
-
-            /// Transform step for the second component of a gradient
-            static const Step STEP_GRAD_TWO = DO_SCALAR;
-
-            /// Transform step for the third component of a gradient
-            static const Step STEP_GRAD_THREE = DO_GRAD;
-
-
-            /// Number of variable to transfer to next stage for gradient
-            static const int GRAD_VARIABLES = 3;
-
-            /// Number of variable to transfer to next stage for vector gradient
-            static const int VGRAD_VARIABLES = 9;
-
-            /// Number of variable to transfer to next stage for curl
-            static const int CURL_VARIABLES = 3;
          };
       }
    }

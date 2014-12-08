@@ -69,7 +69,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get the physical gradient components requirements
           */
-         const ArrayB& gradientComps(const FieldComponents::Physical::Id id) const;
+         const ArrayB& gradientComps(const FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Get the physical curl components requirements
@@ -94,7 +94,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get map for gradient components to field requirements
           */
-         std::map<FieldComponents::Physical::Id,bool> mapGradientComps(const FieldComponents::Physical::Id id) const;
+         std::map<FieldComponents::Physical::Id,bool> mapGradientComps(const FieldComponents::Spectral::Id id) const;
 
          /**
           * @brief Get map for curl components to field requirements
@@ -109,7 +109,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Update the gradient component requirements
           */
-         void updateGradient(const std::map<FieldComponents::Physical::Id,ArrayB>& comps);
+         void updateGradient(const std::map<FieldComponents::Spectral::Id,ArrayB>& comps);
 
          /**
           * @brief Update the curl component requirements
@@ -174,7 +174,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Detailed requirements for gradient field components
           */
-         std::map<FieldComponents::Physical::Id,ArrayB> mGradientComps;
+         std::map<FieldComponents::Spectral::Id,ArrayB> mGradientComps;
 
          /**
           * @brief Detailed requirements for curl field components

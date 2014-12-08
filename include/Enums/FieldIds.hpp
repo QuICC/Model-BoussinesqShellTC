@@ -93,6 +93,28 @@ namespace GeoMHDiSCC {
    };
 
    /**
+    * @brief Simple struct to hold the field types
+    */
+   struct FieldType
+   {
+      /**
+       * @brief Enum for the field types
+       */
+      enum Id {
+         /// Scalar field
+         SCALAR,
+         /// Vector field
+         VECTOR,
+         /// Gradient field
+         GRADIENT,
+         /// Curl field
+         CURL,
+         /// divergence field
+         DIVERGENCE,
+      };
+   };
+
+   /**
     * @brief Simple struct to hold the field components
     */
    struct FieldComponents

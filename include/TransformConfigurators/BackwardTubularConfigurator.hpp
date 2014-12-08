@@ -41,35 +41,35 @@ namespace Transform {
          /**
           * @brief Compute the first step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void firstStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void secondStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void lastStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup first exchange communication
@@ -93,150 +93,6 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Compute the first step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward gradient transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward gradient transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward curl transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward gradient transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward gradient transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward curl transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward gradient transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalGradient(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward curl transform for a scalar variable (DUMMY implementation for generalisation)
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward gradient transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalGradient(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward curl transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalCurl(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
           * @brief Empty constructor
           */
          BackwardTubularConfigurator(){};
@@ -249,66 +105,80 @@ namespace Transform {
       private:
    };
 
-   template <typename TVariable> void BackwardTubularConfigurator::firstStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardTubularConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Compute physical projection if required
-      if(coord.needPhysical(name))
-      {
-         BackwardTubularConfigurator::firstPhysical(rVariable, coord);
-      }
+      // Iterators for the three transforms
+      ProjectorTree::Projector1DEdge_iterator it1D;
 
-      // Compute physical gradient projection if required
-      if(coord.needPhysicalGradient(name))
-      {
-         BackwardTubularConfigurator::firstPhysicalGradient(rVariable, coord);
-      }
+      // Ranges for the vector of edges for the three transforms
+      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
 
-      // Compute physical curl projection if required
-      if(coord.needPhysicalCurl(name))
+      // Prepare required spectral data
+      BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
+
+      // Loop over first transform
+      int hold1D = std::distance(range1D.first, range1D.second) - 1;
+      for(it1D = range1D.first; it1D != range1D.second; ++it1D, --hold1D)
       {
-         BackwardTubularConfigurator::firstPhysicalCurl(rVariable, coord);
+         // Compute first transform
+         BackwardConfigurator::project1D(*it1D, coord, hold1D);
       }
    }
 
-   template <typename TVariable> void BackwardTubularConfigurator::secondStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardTubularConfigurator::secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Compute physical projection if required
-      if(coord.needPhysical(name))
-      {
-         BackwardTubularConfigurator::secondPhysical(rVariable, coord);
-      }
+      // Iterators for the three transforms
+      ProjectorTree::Projector1DEdge_iterator it1D;
+      ProjectorTree::Projector2DEdge_iterator it2D;
 
-      // Compute physical gradient projection if required
-      if(coord.needPhysicalGradient(name))
-      {
-         BackwardTubularConfigurator::secondPhysicalGradient(rVariable, coord);
-      }
+      // Ranges for the vector of edges for the three transforms
+      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
+      ProjectorTree::Projector2DEdge_range range2D;
 
-      // Compute physical curl projection if required
-      if(coord.needPhysicalCurl(name))
+      // Loop over first transform
+      for(it1D = range1D.first; it1D != range1D.second; ++it1D)
       {
-         BackwardTubularConfigurator::secondPhysicalCurl(rVariable, coord);
+         range2D = it1D->edgeRange();
+         int recover2D = 0;
+         int hold2D = std::distance(range2D.first, range2D.second) - 1;
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         {
+            // Compute second transform
+            BackwardConfigurator::project2D(*it2D, coord, recover2D, hold2D);
+         }
       }
    }
 
-   template <typename TVariable> void BackwardTubularConfigurator::lastStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardTubularConfigurator::lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Compute physical projection if required
-      if(coord.needPhysical(name))
-      {
-         BackwardTubularConfigurator::lastPhysical(rVariable, coord);
-      }
+      // Iterators for the three transforms
+      ProjectorTree::Projector1DEdge_iterator it1D;
+      ProjectorTree::Projector2DEdge_iterator it2D;
+      ProjectorTree::Projector3DEdge_iterator it3D;
 
-      // Compute physical gradient projection if required
-      if(coord.needPhysicalGradient(name))
-      {
-         BackwardTubularConfigurator::lastPhysicalGradient(rVariable, coord);
-      }
+      // Ranges for the vector of edges for the three transforms
+      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
+      ProjectorTree::Projector2DEdge_range range2D;
+      ProjectorTree::Projector3DEdge_range range3D;
 
-      // Compute physical curl projection if required
-      if(coord.needPhysicalCurl(name))
+      // Loop over first transform
+      for(it1D = range1D.first; it1D != range1D.second; ++it1D)
       {
-         BackwardTubularConfigurator::lastPhysicalCurl(rVariable, coord);
+         range2D = it1D->edgeRange();
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D)
+         {
+            range3D = it2D->edgeRange();
+            int recover3D = 0;
+            int hold3D = std::distance(range3D.first, range3D.second) - 1;
+            for(it3D = range3D.first; it3D != range3D.second; ++it3D, ++recover3D, --hold3D)
+            {
+               // Prepare physical output data
+               BackwardConfigurator::preparePhysical(tree, *it3D, rVariable, coord);
+
+               // Compute third transform
+               BackwardConfigurator::project3D(*it3D, coord, recover3D, hold3D);
+            }
+         }
       }
    }
 
@@ -331,14 +201,6 @@ namespace Transform {
    {
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardCommunication();
    }
-
-   // DUMMY implementations
-   inline void BackwardTubularConfigurator::firstPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
-   {}
-   inline void BackwardTubularConfigurator::secondPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
-   {}
-   inline void BackwardTubularConfigurator::lastPhysicalCurl(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord)
-   {}
 
 }
 }

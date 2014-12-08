@@ -94,7 +94,7 @@ namespace Datatypes {
    template <typename TScalar, typename TType> inline const TScalar& VectorField<TScalar,TType>::comp(const TType id) const
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > static_cast<size_t>(id));
+      assert(this->mComponents.count(id) == 1);
 
       return this->mComponents.find(id)->second;
    }
@@ -102,7 +102,7 @@ namespace Datatypes {
    template <typename TScalar, typename TType> inline TScalar& VectorField<TScalar,TType>::rComp(const TType id)
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > static_cast<size_t>(id));
+      assert(this->mComponents.count(id) == 1);
 
       return this->mComponents.find(id)->second;
    }

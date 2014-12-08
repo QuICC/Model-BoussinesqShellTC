@@ -30,7 +30,7 @@ namespace Transform {
    {
    }
 
-   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions)
+   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const VariableRequirement& varInfo, const std::vector<Transform::ProjectorTree>& projectorTree, const std::set<PhysicalNames::Id>& nonInfo, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions)
    {
       // Get the list of required options
       std::set<NonDimensional::Id>  requests;
@@ -59,7 +59,7 @@ namespace Transform {
       rCoord.setOptions(options);
 
       // Initialise the transform coordinator
-      rCoord.initTransforms(spRes, varInfo);
+      rCoord.initTransforms(spRes, projectorTree);
 
       // Initialise the communicator
       rCoord.initCommunicator(spRes);
@@ -67,8 +67,8 @@ namespace Transform {
       // Get the buffer pack sizes
       ArrayI packs1DFwd = spFwdGrouper->packs1D(varInfo, nonInfo);
       ArrayI packs2DFwd = spFwdGrouper->packs2D(varInfo, nonInfo);
-      ArrayI packs1DBwd = spBwdGrouper->packs1D(varInfo);
-      ArrayI packs2DBwd = spBwdGrouper->packs2D(varInfo);
+      ArrayI packs1DBwd = spBwdGrouper->packs1D(projectorTree);
+      ArrayI packs2DBwd = spBwdGrouper->packs2D(projectorTree);
 
       // Initialise the converters
       rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, spFwdGrouper->split);

@@ -17,6 +17,11 @@ foreach(ModelFile ${MHDPhysicalModels})
    file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
    STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
    STRING(REGEX REPLACE " " "" Scheme ${Scheme})
+   set(GEOMHDISCC_SPATIALSCHEME ${Scheme})
+
+   # Generate sources list
+   set(All_Srcs )
+   include(../cmake.d/setup/AllSrc.cmake)
 
    # Get model specific sources
    include(${GEOMHDISCC_INCLUDE_DIR}/PhysicalModels/cmake.d/${ModelName}Sources.cmake)
