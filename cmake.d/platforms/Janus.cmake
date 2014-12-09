@@ -58,7 +58,7 @@ set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib"
 #--------- AVAILABLE TRANSFORM OPERATORS ---------#
 ###################################################
 
-set(GEOMHDISCC_TRANSOPS "Forward" "Backward" PARENT_SCOPE)
+set(GEOMHDISCC_TRANSOPS "Forward" "Recurrence" "Backward" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#

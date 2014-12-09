@@ -61,8 +61,10 @@ namespace Transform {
       // Initialise FFTW interface
       this->initFft();
 
-      // Initialise Chebyshev operator(s)
-      this->initOperators();
+      #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Initialise Chebyshev operator(s)
+         this->initOperators();
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
 
       // Register the FFTW object
       FftwLibrary::registerFft();
@@ -135,6 +137,7 @@ namespace Transform {
       this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
    }
 
+   #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
    void ChebyshevFftwTransform::initOperators()
    {
       // Storage for the differentiation operator
@@ -197,6 +200,61 @@ namespace Transform {
          }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
+   #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+
+   #if defined GEOMHDISCC_TRANSOP_RECURRENCE
+   void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Matrix& chebVal) const
+   {
+      int i = chebVal.rows()-1;
+
+      // Set T_N to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
+
+      // Compute T_N-1
+      rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      --i;
+
+      // Compute remaining modes
+      for(; i >= 0; --i)
+      {
+         rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      }
+   }
+
+   void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const MatrixZ& chebVal, const bool useImag) const
+   {
+      int i = chebVal.rows()-1;
+
+      // Set T_N to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
+
+      if(useImag)
+      {
+         // Compute T_N-1
+         rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).imag();
+          --i;
+
+         // Compute remaining modes
+         for(; i >= 0; --i)
+         {
+            rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).imag();
+         }
+      } else
+      {
+         // Compute T_N-1
+         rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).real();
+         --i;
+
+         // Compute remaining modes
+         for(; i >= 0; --i)
+         {
+            rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).real();
+         }
+      }
+   }
+   #endif //defined GEOMHDISCC_TRANSOP_RECURRENCE
 
    void ChebyshevFftwTransform::cleanupFft()
    {

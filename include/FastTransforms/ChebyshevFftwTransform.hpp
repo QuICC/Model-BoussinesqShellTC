@@ -213,10 +213,12 @@ namespace Transform {
           */
          Matrix   mTmpOut;
 
+         #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
           * @brief Storage for the Chebyshev differentiation matrix
           */
          SparseMatrix   mDiff;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
 
          #if defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
@@ -240,10 +242,25 @@ namespace Transform {
           */
          void initFft();
 
+         #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
           * @brief Initialise the spectral operators
           */
          void initOperators();
+
+         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
+
+         /**
+          * @brief Compute derivative by recurrence relation
+          */
+         void recurrenceDiff(Matrix& rDealiased, const Matrix& rChebVal) const;
+
+         /**
+          * @brief Compute derivative by recurrence relation
+          */
+         void recurrenceDiff(Matrix& rDealiased, const MatrixZ& rChebVal, const bool useImag) const;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+
 
          /**
           * @brief Cleanup memory used by FFTW on destruction
@@ -299,6 +316,8 @@ namespace Transform {
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
+            this->recurrenceDiff(this->mTmpIn, chebVal);
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
             this->mTmpInS.topRows(1).setZero();
@@ -376,6 +395,8 @@ namespace Transform {
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
+            this->recurrenceDiff(this->mTmpIn, chebVal, false);
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
             this->mTmpInS.topRows(1).setZero();
@@ -402,6 +423,8 @@ namespace Transform {
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
+            this->recurrenceDiff(this->mTmpIn, chebVal, true);
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
             this->mTmpInS.topRows(1).setZero();

@@ -52,7 +52,7 @@ set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 #--------- AVAILABLE TRANSFORM OPERATORS ---------#
 ###################################################
 
-set(GEOMHDISCC_TRANSOPS "Forward" "Backward" PARENT_SCOPE)
+set(GEOMHDISCC_TRANSOPS "Forward" "Recurrence" "Backward" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
