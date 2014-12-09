@@ -23,9 +23,18 @@ namespace GeoMHDiSCC {
    void LegendreRule::computeQuadrature(Array& grid, Array& weights, const int size)
    {
       // Internal grid and weights arrays
-      internal::Array   igrid(size);
+      internal::Array   igrid;
+      internal::Array   iweights;
+
+      LegendreRule::computeQuadrature(grid, weights, igrid, iweights, size);
+   }
+
+   void LegendreRule::computeQuadrature(Array& grid, Array& weights, internal::Array& igrid, internal::Array& iweights, const int size)
+   {
+      // Internal grid and weights arrays
+      igrid.resize(size);
       igrid.setConstant(MHD_MP(0.0));
-      internal::Array   iweights(size);
+      iweights.resize(size);
       iweights.setConstant(MHD_MP(0.0));
 
       internal::Array   taylor(std::min(size+1,PrueferAlgorithm::TAYLOR_ORDER+1));
