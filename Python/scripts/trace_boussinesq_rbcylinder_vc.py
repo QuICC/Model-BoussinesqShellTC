@@ -11,10 +11,10 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [20, 0, 20]
+res = [30, 0, 30]
 eq_params = {'prandtl':1, 'rayleigh':5901.55, 'ratio31':1.0, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':0., 'ratio31':1.0}
-eigs = [1]
+eigs = [4]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
@@ -59,7 +59,7 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = -1
+    viz_mode = 0
     zscale = eq_params['ratio31']*eq_params['scale3d']
 
     for mode in range(0,len(evp_lmb)):
@@ -68,7 +68,7 @@ if show_solution:
         sol_v = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
         # Extract continuity from velocity 
-        sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sr = 0, sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))

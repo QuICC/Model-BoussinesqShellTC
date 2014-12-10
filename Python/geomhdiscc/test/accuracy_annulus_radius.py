@@ -30,7 +30,11 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     sol = transf.torcheb(t)
     err = np.abs(rhs - sol)
     relerr = err/(1.0 + np.abs(sol))
+    print("solution:")
     print(sol)
+    print("computation:")
+    print(rhs)
+    print("-----------------------------------------")
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
@@ -89,10 +93,9 @@ def x1div(nr, a, b, rg):
 
     print("x1div:")
     x = sy.Symbol('x')
-    A = annulus.x1div(nr, a, b, annulus.radbc.no_bc())
+    A = annulus.x1div(nr, a, b, annulus.radbc.no_bc(), zr = 0)
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-    sphys = np.sum([(1e-20)**x**(i) for i in np.arange(0,8,1)] + [(1e10*x**(20.0))]) 
-    sphys = (1e10*x**(10.0)) 
+    sphys = 1e10*x**(nr-1) 
     print(sphys)
     ssol = sy.expand(sy.diff(sphys*x,x))
     test_forward(A, sphys, ssol, rg, 0)
@@ -104,6 +107,8 @@ def i1(nr, a, b, rg):
     x = sy.Symbol('x')
     A = annulus.i1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = 1e14*x**(nr-2) 
+    print(sphys)
     ssol = sy.integrate(sphys,x)
     test_forward(A, sphys, ssol, rg, 1)
 
@@ -114,6 +119,8 @@ def i1x1d1(nr, a, b, rg):
     x = sy.Symbol('x')
     A = annulus.i1x1d1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = 1e10*x**(nr-1) 
+    print(sphys)
     ssol = sy.expand(sy.diff(sphys,x)*x)
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -125,6 +132,8 @@ def i1x1div(nr, a, b, rg):
     x = sy.Symbol('x')
     A = annulus.i1x1div(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = 1e10*x**(nr-1) 
+    print(sphys)
     ssol = sy.expand(sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -136,6 +145,8 @@ def i1x1(nr, a, b, rg):
     x = sy.Symbol('x')
     A = annulus.i1x1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    sphys = 1e10*x**(nr-1) 
+    print(sphys)
     ssol = sy.expand(sphys*x)
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -308,20 +319,20 @@ def mvss_x1div(nr, a, b, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 50
+    nr = 16
     a, b = annulus.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
     print(rg)
 
     # run tests
     #zblk(nr, a, b, rg)
-    x1(nr, a, b, rg)
-    d1(nr, a, b, rg)
+#    x1(nr, a, b, rg)
+#    d1(nr, a, b, rg)
     x1div(nr, a, b, rg)
-#    i1(nr, a, b, rg)
-#    i1x1d1(nr, a, b, rg)
-#    i1x1div(nr, a, b, rg)
-#    i1x1(nr, a, b, rg)
+    i1(nr, a, b, rg)
+    i1x1d1(nr, a, b, rg)
+    i1x1div(nr, a, b, rg)
+    i1x1(nr, a, b, rg)
 #    i2(nr, a, b, rg)
 #    i2x1(nr, a, b, rg)
 #    i2x2(nr, a, b, rg)

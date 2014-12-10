@@ -39,7 +39,9 @@ def x1(nr, parity, bc, coeff = 1.0, zr = 0):
 
     mat = coeff*spsp.diags(diags, offsets)
     if zr > 0:
+        mat = mat.tolil()
         mat[-zr:,:] = 0
+        mat = mat.tocsr()
     return radbc.constrain(mat, parity, bc)
 
 def d1(nr, parity, bc, coeff = 1.0, zr = 1):
@@ -47,7 +49,7 @@ def d1(nr, parity, bc, coeff = 1.0, zr = 1):
 
     row = [2*j for j in range(parity,2*nr,2)]
     mat = spsp.lil_matrix((nr,nr))
-    for i in range(0,nr-1):
+    for i in range(0,nr):
         mat[i,i+(parity+1)%2:] = row[i+(parity+1)%2:]
     if zr > 0:
         mat[-zr:,:] = 0
@@ -58,7 +60,7 @@ def d1(nr, parity, bc, coeff = 1.0, zr = 1):
 def x1div(nr, parity, bc, coeff = 1.0, zr = 1):
     """Create operator for x times radial divergence"""
 
-    mat = sid(nr, parity, zr, radbc.no_bc(), coeff) + x1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = 0)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
+    mat = sid(nr, parity, zr, radbc.no_bc(), coeff) + x1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = zr)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
     return radbc.constrain(mat, parity, bc)
 
 def i1(nr, parity, bc, coeff = 1.0):

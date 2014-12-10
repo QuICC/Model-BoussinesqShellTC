@@ -61,7 +61,7 @@ def d1(nr, a, b, bc, coeff = 1.0, zr = 1):
 def x1div(nr, a, b, bc, coeff = 1.0, zr = 1):
     """Create operator for x times radial divergence"""
 
-    mat = sid(nr, zr, radbc.no_bc(), coeff) + x1(nr, a, b, radbc.no_bc(), coeff, zr = 0)*d1(nr, a, b, radbc.no_bc(), coeff, zr = zr)
+    mat = sid(nr, zr, radbc.no_bc(), coeff) + x1(nr, a, b, radbc.no_bc(), coeff, zr = zr)*d1(nr, a, b, radbc.no_bc(), coeff, zr = zr)
     return radbc.constrain(mat, bc)
 
 def i1(nr, a, b, bc, coeff = 1.0):

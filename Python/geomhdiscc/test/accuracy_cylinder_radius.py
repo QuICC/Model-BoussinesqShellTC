@@ -33,6 +33,11 @@ def test_forward(op, parity, res_expr, sol_expr, grid, q):
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
     sol = transf.torcheb(t, psol)
+    print("solution:")
+    print(sol)
+    print("computation:")
+    print(rhs)
+    print("-----------------------------------------")
     err = np.abs(rhs - sol)
     relerr = err/(1.0 + np.abs(sol))
     if np.max(err[q:]) > 10*np.spacing(1):
@@ -89,8 +94,9 @@ def x1(nr, rg):
         m = m + (m+i)%2
         parity = m%2
         print("\tTest for m = " + str(m))
-        A = cylinder.x1(nr, parity, cylinder.radbc.no_bc())
+        A = cylinder.x1(nr, parity, cylinder.radbc.no_bc(), zr = 0)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        sphys = 1e10*x**(2*nr-2+parity)
         ssol = sy.expand(x*sphys)
         test_forward(A, (parity,(parity+1)%2), sphys, ssol, rg, 1)
 
@@ -119,8 +125,9 @@ def x1div(nr, rg):
         m = m + (m+i)%2
         parity = m%2
         print("\tTest for m = " + str(m))
-        A = cylinder.x1div(nr, parity, cylinder.radbc.no_bc())
+        A = cylinder.x1div(nr, parity, cylinder.radbc.no_bc(), zr = 0)
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        print(sphys)
         ssol = sy.expand(sy.diff(x*sphys,x))
         test_forward(A, parity, sphys, ssol, rg, 1)
 
@@ -422,12 +429,12 @@ def mvss_d1(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 51
+    nr = 12
     rg = transf.rgrid(nr)
 
     # run tests
     #zblk(nr, rg)
-#    x1(nr, rg)
+    x1(nr, rg)
 #    d1(nr, rg)
 #    x1div(nr, rg)
 #    i1(nr, rg)
@@ -448,5 +455,5 @@ if __name__ == "__main__":
 #    qid(nr, rg)
 
     # Matmult vs Solve operators
-    mvss_1_x(nr, rg)
-    mvss_d1(nr, rg)
+#    mvss_1_x(nr, rg)
+#    mvss_d1(nr, rg)

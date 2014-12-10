@@ -13,7 +13,7 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
 eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
-eigs = [0]
+eigs = [3]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
@@ -64,7 +64,10 @@ if solve_evp:
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
         # Extract continuity from velocity 
         a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        print(mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_u)
+        print(1j*eigs[0]*sol_v)
+        print(mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w)
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
 if show_solution:
@@ -78,7 +81,7 @@ if show_solution:
     sol_p = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
     a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-    sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+    sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_u + 1j*eigs[0]*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)

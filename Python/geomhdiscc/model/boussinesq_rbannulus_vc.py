@@ -416,7 +416,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
                     mat = annulus.zblk(res[0], res[2], 1, 1, bc)
                     mat = mat + utils.id_from_idx(idx_p, res[0]*res[2])
             else:
-                mat = annulus.zblk(res[0], res[2], 2, 2, no_bc())
+                mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
 
         return mat
 
@@ -450,7 +450,7 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+            mat = annulus.zblk(res[0], res[2], 1, 1, bc)
 
         return mat
 
@@ -459,18 +459,19 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 
         # U: T_iN, T_Ni
         idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # V: T_iN, T_Ni
         idx_v = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # W: T_Nk, T_N-1K
         idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2))
+        idx_w = []
 
         # Pressure: T_iN, T_Nk
         idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2)))
+        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
         idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-4)))
         # Pressure: T_00
         if eigs[0] == 0:
