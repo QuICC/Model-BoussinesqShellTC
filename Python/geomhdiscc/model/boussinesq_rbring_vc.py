@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a 1D box (2 periodic directions) (velocity-continuity formulation)"""
+"""Module provides the functions to generate the 2D Boussinesq Rayleigh-Benard convection in a ring (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,40 +7,40 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import geomhdiscc.geometry.cylindrical.annulus_radius as annulus
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
+from geomhdiscc.geometry.cylindrical.annulus_radius_boundary import no_bc
 
 
-class BoussinesqRB1DBoxVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a 1D box (2 periodic directions) (velocity-continuity formulation)"""
+class BoussinesqRBRingVC(base_model.BaseModel):
+    """Class to setup the 2D Boussinesq Rayleigh-Benard convection in a ring (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d"]
+        return ["prandtl", "rayleigh", "ro", "rratio"]
 
     def periodicity(self):
         """Get the domain periodicity"""
 
-        return [False, True, True]
+        return [False, False, False]
 
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocityx", "velocityy", "velocityz", "temperature"]
+        return ["velocityx", "velocityy", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
+        fields =  [("velocityx",""), ("velocityy",""), ("temperature",""), ("pressure","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
+        fields =  [("velocityx",""), ("velocityy",""), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -56,24 +56,24 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocityx","") or field_row == ("velocityy","") or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("pressure",""):
-                shift_x = 2
+            if field_row == ("velocityx","") or field_row == ("velocityy","") or field_row == ("temperature",""):
+                shift_r = 2
             else:
-                shift_x = 0
+                shift_r = 0
 
-            gal_n = (res[0] - shift_x)
+            gal_n = (res[0] - shift_r)
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
+        block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 
-        # Matrix operator is complex except for vorticity and mean temperature
+        # Matrix operator is complex
         is_complex = True
 
         # Implicit field coupling
@@ -82,7 +82,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         ex_fields = self.explicit_fields(field_row)
 
         # Index mode: 
-        index_mode = self.MODE
+        index_mode = self.SLOWEST
 
         # Compute block info
         block_info = self.block_size(res, field_row)
@@ -108,19 +108,18 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
             m = eigs[0]
+            a, b = annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
-            # No-slip / Fixed temperature
+            # No-slip/No-slip, Fixed temperature/Fixed temperature
             if bcId == 0:
                 if self.use_galerkin:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                    if field_col == ("velocityx",""):
                         bc = {0:-20, 'r':0}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                    elif field_col == ("velocityy",""):
                         bc = {0:-20, 'r':0}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {0:-20, 'r':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_col == ("temperature",""):
                         bc = {0:-20, 'r':0}
 
                 else:
@@ -128,47 +127,53 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("velocityy","") and field_col == ("velocityy",""):
                         bc = {0:20}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
-                        bc = {0:20}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {0:20}
 
-            # Stress-free / Fixed flux
+            # Stress-free/Stress-free, Fixed flux/Fixed flux
             elif bcId == 1:
                 if self.use_galerkin:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {0:-21, 'r':0}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {0:-21, 'r':0}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    if field_col == ("velocityx",""):
                         bc = {0:-20, 'r':0}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                    elif field_col == ("velocityy",""):
+                        bc = {0:-24, 'r':0}
+                    elif field_col == ("temperature",""):
                         bc = {0:-21, 'r':0}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
-                        bc = {0:21}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
-                        bc = {0:21}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
                         bc = {0:20}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {0:24, 'c':{'a':a, 'b':b}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {0:21}
             
+            # Stress-free/No-slip, Fixed flux/Fixed temperature
+            elif bcId == 2:
+                if self.use_galerkin:
+                    if field_col == ("velocityx",""):
+                        bc = {0:-20, 'r':0}
+                    elif field_col == ("velocityy",""):
+                        bc = {0:-24, 'r':0}
+                    elif field_col == ("temperature",""):
+                        bc = {0:-21, 'r':0}
+
+                else:
+                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                        bc = {0:20}
+                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                        bc = {0:24, 'c':{'a':a, 'b':b}}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {0:21}
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['r'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
-                elif field_ror == ("velocityz",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['r'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['r'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -176,23 +181,19 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocityx",""):
-                        bc = {0:-20, 'x':0}
+                        bc = {0:-20, 'r':0}
                     elif field_col == ("velocityy",""):
-                        bc = {0:-20, 'x':0}
-                    elif field_col == ("velocityz",""):
-                        bc = {0:-20, 'x':0}
+                        bc = {0:-20, 'r':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'x':0}
+                        bc = {0:-20, 'r':0}
 
                 elif bcId == 1:
                     if field_col == ("velocityx",""):
-                        bc = {0:-21, 'x':0}
+                        bc = {0:-20, 'r':0}
                     elif field_col == ("velocityy",""):
-                        bc = {0:-21, 'x':0}
-                    elif field_col == ("velocityz",""):
-                        bc = {0:-20, 'x':0}
+                        bc = {0:-24, 'r':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-21, 'x':0}
+                        bc = {0:-21, 'r':0}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -200,15 +201,9 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
                     bc['r'] = 2
-                    bc['r'] = 2
                 elif field_row == ("velocityy",""):
                     bc['r'] = 2
-                    bc['r'] = 2
-                elif field_row == ("velocityz",""):
-                    bc['r'] = 2
-                    bc['r'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
                     bc['r'] = 2
 
         return bc
@@ -218,31 +213,29 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c1d.stencil(res[0], res[2], bc)
+        return annulus.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        a, b = annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c1d.i2(res[0], bc)
+            mat = annulus.i2x2(res[0], a, b, bc)
             mat = utils.qid_from_idx(idx_u, res[0])*mat
 
         elif field_row == ("velocityy",""):
-            mat = c1d.i2(res[0], bc)
+            mat = annulus.i2x2(res[0], a, b, bc)
             mat = utils.qid_from_idx(idx_v, res[0])*mat
 
-        elif field_row == ("velocityz",""):
-            mat = c1d.i2(res[0], bc)
-            mat = utils.qid_from_idx(idx_w, res[0])*mat
-
         elif field_row == ("temperature",""):
-            mat = c1d.i2(res[0], bc)
+            mat = annulus.i2x2(res[0], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = c1d.zblk(res[0], bc)
+            mat = annulus.zblk(res[0], bc)
 
         return mat
 
@@ -250,123 +243,96 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
-        zscale = eq_params['scale1d']
+        m = eigs[0]
 
-        k1 = eigs[0]
-        k2 = eigs[1]
+        a, b = annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
+                mat = annulus.i2x2laplh(res[0], m, a, b, bc)
+                bc[0] = min(bc[0], 0)
+                mat = mat + annulus.i2(res[0], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx(idx_u, res[0])
 
             elif field_col == ("velocityy",""):
-                mat = c1d.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = c1d.zblk(res[0], bc)
+                mat = annulus.i2(res[0], a, b, bc, -2.0*1j*m)
+                mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0], bc)
+                mat = annulus.zblk(res[0], bc)
+                #mat = annulus.i2x2(res[0], a, b, bc, Ra)
+                #mat = utils.qid_from_idx(idx_u, res[0])*mat
 
             elif field_col == ("pressure",""):
-                mat = c1d.i2(res[0], bc, -1j*k1)
+                mat = annulus.i2x2d1(res[0], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = c1d.zblk(res[0], bc)
+                mat = annulus.i2(res[0], a, b, bc, 2.0*1j*m)
+                mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
 
             elif field_col == ("velocityy",""):
-                mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
+                mat = annulus.i2x2laplh(res[0], m, a, b, bc)
+                bc[0] = min(bc[0], 0)
+                mat = mat + annulus.i2(res[0], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx(idx_v, res[0])
 
-            elif field_col == ("velocityz",""):
-                mat = c1d.zblk(res[0], bc)
-
             elif field_col == ("temperature",""):
-                mat = c1d.zblk(res[0], bc)
+                mat = annulus.zblk(res[0], bc)
 
             elif field_col == ("pressure",""):
-                mat = c1d.i2(res[0], bc, -1j*k2)
+                mat = annulus.i2x1(res[0], a, b, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
-
-        elif field_row == ("velocityz",""):
-            if field_col == ("velocityx",""):
-                mat = c1d.zblk(res[0], bc)
-
-            elif field_col == ("velocityy",""):
-                mat = c1d.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
-                if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_w, res[0])
-
-            elif field_col == ("temperature",""):
-                mat = c1d.i2(res[0], bc, Ra)
-
-            elif field_col == ("pressure",""):
-                mat = c1d.i2d1(res[0], bc, -1.0, cscale = zscale)
-                mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
-                mat = c1d.zblk(res[0], bc)
+                if self.linearize:
+                    mat = annulus.i2(res[0], a, b, bc)
+                    mat = mat*utils.qid_from_idx(idx_u, res[0])
+                else:
+                    mat = annulus.zblk(res[0], bc)
 
             elif field_col == ("velocityy",""):
-                mat = c1d.zblk(res[0], bc)
-
-            elif field_col == ("velocityz",""):
-                if self.linearize:
-                    mat = c1d.i2(res[0], bc)
-                    mat = mat*utils.qid_from_idx(idx_w, res[0])
-                else:
-                    mat = c1d.zblk(res[0], bc)
+                mat = annulus.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
+                mat = annulus.i2x2laplh(res[0], m, a, b, bc)
 
             elif field_col == ("pressure",""):
-                mat = c1d.zblk(res[0], bc)
+                mat = annulus.zblk(res[0], bc)
 
         elif field_row == ("pressure",""):
-            if bcs["bcType"] == self.SOLVER_NO_TAU:
-                mat = c1d.zblk(res[0], no_bc())
-
-            else:
+            if bcs["bcType"] == self.SOLVER_HAS_BC:
                 if field_col == ("velocityx",""):
-                    bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = c1d.i1(res[0]+1, bc, 1j*k1)
+                    bc['rt'] = 1
+                    #bc['zb'] = 1
+                    mat = annulus.i1x1div(res[0]+1, a, b, bc)
                     mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
 
                 elif field_col == ("velocityy",""):
-                    bc['rt'] = 1
                     bc['cr'] = 1
-                    mat = c1d.i1(res[0]+1, bc, 1j*k2)
+                    bc['rt'] = 1
+                    #bc['zb'] = 1
+                    mat = annulus.i1(res[0]+1, a, b, bc, 1j*m)
                     mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
-                elif field_col == ("velocityz",""):
-                    bc['rt'] = 1
-                    bc['cr'] = 1
-                    mat = c1d.i1d1(res[0]+1, bc, cscale = zscale)
-                    mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
-
                 elif field_col == ("temperature",""):
-                    mat = c1d.zblk(res[0], bc)
+                    mat = annulus.zblk(res[0], bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c1d.zblk(res[0], bc)
+                    mat = annulus.zblk(res[0], bc)
                     mat = mat + utils.id_from_idx(idx_p, res[0])
+            else:
+                mat = annulus.zblk(res[0], no_bc())
 
         return mat
 
@@ -375,45 +341,46 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
+        a, b = annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        m = eigs[0]
+
+        idx_u, idx_v, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c1d.i2(res[0], bc, 1.0/Pr)
+            mat = annulus.i2x2(res[0], a, b, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0])
             mat = S*mat*S
 
         elif field_row == ("velocityy",""):
-            mat = c1d.i2(res[0], bc, 1.0/Pr)
+            mat = annulus.i2x2(res[0], a, b, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0])
             mat = S*mat*S
 
-        elif field_row == ("velocityz",""):
-            mat = c1d.i2(res[0], bc, 1.0/Pr)
-            S = utils.qid_from_idx(idx_w, res[0])
-            mat = S*mat*S
-
         elif field_row == ("temperature",""):
-            mat = c1d.i2(res[0], bc)
+            mat = annulus.i2x2(res[0], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = c1d.zblk(res[0], bc)
+            mat = annulus.zblk(res[0], bc)
 
         return mat
 
     def zero_blocks(self, res, eigs, restriction = None):
         """Build restriction matrices"""
 
-        # U: TN
-        idx_u = utils.qidx(res[0], res[0]-1)
+        # U: T_iN, T_Ni
+        idx_u = []
+#        idx_u = utils.qidx(res[0], res[0]-1)
 
-        # V: TN
-        idx_v = utils.qidx(res[0], res[0]-1)
+        # V: T_iN, T_Ni
+        idx_v = []
+#        idx_v = utils.qidx(res[0], res[0]-1)
 
-        # W:
-        idx_w = utils.qidx(res[0], res[0])
+        # Pressure: T_iN, T_Nk
+        idx_p = []
+#        idx_p = utils.qidx(res[0], res[0]-2)
+        # Pressure: T_00
+        if eigs[0] == 0:
+            idx_p = utils.sidx(res[0], res[0]-1)
 
-        # Pressure: T_N
-        idx_p = utils.qidx(res[0], res[0]-1)
-
-        return (idx_u, idx_v, idx_w, idx_p)
+        return (idx_u, idx_v, idx_p)

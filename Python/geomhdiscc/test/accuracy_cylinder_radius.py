@@ -43,9 +43,9 @@ def test_forward(op, parity, res_expr, sol_expr, grid, q):
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
-    if np.max(relerr) > 10*np.spacing(1):
+    if np.max(relerr[q:]) > 10*np.spacing(1):
         print(relerr)
-    print("\t\tMax forward relative error: " + str(np.max(relerr)))
+    print("\t\tMax forward relative error: " + str(np.max(relerr[q:])))
 
 def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
     """Perform a tau backward operation test"""
@@ -429,12 +429,12 @@ def mvss_d1(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 12
+    nr = 20
     rg = transf.rgrid(nr)
 
     # run tests
     #zblk(nr, rg)
-    x1(nr, rg)
+#    x1(nr, rg)
 #    d1(nr, rg)
 #    x1div(nr, rg)
 #    i1(nr, rg)
@@ -442,7 +442,7 @@ if __name__ == "__main__":
 #    i1x1div(nr, rg)
 #    i1x1(nr, rg)
 #    i2(nr, rg)
-#    i2x1(nr, rg)
+    i2x1(nr, rg)
 #    i2x2(nr, rg)
 #    i2x2d2(nr, rg)
 #    i2x2d1(nr, rg)

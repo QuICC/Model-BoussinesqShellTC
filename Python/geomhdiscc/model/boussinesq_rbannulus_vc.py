@@ -466,8 +466,8 @@ class BoussinesqRBAnnulusVC(base_model.BaseModel):
 #        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # W: T_Nk, T_N-1K
+#        idx_w = []
         idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2))
-        idx_w = []
 
         # Pressure: T_iN, T_Nk
         idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
