@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRRBAnnulusVCVelocityX.hpp
- * @brief Implementation of the momentum equation for the X component for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+ * @file BoussinesqRRBAnnulusVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRRBANNULUSVCVELOCITYX_HPP
-#define BOUSSINESQRRBANNULUSVCVELOCITYX_HPP
+#ifndef BOUSSINESQRRBANNULUSVCMOMENTUM_HPP
+#define BOUSSINESQRRBANNULUSVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the X component for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
     */
-   class BoussinesqRRBAnnulusVCVelocityX: public IScalarEquation
+   class BoussinesqRRBAnnulusVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRRBAnnulusVCVelocityX(SharedEquationParameters spEqParams);
+         BoussinesqRRBAnnulusVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRRBAnnulusVCVelocityX();
+         virtual ~BoussinesqRRBAnnulusVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRRBANNULUSVCVELOCITYX_HPP
+#endif // BOUSSINESQRRBANNULUSVCMOMENTUM_HPP

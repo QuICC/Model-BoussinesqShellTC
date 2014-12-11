@@ -50,11 +50,14 @@ namespace Equations {
 
    void BoussinesqRRB1DBoxVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
+      // Get Prandtl number
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
+
       /// 
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)u_x\f$
       ///
-      FieldComponents::Spectral::Id specId;
+      FieldComponents::Spectral::Id specId = FieldComponents::Spectral::NOTUSED;
       if(id == FieldComponents::Physical::X)
       {
          specId = FieldComponents::Spectral::X;
@@ -66,7 +69,7 @@ namespace Equations {
          specId = FieldComponents::Spectral::Z;
       }
       
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
    void BoussinesqRRB1DBoxVCMomentum::setRequirements()

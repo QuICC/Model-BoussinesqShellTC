@@ -113,7 +113,7 @@ namespace GeoMHDiSCC {
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::VELOCITY)
+      spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }

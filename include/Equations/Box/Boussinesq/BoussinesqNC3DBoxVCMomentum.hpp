@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBAnnulusVCVelocityX.hpp
- * @brief Implementation of the momentum equation for the X component for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+ * @file BoussinesqNC3DBoxVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for natural convection in a 3D box (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBANNULUSVCVELOCITYX_HPP
-#define BOUSSINESQRBANNULUSVCVELOCITYX_HPP
+#ifndef BOUSSINESQNC3DBOXVCMOMENTUM_HPP
+#define BOUSSINESQNC3DBOXVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the X component for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for natural convection in a 3D box (velocity-continuity formulation)
     */
-   class BoussinesqRBAnnulusVCVelocityX: public IScalarEquation
+   class BoussinesqNC3DBoxVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBAnnulusVCVelocityX(SharedEquationParameters spEqParams);
+         BoussinesqNC3DBoxVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBAnnulusVCVelocityX();
+         virtual ~BoussinesqNC3DBoxVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRBANNULUSVCVELOCITYX_HPP
+#endif // BOUSSINESQNC3DBOXVCMOMENTUM_HPP

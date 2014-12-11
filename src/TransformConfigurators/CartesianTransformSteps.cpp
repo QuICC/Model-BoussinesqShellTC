@@ -107,17 +107,17 @@ namespace TransformSteps {
 
       if(req.find(FieldComponents::Physical::ONE)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::ONE, FieldType::GRADIENT));
       }
 
       if(req.find(FieldComponents::Physical::TWO)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::TWO, FieldType::GRADIENT));
       }
 
       if(req.find(FieldComponents::Physical::THREE)->second)
       {
-         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THREE, FieldType::GRADIENT));
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::PROJ, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THREE, FieldType::GRADIENT));
       }
 
       return transform;

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRRBAnnulusVCVelocityY.hpp
- * @brief Implementation of the momentum equation for the Y component for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+ * @file BoussinesqRRB2DBoxVCTransport.hpp
+ * @brief Implementation of the transport equation for rotating Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRRBANNULUSVCVELOCITYY_HPP
-#define BOUSSINESQRRBANNULUSVCVELOCITYY_HPP
+#ifndef BOUSSINESQRRB2DBOXVCTRANSPORT_HPP
+#define BOUSSINESQRRB2DBOXVCTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the Y component for rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
+    * @brief Implementation of the transport equation for rotating Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
     */
-   class BoussinesqRRBAnnulusVCVelocityY: public IScalarEquation
+   class BoussinesqRRB2DBoxVCTransport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRRBAnnulusVCVelocityY(SharedEquationParameters spEqParams);
+         BoussinesqRRB2DBoxVCTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRRBAnnulusVCVelocityY();
+         virtual ~BoussinesqRRB2DBoxVCTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRRBANNULUSVCVELOCITYY_HPP
+#endif // BOUSSINESQRRB2DBOXVCTRANSPORT_HPP

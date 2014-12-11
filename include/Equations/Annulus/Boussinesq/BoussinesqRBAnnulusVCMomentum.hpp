@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRB2DBoxVCVelocityZ.hpp
- * @brief Implementation of the momentum equation for the Z component for Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
+ * @file BoussinesqRBAnnulusVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRB2DBOXVCVELOCITYZ_HPP
-#define BOUSSINESQRB2DBOXVCVELOCITYZ_HPP
+#ifndef BOUSSINESQRBANNULUSVCMOMENTUM_HPP
+#define BOUSSINESQRBANNULUSVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the Z component for Rayleigh-Benard convection in a 2D box (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)
     */
-   class BoussinesqRB2DBoxVCVelocityZ: public IScalarEquation
+   class BoussinesqRBAnnulusVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRB2DBoxVCVelocityZ(SharedEquationParameters spEqParams);
+         BoussinesqRBAnnulusVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRB2DBoxVCVelocityZ();
+         virtual ~BoussinesqRBAnnulusVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRB2DBOXVCVELOCITYZ_HPP
+#endif // BOUSSINESQRBANNULUSVCMOMENTUM_HPP

@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRRB3DBoxVCVelocityZ.hpp
- * @brief Implementation of the momentum equation for the Z component for rotating Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)
+ * @file BoussinesqRRB1DBoxVCContinuity.hpp
+ * @brief Implementation of the continuity equation for rotating Rayleigh-Benard convection in a 1D box (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRRB3DBOXVCVELOCITYZ_HPP
-#define BOUSSINESQRRB3DBOXVCVELOCITYZ_HPP
+#ifndef BOUSSINESQRRB1DBOXVCCONTINUITY_HPP
+#define BOUSSINESQRRB1DBOXVCCONTINUITY_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the Z component for rotating Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)
+    * @brief Implementation of the continuity equation for rotating Rayleigh-Benard convection in a 1D box (velocity-continuity formulation)
     */
-   class BoussinesqRRB3DBoxVCVelocityZ: public IScalarEquation
+   class BoussinesqRRB1DBoxVCContinuity: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRRB3DBoxVCVelocityZ(SharedEquationParameters spEqParams);
+         BoussinesqRRB1DBoxVCContinuity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRRB3DBoxVCVelocityZ();
+         virtual ~BoussinesqRRB1DBoxVCContinuity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRRB3DBOXVCVELOCITYZ_HPP
+#endif // BOUSSINESQRRB1DBOXVCCONTINUITY_HPP
