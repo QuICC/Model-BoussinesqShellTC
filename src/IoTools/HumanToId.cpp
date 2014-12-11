@@ -233,9 +233,29 @@ namespace IoTools {
       {
          return PhysicalNames::TILTED_NO_VORTICITYZ;
 
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_VELOCITYX))
+      {
+         return PhysicalNames::MEAN_VELOCITYX;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_VELOCITYY))
+      {
+         return PhysicalNames::MEAN_VELOCITYY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::MEAN_VELOCITYZ))
+      {
+         return PhysicalNames::MEAN_VELOCITYZ;
+
       } else if(id == IdToHuman::toTag(PhysicalNames::KINETIC_ENERGY))
       {
          return PhysicalNames::KINETIC_ENERGY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::ZONAL_KINETIC_ENERGY))
+      {
+         return PhysicalNames::ZONAL_KINETIC_ENERGY;
+
+      } else if(id == IdToHuman::toTag(PhysicalNames::NONZONAL_KINETIC_ENERGY))
+      {
+         return PhysicalNames::NONZONAL_KINETIC_ENERGY;
 
       } else
       {

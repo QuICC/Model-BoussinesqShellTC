@@ -109,8 +109,23 @@ namespace IoTools {
          case PhysicalNames::TILTED_VELOCITYZ:
             return "Tilted vertical velocityZ";
 
+         case PhysicalNames::MEAN_VELOCITYX:
+            return "Mean velocityX";
+
+         case PhysicalNames::MEAN_VELOCITYY:
+            return "Mean velocityY";
+
+         case PhysicalNames::MEAN_VELOCITYZ:
+            return "Mean velocityZ";
+
          case PhysicalNames::KINETIC_ENERGY:
             return "Kinetic energy";
+
+         case PhysicalNames::ZONAL_KINETIC_ENERGY:
+            return "Zonal kinetic energy";
+
+         case PhysicalNames::NONZONAL_KINETIC_ENERGY:
+            return "Non zonal kinetic energy";
 
          default:
             throw Exception("Unknown ID to string conversion requested (PhysicalNames)");
@@ -199,8 +214,23 @@ namespace IoTools {
          case PhysicalNames::TILTED_VELOCITYZ:
             return "tilted_velocityz";
 
+         case PhysicalNames::MEAN_VELOCITYX:
+            return "mean_velocityx";
+
+         case PhysicalNames::MEAN_VELOCITYY:
+            return "mean_velocityy";
+
+         case PhysicalNames::MEAN_VELOCITYZ:
+            return "mean_velocityz";
+
          case PhysicalNames::KINETIC_ENERGY:
             return "kinetic_energy";
+
+         case PhysicalNames::ZONAL_KINETIC_ENERGY:
+            return "zonal_kinetic_energy";
+
+         case PhysicalNames::NONZONAL_KINETIC_ENERGY:
+            return "nonzonal_kinetic_energy";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (PhysicalNames)");

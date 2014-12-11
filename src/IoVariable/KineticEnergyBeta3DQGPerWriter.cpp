@@ -46,25 +46,41 @@ namespace IoVariable {
       // Create file
       this->preWrite();
 
+      KineticEnergyBeta3DQGPerWriter::scalar_iterator sIt;
       KineticEnergyBeta3DQGPerWriter::scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 1);
+      assert(std::distance(sRange.first, sRange.second) == 3);
 
-      MHDFloat energy = 0.0;
+      Array energy = Array::Zero(3);
       ArrayI mode = sRange.first->second->dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(0);
       if(mode(2) == 0 && mode(3) == 0)
       {
-         energy = sRange.first->second->dom(0).perturbation().point(0,0,0).real();
+         for(sIt = sRange.first; sIt != sRange.second; ++sIt)
+         {
+            if(sIt->first == PhysicalNames::KINETIC_ENERGY)
+            {   
+               energy(0) = sIt->second->dom(0).perturbation().point(0,0,0).real();
+            } else if(sIt->first == PhysicalNames::ZONAL_KINETIC_ENERGY)
+            {
+               energy(1) = sIt->second->dom(0).perturbation().point(0,0,0).real();
+            } else if(sIt->first == PhysicalNames::NONZONAL_KINETIC_ENERGY)
+            {
+               energy(2) = sIt->second->dom(0).perturbation().point(0,0,0).real();
+            } else
+            {
+               throw Exception("Kinetic energy calculation failed!");
+            }
+         }
       }
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef GEOMHDISCC_MPI
-         MPI_Allreduce(MPI_IN_PLACE, &energy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         MPI_Allreduce(MPI_IN_PLACE, energy.data(), energy.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif //GEOMHDISCC_MPI
 
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << energy << std::endl;
+         this->mFile << std::setprecision(16) << this->mTime << "\t" << energy(0) << "\t" << energy(1) << "\t" << energy(2) << std::endl;
       }
 
       // Close file

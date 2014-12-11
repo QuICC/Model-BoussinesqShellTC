@@ -87,8 +87,19 @@ namespace GeoMHDiSCC {
          /// Non orthogonal vertical vorticity field in tilted box
          TILTED_NO_VORTICITYZ,
 
-         /// Kinetic energy: u \cdot u
+         /// Mean X velocity field
+         MEAN_VELOCITYX,
+         /// Mean Y velocity field
+         MEAN_VELOCITYY,
+         /// Mean Z velocity field
+         MEAN_VELOCITYZ,
+
+         /// kinetic energy: u \cdot u
          KINETIC_ENERGY,
+         /// Zonal kinetic energy: u \cdot u
+         ZONAL_KINETIC_ENERGY,
+         /// Non zonal kinetic energy: u \cdot u
+         NONZONAL_KINETIC_ENERGY,
       };
    };
 

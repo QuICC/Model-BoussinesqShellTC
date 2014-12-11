@@ -52,9 +52,9 @@ namespace Equations {
       /// Computation:
       ///   \f$ u \cdot u\f$
       ///
-      rNLComp.setData((this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::THREE).data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::THREE).data().array()).matrix());
-      rNLComp.addData((this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array()*this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array()).matrix());
-      rNLComp.addData((this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()*this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array()).matrix());
+      rNLComp.setData((this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::THREE).data().array().pow(2)).matrix());
+      rNLComp.addData((this->scalar(PhysicalNames::STREAMFUNCTION).dom(0).grad().comp(FieldComponents::Physical::TWO).data().array().pow(2)).matrix());
+      rNLComp.addData((this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys().data().array().pow(2)).matrix());
    }
 
    void BoussinesqBeta3DQGPerKineticNRG::setRequirements()
@@ -65,13 +65,13 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add kinetic energy to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::KINETIC_ENERGY, FieldRequirement(true, true, false, false));
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::STREAMFUNCTION, FieldRequirement(true, false, false, true));
 
-      // Add temperature to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add Z velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, false));
    }
 

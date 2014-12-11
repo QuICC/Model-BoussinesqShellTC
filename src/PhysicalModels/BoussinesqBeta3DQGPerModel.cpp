@@ -32,6 +32,10 @@
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerVorticityZ.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanHeat.hpp"
 #include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerKineticNRG.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerZonalKineticNRG.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerNonZonalKineticNRG.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityY.hpp"
+#include "Equations/Asymptotics/Beta3DQG/Boussinesq/BoussinesqBeta3DQGPerMeanVelocityZ.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -60,8 +64,17 @@ namespace GeoMHDiSCC {
       
       // Add mean heat computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanHeat>();
+
+      // Add mean velocity components
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityY>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityZ>();
+
       // Add kinetic energy computation
       spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerKineticNRG>();
+
+      // Add zonal kinetic energy computation
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerZonalKineticNRG>();
+      spSim->addScalarEquation<Equations::BoussinesqBeta3DQGPerNonZonalKineticNRG>();
    }
 
    void BoussinesqBeta3DQGPerModel::addStates(SharedStateGenerator spGen)
@@ -166,6 +179,10 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DX_MEANTEMPERATURE);
 
+      // Add Mean variables
+      spVis->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityY>();
+      spVis->addScalarEquation<Equations::BoussinesqBeta3DQGPerMeanVelocityZ>();
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
@@ -173,6 +190,8 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::VELOCITYZ);
       spOut->expect(PhysicalNames::VORTICITYZ);
       spOut->expect(PhysicalNames::DX_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::MEAN_VELOCITYY);
+      spOut->expect(PhysicalNames::MEAN_VELOCITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -203,6 +222,8 @@ namespace GeoMHDiSCC {
       // Create kinetic energy writer
       IoVariable::SharedKineticEnergyBeta3DQGPerWriter spKinetic(new IoVariable::KineticEnergyBeta3DQGPerWriter(SchemeType::type()));
       spKinetic->expect(PhysicalNames::KINETIC_ENERGY);
+      spKinetic->expect(PhysicalNames::ZONAL_KINETIC_ENERGY);
+      spKinetic->expect(PhysicalNames::NONZONAL_KINETIC_ENERGY);
       spSim->addAsciiOutputFile(spKinetic);
    }
 

@@ -50,7 +50,12 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        if field_row == ("mean_velocityy",""):
+            fields = [("streamfunction","")]
+        elif field_row == ("mean_velocityz",""):
+            fields = [("velocityz","")]
+        else:
+            fields = []
 
         return fields
 
@@ -210,6 +215,12 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif field_row == ("kinetic_energy",""):
             mat = c1d.avg(res[0])
 
+        elif field_row == ("zonal_kinetic_energy",""):
+            mat = c1d.avg(res[0])
+
+        elif field_row == ("nonzonal_kinetic_energy",""):
+            mat = c1d.avg(res[0])
+
         return mat
 
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
@@ -279,6 +290,21 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
 
             elif field_col == ("vorticityz",""):
                 mat = c1d.i1(res[0], bc, -(kx**2 + ky**2))
+        
+        elif field_row == ("mean_velocityy",""):
+            if field_col == ("streamfunction",""):
+                if ky == 0:
+                    mat = c1d.qid(res[0], 0, no_bc(), -1j*kx)
+                else:
+                    mat = c1d.zblk(res[0], no_bc())
+        
+        elif field_row == ("mean_velocityz",""):
+            if field_col == ("velocityz",""):
+                if ky == 0:
+                    mat = c1d.qid(res[0], 0, no_bc(), -1.0)
+                else:
+                    mat = c1d.zblk(res[0], no_bc())
+
 
         return mat
 
