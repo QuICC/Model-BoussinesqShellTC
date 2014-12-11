@@ -444,8 +444,16 @@ def stencil(nx, bc):
 def avg(nx):
     """Compute the average of the expansion"""
 
-    mat = zblk(nx, c1dbc.no_bc())
+    mat = spsp.lil_matrix((1,nx))
     mat[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
     mat[0,0] = mat[0,0]/2
+
+    return mat
+
+def surfaceFlux(nx, cscale = 1.0):
+    """Compute the flux through boundary"""
+
+    mat = c1dbc.constrain(spsp.lil_matrix((1, nx)), {0:12})
+    mat = 2.0*cscale*mat
 
     return mat

@@ -49,11 +49,14 @@ namespace Equations {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
 
+      // Get Prandtl number
+      MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
+
       /// 
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)u_y\f$
       ///
-      Physical::VelocityAdvection<FieldComponents::Physical::ONE,FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::VELOCITYX).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYY).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::ONE,FieldComponents::Physical::TWO,FieldComponents::Physical::THREE>::set(rNLComp, this->scalar(PhysicalNames::VELOCITYX).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYY).dom(0).phys(), this->scalar(PhysicalNames::VELOCITYZ).dom(0).phys(), this->unknown().dom(0).grad(), 1.0/Pr);
    }
 
    void BoussinesqRB3DBoxVCVelocityZ::setRequirements()

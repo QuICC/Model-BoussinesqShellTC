@@ -112,17 +112,17 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_FIXED
-#error "The FIXED parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_FIXED
-#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
-#error "The SINGLE1D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE1D
-#ifdef GEOMHDISCC_MPIALGO_SINGLE2D
-#error "The SINGLE2D parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_SINGLE2D
-#ifdef GEOMHDISCC_MPIALGO_TUBULAR
-#error "The TUBULAR parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#if defined GEOMHDISCC_MPIALGO_FIXED && !defined GEOMHDISCC_MPISPSOLVE
+#error "The FIXED parallelisation is not supported without MPI sparse solver!" 
+#endif //GEOMHDISCC_MPIALGO_FIXED && !defined GEOMHDISCC_MPISPSOLVE
+#if defined GEOMHDISCC_MPIALGO_SINGLE1D && !defined GEOMHDISCC_MPISPSOLVE
+#error "The SINGLE1D parallelisation is not supported without MPI sparse solver!" 
+#endif //GEOMHDISCC_MPIALGO_SINGLE1D && !defined GEOMHDISCC_MPISPSOLVE
+#if defined GEOMHDISCC_MPIALGO_SINGLE2D && !defined GEOMHDISCC_MPISPSOLVE
+#error "The SINGLE2D parallelisation is not supported without MPI sparse solver!" 
+#endif //GEOMHDISCC_MPIALGO_SINGLE2D && !defined GEOMHDISCC_MPISPSOLVE
+#if defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_MPISPSOLVE
+#error "The TUBULAR parallelisation is not supported without MPI sparse solver!" 
+#endif //GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_MPISPSOLVE
 
 #endif // BOUSSINESQRRB3DBOXVCMODEL_HPP

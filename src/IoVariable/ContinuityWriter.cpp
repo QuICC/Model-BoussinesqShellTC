@@ -80,7 +80,7 @@ namespace IoVariable {
    
       MHDFloat continuity = (sIt.at(0)->second->dom(0).grad().comp(comp.at(0)).data() + sIt.at(1)->second->dom(0).grad().comp(comp.at(1)).data() + sIt.at(2)->second->dom(0).grad().comp(comp.at(2)).data()).array().abs().maxCoeff();
 
-      // Get the "global" Continuity number from MPI code
+      // Get the "global" velocity divergence from MPI code
       #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &continuity, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
       #endif //GEOMHDISCC_MPI

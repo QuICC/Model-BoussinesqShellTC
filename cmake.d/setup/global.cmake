@@ -57,6 +57,13 @@ geomhdiscc_provide_choice(GEOMHDISCC_SPLINALGS "Sparse linear algebra" GEOMHDISC
 
 if(splinalgTest)
    geomhdiscc_add_definition(GEOMHDISCC_SPLINALG)
+
+   if(GEOMHDISCC_SPLINALG STREQUAL "MUMPS")
+      option(GEOMHDISCC_MPISPSOLVE "Use MPI sparse solver?" OFF)
+      if(GEOMHDISCC_MPISPSOLVE)
+         add_definitions("-DGEOMHDISCC_MPISPSOLVE")
+      endif(GEOMHDISCC_MPISPSOLVE)
+   endif(GEOMHDISCC_SPLINALG STREQUAL "MUMPS")
 endif(splinalgTest)
 
 

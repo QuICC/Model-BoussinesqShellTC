@@ -263,7 +263,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_u, res[0])
+                    mat = mat + utils.id_from_idx_1d(idx_u, res[0])
 
             elif field_col == ("velocityy",""):
                 mat = c1d.zblk(res[0], bc)
@@ -286,7 +286,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_v, res[0])
+                    mat = mat + utils.id_from_idx_1d(idx_v, res[0])
 
             elif field_col == ("velocityz",""):
                 mat = c1d.zblk(res[0], bc)
@@ -309,7 +309,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 mat = c1d.i2lapl(res[0], k1, k2, bc, cscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0])*mat*utils.qid_from_idx(idx_w, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_w, res[0])
+                    mat = mat + utils.id_from_idx_1d(idx_w, res[0])
 
             elif field_col == ("temperature",""):
                 mat = c1d.i2(res[0], bc, Ra)
@@ -366,7 +366,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = c1d.zblk(res[0], bc)
-                    mat = mat + utils.id_from_idx(idx_p, res[0])
+                    mat = mat + utils.id_from_idx_1d(idx_p, res[0])
 
         return mat
 

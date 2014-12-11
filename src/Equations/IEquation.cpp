@@ -302,8 +302,8 @@ namespace Equations {
 
    void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Get first four standard arguments in a tuple of size 5
-      PyObject *pArgs = this->dispatchBaseArguments(5, bcType, spRes, eigs);
+      // Get first four standard arguments in a tuple of size 6
+      PyObject *pArgs = this->dispatchBaseArguments(6, bcType, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue, *pList;
@@ -323,6 +323,39 @@ namespace Equations {
          Py_DECREF(pTmp);
       }
       PyTuple_SetItem(pArgs, 4, pList);
+
+      // Set the restriction option
+      #ifdef GEOMHDISCC_MPI
+         #ifdef GEOMHDISCC_MPISPSOLVE
+            std::vector<int> slow;
+            std::vector<std::vector<int> > middle;
+
+            spRes->buildRestriction(slow, middle);
+            PyObject *pSlow, *pMiddle;
+
+            if(middle.size() > 0)
+            {
+               pSlow = PythonModelWrapper::makeList(slow);
+               pMiddle = PythonModelWrapper::makeList(middle);
+               pTmp = PyTuple_New(2);
+               PyTuple_SetItem(pTmp, 0, pSlow);
+               PyTuple_SetItem(pTmp, 1, pMiddle);
+            } else
+            {
+               pTmp = PythonModelWrapper::makeList(slow);
+            }
+
+            PyTuple_SetItem(pArgs, 5, pTmp);
+         #else
+            // MPI code with serial sparse solver
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(pArgs, 5, Py_None);
+         #endif //GEOMHDISCC_MPISPSOLVE
+      #else
+         // Serial code can't have any restriction
+         Py_INCREF(Py_None);
+         PyTuple_SetItem(pArgs, 5, Py_None);
+      #endif //GEOMHDISCC_MPI
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(opId));
@@ -368,8 +401,8 @@ namespace Equations {
 
    void IEquation::dispatchQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Get first four standard arguments in a tuple of size 5
-      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
+      // Get first four standard arguments in a tuple of size 6
+      PyObject *pArgs = this->dispatchBaseArguments(6, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;
@@ -381,6 +414,39 @@ namespace Equations {
       pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
       PyTuple_SetItem(pTmp, 1, pValue);
       PyTuple_SetItem(pArgs, 4, pTmp);
+
+      // Set the restriction option
+      #ifdef GEOMHDISCC_MPI
+         #ifdef GEOMHDISCC_MPISPSOLVE
+            std::vector<int> slow;
+            std::vector<std::vector<int> > middle;
+
+            spRes->buildRestriction(slow, middle);
+            PyObject *pSlow, *pMiddle;
+
+            if(middle.size() > 0)
+            {
+               pSlow = PythonModelWrapper::makeList(slow);
+               pMiddle = PythonModelWrapper::makeList(middle);
+               pTmp = PyTuple_New(2);
+               PyTuple_SetItem(pTmp, 0, pSlow);
+               PyTuple_SetItem(pTmp, 1, pMiddle);
+            } else
+            {
+               pTmp = PythonModelWrapper::makeList(slow);
+            }
+
+            PyTuple_SetItem(pArgs, 5, pTmp);
+         #else
+            // MPI code with serial sparse solver
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(pArgs, 5, Py_None);
+         #endif //GEOMHDISCC_MPISPSOLVE
+      #else
+         // Serial code can't have any restriction
+         Py_INCREF(Py_None);
+         PyTuple_SetItem(pArgs, 5, Py_None);
+      #endif //GEOMHDISCC_MPI
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::QI));
@@ -397,8 +463,8 @@ namespace Equations {
 
    void IEquation::dispatchExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
    {
-      // Get first four standard arguments in a tuple of size 6
-      PyObject *pArgs = this->dispatchBaseArguments(6, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
+      // Get first four standard arguments in a tuple of size 7
+      PyObject *pArgs = this->dispatchBaseArguments(7, ModelOperatorBoundary::FIELD_TO_RHS, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;
@@ -418,6 +484,39 @@ namespace Equations {
       pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(fieldId.second).c_str());
       PyTuple_SetItem(pTmp, 1, pValue);
       PyTuple_SetItem(pArgs, 5, pTmp);
+
+      // Set the restriction option
+      #ifdef GEOMHDISCC_MPI
+         #ifdef GEOMHDISCC_MPISPSOLVE
+            std::vector<int> slow;
+            std::vector<std::vector<int> > middle;
+
+            spRes->buildRestriction(slow, middle);
+            PyObject *pSlow, *pMiddle;
+
+            if(middle.size() > 0)
+            {
+               pSlow = PythonModelWrapper::makeList(slow);
+               pMiddle = PythonModelWrapper::makeList(middle);
+               pTmp = PyTuple_New(2);
+               PyTuple_SetItem(pTmp, 0, pSlow);
+               PyTuple_SetItem(pTmp, 1, pMiddle);
+            } else
+            {
+               pTmp = PythonModelWrapper::makeList(slow);
+            }
+
+            PyTuple_SetItem(pArgs, 6, pTmp);
+         #else
+            // MPI code with serial sparse solver
+            Py_INCREF(Py_None);
+            PyTuple_SetItem(pArgs, 6, Py_None);
+         #endif //GEOMHDISCC_MPISPSOLVE
+      #else
+         // Serial code can't have any restriction
+         Py_INCREF(Py_None);
+         PyTuple_SetItem(pArgs, 6, Py_None);
+      #endif //GEOMHDISCC_MPI
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR));

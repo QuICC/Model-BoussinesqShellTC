@@ -73,32 +73,32 @@ def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 15:
-        cond = tau_diff2(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 16:
-        cond = tau_integral(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_integral(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
-        cond = tau_diff2(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
     # Last mode is zero
     elif bc[0] == 99:
-        cond = tau_last(mat.shape[0])
+        cond = tau_last(mat.shape[1])
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()

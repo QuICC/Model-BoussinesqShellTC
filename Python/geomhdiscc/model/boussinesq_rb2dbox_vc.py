@@ -293,7 +293,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_u, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocityy",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
@@ -316,7 +316,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_v, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
 
             elif field_col == ("velocityz",""):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
@@ -339,7 +339,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                 mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_w, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
 
             elif field_col == ("temperature",""):
                 mat = c2d.i2j2(res[0], res[2], bc, Ra)
@@ -406,7 +406,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = c2d.zblk(res[0], res[2], 1, 1, bc)
-                    mat = mat + utils.id_from_idx(idx_p, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
                 mat = c2d.zblk(res[0], res[2], 1, 1, no_bc())
 
@@ -444,7 +444,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs, restriction = None):
+    def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
         # U: TiN
