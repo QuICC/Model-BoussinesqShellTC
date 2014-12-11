@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRRB3DBoxVCModel.cpp
- * @brief Source of the Boussinesq rotating Rayleigh-Benard 3D box (velocity-continuity formulation) model
+ * @file BoussinesqRRB2DBoxVCModel.cpp
+ * @brief Source of the Boussinesq rotating Rayleigh-Benard 2D box (velocity-continuity formulation) model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRRB3DBoxVCModel.hpp"
+#include "PhysicalModels/BoussinesqRRB2DBoxVCModel.hpp"
 
 // Project includes
 //
@@ -23,12 +23,11 @@
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/ContinuityWriter.hpp"
-#include "IoVariable/NusseltCubicWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRRB3DBoxVCTransport.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRRB3DBoxVCMomentum.hpp"
-#include "Equations/Box/Boussinesq/BoussinesqRRB3DBoxVCContinuity.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCTransport.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -36,23 +35,23 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRRB3DBoxVCModel::PYMODULE = "boussinesq_rrb3dbox_vc";
+   const std::string BoussinesqRRB2DBoxVCModel::PYMODULE = "boussinesq_rb2dbox_vc";
 
-   const std::string BoussinesqRRB3DBoxVCModel::PYCLASS = "BoussinesqRRB3DBoxVC";
+   const std::string BoussinesqRRB2DBoxVCModel::PYCLASS = "BoussinesqRRB2DBoxVC";
 
-   void BoussinesqRRB3DBoxVCModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRRB2DBoxVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqRRB3DBoxVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRRB2DBoxVCTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqRRB3DBoxVCMomentum>();
+      spSim->addVectorEquation<Equations::BoussinesqRRB2DBoxVCMomentum>();
 
       // Add continuity equation
-      spSim->addScalarEquation<Equations::BoussinesqRRB3DBoxVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRRB2DBoxVCContinuity>();
    }
 
-   void BoussinesqRRB3DBoxVCModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRRB2DBoxVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(false)
@@ -63,26 +62,26 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYPOLYPOLY);
-         spExact->setModeOptions(1e0, 1.0, 1e0, 0.0, 1e0, 0.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 1.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYPOLYPOLY);
-         spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 0.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYPOLYPOLY);
-         spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 1.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYPOLYPOLY);
-         spExact->setModeOptions(1e1, 1.0, 1e1, 2.0, 1e1, 3.0);
+         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
 
       // Generate random spectrum
       } else
@@ -93,22 +92,22 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator 
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYX);
-         spRand->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator 
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYY);
-         spRand->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator 
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -118,7 +117,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRB3DBoxVCModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRRB2DBoxVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
@@ -130,13 +129,13 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYX);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYY);
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::VELOCITYZ);
 
       // Add output file
@@ -146,7 +145,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRRB3DBoxVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRRB2DBoxVCModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -159,20 +158,15 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRRB3DBoxVCModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRRB2DBoxVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spCont(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spCont->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spCont);
-
-      // Create cubic Nusselt number writer
-      IoVariable::SharedNusseltCubicWriter spNusselt(new IoVariable::NusseltCubicWriter(SchemeType::type()));
-      spNusselt->expect(PhysicalNames::TEMPERATURE);
-      spSim->addAsciiOutputFile(spNusselt);
+      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
+      spState->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spState);
    }
 
-   void BoussinesqRRB3DBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRRB2DBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -187,7 +181,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRRB3DBoxVCModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRRB2DBoxVCModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

@@ -1,7 +1,7 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRB2DBoxVCContinuity.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCMomentum.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCContinuity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/CartesianExactScalarState.cpp

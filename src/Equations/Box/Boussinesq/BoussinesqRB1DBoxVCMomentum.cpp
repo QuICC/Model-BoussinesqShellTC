@@ -54,7 +54,19 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)u_x\f$
       ///
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(), 1.0);
+      FieldComponents::Spectral::Id specId;
+      if(id == FieldComponents::Physical::X)
+      {
+         specId = FieldComponents::Spectral::X;
+      } else if(id == FieldComponents::Physical::Y)
+      {
+         specId = FieldComponents::Spectral::Y;
+      } else if(id == FieldComponents::Physical::Z)
+      {
+         specId = FieldComponents::Spectral::Z;
+      }
+      
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0);
    }
 
    void BoussinesqRB1DBoxVCMomentum::setRequirements()

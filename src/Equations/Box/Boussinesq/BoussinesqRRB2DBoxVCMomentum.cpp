@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRB3DBoxVCMomentum.cpp
- * @brief Source of the implementation of the vector momentum equation in Rayleigh-Benard convection in 3D box
+ * @file BoussinesqRRB2DBoxVCMomentum.cpp
+ * @brief Source of the implementation of the vector momentum equation for rotating Rayleigh-Benard convection in 2D box
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Box/Boussinesq/BoussinesqRB3DBoxVCMomentum.hpp"
+#include "Equations/Box/Boussinesq/BoussinesqRRB2DBoxVCMomentum.hpp"
 
 // Project includes
 //
@@ -28,18 +28,18 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRB3DBoxVCMomentum::BoussinesqRB3DBoxVCMomentum(SharedEquationParameters spEqParams)
+   BoussinesqRRB2DBoxVCMomentum::BoussinesqRRB2DBoxVCMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRB3DBoxVCMomentum::~BoussinesqRB3DBoxVCMomentum()
+   BoussinesqRRB2DBoxVCMomentum::~BoussinesqRRB2DBoxVCMomentum()
    {
    }
 
-   void BoussinesqRB3DBoxVCMomentum::setCoupling()
+   void BoussinesqRRB2DBoxVCMomentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::X, CouplingInformation::PROGNOSTIC, 0, true, true, false);
 
@@ -48,11 +48,11 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
-   void BoussinesqRB3DBoxVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRRB2DBoxVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       /// 
       /// Computation of the advection:
-      ///   \f$ \left(\vec u\cdot\nabla\right)u_i\f$
+      ///   \f$ \left(\vec u\cdot\nabla\right)u_x\f$
       ///
       FieldComponents::Spectral::Id specId;
       if(id == FieldComponents::Physical::X)
@@ -66,10 +66,10 @@ namespace Equations {
          specId = FieldComponents::Spectral::Z;
       }
 
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unkwnown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad().comp(specId), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0);
    }
 
-   void BoussinesqRB3DBoxVCMomentum::setRequirements()
+   void BoussinesqRRB2DBoxVCMomentum::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -77,7 +77,7 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need grad?(, need curl?)
+      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, true));
    }
 

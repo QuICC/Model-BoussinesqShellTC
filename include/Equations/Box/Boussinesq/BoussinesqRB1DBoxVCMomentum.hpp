@@ -28,7 +28,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for Rayleigh-Benard convection in a 1D box (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a 1D box (velocity-continuity formulation)
     */
    class BoussinesqRB1DBoxVCMomentum: public IVectorEquation
    {
