@@ -43,46 +43,36 @@ namespace Transform {
       ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   void ForwardConfigurator::integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
       // Start detailed profiler
-      DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
+      DetailedProfilerMacro_start(ProfilerMacro::FWD3D);
 
-      TransformCoordinatorType::CommunicatorType::Fwd1DType* pInVar;
-
-      // Recover hold input data
-      if(recover)
-      {
-         pInVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd();
-
-      // Get the transfered input data
-      } else
-      {
-         pInVar = &coord.communicator().receiveForward<Dimensions::Transform::TRA1D>();
-      }
+      // Get recover input data from hold
+      TransformCoordinatorType::CommunicatorType::Fwd3DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA3D>();
 
       // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
+      TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
 
-      // Compute integration transform of first dimension
-      coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+      // Compute integration transform of third dimension
+      coord.transform3D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.opId());
 
-      // Hold temporary storage
+      // Hold temporary input storage
       if(hold)
       {
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pInVar);
+         coord.communicator().storage<Dimensions::Transform::TRA3D>().holdFwd(rInVar);
 
-      // Free temporary storage
+      // Free temporary input storage
       } else
       {
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pInVar);
+         coord.communicator().storage<Dimensions::Transform::TRA3D>().freeFwd(rInVar);
       }
 
-      // Hold temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rOutVar);
+      // Transfer output data to next step
+      coord.communicator().transferBackward<Dimensions::Transform::TRA3D>(rOutVar);
 
       // Stop detailed profiler
-      DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD3D);
    }
 
    void ForwardConfigurator::integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
@@ -125,36 +115,46 @@ namespace Transform {
       DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
    }
 
-   void ForwardConfigurator::integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold)
+   void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
       // Start detailed profiler
-      DetailedProfilerMacro_start(ProfilerMacro::FWD3D);
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
 
-      // Get recover input data from hold
-      TransformCoordinatorType::CommunicatorType::Fwd3DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA3D>();
+      TransformCoordinatorType::CommunicatorType::Fwd1DType* pInVar;
 
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
-
-      // Compute integration transform of third dimension
-      coord.transform3D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.opId());
-
-      // Hold temporary input storage
-      if(hold)
+      // Recover hold input data
+      if(recover)
       {
-         coord.communicator().storage<Dimensions::Transform::TRA3D>().holdFwd(rInVar);
+         pInVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd();
 
-      // Free temporary input storage
+      // Get the transfered input data
       } else
       {
-         coord.communicator().storage<Dimensions::Transform::TRA3D>().freeFwd(rInVar);
+         pInVar = &coord.communicator().receiveForward<Dimensions::Transform::TRA1D>();
       }
 
-      // Transfer output data to next step
-      coord.communicator().transferBackward<Dimensions::Transform::TRA3D>(rOutVar);
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
+
+      // Compute integration transform of first dimension
+      coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+
+      // Hold temporary storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pInVar);
+
+      // Free temporary storage
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pInVar);
+      }
+
+      // Hold temporary storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rOutVar);
 
       // Stop detailed profiler
-      DetailedProfilerMacro_stop(ProfilerMacro::FWD3D);
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
    }
 
 }

@@ -1,8 +1,6 @@
 set(MHDModelSources
    ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityX.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityY.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCVelocityZ.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCMomentum.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCContinuity.cpp
    ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen1DTools.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp

@@ -57,7 +57,7 @@ namespace Solver {
       DebuggerMacro_start("Trivial: create solvers", 2);
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
-      for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
+      for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; scalEqIt++)
       {
          // Get type information for the solvers
          this->createSolver((*scalEqIt), FieldComponents::Spectral::SCALAR);
@@ -65,7 +65,7 @@ namespace Solver {
 
       // Loop over all vector equations
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
-      for(vectEqIt = vectEq.first; vectEqIt < vectEq.second; vectEqIt++)
+      for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
          // Get type information for the solvers
          Equations::IVectorEquation::SpectralComponent_iterator compIt;

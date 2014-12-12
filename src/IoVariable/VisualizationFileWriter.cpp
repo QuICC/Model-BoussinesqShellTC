@@ -99,9 +99,16 @@ namespace IoVariable {
    {
       // Create the Physical parameters group
       hid_t group = H5Gcreate(this->file(), VisualizationFileTags::MESH.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      std::vector<FieldComponents::Physical::Id> gridId;
+      gridId.push_back(FieldComponents::Physical::ONE);
+      gridId.push_back(FieldComponents::Physical::TWO);
+      gridId.push_back(FieldComponents::Physical::THREE);
       for(int i = 0; i < this->mspRes->cpu()->nDim(); i ++)
       {
-         this->writeArray(group, VisualizationFileTags::GRID+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), this->mMesh.at(i));
+         if(gridId.at(i) != FieldComponents::Physical::NOTUSED)
+         {
+            this->writeArray(group, VisualizationFileTags::GRID+"_"+IoTools::IdToHuman::toTag(gridId.at(i)), this->mMesh.at(i));
+         }
       }
       
       // close group

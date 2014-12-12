@@ -251,8 +251,8 @@ namespace GeoMHDiSCC {
                   // Initialise transform branch
                   branches.insert(std::make_pair(vectIt->first, std::vector<Transform::IntegratorBranch>()));
 
-                  // Create scalar forward transform
-                  tmpBranches = Transform::TransformSteps::forwardScalar();
+                  // Create vector forward transform
+                  tmpBranches = Transform::TransformSteps::forwardVector();
                   branches.find(vectIt->first)->second.insert(branches.find(vectIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
                }
             }

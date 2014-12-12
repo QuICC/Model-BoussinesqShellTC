@@ -263,7 +263,7 @@ namespace Equations {
       }
 
       // Sort implicit fields
-      infoIt.first->second.sortImplicitFields(eqId.first, FieldComponents::Spectral::SCALAR);
+      infoIt.first->second.sortImplicitFields(eqId.first, eqId.second);
    }
 
    PyObject*  IEquation::dispatchBaseArguments(const int tupleSize, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const

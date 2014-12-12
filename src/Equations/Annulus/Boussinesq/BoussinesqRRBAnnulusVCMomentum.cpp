@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBAnnulusVCMomentum.cpp
- * @brief Source of the implementation of the vector momentum equation in Rayleigh-Benard convection in a cylindrical annulus
+ * @file BoussinesqRRBAnnulusVCMomentum.cpp
+ * @brief Source of the implementation of the vector momentum equation in rotating Rayleigh-Benard convection in a cylindrical annulus
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Annulus/Boussinesq/BoussinesqRBAnnulusVCMomentum.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCMomentum.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRBAnnulusVCMomentum::BoussinesqRBAnnulusVCMomentum(SharedEquationParameters spEqParams)
+   BoussinesqRRBAnnulusVCMomentum::BoussinesqRRBAnnulusVCMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBAnnulusVCMomentum::~BoussinesqRBAnnulusVCMomentum()
+   BoussinesqRRBAnnulusVCMomentum::~BoussinesqRRBAnnulusVCMomentum()
    {
    }
 
-   void BoussinesqRBAnnulusVCMomentum::setCoupling()
+   void BoussinesqRRBAnnulusVCMomentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
-   void BoussinesqRBAnnulusVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRRBAnnulusVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Get Prandtl number
       MHDFloat Pr = this->eqParams().nd(NonDimensional::PRANDTL);
@@ -68,7 +68,7 @@ namespace Equations {
       Physical::VelocityAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::R), this->unknown().dom(0).phys().comp(FieldComponents::Physical::THETA), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
-   void BoussinesqRBAnnulusVCMomentum::setRequirements()
+   void BoussinesqRRBAnnulusVCMomentum::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::VELOCITY);
@@ -76,7 +76,7 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add Z velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, true));
    }
 

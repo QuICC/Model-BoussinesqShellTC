@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    VectorFieldVisualizer::VectorFieldVisualizer(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams), mViewField(true), mViewGradient(false)
+      : IVectorEquation(spEqParams), mViewField(true), mViewGradient(false), mViewCurl(false)
    {
    }
 
@@ -42,29 +42,39 @@ namespace Equations {
       // Set the name
       this->setName(name);
 
-      // Setup toroidal/poloidal components
-      this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
-      this->mSpectralIds.push_back(FieldComponents::Spectral::TWO);
-
       // Set the variable requirements
       this->setRequirements();
    }
 
-   void VectorFieldVisualizer::setFields(const bool viewField, const bool viewGradient)
+   void VectorFieldVisualizer::setFields(const bool viewField, const bool viewGradient, const bool viewCurl)
    {
       this->mViewField = viewField;
 
       this->mViewGradient = viewGradient;
+
+      this->mViewCurl = viewCurl;
    }
 
    void VectorFieldVisualizer::setCoupling()
    {
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator specIt;
-      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
       {
-         this->defineCoupling(*specIt, CouplingInformation::WRAPPER, 0, false, false, false);
+         this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::WRAPPER, 0, true, false, false);
       }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::WRAPPER, 0, true, false, false);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::WRAPPER, 0, true, false, false);
+      }
+   }
+
+   void VectorFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   {
    }
 
    void VectorFieldVisualizer::setRequirements()
@@ -72,8 +82,8 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::AFTER);
 
-      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(this->name(), FieldRequirement(false, true, this->mViewField, this->mViewGradient));
+      // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?(, needCurl)
+      this->mRequirements.addField(this->name(), FieldRequirement(false, true, this->mViewField, this->mViewGradient, this->mViewCurl));
    }
 
 }

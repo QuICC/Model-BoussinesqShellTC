@@ -26,9 +26,7 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCTransport.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityX.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityY.hpp"
-#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCVelocityZ.hpp"
+#include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCMomentum.hpp"
 #include "Equations/Annulus/Boussinesq/BoussinesqRRBAnnulusVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/AnnulusExactScalarState.hpp"
@@ -47,9 +45,7 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityX>();
-      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityY>();
-      spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCVelocityZ>();
+      spSim->addVectorEquation<Equations::BoussinesqRRBAnnulusVCMomentum>();
 
       // Add continuity equation
       spSim->addScalarEquation<Equations::BoussinesqRRBAnnulusVCContinuity>();
@@ -116,9 +112,7 @@ namespace GeoMHDiSCC {
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::VELOCITYX);
-      spOut->expect(PhysicalNames::VELOCITYY);
-      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
@@ -147,9 +141,7 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spOut->expect(PhysicalNames::VELOCITYX);
-      spOut->expect(PhysicalNames::VELOCITYY);
-      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -160,9 +152,7 @@ namespace GeoMHDiSCC {
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
-      spIn->expect(PhysicalNames::VELOCITYX);
-      spIn->expect(PhysicalNames::VELOCITYY);
-      spIn->expect(PhysicalNames::VELOCITYZ);
+      spIn->expect(PhysicalNames::VELOCITY);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -172,9 +162,7 @@ namespace GeoMHDiSCC {
    {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITYX);
-      spState->expect(PhysicalNames::VELOCITYY);
-      spState->expect(PhysicalNames::VELOCITYZ);
+      spState->expect(PhysicalNames::VELOCITY);
       spSim->addAsciiOutputFile(spState);
    }
 

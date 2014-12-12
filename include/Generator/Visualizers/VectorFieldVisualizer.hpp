@@ -53,7 +53,15 @@ namespace Equations {
          /**
           * @brief Set which fields to output
           */
-         void setFields(const bool viewField, const bool viewGradient);
+         void setFields(const bool viewField, const bool viewGradient, const bool viewCurl);
+
+         /**
+          * @brief Compute the nonlinear interaction term
+          *
+          * @param rNLComp Nonlinear term component
+          * @param compId  ID of the component (allows for a more general implementation)
+          */
+         virtual void computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const;
 
       protected:
          /**
@@ -76,6 +84,11 @@ namespace Equations {
           * @brief Storage for output gradient flag
           */
          bool mViewGradient;
+
+         /**
+          * @brief Storage for output curl flag
+          */
+         bool mViewCurl;
    };
 
    /// Typedef for a shared VectorFieldVisualizer
