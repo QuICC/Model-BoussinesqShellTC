@@ -29,8 +29,11 @@
 #include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCMomentum.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRB2DBoxVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
+#include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
+#include "Generator/States/CartesianExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -57,57 +60,43 @@ namespace GeoMHDiSCC {
       if(false)
       {
          // Shared pointer to equation
-         Equations::SharedCartesianExactScalarState spExact;
+         Equations::SharedCartesianExactScalarState spScalar;
+         Equations::SharedCartesianExactVectorState spVector;
+
+         // Add exact initial state generator
+         spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
+         spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactVectorState::POLYSINPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
+         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactVectorState::POLYSINPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactVectorState::POLYSINPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 1.0);
-
-         // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
-
-         // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
-
-         // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
-         spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
 
       // Generate random spectrum
       } else
       {
          // Shared pointer to random initial state equation
-         Equations::SharedRandomScalarState spRand;
+         Equations::SharedRandomScalarState spScalar;
+         Equations::SharedRandomVectorState spVector;
 
-         // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYX);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
-
-         // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYY);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
-
-         // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         // Add random initial state generator 
+         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
+         spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setSpectrum(FieldComponents::Spectral::X, -1e-3, 1e-3, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::Y, -1e-3, 1e-3, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::Z, -1e-3, 1e-3, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -120,23 +109,18 @@ namespace GeoMHDiSCC {
    void BoussinesqRB2DBoxVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spScalar;
+      Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, false);
+      spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity fields visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYX);
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYY);
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYZ);
+      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setIdentity(PhysicalNames::VELOCITY);
+      spVector->setFields(true, false, false);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -163,6 +147,7 @@ namespace GeoMHDiSCC {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
       spState->expect(PhysicalNames::VELOCITY);
+
       spSim->addAsciiOutputFile(spState);
    }
 

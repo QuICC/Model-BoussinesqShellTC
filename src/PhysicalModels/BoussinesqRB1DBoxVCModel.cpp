@@ -147,6 +147,7 @@ namespace GeoMHDiSCC {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
       spState->expect(PhysicalNames::VELOCITY);
+
       spSim->addAsciiOutputFile(spState);
    }
 

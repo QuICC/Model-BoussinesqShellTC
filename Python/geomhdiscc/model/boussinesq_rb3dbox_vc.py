@@ -30,19 +30,19 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocityx", "velocityy", "velocityz", "temperature"]
+        return ["velocity", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature",""), ("pressure","")]
+        fields =  [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature",""), ("pressure","")]
 
         return fields
 
@@ -58,7 +58,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
 
         tau_n = res[0]*res[1]*res[2]
         if self.use_galerkin:
-            if field_row == ("velocityx","") or field_row == ("velocityy","")  or field_row == ("velocityz","") or field_row == ("temperature","") or field_row == ("pressure",""):
+            if field_row == ("velocity","x") or field_row == ("velocity","y")  or field_row == ("velocity","z") or field_row == ("temperature","") or field_row == ("pressure",""):
                 shift_x = 2
                 shift_y = 2
                 shift_z = 2
@@ -121,21 +121,21 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             # No-slip/No-slip/No-slip, Fixed temperature/Fixed temperature/Fixed temperature
             if bcId == 0:
                 if self.use_galerkin:
-                    if field_col == ("velocityx",""):
+                    if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityy",""):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
+                    elif field_col == ("velocity","z"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'xz'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'yx'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:20}, 'y':{0:20}, 'z':{0:20}, 'priority':'zy'}
@@ -143,21 +143,21 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
             elif bcId == 4:
                 if self.use_galerkin:
-                    if field_col == ("velocityx",""):
+                    if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityy",""):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
+                    elif field_col == ("velocity","z"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
                         bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:20}, 'priority':'xz'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:20}, 'priority':'yz'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsy'}
@@ -165,32 +165,32 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             # Stress-free/Stress-free/no-slip, Fixed flux/Fixed flux/Fixed temperature
             elif bcId == 6:
                 if self.use_galerkin:
-                    if field_col == ("velocityx",""):
+                    if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityy",""):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-21, 'r':0}}
-                    elif field_col == ("velocityz",""):
+                    elif field_col == ("velocity","z"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 else:
-                    if field_row == ("velocityx","") and field_col == ("velocityx",""):
+                    if field_row == ("velocity","x") and field_col == ("velocity","x"):
                         bc = {'x':{0:20}, 'y':{0:21}, 'z':{0:21}, 'priority':'xsz'}
-                    elif field_row == ("velocityy","") and field_col == ("velocityy",""):
+                    elif field_row == ("velocity","y") and field_col == ("velocity","y"):
                         bc = {'x':{0:21}, 'y':{0:20}, 'z':{0:21}, 'priority':'ysz'}
-                    elif field_row == ("velocityz","") and field_col == ("velocityz",""):
+                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
                         bc = {'x':{0:21}, 'y':{0:21}, 'z':{0:20}, 'priority':'zsx'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
-                if field_row == ("velocityx",""):
+                if field_row == ("velocity","x"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
-                elif field_row == ("velocityy",""):
+                elif field_row == ("velocity","y"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
-                elif field_row == ("velocityz",""):
+                elif field_row == ("velocity","z"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
@@ -204,21 +204,21 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             if self.use_galerkin:
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
-                    if field_col == ("velocityx",""):
+                    if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityy",""):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
+                    elif field_col == ("velocity","z"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
 
                 elif bcId == 4:
-                    if field_col == ("velocityx",""):
+                    if field_col == ("velocity","x"):
                         bc = {'x':{0:-20, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityy",""):
+                    elif field_col == ("velocity","y"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
-                    elif field_col == ("velocityz",""):
+                    elif field_col == ("velocity","z"):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
                     elif field_col == ("temperature",""):
                         bc = {'x':{0:-21, 'r':0}, 'y':{0:-21, 'r':0}, 'z':{0:-20, 'r':0}}
@@ -227,15 +227,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
-                if field_row == ("velocityx",""):
+                if field_row == ("velocity","x"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
-                elif field_row == ("velocityy",""):
+                elif field_row == ("velocity","y"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
-                elif field_row == ("velocityz",""):
+                elif field_row == ("velocity","z"):
                     bc['x']['r'] = 2
                     bc['y']['r'] = 2
                     bc['z']['r'] = 2
@@ -259,15 +259,15 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocityx",""):
+        if field_row == ("velocity","x"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_u, np.prod(res))*mat
 
-        elif field_row == ("velocityy",""):
+        elif field_row == ("velocity","y"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_v, np.prod(res))*mat
 
-        elif field_row == ("velocityz",""):
+        elif field_row == ("velocity","z"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
@@ -291,17 +291,17 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocityx",""):
-            if field_col == ("velocityx",""):
+        if field_row == ("velocity","x"):
+            if field_col == ("velocity","x"):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_3d(idx_u, res[1], res[2], res[0], restriction = restriction)
 
-            elif field_col == ("velocityy",""):
+            elif field_col == ("velocity","y"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityz",""):
+            elif field_col == ("velocity","z"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
@@ -311,17 +311,17 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
-        elif field_row == ("velocityy",""):
-            if field_col == ("velocityx",""):
+        elif field_row == ("velocity","y"):
+            if field_col == ("velocity","x"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityy",""):
+            elif field_col == ("velocity","y"):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_3d(idx_v, res[1], res[2], res[0], restriction = restriction)
 
-            elif field_col == ("velocityz",""):
+            elif field_col == ("velocity","z"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
@@ -331,14 +331,14 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
-        elif field_row == ("velocityz",""):
-            if field_col == ("velocityx",""):
+        elif field_row == ("velocity","z"):
+            if field_col == ("velocity","x"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityy",""):
+            elif field_col == ("velocity","y"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityz",""):
+            elif field_col == ("velocity","z"):
                 mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -353,13 +353,13 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("temperature",""):
-            if field_col == ("velocityx",""):
+            if field_col == ("velocity","x"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityy",""):
+            elif field_col == ("velocity","y"):
                 mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
-            elif field_col == ("velocityz",""):
+            elif field_col == ("velocity","z"):
                 if self.linearize:
                     mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
                     mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
@@ -376,7 +376,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
             if bcs["bcType"] == self.SOLVER_NO_TAU:
                 mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
             else:
-                if field_col == ("velocityx",""):
+                if field_col == ("velocity","x"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
                     bc['x']['zb'] = 1
@@ -389,7 +389,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
-                elif field_col == ("velocityy",""):
+                elif field_col == ("velocity","y"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
                     bc['x']['zb'] = 1
@@ -402,7 +402,7 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
                     mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
-                elif field_col == ("velocityz",""):
+                elif field_col == ("velocity","z"):
                     bc['x']['cr'] = 1
                     bc['x']['rt'] = 1
                     bc['x']['zb'] = 1
@@ -432,17 +432,17 @@ class BoussinesqRB3DBoxVC(base_model.BaseModel):
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocityx",""):
+        if field_row == ("velocity","x"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_u, np.prod(res))
             mat = S*mat*S
 
-        elif field_row == ("velocityy",""):
+        elif field_row == ("velocity","y"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_v, np.prod(res))
             mat = S*mat*S
 
-        elif field_row == ("velocityz",""):
+        elif field_row == ("velocity","z"):
             mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_w, np.prod(res))
             mat = S*mat*S

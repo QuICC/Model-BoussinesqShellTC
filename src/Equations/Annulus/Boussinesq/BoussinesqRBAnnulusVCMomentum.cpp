@@ -41,7 +41,11 @@ namespace Equations {
 
    void BoussinesqRBAnnulusVCMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::R, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+
+      this->defineCoupling(FieldComponents::Spectral::THETA, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+
+      this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
    void BoussinesqRBAnnulusVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -76,7 +80,7 @@ namespace Equations {
       // Set solver timing
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
-      // Add Z velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
+      // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, true));
    }
 

@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqRRBAnnulusVCModel.hpp
- * @brief Implementation of the Boussinesq rotating Rayleigh-Benard annulus (velocity-continuity formulation) model
+ * @brief Implementation of Boussinesq rotating Rayleigh-Benard in a annulus (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq Rayleigh-Benard rotating annulus (velocity-continuity formulation) model
+    * @brief Implementation of Boussinesq rotating Rayleigh-Benard rotating in a annulus (velocity-continuity formulation)
     */
    class BoussinesqRRBAnnulusVCModel
    {

@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqCylinderModel.hpp
- * @brief Implementation of the Boussinesq Rayleigh-Benard cylinder (velocity-continuity formulation) model 
+ * @brief Implementation of Boussinesq Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -27,7 +27,7 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq  Rayleigh-Benard cylinder (velocity-continuity formulation) model
+    * @brief Implementation of Boussinesq Rayleigh-Benard in a cylinder (velocity-continuity formulation) model
     */
    class BoussinesqRBCylinderVCModel
    {

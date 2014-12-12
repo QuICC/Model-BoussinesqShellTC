@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqRBAnnulusVCModel.hpp
- * @brief Implementation of Boussinesq Rayleigh-Benard in a annulus (velocity-continuity formulation)
+ * @file BoussinesqCylinderModel.hpp
+ * @brief Implementation of Boussinesq rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBANNULUSVCMODEL_HPP
-#define BOUSSINESQRBANNULUSVCMODEL_HPP
+#ifndef BOUSSINESQRRBCYLINDERVCMODEL_HPP
+#define BOUSSINESQRRBCYLINDERVCMODEL_HPP
 
 // Configuration includes
 //
@@ -22,14 +22,14 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/AFTScheme.hpp"
+#include "SpatialSchemes/3D/CFTScheme.hpp"
 
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of Boussinesq Rayleigh-Benard in a annulus (velocity-continuity formulation)
+    * @brief Implementation of Boussinesq rotating Rayleigh-Benard in a cylinder (velocity-continuity formulation) model
     */
-   class BoussinesqRBAnnulusVCModel
+   class BoussinesqRRBCylinderVCModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -42,7 +42,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::AFTScheme SchemeType;
+         typedef Schemes::CFTScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -99,12 +99,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqRBAnnulusVCModel();
+         BoussinesqRRBCylinderVCModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqRBAnnulusVCModel();
+         ~BoussinesqRRBCylinderVCModel();
    };
 
 }
@@ -122,4 +122,4 @@ namespace GeoMHDiSCC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
-#endif // BOUSSINESQRBANNULUSVCMODEL_HPP
+#endif // BOUSSINESQRRBCYLINDERVCMODEL_HPP

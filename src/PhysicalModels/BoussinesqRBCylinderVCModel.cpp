@@ -1,6 +1,6 @@
 /** 
  * @file BoussinesqRBCylinderVCModel.cpp
- * @brief Source of the Boussinesq Rayleigh-Benard cylinder (velocity-continuity formulation) model
+ * @brief Source of Boussinesq Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -24,13 +24,15 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVCTransport.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityX.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityY.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVCVelocityZ.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqCylinderVCContinuity.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCTransport.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCMomemtum.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCContinuity.hpp"
+#include "Generator/States/RandomScalarState.hpp"
+#include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CylinderExactScalarState.hpp"
+#include "Generator/States/CylinderExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
+#include "Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -42,15 +44,13 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCylinderVCModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqCylinderVCTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCylinderVCTransport>();
       
       // Add Navier-Stokes equation (X,Y,Z components)
-      spSim->addVectorEquation<Equations::BoussinesqCylinderVCVelocityX>();
-      spSim->addVectorEquation<Equations::BoussinesqCylinderVCVelocityY>();
-      spSim->addVectorEquation<Equations::BoussinesqCylinderVCVelocityZ>();
+      spSim->addVectorEquation<Equations::BoussinesqRBCylinderVCMomentum>();
 
       // Add continuity equation
-      spSim->addVectorEquation<Equations::BoussinesqCylinderVCContinuity>();
+      spSim->addVectorEquation<Equations::BoussinesqRBCylinderVCContinuity>();
    }
 
    void BoussinesqRBCylinderVCModel::addStates(SharedStateGenerator spGen)
@@ -59,64 +59,48 @@ namespace GeoMHDiSCC {
       if(false)
       {
          // Shared pointer to equation
-         Equations::SharedAnnulusExactScalarState spExact;
+         Equations::SharedCylinderExactScalarState spScalar;
+         Equations::SharedCylinderExactVectorState spVector;
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 1.0);
+         spVector = spGen->addVectorEquation<Equations::CylinderExactVectorState>();
+         spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setStateType(FieldComponents::Physical::R, Equations::CylinderExactVectorState::POLYCOSPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::R, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
+         spVector->setStateType(FieldComponents::Physical::THEAT, Equations::CylinderExactVectorState::POLYCOSPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::THETA, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CylinderExactVectorState::POLYCOSPOLY);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
-
-         // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-         spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
-
-         // Add scalar exact initial state generator
-         spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
-         spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
-         spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setStateType(Equations::CylinderExactScalarState::POLYSINPOLY);
+         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
 
       // Generate random spectrum
       } else
       {
          // Shared pointer to random initial state equation
-         Equations::SharedRandomScalarState spRand;
+         Equations::SharedRandomScalarState spScalar;
+         Equations::SharedRandomVectorState spVector;
 
          // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYX);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
-
-         // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYY);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
-
-         // Add scalar random initial state generator 
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::VELOCITYZ);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
+         spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setSpectrum(FieldComponents::Spectral::R, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::THETA, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::Z, -1e-4, 1e-4, 1e4, 1e4, 1e4);
 
          // Add scalar random initial state generator
-         spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
-         spRand->setIdentity(PhysicalNames::TEMPERATURE);
-         spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
       }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
-      spOut->expect(PhysicalNames::VELOCITYX);
-      spOut->expect(PhysicalNames::VELOCITYY);
-      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITY);
       spOut->expect(PhysicalNames::TEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
@@ -124,30 +108,23 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCylinderVCModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spScalar;
+      Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
 
-      // Add velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYX);
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYY);
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYZ);
+      // Add velocity fields visualization
+      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setIdentity(PhysicalNames::VELOCITY);
+      spVector->setFields(true, false, false);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spOut->expect(PhysicalNames::VELOCITYX);
-      spOut->expect(PhysicalNames::VELOCITYY);
-      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::VELOCITY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -158,9 +135,7 @@ namespace GeoMHDiSCC {
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
-      spIn->expect(PhysicalNames::VELOCITYX);
-      spIn->expect(PhysicalNames::VELOCITYY);
-      spIn->expect(PhysicalNames::VELOCITYZ);
+      spIn->expect(PhysicalNames::VELOCITY);
 
       // Set simulation state
       spVis->setInitialState(spIn);
@@ -170,9 +145,8 @@ namespace GeoMHDiSCC {
    {
       // Create maximal continuity writer
       IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITYX);
-      spState->expect(PhysicalNames::VELOCITYY);
-      spState->expect(PhysicalNames::VELOCITYZ);
+      spState->expect(PhysicalNames::VELOCITY);
+
       spSim->addAsciiOutputFile(spState);
    }
 
