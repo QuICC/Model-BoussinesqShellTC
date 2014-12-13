@@ -66,17 +66,17 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactVectorState::POLYCOSCOS);
+         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYCOSCOS);
          spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactVectorState::POLYCOSCOS);
+         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYCOSCOS);
          spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactVectorState::POLYCOSCOS);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSCOS);
          spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CartesianExactScalarState::POLYSINSIN);
+         spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
          spScalar->setModeOptions(1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
 
       // Generate random spectrum

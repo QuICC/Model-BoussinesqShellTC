@@ -49,7 +49,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ,  DIFF, DIVR, DIVRDIFF};
+         enum Id {PROJ,  DIFF, DIVR, DIVRDIFFR};
       };
 
       /**
@@ -238,9 +238,9 @@ namespace Transform {
          Solver::SparseSelector<SparseMatrix>::Type mSDivR;
 
          /**
-          * @brief Storage for the sparse solver for division by R differentiation
+          * @brief Storage for the sparse solver for division by R differentiation times R
           */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivRDiff;
+         Solver::SparseSelector<SparseMatrix>::Type mSDivRDiffR;
 
          /**
           * @brief Storage for the backward operators input data
@@ -346,13 +346,13 @@ namespace Transform {
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R differentiation
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFF)
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRDiff*chebVal.topRows(this->mspSetup->specSize());
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiff, this->mTmpInS);
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiffR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
@@ -445,13 +445,13 @@ namespace Transform {
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R differentiation of real part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFF)
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRDiff*chebVal.topRows(this->mspSetup->specSize()).real();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiff, this->mTmpInS);
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiffR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
@@ -493,13 +493,13 @@ namespace Transform {
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute division by R differentiation of imaginary part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFF)
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivRDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiff, this->mTmpInS);
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivRDiffR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 

@@ -53,9 +53,11 @@ namespace Transform {
           *    - PROJ: projection
           *    - DIFF: D
           *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
           *    - DIVRDIFFR: 1/r D r
+          *    - DIFFDIVR: D 1/r
           */
-         enum Id {PROJ,  DIFF, DIVR, DIVRDIFFR};
+         enum Id {PROJ, DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
       };
 
       /**
@@ -218,12 +220,30 @@ namespace Transform {
           */
          SparseMatrix   mDiff;
 
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+
+         /**
+          * @brief Storage for the division by R physical array
+          */
+         Array   mDivR;
+
+         /**
+          * @brief Storage for the division by R physical array
+          */
+         Array   mDivR2;
+
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+
          /**
           * @brief Storage for the division by R matrix
           */
          SparseMatrix   mDivR;
 
-         #if defined GEOMHDISCC_TRANSOP_BACKWARD
+         /**
+          * @brief Storage for the division by R^2 matrix
+          */
+         SparseMatrix   mDivR2;
+
          /**
           * @brief Storage for the sparse solver for differentiation
           */
@@ -235,6 +255,11 @@ namespace Transform {
          Solver::SparseSelector<SparseMatrix>::Type mSDivR;
 
          /**
+          * @brief Storage for the sparse solver for division by R^2
+          */
+         Solver::SparseSelector<SparseMatrix>::Type mSDivR2;
+
+         /**
           * @brief Storage for the backward operators input data
           */
          Matrix mTmpInS;
@@ -243,7 +268,7 @@ namespace Transform {
           * @brief Storage for the backward operators output data
           */
          Matrix mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -326,21 +351,33 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
       // Compute 1/r D r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute D 1/r
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
+      {
+         throw Exception("DIFFDIVR operator is not yet implemented");
 
       // Compute simple projection
       } else
@@ -354,6 +391,20 @@ namespace Transform {
 
       // Do transform
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
+
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute division by R
+      if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         rPhysVal = this->mDivR.asDiagonal()*rPhysVal;
+
+      // Compute division by R^2
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal = this->mDivR2.asDiagonal()*rPhysVal;
+      }
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
    }
 
    template <Arithmetics::Id TOperation> void AnnulusChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, AnnulusChebyshevFftwTransform::IntegratorType::Id integrator)
@@ -419,21 +470,33 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of real part
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).real();
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2 of real part
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
       // Compute 1/r D r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute D 1/r
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
+      {
+         throw Exception("DIFFDIVR operator is not yet implemented");
 
       // Compute simple projection of real part
       } else
@@ -449,6 +512,19 @@ namespace Transform {
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.real() = this->mTmpOut;
 
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute division by R
+      if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         rPhysVal.real() = this->mDivR.asDiagonal()*rPhysVal.real();
+
+      // Compute division by R^2
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal.real() = this->mDivR2.asDiagonal()*rPhysVal.real();
+      }
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
       // Compute first derivative of imaginary part
       if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFF)
       {
@@ -461,21 +537,33 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of imaginary part
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDivR*chebVal.topRows(this->mspSetup->specSize()).imag();
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2 of imaginary part
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
       // Compute 1/r D r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute D 1/r
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
+      {
+         throw Exception("DIFFDIVR operator is not yet implemented");
 
       // Compute simple projection of imaginary part
       } else
@@ -490,6 +578,19 @@ namespace Transform {
       // Do transform of imaginary part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.imag() = this->mTmpOut;
+
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute division by R
+      if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         rPhysVal.imag() = this->mDivR.asDiagonal()*rPhysVal.imag();
+
+      // Compute division by R^2
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal.imag() = this->mDivR2.asDiagonal()*rPhysVal.imag();
+      }
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
    }
 
 }

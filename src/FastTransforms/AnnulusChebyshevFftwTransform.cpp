@@ -132,16 +132,20 @@ namespace Transform {
 
    void AnnulusChebyshevFftwTransform::initOperators()
    {
-      // First derivative
+      // Initialize first derivative
       this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // Division by R
-      this->mDivR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cylindrical.annulus_radius");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Initialise array for division by R
+         this->mDivR = this->meshGrid().array().pow(-1);
+
+         // Initialise array for division by R^2
+         this->mDivR2 = this->meshGrid().array().pow(-2)
+
          // Prepare arguments to d1(...) call
          PyObject *pArgs, *pValue;
          pArgs = PyTuple_New(4);
@@ -168,10 +172,12 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->mDiff, pValue);
          Py_DECREF(pValue);
 
-         // Free memory for 1/r
-         this->mDivR.resize(0,0);
-         Debug::StaticAssert<false && "Not all forward operators are available!">();
       #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Initialise matrix for division by R
+         this->mDivR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+         // Initialise matrix for division by R^2
+         this->mDivR2.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+
          // Prepare arguments to i1(...) call
          PyObject *pArgs, *pValue;
          pArgs = PyTuple_New(4);
@@ -207,6 +213,16 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDivR, pValue);
          Py_DECREF(pValue);
+
+         // ... create boundary condition (none)
+         pValue = PyTuple_GetItem(pArgs, 3);
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+         // Call x2
+         PythonWrapper::setFunction("x2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDivR2, pValue);
+         Py_DECREF(pValue);
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Cleanup
@@ -226,7 +242,15 @@ namespace Transform {
          // Check for successful factorisation
          if(this->mSDivR.info() != Eigen::Success)
          {
-            throw Exception("Factorization of backward division failed!");
+            throw Exception("Factorization of backward division by R failed!");
+         }
+
+         // Factorize division matrix and free memory
+         this->mSDivR2.compute(this->mDivR2);
+         // Check for successful factorisation
+         if(this->mSDivR2.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward division by R^2 failed!");
          }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }

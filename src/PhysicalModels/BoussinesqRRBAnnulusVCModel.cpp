@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBAnnulusVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedAnnulusExactScalarState spScalar;
@@ -66,17 +66,17 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::AnnulusExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::R, Equations::AnnulusExactVectorState::POLYCOSPOLY);
+         spVector->setStateType(FieldComponents::Physical::R, Equations::AnnulusExactStateIds::POLYCOSPOLY);
          spVector->setModeOptions(FieldComponents::Physical::R, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::THEAT, Equations::AnnulusExactVectorState::POLYCOSPOLY);
+         spVector->setStateType(FieldComponents::Physical::THETA, Equations::AnnulusExactStateIds::POLYCOSPOLY);
          spVector->setModeOptions(FieldComponents::Physical::THETA, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::AnnulusExactVectorState::POLYCOSPOLY);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::AnnulusExactStateIds::POLYCOSPOLY);
          spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::AnnulusExactScalarState::POLYCOSPOLY);
+         spScalar->setStateType(Equations::AnnulusExactStateIds::POLYCOSPOLY);
          spScalar->setModeOptions(1e0, 2.0, 1e0, 2.0, 1e0, 0.0);
 
       // Generate random spectrum
@@ -96,7 +96,7 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-3, 1e3, 1e4, 1e4, 1e4);
       }
 
       // Add output file

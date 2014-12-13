@@ -46,7 +46,7 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void CartesianExactVectorState::setStateType(const FieldComponents::Physical::Id compId, const CartesianExactVectorState::StateTypeId id)
+   void CartesianExactVectorState::setStateType(const FieldComponents::Physical::Id compId, const CartesianExactStateIds::Id id)
    {
       this->mTypeId.insert(std::make_pair(compId, id));
    }
@@ -85,11 +85,11 @@ namespace Equations {
 
    void CartesianExactVectorState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
-      StateTypeId typeId = this->mTypeId.find(compId)->second;
+      CartesianExactStateIds::Id typeId = this->mTypeId.find(compId)->second;
       Array modeA = this->mModeA.find(compId)->second;
       Array modeK = this->mModeK.find(compId)->second;
 
-      if(typeId == CONSTANT)
+      if(typeId == CartesianExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(modeA(0)*modeA(1)*modeA(2));
       } else
@@ -124,11 +124,11 @@ namespace Equations {
                   // Generate solutions for TTT geometries
                   if(static_cast<int>(typeId) > 9 && static_cast<int>(typeId) < 20)
                   {
-                     if(typeId == POLYPOLYPOLY)
+                     if(typeId == CartesianExactStateIds::POLYPOLYPOLY)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->poly(modeA(1),modeK(1),j_);
-                        valI = this->poly(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::poly(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
 
                      } else
                      {
@@ -138,17 +138,17 @@ namespace Equations {
                      // Generate solutions for TFT geometries
                   } else if(static_cast<int>(typeId) > 19 && static_cast<int>(typeId) < 30)
                   {
-                     if(typeId == POLYCOSPOLY)
+                     if(typeId == CartesianExactStateIds::POLYCOSPOLY)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->poly(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == POLYSINPOLY)
+                     } else if(typeId == CartesianExactStateIds::POLYSINPOLY)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->poly(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::poly(modeA(2),modeK(2),i_);
 
                      } else
                      {
@@ -158,29 +158,29 @@ namespace Equations {
                      // Generate solutions for TFF geometries
                   } else if(static_cast<int>(typeId) > 29 && static_cast<int>(typeId) < 50)
                   {
-                     if(typeId == POLYCOSCOS)
+                     if(typeId == CartesianExactStateIds::POLYCOSCOS)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == POLYSINSIN)
+                     } else if(typeId == CartesianExactStateIds::POLYSINSIN)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == POLYSINCOS)
+                     } else if(typeId == CartesianExactStateIds::POLYSINCOS)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == POLYCOSSIN)
+                     } else if(typeId == CartesianExactStateIds::POLYCOSSIN)
                      {
-                        valK = this->poly(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
                      } else
                      {
@@ -190,76 +190,76 @@ namespace Equations {
                      // Generate solutions for FFF geometries
                   } else if(static_cast<int>(typeId) > 39 && static_cast<int>(typeId) < 50)
                   {
-                     if(typeId == COSCOSCOS)
+                     if(typeId == CartesianExactStateIds::COSCOSCOS)
                      {
-                        valK = this->cos(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == SINSINSIN)
+                     } else if(typeId == CartesianExactStateIds::SINSINSIN)
                      {
-                        valK = this->sin(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == COSSINCOS)
+                     } else if(typeId == CartesianExactStateIds::COSSINCOS)
                      {
-                        valK = this->cos(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == SINCOSSIN)
+                     } else if(typeId == CartesianExactStateIds::SINCOSSIN)
                      {
-                        valK = this->sin(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == SINSINCOS)
+                     } else if(typeId == CartesianExactStateIds::SINSINCOS)
                      {
-                        valK = this->sin(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == COSCOSSIN)
+                     } else if(typeId == CartesianExactStateIds::COSCOSSIN)
                      {
-                        valK = this->cos(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == SINCOSCOS)
+                     } else if(typeId == CartesianExactStateIds::SINCOSCOS)
                      {
-                        valK = this->sin(modeA(0),modeK(0),k_);
-                        valJ = this->cos(modeA(1),modeK(1),j_);
-                        valI = this->cos(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::sin(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::cos(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::cos(modeA(2),modeK(2),i_);
 
-                     } else if(typeId == COSSINSIN)
+                     } else if(typeId == CartesianExactStateIds::COSSINSIN)
                      {
-                        valK = this->cos(modeA(0),modeK(0),k_);
-                        valJ = this->sin(modeA(1),modeK(1),j_);
-                        valI = this->sin(modeA(2),modeK(2),i_);
+                        valK = CartesianExactStateIds::cos(modeA(0),modeK(0),k_);
+                        valJ = CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                        valI = CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
                      } else
                      {
                         throw Exception("Unknown exact state");
                      }
 
-                  } else if(typeId == SPECIAL1)
+                  } else if(typeId == CartesianExactStateIds::SPECIAL1)
                   {
-                     valK = 3.31 + this->poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + this->cos(modeA(1),modeK(1),j_) + this->sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + this->cos(modeA(2),modeK(2),i_) + this->sin(modeA(2),modeK(2),i_);
+                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) + CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) + CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                  } else if(typeId == SPECIAL2)
+                  } else if(typeId == CartesianExactStateIds::SPECIAL2)
                   {
-                     valK = 3.31 + this->poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + this->cos(modeA(1),modeK(1),j_) - this->sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + this->cos(modeA(2),modeK(2),i_) - this->sin(modeA(2),modeK(2),i_);
+                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) - CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) - CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
-                  } else if(typeId == SPECIAL3)
+                  } else if(typeId == CartesianExactStateIds::SPECIAL3)
                   {
-                     valK = 3.31 + this->poly(modeA(0),modeK(0),k_);
-                     valJ = 2.71 + this->cos(modeA(1),modeK(1),j_) + this->sin(modeA(1),modeK(1),j_);
-                     valI = -1.3 + this->cos(modeA(2),modeK(2),i_) + this->sin(modeA(2),modeK(2),i_);
+                     valK = 3.31 + CartesianExactStateIds::poly(modeA(0),modeK(0),k_);
+                     valJ = 2.71 + CartesianExactStateIds::cos(modeA(1),modeK(1),j_) + CartesianExactStateIds::sin(modeA(1),modeK(1),j_);
+                     valI = -1.3 + CartesianExactStateIds::cos(modeA(2),modeK(2),i_) + CartesianExactStateIds::sin(modeA(2),modeK(2),i_);
 
                   } else
                   {
@@ -285,34 +285,6 @@ namespace Equations {
 
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
       this->mRequirements.addField(this->name(), FieldRequirement(false, true, true, false));
-   }
-
-   MHDFloat CartesianExactVectorState::cos(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta) const
-   {
-      return amplitude*std::cos(mode*theta);
-   }
-
-   MHDFloat CartesianExactVectorState::sin(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta) const
-   {
-      return amplitude*std::sin(mode*theta);
-   }
-
-   MHDFloat CartesianExactVectorState::poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x) const
-   {
-      MHDFloat val;
-
-      if(mode == CartesianExactVectorState::PCOS)
-      {
-         val = this->cos(amplitude,mode,Math::PI*(x-1)/2.0);
-      } else if(mode == CartesianExactVectorState::PSIN)
-      {
-         val = this->sin(amplitude,mode,Math::PI*(x-1)/2.0);
-      } else
-      {
-         val = amplitude*std::pow(x,mode);
-      }
-
-      return val;
    }
 
 }

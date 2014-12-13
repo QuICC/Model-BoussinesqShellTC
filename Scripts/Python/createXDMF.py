@@ -36,9 +36,18 @@ def main(argv):
     # Extract file information
     h5_file = h5py.File(inputfile, 'r')
     scheme = h5_file['/'].attrs['type']
-    g1D = 'x'
-    g2D = 'y'
-    g3D = 'z'
+    if scheme in [b'TTT', b'TFT', b'TFF', b'FFF']:
+        g1D = 'x'
+        g2D = 'y'
+        g3D = 'z'
+    elif scheme in [b'AFT', b'CFT', b'WFT']:
+        g1D = 'r'
+        g2D = 'theta'
+        g3D = 'z'
+    elif scheme in [b'SLF', b'BLF', b'WLF']:
+        g1D = 'r'
+        g2D = 'theta'
+        g3D = 'phi'
     n1D = h5_file['mesh']['grid_'+g1D].size
     n2D = h5_file['mesh']['grid_'+g2D].size
     n3D = h5_file['mesh']['grid_'+g3D].size
@@ -61,19 +70,20 @@ def main(argv):
     print("Time: ", time)
     h5_file.close()
 
-    # Open file
+    # XDMF blocks and templates
     xdmfHead = '<?xml version="1.0" ?>\n<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>\n<Xdmf Version="2.0">\n\t<Domain>'
-    xdmfRevGrid = '\t\t\t\t<DataItem ItemType="Function" Function="-1.0*$0" Dimensions="%(nD)u">\n'
+    xdmfRevGrid = '\t\t\t\t<DataItem ItemType="Function" Function="-1.0*$0" Dimensions="{nD}">\n'
     xdmfRevGridEnd = '\t\t\t\t</DataItem>\n'
-    xdmfVxVyVzGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DRectMesh" NumberOfElements="%(n1D)u %(n2D)u %(n3D)u"/>\n\t\t\t<Geometry GeometryType="VxVyVz">\n%(r3D)s\t\t\t\t<DataItem Dimensions="%(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g3D)s\n\t\t\t\t</DataItem>\n%(r3De)s%(r2D)s\t\t\t\t<DataItem Dimensions="%(n2D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g2D)s\n\t\t\t\t</DataItem>\n%(r2De)s%(r1D)s\t\t\t\t<DataItem Dimensions="%(n1D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/mesh/grid_%(g1D)s\n\t\t\t\t</DataItem>\n%(r1De)s\t\t\t</Geometry>'
-    xdmfXYZGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DSMesh" NumberOfElements="%(n1D)u %(n2D)u %(n3D)u"/>\n\t\t\t<Geometry GeometryType="XYZ">\n\t\t\t\t<DataItem Dimensions="%(nN)u 3" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(gridfile)s.hdf5:/mesh/grid_%(g1D)s%(g2D)s%(g3D)s\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
-    xdmfScalar ='\t\t\t<Attribute Name="%(sname)s" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="%(n1D)u %(n2D)u %(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/%(sname)s/%(sname)s\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
-    xdmfVScalar ='\t\t\t<Attribute Name="%(sname)s" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="%(n1D)u %(n2D)u %(n3D)u" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t%(basename)s%(fid)04u.hdf5:/%(vname)s/%(sname)s\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
-    xdmfTime = '\t\t\t<Time Value="%(time)e" />'
+    xdmfVxVyVzGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DRectMesh" NumberOfElements="{n1D} {n2D} {n3D}"/>\n\t\t\t<Geometry GeometryType="VxVyVz">\n{r3D}\t\t\t\t<DataItem Dimensions="{n3D}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/mesh/grid_{g3D}\n\t\t\t\t</DataItem>\n{r3De}{r2D}\t\t\t\t<DataItem Dimensions="{n2D}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/mesh/grid_{g2D}\n\t\t\t\t</DataItem>\n{r2De}{r1D}\t\t\t\t<DataItem Dimensions="{n1D}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/mesh/grid_{g1D}\n\t\t\t\t</DataItem>\n{r1De}\t\t\t</Geometry>'
+    xdmfXYZGrid = '\t\t<Grid Name="grid" GridType="Uniform">\n\t\t\t<Topology TopologyType="3DSMesh" NumberOfElements="{n1D} {n2D} {n3D}"/>\n\t\t\t<Geometry GeometryType="XYZ">\n\t\t\t\t<DataItem Dimensions="{nN} 3" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{gridfile}.hdf5:/mesh/grid_{g1D[0]}{g2D[0]}{g3D[0]}\n\t\t\t\t</DataItem>\n\t\t\t</Geometry>'
+    xdmfScalar ='\t\t\t<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="{n1D} {n2D} {n3D}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/{sname}/{sname}\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
+    xdmfVScalar ='\t\t\t<Attribute Name="{sname}" AttributeType="Scalar" Center="Node">\n\t\t\t\t<DataItem Dimensions="{n1D} {n2D} {n3D}" NumberType="Float" Precision="8" Format="HDF">\n\t\t\t\t\t{basename}{fid:04d}.hdf5:/{vname}/{sname}\n\t\t\t\t</DataItem>\n\t\t\t</Attribute>'
+    xdmfTime = '\t\t\t<Time Value="{time}" />'
     xdmfEnd = '\t\t</Grid>\n\t</Domain>\n</Xdmf>'
     xdmfSeries = '\t\t<Grid Name="Timeseries" GridType="Collection" CollectionType="Temporal">'
     xdmfEndSeries = '\t\t</Grid>'
 
+    # Open file
     out_file = open(outputfile, 'w')
     print(xdmfHead, file=out_file)
     if snapshots > 1:
@@ -83,49 +93,48 @@ def main(argv):
         h5_file = h5py.File(current, 'r')
         if scheme in b'TFF':
             #if fId == sId:
-            #   boxXYZ(h5_file)
-            #print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'box_grid'}, file=out_file)
-            print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': '', 'r2De': '', 'r3D': '', 'r3De': ''}, file=out_file)
+            #   boxXYZ(h5_file, g1D, g2D, g3D)
+            #print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'box_grid'), file=out_file)
+            print(xdmfVxVyVzGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, fid = fId, basename = basename, g1D = g1D, g2D = g2D, g3D = g3D, r1D = xdmfRevGrid.format(nD = n1D), r1De = xdmfRevGridEnd, r2D = '', r2De = '', r3D ='', r3De = ''), file=out_file)
         elif scheme in [b'TFT']:
-            print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': '', 'r2De': '', 'r3D': xdmfRevGrid % {'nD': n3D}, 'r3De': xdmfRevGridEnd}, file=out_file)
+            print(xdmfVxVyVzGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, fid = fId, basename = basename, g1D = g1D, g2D = g2D, g3D = g3D, r1D = xdmfRevGrid.format(nD = n1D), r1De = xdmfRevGridEnd, r2D = '', r2De = '', r3D = xdmfRevGrid.format(nD = n3D), r3De = xdmfRevGridEnd), file=out_file)
         elif scheme in [b'TTT']:
-            print(xdmfVxVyVzGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'fid': fId, 'basename': basename, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'r1D': xdmfRevGrid % {'nD': n1D}, 'r1De': xdmfRevGridEnd, 'r2D': xdmfRevGrid % {'nD': n2D}, 'r2De': xdmfRevGridEnd, 'r3D': xdmfRevGrid % {'nD': n3D}, 'r3De': xdmfRevGridEnd}, file=out_file)
+            print(xdmfVxVyVzGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, fid = fId, basename = basename, g1D = g1D, g2D = g2D, g3D = g3D, r1D = xdmfRevGrid.format(nD = n1D), r1De = xdmfRevGridEnd, r2D = xdmfRevGrid.format(nD = n2D), r2De = xdmfRevGridEnd, r3D = xdmfRevGrid.format(nD = n3D), r3De = xdmfRevGridEnd), file=out_file)
         elif scheme in [b'CFT']:
             if fId == sId:
-                cylinderXYZ(h5_file)
-            print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'cylinder_grid'}, file=out_file)
+                cylinderXYZ(h5_file, g1D, g2D, g3D)
+            print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'cylinder_grid'), file=out_file)
         elif scheme in [b'AFT']:
             if fId == sId:
-                annulusXYZ(h5_file)
-                annulusWedgeXYZ(h5_file)
-            print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'annulus_grid'}, file=out_file)
+                annulusXYZ(h5_file, g1D, g2D, g3D)
+            print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'annulus_grid'), file=out_file)
         elif scheme in [b'BLF']:
             if fId == sId:
-                sphereXYZ(h5_file)
-            print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'sphere_grid'}, file=out_file)
+                sphereXYZ(h5_file, g1D, g2D, g3D)
+            print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'sphere_grid'), file=out_file)
         elif scheme in [b'SLF']:
             if fId == sId:
-                shellXYZ(h5_file)
-            print(xdmfXYZGrid % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'nN': n1D*n2D*n3D, 'g1D': g1D, 'g2D': g2D, 'g3D': g3D, 'gridfile': 'shell_grid'}, file=out_file)
+                shellXYZ(h5_file, g1D, g2D, g3D)
+            print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'shell_grid'), file=out_file)
         # Create scalars  
         for s in list(h5_file):
             if s in list(h5_file[s]):
-                print(xdmfScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'sname': s, 'fid': fId, 'basename': basename}, file=out_file)
+                print(xdmfScalar.format(n1D = n1D, n2D = n2D, n3D = n3D, sname = s, fid = fId, basename = basename), file=out_file)
         # Create vectors as scalars if requested
         if with_components:
             for v in list(h5_file):
                 for ext in [g1D, g2D, g3D]:
                     if v +  '_' + ext in list(h5_file[v]):
-                        print(xdmfVScalar % {'n1D': n1D, 'n2D': n2D, 'n3D': n3D, 'vname': v, 'sname': v +  '_' + ext, 'fid': fId, 'basename': basename}, file=out_file)
+                        print(xdmfVScalar.format(n1D = n1D, n2D = n2D, n3D = n3D, vname = v, sname = v +  '_' + ext, fid = fId, basename = basename), file=out_file)
         time = h5_file['run']['time'].value
-        print(xdmfTime % {'time': time}, file=out_file)
+        print(xdmfTime.format(time = time), file=out_file)
         if snapshots > 1:
             print(xdmfEndSeries, file=out_file)
         h5_file.close()
     print(xdmfEnd, file=out_file)
     out_file.close()
 
-def boxXYZ(h5_file):
+def boxXYZ(h5_file, g1D, g2D, g3D):
     g_x = h5_file['mesh']['grid_x']
     g_y = h5_file['mesh']['grid_y']
     g_z = h5_file['mesh']['grid_z']
@@ -139,13 +148,13 @@ def boxXYZ(h5_file):
                 i = i + 1
     grid_file = h5py.File('box_grid.hdf5', 'w')
     mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
     dset[:,:] = box
     grid_file.close()
 
-def cylinderXYZ(h5_file):
-    g_r = h5_file['mesh']['grid_x']
-    g_th = h5_file['mesh']['grid_y']
+def cylinderXYZ(h5_file, g1D, g2D, g3D):
+    g_r = h5_file['mesh']['grid_r']
+    g_th = h5_file['mesh']['grid_theta']
     g_z = h5_file['mesh']['grid_z']
     size = g_r.size*g_th.size*g_z.size
     annulus = np.zeros([size,3])
@@ -157,14 +166,14 @@ def cylinderXYZ(h5_file):
                 i = i + 1
     grid_file = h5py.File('cylinder_grid.hdf5', 'w')
     mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
     dset[:,:] = annulus
     grid_file.close()
 
-def annulusXYZ(h5_file):
-    g_r = h5_file['mesh']['grid_x']
-    g_th = h5_file['mesh']['grid_y']
-    g_z = h5_file['mesh']['grid_z']
+def annulusXYZ(h5_file, g1D, g2D, g3D):
+    g_r = h5_file['mesh']['grid_'+g1D]
+    g_th = h5_file['mesh']['grid_'+g2D]
+    g_z = h5_file['mesh']['grid_'+g3D]
     size = g_r.size*g_th.size*g_z.size
     annulus = np.zeros([size,3])
     i = 0
@@ -175,14 +184,14 @@ def annulusXYZ(h5_file):
                 i = i + 1
     grid_file = h5py.File('annulus_grid.hdf5', 'w')
     mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
     dset[:,:] = annulus
     grid_file.close()
 
-def annulusWedgeXYZ(h5_file):
-    g_r = h5_file['mesh']['grid_x']
-    g_th = h5_file['mesh']['grid_y']
-    g_z = h5_file['mesh']['grid_z']
+def annulusWedgeXYZ(h5_file, g1D, g2D, g3D):
+    g_r = h5_file['mesh']['grid_'+g1D]
+    g_th = h5_file['mesh']['grid_'+g2D]
+    g_z = h5_file['mesh']['grid_'+g3D]
     size = g_r.size*2*g_z.size
     annulus = np.zeros([size,3])
     i = 0
@@ -200,10 +209,10 @@ def annulusWedgeXYZ(h5_file):
     dset[:,:] = annulus
     grid_file.close()
 
-def sphereXYZ(h5_file):
-    g_r = h5_file['mesh']['grid_x']
-    g_th = h5_file['mesh']['grid_y']
-    g_ph = h5_file['mesh']['grid_z']
+def sphereXYZ(h5_file, g1D, g2D, g3D):
+    g_r = h5_file['mesh']['grid_'+g1D]
+    g_th = h5_file['mesh']['grid_'+g2D]
+    g_ph = h5_file['mesh']['grid_'+g3D]
     size = g_r.size*g_th.size*g_ph.size
     shell = np.zeros([size,3])
     i = 0
@@ -214,14 +223,14 @@ def sphereXYZ(h5_file):
                 i = i + 1
     grid_file = h5py.File('sphere_grid.hdf5', 'w')
     mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
     dset[:,:] = shell
     grid_file.close()
 
-def shellXYZ(h5_file):
-    g_r = h5_file['mesh']['grid_x']
-    g_th = h5_file['mesh']['grid_y']
-    g_ph = h5_file['mesh']['grid_z']
+def shellXYZ(h5_file, g1D, g2D, g3D):
+    g_r = h5_file['mesh']['grid_'+g1D]
+    g_th = h5_file['mesh']['grid_'+g2D]
+    g_ph = h5_file['mesh']['grid_'+g3D]
     size = g_r.size*g_th.size*g_ph.size
     shell = np.zeros([size,3])
     i = 0
@@ -232,7 +241,7 @@ def shellXYZ(h5_file):
                 i = i + 1
     grid_file = h5py.File('shell_grid.hdf5', 'w')
     mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_xyz', (size, 3), '=f8')
+    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
     dset[:,:] = shell
     grid_file.close()
 
