@@ -215,6 +215,5 @@ if show_solution:
     pl.contourf(grid_z, grid_r, phys_t, 50)
     pl.colorbar()
     pl.title("T")
-
     pl.show()
     pl.close("all")

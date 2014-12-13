@@ -75,7 +75,17 @@ def x1(nr, a, b, rg):
     x = sy.Symbol('x')
     A = annulus.x1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
-    ssol = sphys*x
+    ssol = sy.expand(sphys*x)
+    test_forward(A, sphys, ssol, rg, 0)
+
+def x2(nr, a, b, rg):
+    """Accuracy test for x^2 operator"""
+
+    print("x2:")
+    x = sy.Symbol('x')
+    A = annulus.x2(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sphys*x**2)
     test_forward(A, sphys, ssol, rg, 0)
 
 def d1(nr, a, b, rg):
@@ -86,6 +96,17 @@ def d1(nr, a, b, rg):
     A = annulus.d1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x)
+    test_forward(A, sphys, ssol, rg, 0)
+
+def x1d1(nr, a, b, rg):
+    """Accuracy test for x1d1 operator"""
+
+    print("x1d1:")
+    x = sy.Symbol('x')
+    A = annulus.x1d1(nr, a, b, annulus.radbc.no_bc(), zr = 0)
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    print(sphys)
+    ssol = sy.expand(x*sy.diff(sphys,x))
     test_forward(A, sphys, ssol, rg, 0)
 
 def x1div(nr, a, b, rg):
@@ -133,7 +154,6 @@ def i1x1div(nr, a, b, rg):
     A = annulus.i1x1div(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     sphys = 1e10*x**(nr-1) 
-    print(sphys)
     ssol = sy.expand(sy.diff(sphys*x,x))
     ssol = sy.integrate(ssol,x)
     test_forward(A, sphys, ssol, rg, 1)
@@ -146,9 +166,19 @@ def i1x1(nr, a, b, rg):
     A = annulus.i1x1(nr, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     sphys = 1e10*x**(nr-1) 
-    print(sphys)
     ssol = sy.expand(sphys*x)
-    ssol = sy.integrate(ssol,x)
+    ssol = sy.expand(sy.integrate(ssol,x))
+    test_forward(A, sphys, ssol, rg, 1)
+
+def i1x2(nr, a, b, rg):
+    """Accuracy test for i1x2 operator"""
+
+    print("i1x2:")
+    x = sy.Symbol('x')
+    A = annulus.i1x2(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sphys*x**2)
+    ssol = sy.expand(sy.integrate(ssol,x))
     test_forward(A, sphys, ssol, rg, 1)
 
 def i2(nr, a, b, rg):
@@ -194,6 +224,28 @@ def i2x2d2(nr, a, b, rg):
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
+def i2x3d1(nr, a, b, rg):
+    """Accuracy test for i2x3d1 operator"""
+
+    print("i2x3d1:")
+    x = sy.Symbol('x')
+    A = annulus.i2x3d1(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sy.diff(sphys,x)*x**3)
+    ssol = sy.expand(sy.integrate(ssol,x,x))
+    test_forward(A, sphys, ssol, rg, 2)
+
+def i2x3d1x_2(nr, a, b, rg):
+    """Accuracy test for i2x3d1x_2 operator"""
+
+    print("i2x3d1x_2:")
+    x = sy.Symbol('x')
+    A = annulus.i2x3d1x_2(nr, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(sy.diff(sphys,x)*x - 2*sphys)
+    ssol = sy.expand(sy.integrate(ssol,x,x))
+    test_forward(A, sphys, ssol, rg, 2)
+
 def i2x2(nr, a, b, rg):
     """Accuracy test for i2x2 operator"""
 
@@ -226,6 +278,18 @@ def i2x2laplh(nr, a, b, rg):
     A = annulus.i2x2laplh(nr, m, a, b, annulus.radbc.no_bc())
     sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.expand(x**2*sy.diff(sphys,x,x) + x*sy.diff(sphys,x) - m**2*sphys)
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, rg, 2)
+
+def i2x3laplhx_1(nr, a, b, rg):
+    """Accuracy test for i2x3laplhx_1 operator"""
+
+    print("i2x3laplhx_1:")
+    x = sy.Symbol('x')
+    m = np.random.randint(1, nr)
+    A = annulus.i2x3laplhx_1(nr, m, a, b, annulus.radbc.no_bc())
+    sphys = np.sum([rand_amplitude*np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(x**2*sy.diff(sphys,x,x) - x*sy.diff(sphys,x) - m**2*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
@@ -322,24 +386,29 @@ if __name__ == "__main__":
     nr = 16
     a, b = annulus.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
-    print(rg)
 
     # run tests
     #zblk(nr, a, b, rg)
 #    x1(nr, a, b, rg)
+    x2(nr, a, b, rg)
 #    d1(nr, a, b, rg)
-    x1div(nr, a, b, rg)
-    i1(nr, a, b, rg)
-    i1x1d1(nr, a, b, rg)
-    i1x1div(nr, a, b, rg)
-    i1x1(nr, a, b, rg)
+    x1d1(nr, a, b, rg)
+#    x1div(nr, a, b, rg)
+#    i1(nr, a, b, rg)
+#    i1x1d1(nr, a, b, rg)
+#    i1x1div(nr, a, b, rg)
+#    i1x1(nr, a, b, rg)
+    i1x2(nr, a, b, rg)
 #    i2(nr, a, b, rg)
 #    i2x1(nr, a, b, rg)
 #    i2x2(nr, a, b, rg)
-#    i2x2d2(nr, a, b, rg)
 #    i2x2d1(nr, a, b, rg)
+#    i2x2d2(nr, a, b, rg)
+    i2x3d1(nr, a, b, rg)
+    i2x3d1x_2(nr, a, b, rg)
 #    i2x2div(nr, a, b, rg)
 #    i2x2laplh(nr, a, b, rg)
+    i2x3laplhx_1(nr, a, b, rg)
 #    i4x4(nr, a, b, rg)
 #    i4x4laplh(nr, a, b, rg)
 #    i4x4lapl2h(nr, a, b, rg)
