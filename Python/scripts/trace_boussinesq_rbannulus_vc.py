@@ -4,8 +4,7 @@ import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 
-#import geomhdiscc.model.boussinesq_rbannulus_vc as mod
-import geomhdiscc.model.boussinesq_rbannulus_vc2 as mod
+import geomhdiscc.model.boussinesq_rbannulus_vc as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBAnnulusVC()
@@ -67,7 +66,6 @@ if solve_evp:
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
         # Extract continuity from velocity 
         a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        #sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         sol_c = mod.annulus.x1d1(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         intg_c = mod.annulus.i1j1x1d1(res[0], res[2], a, b, mod.no_bc())*sol_ubar + mod.annulus.i1j1(res[0], res[2], a, b, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.annulus.i1j1x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
@@ -83,7 +81,6 @@ if show_solution:
     sol_pbar = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
     a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-    #sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     sol_c = mod.annulus.x1d1(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     intg_c = mod.annulus.i1j1x1d1(res[0], res[2], a, b, mod.no_bc())*sol_ubar + mod.annulus.i1j1(res[0], res[2], a, b, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.annulus.i1j1x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale)*sol_w
     

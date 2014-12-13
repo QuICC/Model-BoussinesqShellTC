@@ -4,9 +4,7 @@ import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 
-#import geomhdiscc.model.boussinesq_rbcylinder_vc as mod
-#import geomhdiscc.model.boussinesq_rbcylinder_vc2 as mod
-import geomhdiscc.model.boussinesq_rbcylinder_vc3 as mod
+import geomhdiscc.model.boussinesq_rbcylinder_vc as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBCylinderVC()
@@ -73,7 +71,6 @@ if show_solution:
         sol_vbar = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
         # Extract continuity from velocity 
-        #sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
         intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
@@ -86,7 +83,6 @@ if show_solution:
     sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
     sol_pbar = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
-    #sol_c = mod.cylinder.x1div(res[0], res[2], (eigs[0]+1)%2, mod.no_bc(), sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x1e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
     intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
     

@@ -271,7 +271,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+            mat = annulus.zblk(res[0], res[2], 1, 1, bc)
 
         return mat
 
@@ -292,13 +292,10 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = annulus.i2j2x3laplx_1(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_u, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","theta"):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
@@ -314,7 +311,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, -1.0)
+                mat = annulus.i2j2x3d1x_2(res[0], res[2], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","theta"):
@@ -326,13 +323,10 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2(res[0], res[2], a, b, bc, -1.0)
+                mat = annulus.i2j2x3laplx_1(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_v, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
 
             elif field_col == ("velocity","z"):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
@@ -341,7 +335,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m)
+                mat = annulus.i2j2(res[0], res[2], a, b, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
@@ -355,14 +349,14 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
-                    mat = mat + utils.id_from_idx(idx_w, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
 
             elif field_col == ("temperature",""):
                 mat = annulus.i2j2x2(res[0], res[2], a, b, bc, Ra)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
+                mat = annulus.i2j2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
@@ -390,17 +384,17 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 if field_col == ("velocity","r"):
                     bc['r']['cr'] = 1
                     bc['r']['rt'] = 1
-                    bc['r']['zb'] = 1
+                    #bc['r']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc)
+                    mat = annulus.i1j1x1d1(res[0]+1, res[2]+1, a, b, bc)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","theta"):
                     bc['r']['cr'] = 1
                     bc['r']['rt'] = 1
-                    bc['r']['zb'] = 1
+                    #bc['r']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
@@ -410,11 +404,11 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 elif field_col == ("velocity","z"):
                     bc['r']['cr'] = 1
                     bc['r']['rt'] = 1
-                    bc['r']['zb'] = 1
+                    #bc['r']['zb'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
+                    mat = annulus.i1j1x2e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
@@ -422,9 +416,9 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = annulus.zblk(res[0], res[2], 1, 1, bc)
-                    mat = mat + utils.id_from_idx(idx_p, res[0]*res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[2])
             else:
-                mat = annulus.zblk(res[0], res[2], 2, 2, no_bc())
+                mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
 
         return mat
 
@@ -458,7 +452,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
             mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
 
         elif field_row == ("pressure",""):
-            mat = annulus.zblk(res[0], res[2], 2, 2, bc)
+            mat = annulus.zblk(res[0], res[2], 1, 1, bc)
 
         return mat
 
@@ -467,18 +461,19 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
         # U: T_iN, T_Ni
         idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # V: T_iN, T_Ni
         idx_v = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # W: T_Nk, T_N-1K
+#        idx_w = utils.qidx(res[2], res[2])
         idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2))
 
         # Pressure: T_iN, T_Nk
         idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
         idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-4)))
         # Pressure: T_00
         if eigs[0] == 0:
