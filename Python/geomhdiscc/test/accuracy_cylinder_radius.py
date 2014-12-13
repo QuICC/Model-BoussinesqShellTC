@@ -100,6 +100,22 @@ def x1(nr, rg):
         ssol = sy.expand(x*sphys)
         test_forward(A, (parity,(parity+1)%2), sphys, ssol, rg, 1)
 
+def x2(nr, rg):
+    """Accuracy test for x2 operator"""
+
+    print("x2:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.x2(nr, parity, cylinder.radbc.no_bc(), zr = 0)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        sphys = 1e10*x**(2*nr-2+parity)
+        ssol = sy.expand(x**2*sphys)
+        test_forward(A, parity, sphys, ssol, rg, 1)
+
 def d1(nr, rg):
     """Accuracy test for d1 operator"""
 
@@ -114,6 +130,22 @@ def d1(nr, rg):
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
         ssol = sy.expand(sy.diff(sphys,x))
         test_forward(A, (parity,(parity+1)%2), sphys, ssol, rg, 1)
+
+def x1d1(nr, rg):
+    """Accuracy test for x1d1 operator"""
+
+    print("x1d1:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.x1d1(nr, parity, cylinder.radbc.no_bc(), zr = 0)
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        print(sphys)
+        ssol = sy.expand(x*sy.diff(sphys,x))
+        test_forward(A, parity, sphys, ssol, rg, 1)
 
 def x1div(nr, rg):
     """Accuracy test for x1div operator"""
@@ -157,6 +189,7 @@ def i1x1d1(nr, rg):
         parity = m%2
         print("\tTest for m = " + str(m))
         A = cylinder.i1x1d1(nr, parity, cylinder.radbc.no_bc())
+        print(A.todense())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
         ssol = sy.expand(sy.diff(sphys,x)*x)
         ssol = sy.integrate(ssol,x)
@@ -193,6 +226,22 @@ def i1x1(nr, rg):
         ssol = sy.expand(sphys*x)
         ssol = sy.integrate(ssol,x)
         test_forward(A, parity, sphys, ssol, rg, 1)
+
+def i1x2(nr, rg):
+    """Accuracy test for i1x2 operator"""
+
+    print("i1x2:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.i1x2(nr, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(sphys*x**2)
+        ssol = sy.integrate(ssol,x)
+        test_forward(A, (parity,(parity+1)%2), sphys, ssol, rg, 1)
 
 def i2(nr, rg):
     """Accuracy test for i2 operator"""
@@ -257,6 +306,38 @@ def i2x2d2(nr, rg):
         ssol = sy.integrate(ssol,x,x)
         test_forward(A, parity, sphys, ssol, rg, 2)
 
+def i2x3d1(nr, rg):
+    """Accuracy test for i2x3d1 operator"""
+
+    print("i2x3d1:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.i2x3d1(nr, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys,x)*x**3)
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, parity, sphys, ssol, rg, 2)
+
+def i2x3d1x_2(nr, rg):
+    """Accuracy test for i2x3d1x_2 operator"""
+
+    print("i2x3d1x_2:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.i2x3d1x_2(nr, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(sy.diff(sphys,x)*x - 2*sphys)
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, parity, sphys, ssol, rg, 2)
+
 def i2x2(nr, rg):
     """Accuracy test for i2x2 operator"""
 
@@ -303,6 +384,22 @@ def i2x2laplh(nr, rg):
         A = cylinder.i2x2laplh(nr, m, parity, cylinder.radbc.no_bc())
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
         ssol = sy.expand(x**2*sy.diff(sphys,x,x) + x*sy.diff(sphys,x) - m**2*sphys)
+        ssol = sy.integrate(ssol,x,x)
+        test_forward(A, parity, sphys, ssol, rg, 1)
+
+def i2x3laplhx_1(nr, rg):
+    """Accuracy test for i2x3laplhx_1 operator"""
+
+    print("i2x3laplhx_1:")
+    x = sy.Symbol('x')
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\tTest for m = " + str(m))
+        A = cylinder.i2x3laplhx_1(nr, m, parity, cylinder.radbc.no_bc())
+        sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*nr,2)])
+        ssol = sy.expand(x**2*sy.diff(sphys,x,x) - x*sy.diff(sphys,x) - m**2*sphys)
         ssol = sy.integrate(ssol,x,x)
         test_forward(A, parity, sphys, ssol, rg, 1)
 
@@ -429,25 +526,33 @@ def mvss_d1(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 20
+    nr = 6
     rg = transf.rgrid(nr)
 
     # run tests
     #zblk(nr, rg)
-#    x1(nr, rg)
+    x1(nr, rg)
+#    x2(nr, rg)
 #    d1(nr, rg)
+#    x1d1(nr, rg)
 #    x1div(nr, rg)
 #    i1(nr, rg)
 #    i1x1d1(nr, rg)
 #    i1x1div(nr, rg)
 #    i1x1(nr, rg)
+#    i1x2(nr, rg)
 #    i2(nr, rg)
-    i2x1(nr, rg)
+#    i2x1(nr, rg)
+#    i2(nr, rg)
+#    i2x1(nr, rg)
 #    i2x2(nr, rg)
-#    i2x2d2(nr, rg)
 #    i2x2d1(nr, rg)
+#    i2x2d2(nr, rg)
+#    i2x3d1(nr, rg)
+#    i2x3d1x_2(nr, rg)
 #    i2x2div(nr, rg)
 #    i2x2laplh(nr, rg)
+#    i2x3laplhx_1(nr, rg)
 #    i4(nr, rg)
 #    i4x4(nr, rg)
 #    i4x4laplh(nr, rg)

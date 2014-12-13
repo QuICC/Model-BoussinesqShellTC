@@ -431,6 +431,39 @@ def i2x2laplh(nr, m, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i2x3laplhx_1(nr, m, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^3 Laplacian 1/x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**2*(m**2 - n**2 + 6.0*n - 8.0)/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b*(2.0*n - 5.0)/(2.0*n)
+
+    # Generate main diagonal
+    def d0(n):
+        return (a**2*m**2 + a**2*n**2 - 4.0*a**2 + 2.0*b**2*n**2 - 2.0*b**2)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a*b*(2.0*n + 5.0)/(2.0*n)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*(m**2 - n**2 - 6.0*n - 8.0)/(4.0*n*(n + 1.0))
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral T_n(x)."""
 

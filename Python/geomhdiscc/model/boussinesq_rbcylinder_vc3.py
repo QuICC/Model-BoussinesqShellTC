@@ -136,6 +136,28 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:10}, 'z':{0:20}, 'priority':'z'}
+
+            # Stress-free/No-slip, Fixed flux/Fixed temperature
+            elif bcId == 2:
+                if self.use_galerkin:
+                    if field_col == ("velocity","r"):
+                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocity","theta"):
+                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("velocity","z"):
+                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                    elif field_col == ("temperature",""):
+                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+
+                else:
+                    if field_row == ("velocity","r") and field_col == ("velocity","r"):
+                        bc = {'r':{0:10}, 'z':{0:20}, 'priority':'r'}
+                    elif field_row == ("velocity","theta") and field_col == ("velocity","theta"):
+                        bc = {'r':{0:13}, 'z':{0:20}, 'priority':'r'}
+                    elif field_row == ("velocity","z") and field_col == ("velocity","z"):
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {'r':{0:11}, 'z':{0:20}, 'priority':'z'}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -201,11 +223,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta"):
@@ -233,16 +255,13 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
+                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -2.0*1j*m)
+                mat = cylinder.i2j2(res[0], res[2], m%2, bc, -2.0*1j*m)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
             elif field_col == ("velocity","z"):
@@ -252,19 +271,16 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x2d1(res[0], res[2], m%2, bc, -1.0)
+                mat = cylinder.i2j2x3d1x_2(res[0], res[2], m%2, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","theta"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2j2(res[0], res[2], (m+1)%2, bc, 2.0*1j*m)
+                mat = cylinder.i2j2(res[0], res[2], m%2, bc, 2.0*1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, (m+1)%2, bc, zscale = zscale)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2(res[0], res[2], (m+1)%2, bc, -1.0)
+                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
@@ -276,15 +292,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x1(res[0], res[2], m%2, bc, -1j*m)
+                mat = cylinder.i2j2(res[0], res[2], m%2, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","r"):
-                mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","z"):
                 mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
@@ -297,15 +313,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x2e1(res[0], res[2], m%2, bc, -1.0, zscale = zscale)
+                mat = cylinder.i2j2e1(res[0], res[2], m%2, bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","r"):
-                mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.zblk(res[0], res[2], (m+1)%2, 1, 2, bc)
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","z"):
                 if self.linearize:
@@ -323,33 +339,57 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
                 if field_col == ("velocity","r"):
-                    bc['r']['rt'] = 1
-                    bc['r']['cr'] = 1
-                    bc['r']['zb'] = 1
+                    if m%2 == 1:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
+                    else:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
-                    mat = cylinder.i1j1x1div(res[0]+1, res[2]+1, (m+1)%2, bc)
+                    if m%2 == 1:
+                        mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
+                    else:
+                        mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","theta"):
-                    bc['r']['rt'] = 1
-                    bc['r']['cr'] = 1
-                    bc['r']['zb'] = 1
+                    if m%2 == 1:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
+                    else:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
-                    mat = cylinder.i1j1(res[0]+1, res[2]+1, (m%1)%2, bc, 1j*m)
+                    if m%2 == 1:
+                        mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
+                    else:
+                        mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
                 elif field_col == ("velocity","z"):
-                    bc['r']['rt'] = 1
-                    bc['r']['cr'] = 1
-                    bc['r']['zb'] = 1
+                    if m%2 == 1:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
+                    else:
+                        bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
+                        #bc['r']['zb'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
-                    mat = cylinder.i1j1x1e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
+                    if m%2 == 1:
+                        mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
+                    else:
+                        mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
@@ -374,12 +414,12 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
@@ -399,26 +439,39 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def zero_blocks(self, res, eigs, restriction = None):
         """Build restriction matrices"""
 
-        m = eigs[0]
+        if eigs[0]%2 == 1:
+            # U: T_Ni
+            idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 
-        # U: T_Ni
-        idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+            # V: T_Ni
+            idx_v = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 
-        # V: T_Ni
-        idx_v = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+            # W: TiN
+            idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
 
-        # W: TiN
-        idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+            # P:
+            idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2)))
+        else:
+            # U: T_Ni
+            idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+    #        idx_u = np.union1d(idx_u, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
-        # P:
-        idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
-#        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2)))
-        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-1)))
-        # Pressure: T_00
-        if eigs[0] == 0:
-            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
+            # V: T_Ni
+            idx_v = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+    #        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+
+            # W: TiN
+            idx_w = utils.qidx(res[2], res[2])
+            idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
+
+            # P:
+            idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
+            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2)))
+    #        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-1)))
+            # Pressure: T_00
+            if eigs[0] == 0:
+                idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
         return (idx_u, idx_v, idx_w, idx_p)

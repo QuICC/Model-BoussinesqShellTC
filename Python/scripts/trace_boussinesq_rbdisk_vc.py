@@ -2,7 +2,9 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rbdisk_vc as mod
+#import geomhdiscc.model.boussinesq_rbdisk_vc as mod
+#import geomhdiscc.model.boussinesq_rbdisk_vc2 as mod
+import geomhdiscc.model.boussinesq_rbdisk_vc3 as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqRBDiskVC()
@@ -11,13 +13,13 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [2000, 0, 0]
+res = [500, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':5901.55}
 #eq_params = {'prandtl':1, 'rayleigh':0.}
-eigs = [4]
+eigs = [7]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -59,15 +61,17 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = 9
+    viz_mode = 1
 
     for mode in range(0,len(evp_lmb)):
         # Get solution vectors
         sol_u = evp_vec[0:res[0],mode]
         sol_v = evp_vec[res[0]:2*res[0],mode]
         # Extract continuity from velocity 
-        sol_c = mod.cylinder.x1div(res[0], (eigs[0]+1)%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
-        intg_c = mod.cylinder.i1x1div(res[0], (eigs[0]+1)%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], (eigs[0]+1)%2 , mod.no_bc(), 1j*eigs[0])*sol_v
+        #sol_c = mod.cylinder.x1div(res[0], (eigs[0]+1)%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
+        #intg_c = mod.cylinder.i1x1div(res[0], (eigs[0]+1)%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], (eigs[0]+1)%2 , mod.no_bc(), 1j*eigs[0])*sol_v
+        sol_c = mod.cylinder.x1d1(res[0], eigs[0]%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
+        intg_c = mod.cylinder.i1x1d1(res[0], eigs[0]%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], eigs[0]%2 , mod.no_bc(), 1j*eigs[0])*sol_v
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
@@ -77,8 +81,10 @@ if show_solution:
     sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
     sol_p = evp_vec[3*res[0]:4*res[0],viz_mode]
     # Extract continuity from velocity 
-    sol_c = mod.cylinder.x1div(res[0], (eigs[0]+1)%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
-    intg_c = mod.cylinder.i1x1div(res[0], (eigs[0]+1)%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], (eigs[0]+1)%2 , mod.no_bc(), 1j*eigs[0])*sol_v
+    #sol_c = mod.cylinder.x1div(res[0], (eigs[0]+1)%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
+    #intg_c = mod.cylinder.i1x1div(res[0], (eigs[0]+1)%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], (eigs[0]+1)%2 , mod.no_bc(), 1j*eigs[0])*sol_v
+    sol_c = mod.cylinder.x1d1(res[0], eigs[0]%2, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
+    intg_c = mod.cylinder.i1x1d1(res[0], eigs[0]%2, mod.no_bc())*sol_u + mod.cylinder.i1(res[0], eigs[0]%2 , mod.no_bc(), 1j*eigs[0])*sol_v
     
     # Create spectrum plots
     pl.subplot(2,3,1)
@@ -101,11 +107,11 @@ if show_solution:
 
     # Compute physical space values
     grid_r = transf.rgrid(res[0])
-    phys_u = transf.torphys(sol_u.real, (eigs[0]+1)%2)
-    phys_v = transf.torphys(sol_v.real, (eigs[0]+1)%2)
+    phys_u = transf.torphys(sol_u.real, eigs[0]%2)
+    phys_v = transf.torphys(sol_v.real, eigs[0]%2)
     phys_t = transf.torphys(sol_t.real, eigs[0]%2)
     phys_p = transf.torphys(sol_p.real, eigs[0]%2)
-    phys_c = transf.torphys(sol_c.real, (eigs[0]+1)%2)
+    phys_c = transf.torphys(sol_c.real, eigs[0]%2)
 
     # Show physical contour plot
     pl.subplot(2,3,1)

@@ -21,6 +21,19 @@ def x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def x2():
+    """Cylinder multiplication by x^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':2, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i1():
     """Cylinder 1st integral operator"""
 
@@ -73,6 +86,19 @@ def i1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i1x2():
+    """Cylinder 1st integral of x^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':2, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2():
     """Cylinder 2nd integral operator"""
 
@@ -104,6 +130,32 @@ def i2x2d1():
 
     # Setup terms in recurrence
     terms = [{'q':2, 'p':2, 'd':1, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3d1():
+    """Cylinder 2nd integral of x^3 1st derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':3, 'd':1, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3d1x_2():
+    """Cylinder 2nd integral of x^3 1st derivative 1/x^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-2.0}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 
@@ -158,6 +210,20 @@ def i2x2laplh():
     # Setup terms in recurrence
     m = sympy.Symbol('m')
     terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-m**2}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3laplhx_1():
+    """Cylinder 2nd integral of x^3 horizontal laplacian 1/x operator"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':-1}, {'q':2, 'p':0, 'd':0, 'c':-m**2}]
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
 

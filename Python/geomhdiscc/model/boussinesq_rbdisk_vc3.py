@@ -28,7 +28,7 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
     def all_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocityx", "velocityy", "temperature"]
+        return ["velocity", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
@@ -179,11 +179,11 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2x2(res[0], (m+1)%2, bc)
+            mat = cylinder.i2x2(res[0], m%2, bc)
             mat = utils.qid_from_idx(idx_u, res[0])*mat
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2x2(res[0], (m+1)%2, bc)
+            mat = cylinder.i2x2(res[0], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0])*mat
 
         elif field_row == ("temperature",""):
@@ -205,33 +205,29 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2x2laplh(res[0], m, (m+1)%2, bc)
-                bc[0] = min(bc[0], 0)
-                mat = mat + cylinder.i2(res[0], (m+1)%2, bc, -1.0)
+                mat = cylinder.i2x3laplhx_1(res[0], m, m%2, bc)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_1d(idx_u, res[0])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2(res[0], (m+1)%2, bc, -2.0*1j*m)
+                mat = cylinder.i2(res[0], m%2, bc, -2.0*1j*m)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
             elif field_col == ("temperature",""):
                 mat = cylinder.zblk(res[0], m%2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2x2d1(res[0], m%2, bc, -1.0)
+                mat = cylinder.i2x3d1x_2(res[0], m%2, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("velocity","theta"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2(res[0], (m+1)%2, bc, 2.0*1j*m)
+                mat = cylinder.i2(res[0], m%2, bc, 2.0*1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2x2laplh(res[0], m, (m+1)%2, bc)
-                bc[0] = min(bc[0], 0)
-                mat = mat + cylinder.i2(res[0], (m+1)%2, bc, -1.0)
+                mat = cylinder.i2x3laplhx_1(res[0], m, m%2, bc)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_1d(idx_v, res[0])
@@ -240,15 +236,15 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
                 mat = cylinder.zblk(res[0], m%2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2x1(res[0], m%2, bc, -1j*m)
+                mat = cylinder.i2(res[0], m%2, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0])*mat*utils.qid_from_idx(idx_p, res[0])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","r"):
-                mat = cylinder.zblk(res[0], (m+1)%2, bc)
+                mat = cylinder.zblk(res[0], m%2, bc)
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.zblk(res[0], (m+1)%2, bc)
+                mat = cylinder.zblk(res[0], m%2, bc)
 
             elif field_col == ("temperature",""):
                 mat = cylinder.i2x2laplh(res[0], m, m%2, bc)
@@ -262,14 +258,14 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
                     bc['rt'] = 1
                     bc['cr'] = 1
 #                    bc['zb'] = 1
-                    mat = cylinder.i1x1div(res[0]+1, (m+1)%2, bc)
+                    mat = cylinder.i1x1d1(res[0]+1, m%2, bc)
                     mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_u, res[0])
 
                 elif field_col == ("velocity","theta"):
                     bc['rt'] = 1
                     bc['cr'] = 1
 #                    bc['zb'] = 1
-                    mat = cylinder.i1(res[0]+1, (m%1)%2, bc, 1j*m)
+                    mat = cylinder.i1(res[0]+1, m%2, bc, 1j*m)
                     mat = utils.qid_from_idx(idx_p, res[0])*mat*utils.qid_from_idx(idx_v, res[0])
 
                 elif field_col == ("temperature",""):
@@ -294,12 +290,12 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2x2(res[0], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2x2(res[0], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2x2(res[0], (m+1)%2, bc, 1.0/Pr)
+            mat = cylinder.i2x2(res[0], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0])
             mat = S*mat*S
 
@@ -316,17 +312,14 @@ class BoussinesqRBDiskVC(base_model.BaseModel):
 
         # U: T_iN, T_Ni
         idx_u = utils.qidx(res[0], res[0])
-#        idx_u = utils.qidx(res[0], res[0]-1)
 
         # V: T_iN, T_Ni
         idx_v = utils.qidx(res[0], res[0])
-#        idx_v = utils.qidx(res[0], res[0]-1)
 
         # Pressure: T_iN, T_Nk
-        idx_p = utils.qidx(res[0], res[0])
         idx_p = utils.qidx(res[0], res[0]-1)
         # Pressure: T_00
         if eigs[0] == 0:
-            idx_p = utils.sidx(res[0], res[0]-1)
+            idx_p = np.union1d(idx_p, utils.sidx(res[0], res[0]-1))
 
         return (idx_u, idx_v, idx_p)

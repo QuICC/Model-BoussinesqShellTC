@@ -140,6 +140,13 @@ def i2j2x2lapl(nr, nz, m, a, b, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 
+def i2x3laplhx_1(nr, nz, m, a, b, bc, coeff = 1.0):
+    """Create a i2x3laplhx_1 in R kronecker with an identity in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.qid(nz, 0, bcz), rad.i2x3laplhx_1(nr, m, a, b, bcr))
+    return cylbc.constrain(mat, nr, nz, 2, 0, bc)
+
 def i4j4(nr, nz, a, b, bc, coeff = 1.0):
     """Create a i4 in R kronecker with an i4 in Z"""
 
