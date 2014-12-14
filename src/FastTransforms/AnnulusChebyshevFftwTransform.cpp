@@ -144,7 +144,7 @@ namespace Transform {
          this->mDivR = this->meshGrid().array().pow(-1);
 
          // Initialise array for division by R^2
-         this->mDivR2 = this->meshGrid().array().pow(-2)
+         this->mDivR2 = this->meshGrid().array().pow(-2);
 
          // Prepare arguments to d1(...) call
          PyObject *pArgs, *pValue;

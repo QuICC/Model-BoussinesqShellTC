@@ -565,9 +565,9 @@ namespace Equations {
          {
             assert(matIdx == 0);
 
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+            //int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            //int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
 
             //Safety assertion
             assert(start >= 0);

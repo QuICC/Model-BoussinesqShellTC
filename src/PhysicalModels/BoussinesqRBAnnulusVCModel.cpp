@@ -119,8 +119,8 @@ namespace GeoMHDiSCC {
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setFields(true, true, false);
       spVector->setIdentity(PhysicalNames::VELOCITY);
-      spVector->setFields(true, false, false);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));

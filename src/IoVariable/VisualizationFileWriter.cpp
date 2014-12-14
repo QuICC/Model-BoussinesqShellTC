@@ -25,6 +25,7 @@
 #include "IoVariable/VisualizationFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoVariable {
@@ -85,9 +86,25 @@ namespace IoVariable {
             this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).phys().data());
          }
 
+         if(vit->second->dom(0).hasGrad())
+         {
+            std::cerr << "SHOULD WRITE GRAD" << std::endl;
+            std::vector<FieldComponents::Spectral::Id> fId;
+            fId.push_back(FieldComponents::Spectral::ONE);
+            fId.push_back(FieldComponents::Spectral::TWO);
+            fId.push_back(FieldComponents::Spectral::THREE);
+            for(unsigned int i = 0; i < fId.size(); i ++)
+            {
+               if(fId.at(i) != FieldComponents::Spectral::NOTUSED)
+               {
+                  this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first)+"_grad_"+IoTools::IdToHuman::toTag(fId.at(i)), vit->second->dom(0).grad(fId.at(i)).data());
+               }
+            }
+         }
+
          if(vit->second->dom(0).hasCurl())
          {
-            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).curl().data());
+            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first)+"_curl", vit->second->dom(0).curl().data());
          }
       }
 
