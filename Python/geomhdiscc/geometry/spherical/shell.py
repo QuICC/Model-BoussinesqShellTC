@@ -17,7 +17,7 @@ def convert_bc(bc):
         bcr = bc
     else:
         bcr = rad.radbc.no_bc()
-        for k, v in bc['r'].items():
+        for k, v in bc.items():
             if k != 0:
                 bcr[k] = v
 

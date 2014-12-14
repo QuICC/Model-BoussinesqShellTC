@@ -24,6 +24,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "Generator/States/ShellExactStateIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,13 +36,8 @@ namespace Equations {
    class ShellExactVectorState: public IVectorEquation
    {
       public:
-         /**
-          * @brief Enums for the avaialable exact states
-          */
-         enum StateTypeId {
-            CONSTANT,
-            HARMONIC,
-         };
+         /// Typedef to simplify notations for harmonic mode
+         typedef std::tr1::tuple<int, int, MHDComplex> HarmonicModeType;
 
          /**
           * @brief Simple constructor
@@ -81,16 +77,14 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
-         void setStateType(const ShellExactVectorState::StateTypeId id);
+         void setStateType(const FieldComponents::Physical::Id compId, const ShellExactStateIds::Id id);
 
          /**
           * @brief Set options for the harmonics states
           *
-          * @param rModes   List of harmonics with amplitude to create
-          * @param tModes   List of harmonics with amplitude to create
-          * @param pModes   List of harmonics with amplitude to create
+          * @param modes   List of harmonics with amplitude to create
           */
-         void setHarmonicOptions(const std::vector<std::tr1::tuple<int, int, MHDComplex> >& rModes, const std::vector<std::tr1::tuple<int, int, MHDComplex> >& tModes, const std::vector<std::tr1::tuple<int, int, MHDComplex> >& pModes);
+         void setHarmonicOptions(const FieldComponents::Physical::Id compId, const std::vector<HarmonicModeType>& modes);
 
       protected:
          /**
@@ -107,22 +101,12 @@ namespace Equations {
          /**
           * @brief Type of the state to generate
           */
-         StateTypeId mTypeId;
+         std::map<FieldComponents::Physical::Id,ShellExactStateIds::Id> mTypeId;
 
          /**
           * @brief Storage for the list of spherical harmonic modes to generate
           */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mRSHModes;
-
-         /**
-          * @brief Storage for the list of spherical harmonic modes to generate
-          */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mTSHModes;
-
-         /**
-          * @brief Storage for the list of spherical harmonic modes to generate
-          */
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > mPSHModes;
+         std::map<FieldComponents::Physical::Id,std::vector<HarmonicModeType> > mSHModes;
    };
 
    /// Typedef for a shared ShellExactVectorState

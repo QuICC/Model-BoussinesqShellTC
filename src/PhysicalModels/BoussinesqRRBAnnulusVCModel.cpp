@@ -145,9 +145,9 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBAnnulusVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITY);
-      spSim->addAsciiOutputFile(spState);
+//      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
+//      spState->expect(PhysicalNames::VELOCITY);
+//      spSim->addAsciiOutputFile(spState);
    }
 
    void BoussinesqRRBAnnulusVCModel::addHdf5OutputFiles(SharedSimulation spSim)

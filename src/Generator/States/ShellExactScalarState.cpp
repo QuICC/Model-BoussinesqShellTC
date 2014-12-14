@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ShellExactScalarState::ShellExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CONSTANT)
+      : IScalarEquation(spEqParams), mTypeId(ShellExactStateIds::CONSTANT)
    {
    }
 
@@ -47,12 +47,12 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void ShellExactScalarState::setStateType(const ShellExactScalarState::StateTypeId id)
+   void ShellExactScalarState::setStateType(const ShellExactStateIds::Id id)
    {
       this->mTypeId = id;
    }
 
-   void ShellExactScalarState::setHarmonicOptions(const std::vector<std::tr1::tuple<int,int,MHDComplex> >& modes)
+   void ShellExactScalarState::setHarmonicOptions(const std::vector<ShellExactScalarState::HarmonicModeType>& modes)
    {
       this->mSHModes = modes;
    }
@@ -67,10 +67,10 @@ namespace Equations {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Physical::SCALAR);
 
-      if(this->mTypeId == CONSTANT)
+      if(this->mTypeId == ShellExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(42);
-      } else if(this->mTypeId == HARMONIC)
+      } else if(this->mTypeId == ShellExactStateIds::HARMONIC)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -80,10 +80,12 @@ namespace Equations {
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
-         Array funcPh(nPh);
-         MHDFloat funcR(nR);
-         MHDFloat funcTh;
-         std::vector<std::tr1::tuple<int,int,MHDComplex> >::const_iterator it;
+         Array sphHarm(nPh);
+         MHDFloat funcR;
+         typedef std::vector<HarmonicModeType>::const_iterator ModeIt;
+         ModeIt it;
+         std::pair<ModeIt, ModeIt>  modeRange = std::make_pair(this->mSHModes.begin(), this->mSHModes.end());
+
          rNLComp.rData().setConstant(0);
          for(int iR = 0; iR < nR; ++iR)
          {
@@ -91,17 +93,16 @@ namespace Equations {
             {
                funcR = 1.0;
 
-               for(it = this->mSHModes.begin(); it != this->mSHModes.end(); ++it)
+               for(it = modeRange.first; it != modeRange.second; ++it)
                {
                   int l = std::tr1::get<0>(*it);
                   int m = std::tr1::get<1>(*it);
-                  MHDFloat re = std::tr1::get<2>(*it).real();
-                  MHDFloat im = std::tr1::get<2>(*it).imag();
+                  MHDComplex amplitude = std::tr1::get<2>(*it);
 
                   // Spherical harmonic Y_l^m
-                  funcPh = re*(static_cast<MHDFloat>(m)*phGrid).array().cos() + im*(static_cast<MHDFloat>(m)*phGrid).array().sin();
-                  funcTh = std::tr1::sph_legendre(l,m, thGrid(iTh));
-                  rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+                  sphHarm = ShellExactStateIds::sph_harmonic(amplitude, l, m, thGrid(iTh), phGrid);
+
+                  rNLComp.addProfile(funcR*sphHarm,iTh,iR);
                }
             }
          }

@@ -366,6 +366,46 @@ def i2x2(nr, parity, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, parity, bc)
 
+def i2x3(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^3 T_n(x)."""
+
+    ns = np.arange((parity+1)%2, 2*nr, 2)
+    if parity == 0:
+        offsets = np.arange(-2,4)
+    else:
+        offsets = np.arange(-3,3)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return 1.0/(32.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return (n + 3.0)/(32.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -1.0/(16.0*n*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return d_1(n - 1.0)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return (n - 3.0)/(32.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return d_3(n + 1.0)
+
+    ds = [d_3, d_2, d_1, d1, d2, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, parity, bc)
+
 def i2x2div(nr, parity, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 radial divergence T_n(x)."""
 

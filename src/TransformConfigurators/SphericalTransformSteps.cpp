@@ -35,6 +35,23 @@ namespace TransformSteps {
       return transform;
    }
 
+   #if defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+
+   std::vector<IntegratorBranch>  forwardVector()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::POL, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR));
+
+      return transform;
+   }
+
+   #else
+
    std::vector<IntegratorBranch>  forwardVector()
    {
       std::vector<IntegratorBranch> transform;
@@ -47,6 +64,8 @@ namespace TransformSteps {
 
       return transform;
    }
+
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
    std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -106,6 +125,28 @@ namespace TransformSteps {
 
       return transform;
    } 
+
+   std::vector<ProjectorBranch>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req)
+   {
+      std::vector<ProjectorBranch> transform;
+
+      if(req.find(FieldComponents::Physical::R)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIFF, ProjectorBranch::Proj2DType::PROJ, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::R, FieldType::GRADIENT));
+      }
+
+      if(req.find(FieldComponents::Physical::THETA)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::GRADIENT));
+      }
+
+      if(req.find(FieldComponents::Physical::PHI)->second)
+      {
+         transform.push_back(ProjectorBranch(id, ProjectorBranch::Proj1DType::DIVR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::GRADIENT));
+      }
+
+      return transform;
+   }
 
    std::vector<ProjectorBranch>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req)
    {

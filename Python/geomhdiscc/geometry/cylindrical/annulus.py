@@ -122,6 +122,13 @@ def i2j2x2(nr, nz, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x2(nr, a, b, bcr))
     return cylbc.constrain(mat, nr, nz, 2, 2, bc)
 
+def i2j2x3(nr, nz, a, b, bc, coeff = 1.0):
+    """Create a i2x3 in R kronecker with an i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = coeff*spsp.kron(c1d.i2(nz,bcz), rad.i2x3(nr, a, b, bcr))
+    return cylbc.constrain(mat, nr, nz, 2, 2, bc)
+
 def i2j2x2d1(nr, nz, a, b, bc, coeff = 1.0):
     """Create a i2x2d1 in R kronecker with an i2 in Z"""
 

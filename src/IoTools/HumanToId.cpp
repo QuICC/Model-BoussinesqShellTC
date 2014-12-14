@@ -245,7 +245,10 @@ namespace IoTools {
 
    FieldComponents::Spectral::Id HumanToId::toComp(const std::string& id)
    {
-      if(id == IdToHuman::toTag(FieldComponents::Spectral::ONE))
+      if(id == IdToHuman::toTag(FieldComponents::Spectral::SCALAR))
+      {
+         return FieldComponents::Spectral::SCALAR;
+      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::ONE))
       {
          return FieldComponents::Spectral::ONE;
       } else if(id == IdToHuman::toTag(FieldComponents::Spectral::TWO))
@@ -254,9 +257,6 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(FieldComponents::Spectral::THREE))
       {
          return FieldComponents::Spectral::THREE;
-      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::SCALAR))
-      {
-         return FieldComponents::Spectral::SCALAR;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (FieldComponents::Spectral)");

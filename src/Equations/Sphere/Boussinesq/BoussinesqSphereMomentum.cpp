@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqSphereVelocity.cpp
- * @brief Source of the implementation of the Navier-Stokes equation in the Boussinesq sphere model
+ * @file BoussinesqSphereMomentum.cpp
+ * @brief Source of the implementation of the vector Navier-Stokes equation in the Boussinesq sphere model
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Sphere/Boussinesq/BoussinesqSphereVelocity.hpp"
+#include "Equations/Sphere/Boussinesq/BoussinesqSphereMomentum.hpp"
 
 // Project includes
 //
@@ -27,33 +27,36 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqSphereVelocity::BoussinesqSphereVelocity(SharedEquationParameters spEqParams)
+   BoussinesqSphereMomentum::BoussinesqSphereMomentum(SharedEquationParameters spEqParams)
       : IVectorEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqSphereVelocity::~BoussinesqSphereVelocity()
+   BoussinesqSphereMomentum::~BoussinesqSphereMomentum()
    {
    }
 
-   void BoussinesqSphereVelocity::setCoupling()
+   void BoussinesqSphereMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 1, false, false, false);
 
-      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 1, false, false, false);
    }
 
-   void BoussinesqSphereVelocity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       throw Exception("Nonlinear term in spherical shell toroidal/poloidal Navier-Stokes equation not done yet");
    }
 
-   void BoussinesqSphereVelocity::setRequirements()
+   void BoussinesqSphereMomentum::setRequirements()
    {
       // Set velocity as equation unknown
       this->setName(PhysicalNames::VELOCITY);
+
+      // Set solver timing
+      this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(,need curl?)
       this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, false, false));

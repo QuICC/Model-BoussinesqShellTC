@@ -26,7 +26,7 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-namespace Eigen2D {
+namespace EigenSH {
 
    int fieldCouplingNMat(const SharedResolution spRes)
    {

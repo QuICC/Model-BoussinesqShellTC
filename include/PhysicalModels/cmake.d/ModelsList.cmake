@@ -14,8 +14,10 @@ set(MHDPhysicalModels
    BoussinesqRRB3DBoxVCModel.hpp
    BoussinesqRRBAnnulusVCModel.hpp
    #BoussinesqRRBCylinderVCModel.hpp
-   #BoussinesqShellModel.hpp
-   #BoussinesqSphereModel.hpp
+   BoussinesqTCShellModel.hpp
+   BoussinesqRTCShellModel.hpp
+   #BoussinesqTCSphereModel.hpp
+   #BoussinesqRTCSphereModel.hpp
    )
 
 set(MHDTestModels 

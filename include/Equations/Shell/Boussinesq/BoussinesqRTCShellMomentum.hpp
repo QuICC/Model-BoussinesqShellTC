@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqShellTransport.hpp
- * @brief Implementation of the transport equation for the Boussinesq spherical shell model 
+ * @file BoussinesqRTCShellMomentum.hpp
+ * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSHELLTRANSPORT_HPP
-#define BOUSSINESQSHELLTRANSPORT_HPP
+#ifndef BOUSSINESQRTCSHELLMOMENTUM_HPP
+#define BOUSSINESQRTCSHELLMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for the Boussinesq spherical shell model 
+    * @brief Implementation of the vector Navier-Stokes equation for the Boussinesq rotating thermal convection in a spherical shell
     */
-   class BoussinesqShellTransport: public IScalarEquation
+   class BoussinesqRTCShellMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams  Shared equation parameters
           */
-         BoussinesqShellTransport(SharedEquationParameters spEqParams);
+         BoussinesqRTCShellMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqShellTransport();
+         virtual ~BoussinesqRTCShellMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQSHELLTRANSPORT_HPP
+#endif // BOUSSINESQRTCSHELLMOMENTUM_HPP

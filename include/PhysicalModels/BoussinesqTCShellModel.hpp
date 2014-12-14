@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqShellModel.hpp
- * @brief Implementation of the Boussinesq spherical shell model
+ * @file BoussinesqTCShellModel.hpp
+ * @brief Implementation of the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQSHELLMODEL_HPP
-#define BOUSSINESQSHELLMODEL_HPP
+#ifndef BOUSSINESQTCSHELLMODEL_HPP
+#define BOUSSINESQTCSHELLMODEL_HPP
 
 // Configuration includes
 //
@@ -24,12 +24,15 @@
 #include "Generator/VisualizationGenerator.hpp"
 #include "SpatialSchemes/3D/SLFScheme.hpp"
 
+// THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
+// GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
+
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq spherical shell model
+    * @brief Implementation of the Boussinesq thermal convection spherical shell model (Toroidal/Poloidal formulation)
     */
-   class BoussinesqShellModel
+   class BoussinesqTCShellModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -99,12 +102,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqShellModel();
+         BoussinesqTCShellModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqShellModel();
+         ~BoussinesqTCShellModel();
    };
 
 }
@@ -122,4 +125,4 @@ namespace GeoMHDiSCC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
-#endif // BOUSSINESQSHELLMODEL_HPP
+#endif // BOUSSINESQTCSHELLMODEL_HPP

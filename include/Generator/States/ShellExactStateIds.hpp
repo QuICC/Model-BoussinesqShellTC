@@ -43,7 +43,13 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+         HARMONIC = 10, // Generate spherical harmonic state
       };
+
+      /**
+       * @brief Compute spherical harmonic physical values
+       */
+      static Array sph_harmonic(const MHDComplex amplitude, const int l, const int m, const MHDFloat theta, const Array& phi);
    };
 
 }

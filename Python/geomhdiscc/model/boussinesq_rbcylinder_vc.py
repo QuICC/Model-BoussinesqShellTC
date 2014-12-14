@@ -223,11 +223,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+            mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+            mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta"):

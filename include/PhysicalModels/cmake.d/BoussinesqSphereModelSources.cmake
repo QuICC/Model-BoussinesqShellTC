@@ -1,9 +1,0 @@
-set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqSphereTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Sphere/Boussinesq/BoussinesqSphereVelocity.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigen2DTools.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/SphereExactScalarState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/States/SphereExactVectorState.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
-   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
-)

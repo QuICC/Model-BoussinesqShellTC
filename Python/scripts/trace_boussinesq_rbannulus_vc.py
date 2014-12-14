@@ -13,9 +13,10 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 32]
-eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
-eigs = [5]
+res = [12, 0, 12]
+#eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':5000, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
+eigs = [3]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
@@ -55,7 +56,7 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e1, 1e2)
     print(evp_lmb)
     zscale = eq_params['scale3d']
 

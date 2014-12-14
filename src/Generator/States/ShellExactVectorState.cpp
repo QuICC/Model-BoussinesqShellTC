@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ShellExactVectorState::ShellExactVectorState(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
+      : IVectorEquation(spEqParams)
    {
    }
 
@@ -43,42 +43,46 @@ namespace Equations {
       // Set the name
       this->setName(name);
 
-      // Set toroidal and poloidal components
-      this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
-      this->mSpectralIds.push_back(FieldComponents::Spectral::TWO);
-
       // Set the variable requirements
       this->setRequirements();
    }
 
-   void ShellExactVectorState::setStateType(const ShellExactVectorState::StateTypeId id)
+   void ShellExactVectorState::setStateType(const FieldComponents::Physical::Id compId, const ShellExactStateIds::Id id)
    {
-      this->mTypeId = id;
+      this->mTypeId.insert(std::make_pair(compId, id));
    }
 
-   void ShellExactVectorState::setHarmonicOptions(const std::vector<std::tr1::tuple<int,int,MHDComplex> >& rModes, const std::vector<std::tr1::tuple<int,int,MHDComplex> >& tModes, const std::vector<std::tr1::tuple<int,int,MHDComplex> >& pModes)
+   void ShellExactVectorState::setHarmonicOptions(const FieldComponents::Physical::Id compId, const std::vector<ShellExactVectorState::HarmonicModeType>& modes)
    {
-      this->mRSHModes = rModes;
-      this->mTSHModes = tModes;
-      this->mPSHModes = pModes;
+      this->mSHModes.insert(std::make_pair(compId, modes));
    }
 
    void ShellExactVectorState::setCoupling()
    {
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator specIt;
-      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
       {
-         this->defineCoupling(*specIt, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+         this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::TRIVIAL, 0, true, false, false, false);
       }
    }
 
    void ShellExactVectorState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
-      if(this->mTypeId == CONSTANT)
+      ShellExactStateIds::Id typeId = this->mTypeId.find(compId)->second;
+
+      if(typeId == ShellExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(42);
-      } else if(this->mTypeId == HARMONIC)
+      } else if(typeId == ShellExactStateIds::HARMONIC)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
@@ -88,24 +92,14 @@ namespace Equations {
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
-         Array funcPh(nPh);
-         MHDFloat funcR(nR);
-         MHDFloat funcTh;
-         typedef std::vector<std::tr1::tuple<int,int,MHDComplex> >::const_iterator ModeIt;
+         Array sphHarm(nPh);
+         MHDFloat funcR;
+         typedef std::vector<HarmonicModeType>::const_iterator ModeIt;
          std::pair<ModeIt, ModeIt>  modeRange;
-         if(compId == FieldComponents::Physical::ONE)
-         {
-            modeRange.first = this->mRSHModes.begin();
-            modeRange.second = this->mRSHModes.end();
-         } else if(compId == FieldComponents::Physical::TWO)
-         {
-            modeRange.first = this->mTSHModes.begin();
-            modeRange.second = this->mTSHModes.end();
-         } else
-         {
-            modeRange.first = this->mPSHModes.begin();
-            modeRange.second = this->mPSHModes.end();
-         }
+
+         modeRange.first = this->mSHModes.find(compId)->second.begin();
+         modeRange.second = this->mSHModes.find(compId)->second.end();
+
          rNLComp.rData().setConstant(0);
          for(int iR = 0; iR < nR; ++iR)
          {
@@ -117,13 +111,12 @@ namespace Equations {
                {
                   int l = std::tr1::get<0>(*it);
                   int m = std::tr1::get<1>(*it);
-                  MHDFloat re = std::tr1::get<2>(*it).real();
-                  MHDFloat im = std::tr1::get<2>(*it).imag();
+                  MHDComplex amplitude = std::tr1::get<2>(*it);
 
                   // Spherical harmonic Y_l^m
-                  funcPh = re*(static_cast<MHDFloat>(m)*phGrid).array().cos() + im*(static_cast<MHDFloat>(m)*phGrid).array().sin();
-                  funcTh = std::tr1::sph_legendre(l,m, thGrid(iTh));
-                  rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+                  sphHarm = ShellExactStateIds::sph_harmonic(amplitude, l, m, thGrid(iTh), phGrid);
+                  
+                  rNLComp.addProfile(funcR*sphHarm,iTh,iR);
                }
             }
          }

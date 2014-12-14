@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqSphereTransport.cpp
- * @brief Source of the implementation of the transport equation in the Boussinesq sphere model
+ * @file BoussinesqRTCShellTransport.cpp
+ * @brief Source of the implementation of the transport equation in the Boussinesq rotating thermal convection in a spherical shell
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,35 +15,34 @@
 
 // Class include
 //
-#include "Equations/Sphere/Boussinesq/BoussinesqSphereTransport.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.hpp"
 
 // Project includes
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqSphereTransport::BoussinesqSphereTransport(SharedEquationParameters spEqParams)
+   BoussinesqRTCShellTransport::BoussinesqRTCShellTransport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqSphereTransport::~BoussinesqSphereTransport()
+   BoussinesqRTCShellTransport::~BoussinesqRTCShellTransport()
    {
    }
 
-   void BoussinesqSphereTransport::setCoupling()
+   void BoussinesqRTCShellTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false, false);
    }
 
-   void BoussinesqSphereTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRTCShellTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -51,7 +50,7 @@ namespace Equations {
       throw Exception("Nonlinear term in spherical shell transport equation not done yet");
    }
 
-   void BoussinesqSphereTransport::setRequirements()
+   void BoussinesqRTCShellTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);
