@@ -62,19 +62,19 @@ namespace GeoMHDiSCC {
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-      spExact->setStateType(Equations::CartesianExactScalarState::SINSINCOS);
+      spExact->setStateType(Equations::CartesianExactStateIds::SINSINCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::VELOCITYZ);
-      spExact->setStateType(Equations::CartesianExactScalarState::COSSINCOS);
+      spExact->setStateType(Equations::CartesianExactStateIds::COSSINCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add first scalar initial state generator
       spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
       spExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spExact->setStateType(Equations::CartesianExactScalarState::SINCOSCOS);
+      spExact->setStateType(Equations::CartesianExactStateIds::SINCOSCOS);
       spExact->setModeOptions(1e0, 1.0, 1e0, 1.0, 1e0, 1.0);
 
       // Add output file
