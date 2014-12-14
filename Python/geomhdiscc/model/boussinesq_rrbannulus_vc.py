@@ -456,7 +456,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs, restriction = None):
+    def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
         # U: T_iN, T_Ni

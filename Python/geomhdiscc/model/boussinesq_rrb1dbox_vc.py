@@ -406,7 +406,7 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs, restriction = None):
+    def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
         # U: TN

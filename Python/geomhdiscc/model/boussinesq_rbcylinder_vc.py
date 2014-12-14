@@ -436,7 +436,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
         return mat
 
-    def zero_blocks(self, res, eigs, restriction = None):
+    def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
         if eigs[0]%2 == 1:
