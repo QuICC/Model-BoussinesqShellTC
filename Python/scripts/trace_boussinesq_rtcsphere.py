@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rtcshell as mod
+import geomhdiscc.model.boussinesq_rtcsphere as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRTCShell()
+model = mod.BoussinesqRTCSphere()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
@@ -15,7 +15,7 @@ l = 0
 m = 9
 res = [16, m+16, 0]
 eigs = [l, m]
-eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
+eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6}
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
@@ -37,7 +37,7 @@ if show_spy or show_solution:
     import matplotlib.pylab as pl
 
 if show_solution:
-    import geomhdiscc.transform.shell as transf
+    import geomhdiscc.transform.sphere as transf
 
 # Show the "spy" of the two matrices
 if show_spy:

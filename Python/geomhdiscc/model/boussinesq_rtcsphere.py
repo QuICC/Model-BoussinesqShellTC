@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq convection in a rotating sphere model"""
+"""Module provides the functions to generate the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,8 +12,8 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
 
 
-class BoussinesqRotConvSphere(base_model.BaseModel):
-    """Class to setup the Boussinesq convection in a rotating sphere model"""
+class BoussinesqRTCSphere(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -194,7 +194,7 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return shell.stencil(res[0], res[1], bc)
 
-    def qi(self, res, eq_params, eigs, bcs, field_row):
+    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
         m = eigs[1]
@@ -211,12 +211,14 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        T = Ta**0.5
+        
         m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -224,22 +226,22 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
             if field_col == ("velocity","tor"):
                 mat = sphere.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
                 bc[0] = min(bc[0], 0)
-                mat = mat + sphere.i2x2(res[0], res[1], m, bc, 1j*m*Ta**0.5)
+                mat = mat + sphere.i2x2(res[0], res[1], m, bc, 1j*m*T)
 
             elif field_col == ("velocity","pol"):
-                mat = sphere.i2x2coriolis(res[0], res[1], m, bc, -Ta**0.5)
+                mat = sphere.i2x2coriolis(res[0], res[1], m, bc, -T)
 
             elif field_col == ("temperature",""):
                 mat = sphere.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = sphere.i4x4coriolis(res[0], res[1], m, bc, Ta**0.5)
+                mat = sphere.i4x4coriolis(res[0], res[1], m, bc, T)
 
             elif field_col == ("velocity","pol"):
                 mat = sphere.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
                 bc[0] = min(bc[0], 0)
-                mat = mat + sphere.i4x4lapl(res[0], res[1], m, bc, 1j*m*Ta**0.5)
+                mat = mat + sphere.i4x4lapl(res[0], res[1], m, bc, 1j*m*T)
 
             elif field_col == ("temperature",""):
                 mat = sphere.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
@@ -260,12 +262,10 @@ class BoussinesqRotConvSphere(base_model.BaseModel):
 
         return mat
 
-    def time_block(self, res, eq_params, eigs, bcs, field_row):
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
-        Ra = eq_params['rayleigh']
         m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
