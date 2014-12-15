@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
+res = [16, 0, 0]
 
 # SF, FT,
 bc_vel = 1
@@ -22,7 +22,7 @@ eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'scale1d':2.0}
 
 eigs = [kx, ky]
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -32,7 +32,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)
@@ -44,11 +44,14 @@ if show_solution:
     import geomhdiscc.transform.cartesian as transf
 
 # Show the "spy" of the two matrices
-if False:
-    import matplotlib.pylab as pl
-    pl.spy(A, markersize=0.2)
+if show_spy:
+    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
-    pl.spy(B, markersize=0.2)
+    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
 
 # Export the two matrices to matrix market format

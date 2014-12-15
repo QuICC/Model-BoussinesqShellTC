@@ -1,25 +1,23 @@
-"""Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus model (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a cylinder model (velocity-continuity formulation)"""
 
 import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 
-import geomhdiscc.model.boussinesq_rrbannulus_vc as mod
+import geomhdiscc.model.boussinesq_rrbcylinder_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRRBAnnulusVC()
+model = mod.BoussinesqRRBCylinderVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
+res = [32, 0, 32]
 res = [14, 0, 14]
-eq_params = {'prandtl':7, 'rayleigh':3.440597e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
-eigs = [0]
-eq_params = {'prandtl':7, 'rayleigh':3.56674e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':3.5e6, 'taylor':1e10, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':5e4, 'taylor':1e6, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
-eigs = [0]
+eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':5901.55, 'scale3d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':0.}
+eigs = [2]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
@@ -41,7 +39,7 @@ if show_spy or show_solution:
     import matplotlib.pylab as pl
 
 if show_solution:
-    import geomhdiscc.transform.annulus as transf
+    import geomhdiscc.transform.cylinder as transf
 
 # Show the "spy" of the two matrices
 if show_spy:
@@ -76,9 +74,8 @@ if show_solution:
         sol_vbar = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
         sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
         # Extract continuity from velocity 
-        a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        sol_c = mod.annulus.x1d1(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
-        intg_c = mod.annulus.i1j1x1d1(res[0], res[2], a, b, mod.no_bc())*sol_ubar + mod.annulus.i1j1(res[0], res[2], a, b, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.annulus.i1j1x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale)*sol_w
+        sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+        intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
 
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
@@ -89,9 +86,8 @@ if show_solution:
     sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
     sol_pbar = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
     # Extract continuity from velocity 
-    a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-    sol_c = mod.annulus.x1d1(res[0], res[2], a, b, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.annulus.x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
-    intg_c = mod.annulus.i1j1x1d1(res[0], res[2], a, b, mod.no_bc())*sol_ubar + mod.annulus.i1j1(res[0], res[2], a, b, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.annulus.i1j1x2e1(res[0], res[2], a, b, mod.no_bc(), zscale = zscale)*sol_w
+    sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
+    intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
     
     # Create spectrum plots
     pl.subplot(2,3,1)
@@ -117,13 +113,13 @@ if show_solution:
     
     # Create solution matrices
     mat_ubar = sol_ubar.reshape(res[0], res[2], order = 'F')
-    mat_u = spsplin.spsolve(mod.annulus.rad.x1(res[0], a, b, {0:0}, zr = 0).tocsr(), mat_ubar.real)
+    mat_u = spsplin.spsolve(mod.cylinder.rad.x1(res[0], (eigs[0]+1)%2, {0:0}, zr = 0).tocsr(), mat_ubar.real)
     mat_vbar = sol_vbar.reshape(res[0], res[2], order = 'F')
-    mat_v = spsplin.spsolve(mod.annulus.rad.x1(res[0], a, b, {0:0}, zr = 0).tocsr(), mat_vbar.real)
+    mat_v = spsplin.spsolve(mod.cylinder.rad.x1(res[0], (eigs[0]+1)%2, {0:0}, zr = 0).tocsr(), mat_vbar.real)
     mat_w = sol_w.reshape(res[0], res[2], order = 'F')
     mat_t = sol_t.reshape(res[0], res[2], order = 'F')
     mat_pbar = sol_pbar.reshape(res[0], res[2], order = 'F')
-    mat_p = spsplin.spsolve(mod.annulus.rad.x2(res[0], a, b, {0:0}, zr = 0).tocsr(), mat_pbar.real)
+    mat_p = spsplin.spsolve(mod.cylinder.rad.x2(res[0], eigs[0]%2, {0:0}, zr = 0).tocsr(), mat_pbar.real)
     mat_c = sol_c.reshape(res[0], res[2], order = 'F')
 
     # Visualize spectrum matrix
@@ -168,17 +164,17 @@ if show_solution:
     pl.close("all")
 
     # Compute physical space values
-    grid_r = transf.rgrid(res[0], a, b)
+    grid_r = transf.rgrid(res[0])
     grid_z = transf.zgrid(res[2])
-    phys_ubar = transf.tophys2d(mat_ubar)
-    phys_u = transf.tophys2d(mat_u)
-    phys_vbar = transf.tophys2d(mat_vbar)
-    phys_v = transf.tophys2d(mat_v)
-    phys_w = transf.tophys2d(mat_w)
-    phys_t = transf.tophys2d(mat_t)
-    phys_pbar = transf.tophys2d(mat_pbar)
-    phys_p = transf.tophys2d(mat_p)
-    phys_c = transf.tophys2d(mat_c)
+    phys_ubar = transf.tophys2d(mat_ubar, eigs[0]%2)
+    phys_u = transf.tophys2d(mat_u, (eigs[0]+1)%2)
+    phys_vbar = transf.tophys2d(mat_vbar, eigs[0]%2)
+    phys_v = transf.tophys2d(mat_v, (eigs[0]+1)%2)
+    phys_w = transf.tophys2d(mat_w, eigs[0]%2)
+    phys_t = transf.tophys2d(mat_t, eigs[0]%2)
+    phys_pbar = transf.tophys2d(mat_pbar, eigs[0]%2)
+    phys_p = transf.tophys2d(mat_p, eigs[0]%2)
+    phys_c = transf.tophys2d(mat_c, eigs[0]%2)
 
     # Show physical contour plot
     pl.subplot(2,5,1)

@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [40, 0, 0]
+res = [32, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
 
 # Set wave number
@@ -31,7 +31,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = True
 solve_evp = True
 show_solution = (False and solve_evp)
@@ -44,9 +44,13 @@ if show_solution:
 
 # Show the "spy" of the two matrices
 if show_spy:
-    pl.spy(A, markersize=0.2)
+    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
-    pl.spy(B, markersize=0.2)
+    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
 
 # Export the two matrices to matrix market format
