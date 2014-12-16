@@ -46,6 +46,21 @@ namespace Equations {
          POLYCOSPOLY = 10, // Polynomial, Cosine, Polynomial
          POLYSINPOLY,      // Polynomial, Sine, Polynomial
       };
+
+      /**
+       * @brief Compute even periodic mode
+       */
+      static MHDFloat cos(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta);
+
+      /**
+       * @brief Compute odd periodic mode
+       */
+      static MHDFloat sin(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat theta);
+
+      /**
+       * @brief Compute polynomial mode
+       */
+      static MHDFloat poly(const MHDFloat amplitude, const MHDFloat mode, const MHDFloat x);
    };
 
 }

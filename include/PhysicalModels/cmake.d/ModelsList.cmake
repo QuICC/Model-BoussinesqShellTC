@@ -8,12 +8,12 @@ set(MHDPhysicalModels
    BoussinesqRB3DBoxVCModel.hpp
    BoussinesqNC3DBoxVCModel.hpp
    BoussinesqRBAnnulusVCModel.hpp
-   #BoussinesqRBCylinderVCModel.hpp
+   BoussinesqRBCylinderVCModel.hpp
    BoussinesqRRB1DBoxVCModel.hpp
    BoussinesqRRB2DBoxVCModel.hpp
    BoussinesqRRB3DBoxVCModel.hpp
    BoussinesqRRBAnnulusVCModel.hpp
-   #BoussinesqRRBCylinderVCModel.hpp
+   BoussinesqRRBCylinderVCModel.hpp
    BoussinesqTCShellModel.hpp
    BoussinesqRTCShellModel.hpp
    #BoussinesqTCSphereModel.hpp

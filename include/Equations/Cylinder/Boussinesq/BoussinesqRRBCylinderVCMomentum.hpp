@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCylinderVCVelocityX.hpp
- * @brief Implementation of the momentum equation for the X component for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+ * @file BoussinesqRRBCylinderVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCYLINDERVCVELOCITYX_HPP
-#define BOUSSINESQRBCYLINDERVCVELOCITYX_HPP
+#ifndef BOUSSINESQRRBCYLINDERVCMOMENTUM_HPP
+#define BOUSSINESQRRBCYLINDERVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the X component for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
     */
-   class BoussinesqRBCylinderVCVelocityX: public IScalarEquation
+   class BoussinesqRRBCylinderVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCylinderVCVelocityX(SharedEquationParameters spEqParams);
+         BoussinesqRRBCylinderVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCylinderVCVelocityX();
+         virtual ~BoussinesqRRBCylinderVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRBCYLINDERVCVELOCITYX_HPP
+#endif // BOUSSINESQRRBCYLINDERVCMOMENTUM_HPP

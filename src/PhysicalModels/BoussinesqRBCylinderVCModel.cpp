@@ -25,10 +25,11 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCTransport.hpp"
-#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCMomemtum.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCMomentum.hpp"
 #include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCContinuity.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
+#include "Generator/States/CylinderExactStateIds.hpp"
 #include "Generator/States/CylinderExactScalarState.hpp"
 #include "Generator/States/CylinderExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -50,7 +51,7 @@ namespace GeoMHDiSCC {
       spSim->addVectorEquation<Equations::BoussinesqRBCylinderVCMomentum>();
 
       // Add continuity equation
-      spSim->addVectorEquation<Equations::BoussinesqRBCylinderVCContinuity>();
+      spSim->addScalarEquation<Equations::BoussinesqRBCylinderVCContinuity>();
    }
 
    void BoussinesqRBCylinderVCModel::addStates(SharedStateGenerator spGen)
@@ -112,9 +113,9 @@ namespace GeoMHDiSCC {
       Equations::SharedVectorFieldVisualizer spVector;
 
       // Add temperature field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, false);
+      spScalar->setIdentity(PhysicalNames::TEMPERATURE);
 
       // Add velocity fields visualization
       spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
@@ -144,10 +145,10 @@ namespace GeoMHDiSCC {
    void BoussinesqRBCylinderVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITY);
-
-      spSim->addAsciiOutputFile(spState);
+///      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
+///      spState->expect(PhysicalNames::VELOCITY);
+///
+///      spSim->addAsciiOutputFile(spState);
    }
 
    void BoussinesqRBCylinderVCModel::addHdf5OutputFiles(SharedSimulation spSim)

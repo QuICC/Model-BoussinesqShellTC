@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCylinderVCTransport.hpp
- * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+ * @file BoussinesqRRBCylinderVCTransport.hpp
+ * @brief Implementation of the transport equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCYLINDERVCTRANSPORT_HPP
-#define BOUSSINESQRBCYLINDERVCTRANSPORT_HPP
+#ifndef BOUSSINESQRRBCYLINDERVCTRANSPORT_HPP
+#define BOUSSINESQRRBCYLINDERVCTRANSPORT_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the transport equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+    * @brief Implementation of the transport equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
     */
-   class BoussinesqRBCylinderVCTransport: public IScalarEquation
+   class BoussinesqRRBCylinderVCTransport: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCylinderVCTransport(SharedEquationParameters spEqParams);
+         BoussinesqRRBCylinderVCTransport(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCylinderVCTransport();
+         virtual ~BoussinesqRRBCylinderVCTransport();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRBCYLINDERVCTRANSPORT_HPP
+#endif // BOUSSINESQRRBCYLINDERVCTRANSPORT_HPP

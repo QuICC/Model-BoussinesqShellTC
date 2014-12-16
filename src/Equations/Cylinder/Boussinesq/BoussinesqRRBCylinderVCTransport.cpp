@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqRBCylinderVCTransport.cpp
- * @brief Source of the implementation of the transport equation in Rayleigh-Benard convection in a cylinder
+ * @file BoussinesqRRBCylinderVCTransport.cpp
+ * @brief Source of the implementation of the transport equation in rotating Rayleigh-Benard convection in a cylinder
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "Equations/Cylinder/Boussinesq/BoussinesqRBCylinderVCTransport.hpp"
+#include "Equations/Cylinder/Boussinesq/BoussinesqRRBCylinderVCTransport.hpp"
 
 // Project includes
 //
@@ -28,23 +28,23 @@ namespace GeoMHDiSCC {
 
 namespace Equations {
 
-   BoussinesqRBCylinderVCTransport::BoussinesqRBCylinderVCTransport(SharedEquationParameters spEqParams)
+   BoussinesqRRBCylinderVCTransport::BoussinesqRRBCylinderVCTransport(SharedEquationParameters spEqParams)
       : IScalarEquation(spEqParams)
    {
       // Set the variable requirements
       this->setRequirements();
    }
 
-   BoussinesqRBCylinderVCTransport::~BoussinesqRBCylinderVCTransport()
+   BoussinesqRRBCylinderVCTransport::~BoussinesqRRBCylinderVCTransport()
    {
    }
 
-   void BoussinesqRBCylinderVCTransport::setCoupling()
+   void BoussinesqRRBCylinderVCTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, true, false);
    }
 
-   void BoussinesqRBCylinderVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRRBCylinderVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       // Assert on scalar component is used
       assert(id == FieldComponents::Physical::SCALAR);
@@ -56,7 +56,7 @@ namespace Equations {
       Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::R), this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::THETA), this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(), 1.0);
    }
 
-   void BoussinesqRBCylinderVCTransport::setRequirements()
+   void BoussinesqRRBCylinderVCTransport::setRequirements()
    {
       // Set temperatur as equation unknown
       this->setName(PhysicalNames::TEMPERATURE);

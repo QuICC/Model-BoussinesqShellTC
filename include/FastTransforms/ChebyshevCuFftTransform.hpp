@@ -39,6 +39,8 @@
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -54,8 +56,15 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** Enum of projector IDs
+          *    - PROJ: projection
+          *    - DIFF: D
+          *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
+          *    - DIVRDIFFR: 1/r D r
+          *    - DIFFDIVR: D 1/r
+          */
+         enum Id {PROJ,  DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
       };
 
       /**

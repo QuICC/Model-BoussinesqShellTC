@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCylinderVCVelocityZ.hpp
- * @brief Implementation of the momentum equation for the Z component for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+ * @file BoussinesqRBCylinderVCMomentum.hpp
+ * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCYLINDERVCVELOCITYZ_HPP
-#define BOUSSINESQRBCYLINDERVCVELOCITYZ_HPP
+#ifndef BOUSSINESQRBCYLINDERVCMOMENTUM_HPP
+#define BOUSSINESQRBCYLINDERVCMOMENTUM_HPP
 
 // Configuration includes
 //
@@ -21,16 +21,16 @@
 //
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
-#include "Equations/IScalarEquation.hpp"
+#include "Equations/IVectorEquation.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Equations {
 
    /**
-    * @brief Implementation of the momentum equation for the Z component for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+    * @brief Implementation of the vector momentum equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
     */
-   class BoussinesqRBCylinderVCVelocityZ: public IScalarEquation
+   class BoussinesqRBCylinderVCMomentum: public IVectorEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCylinderVCVelocityZ(SharedEquationParameters spEqParams);
+         BoussinesqRBCylinderVCMomentum(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCylinderVCVelocityZ();
+         virtual ~BoussinesqRBCylinderVCMomentum();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRBCYLINDERVCVELOCITYZ_HPP
+#endif // BOUSSINESQRBCYLINDERVCMOMENTUM_HPP

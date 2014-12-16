@@ -1,11 +1,11 @@
 /**
- * @file BoussinesqRBCylinderVCContinuity.hpp
- * @brief Implementation of the continuity equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+ * @file BoussinesqRRBCylinderVCContinuity.hpp
+ * @brief Implementation of the continuity equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRBCYLINDERVCCONTINUITY_HPP
-#define BOUSSINESQRBCYLINDERVCCONTINUITY_HPP
+#ifndef BOUSSINESQRRBCYLINDERVCCONTINUITY_HPP
+#define BOUSSINESQRRBCYLINDERVCCONTINUITY_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    /**
-    * @brief Implementation of the continuity equation for Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
+    * @brief Implementation of the continuity equation for rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)
     */
-   class BoussinesqRBCylinderVCContinuity: public IScalarEquation
+   class BoussinesqRRBCylinderVCContinuity: public IScalarEquation
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Equations {
           *
           * @param spEqParams    Shared equation parameters
           */
-         BoussinesqRBCylinderVCContinuity(SharedEquationParameters spEqParams);
+         BoussinesqRRBCylinderVCContinuity(SharedEquationParameters spEqParams);
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BoussinesqRBCylinderVCContinuity();
+         virtual ~BoussinesqRRBCylinderVCContinuity();
 
          /**
           * @brief Compute the nonlinear interaction term
@@ -70,4 +70,4 @@ namespace Equations {
 }
 }
 
-#endif // BOUSSINESQRBCYLINDERVCCONTINUITY_HPP
+#endif // BOUSSINESQRRBCYLINDERVCCONTINUITY_HPP
