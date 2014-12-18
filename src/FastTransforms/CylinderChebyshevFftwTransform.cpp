@@ -34,7 +34,7 @@ namespace Transform {
       // Create Chebyshev grid
       for(int k = 0; k < size; k++)
       {
-         grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
+         grid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(2*size));
       }
 
       return grid;
@@ -123,15 +123,18 @@ namespace Transform {
       // First derivative
       this->mDiffE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
       this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // Division by R
-      this->mDivRE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      this->mDivRO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Initialise array for division by R
+         this->mDivR = this->meshGrid().array().pow(-1);
+
+         // Initialise array for division by R^2
+         this->mDivR2 = this->meshGrid().array().pow(-2);
+
          // Prepare arguments to d1(...) call
          PyObject *pArgs, *pValue;
          pArgs = PyTuple_New(3);
@@ -167,6 +170,14 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->mDiffO, pValue);
          Py_DECREF(pValue);
       #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         // Division by R
+         this->mDivRE.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+         this->mDivRO.resize(this->mspSetup->specSize(),this->mspSetup->specSize()); 
+
+         // Division by R2
+         this->mDivR2E.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+         this->mDivR2O.resize(this->mspSetup->specSize(),this->mspSetup->specSize()); 
+
          // Prepare arguments to i1(...) call
          PyObject *pArgs, *pValue;
          pArgs = PyTuple_New(3);
@@ -201,6 +212,54 @@ namespace Transform {
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDiffO, pValue);
          Py_DECREF(pValue);
+
+         // ... set even parity
+         pValue = PyLong_FromLong(0);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call x1
+         PythonWrapper::setFunction("x1");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix and clenup
+         PythonWrapper::fillMatrix(this->mDivRE, pValue);
+         Py_DECREF(pValue);
+
+         // ... set odd parity
+         pValue = PyLong_FromLong(1);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call x1
+         PythonWrapper::setFunction("x1");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDivRO, pValue);
+         Py_DECREF(pValue);
+
+         // ... set even parity
+         pValue = PyLong_FromLong(0);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call x2
+         PythonWrapper::setFunction("x2");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix and clenup
+         PythonWrapper::fillMatrix(this->mDivR2E, pValue);
+         Py_DECREF(pValue);
+
+         // ... set odd parity
+         pValue = PyLong_FromLong(1);
+         PyTuple_SetItem(pArgs, 1, pValue);
+
+         // Call x2
+         PythonWrapper::setFunction("x2");
+         pValue = PythonWrapper::callFunction(pArgs);
+
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDivR2O, pValue);
+         Py_DECREF(pValue);
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Fill matrix and cleanup
@@ -227,14 +286,29 @@ namespace Transform {
          // Check for successful factorisation
          if(this->mSDivRE.info() != Eigen::Success)
          {
-            throw Exception("Factorization of backward even division failed!");
+            throw Exception("Factorization of backward even division by R failed!");
          }
          // Factorize division matrix and free memory
          this->mSDivRO.compute(this->mDivRO);
          // Check for successful factorisation
          if(this->mSDivRO.info() != Eigen::Success)
          {
-            throw Exception("Factorization of backward odd division failed!");
+            throw Exception("Factorization of backward odd division by R failed!");
+         }
+
+         // Factorize division matrix and free memory
+         this->mSDivR2E.compute(this->mDivR2E);
+         // Check for successful factorisation
+         if(this->mSDivR2E.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward even division by R^2 failed!");
+         }
+         // Factorize division matrix and free memory
+         this->mSDivR2O.compute(this->mDivR2O);
+         // Check for successful factorisation
+         if(this->mSDivR2O.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward odd division by R^2 failed!");
          }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }

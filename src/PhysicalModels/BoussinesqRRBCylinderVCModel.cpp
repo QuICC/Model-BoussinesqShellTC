@@ -57,7 +57,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRRBCylinderVCModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedCylinderExactScalarState spScalar;
@@ -76,8 +76,8 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CylinderExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CylinderExactStateIds::POLYSINPOLY);
-         spScalar->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
+         spScalar->setStateType(Equations::CylinderExactStateIds::POLYCOSPOLY);
+         spScalar->setModeOptions(1e0, 2.0, 1e0, 2.0, 1e0, 1.0);
 
       // Generate random spectrum
       } else

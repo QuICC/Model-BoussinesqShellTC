@@ -19,7 +19,7 @@ class BoussinesqRRBCylinderVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "ro", "scale3d"]
+        return ["taylor", "prandtl", "rayleigh", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""

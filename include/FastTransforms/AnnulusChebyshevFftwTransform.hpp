@@ -358,9 +358,7 @@ namespace Transform {
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
       {
@@ -500,9 +498,7 @@ namespace Transform {
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
             Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2 of real part
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVR2)
       {
@@ -619,7 +615,6 @@ namespace Transform {
       // Compute simple projection of imaginary part
       } else
       {
-         // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
       }
 
