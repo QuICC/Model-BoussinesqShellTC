@@ -230,7 +230,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","theta"):
+        elif field_row == ("velocity","z"):
             mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
@@ -399,7 +399,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                     mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
                     mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
-                mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
+                mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, no_bc())
 
         return mat
 

@@ -37,14 +37,14 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "KentLU" "Pardiso" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "MUMPS" "KentLU" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_KENTLU "klu" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPARSELU "/usr/local/lib/libmetis.a" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SPARSELU "/usr/local/include" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_PARDISO "/usr/local/Pardiso-4.1.2/lib" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
@@ -89,5 +89,8 @@ set(GEOMHDISCC_CC_LIB_MPI_GCC ${GEOMHDISCC_CC_LIB_GCC} PARENT_SCOPE)
 #-------------- GENERAL LIBRARIES ----------------#
 ###################################################
 
-set(GEOMHDISCC_LIBRARIES "" PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES "" PARENT_SCOPE)
+# Find python headers and library
+find_package(PythonLibs REQUIRED)
+
+set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARIES} PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIRS} PARENT_SCOPE)

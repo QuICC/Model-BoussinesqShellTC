@@ -25,7 +25,6 @@
 #include "IoVariable/VisualizationFileTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoVariable {
@@ -88,7 +87,6 @@ namespace IoVariable {
 
          if(vit->second->dom(0).hasGrad())
          {
-            std::cerr << "SHOULD WRITE GRAD" << std::endl;
             std::vector<FieldComponents::Spectral::Id> fId;
             fId.push_back(FieldComponents::Spectral::ONE);
             fId.push_back(FieldComponents::Spectral::TWO);

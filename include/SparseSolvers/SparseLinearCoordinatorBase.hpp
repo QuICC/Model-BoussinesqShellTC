@@ -300,7 +300,8 @@ namespace Solver {
 
       inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
       {
-         assert(decMat.real().size() > 0);
+         assert(decMat.real().rows() > 0);
+         assert(decMat.real().cols() > 0);
          assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
 
          if(c != 1.0)
@@ -314,9 +315,12 @@ namespace Solver {
 
       inline void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat)
       {
-         assert(decMat.real().size() > 0);
-         assert(decMat.imag().size() > 0);
-         assert(decMat.real().size() == decMat.imag().size());
+         assert(decMat.real().rows() > 0);
+         assert(decMat.real().cols() > 0);
+         assert(decMat.imag().rows() > 0);
+         assert(decMat.imag().cols() > 0);
+         assert(decMat.real().rows() == decMat.imag().rows());
+         assert(decMat.real().cols() == decMat.imag().cols());
 
          if(c != 1.0)
          {

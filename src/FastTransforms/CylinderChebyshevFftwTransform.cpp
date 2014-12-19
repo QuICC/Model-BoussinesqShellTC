@@ -136,6 +136,14 @@ namespace Transform {
          this->mTmpOIn.setZero(fwdSize, howmanyOdd);
          this->mTmpOOut.setZero(bwdSize, howmanyOdd);
 
+         // Create the physical to spectral plan
+         const fftw_r2r_kind fwdKind[] = {FFTW_REDFT10};
+         this->mFEOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpOIn.data(), NULL, 1, fwdSize, this->mTmpOOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
+
+         // Initialise temporary storage
+         this->mTmpOIn.setZero(fwdSize, howmanyOdd);
+         this->mTmpOOut.setZero(bwdSize, howmanyOdd);
+
          // Create the spectral to physical plan
          const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
          this->mBEOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpOOut.data(), NULL, 1, bwdSize, this->mTmpOIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
@@ -148,7 +156,10 @@ namespace Transform {
          this->mFBOEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpOIn.data(), NULL, 1, fwdSize, this->mTmpOOut.data(), NULL, 1, bwdSize, fbwdKind, FftwLibrary::planFlag());
       } else
       {
+         this->mFEOPlan = this->mFEPlan;
+
          this->mBEOPlan = this->mBEPlan;
+
          this->mFBOEPlan = this->mFBOPlan;
       }
    }
@@ -365,6 +376,24 @@ namespace Transform {
       if(this->mFBOPlan)
       {
          fftw_destroy_plan(this->mFBOPlan);
+      }
+
+      // Detroy forward even plan on odd sizes
+      if(this->mFEOPlan)
+      {
+         fftw_destroy_plan(this->mFEOPlan);
+      }
+
+      // Detroy backward even plan on odd sizes
+      if(this->mBEOPlan)
+      {
+         fftw_destroy_plan(this->mBEOPlan);
+      }
+
+      // Detroy forward/backward odd plan on even sizes
+      if(this->mFBOEPlan)
+      {
+         fftw_destroy_plan(this->mFBOEPlan);
       }
 
       // Unregister the FFTW object

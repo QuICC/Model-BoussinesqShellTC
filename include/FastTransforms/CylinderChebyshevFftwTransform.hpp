@@ -49,13 +49,16 @@ namespace Transform {
        */
       struct Projectors
       {
-         /** Enum of projector IDs:
+         /** 
+          * Enum of projector IDs:
           *    - PROJ: projection
           *    - DIFF: D
           *    - DIVR: 1/r
           *    - DIVR2: 1/r^2
           *    - DIVRDIFFR: 1/r D r
           *    - DIFFDIVR: D 1/r
+          *
+          * All projectors assume "even" data, ie even "m" -> even "r", odd "m" -> odd "r"
           */
          enum Id {PROJ, DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
       };
@@ -65,8 +68,12 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
-         enum Id {INTG};
+         /** 
+          * Enum of integrator IDs
+          *    - INTGE: even integration, even "m" -> even "r", etc
+          *    - INTGO: odd integration, even "m" -> odd "r", etc
+          */
+         enum Id {INTGE, INTGO};
       };
 
    };
@@ -211,6 +218,11 @@ namespace Transform {
           * @brief FFTW plan for the even backward transform (real -> real)
           */
          fftw_plan   mBEPlan;
+
+         /**
+          * @brief FFTW plan for the odd forward transform with even size (real -> real)
+          */
+         fftw_plan   mFEOPlan;
 
          /**
           * @brief FFTW plan for the even backward transform with odd size (real -> real)
@@ -388,7 +400,7 @@ namespace Transform {
          /**
           * @brief Get the FFTW plan depending on parity
           */
-         fftw_plan fPlan(const int parity);
+         fftw_plan fPlan(const int parity, const int sizeParity);
 
          /**
           * @brief Get the FFTW plan depending on parity
@@ -434,14 +446,20 @@ namespace Transform {
       }
    }
 
-   inline fftw_plan CylinderChebyshevFftwTransform::fPlan(const int parity)
+   inline fftw_plan CylinderChebyshevFftwTransform::fPlan(const int parity, const int sizeParity)
    {
-      if(parity == 0)
+      if(parity == 0 && parity == sizeParity)
       {
          return this->mFEPlan;
-      } else
+      } else if(parity == 1 && parity == sizeParity)
       {
          return this->mFBOPlan;
+      } else if(parity == 0)
+      {
+         return this->mFEOPlan;
+      } else
+      {
+         return this->mFBOEPlan;
       }
    }
 
@@ -489,12 +507,25 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do even transform
-      for(int parity = 0; parity < 2; ++parity)
+      // Compute even integration
+      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
       {
-         this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
-         fftw_execute_r2r(this->fPlan(parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-         this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
+         // Do even transform
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
+            fftw_execute_r2r(this->fPlan(parity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
+            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
+         }
+      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
+      {
+         // Do even transform
+         for(int parity = 0; parity < 2; ++parity)
+         {
+            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
+            fftw_execute_r2r(this->fPlan((parity + 1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
+            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
+         }
       }
 
       // Rescale to remove FFT scaling
@@ -635,17 +666,34 @@ namespace Transform {
 
       // assert right sizes for output matrix
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
+      assert(rChebVal.cols() == this->mspSetup->howmany()); 
 
-      // Loop over real and imaginary
-      for(int isReal = 0; isReal < 2; ++isReal)
+      // Compute even integration
+      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
       {
-         // Do transform of real part
-         for(int parity = 0; parity < 2; ++parity)
+         // Loop over real and imaginary
+         for(int isReal = 0; isReal < 2; ++isReal)
          {
-            this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
-            fftw_execute_r2r(this->fPlan(parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-            this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
+            // Do transform of real part
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
+               fftw_execute_r2r(this->fPlan(parity, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
+               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
+            }
+         }
+      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
+      {
+         // Loop over real and imaginary
+         for(int isReal = 0; isReal < 2; ++isReal)
+         {
+            // Do transform of real part
+            for(int parity = 0; parity < 2; ++parity)
+            {
+               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
+               fftw_execute_r2r(this->fPlan((parity+1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
+               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
+            }
          }
       }
 
