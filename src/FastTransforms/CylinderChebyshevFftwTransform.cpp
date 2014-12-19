@@ -41,8 +41,10 @@ namespace Transform {
    }
 
    CylinderChebyshevFftwTransform::CylinderChebyshevFftwTransform()
-      : mFPlan(NULL), mBPlan(NULL)
+      : mFEPlan(NULL), mFBOPlan(NULL), mBEPlan(NULL)
+
    {
+      PythonWrapper::init();
    }
 
    CylinderChebyshevFftwTransform::~CylinderChebyshevFftwTransform()
@@ -94,7 +96,8 @@ namespace Transform {
 
       int fwdSize = this->mspSetup->fwdSize();
       int bwdSize = this->mspSetup->bwdSize();
-      int howmany = this->mspSetup->howmany();
+      int howmanyEven = this->mspSetup->howmany(0);
+      int howmanyOdd = this->mspSetup->howmany(1);
 
       // Create the two plans
       const int  *fftSize = &fwdSize;
@@ -105,17 +108,49 @@ namespace Transform {
       {
       }
 
+      // Safety assert
+      assert(fwdSize == bwdSize);
+
       // Initialise temporary storage
-      this->mTmpIn.setZero(fwdSize, howmany);
-      this->mTmpOut.setZero(bwdSize, howmany);
+      this->mTmpEIn.setZero(fwdSize, howmanyEven);
+      this->mTmpEOut.setZero(bwdSize, howmanyEven);
 
       // Create the physical to spectral plan
       const fftw_r2r_kind fwdKind[] = {FFTW_REDFT10};
-      this->mFPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpIn.data(), NULL, 1, fwdSize, this->mTmpOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
+      this->mFEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpEIn.data(), NULL, 1, fwdSize, this->mTmpEOut.data(), NULL, 1, bwdSize, fwdKind, FftwLibrary::planFlag());
 
       // Create the spectral to physical plan
       const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
-      this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+      this->mBEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpEOut.data(), NULL, 1, bwdSize, this->mTmpEIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+
+      // Initialise temporary storage
+      this->mTmpOIn.setZero(fwdSize, howmanyOdd);
+      this->mTmpOOut.setZero(bwdSize, howmanyOdd);
+
+      const fftw_r2r_kind fbwdKind[] = {FFTW_REDFT11};
+      this->mFBOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpOIn.data(), NULL, 1, fwdSize, this->mTmpOOut.data(), NULL, 1, bwdSize, fbwdKind, FftwLibrary::planFlag());
+
+      if(howmanyEven != howmanyOdd)
+      {
+         // Initialise temporary storage
+         this->mTmpOIn.setZero(fwdSize, howmanyOdd);
+         this->mTmpOOut.setZero(bwdSize, howmanyOdd);
+
+         // Create the spectral to physical plan
+         const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
+         this->mBEOPlan = fftw_plan_many_r2r(1, fftSize, howmanyOdd, this->mTmpOOut.data(), NULL, 1, bwdSize, this->mTmpOIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
+
+         // Initialise temporary storage
+         this->mTmpEIn.setZero(fwdSize, howmanyEven);
+         this->mTmpEOut.setZero(bwdSize, howmanyEven);
+
+         const fftw_r2r_kind fbwdKind[] = {FFTW_REDFT11};
+         this->mFBOEPlan = fftw_plan_many_r2r(1, fftSize, howmanyEven, this->mTmpOIn.data(), NULL, 1, fwdSize, this->mTmpOOut.data(), NULL, 1, bwdSize, fbwdKind, FftwLibrary::planFlag());
+      } else
+      {
+         this->mBEOPlan = this->mBEPlan;
+         this->mFBOEPlan = this->mFBOPlan;
+      }
    }
 
    void CylinderChebyshevFftwTransform::initOperators()
@@ -125,7 +160,6 @@ namespace Transform {
       this->mDiffO.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
-      PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cylindrical.cylinder_radius");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
@@ -315,16 +349,22 @@ namespace Transform {
 
    void CylinderChebyshevFftwTransform::cleanupFft()
    {
-      // Detroy forward plan
-      if(this->mFPlan)
+      // Detroy forward even plan
+      if(this->mFEPlan)
       {
-         fftw_destroy_plan(this->mFPlan);
+         fftw_destroy_plan(this->mFEPlan);
       }
 
-      // Detroy backward plan
-      if(this->mBPlan)
+      // Detroy backward even plan
+      if(this->mBEPlan)
       {
-         fftw_destroy_plan(this->mBPlan);
+         fftw_destroy_plan(this->mBEPlan);
+      }
+
+      // Detroy forward/backward odd plan
+      if(this->mFBOPlan)
+      {
+         fftw_destroy_plan(this->mFBOPlan);
       }
 
       // Unregister the FFTW object
@@ -332,6 +372,135 @@ namespace Transform {
 
       // cleanup fftw library
       FftwLibrary::cleanupFft();
+   }
+
+   void CylinderChebyshevFftwTransform::extractParityModes(Matrix& rSelected, const Matrix& data, const MatrixI& info, const int rows)
+   {
+      assert(rSelected.cols() == info.col(1).sum());
+
+      int k = 0;
+      for(int i = 0; i < info.rows(); ++i)
+      {
+         int j0 = info(i,0);
+         for(int j = 0; j < info(i,1); ++j, ++k)
+         { 
+            rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows);
+         }
+      }
+   }
+
+   void CylinderChebyshevFftwTransform::setParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
+   {
+      assert(selected.cols() == info.col(1).sum());
+
+      int k = 0;
+      for(int i = 0; i < info.rows(); ++i)
+      {
+         int j0 = info(i,0);
+         for(int j = 0; j < info(i,1); ++j, ++k)
+         { 
+            rData.col(j0 + j).topRows(rows) = selected.col(k).topRows(rows);
+         }
+      }
+   }
+
+   void CylinderChebyshevFftwTransform::addParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows)
+   {
+      assert(selected.cols() == info.col(1).sum());
+
+      int k = 0;
+      for(int i = 0; i < info.rows(); ++i)
+      {
+         int j0 = info(i,0);
+         for(int j = 0; j < info(i,1); ++j, ++k)
+         { 
+            rData.col(j0 + j).topRows(rows) += selected.col(k).topRows(rows);
+         }
+      }
+   }
+
+   void CylinderChebyshevFftwTransform::extractParityModes(Matrix& rSelected, const MatrixZ& data, const bool isReal, const MatrixI& info, const int rows)
+   {
+      assert(rSelected.cols() == info.col(1).sum());
+
+      int k = 0;
+      if(isReal)
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows).real();
+            }
+         }
+      } else
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rSelected.col(k).topRows(rows) = data.col(j0 + j).topRows(rows).imag();
+            }
+         }
+      }
+   }
+
+   void CylinderChebyshevFftwTransform::setParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
+   {
+      assert(selected.cols() == info.col(1).sum());
+
+      int k = 0;
+      if(isReal)
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rData.col(j0 + j).topRows(rows).real() = selected.col(k).topRows(rows);
+            }
+         }
+      } else
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rData.col(j0 + j).topRows(rows).imag() = selected.col(k).topRows(rows);
+            }
+         }
+      }
+   }
+
+   void CylinderChebyshevFftwTransform::addParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows)
+   {
+      assert(selected.cols() == info.col(1).sum());
+
+      int k = 0;
+      if(isReal)
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rData.col(j0 + j).topRows(rows).real() += selected.col(k).topRows(rows);
+            }
+         }
+      } else
+      {
+         for(int i = 0; i < info.rows(); ++i)
+         {
+            int j0 = info(i,0);
+            for(int j = 0; j < info(i,1); ++j, ++k)
+            { 
+               rData.col(j0 + j).topRows(rows).imag() += selected.col(k).topRows(rows);
+            }
+         }
+      }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

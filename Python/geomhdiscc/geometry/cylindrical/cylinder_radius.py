@@ -69,8 +69,11 @@ def x2(nr, parity, bc, coeff = 1.0, zr = 0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, parity, bc)
 
-def d1(nr, parity, bc, coeff = 1.0, zr = 1):
+def d1(nr, parity, bc, coeff = 1.0, zr = None):
     """Create operator for 1st derivative"""
+
+    if zr == None:
+        zr = (parity+1)%2
 
     row = [2*j for j in range(parity,2*nr,2)]
     mat = spsp.lil_matrix((nr,nr))

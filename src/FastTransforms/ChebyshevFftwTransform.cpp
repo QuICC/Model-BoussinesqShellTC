@@ -42,6 +42,9 @@ namespace Transform {
    ChebyshevFftwTransform::ChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL), mCScale(0.0)
    {
+      #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+         PythonWrapper::init();
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    ChebyshevFftwTransform::~ChebyshevFftwTransform()
@@ -144,7 +147,6 @@ namespace Transform {
       this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
       // Initialise python wrapper
-      PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
