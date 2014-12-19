@@ -60,6 +60,11 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
     rhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.torcheb(x_to_phys(sol_expr,grid), psol)
+    print("solution:")
+    print(sol)
+    print("computation:")
+    print(lhs)
+    print("-----------------------------------------")
     err = np.abs(lhs - sol)
     relerr = err/(1.0 + np.abs(sol))
     if np.max(err) > 10*np.spacing(1):
@@ -68,6 +73,33 @@ def test_backward_tau(opA, opB, parity, res_expr, sol_expr, grid):
     if np.max(relerr) > 10*np.spacing(1):
         print(relerr)
     print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
+
+def test_backward_galerkin(opA, opB, opS, parity, res_expr, sol_expr, grid):
+    """Perform a tau backward operation test"""
+
+    try:
+        pres, psol = parity
+    except:
+        pres = parity
+        psol = parity
+
+    x = sy.Symbol('x')
+    rhs = transf.torcheb(x_to_phys(res_expr,grid), pres)
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    sol = transf.torcheb(x_to_phys(sol_expr,grid), psol)
+    print("solution:")
+    print(sol)
+    print("computation:")
+    print(lhs)
+    print("-----------------------------------------")
+    err = np.abs(opS*lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
+    if np.max(err) > 10*np.spacing(1):
+        print(err)
+    print("\t\tMax galerkin backward error: " + str(np.max(err)))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr)
+    print("\t\tMax galerkin backward relative error: " + str(np.max(relerr)))
 
 def zblk(nr, rg):
     """Accuracy test for zblk operator"""
@@ -387,6 +419,58 @@ def i2x2laplh(nr, rg):
         ssol = sy.integrate(ssol,x,x)
         test_forward(A, parity, sphys, ssol, rg, 1)
 
+    print("\tbc = 10:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\t\tTest for m = " + str(m))
+        A = cylinder.i2x2laplh(nr, m, parity, {0:10}).tocsr()
+        B = cylinder.i2(nr, parity, cylinder.radbc.no_bc()).tocsr()
+        ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*(nr-1),2)]))
+        sphys = sy.expand(x**2*sy.diff(ssol,x,x) + x*sy.diff(ssol,x) - m**2*ssol)
+        test_backward_tau(A, B, parity, sphys, ssol, rg)
+
+    print("\tbc = 11:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\t\tTest for m = " + str(m))
+        A = cylinder.i2x2laplh(nr, m, parity, {0:11}).tocsr()
+        B = cylinder.i2(nr, parity, cylinder.radbc.no_bc()).tocsr()
+        ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*(nr-2),2)]))
+        sphys = sy.expand(x**2*sy.diff(ssol,x,x) + x*sy.diff(ssol,x) - m**2*ssol)
+        test_backward_tau(A, B, parity, sphys, ssol, rg)
+
+    print("\tbc = -10:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\t\tTest for m = " + str(m))
+        A = cylinder.i2x2laplh(nr, m, parity, {0:-10, 'rt':1}).tocsr()
+        B = cylinder.i2(nr, parity, cylinder.radbc.no_bc()).tocsr()
+        B = B[1:,:]
+        S = cylinder.radbc.stencil(nr, parity, {0:-10})
+        ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*(nr-1),2)]))
+        sphys = sy.expand(x**2*sy.diff(ssol,x,x) + x*sy.diff(ssol,x) - m**2*ssol)
+        test_backward_galerkin(A, B, S, parity, sphys, ssol, rg)
+
+    print("\tbc = -11:")
+    for i in range(0,2):
+        m = np.random.randint(1, nr-1)
+        m = m + (m+i)%2
+        parity = m%2
+        print("\t\tTest for m = " + str(m))
+        A = cylinder.i2x2laplh(nr, m, parity, {0:-11, 'rt':1}).tocsr()
+        B = cylinder.i2(nr, parity, cylinder.radbc.no_bc()).tocsr()
+        B = B[1:,:]
+        S = cylinder.radbc.stencil(nr, parity, {0:-11})
+        ssol = sy.expand((1.0 - x**2)**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(parity,2*(nr-2),2)]))
+        sphys = sy.expand(x**2*sy.diff(ssol,x,x) + x*sy.diff(ssol,x) - m**2*ssol)
+        test_backward_galerkin(A, B, S, parity, sphys, ssol, rg)
+
 def i2x3laplhx_1(nr, rg):
     """Accuracy test for i2x3laplhx_1 operator"""
 
@@ -526,12 +610,12 @@ def mvss_d1(nr, rg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 6
+    nr = 16
     rg = transf.rgrid(nr)
 
     # run tests
     #zblk(nr, rg)
-    x1(nr, rg)
+#    x1(nr, rg)
 #    x2(nr, rg)
 #    d1(nr, rg)
 #    x1d1(nr, rg)
@@ -551,7 +635,7 @@ if __name__ == "__main__":
 #    i2x3d1(nr, rg)
 #    i2x3d1x_2(nr, rg)
 #    i2x2div(nr, rg)
-#    i2x2laplh(nr, rg)
+    i2x2laplh(nr, rg)
 #    i2x3laplhx_1(nr, rg)
 #    i4(nr, rg)
 #    i4x4(nr, rg)

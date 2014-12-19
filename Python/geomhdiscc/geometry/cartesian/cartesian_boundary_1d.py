@@ -319,7 +319,8 @@ def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nx = mat.shape[0]
-    return mat*stencil(nx, bc)
+    mat = mat*stencil(nx, bc)
+    return mat
 
 def restrict_eye(nx, t, q):
     """Create the non-square identity to restrict matrix"""
