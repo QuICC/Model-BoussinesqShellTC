@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,18 +7,18 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell as shell
+import geomhdiscc.geometry.spherical.sphere as sphere
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.shell_boundary import no_bc
+from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
 
 
-class BoussinesqTCShell(base_model.BaseModel):
-    """Class to setup the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+class BoussinesqTCSphere(base_model.BaseModel):
+    """Class to setup the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio"]
+        return ["prandtl", "rayleigh"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -40,7 +40,10 @@ class BoussinesqTCShell(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        if field_row == ("velocity","tor") or field_row == ("velocity","pol") or field_row == ("temperature",""):
+            fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        else:
+            fields = []
 
         return fields
 
@@ -57,19 +60,19 @@ class BoussinesqTCShell(base_model.BaseModel):
         tau_n = res[0]*res[1]
         if self.use_galerkin:
             if field_row == ("velocity","tor") or field_row == ("temperature",""):
-                shift_r = 2
+                shift_r = 1
             elif field_row == ("velocity","pol"):
-                shift_r = 4
+                shift_r = 2
             else:
                 shift_r = 0
 
-            gal_n = (res[0] - shift_r)*res[1]
+            gal_n = (res[0] - shift_x)*res[1]
 
         else:
             gal_n = tau_n
             shift_x = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
+        block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -83,7 +86,7 @@ class BoussinesqTCShell(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, GEOMETRIC_1D_3D
+        # Index mode: SLOWEST = 0, MODE = 1
         index_mode = self.GEOMETRIC_1D_3D
 
         # Compute block info
@@ -114,41 +117,41 @@ class BoussinesqTCShell(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-10, 'r':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
-                    elif field_col == ("temperature",""):
                         bc = {0:-20, 'r':0}
+                    elif field_col == ("temperature",""):
+                        bc = {0:-10, 'r':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:20}
+                            bc = {0:10}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
-                    elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
+                    elif field_row == ("temperature","") and field_col == ("temperature",""):
+                            bc = {0:10}
 
-            elif bcId == 1:
+            elif bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-11, 'r':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-21, 'r':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:21}
+                            bc = {0:11}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:41}
+                            bc = {0:21}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['r'] = 1
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
-                elif field_row == ("temperature",""):
                     bc['r'] = 2
+                elif field_row == ("temperature",""):
+                    bc['r'] = 1
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -156,28 +159,28 @@ class BoussinesqTCShell(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-10, 'r':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
-                    elif field_col == ("temperature",""):
                         bc = {0:-20, 'r':0}
+                    elif field_col == ("temperature",""):
+                        bc = {0:-10, 'r':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-11, 'r':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-21, 'r':0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['r'] = 1
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
-                elif field_row == ("temperature",""):
                     bc['r'] = 2
+                elif field_row == ("temperature",""):
+                    bc['r'] = 1
 
         else:
             bc = no_bc()
@@ -189,23 +192,22 @@ class BoussinesqTCShell(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+        return sphere.stencil(res[0], res[1], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = sphere.i2x2(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = sphere.i4x4(res[0], res[1], m, bc)
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = sphere.i2x2(res[0], res[1], m, bc)
 
         return mat
 
@@ -214,45 +216,43 @@ class BoussinesqTCShell(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-
+        
         m = eigs[1]
-
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = sphere.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("velocity","pol"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = sphere.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh')
+                mat = sphere.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                    mat = sphere.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
 
                 else:
-                    mat = shell.zblk(res[0], res[1], m, bc)
+                    mat = sphere.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc)
+                mat = sphere.i2x2lapl(res[0], res[1], m, bc)
 
         return mat
 
@@ -260,19 +260,16 @@ class BoussinesqTCShell(base_model.BaseModel):
         """Create matrix block of time operator"""
 
         Pr = eq_params['prandtl']
-
         m = eigs[1]
-
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = sphere.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = sphere.i4x4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, Pr)
+            mat = sphere.i2x2(res[0], res[1], m, bc, Pr)
 
         return mat
