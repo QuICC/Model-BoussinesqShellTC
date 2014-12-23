@@ -164,7 +164,7 @@ def apply_galerkin(mat, parity, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nr = mat.shape[0]
-    mat = mat*stencil(nr, parity, bc)
+    mat = restrict_eye(nr, parity, 'rt', bc['r'])*mat*stencil(nr, parity, bc)
     return mat
 
 def restrict_eye(nr, parity, t, q):
@@ -261,7 +261,7 @@ def stencil_1rdr(nr, parity):
 
     # Generate subdiagonal
     def d_1(n):
-        return -(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
+        return -(n - 3.0)/(n + 1.0)
 
     # Generate diagonal
     def d0(n):

@@ -13,9 +13,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [32, 0, 32]
-res = [16, 0, 16]
-eq_params = {'prandtl':1, 'rayleigh':5901.55, 'scale3d':2.0}
+res = [64, 0, 64]
+eq_params = {'prandtl':7, 'rayleigh':2e10, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':0.}
 eigs = [2]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
@@ -32,7 +31,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = False
 write_mtx = True
-solve_evp = True
+solve_evp = False
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:

@@ -58,7 +58,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         tau_n = res[0]*res[2]
         if self.use_galerkin:
             if field_row == ("velocity","r") or field_row == ("velocity","theta") or field_row == ("velocity","z") or field_row == ("temperature",""):
-                shift_r = 2
+                shift_r = 1
                 shift_z = 2
             else:
                 shift_r = 0
@@ -173,6 +173,9 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 elif field_row == ("temperature",""):
                     bc['r']['r'] = 1
                     bc['z']['r'] = 2
+                elif field_row == ("pressure",""):
+                    bc['r']['r'] = 1
+                    bc['z']['r'] = 1
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:

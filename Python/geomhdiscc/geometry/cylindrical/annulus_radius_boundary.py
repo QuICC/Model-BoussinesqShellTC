@@ -7,6 +7,10 @@ import numpy as np
 import scipy.sparse as spsp
 import itertools
 
+import geomhdiscc.base.utils as utils
+
+
+use_parity_bc = False
 
 def no_bc():
     """Get a no boundary condition flag"""
@@ -303,6 +307,8 @@ def tau_last(nr):
 def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
+    nr = mat.shape[0]
+    mat = mat*stencil(nr, parity, bc)
     return mat
 
 def restrict_eye(nr, t, q):

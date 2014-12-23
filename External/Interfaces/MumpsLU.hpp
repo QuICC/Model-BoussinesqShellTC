@@ -261,6 +261,8 @@ namespace Eigen {
                m_id.icntl[4-1] = 0;
             #endif // GEOMHDISCC_NO_DEBUG
 
+            // Force specific ordering algorithm
+            //m_id.icntl[7-1] = 3;
             if(m_isParallel)
             {
                // Matrix distribution
