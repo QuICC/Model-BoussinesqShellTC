@@ -38,9 +38,9 @@ namespace GeoMHDiSCC {
       /**
        * @brief Specialialised IndexConverterSelector for the second transform
        */
-      // Configure index converter on spherical harmonics basis
-   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
-      #include "Communicators/Converters/SHIndexConv.hpp"
+      // Configure index converter on spherical harmonics basis with l spectral ordering
+   #if defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_WLF
+      #include "Communicators/Converters/SHlIndexConv.hpp"
 
       namespace GeoMHDiSCC {
          namespace Parallel {
@@ -48,7 +48,21 @@ namespace GeoMHDiSCC {
             template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
             {
                /// Typedef for the type of the index converter
-               typedef SHIndexConv  Type;
+               typedef SHlIndexConv  Type;
+            };
+         }
+      }
+      // Configure index converter on spherical harmonics basis with m spectral ordering
+   #elif defined GEOMHDISCC_SPATIALSCHEME_BLFM  || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_WLFM
+      #include "Communicators/Converters/SHmIndexConv.hpp"
+
+      namespace GeoMHDiSCC {
+         namespace Parallel {
+
+            template <> struct IndexConverterSelector<Dimensions::Transform::TRA2D>
+            {
+               /// Typedef for the type of the index converter
+               typedef SHmIndexConv  Type;
             };
          }
       }
@@ -79,6 +93,6 @@ namespace GeoMHDiSCC {
             };
          }
       }
-   #endif //GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLF || GEOMHDISCC_SPATIALSCHEME_WLF
+   #endif //GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || GEOMHDISCC_SPATIALSCHEME_WLF
 
 #endif // INDEXCONVERTERSELCTOR_HPP

@@ -6,8 +6,6 @@
 
 // System includes
 //
-#include <cassert>
-#include <tr1/cmath>
 
 // External includes
 //
@@ -21,6 +19,7 @@
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "Quadratures/LegendreRule.hpp"
+#include "PolynomialTransforms/AssociatedLegendrePolynomial.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -53,13 +52,7 @@ namespace Transform {
       this->mspSetup = spSetup;
 
       // Initialise the quadrature grid and weights
-      this->initQuadrature();
-
-      // Initialise the projector
-      this->initProjector();
-
-      // Initialise the derivative
-      this->initDerivative();
+      this->initOperators();
    }
 
    void AssociatedLegendreTransform::requiredOptions(std::set<NonDimensional::Id>& list, const Dimensions::Transform::Id dimId) const
@@ -86,84 +79,69 @@ namespace Transform {
       return this->mThGrid;
    }
 
-   void AssociatedLegendreTransform::initQuadrature()
+   void AssociatedLegendreTransform::initOperators()
    {
       this->mXGrid.resize(this->mspSetup->fwdSize());
       this->mThGrid.resize(this->mspSetup->fwdSize());
       this->mWeights.resize(this->mspSetup->fwdSize());
 
-      LegendreRule::computeQuadrature(this->mXGrid, this->mWeights, this->mspSetup->fwdSize());
+      internal::Array igrid, iweights;
+
+      LegendreRule::computeQuadrature(this->mXGrid, this->mWeights, igrid, iweights, this->mspSetup->fwdSize());
 
       this->mThGrid = this->mXGrid.array().acos();
 
-      // Normalise weights by 2*pi
+      // Normalise weights by 2*pi for spherical harmonics
       this->mWeights.array() *= 2*Math::PI;
-   }
 
-   void AssociatedLegendreTransform::initProjector()
-   {
-      // Reserve storage for the projectors
+      // Reserve storage for the projectors, 1/sin projectors and derivative
       this->mProj.reserve(this->mspSetup->slow().size());
-
-      // Loop over harmonic orders
-      for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
-      {
-         int m = this->mspSetup->slow()(iM);
-
-         // Allocate memory for the projector
-         this->mProj.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
-
-         // Loop over harmonic degrees
-         for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
-         {
-            int l = this->mspSetup->fast().at(iM)(iL);
-
-            // Loop over grid points
-            for(int iG = 0; iG < this->mThGrid.size(); iG++)
-            {
-               this->mProj.at(iM)(iG,iL) = std::tr1::sph_legendre(l,m,this->mThGrid(iG));
-            }
-         }
-      }
-   }
-
-   void AssociatedLegendreTransform::initDerivative()
-   {
-      // Reserve storage for the derivative
+      this->mDivSin.reserve(this->mspSetup->slow().size());
       this->mDiff.reserve(this->mspSetup->slow().size());
 
       // Loop over harmonic orders
+      Matrix op;
+      internal::Matrix  itmp, ipoly;
       for(int iM = 0; iM < this->mspSetup->slow().size(); iM++)
       {
          int m = this->mspSetup->slow()(iM);
+         int maxL = this->mspSetup->fast().at(iM)(this->mspSetup->fast().at(iM).size()-1);
 
-         // Allocate memory for the derivative
+         // Allocate memory for the projector, 1/sin projector and derivatives
+         this->mProj.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mDivSin.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
          this->mDiff.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
 
-         // Loop over harmonic degrees
+         op.resize(this->mThGrid.size(), maxL - m + 1);
+
+         // Loop over harmonic degrees for projectors
+         Polynomial::AssociatedLegendrePolynomial::Plm(op, ipoly, m, igrid);
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
          {
             int l = this->mspSetup->fast().at(iM)(iL);
 
-            // Loop over grid points
-            for(int iG = 0; iG < this->mThGrid.size(); iG++)
-            {
-               if(l == 0 && m == 0)
-               {
-                  this->mDiff.at(iM)(iG,iL) = 0.0;
-               } else if(m == 0)
-               {
-                  this->mDiff.at(iM)(iG,iL) = -0.5*std::sqrt(static_cast<MHDFloat>(l*(l+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG));
-               } else if(m == l)
-               {
-                  this->mDiff.at(iM)(iG,iL) = 0.5*std::sqrt(static_cast<MHDFloat>(2*l))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG));
-               } else
-               {
-                  this->mDiff.at(iM)(iG,iL) = 0.5*(std::sqrt(static_cast<MHDFloat>((l+m)*(l-m+1)))*std::tr1::sph_legendre(l,m-1,this->mThGrid(iG)) - std::sqrt(static_cast<MHDFloat>((l-m)*(l+m+1)))*std::tr1::sph_legendre(l,m+1,this->mThGrid(iG)));
-               }
-            }
+            this->mProj.at(iM).col(iL) = op.col(l - m);
+         }
+
+         // Loop over harmonic degrees for derivative
+         Polynomial::AssociatedLegendrePolynomial::dPlm(op, itmp, m, ipoly, igrid);
+         for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
+         {
+            int l = this->mspSetup->fast().at(iM)(iL);
+
+            this->mDiff.at(iM).col(iL) = op.col(l - m);
+         }
+
+         // Loop over harmonic degrees for 1/\sin\theta
+         Polynomial::AssociatedLegendrePolynomial::sin_1Plm(op, itmp, m, igrid);
+         for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
+         {
+            int l = this->mspSetup->fast().at(iM)(iL);
+
+            this->mDivSin.at(iM).col(iL) = op.col(l - m);
          }
       }
+
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
@@ -186,6 +164,12 @@ namespace Transform {
       for(size_t i = 0; i < this->mDiff.size(); i++)
       {
          mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDiff.at(i).rows()*this->mDiff.at(i).cols();
+      }
+
+      // Storage for the 1/\sin\theta
+      for(size_t i = 0; i < this->mDivSin.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDivSin.at(i).rows()*this->mDivSin.at(i).cols();
       }
 
       return mem;

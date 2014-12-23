@@ -1,11 +1,11 @@
 /** 
- * @file IRegularSHScheme.hpp
- * @brief Implementation of the Regular basis + Spherical Harmonics scheme
+ * @file IRegularSHmScheme.hpp
+ * @brief Implementation of the Regular basis + Spherical Harmonics scheme with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef IREGULARSHSCHEME_HPP
-#define IREGULARSHSCHEME_HPP
+#ifndef IREGULARSHMSCHEME_HPP
+#define IREGULARSHMSCHEME_HPP
 
 // Configuration includes
 //
@@ -28,9 +28,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of Regular basis + Spherical Harmonics scheme
+    * @brief Implementation of Regular basis + Spherical Harmonics scheme with m spectral ordering
     */
-   class IRegularSHScheme: public ISpatialScheme
+   class IRegularSHmScheme: public ISpatialScheme
    {
       public:
          /**
@@ -53,12 +53,12 @@ namespace Schemes {
           *
           * @param dim 0: radial, 1: latitudinal, 2: longitudinal
           */
-         explicit IRegularSHScheme(const ArrayI& dim);
+         explicit IRegularSHmScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~IRegularSHScheme();
+         virtual ~IRegularSHmScheme();
 
          /**
           * @brief Create indexes for a possibly restricted set
@@ -111,4 +111,4 @@ namespace Schemes {
 }
 }
 
-#endif // IREGULARSHSCHEME_HPP
+#endif // IREGULARSHMSCHEME_HPP

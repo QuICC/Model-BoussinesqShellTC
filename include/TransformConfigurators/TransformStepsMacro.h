@@ -15,7 +15,7 @@
    // include transform steps for cylindrical geometry
    #include "TransformConfigurators/CylindricalTransformSteps.hpp"
 
-#elif defined GEOMHDISCC_SPATIALSCHEME_SLF || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
+#elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLF || defined GEOMHDISCC_SPATIALSCHEME_WLF
    // include transform steps for spherical geometry
    #include "TransformConfigurators/SphericalTransformSteps.hpp"
 

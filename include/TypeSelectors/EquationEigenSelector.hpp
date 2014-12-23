@@ -118,7 +118,7 @@
 #endif //GEOMHDISCC_SPATIALSCHEME_BLF
 
 // Configure code to use SLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
+#if defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
 
    #include "Equations/Tools/EquationEigenSHTools.hpp"
 
@@ -129,7 +129,7 @@
          namespace EigenSelector = EigenSH;
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_SLF
+#endif //defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
 
 // Configure code to use WFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WFT

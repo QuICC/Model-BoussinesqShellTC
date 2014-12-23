@@ -1,6 +1,6 @@
 /** 
- * @file IRegularSHScheme.cpp
- * @brief Source of the Regular basis + Spherical Harmonics scheme implementation
+ * @file IRegularSHlScheme.cpp
+ * @brief Source of the Regular basis + Spherical Harmonics scheme implementation with l spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,43 +13,43 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
+#include "SpatialSchemes/3D/IRegularSHlScheme.hpp"
 
 // Project includes
 //
 #include "SpatialSchemes/Tools/SphericalHarmonicTools.hpp"
-#include "Resolutions/Tools/SphericalHarmonicIndexCounter.hpp"
+#include "Resolutions/Tools/SHlIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
 
 namespace Schemes {
 
-   void IRegularSHScheme::tuneResolution(SharedResolution spRes)
+   void IRegularSHlScheme::tuneResolution(SharedResolution spRes)
    {
-      SharedSphericalHarmonicIndexCounter   spCounter(new SphericalHarmonicIndexCounter(spRes->sim(), spRes->cpu()));
+      SharedSHlIndexCounter   spCounter(new SHlIndexCounter(spRes->sim(), spRes->cpu()));
 
       spRes->setIndexCounter(spCounter);
 
       ISpatialScheme::tuneMpiResolution();
    }
 
-   const int IRegularSHScheme::DIMENSIONS = 3;
+   const int IRegularSHlScheme::DIMENSIONS = 3;
 
-   bool IRegularSHScheme::isRegular()
+   bool IRegularSHlScheme::isRegular()
    {
       return false;
    }
 
-   IRegularSHScheme::IRegularSHScheme(const ArrayI& dim)
+   IRegularSHlScheme::IRegularSHlScheme(const ArrayI& dim)
       : ISpatialScheme(dim.size()), mI(dim(0)), mL(dim(1)), mM(dim(2))
    {
    }
 
-   IRegularSHScheme::~IRegularSHScheme()
+   IRegularSHlScheme::~IRegularSHlScheme()
    {
    }
 
-   void IRegularSHScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -417,7 +417,7 @@ namespace Schemes {
       }
    }
 
-   int IRegularSHScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
+   int IRegularSHlScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       // Splittable size for first transform splitting
       if(flag == Splitting::Locations::FIRST)
@@ -486,7 +486,7 @@ namespace Schemes {
       return -1;
    }
 
-   void IRegularSHScheme::buildMLMap(std::multimap<int,int>& harmonics, const int id, const int bins)
+   void IRegularSHlScheme::buildMLMap(std::multimap<int,int>& harmonics, const int id, const int bins)
    {
       // Assert that more than one bin is available
       assert(bins > 1);

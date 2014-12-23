@@ -1,6 +1,6 @@
 /** 
- * @file SphericalHarmonicIndexCounter.cpp
- * @brief Source of spherical harmonic index counter
+ * @file SHlIndexCounter.cpp
+ * @brief Source of spherical harmonic index counter with l spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -12,31 +12,30 @@
 
 // Class include
 //
-#include "Resolutions/Tools/SphericalHarmonicIndexCounter.hpp"
+#include "Resolutions/Tools/SHlIndexCounter.hpp"
 
 // Project includes
 //
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
-   SphericalHarmonicIndexCounter::SphericalHarmonicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
+   SHlIndexCounter::SHlIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IndexCounter(), mspSim(spSim), mspCpu(spCpu)
    {
    }
 
-   SphericalHarmonicIndexCounter::~SphericalHarmonicIndexCounter()
+   SHlIndexCounter::~SHlIndexCounter()
    {
    }
 
-   ArrayI SphericalHarmonicIndexCounter::orderedDimensions(const Dimensions::Space::Id spaceId) const
+   ArrayI SHlIndexCounter::orderedDimensions(const Dimensions::Space::Id spaceId) const
    {
       ArrayI dims = this->mspSim->dimensions(spaceId);
 
       return this->orderedDimensions(dims, spaceId);
    }
 
-   ArrayI SphericalHarmonicIndexCounter::orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const
+   ArrayI SHlIndexCounter::orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const
    {
       // Storage for the ordered dimensions
       ArrayI oDims(dims.size());
@@ -70,12 +69,12 @@ namespace GeoMHDiSCC {
       return oDims;
    }
 
-   void SphericalHarmonicIndexCounter::computeOffsets(std::vector<std::vector<SphericalHarmonicIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
+   void SHlIndexCounter::computeOffsets(std::vector<std::vector<SHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
    {
       this->computeOffsets(offsets, spaceId, this->mspSim);
    }
 
-   void SphericalHarmonicIndexCounter::computeOffsets(std::vector<std::vector<SphericalHarmonicIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
+   void SHlIndexCounter::computeOffsets(std::vector<std::vector<SHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
       Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;

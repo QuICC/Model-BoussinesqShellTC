@@ -84,7 +84,7 @@ class BoussinesqTCShell(base_model.BaseModel):
         ex_fields = self.explicit_fields(field_row)
 
         # Index mode: SLOWEST, MODE, GEOMETRIC_1D_3D
-        index_mode = self.GEOMETRIC_1D_3D
+        index_mode = self.SLOWEST
 
         # Compute block info
         block_info = self.block_size(res, field_row)

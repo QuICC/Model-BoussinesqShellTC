@@ -64,7 +64,7 @@ namespace GeoMHDiSCC {
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
          std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
-         tSH.push_back(std::tr1::make_tuple(23,9,MHDComplex(1,1)));
+         tSH.push_back(std::tr1::make_tuple(3,3,MHDComplex(1,1)));
          spScalar->setHarmonicOptions(tSH);
 
          // Add temperature initial state generator

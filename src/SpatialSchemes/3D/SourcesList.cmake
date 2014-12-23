@@ -42,10 +42,15 @@ elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLF")
       IRegularSHScheme.cpp
       BLFScheme.cpp
       )
-elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLF")
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL")
    list(APPEND MHDSources 
-      IRegularSHScheme.cpp
-      SLFScheme.cpp
+      IRegularSHlScheme.cpp
+      SLFlScheme.cpp
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
+   list(APPEND MHDSources 
+      IRegularSHmScheme.cpp
+      SLFmScheme.cpp
       )
 elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "WLF")
    list(APPEND MHDSources 

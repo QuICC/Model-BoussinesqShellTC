@@ -1,6 +1,6 @@
 /** 
- * @file BLFScheme.cpp
- * @brief Source of the sphere (ball) Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation
+ * @file SLFlScheme.cpp
+ * @brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with spectral ordering l
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -13,7 +13,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/3D/BLFScheme.hpp"
+#include "SpatialSchemes/3D/SLFlScheme.hpp"
 
 // Project includes
 //
@@ -23,12 +23,12 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
    
-   std::string BLFScheme::type()
+   std::string SLFlScheme::type()
    {
-      return "BLF";
+      return "SLFl";
    }
 
-   void BLFScheme::addTransformSetups(SharedResolution spRes) const
+   void SLFlScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
       Transform::SharedFftSetup  spS1D = this->spSetup1D(spRes);
@@ -43,7 +43,7 @@ namespace Schemes {
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::SharedFftSetup BLFScheme::spSetup1D(SharedResolution spRes) const
+   Transform::SharedFftSetup SLFlScheme::spSetup1D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
@@ -61,7 +61,7 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::COMPONENT));
    }
 
-   Transform::SharedPolySetup BLFScheme::spSetup2D(SharedResolution spRes) const
+   Transform::SharedPolySetup SLFlScheme::spSetup2D(SharedResolution spRes) const
    {
       // Get physical size of polynomial transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
@@ -97,7 +97,7 @@ namespace Schemes {
       return Transform::SharedPolySetup(new Transform::PolySetup(size, howmany, specSize, fast, slow, mult));
    }
 
-   Transform::SharedFftSetup BLFScheme::spSetup3D(SharedResolution spRes) const
+   Transform::SharedFftSetup SLFlScheme::spSetup3D(SharedResolution spRes) const
    {
       // Get size of FFT transform
       int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
@@ -115,24 +115,26 @@ namespace Schemes {
       return Transform::SharedFftSetup(new Transform::FftSetup(size, howmany, specSize, Transform::FftSetup::MIXED));
    }
 
-   BLFScheme::BLFScheme(const ArrayI& dim)
-      : IRegularSHScheme(dim)
+   SLFlScheme::SLFlScheme(const ArrayI& dim)
+      : IRegularSHlScheme(dim)
    {
    }
 
-   BLFScheme::~BLFScheme()
+   SLFlScheme::~SLFlScheme()
    {
    }
 
-   void BLFScheme::setDimensions()
+   void SLFlScheme::setDimensions()
    {
+      /// \mhdBug Setup of resolution information doesn't seem right
+
       //
       // Set transform space sizes
       //
       ArrayI traSize(3);
       traSize(0) = this->mI + 1;
-      traSize(1) = this->mM + 1;
-      traSize(2) = this->mL + 1;
+      traSize(1) = this->mL + 1;
+      traSize(2) = this->mM + 1;
       this->setTransformSpace(traSize);
 
       //
@@ -201,7 +203,7 @@ namespace Schemes {
       this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
    }
 
-   void BLFScheme::setCosts()
+   void SLFlScheme::setCosts()
    {
       // Set first transform cost
       this->setCost(1.0, Dimensions::Transform::TRA1D);
@@ -213,7 +215,7 @@ namespace Schemes {
       this->setCost(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void BLFScheme::setScalings()
+   void SLFlScheme::setScalings()
    {
       // Set first transform scaling
       this->setScaling(1.0, Dimensions::Transform::TRA1D);
@@ -225,7 +227,7 @@ namespace Schemes {
       this->setScaling(1.0, Dimensions::Transform::TRA3D);
    }
 
-   void BLFScheme::setMemoryScore()
+   void SLFlScheme::setMemoryScore()
    {
       // Set first transform memory footprint
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
@@ -237,7 +239,7 @@ namespace Schemes {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool BLFScheme::applicable() const
+   bool SLFlScheme::applicable() const
    {
       return true;
    }

@@ -113,33 +113,48 @@
 
 // Configure code to use BLF scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_BLF
-   // SLF includes
+   // BLF includes
    #include "SpatialSchemes/3D/BLFScheme.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Schemes {
 
-         /// Typedef for the SLF spatial scheme
+         /// Typedef for the BLF spatial scheme
          typedef BLFScheme SpatialSelector;
       }
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_BLF
 
-// Configure code to use SLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
-   // SLF includes
-   #include "SpatialSchemes/3D/SLFScheme.hpp"
+// Configure code to use SLFl scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+   // SLFl includes
+   #include "SpatialSchemes/3D/SLFlScheme.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Schemes {
 
-         /// Typedef for the SLF spatial scheme
-         typedef SLFScheme SpatialSelector;
+         /// Typedef for the SLFl spatial scheme
+         typedef SLFlScheme SpatialSelector;
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_SLF
+#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
+// Configure code to use SLFm scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+   // SLFm includes
+   #include "SpatialSchemes/3D/SLFmScheme.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Schemes {
+
+         /// Typedef for the SLFm spatial scheme
+         typedef SLFmScheme SpatialSelector;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_SLFM
 
 // Configure code to use WFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WFT

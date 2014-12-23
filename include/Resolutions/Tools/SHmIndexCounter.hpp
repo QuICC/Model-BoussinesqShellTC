@@ -1,11 +1,11 @@
 /** 
- * @file SphericalHarmonicIndexCounter.hpp
- * @brief Implementation of spherical harmonic index counter 
+ * @file SHmIndexCounter.hpp
+ * @brief Implementation of spherical harmonic index counter with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERICALHARMONICINDEXCOUNTER_HPP
-#define SPHERICALHARMONICINDEXCOUNTER_HPP
+#ifndef SHMINDEXCOUNTER_HPP
+#define SHMINDEXCOUNTER_HPP
 
 // Configuration includes
 //
@@ -28,20 +28,20 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of spherical harmonic index counter
+    * @brief Implementation of spherical harmonic index counter with m spectral ordering
     */ 
-   class SphericalHarmonicIndexCounter: public IndexCounter
+   class SHmIndexCounter: public IndexCounter
    {
       public:
          /**
           * @brief Constructor
           */
-         SphericalHarmonicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu);
+         SHmIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu);
 
          /**
           * @brief Empty destructor
           */
-         ~SphericalHarmonicIndexCounter();
+         ~SHmIndexCounter();
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -87,9 +87,9 @@ namespace GeoMHDiSCC {
 
    };
 
-   /// Typedef for an smart reference counting pointer for a SphericalHarmonicIndexCounter
-   typedef SharedPtrMacro<SphericalHarmonicIndexCounter>   SharedSphericalHarmonicIndexCounter;
+   /// Typedef for an smart reference counting pointer for a SHmIndexCounter
+   typedef SharedPtrMacro<SHmIndexCounter>   SharedSHmIndexCounter;
 
 }
 
-#endif // SPHERICALHARMONICINDEXCOUNTER_HPP
+#endif // SHMINDEXCOUNTER_HPP

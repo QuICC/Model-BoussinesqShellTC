@@ -88,6 +88,12 @@ if(largeioTest)
    geomhdiscc_add_definition(GEOMHDISCC_LARGEIO)
 endif(largeioTest)
 
+###################################################
+#----------------- SH NORMALIZATION --------------#
+###################################################
+
+set(GEOMHDISCC_SHNORM "Unity")
+geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#

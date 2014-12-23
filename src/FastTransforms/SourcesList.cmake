@@ -19,7 +19,7 @@ if(GEOMHDISCC_FFT STREQUAL "FFTW")
          ChebyshevFftwTransform.cpp
          CylinderChebyshevFftwTransform.cpp
          )
-   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLF")
+   elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
       list(APPEND MHDSources 
          ShellChebyshevFftwTransform.cpp
          )

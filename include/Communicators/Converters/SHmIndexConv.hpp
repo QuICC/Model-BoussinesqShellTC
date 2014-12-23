@@ -1,11 +1,11 @@
 /**
- * @file SHIndexConv.hpp
- * @brief Implementation of the index converter for spherical harmonics 
+ * @file SHmIndexConv.hpp
+ * @brief Implementation of the index converter for spherical harmonics with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SHINDEXCONV_HPP
-#define SHINDEXCONV_HPP
+#ifndef SHMINDEXCONV_HPP
+#define SHMINDEXCONV_HPP
 
 // Configuration includes
 //
@@ -25,9 +25,9 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * @brief Implementation of the index converter for spherical harmonics
+    * @brief Implementation of the index converter for spherical harmonics with m spectral ordering
     */
-   class SHIndexConv
+   class SHmIndexConv
    {
       public:
          /**
@@ -36,12 +36,12 @@ namespace Parallel {
           * @param spRes   Shared resolution
           * @param id      Forward dimension index ID
           */
-         SHIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id);
+         SHmIndexConv(SharedResolution spRes, const Dimensions::Transform::Id id);
 
          /**
           * @brief Destructor
           */
-         ~SHIndexConv();
+         ~SHmIndexConv();
 
          /**
           * @brief Compute shift due to central padding
@@ -158,67 +158,67 @@ namespace Parallel {
          int kS(const int i, const int j, const int k);
    };
 
-   inline int SHIndexConv::centralPadding(const int idx, const int k)
+   inline int SHmIndexConv::centralPadding(const int idx, const int k)
    {
       return 0;
    }
 
-   inline int SHIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
+   inline int SHmIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      return idxK-idxJ;
+      return idxK+idxJ;
    }
 
-   inline int SHIndexConv::iS(const int i, const int j, const int k)
+   inline int SHmIndexConv::iS(const int i, const int j, const int k)
    {
-      return SHIndexConv::i(i,j,k,i,j,k);
+      return SHmIndexConv::i(i,j,k,i,j,k);
    }
 
-   inline int SHIndexConv::i(const int i, const int j, const int idxI, const int idxJ)
+   inline int SHmIndexConv::i(const int i, const int j, const int idxI, const int idxJ)
    {
-      return idxJ-idxI;
+      return idxJ+idxI;
    }
 
-   inline int SHIndexConv::iS(const int i, const int j)
+   inline int SHmIndexConv::iS(const int i, const int j)
    {
-      return SHIndexConv::i(i,j,i,j);
+      return SHmIndexConv::i(i,j,i,j);
    }
 
-   inline int SHIndexConv::i(const int i)
+   inline int SHmIndexConv::i(const int i)
    {
       return i;
    }
 
-   inline int SHIndexConv::j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
+   inline int SHmIndexConv::j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
       return i;
    }
 
-   inline int SHIndexConv::jS(const int i, const int j, const int k)
+   inline int SHmIndexConv::jS(const int i, const int j, const int k)
    {
-      return SHIndexConv::j(i,j,k,i,j,k);
+      return SHmIndexConv::j(i,j,k,i,j,k);
    }
 
-   inline int SHIndexConv::j(const int i, const int j, const int idxI, const int idxJ)
+   inline int SHmIndexConv::j(const int i, const int j, const int idxI, const int idxJ)
    {
       return i;
    }
 
-   inline int SHIndexConv::jS(const int i, const int j)
+   inline int SHmIndexConv::jS(const int i, const int j)
    {
-      return SHIndexConv::j(i,j,i,j);
+      return SHmIndexConv::j(i,j,i,j);
    }
 
-   inline int SHIndexConv::k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
+   inline int SHmIndexConv::k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      return j;
+      return k;
    }
 
-   inline int SHIndexConv::kS(const int i, const int j, const int k)
+   inline int SHmIndexConv::kS(const int i, const int j, const int k)
    {
-      return SHIndexConv::k(i,j,k,i,j,k);
+      return SHmIndexConv::k(i,j,k,i,j,k);
    }
 
 }
 }
 
-#endif // SHINDEXCONV_HPP
+#endif // SHMINDEXCONV_HPP

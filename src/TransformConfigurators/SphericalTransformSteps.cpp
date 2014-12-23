@@ -35,7 +35,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #if defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
    std::vector<IntegratorBranch>  forwardVector()
    {
@@ -65,7 +65,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
    std::vector<ProjectorBranch>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -98,7 +98,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #if defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #if defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
    std::vector<ProjectorBranch>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req)
    {
@@ -265,7 +265,7 @@ namespace TransformSteps {
       return transform;
    }
 
-   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
 }
 }

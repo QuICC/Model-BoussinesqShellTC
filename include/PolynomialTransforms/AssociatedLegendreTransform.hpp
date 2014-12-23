@@ -46,7 +46,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ,  DIFF, DIVSIN, DIVSINDIFFSIN};
+         enum Id {PROJ, DIFF, DIVSIN, DIVSINDIFFSIN};
       };
 
       /**
@@ -148,19 +148,9 @@ namespace Transform {
 
       private:
          /**
-          * @brief Initialise the quadrature points and weights
+          * @brief Initialise the operators
           */
-         void initQuadrature();
-
-         /**
-          * @brief Initialise the projector
-          */
-         void initProjector();
-
-         /**
-          * @brief Initialise the derivative
-          */
-         void initDerivative();
+         void initOperators();
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]
@@ -191,14 +181,15 @@ namespace Transform {
           * @brief Derivative matrix
           */
          std::vector<Matrix>  mDiff;
+
+         /**
+          * @brief \f$1/\sin\theta\f$ projector matrix
+          */
+         std::vector<Matrix>  mDivSin;
    };
 
    template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator)
    {
-      //
-      /// \mhdBug Implementation should work but is probably slow!
-      //
-      
       // Add static assert to make sure only SET operation is used
       Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
 
@@ -243,6 +234,19 @@ namespace Transform {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDiff.at(i).cols();
             rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
+
+      // Compute \f$1/\sin\theta\f$ projection
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSIN)
+      {
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDiff.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*specVal.block(0,start, specRows, cols);
             start += cols;
          }
 

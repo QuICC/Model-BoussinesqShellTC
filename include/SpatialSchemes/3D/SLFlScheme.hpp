@@ -1,11 +1,11 @@
 /** 
- * @file SLFScheme.hpp
- * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+ * @file SLFlScheme.hpp
+ * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral l ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SLFSCHEME_HPP
-#define SLFSCHEME_HPP
+#ifndef SLFLSCHEME_HPP
+#define SLFLSCHEME_HPP
 
 // Configuration includes
 //
@@ -22,7 +22,7 @@
 #include "TypeSelectors/FftSelector.hpp"
 #include "Enums/Splitting.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "SpatialSchemes/3D/IRegularSHScheme.hpp"
+#include "SpatialSchemes/3D/IRegularSHlScheme.hpp"
 #include "FastTransforms/FftSetup.hpp"
 #include "PolynomialTransforms/PolySetup.hpp"
 
@@ -31,9 +31,9 @@ namespace GeoMHDiSCC {
 namespace Schemes {
 
    /**
-    * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme
+    * @brief Implementation of the shell Chebyshev(FFT) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral l ordering
     */
-   class SLFScheme: public IRegularSHScheme
+   class SLFlScheme: public IRegularSHlScheme
    {
       public:
          /**
@@ -46,12 +46,12 @@ namespace Schemes {
           *
           * @param dim     Chebyshev truncations 
           */
-         explicit SLFScheme(const ArrayI& dim);
+         explicit SLFlScheme(const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~SLFScheme(); 
+         virtual ~SLFlScheme(); 
 
          /**
           * @brief Scheme specific splitting restrictions
@@ -104,4 +104,4 @@ namespace Schemes {
 }
 }
 
-#endif // SLFSCHEME_HPP
+#endif // SLFLSCHEME_HPP

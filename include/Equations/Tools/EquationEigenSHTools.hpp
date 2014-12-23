@@ -57,14 +57,7 @@ namespace EigenSH {
    {
       std::vector<MHDFloat> eigs;
 
-      // Get mode indexes
-      ArrayI mode = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-
-      // l
-      eigs.push_back(static_cast<MHDFloat>(mode(2)));
-
-      // m
-      eigs.push_back(static_cast<MHDFloat>(mode(3)));
+      eigs.push_back(static_cast<MHDFloat>(eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)));
 
       return eigs;
    }

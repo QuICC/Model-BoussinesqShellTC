@@ -17,6 +17,7 @@ foreach(ModelFile ${MHDPhysicalModels})
    file(STRINGS ${ModelFile} Scheme REGEX "typedef .* SchemeType;")
    STRING(REGEX REPLACE "typedef Schemes::([a-z,A-Z]*)Scheme SchemeType;" "\\1" Scheme ${Scheme})
    STRING(REGEX REPLACE " " "" Scheme ${Scheme})
+   STRING(TOUPPER ${Scheme} Scheme) 
    set(GEOMHDISCC_SPATIALSCHEME ${Scheme})
 
    # Extract the spatial scheme formulation from model file
