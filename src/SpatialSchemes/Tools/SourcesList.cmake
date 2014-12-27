@@ -1,4 +1,5 @@
 # Create list of sources
 set(MHDSources
-   SphericalHarmonicTools.cpp
+   SHlTools.cpp
+   SHmTools.cpp
 )

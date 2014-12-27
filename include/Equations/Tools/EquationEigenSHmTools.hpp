@@ -1,11 +1,11 @@
 /**
- * @file EquationEigenSHTools.hpp
- * @brief Implementation of some tools for schemes with spherical harmonics expansions 
+ * @file EquationEigenSHmTools.hpp
+ * @brief Implementation of some tools for schemes with spherical harmonics expansions with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef EQUATIONEIGENSHTOOLS_HPP
-#define EQUATIONEIGENSHTOOLS_HPP
+#ifndef EQUATIONEIGENSHMTOOLS_HPP
+#define EQUATIONEIGENSHMTOOLS_HPP
 
 // Configuration includes
 //
@@ -33,9 +33,9 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
 /**
- * @brief Tools for equations with spherical harmonic expansions
+ * @brief Tools for equations with spherical harmonic expansions with m spectral ordering
  */
-namespace EigenSH {
+namespace EigenSHm {
 
    /**
     * @brief Set eigen values
@@ -66,4 +66,4 @@ namespace EigenSH {
 }
 }
 
-#endif // EQUATIONEIGENSHTOOLS_HPP
+#endif // EQUATIONEIGENSHMTOOLS_HPP

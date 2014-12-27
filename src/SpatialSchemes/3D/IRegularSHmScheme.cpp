@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "SpatialSchemes/Tools/SphericalHarmonicTools.hpp"
+#include "SpatialSchemes/Tools/SHmTools.hpp"
 #include "Resolutions/Tools/SHmIndexCounter.hpp"
 
 namespace GeoMHDiSCC {
@@ -78,8 +78,8 @@ namespace Schemes {
       int cN = -1;
       bool isRegular;
 
-      int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-      int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       // No splitting
       if(flag == Splitting::Locations::NONE)
@@ -87,7 +87,7 @@ namespace Schemes {
          if(transId == Dimensions::Transform::TRA1D)
          {
             // Get full list of harmonics
-            SphericalHarmonicTools::buildLMap(modes, nL, nM);
+            SHmTools::buildLMap(modes, nL, nM);
 
             // Indexes structure is NOT regular
             isRegular = false;
@@ -113,7 +113,7 @@ namespace Schemes {
          if(flag == Splitting::Locations::FIRST)
          {
             // Get restricted list of harmonics
-            SphericalHarmonicTools::buildLHMap(modes, nL, nM, n0(0), nN(0));
+            SHmTools::buildLHMap(modes, nL, nM, n0(0), nN(0));
 
             // Indexes structure is not regular
             isRegular = false;
@@ -428,7 +428,7 @@ namespace Schemes {
             int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
             int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
-            return SphericalHarmonicTools::nHarmonics(nL, nM);
+            return SHmTools::nHarmonics(nL, nM);
 
          // Get total size for second transform
          } else if(transId == Dimensions::Transform::TRA2D)
@@ -494,34 +494,34 @@ namespace Schemes {
       // Make sure the list of harmonics is empty
       harmonics.clear();
 
-      int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-      int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       // Reset the loads
       this->resetLoad(); // ISchemeCosts
 
       // Initialise the loads
-      SphericalHarmonicTools::initMLLoad(this->mLoadList, this->mLoad, this->mOptimalLoad, nL, nM, bins);
+      SHmTools::initMLLoad(this->mLoadList, this->mLoad, this->mOptimalLoad, nL, nM, bins);
 
       // Combine load into pairs
-      SphericalHarmonicTools::combineMPairs(this->mLoadList, this->mRegularLoad, nM, bins);
+      SHmTools::combineMPairs(this->mLoadList, this->mRegularLoad, nM, bins);
 
       // Fill bins with pairs
-      SphericalHarmonicTools::fillMPairsBins(this->mLoadList, this->mRegularLoad, this->mLoad, bins);
+      SHmTools::fillMPairsBins(this->mLoadList, this->mRegularLoad, this->mLoad, bins);
 
       // Update Load sums
       this->updateLoad(bins); // ISchemeCosts
 
       // Fill bins with remaining modes
-      SphericalHarmonicTools::fillMRestBins(this->mLoadList, this->mRegularLoad, this->mLoad, this->mOptimalLoad, bins);
+      SHmTools::fillMRestBins(this->mLoadList, this->mRegularLoad, this->mLoad, this->mOptimalLoad, bins);
 
       // Update Load sums
       this->updateLoad(bins); // ISchemeCosts
 
       // Convert loads to harmonic orders
-      SphericalHarmonicTools::convertLoadToOrders(this->mRegularLoad, nL);
+      SHmTools::convertLoadToOrders(this->mRegularLoad, nL);
 
-      // Extract right bin
+      // Extract correct bin
       std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;
       mapRange = this->mRegularLoad.equal_range(id);
 

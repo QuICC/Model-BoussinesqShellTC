@@ -52,8 +52,6 @@ namespace Equations {
             MODE,
             /// Single matrix (ex. TTT scheme)
             SINGLE,
-            /// Matrix index is an index for geometrically coupled 1D and 3D
-            GEOMETRIC_1D_3D,
          };
 
          /**

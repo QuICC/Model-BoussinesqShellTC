@@ -86,7 +86,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: 
+        # Index mode: SLOWEST, MODE, SINGLE
         index_mode = self.MODE
 
         # Compute block info

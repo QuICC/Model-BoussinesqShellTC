@@ -1,11 +1,11 @@
 /** 
- * @file SphericalHarmonicTools.hpp
- * @brief Implementation of the tools for the spherical harmonics based schemes
+ * @file SHmTools.hpp
+ * @brief Implementation of the tools for the spherical harmonics based schemes with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SPHERICALHARMONICSTOOLS_HPP
-#define SPHERICALHARMONICSTOOLS_HPP
+#ifndef SHMTOOLS_HPP
+#define SHMTOOLS_HPP
 
 // Configuration includes
 //
@@ -31,7 +31,7 @@ namespace Schemes {
    /**
     * @brief Implementation of the tools for the spherical harmonics based schemes
     */
-   class SphericalHarmonicTools
+   class SHmTools
    {
       public:
          static int nM(const int l, const int nM);
@@ -55,4 +55,4 @@ namespace Schemes {
 }
 }
 
-#endif // SPHERICALHARMONICSTOOLS_HPP
+#endif // SHMTOOLS_HPP

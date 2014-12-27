@@ -15,6 +15,7 @@ set(MHDPhysicalModels
    BoussinesqRRBAnnulusVCModel.hpp
    BoussinesqRRBCylinderVCModel.hpp
    BoussinesqTCShellModel.hpp
+   BoussinesqTCShellStdModel.hpp
    BoussinesqRTCShellModel.hpp
    #BoussinesqTCSphereModel.hpp
    #BoussinesqRTCSphereModel.hpp

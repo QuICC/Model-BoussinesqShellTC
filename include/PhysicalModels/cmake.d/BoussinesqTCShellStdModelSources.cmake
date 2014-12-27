@@ -1,7 +1,7 @@
 set(MHDModelSources
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqRTCShellMomentum.cpp
-   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHmTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHlTools.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
    ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp

@@ -1,6 +1,6 @@
 /** 
- * @file SphericalHarmonicTools.cpp
- * @brief Source of the Spherical Harmonics tools for spatial schemes
+ * @file SHlTools.cpp
+ * @brief Source of the Spherical Harmonics tools for spatial schemes with l spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "SpatialSchemes/Tools/SphericalHarmonicTools.hpp"
+#include "SpatialSchemes/Tools/SHlTools.hpp"
 
 // Project includes
 //
@@ -21,12 +21,12 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
-   int SphericalHarmonicTools::nM(const int l, const int nM)
+   int SHlTools::nM(const int l, const int nM)
    {
       return std::min(l+1, nM);
    }
 
-   int SphericalHarmonicTools::nHarmonics(const int nL, const int nM)
+   int SHlTools::nHarmonics(const int nL, const int nM)
    {
       int tot = 0;
 
@@ -34,7 +34,7 @@ namespace Schemes {
       for(int l = 0; l < nL; l++)
       {
          // loop up to l, or if only a limited number of orders is required up to M
-         for(int m = 0; m < SphericalHarmonicTools::nM(l, nM); m++)
+         for(int m = 0; m < SHlTools::nM(l, nM); m++)
          {
             tot++;
          }
@@ -43,7 +43,7 @@ namespace Schemes {
       return tot;
    }
 
-   void SphericalHarmonicTools::buildLMap(std::multimap<int,int>& harmonics, const int nL, const int nM)
+   void SHlTools::buildLMap(std::multimap<int,int>& harmonics, const int nL, const int nM)
    {
       // List of the harmonics
       harmonics.clear();
@@ -52,14 +52,14 @@ namespace Schemes {
       for(int l = 0; l < nL; l++)
       {
          // loop up to l, or if only a limited number of orders is required up to M
-         for(int m = 0; m < SphericalHarmonicTools::nM(l, nM); m++)
+         for(int m = 0; m < SHlTools::nM(l, nM); m++)
          {
             harmonics.insert(std::make_pair(l, m));
          }
       }
    }
 
-   void SphericalHarmonicTools::buildLHMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH)
+   void SHlTools::buildLHMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH)
    {
       // Make sure the list is empty at start
       harmonics.clear();
@@ -79,12 +79,12 @@ namespace Schemes {
       std::queue<std::pair<int,int> >  modeQueue;
       for(int l=0; l < maxL/2; ++l)
       {
-         for(int m=0; m < SphericalHarmonicTools::nM(l,nM); ++m)
+         for(int m=0; m < SHlTools::nM(l,nM); ++m)
          {
             modeQueue.push(std::make_pair(l, m));
          }
 
-         for(int m=0; m < SphericalHarmonicTools::nM(maxL-l-1, nM); ++m)
+         for(int m=0; m < SHlTools::nM(maxL-l-1, nM); ++m)
          {
             modeQueue.push(std::make_pair(maxL-l-1, m));
          }
@@ -93,7 +93,7 @@ namespace Schemes {
       // Add in the missing ones
       for(int l=maxL; l < nL; ++l)
       {
-         for(int m=0; m < SphericalHarmonicTools::nM(l, nM); ++m)
+         for(int m=0; m < SHlTools::nM(l, nM); ++m)
          {
             modeQueue.push(std::make_pair(l, m));
          }
@@ -113,7 +113,7 @@ namespace Schemes {
       }
    }
 
-   void SphericalHarmonicTools::initMLLoad(std::deque<int>& list, std::vector<int>& load, std::queue<int>& optimal, const int nL, const int nM, const int bins)
+   void SHlTools::initMLLoad(std::deque<int>& list, std::vector<int>& load, std::queue<int>& optimal, const int nL, const int nM, const int bins)
    {
       // Initialise total load
       double totalLoad = 0.0;
@@ -148,7 +148,7 @@ namespace Schemes {
       }
    }
 
-   void SphericalHarmonicTools::combineMPairs(std::deque<int>& list, std::multimap<int, int>& regular, const int nM, const int bins)
+   void SHlTools::combineMPairs(std::deque<int>& list, std::multimap<int, int>& regular, const int nM, const int bins)
    {
       // Aiming for the same number of modes per part, compute the number of slots avaiable per part
       int slots = static_cast<int>(std::ceil(static_cast<double>(nM)/static_cast<double>(bins)));
@@ -211,7 +211,7 @@ namespace Schemes {
       list.erase(list.begin(), list.begin() + 2*k);
    }
 
-   void SphericalHarmonicTools::fillMPairsBins(std::deque<int>& list, std::multimap<int, int>& regular, std::vector<int>& load, const int bins)
+   void SHlTools::fillMPairsBins(std::deque<int>& list, std::multimap<int, int>& regular, std::vector<int>& load, const int bins)
    {
       // Obviously only required if any load is left
       if(list.size() > 0)
@@ -276,7 +276,7 @@ namespace Schemes {
       }
    }
 
-   void SphericalHarmonicTools::fillMRestBins(std::deque<int>& list, std::multimap<int, int>& regular, std::vector<int>& load, std::queue<int>& optimal, const int bins)
+   void SHlTools::fillMRestBins(std::deque<int>& list, std::multimap<int, int>& regular, std::vector<int>& load, std::queue<int>& optimal, const int bins)
    {
       // Obviously only required if any load is left
       if(list.size() > 0)
@@ -338,7 +338,7 @@ namespace Schemes {
       }
    }
 
-   void SphericalHarmonicTools::convertLoadToOrders(std::multimap<int, int>& regular, const int nL)
+   void SHlTools::convertLoadToOrders(std::multimap<int, int>& regular, const int nL)
    {
       std::map<int,int>::iterator   it;
 

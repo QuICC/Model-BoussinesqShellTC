@@ -223,7 +223,7 @@ namespace Equations {
       // Set source flags: has source term?
       infoIt.first->second.setSource(hasSource);
 
-      // Set index type: SLOWEST, MODE, SINGLE, GEOMETRIC_1D_3D
+      // Set index type: SLOWEST, MODE, SINGLE
       infoIt.first->second.setIndexType(static_cast<CouplingInformation::IndexType>(indexMode));
 
       // Create implicit field coupling
@@ -242,13 +242,8 @@ namespace Equations {
          }
       }
 
-      // Set geometric coupling information
-      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::GEOMETRIC_1D_3D)
-      {
-         throw Exception("Geometric coupling is not yet implemented!");
-
       // Set field coupling information
-      } else
+      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::MODE || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SINGLE)
       {
          int nMat = EigenSelector::fieldCouplingNMat(spRes);
          ArrayI tauNs(nMat);
@@ -260,6 +255,11 @@ namespace Equations {
          ArrayI systemNs(nMat);
          systemNs.setConstant(systemSize);
          infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
+
+      // Unknown field coupling has be requested
+      } else
+      {
+         throw Exception("Unknown field coupling type has been requested!");
       }
 
       // Sort implicit fields
