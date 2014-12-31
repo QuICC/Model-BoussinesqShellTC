@@ -17,9 +17,10 @@
 
 // Project includes
 //
-#include "SpatialSchemes/Tools/SHmTools.hpp"
+#include "SpatialSchemes/Tools/SHTools.hpp"
 #include "Resolutions/Tools/SHmIndexCounter.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Schemes {
@@ -87,7 +88,7 @@ namespace Schemes {
          if(transId == Dimensions::Transform::TRA1D)
          {
             // Get full list of harmonics
-            SHmTools::buildLMap(modes, nL, nM);
+            SHTools::buildMMap(modes, nL, nM);
 
             // Indexes structure is NOT regular
             isRegular = false;
@@ -113,7 +114,7 @@ namespace Schemes {
          if(flag == Splitting::Locations::FIRST)
          {
             // Get restricted list of harmonics
-            SHmTools::buildLHMap(modes, nL, nM, n0(0), nN(0));
+            SHTools::buildLHMap(modes, nL, nM, n0(0), nN(0));
 
             // Indexes structure is not regular
             isRegular = false;
@@ -428,7 +429,7 @@ namespace Schemes {
             int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
             int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
-            return SHmTools::nHarmonics(nL, nM);
+            return SHTools::nHarmonics(nL, nM);
 
          // Get total size for second transform
          } else if(transId == Dimensions::Transform::TRA2D)
@@ -501,25 +502,25 @@ namespace Schemes {
       this->resetLoad(); // ISchemeCosts
 
       // Initialise the loads
-      SHmTools::initMLLoad(this->mLoadList, this->mLoad, this->mOptimalLoad, nL, nM, bins);
+      SHTools::initMLLoad(this->mLoadList, this->mLoad, this->mOptimalLoad, nL, nM, bins);
 
       // Combine load into pairs
-      SHmTools::combineMPairs(this->mLoadList, this->mRegularLoad, nM, bins);
+      SHTools::combineMPairs(this->mLoadList, this->mRegularLoad, nM, bins);
 
       // Fill bins with pairs
-      SHmTools::fillMPairsBins(this->mLoadList, this->mRegularLoad, this->mLoad, bins);
+      SHTools::fillMPairsBins(this->mLoadList, this->mRegularLoad, this->mLoad, bins);
 
       // Update Load sums
       this->updateLoad(bins); // ISchemeCosts
 
       // Fill bins with remaining modes
-      SHmTools::fillMRestBins(this->mLoadList, this->mRegularLoad, this->mLoad, this->mOptimalLoad, bins);
+      SHTools::fillMRestBins(this->mLoadList, this->mRegularLoad, this->mLoad, this->mOptimalLoad, bins);
 
       // Update Load sums
       this->updateLoad(bins); // ISchemeCosts
 
       // Convert loads to harmonic orders
-      SHmTools::convertLoadToOrders(this->mRegularLoad, nL);
+      SHTools::convertLoadToOrders(this->mRegularLoad, nL);
 
       // Extract correct bin
       std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;

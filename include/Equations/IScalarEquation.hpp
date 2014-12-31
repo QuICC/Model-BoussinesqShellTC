@@ -27,6 +27,7 @@
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -310,6 +311,12 @@ namespace Equations {
       {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         std::cerr << rows << " x " << cols << std::endl;
+         std::cerr << matIdx << std::endl;
+         std::cerr << start << std::endl;
+         std::cerr << storage.real().rows() << " vs " << storage.real().cols() << std::endl;
+         std::cerr << storage.imag().rows() << " vs " << storage.imag().cols() << std::endl;
 
          //Safety assertion
          assert(start >= 0);

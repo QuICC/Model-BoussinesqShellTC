@@ -54,7 +54,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[1]
+        tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("velocity","tor") or field_row == ("temperature",""):
                 shift_r = 2
@@ -63,7 +63,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
             else:
                 shift_r = 0
 
-            gal_n = (res[0] - shift_r)*res[1]
+            gal_n = (res[0] - shift_r)
 
         else:
             gal_n = tau_n

@@ -17,6 +17,7 @@
 // Project includes
 //
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -58,6 +59,14 @@ namespace Parallel {
 
       // Compute the indexes
       this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D);
+      std::cerr << " ------------------------- " << transId << " ----------------------" << std::endl;
+      std::cerr << " ~~ 3D ~~" << std::endl;
+      std::cerr << idx3D.transpose() << std::endl;
+      std::cerr << " ~~ 2D ~~" << std::endl;
+      for(int i = 0; i < idx3D.size(); i++)
+      {
+         std::cerr << idx2D.at(i).transpose() << std::endl;
+      }
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));

@@ -1,6 +1,6 @@
 /** 
  * @file SLFmScheme.cpp
- * @brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with spectral ordering m
+ * @brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with m spectral ordering
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -126,8 +126,6 @@ namespace Schemes {
 
    void SLFmScheme::setDimensions()
    {
-      /// \mhdBug Setup of resolution information doesn't seem right
-
       //
       // Set transform space sizes
       //

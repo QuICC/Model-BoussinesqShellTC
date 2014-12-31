@@ -7,9 +7,9 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell as shell
+import geomhdiscc.geometry.spherical.shell_radius as shell
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.shell_boundary import no_bc
+from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
 
 class BoussinesqTCShellStd(base_model.BaseModel):
@@ -60,7 +60,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[1]
+        tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("velocity","tor") or field_row == ("temperature",""):
                 shift_r = 2
@@ -69,7 +69,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
             else:
                 shift_r = 0
 
-            gal_n = (res[0] - shift_r)*res[1]
+            gal_n = (res[0] - shift_r)
 
         else:
             gal_n = tau_n
@@ -200,18 +200,17 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        m = eigs[1]
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i4x4(res[0], a, b, bc)
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         return mat
 
@@ -221,32 +220,31 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        m = eigs[1]
-
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        l = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = shell.i4x4lapl2(res[0], l, a, b, bc, with_sh_coeff = 'laplh')
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh')
+                mat = shell.i4x4(res[0], a, b, bc, -Ra, with_sh_coeff = 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                    mat = shell.i2x2(res[0], a, b, bc, with_sh_coeff = 'laplh')
 
                 else:
-                    mat = shell.zblk(res[0], res[1], m, bc)
+                    mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc)
 
         return mat
 
@@ -255,18 +253,16 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
 
-        m = eigs[1]
-
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i2x2(res[0], a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i4x4lapl(res[0], a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, Pr)
+            mat = shell.i2x2(res[0], a, b, bc, Pr)
 
         return mat

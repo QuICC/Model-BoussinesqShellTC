@@ -1,11 +1,11 @@
 /** 
- * @file SHmTools.hpp
- * @brief Implementation of the tools for the spherical harmonics based schemes with m spectral ordering
+ * @file SHTools.hpp
+ * @brief Implementation of the tools for the spherical harmonics based schemes
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef SHMTOOLS_HPP
-#define SHMTOOLS_HPP
+#ifndef SHTOOLS_HPP
+#define SHTOOLS_HPP
 
 // Configuration includes
 //
@@ -31,12 +31,16 @@ namespace Schemes {
    /**
     * @brief Implementation of the tools for the spherical harmonics based schemes
     */
-   class SHmTools
+   class SHTools
    {
       public:
          static int nM(const int l, const int nM);
 
+         static int nL(const int m, const int nL);
+
          static int nHarmonics(const int nL, const int nM);
+
+         static void buildMMap(std::multimap<int,int>& harmonics, const int nL, const int nM);
 
          static void buildLMap(std::multimap<int,int>& harmonics, const int nL, const int nM);
 
@@ -55,4 +59,4 @@ namespace Schemes {
 }
 }
 
-#endif // SHMTOOLS_HPP
+#endif // SHTOOLS_HPP

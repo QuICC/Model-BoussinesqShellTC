@@ -248,12 +248,12 @@ namespace Equations {
          int nMat = EigenSelector::fieldCouplingNMat(spRes);
          ArrayI tauNs(nMat);
          ArrayI galerkinNs(nMat);
-         tauNs.setConstant(tauSize);
-         galerkinNs.setConstant(galerkinSize);
          ArrayI rhsCols(nMat);
-         rhsCols.setConstant(rhsSize);
          ArrayI systemNs(nMat);
-         systemNs.setConstant(systemSize);
+         EigenSelector::interpretTauN(tauNs, tauSize, spRes);
+         EigenSelector::interpretGalerkinN(galerkinNs, galerkinSize, spRes);
+         EigenSelector::interpretRhsN(rhsCols, rhsSize, spRes);
+         EigenSelector::interpretSystemN(systemNs, systemSize, spRes);
          infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs); 
 
       // Unknown field coupling has be requested
