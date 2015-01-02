@@ -143,10 +143,9 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -156,10 +155,9 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (R2R)
@@ -169,10 +167,9 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -182,10 +179,9 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -488,339 +484,6 @@ namespace Transform {
       } else
       {
          return this->mDiffO;
-      }
-   }
-
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
-
-      // Compute even integration
-      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
-      {
-         // Do even transform
-         for(int parity = 0; parity < 2; ++parity)
-         {
-            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
-            fftw_execute_r2r(this->fPlan(parity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
-         }
-      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
-      {
-         // Do even transform
-         for(int parity = 0; parity < 2; ++parity)
-         {
-            this->extractParityModes(this->rTmpIn(parity), physVal, this->parityBlocks(parity), physVal.rows());
-            fftw_execute_r2r(this->fPlan((parity + 1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-            this->setParityModes(rChebVal, this->rTmpOut(parity), this->parityBlocks(parity), physVal.rows());
-         }
-      }
-
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
-   }
-
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, CylinderChebyshevFftwTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      for(int parity = 0; parity < 2; ++parity)
-      {
-         int fftParity = parity;
-
-         this->extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-
-         // Compute first derivative
-         if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
-         {
-            fftParity = (fftParity + 1) % 2;
-
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
-               this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-            #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-               throw Exception("Not yet implemented!");
-            #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-         #if defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Compute division by R
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
-         {
-            fftParity = (fftParity + 1) % 2;
-            throw Exception("Not yet implemented!");
-
-         // Compute division by R^2
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
-         {
-            throw Exception("Not yet implemented!");
-         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
-
-         // Compute 1/r D r
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-         {
-            throw Exception("DIVRDIFFR operator is not yet implemented");
-
-         // Compute D 1/r
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
-         {
-            fftParity = (fftParity + 1) % 2;
-
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
-               // Compute D f/r part
-               this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-            #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-               throw Exception("Backward DIFFDIVR operator is not yet implemented");
-            #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-         }
-
-         // Set the padded values to zero
-         this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
-
-         // Do transform
-         fftw_execute_r2r(this->bPlan(fftParity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-         // Compute division by R
-         if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
-         {
-            this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
-
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-
-         // Compute division by R^2
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
-         {
-            this->rTmpOut(parity) = this->mDivR2.asDiagonal()*this->rTmpOut(parity);
-
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-
-         // Compute D 1/r
-         } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
-         {
-            // Compute Df/r
-            this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
-
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-
-            // Compute f/r^2
-            this->extractParityModes(this->rTmpIn(parity), chebVal, this->parityBlocks(parity), this->mspSetup->specSize());
-
-            // Set the padded values to zero
-            this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
-
-            // Do transform
-            fftw_execute_r2r(this->bPlan(parity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-
-            // Compute D f/r - f/r^2
-            this->rTmpOut(parity) = (-this->mDivR2).asDiagonal()*this->rTmpOut(parity);
-
-            this->addParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-         } else
-         {
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-         }
-         #else
-            this->setParityModes(rPhysVal, this->rTmpOut(parity), this->parityBlocks(parity), rPhysVal.rows());
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-      }
-   }
-
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany()); 
-
-      // Compute even integration
-      if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGE)
-      {
-         // Loop over real and imaginary
-         for(int isReal = 0; isReal < 2; ++isReal)
-         {
-            // Do transform of real part
-            for(int parity = 0; parity < 2; ++parity)
-            {
-               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
-               fftw_execute_r2r(this->fPlan(parity, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
-            }
-         }
-      } else if(integrator == CylinderChebyshevFftwTransform::IntegratorType::INTGO)
-      {
-         // Loop over real and imaginary
-         for(int isReal = 0; isReal < 2; ++isReal)
-         {
-            // Do transform of real part
-            for(int parity = 0; parity < 2; ++parity)
-            {
-               this->extractParityModes(this->rTmpIn(parity), physVal, isReal, this->parityBlocks(parity), physVal.rows());
-               fftw_execute_r2r(this->fPlan((parity+1)%2, parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-               this->setParityModes(rChebVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), physVal.rows());
-            }
-         }
-      }
-
-      // Rescale FFT output
-      rChebVal *= this->mspSetup->scale();
-   }
-
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, CylinderChebyshevFftwTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Loop over real and imaginary
-      for(int isReal = 0; isReal < 2; ++isReal)
-      {
-         for(int parity = 0; parity < 2; ++parity)
-         {
-            int fftParity = parity;
-
-            this->extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
-
-            // Compute first derivative of real part
-            if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
-            {
-               fftParity = (fftParity + 1) % 2;
-
-               #if defined GEOMHDISCC_TRANSOP_FORWARD
-                  this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-               #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-                  throw Exception("Not yet implemented!");
-               #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-            #if defined GEOMHDISCC_TRANSOP_BACKWARD
-            // Compute division by R of real part
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
-            {
-               fftParity = (fftParity + 1) % 2;
-               throw Exception("Not yet implemented!");
-
-            // Compute division by R^2 of real part
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
-            {
-               throw Exception("Not yet implemented!");
-            #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
-
-            // Compute 1/r D r
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-            {
-               throw Exception("DIVRDIFFR operator is not yet implemented");
-
-            // Compute D 1/r
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
-            {
-               fftParity = (fftParity + 1) % 2;
-
-               #if defined GEOMHDISCC_TRANSOP_FORWARD
-                  // Compute D f/r part
-                  this->rTmpIn(parity).topRows(this->mspSetup->specSize()) = this->diff(parity)*this->rTmpIn(parity).topRows(this->mspSetup->specSize());
-               #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-                  throw Exception("Backward DIFFDIVR operator is not yet implemented");
-               #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-            }
-
-            // Set the padded values to zero
-            this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
-
-            // Do transform of real part
-            fftw_execute_r2r(this->bPlan(fftParity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-
-            #if defined GEOMHDISCC_TRANSOP_FORWARD
-            // Compute division by R
-            if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR)
-            {
-               this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
-
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-
-            // Compute division by R^2
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIVR2)
-            {
-               this->rTmpOut(parity) = this->mDivR2.asDiagonal()*this->rTmpOut(parity);
-
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-
-            // Compute D 1/r
-            } else if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFFDIVR)
-            {
-               // Compute Df/r
-               this->rTmpOut(parity) = this->mDivR.asDiagonal()*this->rTmpOut(parity);
-
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-
-               // Compute f/r^2
-               this->extractParityModes(this->rTmpIn(parity), chebVal, isReal, this->parityBlocks(parity), this->mspSetup->specSize());
-
-               // Set the padded values to zero
-               this->rTmpIn(parity).bottomRows(this->mspSetup->padSize()).setZero();
-
-               // Do transform
-               fftw_execute_r2r(this->bPlan(parity,parity), this->rTmpIn(parity).data(), this->rTmpOut(parity).data());
-               // Compute D f/r - f/r^2
-               this->rTmpOut(parity) = (-this->mDivR2).asDiagonal()*this->rTmpOut(parity);
-
-               this->addParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-            } else
-            {
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-            }
-            #else
-               this->setParityModes(rPhysVal, this->rTmpOut(parity), isReal, this->parityBlocks(parity), rPhysVal.rows());
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-         }
       }
    }
 

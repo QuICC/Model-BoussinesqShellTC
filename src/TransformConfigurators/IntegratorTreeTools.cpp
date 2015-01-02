@@ -98,7 +98,7 @@ namespace Transform {
 
                   // Extract unique 1D operators
                   std::map<IntegratorTree::Intg1DId, int> op1D;
-                  std::map<IntegratorTree::Intg1DId, std::pair<FieldComponents::Spectral::Id,FieldType::Id> > op1DSpec;
+                  std::map<IntegratorTree::Intg1DId, std::tr1::tuple<FieldComponents::Spectral::Id,FieldType::Id,Arithmetics::Id> > op1DSpec;
                   std::pair<std::map<IntegratorTree::Intg1DId,int>::iterator,bool> op1DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
@@ -106,7 +106,7 @@ namespace Transform {
                      {
                         op1DPairIt = op1D.insert(std::make_pair(branchIt->intg1DId(), 0));
                         op1DPairIt.first->second += 1;
-                        op1DSpec.insert(std::make_pair(branchIt->intg1DId(), std::make_pair(branchIt->specId(), branchIt->fieldId())));
+                        op1DSpec.insert(std::make_pair(branchIt->intg1DId(), std::tr1::make_tuple(branchIt->specId(), branchIt->fieldId(), branchIt->arithId())));
                      }
                   }
 
@@ -116,11 +116,12 @@ namespace Transform {
                   {
                      IntegratorTree::Integrator1DEdge &rEdge1D = rEdge2D.addEdge(op1DIt->first, op1DIt->second);
 
-                     rEdge1D.setSpectral(op1DSpec.find(op1DIt->first)->second.first, op1DSpec.find(op1DIt->first)->second.second);
+                     rEdge1D.setSpectral(std::tr1::get<0>(op1DSpec.find(op1DIt->first)->second), std::tr1::get<1>(op1DSpec.find(op1DIt->first)->second), std::tr1::get<2>(op1DSpec.find(op1DIt->first)->second));
                      DebuggerMacro_showValue("Edge operator: ", 5, op1DIt->first);
                      DebuggerMacro_showValue("Edge weight: ", 5, op3DIt->second);
                      DebuggerMacro_showValue("Spectral component: ", 6, rEdge1D.specId());
                      DebuggerMacro_showValue("Field type: ", 6, rEdge1D.fieldId());
+                     DebuggerMacro_showValue("Arithmetic: ", 6, rEdge1D.arithId());
                   }
                }
             }

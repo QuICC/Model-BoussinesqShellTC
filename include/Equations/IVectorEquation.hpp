@@ -22,6 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/Arithmetics.hpp"
 #include "Enums/ModelOperatorBoundary.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/IEquation.hpp"
@@ -29,7 +30,6 @@
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -92,8 +92,9 @@ namespace Equations {
           *
           * @param rhs     Dealised input
           * @param compId  ID of the vector component
+          * @param arithId ID of the arithmetic operation
           */
-         void updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId);
+         void updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId, Arithmetics::Id arithId);
 
          /**
           * @brief Transfer solver solution to equation unknown
@@ -318,12 +319,6 @@ namespace Equations {
       {
          int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-
-         std::cerr << rows << " x " << cols << std::endl;
-         std::cerr << matIdx << std::endl;
-         std::cerr << start << std::endl;
-         std::cerr << storage.real().rows() << " vs " << storage.real().cols() << std::endl;
-         std::cerr << storage.imag().rows() << " vs " << storage.imag().cols() << std::endl;
 
          //Safety assertion
          assert(start >= 0);

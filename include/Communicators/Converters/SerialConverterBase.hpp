@@ -29,7 +29,6 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/IConverter.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -231,7 +230,6 @@ namespace Parallel {
       #else
          if(TBwdB::FieldDimension == Dimensions::THREED)
          {
-            std::cerr << this->mspIdxConv->iS(i,j,k) << " vs " << this->mspIdxConv->jS(i,j,k) << " vs " << this->mspIdxConv->kS(i,j,k) << std::endl;
             return in.point(this->mspIdxConv->iS(i,j,k),this->mspIdxConv->jS(i,j,k),this->mspIdxConv->kS(i,j,k));
 
          } else if(TBwdB::FieldDimension == Dimensions::TWOD)

@@ -144,6 +144,114 @@ namespace Transform {
 
    }
 
+   void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rSpecVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative integration
+      if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIFF)
+      { 
+         // Compute integration of derivative
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDiff.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSIN)
+      { 
+         // Compute integration of 1/sin
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDivSin.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDivSin.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+      } else
+      {
+         // Compute integration
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mProj.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+      }
+   }
+
+   void AssociatedLegendreTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // assert right sizes for input  matrix
+      assert(specVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative
+      if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
+      {
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDiff.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
+
+      // Compute \f$1/\sin\theta\f$ projection
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSIN)
+      {
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDivSin.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDivSin.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
+
+      // Compute \f$1/\sin\theta \partial \sin\theta\f$ projection
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINDIFFSIN)
+      {
+         throw Exception("DIVSINDIFFSIN not yet implemented");
+
+      // Compute simple projection
+      } else
+      {
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mProj.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mProj.at(i).cols();
+            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*specVal.block(0,start, specRows, cols);
+            start += cols;
+         }
+      }
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
    MHDFloat AssociatedLegendreTransform::requiredStorage() const
    {

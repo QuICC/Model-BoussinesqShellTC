@@ -413,11 +413,11 @@ namespace Polynomial {
          throw Exception("Tried to compute associated Legendre polynomial P_l^m with m < 0");
       } else if(m == 0)
       {
-         op.setConstant(MHD_MP(1.0));
+         op.setConstant(precision::sqrt(MHD_MP(1.0)/(MHD_MP(4.0)*Precision::PI)));
       } else
       {
          internal::MHDFloat di;
-         internal::MHDFloat factor = precision::sqrt(internal::MHDFloat(2*m) + MHD_MP(1.0));
+         internal::MHDFloat factor = precision::sqrt((internal::MHDFloat(2*m) + MHD_MP(1.0))/(MHD_MP(4.0)*Precision::PI));
 
          for(int i = 1; i <= m; i++)
          {
@@ -455,7 +455,7 @@ namespace Polynomial {
       } else
       {
          internal::MHDFloat di;
-         internal::MHDFloat factor = precision::sqrt(internal::MHDFloat(2*m) + MHD_MP(1.0));
+         internal::MHDFloat factor = precision::sqrt((internal::MHDFloat(2*m) + MHD_MP(1.0))/(MHD_MP(4.0)*Precision::PI));
 
          for(int i = 1; i <= m; i++)
          {

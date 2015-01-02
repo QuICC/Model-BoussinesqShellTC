@@ -19,6 +19,7 @@
 // Intgect includes
 //
 #include "TypeSelectors/TransformSelector.hpp"
+#include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,7 +42,7 @@ namespace Transform {
          /**
           * @brief Contructor for branch
           */
-         IntegratorBranch(FieldComponents::Physical::Id physId, Intg3DId intg3D, Intg2DId intg2D, Intg1DId intg1D, FieldComponents::Spectral::Id specId, FieldType::Id fieldId);
+         IntegratorBranch(FieldComponents::Physical::Id physId, Intg3DId intg3D, Intg2DId intg2D, Intg1DId intg1D, FieldComponents::Spectral::Id specId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Get physical component ID
@@ -78,6 +79,11 @@ namespace Transform {
           */
          FieldType::Id fieldId() const;
 
+         /**
+          * @brief Get arithmetic ID
+          */
+         Arithmetics::Id arithId() const;
+
       private:
          /**
           * @brief Physical component required for transform branch
@@ -107,6 +113,11 @@ namespace Transform {
           * @brief Field type required for transform branch
           */
          FieldType::Id mFieldId;
+
+         /**
+          * @brief Arithmetic operation to store result after transform
+          */
+         Arithmetics::Id mArithId;
    };
 
 }

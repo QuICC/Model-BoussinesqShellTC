@@ -28,7 +28,7 @@ namespace Schemes {
 
    int SHTools::nL(const int m, const int nL)
    {
-      return nL-m+1;
+      return nL-m;
    }
 
    int SHTools::nHarmonics(const int nL, const int nM)

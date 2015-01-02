@@ -111,7 +111,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.opId());
+      coord.transform1D().project(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
 
       // Hold spectral input
       if(hold)
@@ -152,7 +152,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
 
       // Compute projection transform for second dimension 
-      coord.transform2D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+      coord.transform2D().project(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
 
       // Hold temporary storage
       if(hold)
@@ -194,7 +194,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Fwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().recoverFwd();
 
       // Compute projection transform for third dimension 
-      coord.transform3D().project<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+      coord.transform3D().project(rOutVar.rData(), pInVar->data(), edge.opId(),  edge.arithId());
 
       // Hold temporary storage
       if(hold)

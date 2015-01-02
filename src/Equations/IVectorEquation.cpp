@@ -71,14 +71,25 @@ namespace Equations {
       return std::make_pair(this->mRequirements.field(this->name()).spectralIds().begin(), this->mRequirements.field(this->name()).spectralIds().end());
    }
 
-   void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId)
+   void IVectorEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId, Arithmetics::Id arithId)
    {
       // Assert dealiasing has taken place!
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows() < rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().cols() == rhs.data().cols());
 
-      // Copy values over into unknown
-      this->rUnknown().rDom(0).rPerturbation().rComp(compId).setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+      if(arithId == Arithmetics::SET)
+      {
+         // Copy values over into unknown
+         this->rUnknown().rDom(0).rPerturbation().rComp(compId).setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+      } else if(arithId == Arithmetics::ADD)
+      {
+         // Add values to unknown
+         this->rUnknown().rDom(0).rPerturbation().rComp(compId).addData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+      } else if(arithId == Arithmetics::SUB)
+      {
+         // Substract values from unknown
+         this->rUnknown().rDom(0).rPerturbation().rComp(compId).subData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+      }
    }
 
    void IVectorEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)

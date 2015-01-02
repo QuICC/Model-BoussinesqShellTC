@@ -24,8 +24,8 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   ProjectorBranch::ProjectorBranch(FieldComponents::Spectral::Id specId, ProjectorBranch::Proj1DId proj1D, ProjectorBranch::Proj2DId proj2D, ProjectorBranch::Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId)
-      :mSpecId(specId), mProj1D(proj1D), mProj2D(proj2D), mProj3D(proj3D), mPhysId(physId), mFieldId(fieldId)
+   ProjectorBranch::ProjectorBranch(FieldComponents::Spectral::Id specId, ProjectorBranch::Proj1DId proj1D, ProjectorBranch::Proj2DId proj2D, ProjectorBranch::Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId)
+      :mSpecId(specId), mProj1D(proj1D), mProj2D(proj2D), mProj3D(proj3D), mPhysId(physId), mFieldId(fieldId), mArithId(arithId)
    {
    }
 
@@ -61,6 +61,11 @@ namespace Transform {
    FieldType::Id ProjectorBranch::fieldId() const
    {
       return this->mFieldId;
+   }
+
+   Arithmetics::Id ProjectorBranch::arithId() const
+   {
+      return this->mArithId;
    }
 
 }

@@ -20,7 +20,6 @@
 #include "SpatialSchemes/Tools/SHTools.hpp"
 #include "Resolutions/Tools/SHmIndexCounter.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Schemes {

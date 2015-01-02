@@ -97,7 +97,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Compute linear term component
-      spEquation->updateDealiasedUnknown(rInVar, edge.specId());
+      spEquation->updateDealiasedUnknown(rInVar, edge.specId(), edge.arithId());
 
       // Hold temporary storage
       if(hold)

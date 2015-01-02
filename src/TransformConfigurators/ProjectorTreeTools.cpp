@@ -98,7 +98,7 @@ namespace Transform {
 
                   // Extract unique 3D operators
                   std::map<ProjectorTree::Proj3DId, int> op3D;
-                  std::map<ProjectorTree::Proj3DId, std::pair<FieldComponents::Physical::Id,FieldType::Id> > op3DPhys;
+                  std::map<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
                   std::pair<std::map<ProjectorTree::Proj3DId,int>::iterator,bool> op3DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
@@ -106,7 +106,7 @@ namespace Transform {
                      {
                         op3DPairIt = op3D.insert(std::make_pair(branchIt->proj3DId(), 0));
                         op3DPairIt.first->second += 1;
-                        op3DPhys.insert(std::make_pair(branchIt->proj3DId(), std::make_pair(branchIt->physId(), branchIt->fieldId())));
+                        op3DPhys.insert(std::make_pair(branchIt->proj3DId(), std::tr1::make_tuple(branchIt->physId(), branchIt->fieldId(), branchIt->arithId())));
                      }
                   }
 
@@ -116,11 +116,12 @@ namespace Transform {
                   {
                      ProjectorTree::Projector3DEdge &rEdge3D = rEdge2D.addEdge(op3DIt->first, op3DIt->second);
 
-                     rEdge3D.setPhysical(op3DPhys.find(op3DIt->first)->second.first, op3DPhys.find(op3DIt->first)->second.second);
+                     rEdge3D.setPhysical(std::tr1::get<0>(op3DPhys.find(op3DIt->first)->second), std::tr1::get<1>(op3DPhys.find(op3DIt->first)->second), std::tr1::get<2>(op3DPhys.find(op3DIt->first)->second));
                      DebuggerMacro_showValue("Edge operator: ", 5, op3DIt->first);
                      DebuggerMacro_showValue("Edge weight: ", 5, op3DIt->second);
                      DebuggerMacro_showValue("Physical component: ", 6, rEdge3D.physId());
                      DebuggerMacro_showValue("Field type: ", 6, rEdge3D.fieldId());
+                     DebuggerMacro_showValue("Arithmetic: ", 6, rEdge3D.arithId());
                   }
                }
             }

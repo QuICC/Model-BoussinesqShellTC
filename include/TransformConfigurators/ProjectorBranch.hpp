@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "TypeSelectors/TransformSelector.hpp"
+#include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,7 +42,7 @@ namespace Transform {
          /**
           * @brief Contructor for branch
           */
-         ProjectorBranch(FieldComponents::Spectral::Id specId, Proj1DId proj1D, Proj2DId proj2D, Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId);
+         ProjectorBranch(FieldComponents::Spectral::Id specId, Proj1DId proj1D, Proj2DId proj2D, Proj3DId proj3D, FieldComponents::Physical::Id physId, FieldType::Id fieldId, Arithmetics::Id arithId = Arithmetics::SET);
 
          /**
           * @brief Destructor
@@ -78,6 +79,11 @@ namespace Transform {
           */
          FieldType::Id fieldId() const;
 
+         /**
+          * @brief Get arithmetic ID
+          */
+         Arithmetics::Id arithId() const;
+
       private:
          /**
           * @brief Spectral component required for transform branch
@@ -108,6 +114,11 @@ namespace Transform {
           * @brief Field type required for transform branch
           */
          FieldType::Id mFieldId;
+
+         /**
+          * @brief Arithmetic operation to store result after transform
+          */
+         Arithmetics::Id mArithId;
    };
 
 }

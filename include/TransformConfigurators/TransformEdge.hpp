@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Enums/Arithmetics.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -121,15 +122,20 @@ namespace Transform {
            */
           FieldType::Id fieldId() const;
 
+          /**
+           * @brief Get the arithmetic operation
+           */
+          Arithmetics::Id arithId() const;
+
          /**
           * @brief Set Physical component
           */
-         void setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type);
+         void setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type, const Arithmetics::Id arith);
 
          /**
           * @brief Set Spectral component
           */
-         void setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type);
+         void setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type, const Arithmetics::Id arith);
 
       private:
          /**
@@ -156,6 +162,11 @@ namespace Transform {
           * @brief Spectral output component
           */
          FieldComponents::Spectral::Id mSpecId;
+
+         /**
+          * @brief Arithmetic operation to store result
+          */
+         Arithmetics::Id   mArithId;
    };
 
 
@@ -219,18 +230,27 @@ namespace Transform {
       return this->mFieldId;
    }
 
-   template <typename TOpA> void TransformEdge<TOpA,void,void>::setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type)
+   template <typename TOpA> Arithmetics::Id TransformEdge<TOpA,void,void>::arithId() const
+   {
+      return this->mArithId;
+   }
+
+   template <typename TOpA> void TransformEdge<TOpA,void,void>::setSpectral(const FieldComponents::Spectral::Id id, const FieldType::Id type, const Arithmetics::Id arith)
    {
       this->mSpecId = id;
 
       this->mFieldId = type;
+
+      this->mArithId = arith;
    }
 
-   template <typename TOpA> void TransformEdge<TOpA,void,void>::setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type)
+   template <typename TOpA> void TransformEdge<TOpA,void,void>::setPhysical(const FieldComponents::Physical::Id id, const FieldType::Id type, const Arithmetics::Id arith)
    {
       this->mPhysId = id;
 
       this->mFieldId = type;
+
+      this->mArithId = arith;
    }
 
 }

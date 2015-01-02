@@ -61,7 +61,7 @@ namespace Equations {
       return this->unknown().dom(0).spRes();
    }
 
-   void IScalarEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId)
+   void IScalarEquation::updateDealiasedUnknown(const Datatypes::SpectralScalarType& rhs, FieldComponents::Spectral::Id compId, Arithmetics::Id arithId)
    {
       // Assert scalar
       assert(compId == FieldComponents::Spectral::SCALAR);
@@ -70,8 +70,19 @@ namespace Equations {
       assert(this->rUnknown().rDom(0).rPerturbation().data().rows() < rhs.data().rows());
       assert(this->rUnknown().rDom(0).rPerturbation().data().cols() == rhs.data().cols());
 
-      // Copy values over into unknown
-      this->rUnknown().rDom(0).rPerturbation().setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));
+      if(arithId == Arithmetics::SET)
+      {
+         // Copy values over into unknown
+         this->rUnknown().rDom(0).rPerturbation().setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));
+      } else if(arithId == Arithmetics::ADD)
+      {
+         // Add values to unknown
+         this->rUnknown().rDom(0).rPerturbation().addData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));
+      } else if(arithId == Arithmetics::SUB)
+      {
+         // Substract values from unknown
+         this->rUnknown().rDom(0).rPerturbation().subData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().data().rows()));
+      }
    }
 
    void IScalarEquation::initSpectralMatrices(const SharedSimulationBoundary spBcIds)

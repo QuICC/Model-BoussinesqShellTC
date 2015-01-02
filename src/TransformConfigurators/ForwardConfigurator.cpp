@@ -55,7 +55,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
 
       // Compute integration transform of third dimension
-      coord.transform3D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), edge.opId());
+      coord.transform3D().integrate(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
 
       // Hold temporary input storage
       if(hold)
@@ -95,7 +95,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
 
       // Compute integration transform of second dimension
-      coord.transform2D().integrate<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+      coord.transform2D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
 
       // Hold temporary storage
       if(hold)
@@ -137,7 +137,7 @@ namespace Transform {
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
 
       // Compute integration transform of first dimension
-      coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), pInVar->data(), edge.opId());
+      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
 
       // Hold temporary storage
       if(hold)

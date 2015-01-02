@@ -135,10 +135,9 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rFFTVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (C2R)
@@ -148,10 +147,9 @@ namespace Transform {
           * @param rPhysVal Output physical values
           * @param fftVal Input FFT values
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
+         void project(Matrix& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -161,10 +159,9 @@ namespace Transform {
           * @param rFFTVal Output FFT transformed values
           * @param physVal Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (C2C)
@@ -174,10 +171,9 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param fftVal     Input FFT values
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& fftVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -244,239 +240,6 @@ namespace Transform {
           */
          void cleanupFft();
    };
-
-   template <Arithmetics::Id TOperation> void CuFftTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, CuFftTransform::IntegratorType::Id integrator)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::MIXED);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rFFTVal.rows() == this->mspSetup->bwdSize());
-      assert(rFFTVal.cols() == this->mspSetup->howmany());
-
-      // Do transform
-      int offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = physVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(this->mpDevR.at(i), physVal.data() + offset, sizeof(cufftDoubleReal)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         checkCudaErrors(cufftExecD2Z(this->mFPlan.at(i), this->mpDevR.at(i), this->mpDevZI.at(i)));
-      }
-
-      offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = rFFTVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(rFFTVal.data() + offset, this->mpDevZI.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-
-      // Rescale output from FFT
-      rFFTVal *= this->mspSetup->scale();
-   }
-
-   template <Arithmetics::Id TOperation> void CuFftTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::MIXED);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(fftVal.rows() == this->mspSetup->bwdSize());
-      assert(fftVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative
-      if(projector == CuFftTransform::ProjectorType::DIFF)
-      {
-         // Get differentiation factors
-         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
-
-         // Rescale results
-         this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
-
-      // Compute simple projection
-      } else
-      {
-         // Rescale results
-         this->mTmpRIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
-      }
-
-      // Set the m=0 values to zero
-      this->mTmpRIn.row(0).imag().setConstant(0);
-
-      // Set the padded values to zero
-      this->mTmpRIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform
-      int offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = this->mTmpRIn.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), this->mTmpRIn.data() + offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         checkCudaErrors(cufftExecZ2D(this->mBPlan.at(i), this->mpDevZI.at(i), this->mpDevR.at(i)));
-      }
-
-      offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = rPhysVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(rPhysVal.data() + offset, this->mpDevR.at(i), sizeof(cufftDoubleReal)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-   }
-
-   template <Arithmetics::Id TOperation> void CuFftTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, CuFftTransform::IntegratorType::Id integrator)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a non mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPLEX);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rFFTVal.rows() == this->mspSetup->bwdSize());
-      assert(rFFTVal.cols() == this->mspSetup->howmany());
-
-      // Do transform
-      int offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = physVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), physVal.data() + offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         checkCudaErrors(cufftExecZ2Z(this->mFPlan.at(i), this->mpDevZI.at(i), this->mpDevZO.at(i), CUFFT_FORWARD));
-      }
-
-      offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = rFFTVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(rFFTVal.data() + offset, this->mpDevZO.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-
-      // Rescale output from FFT
-      rFFTVal *= this->mspSetup->scale();
-   }
-
-   template <Arithmetics::Id TOperation> void CuFftTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, CuFftTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a non mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPLEX);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(fftVal.rows() == this->mspSetup->bwdSize());
-      assert(fftVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Get size of positive and negative frequency parts
-      int negN = this->mspSetup->specSize()/2;
-      int posN = negN + (this->mspSetup->specSize()%2);
-
-      // Compute first derivative
-      if(projector == CuFftTransform::ProjectorType::DIFF)
-      {
-         // Get differentiation factors
-         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
-         ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
-
-         // Split positive and negative frequencies and compute derivative
-         this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
-         this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
-
-      // Compute simple projection
-      } else
-      {
-         // Split positive and negative frequencies
-         this->mTmpZIn.topRows(posN) = fftVal.topRows(posN);
-         this->mTmpZIn.bottomRows(negN) = fftVal.bottomRows(negN);
-      }
-
-      // Set the padded values to zero
-      this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
-
-      // Do transform
-      int offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = this->mTmpZIn.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(this->mpDevZI.at(i), this->mTmpZIn.data()+offset, sizeof(cufftDoubleComplex)*sze, cudaMemcpyHostToDevice, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         checkCudaErrors(cufftExecZ2Z(this->mFPlan.at(i), this->mpDevZI.at(i), this->mpDevZO.at(i), CUFFT_INVERSE));
-      }
-
-      offset = 0;
-      for(int i = 0; i < CuFftLibrary::NSTREAMS; i++)
-      {
-         int sze = rPhysVal.rows()*this->mStreamBatch.at(i);
-
-         checkCudaErrors(cudaMemcpyAsync(rPhysVal.data()+offset, this->mpDevZO.at(i), sizeof(cufftDoubleComplex)*sze, cudaMemcpyDeviceToHost, CuFftLibrary::sStream.at(i)));
-
-         offset += sze;
-      }
-   }
 
 }
 }
