@@ -455,7 +455,7 @@ namespace Polynomial {
       } else
       {
          internal::MHDFloat di;
-         internal::MHDFloat factor = precision::sqrt((internal::MHDFloat(2*m) + MHD_MP(1.0))/(MHD_MP(4.0)*Precision::PI));
+         internal::MHDFloat factor = internal::MHDFloat(m)*precision::sqrt((internal::MHDFloat(2*m) + MHD_MP(1.0))/(MHD_MP(4.0)*Precision::PI));
 
          for(int i = 1; i <= m; i++)
          {
@@ -496,10 +496,11 @@ namespace Polynomial {
       {
          op = igrid.array().acos();
          op = op.array().sin().pow(-1);
+         op *= precision::sqrt(MHD_MP(1.0)/(MHD_MP(4.0)*Precision::PI));
       } else
       {
          internal::MHDFloat di;
-         internal::MHDFloat factor = precision::sqrt(internal::MHDFloat(2*m) + MHD_MP(1.0));
+         internal::MHDFloat factor = precision::sqrt((internal::MHDFloat(2*m) + MHD_MP(1.0))/(MHD_MP(4.0)*Precision::PI));
 
          for(int i = 1; i <= m; i++)
          {

@@ -65,7 +65,7 @@ namespace GeoMHDiSCC {
          spScalar = spGen->addScalarEquation<Equations::ShellExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
-         tSH.push_back(std::tr1::make_tuple(5,1,MHDComplex(1,1)));
+         tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
          spScalar->setHarmonicOptions(tSH);
 
          // Add temperature initial state generator
@@ -73,15 +73,15 @@ namespace GeoMHDiSCC {
          spVector->setIdentity(PhysicalNames::VELOCITY);
          spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::HARMONIC);
          tSH.clear(); 
-         tSH.push_back(std::tr1::make_tuple(3,0,MHDComplex(1,0)));
+         tSH.push_back(std::tr1::make_tuple(3,1,MHDComplex(1,0)));
          spVector->setHarmonicOptions(FieldComponents::Physical::R, tSH);
          spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::HARMONIC);
          tSH.clear(); 
-         tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
+         tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
          spVector->setHarmonicOptions(FieldComponents::Physical::THETA, tSH);
          spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::HARMONIC);
          tSH.clear(); 
-         tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+         tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
          spVector->setHarmonicOptions(FieldComponents::Physical::PHI, tSH);
 
       // Generate random spectrum

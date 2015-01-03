@@ -103,10 +103,11 @@ namespace Equations {
          rNLComp.rData().setConstant(0);
          for(int iR = 0; iR < nR; ++iR)
          {
+            funcR = 1.0;
+            funcR = rGrid(iR);
+
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               funcR = 1.0;
-
                for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
                {
                   int l = std::tr1::get<0>(*it);

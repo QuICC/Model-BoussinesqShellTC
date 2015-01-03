@@ -44,7 +44,7 @@ def main(argv):
         g1D = 'r'
         g2D = 'theta'
         g3D = 'z'
-    elif scheme in [b'SLF', b'BLF', b'WLF']:
+    elif scheme in [b'SLFm', b'SLFl', b'BLF', b'WLF']:
         g1D = 'r'
         g2D = 'theta'
         g3D = 'phi'
@@ -112,7 +112,7 @@ def main(argv):
             if fId == sId:
                 sphereXYZ(h5_file, g1D, g2D, g3D)
             print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'sphere_grid'), file=out_file)
-        elif scheme in [b'SLF']:
+        elif scheme in [b'SLFm', b'SLFl']:
             if fId == sId:
                 shellXYZ(h5_file, g1D, g2D, g3D)
             print(xdmfXYZGrid.format(n1D = n1D, n2D = n2D, n3D = n3D, nN = n1D*n2D*n3D, g1D = g1D, g2D = g2D, g3D = g3D, gridfile = 'shell_grid'), file=out_file)

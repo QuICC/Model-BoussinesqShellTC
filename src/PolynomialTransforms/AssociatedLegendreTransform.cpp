@@ -92,7 +92,11 @@ namespace Transform {
       this->mThGrid = this->mXGrid.array().acos();
 
       // Normalise weights by 2*pi for spherical harmonics
-      this->mWeights.array() *= 2*Math::PI;
+      this->mWeights.array() *= 2.0*Math::PI;
+
+      // Initialise storage for l(l+1) factor
+      this->mLl1 = Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+      this->mLl1 = this->mLl1.array()*(this->mLl1.array() + 1.0);
 
       // Reserve storage for the projectors, 1/sin projectors and derivative
       this->mProj.reserve(this->mspSetup->slow().size());
@@ -157,7 +161,7 @@ namespace Transform {
 
       // Compute first derivative integration
       if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIFF)
-      { 
+      {
          // Compute integration of derivative
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
@@ -168,6 +172,7 @@ namespace Transform {
             rSpecVal.block(0, start, specRows, cols) = this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
+
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSIN)
       { 
          // Compute integration of 1/sin
@@ -180,6 +185,20 @@ namespace Transform {
             rSpecVal.block(0, start, specRows, cols) = this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
+
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL1)
+      { 
+         // Compute integration
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mProj.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mLl1.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+
       } else
       {
          // Compute integration

@@ -55,7 +55,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGDIFF, INTGDIVSIN};
+         enum Id {INTG, INTGLL1, INTGDIFF, INTGDIVSIN};
       };
 
    };
@@ -164,6 +164,11 @@ namespace Transform {
           * @brief Storage for the quadrature weights
           */
          Array mWeights;
+
+         /**
+          * @brief Storage for the l(l+1) factor
+          */
+         Array mLl1;
 
          /**
           * @brief Polynomial setup object providing the sizes
