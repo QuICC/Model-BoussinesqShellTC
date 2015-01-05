@@ -47,12 +47,13 @@ namespace GeoMHDiSCC {
           * @brief Map variables to the corresponding equation 
           *
           * @param integratorTree Transform tree for forward integration
-          * @param rScalarEqs Scalar equations
-          * @param rVectorEqs Vector equations
-          * @param scalarVars Scalar variables
-          * @param vectorVars Vector variables
+          * @param rScalarEqs          Scalar equations
+          * @param rVectorEqs          Vector equations
+          * @param scalarVars          Scalar variables
+          * @param vectorVars          Vector variables
+          * @param forwardIsNonlinear  Forward transform works on nonlinear terms
           */
-         static void mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars);
+         static void mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear);
          
       protected:
 

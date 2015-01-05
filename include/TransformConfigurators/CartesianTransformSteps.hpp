@@ -37,9 +37,19 @@ namespace GeoMHDiSCC {
          std::vector<IntegratorBranch>  forwardScalar();
 
          /**
+          * @brief Generate the list of branches in scalar nonlinear term integration transform
+          */
+         std::vector<IntegratorBranch>  forwardScalarNL();
+
+         /**
           * @brief Generate the list of branches in vector integration transform
           */
          std::vector<IntegratorBranch>  forwardVector();
+
+         /**
+          * @brief Generate the list of branches in vector nonlinear term integration transform
+          */
+         std::vector<IntegratorBranch>  forwardVectorNL();
 
          /**
           * @brief Generate the list of branches in scalar projection transform

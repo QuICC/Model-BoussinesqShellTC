@@ -40,9 +40,22 @@ namespace GeoMHDiSCC {
          std::vector<IntegratorBranch>  forwardScalar();
 
          /**
+          * @brief Generate the list of branches in scalar nonlinear term integration transform
+          */
+         std::vector<IntegratorBranch>  forwardScalarNL();
+
+         /**
           * @brief Generate the list of branches in vector integration transform
           */
          std::vector<IntegratorBranch>  forwardVector();
+
+         /**
+          * @brief Generate the list of branches in vector nonlinear term integration transform
+          *
+          * Toroidal component is radial component of curl: \f$\vec r \nabla\wedge N\f$
+          * Poloidal component is radial component of curl curl: \f$\vec r \nabla\wedge\nabla\wedge N\f$
+          */
+         std::vector<IntegratorBranch>  forwardVectorNL();
 
          /**
           * @brief Generate the list of branches in scalar projection transform

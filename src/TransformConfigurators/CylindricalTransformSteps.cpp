@@ -36,7 +36,29 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<IntegratorBranch>  forwardScalarNL()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+
+      return transform;
+   }
+
    std::vector<IntegratorBranch>  forwardVector()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::R, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::THETA, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::Z, FieldType::VECTOR));
+
+      return transform;
+   }
+
+   std::vector<IntegratorBranch>  forwardVectorNL()
    {
       std::vector<IntegratorBranch> transform;
 

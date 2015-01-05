@@ -39,6 +39,7 @@ namespace GeoMHDiSCC {
    StateGenerator::StateGenerator()
       : SimulationBase()
    {
+      this->mForwardIsNonlinear = false;
    }
 
    StateGenerator::~StateGenerator()

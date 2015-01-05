@@ -166,9 +166,23 @@ namespace GeoMHDiSCC {
       Transform::ProjectorTreeTools::generateTrees(projectorTree, branches);
    }
 
-   void RequirementTools::mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars)
+   void RequirementTools::mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear)
    {
-      std::vector<Transform::IntegratorBranch> tmpBranches;
+      // Store the scalar and vector branches
+      std::vector<Transform::IntegratorBranch> scalarBranches;
+      std::vector<Transform::IntegratorBranch> vectorBranches;
+
+      // Forward transform is from nonlinear calculation
+      if(forwardIsNonlinear)
+      {
+         scalarBranches = Transform::TransformSteps::forwardScalarNL();
+         vectorBranches = Transform::TransformSteps::forwardVectorNL();
+      } else
+      {
+         scalarBranches = Transform::TransformSteps::forwardScalar();
+         vectorBranches = Transform::TransformSteps::forwardVector();
+      }
+
       std::map<PhysicalNames::Id, std::vector<Transform::IntegratorBranch> > branches;
 
       // Loop over all scalar variables
@@ -194,8 +208,7 @@ namespace GeoMHDiSCC {
                   branches.insert(std::make_pair(scalIt->first, std::vector<Transform::IntegratorBranch>()));
 
                   // Create scalar forward transform
-                  tmpBranches = Transform::TransformSteps::forwardScalar();
-                  branches.find(scalIt->first)->second.insert(branches.find(scalIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                  branches.find(scalIt->first)->second.insert(branches.find(scalIt->first)->second.end(),scalarBranches.begin(), scalarBranches.end());
                }
             }
 
@@ -252,8 +265,7 @@ namespace GeoMHDiSCC {
                   branches.insert(std::make_pair(vectIt->first, std::vector<Transform::IntegratorBranch>()));
 
                   // Create vector forward transform
-                  tmpBranches = Transform::TransformSteps::forwardVector();
-                  branches.find(vectIt->first)->second.insert(branches.find(vectIt->first)->second.end(),tmpBranches.begin(), tmpBranches.end());
+                  branches.find(vectIt->first)->second.insert(branches.find(vectIt->first)->second.end(),vectorBranches.begin(), vectorBranches.end());
                }
             }
 

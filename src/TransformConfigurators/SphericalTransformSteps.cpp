@@ -35,6 +35,15 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<IntegratorBranch>  forwardScalarNL()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+
+      return transform;
+   }
+
    #if defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
    std::vector<IntegratorBranch>  forwardVector()
@@ -54,9 +63,39 @@ namespace TransformSteps {
       return transform;
    }
 
+   std::vector<IntegratorBranch>  forwardVectorNL()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SET));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SUB));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL1, IntegratorBranch::Intg1DType::INTGDIVR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SET));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGDIVRDIFFR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SUB));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGDIVRDIFFR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SUB));
+
+      return transform;
+   }
+
    #else
 
    std::vector<IntegratorBranch>  forwardVector()
+   {
+      std::vector<IntegratorBranch> transform;
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::R, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THETA, FieldType::VECTOR));
+
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::PHI, FieldType::VECTOR));
+
+      return transform;
+   }
+
+   std::vector<IntegratorBranch>  forwardVectorNL()
    {
       std::vector<IntegratorBranch> transform;
 

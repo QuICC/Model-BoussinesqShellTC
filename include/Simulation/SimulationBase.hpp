@@ -296,6 +296,11 @@ namespace GeoMHDiSCC {
           */
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
 
+         /**
+          * @brief Flag for forward transform
+          */
+         bool mForwardIsNonlinear;
+
       private:
          /**
           * @brief Add addition configuration file parts

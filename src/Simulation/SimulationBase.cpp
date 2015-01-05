@@ -36,7 +36,7 @@
 namespace GeoMHDiSCC {
 
    SimulationBase::SimulationBase()
-      : mExecutionTimer(true), mSimRunCtrl(), mDiagnostics()
+      : mExecutionTimer(true), mSimRunCtrl(), mDiagnostics(), mForwardIsNonlinear(true)
    {
    }
 
@@ -95,7 +95,7 @@ namespace GeoMHDiSCC {
       std::vector<Transform::IntegratorTree> integratorTree;
 
       // Map variables to the equations and set nonlinear requirements
-      RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables);
+      RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
 
       // Initialise the transform coordinator
       this->initTransformCoordinator(integratorTree, projectorTree);
