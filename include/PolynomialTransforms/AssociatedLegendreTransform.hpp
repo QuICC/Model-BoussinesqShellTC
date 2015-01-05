@@ -46,7 +46,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ, DIFF, DIVSIN, DIVSINDIFFSIN};
+         enum Id {PROJ, PROJLL1, DIFF, DIFFLL1, DIVSIN, DIVSINLL1, DIVSINDIFFSIN};
       };
 
       /**
@@ -55,7 +55,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG, INTGLL1, INTGDIFF, INTGDIVSIN};
+         enum Id {INTG, INTGDIVLL1, INTGLL1, INTGDIFF, INTGDIVLL1DIFF, INTGDIVSIN, INTGDIVLL1DIVSIN};
       };
 
    };
@@ -169,6 +169,11 @@ namespace Transform {
           * @brief Storage for the l(l+1) factor
           */
          Array mLl1;
+
+         /**
+          * @brief Storage for the 1/l(l+1) factor
+          */
+         Array mDivLl1;
 
          /**
           * @brief Polynomial setup object providing the sizes

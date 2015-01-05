@@ -165,7 +165,7 @@ namespace Transform {
       if(integrator == FftwTransform::IntegratorType::INTGDIFF)
       {
          // Get differentiation factors
-         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
 
          // Rescale results
          rFFTVal = factor.asDiagonal()*rFFTVal;
@@ -220,6 +220,10 @@ namespace Transform {
       // Do transform with corresponding arithmetics
       if(arithId == Arithmetics::SET)
       {
+         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
+      } else if(arithId == Arithmetics::SETNEG)
+      {
+         this->mTmpRIn = -this->mTmpRIn;
          fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
       } else if(arithId == Arithmetics::ADD)
       {
@@ -313,6 +317,11 @@ namespace Transform {
       // Do transform with corresponding arithmetics
       if(arithId == Arithmetics::SET)
       {
+         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
+
+      } else if(arithId == Arithmetics::SETNEG)
+      {
+         this->mTmpZIn = -this->mTmpZIn;
          fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
 
       } else if(arithId == Arithmetics::ADD)

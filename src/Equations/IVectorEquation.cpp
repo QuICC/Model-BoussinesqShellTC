@@ -81,6 +81,10 @@ namespace Equations {
       {
          // Copy values over into unknown
          this->rUnknown().rDom(0).rPerturbation().rComp(compId).setData(rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
+      } else if(arithId == Arithmetics::SETNEG)
+      {
+         // Copy negative values over into unknown
+         this->rUnknown().rDom(0).rPerturbation().rComp(compId).setData(-rhs.data().topRows(this->rUnknown().rDom(0).rPerturbation().rComp(compId).data().rows()));
       } else if(arithId == Arithmetics::ADD)
       {
          // Add values to unknown

@@ -53,10 +53,13 @@ namespace Transform {
           * Enum of projector IDs:
           *    - PROJ: projection
           *    - DIFF: D
+          *    - DIFF2: D^2
           *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
           *    - DIVRDIFFR: 1/r D r
+          *    - RADLAPL: radial laplacian: D^2 + 2/r D
           */
-         enum Id {PROJ,  DIFF, DIVR, DIVRDIFFR};
+         enum Id {PROJ, DIFF, DIFF2, DIVR, DIVR2, DIVRDIFFR, RADLAPL};
       };
 
       /**
@@ -67,10 +70,11 @@ namespace Transform {
          /** 
           * Enum of integrator IDs:
           *    - INTG: integration
+          *    - INTGR: integration of r
           *    - INTGDIVR: integration of 1/r
-          *    - INTEGDIVRDIFFR: integration of 1 /r D r
+          *    - INTGDIVRDIFFR: integration of 1 /r D r
           */
-         enum Id {INTG, INTGDIVR, INTGDIVRDIFFR};
+         enum Id {INTG, INTGR, INTGDIVR, INTGDIVRDIFFR};
       };
 
    };
@@ -216,16 +220,31 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the Chebyshev derivative matrix
           */
          SparseMatrix   mDiff;
 
+         /**
+          * @brief Storage for the Chebyshev second derivative matrix
+          */
+         SparseMatrix   mDiff2;
+
          #if defined GEOMHDISCC_TRANSOP_FORWARD
+
+         /**
+          * @brief Storage for the multiplication by R physical array
+          */
+         Array   mR;
 
          /**
           * @brief Storage for the division by R physical array
           */
          Array   mDivR;
+
+         /**
+          * @brief Storage for the division by R^2 physical array
+          */
+         Array   mDivR2;
 
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
 
@@ -235,14 +254,29 @@ namespace Transform {
          SparseMatrix   mDivR;
 
          /**
+          * @brief Storage for the Chebyshev division by R^2 matrix
+          */
+         SparseMatrix   mDivR2;
+
+         /**
           * @brief Storage for the sparse solver for differentiation
           */
          Solver::SparseSelector<SparseMatrix>::Type mSDiff;
 
          /**
+          * @brief Storage for the sparse solver for second derivative
+          */
+         Solver::SparseSelector<SparseMatrix>::Type mSDiff2;
+
+         /**
           * @brief Storage for the sparse solver for division by R
           */
          Solver::SparseSelector<SparseMatrix>::Type mSDivR;
+
+         /**
+          * @brief Storage for the sparse solver for division by R^2
+          */
+         Solver::SparseSelector<SparseMatrix>::Type mSDivR2;
 
          /**
           * @brief Storage for the backward operators input data

@@ -140,8 +140,12 @@ namespace Transform {
       PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
+         // Initialise array for multiplication by R
+         this->mR = this->meshGrid();
          // Initialise array for division by R
          this->mDivR = this->meshGrid().array().pow(-1);
+         // Initialise array for division by R^2
+         this->mDivR2 = this->meshGrid().array().pow(-2);
 
          // Prepare arguments to d1(...) call
          PyObject *pArgs, *pValue;
@@ -169,9 +173,18 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->mDiff, pValue);
          Py_DECREF(pValue);
 
+         // Call d2
+         PythonWrapper::setFunction("d2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiff2, pValue);
+         Py_DECREF(pValue);
+
       #elif defined GEOMHDISCC_TRANSOP_BACKWARD
          // Initialise matrix for division by R
          this->mDivR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+         // Initialise matrix for division by R
+         this->mDivR2.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
 
          // Prepare arguments to i1(...) call
          PyObject *pArgs, *pValue;
@@ -199,6 +212,13 @@ namespace Transform {
          PythonWrapper::fillMatrix(this->mDiff, pValue);
          Py_DECREF(pValue);
 
+         // Call i1
+         PythonWrapper::setFunction("i2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDiff2, pValue);
+         Py_DECREF(pValue);
+
          // ... create boundary condition (none)
          pValue = PyTuple_GetItem(pArgs, 3);
          PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
@@ -207,6 +227,13 @@ namespace Transform {
          pValue = PythonWrapper::callFunction(pArgs);
          // Fill matrix
          PythonWrapper::fillMatrix(this->mDivR, pValue);
+         Py_DECREF(pValue);
+
+         // Call x2
+         PythonWrapper::setFunction("x2");
+         pValue = PythonWrapper::callFunction(pArgs);
+         // Fill matrix
+         PythonWrapper::fillMatrix(this->mDivR2, pValue);
          Py_DECREF(pValue);
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
@@ -219,7 +246,15 @@ namespace Transform {
          // Check for successful factorisation
          if(this->mSDiff.info() != Eigen::Success)
          {
-            throw Exception("Factorization of backward differentiation failed!");
+            throw Exception("Factorization of backward first derivative failed!");
+         }
+
+         // Factorize differentiation matrix and free memory
+         this->mSDiff2.compute(this->mDiff2);
+         // Check for successful factorisation
+         if(this->mSDiff2.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward first second failed!");
          }
 
          // Factorize division matrix and free memory
@@ -227,7 +262,15 @@ namespace Transform {
          // Check for successful factorisation
          if(this->mSDivR.info() != Eigen::Success)
          {
-            throw Exception("Factorization of backward division failed!");
+            throw Exception("Factorization of backward division by R failed!");
+         }
+
+         // Factorize division matrix and free memory
+         this->mSDivR2.compute(this->mDivR2);
+         // Check for successful factorisation
+         if(this->mSDivR2.info() != Eigen::Success)
+         {
+            throw Exception("Factorization of backward division by R^2 failed!");
          }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
@@ -273,9 +316,15 @@ namespace Transform {
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVR)
       {
          this->mTmpIn = this->mDivR.asDiagonal()*physVal;
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
+      {
+         this->mTmpIn = this->mR.asDiagonal()*physVal;
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
       {
          this->mTmpIn = this->mDivR.asDiagonal()*physVal;
+      } else
+      {
+         this->mTmpIn = physVal;
       }
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
@@ -297,6 +346,9 @@ namespace Transform {
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVR)
+      {
+         throw Exception("INTGDIVR operator is not yet implemented");
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
       {
          throw Exception("INTGDIVR operator is not yet implemented");
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
@@ -337,12 +389,33 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      // Compute second derivative
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
          this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
          Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
@@ -353,7 +426,14 @@ namespace Transform {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
 
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute radial laplacian projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         // Compute D^2 part
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize());
 
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute simple projection
       } else
       {
@@ -373,10 +453,24 @@ namespace Transform {
       {
          rPhysVal = this->mDivR.asDiagonal()*rPhysVal;
 
+      // Compute 1/r^2 projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal = this->mDivR2.asDiagonal()*rPhysVal;
+
       // Compute 1/r D r projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+         rPhysVal += this->mDivR.asDiagonal()*this->mTmpOut;
+
+      // Compute laplacian projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         // Compute 2.0*D/r part
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mDiff*chebVal.topRows(this->mspSetup->specSize());
          this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
          fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
          rPhysVal += this->mDivR.asDiagonal()*this->mTmpOut;
@@ -388,6 +482,11 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute laplacian projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         throw Exception("LAPL operator is not yet implemented");
       }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
@@ -413,7 +512,12 @@ namespace Transform {
       {
          this->mTmpIn = this->mDivR.asDiagonal()*physVal.real();
 
-      // Compute integration of 1/r D r of imaginary part
+      // Compute integration of r of real part
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
+      {
+         this->mTmpIn = this->mR.asDiagonal()*physVal.real();
+
+      // Compute integration of 1/r D r of real part
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
       {
          this->mTmpIn = this->mDivR.asDiagonal()*physVal.real();
@@ -445,6 +549,10 @@ namespace Transform {
       {
          throw Exception("INTGDIVR operator is not yet implemented");
 
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
+      {
+         throw Exception("INTGR operator is not yet implemented");
+
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
       {
          throw Exception("INTGDIVRDIFFR operator is not yet implemented");
@@ -456,6 +564,11 @@ namespace Transform {
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVR)
       {
          this->mTmpIn = this->mDivR.asDiagonal()*physVal.imag();
+
+      // Compute integration of r of imaginary part
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
+      {
+         this->mTmpIn = this->mR.asDiagonal()*physVal.imag();
 
       // Compute integration of 1/r D r of imaginary part
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
@@ -488,6 +601,10 @@ namespace Transform {
       if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVR)
       {
          throw Exception("INTGDIVR operator is not yet implemented");
+
+      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
+      {
+         throw Exception("INTGR operator is not yet implemented");
 
       } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGDIVRDIFFR)
       {

@@ -121,6 +121,132 @@ namespace Equations {
                }
             }
          }
+
+      } else if(typeId == ShellExactStateIds::TORPOLT11P11)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, 1, 0.35);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+
+         rNLComp.rData().setConstant(0);
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               // Toroidal part
+               if(compId == FieldComponents::Physical::R)
+               {
+                  funcR = 0.0;
+                  funcTh = 0.0;
+                  funcPh.setConstant(0.0);
+
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  funcR = std::sqrt(3.0/(2.0*Math::PI));
+                  funcTh = 1.0;
+                  funcPh = phGrid.array().cos() + phGrid.array().sin();
+
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  funcR = std::sqrt(3.0/(2.0*Math::PI));
+                  funcTh = std::cos(thGrid(iTh));
+                  funcPh = phGrid.array().cos() - phGrid.array().sin();
+               }
+               rNLComp.addProfile(funcR*funcTh*funcPh, iTh, iR);
+
+               // Poloidal part
+               if(compId == FieldComponents::Physical::R)
+               {
+                  funcR = std::sqrt(6.0/Math::PI)/rGrid(iR);
+                  funcTh = std::sin(thGrid(iTh));
+                  funcPh = -phGrid.array().cos() + phGrid.array().sin();
+
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  funcR = std::sqrt(3.0/(2.0*Math::PI))/rGrid(iR);
+                  funcTh = std::cos(thGrid(iTh));
+                  funcPh = -phGrid.array().cos() + phGrid.array().sin();
+
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  funcR = std::sqrt(3.0/(2.0*Math::PI))/rGrid(iR);
+                  funcTh = 1.0;
+                  funcPh = phGrid.array().cos() + phGrid.array().sin();
+               }
+               rNLComp.addProfile(funcR*funcTh*funcPh, iTh, iR);
+            }
+         }
+
+      } else if(typeId == ShellExactStateIds::TORPOLT54P43)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, 1, 0.35);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+
+         rNLComp.rData().setConstant(0);
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               // Toroidal part
+               if(compId == FieldComponents::Physical::R)
+               {
+                  funcR = 0.0;
+                  funcTh = 0.0;
+                  funcPh.setConstant(0.0);
+
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  funcR = -(3.0/2.0)*std::sqrt(385.0/(2.0*Math::PI));
+                  funcTh = std::cos(thGrid(iTh))*std::pow(std::sin(thGrid(iTh)),3);
+                  funcPh = (4.0*phGrid).array().cos() + (4.0*phGrid).array().sin();
+
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  funcR = -(3.0/16.0)*std::sqrt(385.0/(2.0*Math::PI));
+                  funcTh = (3.0 + 5.0*std::cos(2.0*thGrid(iTh)))*std::pow(std::sin(thGrid(iTh)),3);
+                  funcPh = (4.0*phGrid).array().cos() - (4.0*phGrid).array().sin();
+               }
+               rNLComp.addProfile(funcR*funcTh*funcPh, iTh, iR);
+
+               // Poloidal part
+               if(compId == FieldComponents::Physical::R)
+               {
+                  funcR = 15.0*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcTh = std::cos(thGrid(iTh))*std::pow(std::sin(thGrid(iTh)),3);
+                  funcPh = -(3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
+
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  funcR = -(3.0/4.0)*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcTh = (1.0 + 2.0*std::cos(2.0*thGrid(iTh)))*std::pow(std::sin(thGrid(iTh)),2);
+                  funcPh = (3.0*phGrid).array().cos() - (3.0*phGrid).array().sin();
+
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  funcR = (9.0/4.0)*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcTh = std::cos(thGrid(iTh))*std::pow(std::sin(thGrid(iTh)),2);
+                  funcPh = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
+               }
+               rNLComp.addProfile(funcR*funcTh*funcPh, iTh, iR);
+            }
+         }
       } else
       {
          throw Exception("Unknown exact state");
