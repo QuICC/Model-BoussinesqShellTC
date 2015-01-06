@@ -45,16 +45,65 @@ def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
         mat = mat.tocsr()
     return radbc.constrain(mat, bc)
 
-def d1(nr, a, b, bc, coeff = 1.0):
+def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
+    """Create operator for x^2 multiplication"""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = -1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2/4.0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b
+
+    # Generate diagonal
+    def d0(n):
+        return (a**2 + 2.0*b**2)/2.0
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return d_1(n)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return d_2(n)
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    if zr > 0:
+        mat = mat.tolil()
+        mat[-zr:,:] = 0
+        mat = mat.tocsr()
+    return radbc.constrain(mat, bc)
+
+def d1(nr, a, b, bc, coeff = 1.0, zr = 1):
     """Create operator for 1st derivative"""
 
     row = [2*j for j in range(0,nr)]
     mat = spsp.lil_matrix((nr,nr))
     for i in range(0,nr-1):
         mat[i,i+1:nr:2] = row[i+1:nr:2]
+    mat[-zr:,:] = 0
 
-    mat = coeff*(1/a)*mat
-    return radbc.constrain(mat, bc)
+    mat = coeff*(1.0/a)*mat
+    return radbc.constrain(mat, bc, location = 'b')
+
+def d2(nr, a, b, bc, coeff = 1.0, zr = 2):
+    """Create operator for 2nd derivative"""
+
+    mat = spsp.lil_matrix((nr,nr))
+    for i in range(0,nr-2):
+        mat[i,i+2:nr:2] = [j*(j**2 - i**2) for j in range(0,nr)][i+2:nr:2]
+    mat[-zr:,:] = 0
+
+    mat = coeff*(1.0/a**2)*mat
+    return radbc.constrain(mat, bc, location = 'b')
 
 def i1(nr, a, b, bc, coeff = 1.0):
     """Create operator for 1st integral T_n(x)."""
@@ -72,6 +121,31 @@ def i1(nr, a, b, bc, coeff = 1.0):
         return -d_1(n)
 
     ds = [d_1, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3,2)
+    nzrow = 1
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2/(4.0*n*(n - 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return -a**2/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return d_2(n+1.0)
+
+    ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)

@@ -8,6 +8,62 @@ import sympy
 import geomhdiscc.recurrence.symbolic as symbolic
 
 
+def x1():
+    """Spherical shell x multiplication operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':1, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def x2():
+    """Spherical shell x^2 multiplication operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':2, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i1():
+    """Spherical shell first integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':0, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2():
+    """Spherical shell second integral operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':0, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2x2():
     """Spherical shell second integral of x^2 operator"""
 

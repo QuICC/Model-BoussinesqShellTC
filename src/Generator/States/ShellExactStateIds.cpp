@@ -32,7 +32,7 @@ namespace Equations {
       MHDFloat re = amplitude.real();
       MHDFloat im = amplitude.imag();
 
-      Array sph_harm = re*(static_cast<MHDFloat>(m)*phi).array().cos() + im*(static_cast<MHDFloat>(m)*phi).array().sin();
+      Array sph_harm = 2.0*re*(static_cast<MHDFloat>(m)*phi).array().cos() + 2.0*im*(static_cast<MHDFloat>(m)*phi).array().sin();
       #if defined GEOMHDISCC_SHNORM_SCHMIDT
          // Schmidt quasi-normalized spherical harmonic Y_l^m
          MHDFloat leg = std::tr1::sph_legendre(l, m, theta)*std::sqrt(4.0*Math::PI/static_cast<MHDFloat>(2*l + 1));
