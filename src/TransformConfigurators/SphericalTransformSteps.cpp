@@ -200,16 +200,16 @@ namespace TransformSteps {
       {
          transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SET));
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::SUB));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIVSINLL1, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::ADD));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SUB));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIVSINLL1, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::ADD));
       }
 
       if(req.find(FieldComponents::Physical::PHI)->second)
       {
          transform.push_back(ProjectorBranch(FieldComponents::Spectral::TOR, ProjectorBranch::Proj1DType::DIVRDIFFR, ProjectorBranch::Proj2DType::DIVSIN, ProjectorBranch::Proj3DType::DIFF, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::SET));
 
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::ADD));
-         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFFLL1, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::THETA, FieldType::CURL, Arithmetics::SUB));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::RADLAPL, ProjectorBranch::Proj2DType::DIFF, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::ADD));
+         transform.push_back(ProjectorBranch(FieldComponents::Spectral::POL, ProjectorBranch::Proj1DType::DIVR2, ProjectorBranch::Proj2DType::DIFFLL1, ProjectorBranch::Proj3DType::PROJ, FieldComponents::Physical::PHI, FieldType::CURL, Arithmetics::SUB));
       }
 
       return transform;

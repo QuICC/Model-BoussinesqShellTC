@@ -49,7 +49,37 @@ def d1(nr, a, b, rg):
     A = shell.d1(nr, a, b, shell.radbc.no_bc())
     sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
     ssol = sy.diff(sphys,x)
+    test_forward(A, sphys, ssol, rg, 1)
+
+def d2(nr, a, b, rg):
+    """Accuracy test for d^2 operator"""
+
+    print("d2:")
+    x = sy.Symbol('x')
+    A = shell.d2(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.diff(sphys,x,x)
     test_forward(A, sphys, ssol, rg, 2)
+
+def x1(nr, a, b, rg):
+    """Accuracy test for x1 operator"""
+
+    print("x1:")
+    x = sy.Symbol('x')
+    A = shell.x1(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(x*sphys)
+    test_forward(A, sphys, ssol, rg, 0)
+
+def x2(nr, a, b, rg):
+    """Accuracy test for x^2 operator"""
+
+    print("x2:")
+    x = sy.Symbol('x')
+    A = shell.x2(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(x*x*sphys)
+    test_forward(A, sphys, ssol, rg, 0)
 
 def i2x1(nr, a, b, rg):
     """Accuracy test for i2x1 operator"""
@@ -172,6 +202,9 @@ if __name__ == "__main__":
     # run tests
     #zblk(nr, a, b, rg)
     d1(nr, a, b, rg)
+    d2(nr, a, b, rg)
+    x1(nr, a, b, rg)
+    x2(nr, a, b, rg)
     i2x1(nr, a, b, rg)
     i2x2d1(nr, a, b, rg)
     i2x2(nr, a, b, rg)

@@ -98,7 +98,7 @@ namespace Transform {
 
                   // Extract unique 3D operators
                   std::map<ProjectorTree::Proj3DId, int> op3D;
-                  std::map<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
+                  std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> > op3DPhys;
                   std::pair<std::map<ProjectorTree::Proj3DId,int>::iterator,bool> op3DPairIt;
                   for(branchIt = nameIt->second.begin(); branchIt != nameIt->second.end(); ++branchIt)
                   {
@@ -112,16 +112,22 @@ namespace Transform {
 
                   // Create 3D edges
                   std::map<ProjectorTree::Proj3DId,int>::const_iterator op3DIt;
+                  std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator op3DPhysIt;
+                  std::pair<std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator,std::multimap<ProjectorTree::Proj3DId, std::tr1::tuple<FieldComponents::Physical::Id,FieldType::Id,Arithmetics::Id> >::iterator> op3DPhysRange;
                   for(op3DIt = op3D.begin(); op3DIt != op3D.end(); ++op3DIt)
                   {
-                     ProjectorTree::Projector3DEdge &rEdge3D = rEdge2D.addEdge(op3DIt->first, op3DIt->second);
+                     op3DPhysRange = op3DPhys.equal_range(op3DIt->first);
+                     for(op3DPhysIt = op3DPhysRange.first; op3DPhysIt != op3DPhysRange.second; ++op3DPhysIt)
+                     {
+                        ProjectorTree::Projector3DEdge &rEdge3D = rEdge2D.addEdge(op3DIt->first, op3DIt->second);
 
-                     rEdge3D.setPhysical(std::tr1::get<0>(op3DPhys.find(op3DIt->first)->second), std::tr1::get<1>(op3DPhys.find(op3DIt->first)->second), std::tr1::get<2>(op3DPhys.find(op3DIt->first)->second));
-                     DebuggerMacro_showValue("Edge operator: ", 5, op3DIt->first);
-                     DebuggerMacro_showValue("Edge weight: ", 5, op3DIt->second);
-                     DebuggerMacro_showValue("Physical component: ", 6, rEdge3D.physId());
-                     DebuggerMacro_showValue("Field type: ", 6, rEdge3D.fieldId());
-                     DebuggerMacro_showValue("Arithmetic: ", 6, rEdge3D.arithId());
+                        rEdge3D.setPhysical(std::tr1::get<0>(op3DPhysIt->second), std::tr1::get<1>(op3DPhysIt->second), std::tr1::get<2>(op3DPhysIt->second));
+                        DebuggerMacro_showValue("Edge operator: ", 5, op3DIt->first);
+                        DebuggerMacro_showValue("Edge weight: ", 5, op3DIt->second);
+                        DebuggerMacro_showValue("Physical component: ", 6, rEdge3D.physId());
+                        DebuggerMacro_showValue("Field type: ", 6, rEdge3D.fieldId());
+                        DebuggerMacro_showValue("Arithmetic: ", 6, rEdge3D.arithId());
+                     }
                   }
                }
             }

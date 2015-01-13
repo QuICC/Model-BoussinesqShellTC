@@ -484,9 +484,9 @@ namespace Transform {
          throw Exception("DIVRDIFFR operator is not yet implemented");
 
       // Compute laplacian projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         throw Exception("LAPL operator is not yet implemented");
+         throw Exception("RADLAPL operator is not yet implemented");
       }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
@@ -644,6 +644,17 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize()).real();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
@@ -653,11 +664,27 @@ namespace Transform {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2 of real part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
       #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R differentiation of real part
+      // Compute 1/r D r projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute radial laplacian projection of real part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize()).real();
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of real part
@@ -675,15 +702,29 @@ namespace Transform {
       rPhysVal.real() = this->mTmpOut;
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R
+      // Compute division by R for real part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
          rPhysVal.real() = this->mDivR.asDiagonal()*rPhysVal.real();
 
-      // Compute 1/r D r projection
+      // Compute division by R^2 for real part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal.real() = this->mDivR2.asDiagonal()*rPhysVal.real();
+
+      // Compute 1/r D r projection for real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+         rPhysVal.real() += this->mDivR.asDiagonal()*this->mTmpOut;
+
+      // Compute radial laplacian projection for real part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         // Compute 2.0*D/r part of real part
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
          this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
          fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
          rPhysVal.real() += this->mDivR.asDiagonal()*this->mTmpOut;
@@ -695,6 +736,11 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute laplacian projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         throw Exception("RADLAPL operator is not yet implemented");
       }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
@@ -710,6 +756,18 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
+      // Compute second derivative by R of imaginary part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize()).imag();
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            this->mTmpInS.topRows(1).setZero();
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
@@ -719,11 +777,27 @@ namespace Transform {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
+      #if defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Compute division by R^2 of imaginary part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+
       #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R differentiation of imaginary part
+      // Compute 1/r D r projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+
+      #if defined GEOMHDISCC_TRANSOP_FORWARD
+      // Compute radial laplacian projection of imaginary part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff2*chebVal.topRows(this->mspSetup->specSize()).imag();
       #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       // Compute simple projection of imaginary part
@@ -741,15 +815,29 @@ namespace Transform {
       rPhysVal.imag() = this->mTmpOut;
 
       #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R
+      // Compute division by R for imaginary part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
          rPhysVal.imag() = this->mDivR.asDiagonal()*rPhysVal.imag();
 
-      // Compute 1/r D r projection
+      // Compute division by R^2 for imaginary part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         rPhysVal.imag() = this->mDivR2.asDiagonal()*rPhysVal.imag();
+
+      // Compute 1/r D r projection for imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+         rPhysVal.imag() += this->mDivR.asDiagonal()*this->mTmpOut;
+
+      // Compute radial laplacian projection for imaginary part
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         // Compute 2.0*D/r part of real part
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
          this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
          fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
          rPhysVal.imag() += this->mDivR.asDiagonal()*this->mTmpOut;
@@ -761,6 +849,11 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
          throw Exception("DIVRDIFFR operator is not yet implemented");
+
+      // Compute laplacian projection
+      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         throw Exception("RADLAPL operator is not yet implemented");
       }
       #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }

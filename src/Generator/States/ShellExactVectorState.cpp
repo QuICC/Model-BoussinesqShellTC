@@ -228,19 +228,19 @@ namespace Equations {
                // Poloidal part
                if(compId == FieldComponents::Physical::R)
                {
-                  funcR = 15.0*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcR = -15.0*std::sqrt(35.0/Math::PI)*std::pow(rGrid(iR),2)*(1.0 + rGrid(iR));
                   funcTh = std::cos(thGrid(iTh))*std::pow(std::sin(thGrid(iTh)),3);
-                  funcPh = -(3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
+                  funcPh = (3.0*phGrid).array().cos() - (3.0*phGrid).array().sin();
 
                } else if(compId == FieldComponents::Physical::THETA)
                {
-                  funcR = -(3.0/4.0)*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcR = -(3.0/4.0)*std::sqrt(35.0/Math::PI)*std::pow(rGrid(iR),2)*(4.0 + 5.0*rGrid(iR));
                   funcTh = (1.0 + 2.0*std::cos(2.0*thGrid(iTh)))*std::pow(std::sin(thGrid(iTh)),2);
                   funcPh = (3.0*phGrid).array().cos() - (3.0*phGrid).array().sin();
 
                } else if(compId == FieldComponents::Physical::PHI)
                {
-                  funcR = (9.0/4.0)*std::sqrt(35.0/Math::PI)/rGrid(iR);
+                  funcR = (9.0/4.0)*std::sqrt(35.0/Math::PI)*std::pow(rGrid(iR),2)*(4.0 + 5.0*rGrid(iR));
                   funcTh = std::cos(thGrid(iTh))*std::pow(std::sin(thGrid(iTh)),2);
                   funcPh = (3.0*phGrid).array().cos() + (3.0*phGrid).array().sin();
                }
