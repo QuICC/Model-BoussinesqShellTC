@@ -1,6 +1,6 @@
 /** 
- * @file BoussinesqTCShellModel.cpp
- * @brief Source of the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)
+ * @file BoussinesqDynamoShellModel.cpp
+ * @brief Source of the Boussinesq thermal convection dynamo in a spherical shell (Toroidal/Poloidal formulation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqTCShellModel.hpp"
+#include "PhysicalModels/BoussinesqDynamoShellModel.hpp"
 
 // Project includes
 //
@@ -24,8 +24,9 @@
 #include "IoVariable/StateFileWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqTCShellTransport.hpp"
-#include "Equations/Shell/Boussinesq/BoussinesqTCShellMomentum.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.hpp"
+#include "Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -37,20 +38,23 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqTCShellModel::PYMODULE = "boussinesq_tcshell";
+   const std::string BoussinesqDynamoShellModel::PYMODULE = "boussinesq_dynamoshell";
 
-   const std::string BoussinesqTCShellModel::PYCLASS = "BoussinesqTCShell";
+   const std::string BoussinesqDynamoShellModel::PYCLASS = "BoussinesqDynamoShell";
 
-   void BoussinesqTCShellModel::addEquations(SharedSimulation spSim)
+   void BoussinesqDynamoShellModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
-      spSim->addScalarEquation<Equations::BoussinesqTCShellTransport>();
+      spSim->addScalarEquation<Equations::BoussinesqDynamoShellTransport>();
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqTCShellMomentum>();
+      spSim->addVectorEquation<Equations::BoussinesqDynamoShellMomentum>();
+      
+      // Add induction equation
+      spSim->addVectorEquation<Equations::BoussinesqDynamoShellInduction>();
    }
 
-   void BoussinesqTCShellModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqDynamoShellModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -59,18 +63,49 @@ namespace GeoMHDiSCC {
          Equations::SharedShellExactScalarState spScalar;
          Equations::SharedShellExactVectorState spVector;
 
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
-
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::ShellExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
+         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
          tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
          spScalar->setHarmonicOptions(tSH);
 
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
+         switch(1)
+         {
+            case 0:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::TORPOLT11P11);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::TORPOLT11P11);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::TORPOLT11P11);
+               break;
+
+            case 1:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::TORPOLT54P43);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::TORPOLT54P43);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::TORPOLT54P43);
+               break;
+
+            case 2:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(3,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::R, tSH);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::THETA, tSH);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::PHI, tSH);
+         }
+
+         // Add magnetic initial state generator
+         spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
+         spVector->setIdentity(PhysicalNames::MAGNETIC);
          switch(1)
          {
             case 0:
@@ -107,9 +142,15 @@ namespace GeoMHDiSCC {
          Equations::SharedRandomScalarState spScalar;
          Equations::SharedRandomVectorState spVector;
 
-         // Add scalar random initial state generator 
+         // Add velocity random initial state generator 
          spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+
+         // Add magnetic random initial state generator 
+         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
+         spVector->setIdentity(PhysicalNames::MAGNETIC);
          spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
          spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
 
@@ -123,10 +164,11 @@ namespace GeoMHDiSCC {
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::MAGNETIC);
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqTCShellModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqDynamoShellModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -142,14 +184,20 @@ namespace GeoMHDiSCC {
       spVector->setFields(true, false, true);
       spVector->setIdentity(PhysicalNames::VELOCITY);
 
+      // Add magnetic field visualization
+      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setFields(true, false, true);
+      spVector->setIdentity(PhysicalNames::MAGNETIC);
+
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::VELOCITY);
+      spOut->expect(PhysicalNames::MAGNETIC);
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqTCShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqDynamoShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -157,12 +205,13 @@ namespace GeoMHDiSCC {
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
       spIn->expect(PhysicalNames::VELOCITY);
+      spIn->expect(PhysicalNames::MAGNETIC);
 
       // Set simulation state
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqTCShellModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqDynamoShellModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -171,7 +220,7 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqTCShellModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqDynamoShellModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -186,7 +235,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqTCShellModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqDynamoShellModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

@@ -64,15 +64,40 @@ namespace GeoMHDiSCC {
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
          spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
          std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
-         tSH.push_back(std::tr1::make_tuple(23,9,MHDComplex(1,1)));
+         tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
          spScalar->setHarmonicOptions(tSH);
 
          // Add temperature initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::CONSTANT);
-         spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::CONSTANT);
-         spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::CONSTANT);
+         switch(1)
+         {
+            case 0:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::TORPOLT11P11);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::TORPOLT11P11);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::TORPOLT11P11);
+               break;
+
+            case 1:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::TORPOLT54P43);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::TORPOLT54P43);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::TORPOLT54P43);
+               break;
+
+            case 2:
+               spVector->setStateType(FieldComponents::Physical::R, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(3,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::R, tSH);
+               spVector->setStateType(FieldComponents::Physical::THETA, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::THETA, tSH);
+               spVector->setStateType(FieldComponents::Physical::PHI, Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               spVector->setHarmonicOptions(FieldComponents::Physical::PHI, tSH);
+         }
 
       // Generate random spectrum
       } else

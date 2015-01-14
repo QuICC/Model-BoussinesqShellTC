@@ -29,6 +29,9 @@ def sh_coeff(coeff):
     if coeff == 'laplh':
         def fct(x):
             return x*(x + 1.0)
+    elif coeff == 'laplh_1':
+        def fct(x):
+            return 1.0/(x*(x + 1.0))
     else:
         def fct(x):
             return 1.0
