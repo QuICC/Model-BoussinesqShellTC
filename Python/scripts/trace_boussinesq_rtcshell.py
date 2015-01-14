@@ -30,7 +30,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = True
 write_mtx = True
-solve_evp = True
+solve_evp = False
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:

@@ -24,6 +24,7 @@ def constrain(mat, bc, location = 't'):
         bc_mat = apply_tau(mat, bc, location = location)
     elif bc[0] < 0:
         bc_mat = apply_galerkin(mat, bc)
+        bc['rt'] = bc['r']
     else:
         bc_mat = mat
 
@@ -241,11 +242,33 @@ def tau_value_diff2(nr, pos, coeffs = None):
 
     return np.array(cond)
 
+def stencil(nx, bc):
+    """Create a Galerkin stencil matrix"""
+
+    if bc[0] == -10:
+        mat = stencil_value(nx, 1)
+    elif bc[0] == -11:
+        mat = stencil_value(nx, -1)
+    elif bc[0] == -12:
+        mat = stencil_value(nx, 1)
+    elif bc[0] == -13:
+        mat = stencil_value(nx, -1)
+    elif bc[0] == -20:
+        mat = stencil_value(nx, 0)
+    elif bc[0] == -21:
+        mat = stencil_diff(nx, 0)
+    elif bc[0] == -40:
+        mat = stencil_value_diff(nx, 0)
+    elif bc[0] == -41:
+        mat = stencil_value_diff2(nx, 0)
+
+    return mat
+
 def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nr = mat.shape[0]
-    mat = mat*stencil(nr, parity, bc)
+    mat = mat*stencil(nr, bc)
     return mat
 
 def restrict_eye(nr, t, q):
@@ -273,6 +296,156 @@ def restrict_eye(nr, t, q):
         ncols = nr - q
 
     return spsp.diags(diags, offsets, (nrows, ncols))
+
+def stencil_value(nr, pos):
+    """Create stencil matrix for a zero boundary value"""
+
+    ns = np.arange(0,nr,1)
+    if pos == 0:
+        offsets = [-2, 0]
+        sgn = -1.0
+    else:
+        offsets = [-1, 0]
+        sgn = -pos 
+
+    # Generate subdiagonal
+    def d_1(n):
+        return galerkin_c(n+offsets[0])*sgn
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_diff(nr, pos):
+    """Create stencil matrix for a zero 1st derivative"""
+
+    ns = np.arange(0,nr,1)
+    if pos == 0:
+        offsets = [-2, 0]
+        sgn = -1.0
+    else:
+        offsets = [-1, 0]
+        sgn = -pos 
+
+    # Generate subdiagonal
+    def d_1(n):
+        return sgn*(n+offsets[0])**2/n**2
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_diff2(nr, pos):
+    """Create stencil matrix for a zero 2nd derivative"""
+
+    ns = np.arange(0,nr,1)
+    if pos == 0:
+        offsets = [-2, 0]
+
+        # Generate subdiagonal
+        def d_1(n):
+            return -(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
+
+    else:
+        offsets = [-1, 0]
+
+        # Generate subdiagonal
+        def d_1(n):
+            return -pos*(n - 2.0)*(n - 1.0)/(n*(n + 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_value_diff(nr, pos):
+    """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
+
+    ns = np.arange(0,nr,1)
+    if pos == 0:
+        offsets = [-4, -2, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            return (n - 3.0)/(n - 1.0)
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            return -2.0*n/(n + 1.0)
+
+    else:
+        offsets = [-2, -1, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            return (2.0*n - 3.0)/(2.0*n - 1.0)
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            return -pos*4.0*n/(2.0*n + 1.0)
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_2, d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_value_diff2(nr, pos):
+    """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
+
+    ns = np.arange(0,nr,1)
+    if pos == 0:
+        offsets = [-4, -2, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            return (n - 3.0)*(2.0*n**2 - 12.0*n + 19.0)/((n - 1.0)*(2*n**2 - 4.0*n + 3.0))
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            return -2.0*n*(2.0*n**2 + 7.0)/((n + 1.0)*(2.0*n**2 + 4.0*n + 3.0))
+
+    else:
+        offsets = [-2, -1, 0]
+
+        # Generate 2nd subdiagonal
+        def d_2(n):
+            return (n - 3.0)*(2.0*n - 3.0)/(n*(2.0*n - 1.0))
+
+        # Generate 1st subdiagonal
+        def d_1(n):
+            return -pos*2.0*(2*.0*n**2 + 1.0)/((n + 1.0)*(2.0*n + 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_2, d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
 
 def tau_c(n):
     """Compute the chebyshev normalisation c factor"""

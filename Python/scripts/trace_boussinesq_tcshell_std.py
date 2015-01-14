@@ -1,22 +1,22 @@
-"""Script to run a marginal curve trace for the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation) without compled field coupling"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_tcshell as mod
+import geomhdiscc.model.boussinesq_tcshell_std as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqTCShell()
+model = mod.BoussinesqTCShellStd()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-l = 0
-m = 9
-res = [20, m+20, 0]
-eigs = [l, m]
-eq_params = {'prandtl':1, 'rayleigh':4.761e5, 'ro':1, 'rratio':0.35}
-eq_params = {'prandtl':1, 'rayleigh':1.02e5, 'ro':1, 'rratio':0.35}
+res = [20, 0, 0]
+#l = 1; eq_params = {'prandtl':1, 'rayleigh':1.645e4, 'ro':1, 'rratio':0.2}
+l = 1; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.3} #NS/NS
+#l = 1; eq_params = {'prandtl':1, 'rayleigh':8.4791e3, 'ro':1, 'rratio':0.3} #SF/SF
+#l = 1; eq_params = {'prandtl':1, 'rayleigh':4.183202e4, 'ro':1, 'rratio':0.5} #SF/SF
+eigs = [l]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
@@ -29,9 +29,9 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = True
-write_mtx = True
-solve_evp = False
+show_spy = False
+write_mtx = False
+solve_evp = True
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
@@ -67,19 +67,18 @@ if show_solution:
     viz_mode = 0
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    nL = res[1]-m+1
-    sol_tor = evp_vec[0:res[0]*nL,viz_mode]
-    sol_pol = evp_vec[res[0]*nL:2*res[0]*nL,viz_mode]
-    sol_t = evp_vec[2*res[0]*nL:3*res[0]*nL,viz_mode]
+    if model.use_galerkin:
+        sol_pol = evp_vec[0:res[0]-4,viz_mode]
+        sol_t = evp_vec[res[0]-4:,viz_mode]
+    else:
+        sol_pol = evp_vec[0:res[0],viz_mode]
+        sol_t = evp_vec[res[0]:2*res[0],viz_mode]
     
     # Create spectrum plots
-    pl.subplot(1,3,1)
-    pl.semilogy(np.abs(sol_tor))
-    pl.title("Toroidal")
-    pl.subplot(1,3,2)
+    pl.subplot(1,2,1)
     pl.semilogy(np.abs(sol_pol))
     pl.title("Poloidal")
-    pl.subplot(1,3,3)
+    pl.subplot(1,2,2)
     pl.semilogy(np.abs(sol_t))
     pl.title("T")
     pl.show()
