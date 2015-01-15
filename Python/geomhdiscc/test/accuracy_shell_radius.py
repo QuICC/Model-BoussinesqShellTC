@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import sympy as sy
 import numpy as np
 import scipy.sparse as spsp
+import scipy.sparse.linalg as spsplin
 
 import geomhdiscc.transform.shell as transf
 import geomhdiscc.geometry.spherical.shell_radius as shell
@@ -30,6 +31,34 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     if np.max(err[q:]) > 10*np.spacing(1):
         print(err)
     print("\t\tMax forward error: " + str(np.max(err[q:])))
+
+def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
+    """Perform a tau backward operation test"""
+
+    x = sy.Symbol('x')
+    rhs = transf.torcheb(x_to_phys(res_expr,grid))
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    sol = transf.torcheb(x_to_phys(sol_expr,grid))
+    err = np.abs(lhs - sol)
+    relerr = err/(1.0 + np.abs(sol))
+    if np.max(err) > 10*np.spacing(1):
+        print(err)
+    print("\t\tMax tau backward error: " + str(np.max(err)))
+    if np.max(relerr) > 10*np.spacing(1):
+        print(relerr)
+    print("\t\tMax tau backward relative error: " + str(np.max(relerr)))
+
+def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
+    """Perform a galerkin backward operation test"""
+
+    print("\tBackward galkerin test")
+    x = sy.Symbol('x')
+    rhs = transf.torcheb(x_to_phys(res_expr,grid))
+    lhs = spsplin.spsolve(opA,opB*rhs)
+    sol = transf.torcheb(x_to_phys(sol_expr,grid))
+    err = np.abs(opS*lhs - sol)
+    vis_error(err, 'Galerkin backward error')
+    print("\t\tMax galerkin backward error: " + str(np.max(err)))
 
 def zblk(nr, a, b, rg):
     """Accuracy test for zblk operator"""
@@ -126,6 +155,18 @@ def i2x2lapl(nr, a, b, rg):
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
+    print("\tbc = 20:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:20}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    print(rg)
+    print([a+b,-a+b])
+    ssol = sy.expand((x-(a+b))*(x-(-a+b))*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-2,1)]))
+    #sphys = sy.expand(x**2*sy.diff(ssol,x,x) + 2*x*sy.diff(ssol,x) - l*(l+1)*ssol)
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
 def i4x3(nr, a, b, rg):
     """Accuracy test for i4x3 operator"""
 
@@ -201,17 +242,17 @@ if __name__ == "__main__":
 
     # run tests
     #zblk(nr, a, b, rg)
-    d1(nr, a, b, rg)
-    d2(nr, a, b, rg)
-    x1(nr, a, b, rg)
-    x2(nr, a, b, rg)
-    i2x1(nr, a, b, rg)
-    i2x2d1(nr, a, b, rg)
-    i2x2(nr, a, b, rg)
+#    d1(nr, a, b, rg)
+#    d2(nr, a, b, rg)
+#    x1(nr, a, b, rg)
+#    x2(nr, a, b, rg)
+#    i2x1(nr, a, b, rg)
+#    i2x2d1(nr, a, b, rg)
+#    i2x2(nr, a, b, rg)
     i2x2lapl(nr, a, b, rg)
-    i4x3(nr, a, b, rg)
-    i4x4d1(nr, a, b, rg)
-    i4x4(nr, a, b, rg)
-    i4x4lapl(nr, a, b, rg)
-    i4x4lapl2(nr, a, b, rg)
-    qid(nr, a, b, rg)
+#    i4x3(nr, a, b, rg)
+#    i4x4d1(nr, a, b, rg)
+#    i4x4(nr, a, b, rg)
+#    i4x4lapl(nr, a, b, rg)
+#    i4x4lapl2(nr, a, b, rg)
+#    qid(nr, a, b, rg)

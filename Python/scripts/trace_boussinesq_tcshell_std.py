@@ -7,7 +7,7 @@ import geomhdiscc.model.boussinesq_tcshell_std as mod
 # Create the model and activate linearization
 model = mod.BoussinesqTCShellStd()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
@@ -30,7 +30,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = False
+write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)
 
