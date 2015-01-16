@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -7,18 +7,18 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell as shell
+import geomhdiscc.geometry.spherical.shell_radius as shell
 import geomhdiscc.base.base_model as base_model
-from geomhdiscc.geometry.spherical.shell_boundary import no_bc
+from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
 
-class BoussinesqTCShell(base_model.BaseModel):
-    """Class to setup the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
+class BoussinesqRTCShellStd(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio"]
+        return ["taylor", "prandtl", "rayleigh", "ro", "rratio"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -33,21 +33,34 @@ class BoussinesqTCShell(base_model.BaseModel):
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        fields =  []
 
         return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
+    
+        if self.linearize:
+            if field_row == ("velocity","pol") or field_row == ("temperature",""):
+                fields = [("velocity","pol"),("temperature","")]
+            else:
+                fields = [field_row]
 
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
+        else:
+            # fields are only coupled to themselves
+            fields = [field_row]
 
         return fields
 
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        if field_row == ("velocity","tor"):
+            fields = []
+        elif field_row == ("velocity","pol"):
+            fields = [("temperature","")]
+        elif field_row == ("temperature",""):
+            fields = [("velocity","pol")]
 
         return fields
 
@@ -83,7 +96,7 @@ class BoussinesqTCShell(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, SINGLE
+        # Index mode: SLOWEST, MODE
         index_mode = self.SLOWEST
 
         # Compute block info
@@ -194,18 +207,17 @@ class BoussinesqTCShell(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        m = eigs[1]
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i4x4(res[0], a, b, bc)
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         return mat
 
@@ -214,63 +226,53 @@ class BoussinesqTCShell(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
+        T = Ta**0.5
 
-        m = eigs[1]
+        l = eigs[0]
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
-
-            elif field_col == ("velocity","pol"):
-                mat = shell.zblk(res[0], res[1], m, bc)
-
-            elif field_col == ("temperature",""):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc)
 
         elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
-
-            elif field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            if field_col == ("velocity","pol"):
+                mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh')
+                mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
-
-            elif field_col == ("velocity","pol"):
+            if field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
                 else:
-                    mat = shell.zblk(res[0], res[1], m, bc)
+                    mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1/Pr)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1/Pr)
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        m = eigs[1]
+        l = eigs[0]
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         return mat

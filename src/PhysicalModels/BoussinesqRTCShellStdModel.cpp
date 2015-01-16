@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqRTCShellModel.cpp
+ * @file BoussinesqRTCShellStdModel.cpp
  * @brief Source of the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqRTCShellModel.hpp"
+#include "PhysicalModels/BoussinesqRTCShellStdModel.hpp"
 
 // Project includes
 //
@@ -37,11 +37,11 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqRTCShellModel::PYMODULE = "boussinesq_rtcshell_std";
+   const std::string BoussinesqRTCShellStdModel::PYMODULE = "boussinesq_rtcshell_std";
 
-   const std::string BoussinesqRTCShellModel::PYCLASS = "BoussinesqRTCShellStd";
+   const std::string BoussinesqRTCShellStdModel::PYCLASS = "BoussinesqRTCShellStd";
 
-   void BoussinesqRTCShellModel::addEquations(SharedSimulation spSim)
+   void BoussinesqRTCShellStdModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqRTCShellTransport>();
@@ -50,7 +50,7 @@ namespace GeoMHDiSCC {
       spSim->addVectorEquation<Equations::BoussinesqRTCShellMomentum>();
    }
 
-   void BoussinesqRTCShellModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqRTCShellStdModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -125,7 +125,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRTCShellModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqRTCShellStdModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -148,7 +148,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqRTCShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqRTCShellStdModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -161,7 +161,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqRTCShellModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqRTCShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -170,7 +170,7 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqRTCShellModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqRTCShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -185,7 +185,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqRTCShellModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqRTCShellStdModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;

@@ -60,7 +60,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         elif field_row == ("velocity","pol"):
             fields = [("temperature","")]
         elif field_row == ("temperature",""):
-            fields = [("velocity","pol")]
+            fields = []
 
         return fields
 
@@ -80,9 +80,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
+        block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -227,8 +227,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
 
-        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
         l = eigs[0]
+
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
@@ -251,26 +252,25 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1/Pr)
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        Pr = eq_params['prandtl']
+        l = eigs[0]
 
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        l = eigs[0]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
             mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], a, b, bc, Pr)
+            mat = shell.i2x2(res[0], a, b, bc)
 
         return mat

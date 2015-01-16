@@ -67,9 +67,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
 
-        block_info = (tau_n, gal_n, (shift_x,0,0), 1)
+        block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
     def equation_info(self, res, field_row):
@@ -250,10 +250,10 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Pm = eq_params['magnetic_prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
         T = Ta**0.5
 
         m = eigs[1]
@@ -347,14 +347,12 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1/Pr)
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
-
-        Pr = eq_params['prandtl']
 
         m = eigs[1]
 
@@ -374,6 +372,6 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, Pr)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
 
         return mat

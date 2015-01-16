@@ -1,5 +1,5 @@
 /** 
- * @file BoussinesqDynamoShellModel.cpp
+ * @file BoussinesqDynamoShellStdModel.cpp
  * @brief Source of the Boussinesq thermal convection dynamo in a spherical shell (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "PhysicalModels/BoussinesqDynamoShellModel.hpp"
+#include "PhysicalModels/BoussinesqDynamoShellStdModel.hpp"
 
 // Project includes
 //
@@ -38,11 +38,11 @@
 
 namespace GeoMHDiSCC {
 
-   const std::string BoussinesqDynamoShellModel::PYMODULE = "boussinesq_dynamoshell_std";
+   const std::string BoussinesqDynamoShellStdModel::PYMODULE = "boussinesq_dynamoshell_std";
 
-   const std::string BoussinesqDynamoShellModel::PYCLASS = "BoussinesqDynamoShellStd";
+   const std::string BoussinesqDynamoShellStdModel::PYCLASS = "BoussinesqDynamoShellStd";
 
-   void BoussinesqDynamoShellModel::addEquations(SharedSimulation spSim)
+   void BoussinesqDynamoShellStdModel::addEquations(SharedSimulation spSim)
    {
       // Add transport equation
       spSim->addScalarEquation<Equations::BoussinesqDynamoShellTransport>();
@@ -54,7 +54,7 @@ namespace GeoMHDiSCC {
       spSim->addVectorEquation<Equations::BoussinesqDynamoShellInduction>();
    }
 
-   void BoussinesqDynamoShellModel::addStates(SharedStateGenerator spGen)
+   void BoussinesqDynamoShellStdModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
       if(true)
@@ -168,7 +168,7 @@ namespace GeoMHDiSCC {
       spGen->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamoShellModel::addVisualizers(SharedVisualizationGenerator spVis)
+   void BoussinesqDynamoShellStdModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spScalar;
@@ -197,7 +197,7 @@ namespace GeoMHDiSCC {
       spVis->addHdf5OutputFile(spOut);
    }
 
-   void BoussinesqDynamoShellModel::setVisualizationState(SharedVisualizationGenerator spVis)
+   void BoussinesqDynamoShellStdModel::setVisualizationState(SharedVisualizationGenerator spVis)
    {
       // Create and add initial state file to IO
       IoVariable::SharedStateFileReader spIn(new IoVariable::StateFileReader("4Visu", SchemeType::type(), SchemeType::isRegular()));
@@ -211,7 +211,7 @@ namespace GeoMHDiSCC {
       spVis->setInitialState(spIn);
    }
 
-   void BoussinesqDynamoShellModel::addAsciiOutputFiles(SharedSimulation spSim)
+   void BoussinesqDynamoShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Add ASCII output file
       //pSim->addOutputFile(AN_ASCIIFILE);
@@ -220,7 +220,7 @@ namespace GeoMHDiSCC {
       //pSim->addOutputFile(AN_ASCIIFILE);
    }
 
-   void BoussinesqDynamoShellModel::addHdf5OutputFiles(SharedSimulation spSim)
+   void BoussinesqDynamoShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
@@ -235,7 +235,7 @@ namespace GeoMHDiSCC {
       spSim->addHdf5OutputFile(spState);
    }
 
-   void BoussinesqDynamoShellModel::setInitialState(SharedSimulation spSim)
+   void BoussinesqDynamoShellStdModel::setInitialState(SharedSimulation spSim)
    {
       // Field IDs iterator
       std::vector<GeoMHDiSCC::PhysicalNames::Id>::const_iterator  it;
