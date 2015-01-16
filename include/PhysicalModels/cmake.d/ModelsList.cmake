@@ -17,8 +17,9 @@ set(MHDPhysicalModels
    BoussinesqTCShellModel.hpp
    BoussinesqTCShellStdModel.hpp
    BoussinesqRTCShellModel.hpp
-   #BoussinesqTCSphereModel.hpp
-   #BoussinesqRTCSphereModel.hpp
+   BoussinesqRTCShellStdModel.hpp
+   BoussinesqDynamoShellModel.hpp
+   BoussinesqDynamoShellStdModel.hpp
    )
 
 set(MHDTestModels 

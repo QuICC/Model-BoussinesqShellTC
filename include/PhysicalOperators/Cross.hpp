@@ -30,23 +30,23 @@ namespace Physical {
    /**
     * @brief Implementation of a generic vector cross product
     */
-   class Cross
+   template <FieldComponents::Physical::Id TFIRST,FieldComponents::Physical::Id TSECOND> class Cross
    {
       public:
          /**
           * @brief Set S to cross product component
           */
-         static void set(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add cross product component to S
           */
-         static void add(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract cross product component from S
           */
-         static void sub(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
          
       protected:
 
@@ -62,102 +62,48 @@ namespace Physical {
          ~Cross();
    };
 
-   inline void Cross::set(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TFIRST,FieldComponents::Physical::Id TSECOND> inline void Cross<TFIRST,TSECOND>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       { 
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.setData((v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::TWO):
-               rS.setData((v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::THREE):
-               rS.setData((v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array()).matrix()*c);
-               break;
-         }
+         rS.setData(c*(v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.subData(c*(v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       } else
       {
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.setData(v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array());
-               break;
-            case(FieldComponents::TWO):
-               rS.setData(v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array());
-               break;
-            case(FieldComponents::THREE):
-               rS.setData(v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array());
-               break;
-         }
+         rS.setData((v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.subData((v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       }
    }
 
-   inline void Cross::add(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TFIRST,FieldComponents::Physical::Id TSECOND> inline void Cross<TFIRST,TSECOND>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.addData((v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::TWO):
-               rS.addData((v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::THREE):
-               rS.addData((v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array()).matrix()*c);
-               break;
-         }
+         rS.addData(c*(v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.subData(c*(v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       } else
       {
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.addData(v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array());
-               break;
-            case(FieldComponents::TWO):
-               rS.addData(v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array());
-               break;
-            case(FieldComponents::THREE):
-               rS.addData(v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array());
-               break;
-         }
+         rS.addData((v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.subData((v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       }
    }
 
-   inline void Cross::sub(FieldComponents::Physical::Id id, Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TFIRST,FieldComponents::Physical::Id TSECOND> inline void Cross<TFIRST,TSECOND>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.subData((v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::TWO):
-               rS.subData((v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array()).matrix()*c);
-               break;
-            case(FieldComponents::THREE):
-               rS.subData((v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array()).matrix()*c);
-               break;
-         }
+         rS.subData(c*(v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.addData(c*(v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       } else
       {
-         switch(id)
-         {
-            case(FieldComponents::ONE):
-               rS.subData(v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::THREE).data().array() - v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array());
-               break;
-            case(FieldComponents::TWO):
-               rS.subData(v.comp(FieldComponents::Physical::THREE).data().array() * w.comp(FieldComponents::Physical::ONE).data().array() - v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::THREE).data().array());
-               break;
-            case(FieldComponents::THREE):
-               rS.subData(v.comp(FieldComponents::Physical::ONE).data().array() * w.comp(FieldComponents::Physical::TWO).data().array() - v.comp(FieldComponents::Physical::TWO).data().array() * w.comp(FieldComponents::Physical::ONE).data().array());
-               break;
-         }
+         rS.subData((v.comp(TFIRST).data().array() * w.comp(TSECOND).data().array()).matrix());
+
+         rS.addData((v.comp(TSECOND).data().array() * w.comp(TFIRST).data().array()).matrix());
       }
    }
 }

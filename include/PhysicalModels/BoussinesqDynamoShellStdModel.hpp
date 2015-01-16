@@ -1,11 +1,11 @@
 /** 
- * @file BoussinesqRTCShellModel.hpp
- * @brief Implementation of the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation)
+ * @file BoussinesqDynamoShellStdModel.hpp
+ * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef BOUSSINESQRTCSHELLMODEL_HPP
-#define BOUSSINESQRTCSHELLMODEL_HPP
+#ifndef BOUSSINESQDYNAMOSHELLSTDMODEL_HPP
+#define BOUSSINESQDYNAMOSHELLSTDMODEL_HPP
 
 // Configuration includes
 //
@@ -22,7 +22,7 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/SLFmScheme.hpp"
+#include "SpatialSchemes/3D/SLFlScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
 // GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
@@ -30,9 +30,9 @@
 namespace GeoMHDiSCC {
 
    /**
-    * @brief Implementation of the Boussinesq rotating thermal convection spherical shell model (Toroidal/Poloidal formulation)
+    * @brief Implementation of the Boussinesq thermal convection dynamo in a spherical shell model (Toroidal/Poloidal formulation) without coupled solve (standard implementation)
     */
-   class BoussinesqRTCShellModel
+   class BoussinesqDynamoShellStdModel
    {
       public:
          /// Typedef for the spatial scheme used
@@ -45,7 +45,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::SLFmScheme SchemeType;
+         typedef Schemes::SLFlScheme SchemeType;
 
          /**
           * @brief Add the required equations
@@ -102,12 +102,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Constructor
           */
-         BoussinesqRTCShellModel();
+         BoussinesqDynamoShellStdModel();
 
          /**
           * @brief Destructor
           */
-         ~BoussinesqRTCShellModel();
+         ~BoussinesqDynamoShellStdModel();
    };
 
 }
@@ -125,4 +125,4 @@ namespace GeoMHDiSCC {
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_TUBULAR
 
-#endif // BOUSSINESQRTCSHELLMODEL_HPP
+#endif // BOUSSINESQDYNAMOSHELLSTDMODEL_HPP

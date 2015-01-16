@@ -22,7 +22,7 @@
 #include "Simulation/Simulation.hpp"
 #include "Generator/StateGenerator.hpp"
 #include "Generator/VisualizationGenerator.hpp"
-#include "SpatialSchemes/3D/SLFScheme.hpp"
+#include "SpatialSchemes/3D/SLFmScheme.hpp"
 
 // THIS IS NOT A COMMENT BUT AND OPTION READ BY CMAKE
 // GEOMHDISCC_SPATIALSCHEME_FORMULATION = TORPOL;
@@ -45,7 +45,7 @@ namespace GeoMHDiSCC {
          static const std::string PYCLASS;
 
          /// Typedef for the spatial scheme used
-         typedef Schemes::SLFScheme SchemeType;
+         typedef Schemes::SLFmScheme SchemeType;
 
          /**
           * @brief Add the required equations

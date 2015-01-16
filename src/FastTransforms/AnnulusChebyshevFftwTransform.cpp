@@ -300,7 +300,7 @@ namespace Transform {
 
    void AnnulusChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, AnnulusChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
    {
-      assert(arithId == Arithmetics::SET)
+      assert(arithId == Arithmetics::SET);
 
       // Assert that a mixed transform was not setup
       assert(this->mspSetup->type() == FftSetup::REAL);

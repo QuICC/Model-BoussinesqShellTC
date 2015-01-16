@@ -69,7 +69,7 @@ namespace Equations {
          specId = FieldComponents::Spectral::Z;
       }
 
-      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys().comp(FieldComponents::Physical::X), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Y), this->unknown().dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(specId), 1.0/Pr);
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->unknown().dom(0).phys(), this->unknown().dom(0).grad(specId), 1.0/Pr);
    }
 
    void BoussinesqRB2DBoxVCMomentum::setRequirements()

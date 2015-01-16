@@ -18,7 +18,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "magnetic_prandtl", "ro", "rratio"]
+        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio"]
 
     def periodicity(self):
         """Get the domain periodicity"""

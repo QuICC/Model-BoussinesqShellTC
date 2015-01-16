@@ -53,7 +53,7 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)\theta\f$
       ///
-      Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::R), this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::THETA), this->vector(PhysicalNames::VELOCITY).dom(0).phys().comp(FieldComponents::Physical::Z), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqRBCylinderVCTransport::setRequirements()

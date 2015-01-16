@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "TypeSelectors/EquationEigenSelector.hpp"
+#include "PhysicalOperators/Cross.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -41,14 +41,37 @@ namespace Equations {
 
    void BoussinesqTCShellMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         int start = 1;
+      #else //if GEOMHDISCC_SPATIALSCHEME_SLFM
+         int start = 0;
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, true, false);
+
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, true, false);
    }
 
    void BoussinesqTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
-      throw Exception("Nonlinear term in spherical shell toroidal/poloidal Navier-Stokes equation not done yet");
+      ///
+      /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right)\f$
+      ///
+      switch(id)
+      {
+         case(FieldComponents::Physical::R):
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            break;
+         case(FieldComponents::Physical::THETA):
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            break;
+         case(FieldComponents::Physical::PHI):
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            break;
+         default:
+            assert(false);
+            break;
+      }
    }
 
    void BoussinesqTCShellMomentum::setRequirements()
@@ -60,7 +83,7 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add velocity to requirements: is scalar?, need spectral?, need physical?, need diff?(, need curl?)
-      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, false, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITY, FieldRequirement(false, true, true, false, true));
    }
 
 }

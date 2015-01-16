@@ -29,7 +29,7 @@ namespace Physical {
    /**
     * @brief Implementation of a generic primitive velocity heat advection
     */
-   template <FieldComponents::Physical::Id TXComp = FieldComponents::Physical::ONE, FieldComponents::Physical::Id TYComp = FieldComponents::Physical::TWO, FieldComponents::Physical::Id TZComp = FieldComponents::Physical::THREE> class VelocityHeatAdvection
+   template <FieldComponents::Physical::Id TONE = FieldComponents::Physical::ONE, FieldComponents::Physical::Id TTWO = FieldComponents::Physical::TWO, FieldComponents::Physical::Id TTHREE = FieldComponents::Physical::THREE> class VelocityHeatAdvection
    {
       public:
          /**
@@ -37,21 +37,21 @@ namespace Physical {
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Add primitive velocity advection heat product to S
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract primitive velocity heat advection product from S
           *
           *    \f$ \left(\vec u\cdot\nabla\right)q = u_x\partial_x q + u_y\partial_y q + u_z\partial_z q\f$
           */
-          static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
+          static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c = 1.0);
          
       protected:
 
@@ -67,60 +67,60 @@ namespace Physical {
          ~VelocityHeatAdvection();
    };
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityHeatAdvection<TXComp,TYComp,TZComp>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> void VelocityHeatAdvection<TONE,TTWO,TTHREE>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {
-         rS.setData(c*(uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.setData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
                                                                               
-         rS.addData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.addData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       } else
       {
-         rS.setData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.setData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
 
-         rS.addData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.addData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.addData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityHeatAdvection<TXComp,TYComp,TZComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> void VelocityHeatAdvection<TONE,TTWO,TTHREE>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {
-         rS.addData(c*(uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.addData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
                                                                               
-         rS.addData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.addData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.addData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       } else
       {
-         rS.addData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.addData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
 
-         rS.addData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.addData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.addData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.addData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp, FieldComponents::Physical::Id TZComp> void VelocityHeatAdvection<TXComp,TYComp,TZComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::PhysicalScalarType &uX, const Datatypes::PhysicalScalarType &uY, const Datatypes::PhysicalScalarType &uZ, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> void VelocityHeatAdvection<TONE,TTWO,TTHREE>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
       if(c != 1.0)
       {
-         rS.subData(c*(uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.subData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
                                                                               
-         rS.subData(c*(uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.subData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.subData(c*(uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.subData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       } else
       {
-         rS.subData((uX.data().array()*gradQ.comp(TXComp).data().array()).matrix());
+         rS.subData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
 
-         rS.subData((uY.data().array()*gradQ.comp(TYComp).data().array()).matrix());
+         rS.subData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
 
-         rS.subData((uZ.data().array()*gradQ.comp(TZComp).data().array() - uZ.data().array()).matrix());
+         rS.subData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array() - u.comp(TTHREE).data().array()).matrix());
       }
    }
 }
