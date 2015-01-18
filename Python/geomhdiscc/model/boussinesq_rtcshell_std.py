@@ -144,13 +144,13 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-22, 'r':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'r':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:21}
+                            bc = {0:22}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
                             bc = {0:41}
             
@@ -177,7 +177,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-22, 'r':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'r':0}
         

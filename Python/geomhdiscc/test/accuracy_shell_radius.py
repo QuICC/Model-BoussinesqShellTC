@@ -7,6 +7,7 @@ import sympy as sy
 import numpy as np
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
+import matplotlib.pylab as pl
 
 import geomhdiscc.transform.shell as transf
 import geomhdiscc.geometry.spherical.shell_radius as shell
@@ -56,9 +57,14 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     rhs = transf.torcheb(x_to_phys(res_expr,grid))
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.torcheb(x_to_phys(sol_expr,grid))
+    pl.plot(transf.torphys(sol))
+    pl.show()
+    pl.plot(transf.torphys(opS*lhs))
+    pl.show()
     err = np.abs(opS*lhs - sol)
-    vis_error(err, 'Galerkin backward error')
-    print("\t\tMax galerkin backward error: " + str(np.max(err)))
+    if np.max(err) > 10*np.spacing(1):
+        print(err)
+    print("\t\tMax tau backward error: " + str(np.max(err)))
 
 def zblk(nr, a, b, rg):
     """Accuracy test for zblk operator"""
@@ -160,12 +166,60 @@ def i2x2lapl(nr, a, b, rg):
     l = np.random.randint(1, nr)
     A = shell.i2x2lapl(nr, l, a, b, {0:20}).tocsr()
     B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
-    print(rg)
-    print([a+b,-a+b])
     ssol = sy.expand((x-(a+b))*(x-(-a+b))*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-2,1)]))
-    #sphys = sy.expand(x**2*sy.diff(ssol,x,x) + 2*x*sy.diff(ssol,x) - l*(l+1)*ssol)
     sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
     test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("\tbc = -20:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:-20, 'r':2}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = B[2:,:]
+    S = shell.radbc.stencil(nr, {0:-20, 'r':2}).tocsr()
+    ssol = sy.expand((x-(a+b))*(x-(-a+b))*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-2,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_galerkin(A, B, S, sphys, ssol, rg)
+
+    print("\tbc = 21:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:21}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("\tbc = -21:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:-21, 'r':2}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = B[2:,:]
+    S = shell.radbc.stencil(nr, {0:-21, 'r':2}).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_galerkin(A, B, S, sphys, ssol, rg)
+
+    print("\tbc = 22:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:22, 'c':{'a':a, 'b':b}}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("\tbc = -22:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i2x2lapl(nr, l, a, b, {0:-22, 'r':2, 'c':{'a':a, 'b':b}}).tocsr()
+    B = shell.i2x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = B[2:,:]
+    S = shell.radbc.stencil(nr, {0:-22, 'r':2, 'c':{'a':a, 'b':b}}).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x) + 2*sy.diff(ssol,x)/x - l*(l+1)*ssol/x**2)
+    test_backward_galerkin(A, B, S, sphys, ssol, rg)
 
 def i4x3(nr, a, b, rg):
     """Accuracy test for i4x3 operator"""
@@ -224,6 +278,46 @@ def i4x4lapl2(nr, a, b, rg):
     ssol = sy.integrate(ssol,x,x,x,x)
     test_forward(A, sphys, ssol, rg, 4)
 
+    print("\tbc = 40:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i4x4lapl2(nr, l, a, b, {0:40}).tocsr()
+    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("\tbc = -40:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i4x4lapl2(nr, l, a, b, {0:-40, 'r':4}).tocsr()
+    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = B[4:,:]
+    S = shell.radbc.stencil(nr, {0:-40, 'r':4}).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**2*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-4,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
+    test_backward_galerkin(A, B, S, sphys, ssol, rg)
+
+    print("\tbc = 41:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i4x4lapl2(nr, l, a, b, {0:41}).tocsr()
+    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**3*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-6,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
+    test_backward_tau(A, B, sphys, ssol, rg)
+
+    print("\tbc = -41:")
+    x = sy.Symbol('x')
+    l = np.random.randint(1, nr)
+    A = shell.i4x4lapl2(nr, l, a, b, {0:-41, 'r':4}).tocsr()
+    B = shell.i4x4(nr, a, b, shell.radbc.no_bc()).tocsr()
+    B = B[4:,:]
+    S = shell.radbc.stencil(nr, {0:-41, 'r':4}).tocsr()
+    ssol = sy.expand(((x-(a+b))*(x-(-a+b)))**3*np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr-3,1)]))
+    sphys = sy.expand(sy.diff(ssol,x,x,x,x) + 4*sy.diff(ssol,x,x,x)/x - 2*l*(l+1)*sy.diff(ssol,x,x)/x**2 + (l-1)*l*(l+1)*(l+2)*ssol/x**4)
+    test_backward_galerkin(A, B, S, sphys, ssol, rg)
+
 def qid(nr, a, b, xg):
     """Accuracy test for qid operator"""
 
@@ -236,7 +330,7 @@ def qid(nr, a, b, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 20
+    nr = 40
     a, b = shell.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
 
@@ -254,5 +348,5 @@ if __name__ == "__main__":
 #    i4x4d1(nr, a, b, rg)
 #    i4x4(nr, a, b, rg)
 #    i4x4lapl(nr, a, b, rg)
-#    i4x4lapl2(nr, a, b, rg)
+    i4x4lapl2(nr, a, b, rg)
 #    qid(nr, a, b, rg)

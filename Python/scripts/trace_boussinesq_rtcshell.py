@@ -16,7 +16,7 @@ m = 9
 res = [16, m+16, 0]
 eigs = [l, m]
 eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
+bc_vel = 1 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -29,8 +29,8 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = True
-write_mtx = True
-solve_evp = False
+write_mtx = False
+solve_evp = True
 show_solution = (True and solve_evp)
 
 if show_spy or show_solution:

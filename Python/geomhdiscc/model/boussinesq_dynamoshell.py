@@ -120,7 +120,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'r':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-23, 'r':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'r':0}
 
@@ -132,29 +132,21 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
                             bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
-                            bc = {0:40}
+                            bc = {0:23}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
 
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
-                    elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
-                    elif field_col == ("magnetic","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-22, 'r':0}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'r':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:21}
+                            bc = {0:22}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:41}
-                    elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
-                            bc = {0:21}
-                    elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
                             bc = {0:41}
             
             # Set LHS galerkin restriction
@@ -166,7 +158,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 elif field_row == ("magnetic","tor"):
                     bc['r'] = 2
                 elif field_row == ("magnetic","pol"):
-                    bc['r'] = 4
+                    bc['r'] = 2
                 elif field_row == ("temperature",""):
                     bc['r'] = 2
 
@@ -182,18 +174,14 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'r':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-23, 'r':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'r':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-22, 'r':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
-                    elif field_col == ("magnetic","tor"):
-                        bc = {0:-21, 'r':0}
-                    elif field_col == ("magnetic","pol"):
                         bc = {0:-41, 'r':0}
         
         # Field values to RHS:
@@ -240,7 +228,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)
 
         elif field_row == ("magnetic","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)
@@ -324,7 +312,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
             elif field_col == ("temperature",""):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -369,7 +357,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("magnetic","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)
