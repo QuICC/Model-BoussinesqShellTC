@@ -195,11 +195,11 @@ def tau_diff2(nx, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nx)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*(((-1.0)**i/3.0)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -228,15 +228,15 @@ def tau_integral(nx, pos, coeffs = None):
     c = next(it)
     if pos >= 0:
         tmp = np.zeros((1,nx))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
-        tmp[0,0] = tmp[0,0]/2
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2.0
         cond.append(tmp[0,:])
         c = next(it)
 
     if pos <= 0:
         tmp = np.zeros((1,nx))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
-        tmp[0,0] = tmp[0,0]/2
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2.0
         cond.append(tmp[0,:])
 
     return np.array(cond)

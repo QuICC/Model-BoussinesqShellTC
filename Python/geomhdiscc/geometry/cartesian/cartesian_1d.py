@@ -85,11 +85,11 @@ def i1(nx, bc, coeff = 1.0):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return 1.0/(2*n)
+        return 1.0/(2.0*n)
 
     # Generate 1st superdiagonal
     def d1(n):
-        return -1.0/(2*n)
+        return -1.0/(2.0*n)
 
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -106,15 +106,15 @@ def i2(nx, bc, coeff = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return 1.0/(4*n*(n - 1))
+        return 1.0/(4.0*n*(n - 1.0))
 
     # Generate main diagonal
     def d0(n):
-        return -1.0/(2*(n - 1)*(n + 1))
+        return -1.0/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return 1.0/(4*n*(n + 1))
+        return 1.0/(4.0*n*(n + 1.0))
 
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -131,11 +131,11 @@ def i2d1(nx, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return 1.0/(2*n)
+        return 1.0/(2.0*n)
 
     # Generate 1st superdiagonal
     def d1(n):
-        return -1.0/(2*n)
+        return -1.0/(2.0*n)
 
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -152,15 +152,15 @@ def i2lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -(k**2 + l**2)/(4*n*(n - 1))
+        return -(k**2 + l**2)/(4.0*n*(n - 1.0))
 
     # Generate main diagonal
     def d0(n):
-        return (k**2 + l**2 + (2*n**2 - 2)*cscale**2)/(2*(n - 1)*(n + 1))
+        return (k**2 + l**2 + (2.0*n**2 - 2.0)*cscale**2)/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -(k**2 + l**2)/(4*n*(n + 1))
+        return -(k**2 + l**2)/(4.0*n*(n + 1.0))
 
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -177,15 +177,15 @@ def i2laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -k**2/(4*n*(n - 1))
+        return -k**2/(4.0*n*(n - 1.0))
 
     # Generate main diagonal
     def d0(n):
-        return (k**2 + (2*n**2 - 2)*cscale**2)/(2*(n - 1)*(n + 1))
+        return (k**2 + (2.0*n**2 - 2.0)*cscale**2)/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -k**2/(4*n*(n + 1))
+        return -k**2/(4.0*n*(n + 1.0))
 
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -202,23 +202,23 @@ def i4(nx, bc, coeff = 1.0):
    
     # Generate 4th subdiagonal
     def d_4(n):
-        return 1.0/(16*n*(n - 3)*(n - 2)*(n - 1))
+        return 1.0/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -1.0/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return -1.0/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)) 
 
     # Generate main diagonal
     def d0(n):
-        return 3.0/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return 3.0/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -1.0/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+        return -1.0/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0)) 
 
     # Generate 4th superdiagonal
     def d4(n):
-        return 1.0/(16*n*(n + 1)*(n + 2)*(n + 3))
+        return 1.0/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -264,15 +264,15 @@ def i4d2(nx, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return 1.0/(4*n*(n - 1))
+        return 1.0/(4.0*n*(n - 1.0))
 
     # Generate main diagonal
     def d0(n):
-        return -1.0/(2*(n - 1)*(n + 1))
+        return -1.0/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return 1.0/(4*n*(n + 1))
+        return 1.0/(4.0*n*(n + 1.0))
 
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -294,23 +294,23 @@ def i4lapl(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
    
     # Generate 4th subdiagonal
     def d_4(n):
-        return -(k**2 + l**2)/(16*n*(n - 3)*(n - 2)*(n - 1))
+        return -(k**2 + l**2)/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return (k**2 + l**2 + (n**2 - 2*n - 3)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return (k**2 + l**2 + (n**2 - 2.0*n - 3.0)*cscale**2)/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)) 
 
     # Generate main diagonal
     def d0(n):
-        return -(3*k**2 + 3*l**2 + (4*n**2 - 16)*cscale**2)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return -(3.0*k**2 + 3.0*l**2 + (4.0*n**2 - 16.0)*cscale**2)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return (k**2 + l**2 + (n**2 + 2*n - 3)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3))
+        return (k**2 + l**2 + (n**2 + 2.0*n - 3.0)*cscale**2)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
 
     # Generate 4th superdiagonal
     def d4(n):
-        return -(k**2 + l**2)/(16*n*(n + 1)*(n + 2)*(n + 3))
+        return -(k**2 + l**2)/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -327,23 +327,23 @@ def i4laplh(nx, k, bc, coeff = 1.0, cscale = 1.0):
    
     # Generate 4th subdiagonal
     def d_4(n):
-        return -k**2/(16*n*(n - 3)*(n - 2)*(n - 1))
+        return -k**2/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return (k**2 + (n**2 - 2*n - 3)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return (k**2 + (n**2 - 2.0*n - 3.0)*cscale**2)/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)) 
 
     # Generate main diagonal
     def d0(n):
-        return -(3*k**2 + (4*n**2 - 16)*cscale**2)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return -(3.0*k**2 + (4.0*n**2 - 16.0)*cscale**2)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return (k**2 + (n**2 + 2*n - 3)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3))
+        return (k**2 + (n**2 + 2.0*n - 3.0)*cscale**2)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
 
     # Generate 4th superdiagonal
     def d4(n):
-        return -k**2/(16*n*(n + 1)*(n + 2)*(n + 3))
+        return -k**2/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -360,23 +360,23 @@ def i4lapl2(nx, k, l, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return (k**2 + l**2)**2/(16*n*(n - 3)*(n - 2)*(n - 1))
+        return (k**2 + l**2)**2/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -(k**2 + l**2)*(k**2 + l**2 + (2*n**2 - 4*n - 6)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return -(k**2 + l**2)*(k**2 + l**2 + (2.0*n**2 - 4.0*n - 6.0)*cscale**2)/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)) 
 
     # Generate main diagonal
     def d0(n):
-        return (3*k**4 + 6*k**2*l**2 + 3*l**4 + (8*k**2*n**2 - 32*k**2 + 8*l**2*n**2 - 32*l**2)*cscale**2 + (8*n**4 - 40*n**2 + 32)*cscale**4)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return (3.0*k**4 + 6.0*k**2*l**2 + 3.0*l**4 + (8.0*k**2*n**2 - 32.0*k**2 + 8.0*l**2*n**2 - 32.0*l**2)*cscale**2 + (8.0*n**4 - 40.0*n**2 + 32.0)*cscale**4)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -(k**2 + l**2)*(k**2 + l**2 + (2*n**2 + 4*n - 6)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+        return -(k**2 + l**2)*(k**2 + l**2 + (2.0*n**2 + 4.0*n - 6.0)*cscale**2)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0)) 
 
     # Generate 4th superdiagonal
     def d4(n):
-        return (k**2 + l**2)**2/(16*n*(n + 1)*(n + 2)*(n + 3))
+        return (k**2 + l**2)**2/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -393,23 +393,23 @@ def i4lapl2h(nx, k, bc, coeff = 1.0, cscale = 1.0):
 
     # Generate 4th subdiagonal
     def d_4(n):
-        return k**4/(16*n*(n - 3)*(n - 2)*(n - 1))
+        return k**4/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return -k**2*(k**2 + (2*n**2 - 4*n - 6)*cscale**2)/(4*n*(n - 3)*(n - 1)*(n + 1)) 
+        return -k**2*(k**2 + (2.0*n**2 - 4.0*n - 6.0)*cscale**2)/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)) 
 
     # Generate main diagonal
     def d0(n):
-        return (3*k**4 + (8*k**2*n**2 - 32*k**2)*cscale**2 + (8*n**4 - 40*n**2 + 32)*cscale**4)/(8*(n - 2)*(n - 1)*(n + 1)*(n + 2))
+        return (3.0*k**4 + (8.0*k**2*n**2 - 32.0*k**2)*cscale**2 + (8.0*n**4 - 40.0*n**2 + 32.0)*cscale**4)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
-        return -k**2*(k**2 + (2*n**2 + 4*n - 6)*cscale**2)/(4*n*(n - 1)*(n + 1)*(n + 3)) 
+        return -k**2*(k**2 + (2.0*n**2 + 4.0*n - 6.0)*cscale**2)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0)) 
 
     # Generate 4th superdiagonal
     def d4(n):
-        return k**4/(16*n*(n + 1)*(n + 2)*(n + 3))
+        return k**4/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -445,8 +445,8 @@ def avg(nx):
     """Compute the average of the expansion"""
 
     mat = spsp.lil_matrix((1,nx))
-    mat[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
-    mat[0,0] = mat[0,0]/2
+    mat[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
+    mat[0,0] = mat[0,0]/2.0
 
     return mat
 
