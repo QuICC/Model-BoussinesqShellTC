@@ -92,7 +92,7 @@ def d1(nr, a, b, bc, coeff = 1.0, zr = 1):
     if zr > 0:    
         mat[-zr:,:] = 0
 
-    mat = coeff*(1/a)*mat
+    mat = coeff*(1.0/a)*mat
     return radbc.constrain(mat, bc)
 
 def x1d1(nr, a, b, bc, coeff = 1.0, zr = 1):

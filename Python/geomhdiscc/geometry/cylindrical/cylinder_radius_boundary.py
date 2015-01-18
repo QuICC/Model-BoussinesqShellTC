@@ -129,7 +129,7 @@ def tau_diff2(nr, parity, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(parity, 2*nr, 2)])
+    cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(parity, 2*nr, 2)])
 
     return np.array(cond)
 

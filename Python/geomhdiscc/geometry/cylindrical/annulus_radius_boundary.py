@@ -174,14 +174,14 @@ def tau_integral(nr, pos, coeffs = None):
     c = next(it)
     if pos >= 0:
         tmp = np.zeros((1,nr))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
         tmp[0,0] = tmp[0,0]/2
         cond.append(tmp[0,:])
         c = next(it)
 
     if pos <= 0:
         tmp = np.zeros((1,nr))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
         tmp[0,0] = tmp[0,0]/2
         cond.append(tmp[0,:])
 
@@ -233,7 +233,7 @@ def tau_diff2(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
@@ -246,7 +246,7 @@ def tau_1rdr(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff(nr, pos, 1/a) + tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff(nr, pos, 1.0/a) + tau_value(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
@@ -255,7 +255,7 @@ def tau_1rd1r(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff(nr, pos, 1/a) - tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff(nr, pos, 1.0/a) - tau_value(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
@@ -264,7 +264,7 @@ def tau_d1rdr(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff2(nr, pos, 1/a) + tau_diff(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff2(nr, pos, 1.0/a) + tau_diff(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
