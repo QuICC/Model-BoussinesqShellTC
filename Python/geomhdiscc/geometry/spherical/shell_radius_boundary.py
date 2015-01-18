@@ -189,7 +189,7 @@ def tau_diff2(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
@@ -229,7 +229,7 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/a)*i**2 - (1.0/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*((1.0/a)*i**2 - (1.0/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
@@ -271,7 +271,7 @@ def tau_insulating(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/a)*i**2 + ((l+1.0)/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*((1.0/a)*i**2 + ((l+1.0)/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:

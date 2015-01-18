@@ -57,10 +57,6 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     rhs = transf.torcheb(x_to_phys(res_expr,grid))
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.torcheb(x_to_phys(sol_expr,grid))
-    pl.plot(transf.torphys(sol))
-    pl.show()
-    pl.plot(transf.torphys(opS*lhs))
-    pl.show()
     err = np.abs(opS*lhs - sol)
     if np.max(err) > 10*np.spacing(1):
         print(err)
@@ -330,23 +326,23 @@ def qid(nr, a, b, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 40
+    nr = 100
     a, b = shell.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
 
     # run tests
     #zblk(nr, a, b, rg)
-#    d1(nr, a, b, rg)
-#    d2(nr, a, b, rg)
-#    x1(nr, a, b, rg)
-#    x2(nr, a, b, rg)
-#    i2x1(nr, a, b, rg)
-#    i2x2d1(nr, a, b, rg)
-#    i2x2(nr, a, b, rg)
+    d1(nr, a, b, rg)
+    d2(nr, a, b, rg)
+    x1(nr, a, b, rg)
+    x2(nr, a, b, rg)
+    i2x1(nr, a, b, rg)
+    i2x2d1(nr, a, b, rg)
+    i2x2(nr, a, b, rg)
     i2x2lapl(nr, a, b, rg)
-#    i4x3(nr, a, b, rg)
-#    i4x4d1(nr, a, b, rg)
-#    i4x4(nr, a, b, rg)
-#    i4x4lapl(nr, a, b, rg)
+    i4x3(nr, a, b, rg)
+    i4x4d1(nr, a, b, rg)
+    i4x4(nr, a, b, rg)
+    i4x4lapl(nr, a, b, rg)
     i4x4lapl2(nr, a, b, rg)
 #    qid(nr, a, b, rg)

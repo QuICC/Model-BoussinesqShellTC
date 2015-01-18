@@ -59,17 +59,18 @@ def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i2x2 radial operator kronecker with coriolis Q term"""
 
     cor_r = sh.coriolis_r(maxl, m).tocsr()
     cordr = sh.coriolisdr(maxl, m).tocsr()
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
+    mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
     for ir,l in enumerate(range(m+1, maxl+1)):
-        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
+        row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
@@ -98,17 +99,18 @@ def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
 
     return sphbc.constrain(mat, nr, maxl, m, bc)
 
-def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0):
+def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
     """Create a i4x4 radial operator kronecker with coriolis Q term"""
 
     cor_r = sh.coriolis_r(maxl, m).tocsr()
     cordr = sh.coriolisdr(maxl, m).tocsr()
 
     bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
+    mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
     for ir,l in enumerate(range(m+1, maxl+1)):
-        row = coeff*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
+        row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
     return sphbc.constrain(mat, nr, maxl, m, bc)

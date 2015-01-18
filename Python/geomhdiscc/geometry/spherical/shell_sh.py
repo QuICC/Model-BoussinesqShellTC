@@ -52,11 +52,11 @@ def coriolis_r(maxl, m, coeff = 1.0):
 
     # Generate 1st subdiagonal
     def d_1(l):
-        return  -(l + 1.0)**2*(l - 1.0)*dgen(l)
+        return (l - 1.0)**2*(l + 1.0)*dgen(l)
 
     # Generate 1st superdiagonal
     def d1(l):
-        return l**2*(l + 2.0)*dgen(l + 1.0)
+        return  -l*(l + 2.0)**2*dgen(l+1.0)
 
     ds = [d_1, d1]
     diags = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)

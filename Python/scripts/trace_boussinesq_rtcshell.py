@@ -12,10 +12,13 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 l = 0
-m = 9
-res = [16, m+16, 0]
+m = 30
+res = [120, m+80, 0]
 eigs = [l, m]
-eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6, 'ro':1, 'rratio':0.35}
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.103005e7, 'ro':1, 'rratio':0.35} # m = 13, SF/SF
+#eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.2726e8, 'ro':1, 'rratio':0.35} # m = 30, NS/NS
+eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.302e8, 'ro':1, 'rratio':0.35} # m = 30, SF/SF
 bc_vel = 1 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
@@ -28,8 +31,8 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = True
-write_mtx = False
+show_spy = False
+write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)
 
@@ -55,11 +58,12 @@ if write_mtx:
     import scipy.io as io
     io.mmwrite("matrix_A.mtx", A)
     io.mmwrite("matrix_B.mtx", B)
+    print("Wrote matrices to MTX files")
 
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e1, 1e2)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e3, 1e2)
     print(evp_lmb)
 
 if show_solution:
