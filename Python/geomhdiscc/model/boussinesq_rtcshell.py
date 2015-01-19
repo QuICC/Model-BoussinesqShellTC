@@ -247,7 +247,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, T)
+                mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero')
 
             elif field_col == ("velocity","pol"):
                 mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')

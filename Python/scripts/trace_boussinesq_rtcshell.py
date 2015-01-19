@@ -12,9 +12,9 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 l = 0
-m = 30
-res = [120, m+80, 0]
-eigs = [l, m]
+m = 31
+res = [32, 32, 0]
+eigs = [float(m)]
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.103005e7, 'ro':1, 'rratio':0.35} # m = 13, SF/SF
 #eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.2726e8, 'ro':1, 'rratio':0.35} # m = 30, NS/NS
@@ -31,7 +31,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)

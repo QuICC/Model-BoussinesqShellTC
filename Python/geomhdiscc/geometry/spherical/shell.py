@@ -75,17 +75,25 @@ def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix =
 def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i2x2 radial operator kronecker with coriolis Q term"""
 
-    cor_r = sh.coriolis_r(maxnl, m).tocsr()
-    cordr = sh.coriolisdr(maxnl, m).tocsr()
+    # Only compute if there are at least 2 harmonic degrees
+    if maxnl - m > 1:
+        cor_r = sh.coriolis_r(maxnl, m).tocsr()
+        cordr = sh.coriolisdr(maxnl, m).tocsr()
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+        bcr = convert_bc(bc)
+        shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for ir,l in enumerate(range(m+1, maxnl)):
-        row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
-        mat = spsp.vstack([mat,row])
+        assert(l_zero_fix == 'zero')
+        rmat1 = rad.i2x1(nr, a, b, bcr)
+        rmat2 = rad.i2x2d1(nr, a, b, bcr)
+        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
+        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
+        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2)
+        for ir,l in enumerate(range(m+1, maxnl)):
+            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
+            mat = spsp.vstack([mat,row])
+    else:
+        mat = rad.zblk(nr, bc)
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
@@ -118,17 +126,26 @@ def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix =
 def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i4x4 radial operator kronecker with coriolis Q term"""
 
-    cor_r = sh.coriolis_r(maxnl, m).tocsr()
-    cordr = sh.coriolisdr(maxnl, m).tocsr()
+    # Only compute if there are at least 2 harmonic degrees
+    if maxnl - m > 1:
+        cor_r = sh.coriolis_r(maxnl, m).tocsr()
+        cordr = sh.coriolisdr(maxnl, m).tocsr()
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+        bcr = convert_bc(bc)
+        shc = sh_coeff(with_sh_coeff)
 
-    mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for ir,l in enumerate(range(m+1, maxnl)):
-        row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
-        mat = spsp.vstack([mat,row])
+        assert(l_zero_fix == 'zero')
+        rmat1 = rad.i4x3(nr, a, b, bcr)
+        rmat2 = rad.i4x4d1(nr, a, b, bcr)
+        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
+        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
+        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:],rmat2)
+        for ir,l in enumerate(range(m+1, maxnl)):
+            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
+            mat = spsp.vstack([mat,row])
+
+    else:
+        mat = rad.zblk(nr, bc)
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
