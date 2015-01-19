@@ -85,8 +85,8 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, SINGLE
-        index_mode = self.SLOWEST
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
+        index_mode = self.SLOWEST_SINGLE_RHS
 
         # Compute block info
         block_info = self.block_size(res, field_row)

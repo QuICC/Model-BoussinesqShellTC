@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "PhysicalOperators/VelocityHeatAdvection.hpp"
+#include "PhysicalOperators/VelocityAdvection.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -53,7 +53,7 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)\theta\f$
       ///
-      Physical::VelocityHeatAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::R,FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqTCShellTransport::setRequirements()

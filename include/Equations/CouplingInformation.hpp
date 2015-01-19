@@ -47,7 +47,9 @@ namespace Equations {
           */
          enum IndexType {
             /// Matrix index is slowest index of field
-            SLOWEST = 0,
+            SLOWEST_SINGLE_RHS = 0,
+            /// Matrix index is slowest index of field but has multiple RHS
+            SLOWEST_MULTI_RHS,
             /// Matrix index is a mode index
             MODE,
             /// Single matrix (ex. TTT scheme)

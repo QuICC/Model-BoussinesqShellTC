@@ -38,112 +38,131 @@ def sh_coeff(coeff):
     
     return fct
 
-def zblk(nr, maxl, m, bc):
+def fix_l_zero(nr, m, mat, bc, fix):
+    """Fix problems with unused l = 0 modes"""
+
+    if m > 0 or not fix:
+        return mat
+    elif fix == 'zero':
+        return rad.zblk(nr, bc)
+    elif fix == 'set':
+        return rad.qid(nr, 0, bc)
+    else:
+        raise RuntimeError("Unkown l=0 fix!")
+
+def zblk(nr, maxnl, m, bc):
     """Create a block of zeros"""
 
     bcr = convert_bc(bc)
 
-    nl = maxl + 1 - m
+    nl = maxnl - m
     mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr))
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc)
 
-def i2x2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i2x2 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*rad.i2x2(nr, a, b, bcr)
-    for l in range(m+1, maxl+1):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2(nr, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i2x2coriolis(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i2x2 radial operator kronecker with coriolis Q term"""
 
-    cor_r = sh.coriolis_r(maxl, m).tocsr()
-    cordr = sh.coriolisdr(maxl, m).tocsr()
+    cor_r = sh.coriolis_r(maxnl, m).tocsr()
+    cordr = sh.coriolisdr(maxnl, m).tocsr()
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i2x2d1(nr, a, b, bcr))
-    for ir,l in enumerate(range(m+1, maxl+1)):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for ir,l in enumerate(range(m+1, maxnl)):
         row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i2x2lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i2x2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*rad.i2x2lapl(nr, m, a, b, bcr)
-    for l in range(m+1, maxl+1):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2lapl(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i4x4(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i4x4 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*rad.i4x4(nr, a, b, bcr)
-    for l in range(m+1, maxl+1):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4(nr, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i4x4coriolis(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i4x4 radial operator kronecker with coriolis Q term"""
 
-    cor_r = sh.coriolis_r(maxl, m).tocsr()
-    cordr = sh.coriolisdr(maxl, m).tocsr()
+    cor_r = sh.coriolis_r(maxnl, m).tocsr()
+    cordr = sh.coriolisdr(maxnl, m).tocsr()
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(m)*spsp.kron(cordr[0,:],rad.i4x4d1(nr, a, b, bcr))
-    for ir,l in enumerate(range(m+1, maxl+1)):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for ir,l in enumerate(range(m+1, maxnl)):
         row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
         mat = spsp.vstack([mat,row])
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i4x4lapl(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i4x4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*rad.i4x4lapl(nr, m, a, b, bcr)
-    for l in range(m+1, maxl+1):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def i4x4lapl2(nr, maxl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None):
+def i4x4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
     mat = coeff*shc(m)*rad.i4x4lapl2(nr, m, a, b, bcr)
-    for l in range(m+1, maxl+1):
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
 
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
 
-def qid(nr, maxl, m, qr, bc, coeff = 1.0):
+def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""
 
     bcr = convert_bc(bc)
 
-    nl = maxl + 1 - m
+    nl = maxnl - m
     mat = coeff*spsp.kron(rad.qid(nl,0,rad.radbc.no_bc()), rad.qid(nr,qr,bcr))
-    return sphbc.constrain(mat, nr, maxl, m, bc)
+    return sphbc.constrain(mat, nr, maxnl, m, bc)

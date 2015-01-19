@@ -206,7 +206,7 @@ namespace Equations {
          solution = &storage;
       }
 
-      if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -224,6 +224,22 @@ namespace Equations {
                k++;
             }
          }
+
+      } else if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+      {
+         int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         // Copy data
+         for(int j = 0; j < cols; j++)
+         {
+            for(int i = solStart; i < rows; i++)
+            {
+               // Copy timestep output into field
+               this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, i,j),i,j,matIdx);
+            }
+         }
+
       } else if(this->couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
          // Get mode indexes
@@ -307,8 +323,8 @@ namespace Equations {
          zeroCol = eq.couplingInfo(compId).galerkinShift(1);
       }
 
-      // matIdx is the index of the slowest varying direction
-      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      // matIdx is the index of the slowest varying direction with a single RHS
+      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -327,6 +343,25 @@ namespace Equations {
 
                // increase storage counter
                k++;
+            }
+         }
+
+      // matIdx is the index of the slowest varying direction with multiple RHS
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+      {
+         int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+         int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+
+         //Safety assertion
+         assert(start >= 0);
+
+         // Copy data
+         for(int j = zeroCol; j < cols; j++)
+         {
+            for(int i = zeroRow; i < rows; i++)
+            {
+               // Copy field value into storage
+               Datatypes::internal::setScalar(storage, i, j, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
             }
          }
 
@@ -427,8 +462,8 @@ namespace Equations {
       // Without nonlinear computation the values have to be initialised to zero   
       } else
       {
-         // matIdx is the index of the slowest varying direction
-         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         // matIdx is the index of the slowest varying direction with a single RHS
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
          {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -449,6 +484,27 @@ namespace Equations {
 
                   // increase storage counter
                   k++;
+               }
+            }
+
+         // matIdx is the index of the slowest varying direction with multiple RHS
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+         {
+            int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Set data to zero
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Set value to zero
+                  Datatypes::internal::setScalar(storage, i, j, typename TData::Scalar(0.0));
                }
             }
 
@@ -515,8 +571,8 @@ namespace Equations {
       // Add source term if required
       if(eq.couplingInfo(compId).hasSource())
       {
-         // matIdx is the index of the slowest varying direction
-         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+         // matIdx is the index of the slowest varying direction with a single RHS
+         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
          {
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
             int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
@@ -537,6 +593,27 @@ namespace Equations {
 
                   // increase storage counter
                   k++;
+               }
+            }
+
+         // matIdx is the index of the slowest varying direction with multiple RHS
+         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+         {
+            int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+            //Safety assertion
+            assert(start >= 0);
+
+            // Copy data
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Add source value
+                  Datatypes::internal::addScalar(storage, i, j, eq.sourceTerm(compId, i, j, matIdx));
                }
             }
 

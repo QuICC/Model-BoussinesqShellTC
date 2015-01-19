@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 

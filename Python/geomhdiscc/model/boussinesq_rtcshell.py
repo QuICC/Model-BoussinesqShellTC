@@ -47,7 +47,10 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        if field_row == ("temperature",""):
+            fields = [("velocity","pol")]
+        else:
+            fields = []
 
         return fields
 
@@ -83,8 +86,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, SINGLE
-        index_mode = self.SLOWEST
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
+        index_mode = self.SLOWEST_SINGLE_RHS
 
         # Compute block info
         block_info = self.block_size(res, field_row)
@@ -197,9 +200,11 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
+        assert(eigs[0].is_integer())
+
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
-        m = eigs[1]
+        m = int(eigs[0])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
@@ -216,24 +221,26 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
+        assert(eigs[0].is_integer())
+
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
         T = Ta**0.5
 
-        m = eigs[1]
+        m = int(eigs[0])
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
                 bc[0] = min(bc[0], 0)
-                mat = mat + shell.i2x2(res[0], res[1], m, a, b, bc, 1j*m*T)
+                mat = mat + shell.i2x2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i2x2coriolis(res[0], res[1], m, a, b, bc, -T)
+                mat = shell.i2x2coriolis(res[0], res[1], m, a, b, bc, -T, l_zero_fix = 'zero')
 
             elif field_col == ("temperature",""):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -243,12 +250,12 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, T)
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
                 bc[0] = min(bc[0], 0)
-                mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T)
+                mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -256,6 +263,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
+                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+
+                elif bcs["bcType"] == self.FIELD_TO_RHS:
                     mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
                 else:
@@ -269,16 +279,18 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        m = eigs[1]
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)

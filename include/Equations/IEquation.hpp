@@ -389,14 +389,15 @@ namespace Equations {
       // Create pointer to sparse operator
       const TOperator * op = &eq.explicitLinear<TOperator>(compId, fieldId, matIdx);
 
-      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST)
+      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          /// \mhdBug very bad and slow implementation!
          Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
+         tmp.setConstant(-4242.4242);
          int k = 0;
          for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
          {
-            for(int i = 0; i < explicitField.slice(matIdx).cols(); i++)
+            for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
             {
                // Copy slice into flat array
                tmp(k) = explicitField.point(i,j,matIdx);
@@ -408,6 +409,11 @@ namespace Equations {
 
          // Apply operator to field
          internal::addExplicitWrapper(eqField, eqStart, *op, tmp);
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+      {
+         // Apply operator to field
+         internal::addExplicitWrapper(eqField, eqStart, *op, explicitField.slice(matIdx));
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
       {
@@ -431,7 +437,7 @@ namespace Equations {
          {
             for(int j = 0; j < explicitField.slice(k).cols(); j++)
             {
-               for(int i = 0; i < explicitField.slice(k).cols(); i++)
+               for(int i = 0; i < explicitField.slice(k).rows(); i++)
                {
                   // Copy slice into flat array
                   tmp(l) = explicitField.point(i,j,k);

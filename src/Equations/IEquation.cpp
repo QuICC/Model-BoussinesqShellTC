@@ -223,7 +223,7 @@ namespace Equations {
       // Set source flags: has source term?
       infoIt.first->second.setSource(hasSource);
 
-      // Set index type: SLOWEST, MODE, SINGLE
+      // Set index type: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
       infoIt.first->second.setIndexType(static_cast<CouplingInformation::IndexType>(indexMode));
 
       // Create implicit field coupling
@@ -243,7 +243,7 @@ namespace Equations {
       }
 
       // Set field coupling information
-      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::MODE || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SINGLE)
+      if(static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST_SINGLE_RHS || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SLOWEST_MULTI_RHS || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::MODE || static_cast<CouplingInformation::IndexType>(indexMode) == CouplingInformation::SINGLE)
       {
          int nMat = EigenSelector::fieldCouplingNMat(spRes);
          ArrayI tauNs(nMat);

@@ -3,7 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
-verbose_write_mtx = False
+verbose_write_mtx = True
 if verbose_write_mtx:
     import scipy.io as io
 
@@ -22,10 +22,10 @@ class BaseModel:
     STENCIL = 2
     FIELD_TO_RHS = 3
 
-    SLOWEST = 0
-    MODE = 1
-    SINGLE = 2
-    GEOMETRIC_1D_3D = 3
+    SLOWEST_SINGLE_RHS = 0
+    SLOWEST_MULTI_RHS = 1
+    MODE = 2
+    SINGLE = 3
 
     def time(self, res, eq_params, eigs, bcs, fields, restriction = None):
         """Create the time derivative operator"""

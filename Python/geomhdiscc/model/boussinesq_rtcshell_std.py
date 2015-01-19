@@ -96,8 +96,8 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE
-        index_mode = self.SLOWEST
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
+        index_mode = self.SLOWEST_MULTI_RHS
 
         # Compute block info
         block_info = self.block_size(res, field_row)
@@ -248,6 +248,9 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
                 if self.linearize:
+                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+
+                elif bcs["bcType"] == self.FIELD_TO_RHS:
                     mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
                 else:

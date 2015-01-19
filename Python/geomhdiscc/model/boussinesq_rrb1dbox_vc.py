@@ -81,7 +81,7 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST, MODE, SINGLE
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.MODE
 
         # Compute block info
