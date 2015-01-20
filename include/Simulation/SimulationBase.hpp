@@ -182,6 +182,16 @@ namespace GeoMHDiSCC {
          void computeNonlinear();
 
          /**
+          * @brief Explicit linear the trivial equations
+          */
+         void explicitTrivialEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
+
+         /**
+          * @brief Explicit linear for the diagnostic equations
+          */
+         void explicitDiagnosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
+
+         /**
           * @brief Solve the trivial equations
           */
          void solveTrivialEquations(const SolveTiming::Id time);

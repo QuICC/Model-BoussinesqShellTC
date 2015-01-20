@@ -37,6 +37,7 @@ namespace Solver {
           *
           * @param start   Starting index (for example without m=0)
           * @param time    Solver timing with respect to timestepping
+          * @param expTime Explicit linear timing with respect to nonlinear calculation
           */
          SparseTrivialSolver(const int start, const SolveTiming::Id time);
 

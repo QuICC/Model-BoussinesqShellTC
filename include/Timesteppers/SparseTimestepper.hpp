@@ -31,6 +31,10 @@ namespace Timestep {
    {
       template <typename TOperator,typename TData> void computeRHSNoMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol);
 
+      void computeRHSRealNoMemory(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol);
+
+      void computeRHSImagNoMemory(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol);
+
       template <typename TOperator,typename TData> void computeRHSNoFieldMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, std::vector<TData>& rOldNL, TData& rTmp);
 
       template <typename TOperator,typename TData> void computeRHSNoNLMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, const std::vector<TOperator>& oldMat, std::vector<TData>& rOldSol);
@@ -48,6 +52,7 @@ namespace Timestep {
           * @brief Constructor
           *
           * @param start   Starting index (for example without m=0)
+          * @param time    Solver timing with respect to timestepping
           */
          SparseTimestepper(const int start, const SolveTiming::Id time);
 
@@ -306,7 +311,6 @@ namespace Timestep {
             this->mRHSMatrix.push_back(TOperator());
          }
 
-
          // Reserve space for the RHS matrices at t_(n-i), i > 0 
          if(IntegratorSelector::FIELD_MEMORY > 0)
          {
@@ -392,7 +396,7 @@ namespace Timestep {
          rTmp = rRHS;
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS = mat*sol + IntegratorSelector::rhsN(0, step)*rRHS;
+         computeRHSNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from nonlinear terms at t_(n-i), i > 0
          for(int n = 0; n < IntegratorSelector::nonlinearMemory(step); n++)
@@ -411,7 +415,7 @@ namespace Timestep {
       template <typename TOperator,typename TData> inline void computeRHSNoNLMemory(const int step, TData& rRHS, const TOperator& mat, const TData& sol, const std::vector<TOperator>& oldMat, std::vector<TData>& rOldSol)
       {
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS = mat*sol + IntegratorSelector::rhsN(0, step)*rRHS;
+         computeRHSNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)
@@ -433,7 +437,7 @@ namespace Timestep {
          rTmp = rRHS;
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS = mat*sol + IntegratorSelector::rhsN(0, step)*rRHS;
+         computeRHSNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)
@@ -462,11 +466,21 @@ namespace Timestep {
          rOldNL.at(0) = rTmp;
       }
 
-      template <> inline void computeRHSNoMemory<SparseMatrix,DecoupledZMatrix>(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol)
+      inline void computeRHSRealNoMemory(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol)
       {
          rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(0, step)*rRHS.real();
+      }
 
+      inline void computeRHSImagNoMemory(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol)
+      {
          rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(0, step)*rRHS.imag();
+      }
+
+      template <> inline void computeRHSNoMemory<SparseMatrix,DecoupledZMatrix>(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol)
+      {
+         computeRHSRealNoMemory(step, rRHS, mat, sol);
+
+         computeRHSImagNoMemory(step, rRHS, mat, sol);
       }
 
       template <> inline void computeRHSNoFieldMemory<SparseMatrix,DecoupledZMatrix>(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol, std::vector<DecoupledZMatrix>& rOldNL, DecoupledZMatrix& rTmp)
@@ -481,7 +495,7 @@ namespace Timestep {
          rTmp.real() = rRHS.real();
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(0, step)*rRHS.real();
+         computeRHSRealNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from nonlinear terms at t_(n-i), i > 0
          for(int n = 0; n < IntegratorSelector::nonlinearMemory(step); n++)
@@ -502,7 +516,7 @@ namespace Timestep {
          rTmp.real() = rRHS.imag();
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(0, step)*rRHS.imag();
+         computeRHSImagNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from nonlinear terms at t_(n-i), i > 0
          for(int n = 0; n < IntegratorSelector::nonlinearMemory(step); n++)
@@ -520,10 +534,10 @@ namespace Timestep {
 
       template <> inline void computeRHSNoNLMemory<SparseMatrix,DecoupledZMatrix>(const int step, DecoupledZMatrix& rRHS, const SparseMatrix& mat, const DecoupledZMatrix& sol, const std::vector<SparseMatrix>& oldMat, std::vector<DecoupledZMatrix>& rOldSol)
       {
-         // Real part
-
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(0, step)*rRHS.real();
+         computeRHSNoMemory(step, rRHS, mat, sol);
+
+         // Real part
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)
@@ -539,9 +553,6 @@ namespace Timestep {
          rOldSol.at(0).real() = sol.real();
 
          // Imaginary part
-
-         // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(0, step)*rRHS.imag();
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)
@@ -569,7 +580,7 @@ namespace Timestep {
          rTmp.real() = rRHS.real();
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.real() = mat*sol.real() + IntegratorSelector::rhsN(0, step)*rRHS.real();
+         computeRHSRealNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)
@@ -603,7 +614,7 @@ namespace Timestep {
          rTmp.real() = rRHS.imag();
 
          // Compute RHS part from solution and nonlinear term at t_n
-         rRHS.imag() = mat*sol.imag() + IntegratorSelector::rhsN(0, step)*rRHS.imag();
+         computeRHSImagNoMemory(step, rRHS, mat, sol);
 
          // Compute RHS part from solution at t_(n-i), i > 0
          for(int i = 0; i < IntegratorSelector::fieldMemory(step); i++)

@@ -34,6 +34,7 @@ namespace Solver {
           * @brief Dummy constructor
           *
           * @param start   Starting index (for example without m=0)
+          * @param time    Solver timing with respect to timestepping
           */
          SparseDummySolver(const int start, const SolveTiming::Id time) {};
 

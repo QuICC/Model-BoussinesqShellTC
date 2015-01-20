@@ -290,6 +290,40 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("computeNonlinear",2);
    }
 
+   void SimulationBase::explicitTrivialEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime)
+   {
+      // Debug statement
+      DebuggerMacro_enter("explicitTrivialEquations",3);
+
+      DebuggerMacro_start("Explicit trivial",4);
+      ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
+      this->mTrivialCoordinator.setSolveTime(time);
+      this->mTrivialCoordinator.setExplicitTime(expTime);
+      this->mTrivialCoordinator.getExplicitInput(this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
+      ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
+      DebuggerMacro_stop("Explicit trivial t = ",4);
+
+      // Debug statement
+      DebuggerMacro_leave("explicitTrivialEquations",3);
+   }
+
+   void SimulationBase::explicitDiagnosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime)
+   {
+      // Debug statement
+      DebuggerMacro_enter("explicitDiagnosticEquations",3);
+
+      DebuggerMacro_start("Explicit diagnostic",4);
+      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
+      this->mTrivialCoordinator.setSolveTime(time);
+      this->mLinearCoordinator.setExplicitTime(expTime);
+      this->mLinearCoordinator.getExplicitInput(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
+      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
+      DebuggerMacro_stop("Explicit diagnostic t = ",4);
+
+      // Debug statement
+      DebuggerMacro_leave("explicitDiagnosticEquations",3);
+   }
+
    void SimulationBase::solveTrivialEquations(const SolveTiming::Id time)
    {
       // Debug statement
@@ -303,7 +337,7 @@ namespace GeoMHDiSCC {
       DebuggerMacro_stop("Solve trivial t = ",4);
 
       // Debug statement
-      DebuggerMacro_leave("solveDiagnosticEquations",3);
+      DebuggerMacro_leave("solveTrivialEquations",3);
    }
 
    void SimulationBase::solveDiagnosticEquations(const SolveTiming::Id time)

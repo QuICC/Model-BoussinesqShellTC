@@ -23,6 +23,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/SolveTiming.hpp"
+#include "Enums/ExplicitTiming.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -162,6 +163,11 @@ namespace Equations {
          void setSolverIndex(const FieldComponents::Spectral::Id, const int idx);
 
          /**
+          * @brief Timing of the explicit linear term for the equation
+          */
+         ExplicitTiming::Id  explicitTiming(const FieldComponents::Spectral::Id compId) const;
+
+         /**
           * @brief Timing of the solver for the equation
           */
          SolveTiming::Id  solveTiming() const;
@@ -171,6 +177,11 @@ namespace Equations {
           * @brief Set the unknown name of equation
           */
          void setName(PhysicalNames::Id name);
+
+         /**
+          * @brief Set explicit timing
+          */
+         void setExplicitTiming(const FieldComponents::Spectral::Id compId, const ExplicitTiming::Id time);
 
          /**
           * @brief Set solver timing
@@ -227,6 +238,11 @@ namespace Equations {
           * @brief Storage for the shared boundary condition list
           */
          SharedSimulationBoundary mspBcIds;
+
+         /**
+          * @brief Storage for the explicit timing
+          */
+         std::map<FieldComponents::Spectral::Id, ExplicitTiming::Id>   mExplicitTiming;
 
          /**
           * @brief Storage for the solve timing

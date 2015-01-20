@@ -73,9 +73,19 @@ namespace GeoMHDiSCC {
          virtual void postRun();
 
          /**
+          * @brief Explicit linear term for all equations
+          */
+         void explicitEquations();
+
+         /**
           * @brief Solve all equations
           */
          void solveEquations();
+
+         /**
+          * @brief Explicit linear for the prognostic equations
+          */
+         void explicitPrognosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
 
          /**
           * @brief Timestep the prognostic equations

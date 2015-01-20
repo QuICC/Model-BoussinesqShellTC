@@ -174,8 +174,9 @@ namespace Equations {
     * @param matIdx  Index of the given data
     * @param start   Start index for the storage
     * @param useShift   Use galerkin shifts
+    * @param isSet      Arithmetic operation is set
     */
-   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift);
+   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet);
 
    /**
     * @brief Transfer nonlinear spectral values from unknown to solver
@@ -197,6 +198,16 @@ namespace Equations {
     * @param start   Start index for the storage
     */
    template <typename TData> void addSource(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
+
+   /**
+    * @brief Set nonlinear spectral values to zero
+    *
+    * @param compId  Component ID
+    * @param storage Storage for the equation values
+    * @param matIdx  Index of the given data
+    * @param start   Start index for the storage
+    */
+   template <typename TData> void setZeroNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start);
 
    template <typename TData> void IVectorEquation::storeSolution(FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
    {
@@ -247,10 +258,10 @@ namespace Equations {
          // Copy data
          for(int j = 0; j < cols; j++)
          {
-            for(int i = solStart; i < rows; i++)
+            for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, i,j),i,j,matIdx);
+               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, i + solStart,j),i,j,matIdx);
             }
          }
 
@@ -300,7 +311,7 @@ namespace Equations {
    {
       // Create temporary storage for tau data
       TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false);
+      Equations::copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
 
@@ -320,7 +331,7 @@ namespace Equations {
       internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
    }
 
-   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift)
+   template <typename TData> void copyUnknown(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet)
    {
       int zeroRow = 0;
       int zeroCol = 0;
@@ -341,15 +352,31 @@ namespace Equations {
 
          // Copy data
          int k = start;
-         for(int j = zeroCol; j < cols; j++)
+         if(isSet)
          {
-            for(int i = zeroRow; i < rows; i++)
+            for(int j = zeroCol; j < cols; j++)
             {
-               // Copy field value into storage
-               Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Copy field value into storage
+                  Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
 
-               // increase storage counter
-               k++;
+                  // increase storage counter
+                  k++;
+               }
+            }
+         } else
+         {
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Copy field value into storage
+                  Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+
+                  // increase storage counter
+                  k++;
+               }
             }
          }
 
@@ -363,12 +390,25 @@ namespace Equations {
          assert(start >= 0);
 
          // Copy data
-         for(int j = zeroCol; j < cols; j++)
+         if(isSet)
          {
-            for(int i = zeroRow; i < rows; i++)
+            for(int j = zeroCol; j < cols; j++)
             {
-               // Copy field value into storage
-               Datatypes::internal::setScalar(storage, i, j, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Copy field value into storage
+                  Datatypes::internal::setScalar(storage, i + start, j, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+               }
+            }
+         } else
+         {
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Copy field value into storage
+                  Datatypes::internal::addScalar(storage, i + start, j, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+               }
             }
          }
 
@@ -384,13 +424,26 @@ namespace Equations {
 
          // Copy data
          int k = start;
-         for(int i = zeroRow; i < rows; i++)
+         if(isSet)
          {
-            // Copy field value into storage
-            Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)));
+            for(int i = zeroRow; i < rows; i++)
+            {
+               // Copy field value into storage
+               Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)));
 
-            // increase storage counter
-            k++;
+               // increase storage counter
+               k++;
+            }
+         } else
+         {
+            for(int i = zeroRow; i < rows; i++)
+            {
+               // Copy field value into storage
+               Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,mode(1),mode(0)));
+
+               // increase storage counter
+               k++;
+            }
          }
 
       // There is a single matrix
@@ -409,19 +462,40 @@ namespace Equations {
 
          // Copy data
          int l = start;
-         for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         if(isSet)
          {
-            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-            for(int j = zeroCol; j < cols; j++)
+            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               for(int i = zeroRow; i < rows; i++)
+               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
+               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
+               for(int j = zeroCol; j < cols; j++)
                {
-                  // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,k));
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,k));
 
-                  // increase storage counter
-                  l++;
+                     // increase storage counter
+                     l++;
+                  }
+               }
+            }
+         } else
+         {
+            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            {
+               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
+               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::addScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,k));
+
+                     // increase storage counter
+                     l++;
+                  }
                }
             }
          }
@@ -430,6 +504,10 @@ namespace Equations {
 
    template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
+      bool isInitialized = (eq.explicitTiming(compId) == ExplicitTiming::LINEAR && eq.couplingInfo(compId).nExplicit() > 0);
+      bool copyIsSet = true;
+      bool applyIsSet = true;
+
       // Check if a nonlinear computation took place and a quasi-inverse has to be applied
       if(eq.couplingInfo(compId).hasNonlinear() && eq.couplingInfo(compId).hasQuasiInverse())
       {
@@ -437,13 +515,17 @@ namespace Equations {
          bool useShift;
          int copyStart;
          TData tmp;
-         if(eq.couplingInfo(compId).isGalerkin())
+         if(eq.couplingInfo(compId).isGalerkin() || isInitialized)
          {
             // Temporary storage is required
             tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
             rhs = &tmp;
             useShift = false;
             copyStart = 0;
+            if(isInitialized)
+            {
+               applyIsSet = false;
+            }
          } else
          {
             // Storage can be used a RHS and LHS
@@ -453,114 +535,26 @@ namespace Equations {
          }
 
          // simply copy values from unknown
-         copyUnknown(eq, compId, *rhs, matIdx, copyStart, useShift);
+         copyUnknown(eq, compId, *rhs, matIdx, copyStart, useShift, copyIsSet);
 
          // Multiply nonlinear term by quasi-inverse
-         applyQuasiInverse(eq, compId, storage, start, matIdx, copyStart, *rhs);
+         applyQuasiInverse(eq, compId, storage, start, matIdx, copyStart, *rhs, applyIsSet);
 
       /// Nonlinear computation took place but no quas-inverse is required
       } else if(eq.couplingInfo(compId).hasNonlinear())
       {
+         if(isInitialized)
+         {
+            copyIsSet = false;
+         }
+
          // simply copy values from unknown
-         copyUnknown(eq, compId, storage, matIdx, start, true);
+         copyUnknown(eq, compId, storage, matIdx, start, true, copyIsSet);
 
       // Without nonlinear computation the values have to be initialised to zero   
-      } else
+      } else if(! isInitialized)
       {
-         if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
-         {
-            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
-            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-
-            //Safety assertion
-            assert(start >= 0);
-
-            // Copy data
-            int k = start;
-            for(int j = zeroCol; j < cols; j++)
-            {
-               for(int i = zeroRow; i < rows; i++)
-               {
-                  // Set field to zero
-                  Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
-
-                  // increase storage counter
-                  k++;
-               }
-            }
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
-         {
-            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
-            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-
-            //Safety assertion
-            assert(start >= 0);
-
-            // Copy data
-            for(int j = zeroCol; j < cols; j++)
-            {
-               for(int i = zeroRow; i < rows; i++)
-               {
-                  // Set field to zero
-                  Datatypes::internal::setScalar(storage, i, j, typename TData::Scalar(0.0));
-               }
-            }
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
-         {
-            //Safety assertion
-            assert(start >= 0);
-
-            // Get mode indexes
-            ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
-            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-
-            // Copy data
-            int k = start;
-            for(int i = zeroRow; i < rows; i++)
-            {
-               // Set field to zero
-               Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
-
-               // increase storage counter
-               k++;
-            }
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
-         {
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
-
-            //Safety assertion
-            assert(matIdx == 0);
-            assert(start >= 0);
-
-            // Set data to zero
-            int l = start;
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
-            {
-               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
-               {
-                  for(int i = zeroRow; i < rows; i++)
-                  {
-                     // Set value to zero
-                     Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
-
-                     // increase storage counter
-                     l++;
-                  }
-               }
-            }
-         }
+         setZeroNonlinear(eq, compId, storage, matIdx, start);
       }
    }
 
@@ -611,7 +605,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
-                  Datatypes::internal::addScalar(storage, i, j, eq.sourceTerm(compId, i, j, matIdx));
+                  Datatypes::internal::addScalar(storage, i + start, j, eq.sourceTerm(compId, i, j, matIdx));
                }
             }
 
@@ -665,6 +659,104 @@ namespace Equations {
                      // increase storage counter
                      l++;
                   }
+               }
+            }
+         }
+      }
+   }
+
+   template <typename TData> void setZeroNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
+   {
+      if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
+      {
+         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+         int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+         //Safety assertion
+         assert(start >= 0);
+
+         // Copy data
+         int k = start;
+         for(int j = zeroCol; j < cols; j++)
+         {
+            for(int i = zeroRow; i < rows; i++)
+            {
+               // Set field to zero
+               Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+               // increase storage counter
+               k++;
+            }
+         }
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
+      {
+         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+         int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+         //Safety assertion
+         assert(start >= 0);
+
+         // Copy data
+         for(int j = zeroCol; j < cols; j++)
+         {
+            for(int i = zeroRow; i < rows; i++)
+            {
+               // Set field to zero
+               Datatypes::internal::setScalar(storage, i + start, j, typename TData::Scalar(0.0));
+            }
+         }
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::MODE)
+      {
+         //Safety assertion
+         assert(start >= 0);
+
+         // Get mode indexes
+         ArrayI mode = eq.unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(mode(0)).rows();
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+
+         // Copy data
+         int k = start;
+         for(int i = zeroRow; i < rows; i++)
+         {
+            // Set field to zero
+            Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+            // increase storage counter
+            k++;
+         }
+
+      } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
+      {
+         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+         int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+
+         //Safety assertion
+         assert(matIdx == 0);
+         assert(start >= 0);
+
+         // Set data to zero
+         int l = start;
+         for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         {
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Set value to zero
+                  Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
+
+                  // increase storage counter
+                  l++;
                }
             }
          }

@@ -181,9 +181,22 @@ namespace Equations {
       this->mCouplingInfos.find(compId)->second.setSolverIndex(idx);
    }
 
+   void EquationData::setExplicitTiming(const FieldComponents::Spectral::Id compId, const ExplicitTiming::Id time)
+   {
+      this->mExplicitTiming.insert(std::make_pair(compId, time));
+   }
+
    void EquationData::setSolveTiming(const SolveTiming::Id time)
    {
       this->mSolveTiming = time;
+   }
+
+   ExplicitTiming::Id  EquationData::explicitTiming(const FieldComponents::Spectral::Id compId) const
+   {
+      // Safety assert
+      assert(this->mExplicitTiming.count(compId) > 0);
+      
+      return this->mExplicitTiming.find(compId)->second;
    }
 
    SolveTiming::Id  EquationData::solveTiming() const
