@@ -205,10 +205,10 @@ class BoussinesqTCShell(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, -1.0, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)
@@ -263,7 +263,7 @@ class BoussinesqTCShell(base_model.BaseModel):
                     mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1/Pr)
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
 
         return mat
 

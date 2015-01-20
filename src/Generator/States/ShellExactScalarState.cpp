@@ -87,11 +87,13 @@ namespace Equations {
          std::pair<ModeIt, ModeIt>  modeRange = std::make_pair(this->mSHModes.begin(), this->mSHModes.end());
 
          rNLComp.rData().setConstant(0);
+         MHDFloat r;
          for(int iR = 0; iR < nR; ++iR)
          {
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               funcR = 1.0;
+               r = rGrid(iR);
+               funcR = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
 
                for(it = modeRange.first; it != modeRange.second; ++it)
                {

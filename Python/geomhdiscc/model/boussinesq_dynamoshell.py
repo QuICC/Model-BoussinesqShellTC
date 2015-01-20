@@ -217,21 +217,24 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        m = eigs[1]
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("magnetic","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("magnetic","pol"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)
@@ -241,13 +244,15 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        Pr = eq_params['prandtl']
+        assert(eigs[0].is_integer())
+
         Pm = eq_params['magnetic_prandtl']
+        Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
         T = Ta**0.5
 
-        m = eigs[1]
+        m = int(eigs[0])
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
@@ -348,7 +353,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        m = eigs[1]
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 

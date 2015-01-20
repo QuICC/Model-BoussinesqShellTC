@@ -202,16 +202,16 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         assert(eigs[0].is_integer())
 
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-
         m = int(eigs[0])
+
+        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], res[1], m, a, b, bc)
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], res[1], m, a, b, bc)

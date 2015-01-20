@@ -207,14 +207,16 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
+        l = eigs[0]
+
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc)
+            mat = shell.i2x2(res[0], a, b, bc, -l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4(res[0], a, b, bc)
+            mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], a, b, bc)
@@ -234,7 +236,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","pol"):
@@ -255,7 +257,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1/Pr)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         return mat
 

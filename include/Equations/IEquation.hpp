@@ -393,7 +393,6 @@ namespace Equations {
       {
          /// \mhdBug very bad and slow implementation!
          Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
-         tmp.setConstant(-4242.4242);
          int k = 0;
          for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
          {

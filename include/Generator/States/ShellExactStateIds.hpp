@@ -44,8 +44,9 @@ namespace Equations {
          // Special states
          CONSTANT = 0,  // All constant
          HARMONIC = 10, // Generate spherical harmonic state
-         TORPOLT11P11 = 20, // Special Toroidal/Poloidal state
-         TORPOLT54P43 = 30, // Special Toroidal/Poloidal state
+         TOROIDAL = 20, // Toroidal Y_l^m
+         POLOIDAL = 21, // Poloidal Y_l^m
+         TORPOL = 30, // Toroidal+Poloidal state
       };
 
       /**
