@@ -23,6 +23,8 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
+#include "PhysicalOperators/SphericalCoriolis.hpp"
+#include "TypeSelectors/TransformSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -52,10 +54,21 @@ namespace Equations {
 
       this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, true, false);
       this->setExplicitTiming(FieldComponents::Spectral::POL, ExplicitTiming::LINEAR);
+
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         // Create cos(theta) and sin(theta) data for Coriolis term
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         this->mCosTheta = thGrid.array().cos();
+         this->mSinTheta = thGrid.array().sin();
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqRTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
-   {
+   {  
+      // Get square root of Taylor number
+      MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+
       ///
       /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
       ///
@@ -74,6 +87,14 @@ namespace Equations {
             assert(false);
             break;
       }
+
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         ///
+         /// Compute Coriolis term
+         ///
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         Physical::SphericalCoriolis::add(rNLComp, id, nR, this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqRTCShellMomentum::setRequirements()
