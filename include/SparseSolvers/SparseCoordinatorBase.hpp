@@ -315,7 +315,11 @@ namespace Solver {
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; scalEqIt++)
       {
-         if((*scalEqIt)->explicitTiming(FieldComponents::Spectral::SCALAR) == ExplicitTiming::LINEAR || ((*scalEqIt)->solveTiming() == this->solveTime() && (*scalEqIt)->explicitTiming(FieldComponents::Spectral::SCALAR) == this->explicitTime()))
+         bool isExplicit = ((*scalEqIt)->explicitTiming(FieldComponents::Spectral::SCALAR) == this->explicitTime());
+         bool isLinear = ((*scalEqIt)->explicitTiming(FieldComponents::Spectral::SCALAR) == ExplicitTiming::LINEAR);
+         bool isSolve = ((*scalEqIt)->solveTiming() == this->solveTime());
+
+         if(isExplicit && (isLinear || isSolve))
          {
             // Get field identity
             myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
@@ -340,30 +344,30 @@ namespace Solver {
       std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
       for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
       {
-         if((*vectEqIt)->solveTiming() == this->solveTime())
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
          {
-            Equations::IVectorEquation::SpectralComponent_iterator compIt;
-            Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
-            for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+            bool isExplicit = ((*vectEqIt)->explicitTiming(*compIt) == this->explicitTime());
+            bool isLinear = ((*vectEqIt)->explicitTiming(*compIt) == ExplicitTiming::LINEAR);
+            bool isSolve = ((*vectEqIt)->solveTiming() == this->solveTime());
+            if(isExplicit && (isLinear || isSolve))
             {
-               if((*vectEqIt)->explicitTiming(*compIt) == ExplicitTiming::LINEAR || (*vectEqIt)->explicitTiming(*compIt) == this->explicitTime())
+               // Get field identity for first component
+               myId = std::make_pair((*vectEqIt)->name(), *compIt);
+
+               // Get index of solver
+               int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+               // Linear solve matrices are complex
+               if((*vectEqIt)->couplingInfo(myId.second).isComplex())
                {
-                  // Get field identity for first component
-                  myId = std::make_pair((*vectEqIt)->name(), *compIt);
+                  getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
 
-                  // Get index of solver
-                  int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
-
-                  // Linear solve matrices are complex
-                  if((*vectEqIt)->couplingInfo(myId.second).isComplex())
-                  {
-                     getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
-
-                     // Linear solve matrices are real
-                  } else
-                  {
-                     getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
-                  }
+                  // Linear solve matrices are real
+               } else
+               {
+                  getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, scalVar, vectVar);
                }
             }
          }

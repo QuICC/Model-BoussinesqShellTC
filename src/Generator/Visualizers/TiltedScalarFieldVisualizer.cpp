@@ -61,6 +61,7 @@ namespace Equations {
    void TiltedScalarFieldVisualizer::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, true, false, false);
+      this->setExplicitTiming(FieldComponents::Spectral::SCALAR, ExplicitTiming::LINEAR);
    }
 
    void TiltedScalarFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const

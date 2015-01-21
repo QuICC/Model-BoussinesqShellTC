@@ -67,14 +67,17 @@ namespace Equations {
       if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
       {
          this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::TRIVIAL, 0, false, false, true, false);
+         this->setExplicitTiming(FieldComponents::Spectral::ONE, ExplicitTiming::LINEAR);
       }
       if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
       {
          this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::TRIVIAL, 0, false, false, true, false);
+         this->setExplicitTiming(FieldComponents::Spectral::TWO, ExplicitTiming::LINEAR);
       }
       if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
       {
          this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::TRIVIAL, 0, false, false, true, false);
+         this->setExplicitTiming(FieldComponents::Spectral::THREE, ExplicitTiming::LINEAR);
       }
    }
 

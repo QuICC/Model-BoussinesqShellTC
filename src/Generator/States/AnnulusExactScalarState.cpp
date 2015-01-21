@@ -65,6 +65,7 @@ namespace Equations {
    void AnnulusExactScalarState::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+      this->setExplicitTiming(FieldComponents::Spectral::SCALAR, ExplicitTiming::LINEAR);
    }
 
    void AnnulusExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const

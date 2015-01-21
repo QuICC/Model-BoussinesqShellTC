@@ -236,7 +236,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
             mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = shell.i4x4lapl(res[0], l, a, b, bc, -l*(l+1.0))
 
         elif field_row == ("magnetic","tor"):
             mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))

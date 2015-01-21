@@ -241,11 +241,11 @@ namespace GeoMHDiSCC {
       this->solvePrognosticEquations();
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::AFTER, ExplicitTiming::LINEAR);
+      this->explicitDiagnosticEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
       this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::AFTER, ExplicitTiming::LINEAR);
+      this->explicitTrivialEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
       this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Update conditions at the end of timestep

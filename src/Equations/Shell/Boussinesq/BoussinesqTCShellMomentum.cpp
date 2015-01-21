@@ -47,10 +47,10 @@ namespace Equations {
          int start = 0;
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, true, false);
       this->setExplicitTiming(FieldComponents::Spectral::TOR, ExplicitTiming::LINEAR);
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, true, false);
       this->setExplicitTiming(FieldComponents::Spectral::POL, ExplicitTiming::LINEAR);
    }
 
