@@ -92,6 +92,31 @@ def d2(nr, a, b, rg):
     ssol = sy.diff(sphys,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
+def divx(nr, a, b, rg):
+    """Accuracy test for 1/x operator"""
+
+    print("1/x:")
+    A = shell.x1(nr, a, b, shell.radbc.no_bc()).tocsr()
+    lhs = np.ones(rg.shape[0])
+    sol = transf.torcheb(transf.torphys(lhs)/rg)
+    rhs = spsplin.spsolve(A,lhs)
+    print(rhs)
+    print(sol)
+    print(np.max(np.abs(sol-rhs)))
+
+def divx2(nr, a, b, rg):
+    """Accuracy test for 1/x^2 operator"""
+
+    print("1/x^2:")
+    A = shell.x2(nr, a, b, shell.radbc.no_bc()).tocsr()
+    lhs = np.ones(rg.shape[0])
+    sol = transf.torcheb(transf.torphys(lhs)/(rg*rg))
+    rhs = spsplin.spsolve(A,lhs)
+    print(rhs)
+    print(sol)
+    print(sol-rhs)
+    print(np.max(np.abs(sol-rhs)))
+
 def x1(nr, a, b, rg):
     """Accuracy test for x1 operator"""
 
@@ -326,23 +351,26 @@ def qid(nr, a, b, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nr = 100
+    nr = 50
     a, b = shell.linear_r2x(1.0, 0.35)
     rg = transf.rgrid(nr, a, b)
 
+    divx(nr, a, b, rg)
+    divx2(nr, a, b, rg)
+
     # run tests
     #zblk(nr, a, b, rg)
-    d1(nr, a, b, rg)
-    d2(nr, a, b, rg)
-    x1(nr, a, b, rg)
+#    d1(nr, a, b, rg)
+#    d2(nr, a, b, rg)
+#    x1(nr, a, b, rg)
     x2(nr, a, b, rg)
-    i2x1(nr, a, b, rg)
-    i2x2d1(nr, a, b, rg)
-    i2x2(nr, a, b, rg)
-    i2x2lapl(nr, a, b, rg)
-    i4x3(nr, a, b, rg)
-    i4x4d1(nr, a, b, rg)
-    i4x4(nr, a, b, rg)
-    i4x4lapl(nr, a, b, rg)
-    i4x4lapl2(nr, a, b, rg)
+#    i2x1(nr, a, b, rg)
+#    i2x2d1(nr, a, b, rg)
+#    i2x2(nr, a, b, rg)
+#    i2x2lapl(nr, a, b, rg)
+#    i4x3(nr, a, b, rg)
+#    i4x4d1(nr, a, b, rg)
+#    i4x4(nr, a, b, rg)
+#    i4x4lapl(nr, a, b, rg)
+#    i4x4lapl2(nr, a, b, rg)
 #    qid(nr, a, b, rg)

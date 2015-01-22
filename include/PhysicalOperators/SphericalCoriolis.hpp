@@ -69,13 +69,13 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.setSlice(-c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.setSlice(-v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal(), iR);
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
@@ -84,15 +84,13 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(-c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
-               rS.subSlice(c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal()), iR);
+               rS.setSlice(-c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(-v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
-               rS.subSlice(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal(), iR);
+               rS.setSlice(-v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
@@ -101,13 +99,15 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal()), iR);
+               rS.setSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.addSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.setSlice(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal(), iR);
+               rS.setSlice(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.addSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
       }
@@ -121,13 +121,13 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.subSlice(c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.subSlice(v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal(), iR);
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
@@ -136,14 +136,12 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
                rS.subSlice(c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
                rS.subSlice(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
@@ -153,13 +151,15 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal()), iR);
+               rS.addSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.addSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal(), iR);
+               rS.addSlice(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.addSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
       }
@@ -173,13 +173,13 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.addSlice(c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.addSlice(v.comp(FieldComponents::Physical::PHI).slice(iR)*sinTheta.asDiagonal(), iR);
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
@@ -188,14 +188,12 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
                rS.addSlice(c*(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.addSlice(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
                rS.addSlice(v.comp(FieldComponents::Physical::PHI).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
@@ -205,13 +203,15 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal()), iR);
+               rS.subSlice(c*(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal()), iR);
+               rS.subSlice(c*(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal()), iR);
             }
          } else
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               rS.subSlice(v.comp(FieldComponents::Physical::R).slice(iR)*cosTheta.asDiagonal(), iR);
+               rS.subSlice(v.comp(FieldComponents::Physical::R).slice(iR)*sinTheta.asDiagonal(), iR);
+               rS.subSlice(v.comp(FieldComponents::Physical::THETA).slice(iR)*cosTheta.asDiagonal(), iR);
             }
          }
       }

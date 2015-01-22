@@ -53,7 +53,7 @@ namespace Transform {
    }
 
    ShellChebyshevFftwTransform::ShellChebyshevFftwTransform()
-      : mFPlan(NULL), mBPlan(NULL), mRo(-1), mRRatio(-1)
+      : mFPlan(NULL), mBPlan(NULL), mRo(-1), mRRatio(-1), mCnstA(0.0), mCnstB(0.0)
    {
    }
 
@@ -93,6 +93,11 @@ namespace Transform {
       this->mRo = options.find(NonDimensional::RO)->second;
 
       this->mRRatio = options.find(NonDimensional::RRATIO)->second;
+
+      // Compute the corresponding linear change of variable r = ax + b
+      this->mCnstB = (this->mRo*this->mRRatio + this->mRo)/2.0;
+
+      this->mCnstA = this->mRo - this->mCnstB;
    }
 
    Array ShellChebyshevFftwTransform::meshGrid() const
@@ -381,7 +386,8 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+            this->recurrenceDiff(this->mTmpIn, chebVal);
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
             this->mTmpInS.topRows(1).setZero();
@@ -401,14 +407,17 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            //this->recurrenceDivR(this->mTmpIn, chebVal);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2
@@ -636,7 +645,8 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+            this->recurrenceDiff(this->mTmpIn, chebVal.real());
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
             this->mTmpInS.topRows(1).setZero();
@@ -655,14 +665,17 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+            //this->recurrenceDivR(this->mTmpIn, chebVal.real());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2 of real part
@@ -748,7 +761,8 @@ namespace Transform {
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
          #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+            this->recurrenceDiff(this->mTmpIn, chebVal.imag());
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
             this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
             this->mTmpInS.topRows(1).setZero();
@@ -768,14 +782,17 @@ namespace Transform {
             this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
          #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         #if defined GEOMHDISCC_TRANSOP_FORWARD
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+//            this->recurrenceDivR(this->mTmpIn, chebVal.imag());
+         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
+            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
+         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
       #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2 of imaginary part

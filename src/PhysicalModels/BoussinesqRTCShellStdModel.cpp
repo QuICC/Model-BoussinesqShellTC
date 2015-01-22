@@ -77,7 +77,7 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(1)
+         switch(2)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
