@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void BoussinesqTCShellStdModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedShellExactScalarState spScalar;
@@ -82,7 +82,7 @@ namespace GeoMHDiSCC {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
                tSH.clear(); 
-               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
+               //tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));

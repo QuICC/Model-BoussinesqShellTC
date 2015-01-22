@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void BoussinesqTCShellModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedShellExactScalarState spScalar;
