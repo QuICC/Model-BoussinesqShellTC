@@ -40,7 +40,6 @@ def test_forward(op, res_expr, sol_expr, grid, q):
     rhs = op*lhs
     t = x_to_phys(sol_expr,grid)
     sol = transf.tocheb(t)
-    pl.semilogy(np.abs(sol))
     err = np.abs(rhs - sol)
     if q > 0:
         err[0:q] = 0
@@ -69,6 +68,8 @@ def test_backward_tau(opA, opB, res_expr, sol_expr, grid):
     rhs = transf.tocheb(x_to_phys(res_expr,grid))
     lhs = spsplin.spsolve(opA,opB*rhs)
     sol = transf.tocheb(x_to_phys(sol_expr,grid))
+    pl.plot(grid, transf.tophys(sol), 'g', grid, transf.tophys(lhs), 'rx')
+    pl.show()
     err = np.abs(lhs - sol)
     vis_error(err, 'Tau backward error')
     print("\t\tMax tau backward error: " + str(np.max(err)))
@@ -163,7 +164,13 @@ def i2(nx, xg):
     print("i2:")
     x = sy.Symbol('x')
     A = c1d.i2(nx, c1d.c1dbc.no_bc())
-    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)])
+    ssol = sy.integrate(sphys,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
+
+    print("i2 (full Chebyshev):")
+    A = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
+    sphys = np.sum([sy.chebyshevt(int(i),x) for i in np.arange(0,nx,1)])
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
@@ -181,7 +188,14 @@ def i2d2(nx, xg):
     print("\tbc = 20")
     A = c1d.i2d2(nx, {0:20}).tocsr()
     B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
-    ssol = sy.expand((1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
+    ssol = sy.expand(1e8*(1.0 - x**2)*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)]))
+    sphys = sy.diff(ssol,x,x)
+    test_backward_tau(A, B, sphys, ssol, xg)
+
+    print("i2 (full Chebyshev):")
+    A = c1d.i2d2(nx, {0:20}).tocsr()
+    B = c1d.i2(nx, c1d.c1dbc.no_bc()).tocsr()
+    ssol = (1.0 - x**2)*np.sum([sy.chebyshevt(int(i),x) for i in np.arange(0,nx,1)])
     sphys = sy.diff(ssol,x,x)
     test_backward_tau(A, B, sphys, ssol, xg)
 
@@ -500,46 +514,46 @@ def surfaceFlux(nx, xg):
 
 if __name__ == "__main__":
     # Set test parameters
-    nx = 20
+    nx = 12
     xg = transf.grid(nx)
 
-    # run hardcoded operator tests
-    print('Hard coded exact operators')
-    #zblk(nx, xg)
-    d1(nx, xg)
-    d2(nx, xg)
-    d4(nx, xg)
-    laplh(nx, xg)
-    lapl2h(nx, xg)
-    i1(nx, xg)
+#    # run hardcoded operator tests
+#    print('Hard coded exact operators')
+#    #zblk(nx, xg)
+#    d1(nx, xg)
+#    d2(nx, xg)
+#    d4(nx, xg)
+#    laplh(nx, xg)
+#    lapl2h(nx, xg)
+#    i1(nx, xg)
     i2(nx, xg)
-    i2d1(nx, xg)
+#    i2d1(nx, xg)
     i2d2(nx, xg)
-    i2lapl(nx, xg)
-    i2laplh(nx, xg)
-    i4(nx, xg)
-    i4d1(nx, xg)
-    i4d2(nx, xg)
-    i4d4(nx, xg)
-    i4lapl(nx, xg)
-    i4laplh(nx, xg)
-    i4lapl2(nx, xg)
-    i4lapl2h(nx, xg)
-    qid(nx, xg)
+#    i2lapl(nx, xg)
+#    i2laplh(nx, xg)
+#    i4(nx, xg)
+#    i4d1(nx, xg)
+#    i4d2(nx, xg)
+#    i4d4(nx, xg)
+#    i4lapl(nx, xg)
+#    i4laplh(nx, xg)
+#    i4lapl2(nx, xg)
+#    i4lapl2h(nx, xg)
+#    qid(nx, xg)
 
-    # run generic operator tests
-    print('Generic operator generator')
-    gen1_x(nx, 0, 1, xg)
-    genxp(nx, 0, 1, xg)
-    genxp(nx, 0, 2, xg)
-    genxp(nx, 0, 3, xg)
-    genxp(nx, 0, 4, xg)
-    genxp(nx, 0, 9, xg)
-    genlinxp(nx, 0, 1, xg)
-    genlinxp(nx, 0, 2, xg)
-    genlinxp(nx, 0, 1.3, xg)
-    genlinxp(nx, 0, 1.3, xg, 10)
-
-    # Run average operator tests
-    avg(nx, xg)
-    surfaceFlux(nx, xg)
+#    # run generic operator tests
+#    print('Generic operator generator')
+#    gen1_x(nx, 0, 1, xg)
+#    genxp(nx, 0, 1, xg)
+#    genxp(nx, 0, 2, xg)
+#    genxp(nx, 0, 3, xg)
+#    genxp(nx, 0, 4, xg)
+#    genxp(nx, 0, 9, xg)
+#    genlinxp(nx, 0, 1, xg)
+#    genlinxp(nx, 0, 2, xg)
+#    genlinxp(nx, 0, 1.3, xg)
+#    genlinxp(nx, 0, 1.3, xg, 10)
+#
+#    # Run average operator tests
+#    avg(nx, xg)
+#    surfaceFlux(nx, xg)

@@ -62,7 +62,10 @@ def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate diagonal
     def d0(n):
-        return (a**2 + 2.0*b**2)/2.0
+        if n <= nr - 1:
+            return (a**2 + 2.0*b**2)/2.0
+        else:
+            return (a**2 + 2.0*b**2)/2.0 - a**2/4.0
 
     # Generate 1st superdiagonal
     def d1(n):
@@ -73,6 +76,59 @@ def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
         return d_2(n)
 
     ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    if zr > 0:
+        mat = mat.tolil()
+        mat[-zr:,:] = 0
+        mat = mat.tocsr()
+    return radbc.constrain(mat, bc)
+
+def x4(nr, a, b, bc, coeff = 1.0, zr = 0):
+    """Create operator for x^4 multiplication"""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-4,5)
+    nzrow = -1
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4/16.0
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*b/2.0
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*(a**2 + 6.0*b**2)/4.0
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b*(3.0*a**2 + 4.0*b**2)/2.0
+
+    # Generate diagonal
+    def d0(n):
+        return (3.0*a**4 + 24.0*a**2*b**2 + 8.0*b**4)/8.0
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return  d_1(n)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return d_2(n)
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return d_3(n)
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return d_4(n)
+
+    ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
@@ -139,7 +195,10 @@ def i2(nr, a, b, bc, coeff = 1.0):
 
     # Generate diagonal
     def d0(n):
-        return -a**2/(2.0*(n - 1.0)*(n + 1.0))
+        if n <= nr - 1:
+            return -a**2/(2.0*(n - 1.0)*(n + 1.0))
+        else:
+            return -a**2/(2.0*(n - 1.0)*(n + 1.0)) - a**2/(4.0*(n + 1.0)*(n + 2.0))
 
     # Generate 2nd superdiagonal
     def d2(n):

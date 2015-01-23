@@ -29,7 +29,6 @@ def integrate(term, base = None):
             base = integrate(t, base)
     return base
 
-
 def spectral_monomial(p, f):
     # Some assertion for safety
     assert (p >= 0)
@@ -47,7 +46,6 @@ def spectral_monomial(p, f):
         for i in recurrence.keys():
             recurrence[i] = recurrence[i].simplify().factor()
     return recurrence
-
 
 def spectral_integral(q, f, asrow = True):
     # Some assertion for safety
@@ -89,7 +87,6 @@ def spectral_intgxmult(q, p, f):
 
     return recurrence
 
-
 def change_variable(terms, type):
     new_terms = []
     if type == 'linear_r2x':
@@ -104,7 +101,6 @@ def change_variable(terms, type):
                 new_terms.append(t)
 
     return new_terms
-
 
 def build_recurrence(terms, fs):
     ops = dict();
@@ -122,7 +118,6 @@ def build_recurrence(terms, fs):
             rec = spectral_intgxmult(tup[0], tup[1], {d:f})
             for i in rec.keys():
                 recurrence[i] = recurrence.get(i,0) + ops[tup]*rec[i]
-
 
     for i in recurrence.keys():
         recurrence[i] = recurrence[i].simplify().factor()

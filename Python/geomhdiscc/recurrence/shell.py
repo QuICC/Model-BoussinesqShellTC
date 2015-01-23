@@ -36,6 +36,20 @@ def x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def x4():
+    """Spherical shell x^2 multiplication operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':4, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i1():
     """Spherical shell first integral operator"""
 
