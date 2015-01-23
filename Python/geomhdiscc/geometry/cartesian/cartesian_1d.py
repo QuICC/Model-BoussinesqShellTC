@@ -110,10 +110,7 @@ def i2(nx, bc, coeff = 1.0):
 
     # Generate main diagonal
     def d0(n):
-        if n <= nx - 1:
-            return -1.0/(2.0*(n - 1.0)*(n + 1.0))
-        else:
-            return -1.0/(2.0*(n - 1.0)*(n + 1.0)) - 1.0/(4.0*(n + 1.0)*(n + 2.0))
+        return -1.0/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):

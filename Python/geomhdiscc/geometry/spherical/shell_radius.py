@@ -62,10 +62,7 @@ def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate diagonal
     def d0(n):
-        if n <= nr - 1:
-            return (a**2 + 2.0*b**2)/2.0
-        else:
-            return (a**2 + 2.0*b**2)/2.0 - a**2/4.0
+        return (a**2 + 2.0*b**2)/2.0
 
     # Generate 1st superdiagonal
     def d1(n):
@@ -195,10 +192,7 @@ def i2(nr, a, b, bc, coeff = 1.0):
 
     # Generate diagonal
     def d0(n):
-        if n <= nr - 1:
-            return -a**2/(2.0*(n - 1.0)*(n + 1.0))
-        else:
-            return -a**2/(2.0*(n - 1.0)*(n + 1.0)) - a**2/(4.0*(n + 1.0)*(n + 2.0))
+        return -a**2/(2.0*(n - 1.0)*(n + 1.0))
 
     # Generate 2nd superdiagonal
     def d2(n):
@@ -287,6 +281,39 @@ def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
         return -a**2*(l - n - 1.0)*(l + n + 2.0)/(4.0*n*(n + 1.0))
 
     ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i4(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-4,5,2)
+    nzrow = 3
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return 3.0*a**4/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**4/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return a**4/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
