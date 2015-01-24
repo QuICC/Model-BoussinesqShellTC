@@ -66,22 +66,19 @@ namespace Equations {
 
    void BoussinesqRTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {  
-      // Get square root of Taylor number
-      MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
-
       ///
       /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
       ///
       switch(id)
       {
          case(FieldComponents::Physical::R):
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 0.0);
             break;
          case(FieldComponents::Physical::THETA):
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 0.0);
             break;
          case(FieldComponents::Physical::PHI):
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 0.0);
             break;
          default:
             assert(false);
@@ -89,6 +86,9 @@ namespace Equations {
       }
 
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         // Get square root of Taylor number
+         MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+
          ///
          /// Compute Coriolis term
          ///
