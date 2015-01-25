@@ -140,7 +140,7 @@ namespace Schemes {
       //
 
       // Get standard dealiased FFT size
-      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1);
+      int nR = Transform::Fft::ToolsSelector::dealiasCosFft(this->mI+1+8);
       // Check for optimised FFT sizes
       nR = Transform::Fft::ToolsSelector::optimizeFft(nR);
 

@@ -21,6 +21,7 @@
 #include "Quadratures/LegendreRule.hpp"
 #include "PolynomialTransforms/AssociatedLegendrePolynomial.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -95,10 +96,11 @@ namespace Transform {
       this->mWeights.array() *= 2.0*Math::PI;
 
       // Initialise storage for l(l+1) factor
-      this->mLl1 = Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
-      this->mLl1 = this->mLl1.array()*(this->mLl1.array() + 1.0);
-      this->mDivLl1 = this->mLl1.array().pow(-1);
-      this->mDivLl1(0) = 0.0;
+      this->mLl = Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+      this->mLl = this->mLl.array()*(this->mLl.array() + 1.0);
+      this->mLl2 = this->mLl.array().pow(2);
+      this->mDivLl = this->mLl.array().pow(-1);
+      this->mDivLl(0) = 0.0;
 
       // Reserve storage for the projectors, 1/sin projectors and derivative
       this->mProj.reserve(this->mspSetup->slow().size());
@@ -175,7 +177,7 @@ namespace Transform {
             start += cols;
          }
 
-      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL1DIFF)
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIFF)
       { 
          // Compute integration of derivative
          int start = 0;
@@ -184,7 +186,46 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl1.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIFF)
+      { 
+         // Compute integration of derivative
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDiff.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIVSIN)
+      { 
+         // Compute integration of 1/sin
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDivSin.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDivSin.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIVSIN)
+      { 
+         // Compute integration of 1/sin
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDivSin.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mDivSin.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
 
@@ -201,20 +242,7 @@ namespace Transform {
             start += cols;
          }
 
-      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL1DIVSIN)
-      { 
-         // Compute integration of 1/sin
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl1.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
-            start += cols;
-         }
-
-      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL1)
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL2)
       { 
          // Compute integration
          int start = 0;
@@ -223,11 +251,11 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl1.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
 
-      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL1)
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL)
       { 
          // Compute integration
          int start = 0;
@@ -236,11 +264,24 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl1.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
 
-      } else
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL)
+      { 
+         // Compute integration
+         int start = 0;
+         int physRows = this->mspSetup->fwdSize(); 
+         for(size_t i = 0; i < this->mDiff.size(); i++)
+         {
+            int cols = this->mspSetup->mult()(i);
+            int specRows = this->mProj.at(i).cols();
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            start += cols;
+         }
+
+      } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTG)
       {
          // Compute integration
          int start = 0;
@@ -252,6 +293,10 @@ namespace Transform {
             rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
             start += cols;
          }
+
+      } else
+      {
+         throw Exception("Requested an unknown integrator");
       }
    }
 
@@ -280,7 +325,7 @@ namespace Transform {
          }
 
       // Compute \f$l(l+1)D\f$ projection
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIFFLL1)
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIFFLL)
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
@@ -288,7 +333,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*this->mLl1.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
             start += cols;
          }
 
@@ -306,7 +351,7 @@ namespace Transform {
          }
 
       // Compute \f$1/\sin\theta\f$ projection
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINLL1)
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINLL)
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
@@ -314,7 +359,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*this->mLl1.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
             start += cols;
          }
 
@@ -324,7 +369,7 @@ namespace Transform {
          throw Exception("DIVSINDIFFSIN not yet implemented");
 
       // Compute \f$l(l+1)\f$ projection
-      } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJLL1)
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJLL)
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
@@ -332,12 +377,12 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*this->mLl1.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
             start += cols;
          }
 
       // Compute simple projection
-      } else
+      } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJ)
       {
          int start = 0;
          int physRows = this->mspSetup->fwdSize(); 
@@ -348,6 +393,10 @@ namespace Transform {
             rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*specVal.block(0,start, specRows, cols);
             start += cols;
          }
+
+      } else
+      {
+         throw Exception("Requested an unknown projector");
       }
    }
 

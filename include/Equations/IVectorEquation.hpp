@@ -30,6 +30,7 @@
 #include "TypeSelectors/SparseSolverSelector.hpp"
 #include "SparseSolvers/SparseLinearSolverTools.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -230,7 +231,7 @@ namespace Equations {
          solStart = start;
          solution = &storage;
       }
-
+ 
       if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          int rows = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
@@ -500,6 +501,11 @@ namespace Equations {
             }
          }
       }
+
+      std::cerr << " ------------ REAL DATA ---------- " << std::endl;
+      std::cerr << storage.real() << std::endl;
+      std::cerr << "----------- IMAG DATA ------------ " << std::endl;
+      std::cerr << storage.imag() << std::endl;
    }
 
    template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)

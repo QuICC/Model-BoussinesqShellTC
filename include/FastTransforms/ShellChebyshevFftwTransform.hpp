@@ -71,10 +71,13 @@ namespace Transform {
           * Enum of integrator IDs:
           *    - INTG: integration
           *    - INTGR: integration of r
-          *    - INTGDIVR: integration of 1/r
-          *    - INTGDIVRDIFFR: integration of 1 /r D r
+          *    - INTGQR: integration of QST Q component for Poloidal NL from radial laplacian
+          *    - INTGQH: integration of QST Q component for Poloidal NL from horizontal laplacian
+          *    - INTGSR: integration of QST S component for Poloidal NL from radial laplacian
+          *    - INTGSH: integration of QST S component for Poloidal NL from horizontal laplacian
+          *    - INTGT: integration of QST T component for Toroidal NL
           */
-         enum Id {INTG, INTGR, INTGDIVR, INTGDIVRDIFFR};
+         enum Id {INTG, INTGR, INTGQR, INTGQH, INTGSR, INTGSH, INTGT};
       };
 
    };
@@ -220,31 +223,56 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
+          * @brief Storage for the Chebyshev multiplication by R matrix
+          */
+         SparseMatrix   mOpR;
+
+         /**
+          * @brief Storage for the Chebyshev QST Q component for NL (radial) matrix
+          */
+         SparseMatrix   mOpQR;
+
+         /**
+          * @brief Storage for the Chebyshev QST Q component for NL (horizontal) matrix
+          */
+         SparseMatrix   mOpQH;
+
+         /**
+          * @brief Storage for the Chebyshev QST S component for NL (radial) matrix
+          */
+         SparseMatrix   mOpSR;
+
+         /**
+          * @brief Storage for the Chebyshev QST S component for NL (horizontal) matrix
+          */
+         SparseMatrix   mOpSH;
+
+         /**
+          * @brief Storage for the Chebyshev QST T component for NL matrix
+          */
+         SparseMatrix   mOpT;
+
+         /**
           * @brief Storage for the Chebyshev derivative matrix
           */
-         SparseMatrix   mDiff;
+         SparseMatrix   mOpD;
 
          /**
           * @brief Storage for the Chebyshev second derivative matrix
           */
-         SparseMatrix   mDiff2;
+         SparseMatrix   mOpD2;
 
          #if defined GEOMHDISCC_TRANSOP_FORWARD
 
          /**
-          * @brief Storage for the multiplication by R physical array
-          */
-         Array   mR;
-
-         /**
           * @brief Storage for the division by R physical array
           */
-         Array   mDivR;
+         Array   mPhysDivR;
 
          /**
           * @brief Storage for the division by R^2 physical array
           */
-         Array   mDivR2;
+         Array   mPhysDivR2;
 
          #elif defined GEOMHDISCC_TRANSOP_BACKWARD
 

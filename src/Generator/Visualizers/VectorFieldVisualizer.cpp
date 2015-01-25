@@ -80,6 +80,10 @@ namespace Equations {
    {
    }
 
+   void VectorFieldVisualizer::useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId)
+   {  
+   }
+
    void VectorFieldVisualizer::setRequirements()
    {
       // Set solver timing

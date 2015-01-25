@@ -319,6 +319,177 @@ def i4(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i4x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-5,6)
+    nzrow = 3
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4*b/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -3.0*a**5/(32.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4*b/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a**5*(n - 8.0)/(16.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return 3.0*a**4*b/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)) 
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a**5*(n + 8.0)/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**4*b/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -3.0*a**5/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return a**4*b/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return a**5/(32.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i4x1d1x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of x D x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-5,6)
+    nzrow = 3
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5*(n - 4.0)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4*b*(2.0*n - 7.0)/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -a**3*(a**2*n - 8.0*a**2 - 4.0*b**2*n - 4.0*b**2)/(32.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4*b*(n - 4.0)/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -a**3*(a**2*n**2 + 2.0*a**2*n - 20.0*a**2 + 6.0*b**2*n**2 - 6.0*b**2*n - 36.0*b**2)/(16.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -9.0*a**4*b/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a**3*(a**2*n**2 - 2.0*a**2*n - 20.0*a**2 + 6.0*b**2*n**2 + 6.0*b**2*n - 36.0*b**2)/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**4*b*(n + 4.0)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return a**3*(a**2*n + 8.0*a**2 - 4.0*b**2*n + 4.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -a**4*b*(2.0*n + 7.0)/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return -a**5*(n + 4.0)/(32.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i4x3d2(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of x^3 D^2 T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-5,6)
+    nzrow = 3
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5*(n - 6.0)*(n - 5.0)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return 3.0*a**4*b*(n - 5.0)*(n - 4.0)/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*(a**2*n**2 + 7.0*a**2*n - 54.0*a**2 + 12.0*b**2*n**2 - 36.0*b**2*n - 48.0*b**2)/(32.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b*(15.0*a**2*n - 57.0*a**2 + 2.0*b**2*n**2 - 4.0*b**2*n - 6.0*b**2)/(8.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -a**3*(a**2*n**3 - 9.0*a**2*n**2 - 16.0*a**2*n + 132.0*a**2 + 6.0*b**2*n**3 - 54.0*b**2*n**2 + 12.0*b**2*n + 288.0*b**2)/(16.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -a**2*b*(3.0*a**2*n**2 - 66.0*a**2 + 4.0*b**2*n**2 - 16.0*b**2)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a**3*(a**2*n**3 + 9.0*a**2*n**2 - 16.0*a**2*n - 132.0*a**2 + 6.0*b**2*n**3 + 54.0*b**2*n**2 + 12.0*b**2*n - 288.0*b**2)/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(15.0*a**2*n + 57.0*a**2 - 2.0*b**2*n**2 - 4.0*b**2*n + 6.0*b**2)/(8.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return a**3*(a**2*n**2 - 7.0*a**2*n - 54.0*a**2 + 12.0*b**2*n**2 + 36.0*b**2*n - 48.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return 3.0*a**4*b*(n + 4.0)*(n + 5.0)/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return a**5*(n + 5.0)*(n + 6.0)/(32.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i4x4(nr, a, b, bc, coeff = 1.0):
     """Create operator for 4th integral of x^4 T_n(x)."""
 
@@ -395,6 +566,63 @@ def i4x4(nr, a, b, bc, coeff = 1.0):
         return d_8(n + 3.0)
 
     ds = [d_8, d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7, d8]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i4x4laplrd1x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of x^4 laplacian 1/x D x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-5,6)
+    nzrow = 3
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5*(n - 6.0)*(n - 5.0)*(n - 4.0)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4*b*(n - 5.0)*(n - 4.0)*(4.0*n - 15.0)/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return 3.0*a**3*(n - 4.0)*(a**2*n**2 - a**2*n - 14.0*a**2 + 8.0*b**2*n**2 - 20.0*b**2*n - 28.0*b**2)/(32.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b*(4.0*a**2*n**3 - 12.0*a**2*n**2 - 67.0*a**2*n + 213.0*a**2 + 8.0*b**2*n**3 - 42.0*b**2*n**2 + 28.0*b**2*n + 78.0*b**2)/(8.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*(a**4*n**4 + 7.0*a**4*n**3 - 52.0*a**4*n**2 - 52.0*a**4*n + 384.0*a**4 + 12.0*a**2*b**2*n**4 + 30.0*a**2*b**2*n**3 - 354.0*a**2*b**2*n**2 - 12.0*a**2*b**2*n + 1440.0*a**2*b**2 + 8.0*b**4*n**4 - 16.0*b**4*n**3 - 56.0*b**4*n**2 + 64.0*b**4*n + 96.0*b**4)/(16.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return 9.0*a**2*b*(3.0*a**2*n**2 - 26.0*a**2 + 4.0*b**2*n**2 - 16.0*b**2)/(8.0*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a*(a**4*n**4 - 7.0*a**4*n**3 - 52.0*a**4*n**2 + 52.0*a**4*n + 384.0*a**4 + 12.0*a**2*b**2*n**4 - 30.0*a**2*b**2*n**3 - 354.0*a**2*b**2*n**2 + 12.0*a**2*b**2*n + 1440.0*a**2*b**2 + 8.0*b**4*n**4 + 16.0*b**4*n**3 - 56.0*b**4*n**2 - 64.0*b**4*n + 96.0*b**4)/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(4.0*a**2*n**3 + 12.0*a**2*n**2 - 67.0*a**2*n - 213.0*a**2 + 8.0*b**2*n**3 + 42.0*b**2*n**2 + 28.0*b**2*n - 78.0*b**2)/(8.0*n*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -3.0*a**3*(n + 4.0)*(a**2*n**2 + a**2*n - 14.0*a**2 + 8.0*b**2*n**2 + 20.0*b**2*n - 28.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return -a**4*b*(n + 4.0)*(n + 5.0)*(4.0*n + 15.0)/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return -a**5*(n + 4.0)*(n + 5.0)*(n + 6.0)/(32.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)
@@ -662,6 +890,79 @@ def i4x3(nr, a, b, bc, coeff = 1.0):
     # Generate 7th superdiagonal
     def d7(n):
         return a**7/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    ds = [d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i4x3d1x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 4th integral of x^3 D x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-7,8)
+    nzrow = 3
+
+    # Generate 7th subdiagonal
+    def d_7(n):
+        return a**7*(n - 6.0)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 6th subdiagonal
+    def d_6(n):
+        return a**6*b*(4.0*n - 21.0)/(64.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0))
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5*(a**2*n**2 + 7.0*a**2*n - 54.0*a**2 + 24.0*b**2*n**2 - 84.0*b**2*n - 108.0*b**2)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return a**4*b*(21.0*a**2*n - 81.0*a**2 + 8.0*b**2*n**2 - 22.0*b**2*n - 30.0*b**2)/(32.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -a**3*(3.0*a**4*n**2 - 12.0*a**4*n - 84.0*a**4 + 24.0*a**2*b**2*n**2 - 180.0*a**2*b**2*n - 456.0*a**2*b**2 - 16.0*b**4*n**2 - 48.0*b**4*n - 32.0*b**4)/(128.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**4*b*(12.0*a**2*n**2 - 9.0*a**2*n - 261.0*a**2 + 32.0*b**2*n**2 - 80.0*b**2*n - 288.0*b**2)/(64.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -3.0*a**3*(a**4*n**3 + 9.0*a**4*n**2 - 24.0*a**4*n - 156.0*a**4 + 16.0*a**2*b**2*n**3 + 88.0*a**2*b**2*n**2 - 264.0*a**2*b**2*n - 1152.0*a**2*b**2 + 16.0*b**4*n**3 + 32.0*b**4*n**2 - 144.0*b**4*n - 288.0*b**4)/(128.0*n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -3.0*a**4*b*(7.0*a**2*n**2 - 93.0*a**2 + 14.0*b**2*n**2 - 126.0*b**2)/(16.0*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return 3.0*a**3*(a**4*n**3 - 9.0*a**4*n**2 - 24.0*a**4*n + 156.0*a**4 + 16.0*a**2*b**2*n**3 - 88.0*a**2*b**2*n**2 - 264.0*a**2*b**2*n + 1152.0*a**2*b**2 + 16.0*b**4*n**3 - 32.0*b**4*n**2 - 144.0*b**4*n + 288.0*b**4)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return a**4*b*(12.0*a**2*n**2 + 9.0*a**2*n - 261.0*a**2 + 32.0*b**2*n**2 + 80.0*b**2*n - 288.0*b**2)/(64.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 3.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return a**3*(3.0*a**4*n**2 + 12.0*a**4*n - 84.0*a**4 + 24.0*a**2*b**2*n**2 + 180.0*a**2*b**2*n - 456.0*a**2*b**2 - 16.0*b**4*n**2 + 48.0*b**4*n - 32.0*b**4)/(128.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return a**4*b*(21.0*a**2*n + 81.0*a**2 - 8.0*b**2*n**2 - 22.0*b**2*n + 30.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return -a**5*(a**2*n**2 - 7.0*a**2*n - 54.0*a**2 + 24.0*b**2*n**2 + 84.0*b**2*n - 108.0*b**2)/(128.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 6th superdiagonal
+    def d6(n):
+        return -a**6*b*(4.0*n + 21.0)/(64.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
+
+    # Generate 7th superdiagonal
+    def d7(n):
+        return -a**7*(n + 6.0)/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0))
 
     ds = [d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)

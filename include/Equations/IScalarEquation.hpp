@@ -217,7 +217,7 @@ namespace Equations {
          solStart = start;
          solution = &storage;
       }
-
+      
       if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
@@ -296,6 +296,7 @@ namespace Equations {
             }
          }
       }
+
    }
 
    template <typename TData> void solveStencilUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)

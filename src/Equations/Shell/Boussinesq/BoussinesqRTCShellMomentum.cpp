@@ -49,10 +49,10 @@ namespace Equations {
          int start = 0;
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false, false);
       this->setExplicitTiming(FieldComponents::Spectral::TOR, ExplicitTiming::LINEAR);
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false, false);
       this->setExplicitTiming(FieldComponents::Spectral::POL, ExplicitTiming::LINEAR);
 
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
@@ -64,12 +64,12 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqRTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqRTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       ///
       /// Compute \f$\left(\nabla\wedge\vec u\right)\wedge\vec u\f$
       ///
-      switch(id)
+      switch(compId)
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 0.0);
@@ -93,7 +93,7 @@ namespace Equations {
          /// Compute Coriolis term
          ///
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         Physical::SphericalCoriolis::add(rNLComp, id, nR, this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+         Physical::SphericalCoriolis::add(rNLComp, compId, nR, this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 

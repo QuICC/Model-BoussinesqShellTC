@@ -40,15 +40,8 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
     
-        if self.linearize:
-            if field_row == ("velocity","pol") or field_row == ("temperature",""):
-                fields = [("velocity","pol"),("temperature","")]
-            else:
-                fields = [field_row]
-
-        else:
-            # fields are only coupled to themselves
-            fields = [field_row]
+        #fields = [("velocity","tor"),("velocity","pol"),("temperature","")]
+        fields = [field_row]
 
         return fields
 
@@ -59,6 +52,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             fields = []
         elif field_row == ("velocity","pol"):
             fields = [("temperature","")]
+            #fields = []
         elif field_row == ("temperature",""):
             fields = [("velocity","pol")]
 
@@ -207,18 +201,11 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        l = eigs[0]
-
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
-        elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], l, a, b, bc, -l*(l+1.0))
-
-        elif field_row == ("temperature",""):
+        if field_row == ("temperature",""):
             mat = shell.i2x2(res[0], a, b, bc)
 
         return mat
@@ -228,8 +215,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
-        T = Ta**0.5
 
         l = eigs[0]
 
@@ -238,28 +223,49 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc)
+                if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
+                    mat = shell.qid(res[0], 0, no_bc())
+                else:
+                    mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+            elif field_col == ("velocity","pol"):
+                mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
+                mat = shell.zblk(res[0], bc)
+
+        elif field_row == ("velocity","pol"):
+            if field_col == ("velocity","tor"):
+                mat = shell.zblk(res[0], bc)
+
+            elif field_col == ("velocity","pol"):
+                if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
+                    mat = shell.qid(res[0], 0, no_bc())
+                else:
+                    mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+
+            elif field_col == ("temperature",""):
+                if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
+                    mat = shell.zblk(res[0], bc)
+                else:
+                    mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            if field_col == ("velocity","pol"):
+            if field_col == ("velocity","tor"):
+                mat = shell.zblk(res[0], bc)
+
+            elif field_col == ("velocity","pol"):
                 if self.linearize:
                     mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
                 elif bcs["bcType"] == self.FIELD_TO_RHS:
                     mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
+             
                 else:
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1/Pr)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         return mat
 

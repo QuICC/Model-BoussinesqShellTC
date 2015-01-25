@@ -198,7 +198,7 @@ namespace Parallel {
       typename TTypes<Dimensions::Transform::TRA1D>::BwdType &rOutData = this->template storage<Dimensions::Transform::TRA1D>().provideBwd();
 
       // Dealias the data
-      rOutData.rData().topRows(rInData.data().rows()) = rInData.data(); 
+      rOutData.rData().topRows(rInData.data().rows()) = rInData.data();
 
       // Hold the input data
       this->template storage<Dimensions::Transform::TRA1D>().holdBwd(rOutData);
