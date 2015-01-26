@@ -224,6 +224,23 @@ def i1(nr, a, b, rg):
     ssol = sy.simplify(sy.integrate(sphys,x))
     test_forward(A, sphys, ssol, rg, 1)
 
+def i1x1(nr, a, b, rg):
+    """Accuracy test for i1x1 operator"""
+
+    print("i1x1:")
+    print("\t Forward: (polynomial):")
+    x = sy.Symbol('x')
+    A = shell.i1x1(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.integrate(x*sphys,x)
+    test_forward(A, sphys, ssol, rg, 1)
+
+    print("\t Forward: (full Chebyshev):")
+    A = shell.i1x1(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
+    ssol = sy.simplify(sy.integrate(x*sphys,x))
+    test_forward(A, sphys, ssol, rg, 1)
+
 def i2(nr, a, b, rg):
     """Accuracy test for i2 operator"""
 
@@ -640,16 +657,17 @@ if __name__ == "__main__":
     # Set test parameters
     nr = 14
     a, b = shell.linear_r2x(1.0, 0.35)
-    rg = transf.rgrid(nr+4, a, b)
+    rg = transf.rgrid(2*nr, a, b)
 
     # run tests
     #zblk(nr, a, b, rg)
-#    d1(nr, a, b, rg)
-#    d2(nr, a, b, rg)
+    d1(nr, a, b, rg)
+    d2(nr, a, b, rg)
     x1(nr, a, b, rg)
     x2(nr, a, b, rg)
     x4(nr, a, b, rg)
     i1(nr, a, b, rg)
+    i1x1(nr, a, b, rg)
     i2(nr, a, b, rg)
     i2x1(nr, a, b, rg)
     i2x2d1(nr, a, b, rg)

@@ -74,25 +74,28 @@ def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
-        cond = tau_rdiffdivr(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_rdiffdivr(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 23:
-        cond = tau_insulating(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_insulating(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+    # Set last modes to zero
+    elif bc[0] > 990 and bc[0] < 1000:
+        cond = tau_last(mat.shape[1], bc[0]-990)
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -327,6 +330,15 @@ def tau_value_diff2(nr, pos, coeffs = None):
         cond[3] = [(td[i] - cond[3][i])/2 for i in np.arange(0,nr)]
 
     return np.array(cond)
+
+def tau_last(nx, nrow):
+    """Create the last modes to zero tau line(s)"""
+
+    cond = np.zeros((nrow, nx))
+    for j in range(0, nrow):
+        cond[j,nx-nrow+j] = tau_c(nx-nrow+j)
+
+    return cond
 
 def stencil(nr, bc):
     """Create a Galerkin stencil matrix"""

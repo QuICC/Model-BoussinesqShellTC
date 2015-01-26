@@ -53,7 +53,7 @@ namespace GeoMHDiSCC {
    void BoussinesqRTCShellStdModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedShellExactScalarState spScalar;
@@ -77,18 +77,18 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(1)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
                tSH.clear(); 
                //tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
                break;
 
@@ -97,11 +97,11 @@ namespace GeoMHDiSCC {
                tSH.clear(); 
                //tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
 
@@ -109,21 +109,21 @@ namespace GeoMHDiSCC {
                spVector->setStateType(Equations::ShellExactStateIds::TORPOL);
                tSH.clear(); 
                //tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
                tSH.clear(); 
                //tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
-               //tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
+               tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
          }

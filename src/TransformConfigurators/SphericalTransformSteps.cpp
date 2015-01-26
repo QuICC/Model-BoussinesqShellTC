@@ -69,18 +69,12 @@ namespace TransformSteps {
       transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGT, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SUB));
 
       // Compute Q component
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SETNEG));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL2, IntegratorBranch::Intg1DType::INTGQH, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SETNEG));
 
       // Compute S component
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGSR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGSR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLLDIFF, IntegratorBranch::Intg1DType::INTGSH, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SUB));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGLLDIVSIN, IntegratorBranch::Intg1DType::INTGSH, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SUB));
+      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
 
       return transform;
    }

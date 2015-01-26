@@ -179,6 +179,39 @@ def i1(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i1x1(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 1st integral x T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-2,3)
+    nzrow = 0
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2/(4.0*n)
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*b/(2.0*n)
+
+    # Generate diagonal
+    def d0(n):
+        return 0
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -d_1(n)
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -d_2(n)
+
+    ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i2(nr, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral T_n(x)."""
 

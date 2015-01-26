@@ -59,7 +59,7 @@ namespace Transform {
           *    - DIVRDIFFR: 1/r D r
           *    - RADLAPL: radial laplacian: D^2 + 2/r D
           */
-         enum Id {PROJ, DIFF, DIFF2, DIVR, DIVR2, DIVRDIFFR, RADLAPL};
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIVRDIFFR, RADLAPL};
       };
 
       /**
@@ -71,13 +71,11 @@ namespace Transform {
           * Enum of integrator IDs:
           *    - INTG: integration
           *    - INTGR: integration of r
-          *    - INTGQR: integration of QST Q component for Poloidal NL from radial laplacian
-          *    - INTGQH: integration of QST Q component for Poloidal NL from horizontal laplacian
-          *    - INTGSR: integration of QST S component for Poloidal NL from radial laplacian
-          *    - INTGSH: integration of QST S component for Poloidal NL from horizontal laplacian
+          *    - INTGQ: integration of QST Q component for Poloidal NL
+          *    - INTGS: integration of QST S component for Poloidal NL
           *    - INTGT: integration of QST T component for Toroidal NL
           */
-         enum Id {INTG, INTGR, INTGQR, INTGQH, INTGSR, INTGSH, INTGT};
+         enum Id {INTG, INTGR, INTGQ, INTGS, INTGT};
       };
 
    };
@@ -223,88 +221,24 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev multiplication by R matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mOpR;
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
 
          /**
-          * @brief Storage for the Chebyshev QST Q component for NL (radial) matrix
+          * @brief Storage for the integrator operators
           */
-         SparseMatrix   mOpQR;
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
 
          /**
-          * @brief Storage for the Chebyshev QST Q component for NL (horizontal) matrix
+          * @brief Storage for the sparse solver matrices
           */
-         SparseMatrix   mOpQH;
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
 
          /**
-          * @brief Storage for the Chebyshev QST S component for NL (radial) matrix
+          * @brief Storage for the sparse solvers
           */
-         SparseMatrix   mOpSR;
-
-         /**
-          * @brief Storage for the Chebyshev QST S component for NL (horizontal) matrix
-          */
-         SparseMatrix   mOpSH;
-
-         /**
-          * @brief Storage for the Chebyshev QST T component for NL matrix
-          */
-         SparseMatrix   mOpT;
-
-         /**
-          * @brief Storage for the Chebyshev derivative matrix
-          */
-         SparseMatrix   mOpD;
-
-         /**
-          * @brief Storage for the Chebyshev second derivative matrix
-          */
-         SparseMatrix   mOpD2;
-
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-
-         /**
-          * @brief Storage for the division by R physical array
-          */
-         Array   mPhysDivR;
-
-         /**
-          * @brief Storage for the division by R^2 physical array
-          */
-         Array   mPhysDivR2;
-
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-
-         /**
-          * @brief Storage for the Chebyshev division by R matrix
-          */
-         SparseMatrix   mDivR;
-
-         /**
-          * @brief Storage for the Chebyshev division by R^2 matrix
-          */
-         SparseMatrix   mDivR2;
-
-         /**
-          * @brief Storage for the sparse solver for differentiation
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiff;
-
-         /**
-          * @brief Storage for the sparse solver for second derivative
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiff2;
-
-         /**
-          * @brief Storage for the sparse solver for division by R
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR;
-
-         /**
-          * @brief Storage for the sparse solver for division by R^2
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR2;
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
 
          /**
           * @brief Storage for the backward operators input data
@@ -315,7 +249,6 @@ namespace Transform {
           * @brief Storage for the backward operators output data
           */
          Matrix mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

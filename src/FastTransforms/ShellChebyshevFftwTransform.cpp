@@ -138,201 +138,167 @@ namespace Transform {
 
    void ShellChebyshevFftwTransform::initOperators()
    {
+      //
+      // Initialise projector operators
+      //
+
+      //
+      // Initialise integrator operators
+      //
       // Multiplication by R
-      this->mOpR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // First derivative
-      this->mOpD.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // Second derivative
-      this->mOpD2.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // QST QR operator
-      this->mOpQR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // QST QH operator
-      this->mOpQH.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // QST SR operator
-      this->mOpSR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-      // QST SH operator
-      this->mOpSH.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGR, SparseMatrix(this->mspSetup->specSize(),this->mspSetup->specSize())));
+      // QST Q operator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ, SparseMatrix(this->mspSetup->specSize(),this->mspSetup->specSize())));
+      // QST S operator
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS, SparseMatrix(this->mspSetup->specSize(),this->mspSetup->specSize())));
       // QST T operator
-      this->mOpT.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, SparseMatrix(this->mspSetup->specSize(),this->mspSetup->specSize())));
+
+      // Multiplication by R
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // Multiplication by R^2
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // First derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // Second derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
-         // Initialise array for division by R
-         this->mPhysDivR = this->meshGrid().array().pow(-1);
-         // Initialise array for division by R^2
-         this->mPhysDivR2 = this->meshGrid().array().pow(-2);
+      // Prepare arguments to Chebyshev matrices call
+      PyObject *pArgs, *pValue;
+      pArgs = PyTuple_New(4);
+      // ... get operator size
+      pValue = PyLong_FromLong(this->mspSetup->specSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
+      // ... compute a, b factors
+      PyObject *pTmp = PyTuple_New(2);
+      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
+      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
+      PythonWrapper::setFunction("linear_r2x");
+      pValue = PythonWrapper::callFunction(pTmp);
+      PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
+      PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
+      // ... create boundray condition (none)
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyTuple_SetItem(pArgs, 3, pValue);
 
-         // Prepare arguments to Chebyshev matrices call
-         PyObject *pArgs, *pValue;
-         pArgs = PyTuple_New(4);
-         // ... get operator size
-         pValue = PyLong_FromLong(this->mspSetup->specSize());
-         PyTuple_SetItem(pArgs, 0, pValue);
-         // ... compute a, b factors
-         PyObject *pTmp = PyTuple_New(2);
-         PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
-         PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
-         PythonWrapper::setFunction("linear_r2x");
-         pValue = PythonWrapper::callFunction(pTmp);
-         PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
-         PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
-         // ... create boundray condition (none)
-         pValue = PyDict_New();
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-         PyTuple_SetItem(pArgs, 3, pValue);
+      // Call x1
+      PythonWrapper::setFunction("x1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGR)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call x1
-         PythonWrapper::setFunction("x1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpR, pValue);
-         Py_DECREF(pValue);
+      // Call QST Q component
+      PythonWrapper::setFunction("i4x3");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call d1
-         PythonWrapper::setFunction("d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpD, pValue);
-         Py_DECREF(pValue);
+      // Call QST S component
+      PythonWrapper::setFunction("i4x3d1x1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call d2
-         PythonWrapper::setFunction("d2");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpD2, pValue);
-         Py_DECREF(pValue);
+      // Call QST T component
+      PythonWrapper::setFunction("i2x2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGT)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call QST QR component
-         PythonWrapper::setFunction("i4x3d2");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpQR, pValue);
-         Py_DECREF(pValue);
+      // Change resoluton for solver matrices
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
+      SparseMatrix tmp(this->mspSetup->fwdSize(),this->mspSetup->fwdSize());
 
-         // Call QST QH component
-         PythonWrapper::setFunction("i4x1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpQH, pValue);
-         Py_DECREF(pValue);
+      // Call x1 for solver
+      PythonWrapper::setFunction("x1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call QST SR component
-         PythonWrapper::setFunction("i4x4laplrd1x1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpSR, pValue);
-         Py_DECREF(pValue);
+      // Call x1 for solver
+      PythonWrapper::setFunction("x2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR2)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call QST SH component
-         PythonWrapper::setFunction("i4x1d1x1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpSH, pValue);
-         Py_DECREF(pValue);
+      // Call d1 for solver
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 3);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+      PythonWrapper::setFunction("i1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
+      Py_DECREF(pValue);
 
-         // Call QST T component
-         PythonWrapper::setFunction("i2x2");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpT, pValue);
-         Py_DECREF(pValue);
+      // Call d2 for solver
+      // ... change boundary condition to zero last modes
+      pValue = PyTuple_GetItem(pArgs, 3);
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(992));
+      PythonWrapper::setFunction("i2");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF2)->second, pValue);
+      Py_DECREF(pValue);
 
-      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Initialise matrix for division by R
-         this->mPhysDivR.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-         // Initialise matrix for division by R
-         this->mPhysDivR2.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      // Initialize solver storage
+      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
+      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
 
-         // Prepare arguments to i1(...) call
-         PyObject *pArgs, *pValue;
-         pArgs = PyTuple_New(4);
-         // ... get operator size
-         pValue = PyLong_FromLong(this->mspSetup->specSize());
-         PyTuple_SetItem(pArgs, 0, pValue);
-         // ... compute a, b factors
-         PyObject *pTmp = PyTuple_New(2);
-         PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mRo));
-         PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mRRatio));
-         PythonWrapper::setFunction("linear_r2x");
-         pValue = PythonWrapper::callFunction(pTmp);
-         PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
-         PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
-         // ... create boundary condition (last mode zero)
-         pValue = PyDict_New();
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(99));
-         PyTuple_SetItem(pArgs, 3, pValue);
+      // Initialize solver and factorize division by R operator
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIVR, pSolver));
+      this->mSolver.find(ProjectorType::DIVR)->second->compute(this->mSolveOp.find(ProjectorType::DIVR)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIVR)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward division by R failed!");
+      }
 
-         // Call i1
-         PythonWrapper::setFunction("i1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpD, pValue);
-         Py_DECREF(pValue);
+      // Initialize solver and factorize division by R^2 operator
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIVR2, pSolver));
+      this->mSolver.find(ProjectorType::DIVR2)->second->compute(this->mSolveOp.find(ProjectorType::DIVR2)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIVR2)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward division by R^2 failed!");
+      }
 
-         // Call i1
-         PythonWrapper::setFunction("i2");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mOpD2, pValue);
-         Py_DECREF(pValue);
+      // Initialize solver and factorize division by d1 operator
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 1st derivative failed!");
+      }
 
-         // ... create boundary condition (none)
-         pValue = PyTuple_GetItem(pArgs, 3);
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-         // Call x1
-         PythonWrapper::setFunction("x1");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mPhysDivR, pValue);
-         Py_DECREF(pValue);
-
-         // Call x2
-         PythonWrapper::setFunction("x2");
-         pValue = PythonWrapper::callFunction(pArgs);
-         // Fill matrix
-         PythonWrapper::fillMatrix(this->mPhysDivR2, pValue);
-         Py_DECREF(pValue);
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+      // Initialize solver and factorize division by d2 operator
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
+      this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIFF2)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 2nd derivative failed!");
+      }
 
       // Cleanup
       PythonWrapper::finalize();
-
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Factorize differentiation matrix and free memory
-         this->mSDiff.compute(this->mOpD);
-         // Check for successful factorisation
-         if(this->mSDiff.info() != Eigen::Success)
-         {
-            throw Exception("Factorization of backward first derivative failed!");
-         }
-
-         // Factorize differentiation matrix and free memory
-         this->mSDiff2.compute(this->mOpD2);
-         // Check for successful factorisation
-         if(this->mSDiff2.info() != Eigen::Success)
-         {
-            throw Exception("Factorization of backward first second failed!");
-         }
-
-         // Factorize division matrix and free memory
-         this->mSDivR.compute(this->mPhysDivR);
-         // Check for successful factorisation
-         if(this->mSDivR.info() != Eigen::Success)
-         {
-            throw Exception("Factorization of backward division by R failed!");
-         }
-
-         // Factorize division matrix and free memory
-         this->mSDivR2.compute(this->mPhysDivR2);
-         // Check for successful factorisation
-         if(this->mSDivR2.info() != Eigen::Success)
-         {
-            throw Exception("Factorization of backward division by R^2 failed!");
-         }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    void ShellChebyshevFftwTransform::cleanupFft()
@@ -374,34 +340,14 @@ namespace Transform {
       // Do transform
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal *= this->mspSetup->scale();
 
-      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpR*rChebVal.topRows(this->mspSetup->specSize());
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpQR*rChebVal.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpQH*rChebVal.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpSR*rChebVal.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpSH*rChebVal.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGT)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()) = this->mOpT*rChebVal.topRows(this->mspSetup->specSize());
       } else
       {
-         throw Exception("Unknown integrator has been requested!");
+         rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*rChebVal.topRows(this->mspSetup->specSize());
       }
 
       #ifdef GEOMHDISCC_DEBUG
@@ -431,119 +377,73 @@ namespace Transform {
       // Compute first derivative
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize());
-            this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(2).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            //this->recurrenceDivR(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute 1/r D r projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute radial laplacian projection
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         // Compute D^2 part
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute simple projection
       } else
       {
          // Copy into other array
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
-
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         rPhysVal = this->mPhysDivR.asDiagonal()*rPhysVal;
-
-      // Compute 1/r^2 projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         rPhysVal = this->mPhysDivR2.asDiagonal()*rPhysVal;
-
-      // Compute 1/r D r projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-
-      // Compute laplacian projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         // Compute 2.0*D/r part
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mOpD*chebVal.topRows(this->mspSetup->specSize());
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
-      // Compute 1/r D r projection
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         throw Exception("DIVRDIFFR operator is not yet implemented");
-
-      // Compute laplacian projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         throw Exception("RADLAPL operator is not yet implemented");
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
    void ShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
@@ -565,74 +465,26 @@ namespace Transform {
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpQR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpQH*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpSR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpSH*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGT)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mOpT*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
+      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
       } else
       {
-         throw Exception("Unknown integrator has been requested!");
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut.topRows(this->mspSetup->specSize());
       }
 
       this->mTmpIn = physVal.imag();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTGR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpQR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGQH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpQH*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSR)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpSR*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGSH)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpSH*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if (integrator == ShellChebyshevFftwTransform::IntegratorType::INTGT)
-      {
-         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mOpT*this->mTmpOut.topRows(this->mspSetup->specSize());
-
-      } else if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
+      if(integrator == ShellChebyshevFftwTransform::IntegratorType::INTG)
       {
          rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
       } else
       {
-         throw Exception("Unknown integrator has been requested!");
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut.topRows(this->mspSetup->specSize());
       }
 
       #ifdef GEOMHDISCC_DEBUG
@@ -662,235 +514,145 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize()).real();
-            this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize()).real();
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
-            //this->recurrenceDivR(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2 of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute 1/r D r projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize()).real();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute radial laplacian projection of real part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize()).real();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of real part
       } else
       {
          // Copy values into simple matrix
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of real part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.real() = this->mTmpOut;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R for real part
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         rPhysVal.real() = this->mPhysDivR.asDiagonal()*rPhysVal.real();
-
-      // Compute division by R^2 for real part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         rPhysVal.real() = this->mPhysDivR2.asDiagonal()*rPhysVal.real();
-
-      // Compute 1/r D r projection for real part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal.real() += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-
-      // Compute radial laplacian projection for real part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         // Compute 2.0*D/r part of real part
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mOpD*chebVal.topRows(this->mspSetup->specSize()).real();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal.real() += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
-      // Compute 1/r D r projection
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         throw Exception("DIVRDIFFR operator is not yet implemented");
-
-      // Compute laplacian projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         throw Exception("RADLAPL operator is not yet implemented");
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
-
       // Compute first derivative of imaginary part
       if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-//            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize()).imag();
-            this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute second derivative by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF2)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize()).imag();
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff2, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
       // Compute division by R of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-//            this->recurrenceDivR(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
       // Compute division by R^2 of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
       {
-         this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-         Solver::internal::solveWrapper(this->mTmpOutS, this->mSDivR2, this->mTmpInS);
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute 1/r D r projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD*chebVal.topRows(this->mspSetup->specSize()).imag();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
       // Compute radial laplacian projection of imaginary part
       } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mOpD2*chebVal.topRows(this->mspSetup->specSize()).imag();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of imaginary part
       } else
       {
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of imaginary part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.imag() = this->mTmpOut;
-
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
-      // Compute division by R for imaginary part
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR)
-      {
-         rPhysVal.imag() = this->mPhysDivR.asDiagonal()*rPhysVal.imag();
-
-      // Compute division by R^2 for imaginary part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVR2)
-      {
-         rPhysVal.imag() = this->mPhysDivR2.asDiagonal()*rPhysVal.imag();
-
-      // Compute 1/r D r projection for imaginary part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal.imag() += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-
-      // Compute radial laplacian projection for imaginary part
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         // Compute 2.0*D/r part of real part
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = 2.0*this->mOpD*chebVal.topRows(this->mspSetup->specSize()).imag();
-         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-         fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-         rPhysVal.imag() += this->mPhysDivR.asDiagonal()*this->mTmpOut;
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
-      // Compute 1/r D r projection
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
-      {
-         throw Exception("DIVRDIFFR operator is not yet implemented");
-
-      // Compute laplacian projection
-      } else if(projector == ShellChebyshevFftwTransform::ProjectorType::RADLAPL)
-      {
-         throw Exception("RADLAPL operator is not yet implemented");
-      }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

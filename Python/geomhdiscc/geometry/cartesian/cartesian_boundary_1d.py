@@ -286,7 +286,7 @@ def tau_value_diff2(nx, pos, coeffs = None):
     return np.array(cond)
 
 def tau_last(nx):
-    """Create the boundary value tau line(s)"""
+    """Create the last modes to zero value tau line(s)"""
 
     cond = []
     cond.append([0 for i in np.arange(0,nx-1)] +  [tau_c(nx)])
