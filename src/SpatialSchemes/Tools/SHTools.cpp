@@ -80,7 +80,7 @@ namespace Schemes {
       }
    }
 
-   void SHTools::buildLHMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH)
+   void SHTools::buildLHSortedMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH)
    {
       // Make sure the list is empty at start
       harmonics.clear();
@@ -117,6 +117,62 @@ namespace Schemes {
          for(int m=0; m < SHTools::nM(l, nM); ++m)
          {
             modeQueue.push(std::make_pair(l, m));
+         }
+      }
+
+      // Remove unused modes from queue
+      for(int h=0; h < h0; ++h)
+      {
+         modeQueue.pop();
+      }
+
+      // Fill harmonics map with requested harmonics
+      for(int h = 0; h < nH; h++)
+      {
+         harmonics.insert(modeQueue.front());
+         modeQueue.pop();
+      }
+   }
+
+   void SHTools::buildMHSortedMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH)
+   {
+      // Make sure the list is empty at start
+      harmonics.clear();
+
+      // Treat the even and odd number of orders carefully
+      int maxM;
+      int minM;
+      if(nM % 2 == 0)
+      {
+         minM = 0;
+         maxM = nM/2;
+      } else
+      {
+         minM = 1;
+         maxM = (nM+1)/2;
+      }
+
+      // Create first part of list as pairs
+      std::queue<std::pair<int,int> >  modeQueue;
+      for(int m = minM; m < maxM; ++m)
+      {
+         for(int l = 0; l < SHTools::nL(m,nL); ++l)
+         {
+            modeQueue.push(std::make_pair(m, l + m));
+         }
+
+         for(int l = 0; l < SHTools::nL(nM-1-m, nL); ++l)
+         {
+            modeQueue.push(std::make_pair(nM-1-m, l+nM-1-m));
+         }
+      }
+
+      // Add in the first droped ones
+      for(int m = 0; m < minM; ++m)
+      {
+         for(int l = 0; l < SHTools::nL(m, nL); ++l)
+         {
+            modeQueue.push(std::make_pair(m, l+m));
          }
       }
 
@@ -208,7 +264,7 @@ namespace Schemes {
          endIdx = nM - 1;
       }
       
-      // Counter for the nubmer of elements removed
+      // Counter for the number of elements removed
       int k = 0;
 
       // Loop over the pairs
@@ -280,7 +336,7 @@ namespace Schemes {
             }
          }
 
-         // If the load list is till empty now. Make sure all get at least one
+         // If the load list is empty now. Make sure all get at least one
          if(regular.size() == 0)
          {
             for(int i = 0; i < bins; i++)
@@ -366,6 +422,31 @@ namespace Schemes {
       for(it = regular.begin(); it != regular.end(); it++)
       {
          it->second = nL - it->second;
+      }
+   }
+
+   void SHTools::fillIndexes1D(std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, const ArrayI& idx3D, const int nF1D, const int nB1D)
+   {
+      // Make full list of indexes for first dimension
+      for(int i = 0; i < idx3D.size(); i++)
+      {
+         // Create storage for indexes
+         fwd1D.push_back(ArrayI(nF1D));
+
+         // Fill array with indexes
+         for(int k = 0; k < fwd1D.at(i).size(); k++)
+         {
+            fwd1D.at(i)(k) = k;
+         }
+
+         // Create storage for indexes
+         bwd1D.push_back(ArrayI(nB1D - idx3D(i)));
+
+         // Fill array with indexes
+         for(int k = 0; k < bwd1D.at(i).size(); k++)
+         {
+            bwd1D.at(i)(k) = idx3D(i) + k;
+         }
       }
    }
 }

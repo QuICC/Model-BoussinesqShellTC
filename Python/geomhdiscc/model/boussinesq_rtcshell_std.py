@@ -204,7 +204,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-
         if field_row == ("temperature",""):
             mat = shell.i2x2(res[0], a, b, bc)
 

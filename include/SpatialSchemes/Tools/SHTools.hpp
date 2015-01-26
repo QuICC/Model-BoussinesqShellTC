@@ -34,17 +34,44 @@ namespace Schemes {
    class SHTools
    {
       public:
+         /**
+          * @brief Compute number of harmonic orders for given harmonic degree l
+          *
+          * Output value is bounded by max number of harmonic orders
+          */
          static int nM(const int l, const int nM);
 
+         /**
+          * @brief Compute number of harmonic degrees for given harmonic order m
+          *
+          * Output value is bounded by max number of harmonic degrees
+          */
          static int nL(const int m, const int nL);
 
+         /**
+          * @brief Compute the total number of spherical harmonics for given max degrees and orders
+          */
          static int nHarmonics(const int nL, const int nM);
 
+         /**
+          * @brief Compute map of all harmonics with harmonic order m as key
+          */
          static void buildMMap(std::multimap<int,int>& harmonics, const int nL, const int nM);
 
+         /**
+          * @brief Compute map of all harmonics with harmonic degree l as key
+          */
          static void buildLMap(std::multimap<int,int>& harmonics, const int nL, const int nM);
 
-         static void buildLHMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH);
+         /**
+          * @brief Compute map of given harmonic indexes sorted to improved load balance with harmonic degree l as key
+          */
+         static void buildLHSortedMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH);
+
+         /**
+          * @brief Compute map of given harmonic indexes sorted to improved load balance with harmonic degree m as key
+          */
+         static void buildMHSortedMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH);
 
          static void initMLLoad(std::deque<int>& list, std::vector<int>& load, std::queue<int>& optimal, const int nL, const int nM, const int bins);
 
@@ -55,6 +82,11 @@ namespace Schemes {
          static void fillMRestBins(std::deque<int>& list, std::multimap<int, int>& regular, std::vector<int>& load, std::queue<int>& optimal, const int bins);
 
          static void convertLoadToOrders(std::multimap<int, int>& regular, const int nL);
+
+         /**
+          * @brief Fill the indexes for 1D for SH based spatial schemes
+          */
+         static void fillIndexes1D(std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, const ArrayI& idx3D, const int nF1D, const int nB1D);
    };
 }
 }

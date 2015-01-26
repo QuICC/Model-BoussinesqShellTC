@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "SpatialSchemes/Tools/RegularTools.hpp"
 #include "SpatialSchemes/Tools/SHTools.hpp"
 #include "Resolutions/Tools/SHmIndexCounter.hpp"
 
@@ -76,7 +77,7 @@ namespace Schemes {
       ArrayI j0, jN;
       int c0 = -1;
       int cN = -1;
-      bool isRegular;
+      bool isRegular = true;
 
       int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
       int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
@@ -86,7 +87,7 @@ namespace Schemes {
       {
          if(transId == Dimensions::Transform::TRA1D)
          {
-            // Get full list of harmonics
+            // Get full list of harmonics mapped by harmonic order m
             SHTools::buildMMap(modes, nL, nM);
 
             // Indexes structure is NOT regular
@@ -112,8 +113,8 @@ namespace Schemes {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
          {
-            // Get restricted list of harmonics
-            SHTools::buildLHMap(modes, nL, nM, n0(0), nN(0));
+            // Get restricted sorted list of harmonics
+            SHTools::buildMHSortedMap(modes, nL, nM, n0(0), nN(0));
 
             // Indexes structure is not regular
             isRegular = false;
@@ -123,14 +124,7 @@ namespace Schemes {
          {
             // Get restricted list of harmonics
             std::multimap<int,int> tmp;
-            this->buildMLMap(tmp, id(0), bins(0));
-
-            // invert order of the map
-            std::multimap<int,int>::iterator it;
-            for(it = tmp.begin(); it != tmp.end(); it++)
-            {
-               modes.insert(std::make_pair(it->second, it->first));
-            }
+            this->buildMLMap(modes, id(0), bins(0));
 
             // Indexes structure is not regular
             isRegular = false;
@@ -138,20 +132,12 @@ namespace Schemes {
          // Splitting is on both transforms
          } else if(flag == Splitting::Locations::BOTH)
          {
-            // Get restricted list of harmonics
-            this->buildMLMap(modes, id(1), bins(1));
-
             std::multimap<int,int> tmp;
 
-            // invert order of the map
-            for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-            {
-               tmp.insert(std::make_pair(mapIt->second, mapIt->first));
-            }
+            // Get restricted list of harmonics
+            this->buildMLMap(tmp, id(1), bins(1));
 
-            // Clear modes
-            modes.clear();
-
+            // Extract number of modes
             int tN = 0;
             int t0 = 0;
             for(int i = 0; i < static_cast<int>(tmp.size()); i++)
@@ -166,7 +152,7 @@ namespace Schemes {
                }
             }
 
-            // invert order of the map
+            // Extract required modes
             mapIt = tmp.begin();
             std::advance(mapIt, t0);
             for(int i = 0; i < tN; i++)
@@ -313,107 +299,19 @@ namespace Schemes {
       // Create modes list for dimensions second and third transform
       if(isRegular)
       {
-         // Counter
-         int c = 0;
-
-         // Loop over third dimension
-         for(int i = 0; i < iN; i++)
-         {
-            // Loop over second dimension
-            for(int j = 0; j < jN(i); j++)
-            {
-               // Check for first mode
-               if(c >= c0)
-               {
-                  if(c >= cN)
-                  {
-                     break;
-                  } else
-                  {
-                     modes.insert(std::make_pair(i0 + i,j0(i) + j));
-                  }
-               }
-               c++;
-            }
-            if(c >= cN)
-            {
-               break;
-            }
-         }
+         RegularTools::buildMap(modes, i0, iN, j0, jN, c0, cN);
       }
 
-      // Loop over all modes
-      for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+      // Fill indexes for 2D and 3D
+      RegularTools::fillIndexes2D3D(idx2D, idx3D, modes);
+
+      // Fill indexes for 1D
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::TRA3D)
       {
-         filter.insert(mapIt->first);
-      }
-
-      // Set third dimension
-      idx3D.resize(filter.size());
-
-      // Make full list of index in third dimension
-      setIt = filter.begin();
-      for(int i = 0; i < idx3D.size(); i++)
+         RegularTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+      } else if(transId == Dimensions::Transform::TRA2D)
       {
-         idx3D(i) = *setIt;
-         setIt++;
-      }
-
-      // Make full list of indexes for second dimension
-      std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         // Create storage for indexes
-         idx2D.push_back(ArrayI(modes.count(idx3D(i))));
-
-         // Get range
-         mapRange = modes.equal_range(idx3D(i));
-
-         // Loop over range
-         int j = 0;
-         for(mapIt = mapRange.first; mapIt != mapRange.second; mapIt++)
-         {
-            idx2D.at(i)(j) = mapIt->second;
-            j++;
-         }
-      }
-
-      // Make full list of indexes for first dimension
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         // Create storage for indexes
-         fwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATF1D)));
-
-         // Fill array with indexes
-         for(int k = 0; k < fwd1D.at(i).size(); k++)
-         {
-            fwd1D.at(i)(k) = k;
-         }
-
-         // Create forward/backward list for first transform
-         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::TRA3D)
-         {
-            // Create storage for indexes
-            bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D)));
-
-            // Fill array with indexes
-            for(int k = 0; k < bwd1D.at(i).size(); k++)
-            {
-               bwd1D.at(i)(k) = k;
-            }
-
-         // Create forward/backward list for second transform
-         } else if(transId == Dimensions::Transform::TRA2D)
-         {
-            // Create storage for indexes
-            bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D) - idx3D(i)));
-
-            // Fill array with indexes
-            for(int k = 0; k < bwd1D.at(i).size(); k++)
-            {
-               bwd1D.at(i)(k) = idx3D(i) + k;
-            }
-         }
+         SHTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
       }
    }
 
@@ -447,7 +345,7 @@ namespace Schemes {
          // Get total size for first transform
          if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim(transId, Dimensions::Data::DAT2D);
+            return this->dim(transId, Dimensions::Data::DAT3D);
 
          // Get total size for second transform
          } else if(transId == Dimensions::Transform::TRA2D)
@@ -466,7 +364,7 @@ namespace Schemes {
          // Get total size for first transform
          if(transId == Dimensions::Transform::TRA1D)
          {
-            return this->dim(transId, Dimensions::Data::DAT3D);
+            return this->dim(transId, Dimensions::Data::DAT2D);
 
          // Get total size for second transform
          } else if(transId == Dimensions::Transform::TRA2D)

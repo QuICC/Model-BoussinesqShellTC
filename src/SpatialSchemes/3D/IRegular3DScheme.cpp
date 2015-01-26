@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "SpatialSchemes/Tools/RegularTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -203,97 +204,14 @@ namespace Schemes {
          }
       }
 
-      // Counter
-      int c = 0;
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, i0, iN, j0, jN, c0, cN);
 
-      // Loop over third dimension
-      for(int i = 0; i < iN; i++)
-      {
-         // Loop over second dimension
-         for(int j = 0; j < jN(i); j++)
-         {
-            // Check for first mode
-            if(c >= c0)
-            {
-               if(c >= cN)
-               {
-                  break;
-               } else
-               {
-                  modes.insert(std::make_pair(i0 + i,j0(i) + j));
-               }
-            }
-            c++;
-         }
-         if(c >= cN)
-         {
-            break;
-         }
-      }
+      // Fill indexes for 2D and 3D
+      RegularTools::fillIndexes2D3D(idx2D, idx3D, modes);
 
-      // Multimap iterator
-      std::multimap<int,int>::iterator mapIt;
-
-      // Set to extract the 3D indexes
-      std::set<int>  filter;
-
-      // Loop over all modes
-      for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-      {
-         filter.insert(mapIt->first);
-      }
-
-      // Set third dimension
-      idx3D.resize(filter.size());
-
-      // Make full list of index in third dimension
-      std::set<int>::iterator setIt = filter.begin();
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         idx3D(i) = *setIt;
-         setIt++;
-      }
-
-      // Make full list of indexes for second dimension
-      std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         // Create storage for indexes
-         idx2D.push_back(ArrayI(modes.count(idx3D(i))));
-
-         // Get range
-         mapRange = modes.equal_range(idx3D(i));
-
-         // Loop over range
-         int j = 0;
-         for(mapIt = mapRange.first; mapIt != mapRange.second; mapIt++)
-         {
-            idx2D.at(i)(j) = mapIt->second;
-            j++;
-         }
-      }
-
-      // Make full list of indexes for first dimension
-      for(int i = 0; i < this->dim(transId, Dimensions::Data::DAT3D); i++)
-      {
-         // Create storage for indexes
-         fwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATF1D)));
-
-         // Fill array with indexes
-         for(int j = 0; j < fwd1D.at(i).size(); j++)
-         {
-            fwd1D.at(i)(j) = j;
-         }
-
-         // Create storage for indexes
-         bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D)));
-
-         // Fill array with indexes
-         for(int j = 0; j < bwd1D.at(i).size(); j++)
-         {
-            bwd1D.at(i)(j) = j;
-         }
-      }
+      // Fill indexes for 1D
+      RegularTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
    }
 
    int IRegular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
