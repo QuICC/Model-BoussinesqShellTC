@@ -56,29 +56,27 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree);
 
       protected:
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped2DCommunication(TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
 
          /**
           * @brief Storage for the size of the grouped second exchange communication
@@ -192,28 +190,24 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped1DCommunication(const PhysicalNames::Id id, const bool hasNL, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
    {
-      int packs = this->mNamedPacks1D.at(id);
-      if(!hasNL)
-      {
-         packs = 0;
-      }
+      int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp()));
 
       TConfigurator::setup1DCommunication(packs, coord);
    }
 
-   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped2DCommunication(TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardSingle2DGrouper<TConfigurator>::setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
    {
       TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs1D(const std::vector<IntegratorTree>& integratorTree)
    {
-      return this->namePacks1D(varInfo, nonInfo);
+      return this->namePacks1D(integratorTree);
    }
 
-   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   template <typename TConfigurator> ArrayI ForwardSingle2DGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
    { 
       // Get size of grouped communication
       ArrayI packs = this->groupPacks2D(varInfo, nonInfo);
