@@ -65,7 +65,6 @@ set(MHDSphericalSrcDirs
    Enums
    Equations
    Polynomials
-   SpectralOperators
    Transforms
 )
 
