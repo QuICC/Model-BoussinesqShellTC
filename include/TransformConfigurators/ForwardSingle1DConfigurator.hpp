@@ -24,6 +24,7 @@
 #include "TypeSelectors/VariableSelector.hpp"
 #include "TransformConfigurators/ForwardConfigurator.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -102,6 +103,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
+      std::cerr << "Single1D packs: " << packs << std::endl;
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
 
       // Stop profiler

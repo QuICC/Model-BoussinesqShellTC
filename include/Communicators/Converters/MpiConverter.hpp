@@ -25,6 +25,7 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -258,6 +259,7 @@ namespace Parallel {
    {
       // Store the number of packs in the next communication
       this->mPacks = packs;
+      std::cerr << "SETEUP COMMUNICATION: " << this->mPacks << std::endl;
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
@@ -392,6 +394,7 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendBwd(const TBwdB& data)
    {
+      std::cerr << "SEND BWD: " << " sending: " << this->mIsSending << " packs: " << this->mActiveFSendPacks << std::endl;
       // Check if communication interface is busy
       if(this->mIsSending)
       {

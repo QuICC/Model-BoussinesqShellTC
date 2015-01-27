@@ -25,6 +25,7 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -183,6 +184,7 @@ namespace Transform {
    template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
    {
       int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp()));
+      std::cerr << "GROUPED 1D: " << packs << " id: " << tree.name() << " - " << tree.comp() << std::endl;
 
       TConfigurator::setup1DCommunication(packs, coord);
    }
@@ -190,6 +192,7 @@ namespace Transform {
    template <typename TConfigurator> void ForwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
    {
       int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp()));
+      std::cerr << "GROUPED 2D: " << packs << " id: " << tree.name() << " - " << tree.comp() << std::endl;
 
       TConfigurator::setup2DCommunication(packs, coord);
    }

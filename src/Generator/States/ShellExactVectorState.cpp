@@ -117,13 +117,14 @@ namespace Equations {
 
             MHDFloat r;
             MHDFloat theta;
+            nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
             for(int iR = 0; iR < nR; ++iR)
             {
-               r = rGrid(iR);
-
+               r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+               nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
-                  theta = thGrid(iTh);
+                  theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
 
                   for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
                   {
@@ -173,14 +174,14 @@ namespace Equations {
 
             MHDFloat r;
             MHDFloat theta;
+            nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
             for(int iR = 0; iR < nR; ++iR)
             {
-               r = rGrid(iR);
-
+               r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+               nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
-                  theta = thGrid(iTh);
-
+                  theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
                   for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
                   {
                      int l = std::tr1::get<0>(*it);
