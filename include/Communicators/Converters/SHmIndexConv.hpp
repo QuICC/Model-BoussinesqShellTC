@@ -165,12 +165,12 @@ namespace Parallel {
 
    inline int SHmIndexConv::i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK)
    {
-      return idxJ;
+      return idxJ - idxK;
    }
 
    inline int SHmIndexConv::iS(const int i, const int j, const int k)
    {
-      return SHmIndexConv::i(i,j,k,i,j,k);
+      return j;
    }
 
    inline int SHmIndexConv::i(const int i, const int j, const int idxI, const int idxJ)

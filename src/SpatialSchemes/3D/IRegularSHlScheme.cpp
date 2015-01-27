@@ -25,15 +25,6 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
-   void IRegularSHlScheme::tuneResolution(SharedResolution spRes)
-   {
-      SharedSHlIndexCounter   spCounter(new SHlIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
-      ISpatialScheme::tuneMpiResolution();
-   }
-
    const int IRegularSHlScheme::DIMENSIONS = 3;
 
    bool IRegularSHlScheme::isRegular()
@@ -48,6 +39,13 @@ namespace Schemes {
 
    IRegularSHlScheme::~IRegularSHlScheme()
    {
+   }
+
+   void IRegularSHlScheme::addIndexCounter(SharedResolution spRes)
+   {
+      SharedSHlIndexCounter   spCounter(new SHlIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
    }
 
    void IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)

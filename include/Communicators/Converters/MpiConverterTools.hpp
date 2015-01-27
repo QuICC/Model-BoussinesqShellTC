@@ -194,7 +194,7 @@ namespace Parallel {
                coord = std::tr1::make_tuple(i, j, k);
 
                // Create key as (1D, 2D, 3D)
-               key = std::tr1::make_tuple(i_, j_, k_);
+               key = spRes->counter()->makeKey(fwdDim, i_, j_, k_);
 
                // add key->coordinate to map
                localIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
@@ -229,7 +229,7 @@ namespace Parallel {
                   i_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
 
                   // Create key as (2D, 3D, 1D) indexes (i.e. data gets transposed during communication)
-                  key = std::tr1::make_tuple(j_, k_, i_);
+                  key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_, k_);
 
                   // Add key to remote set
                   remoteKeys.insert(key);
@@ -330,7 +330,7 @@ namespace Parallel {
                coord = std::tr1::make_tuple(i + spIdxConv->centralPadding(i_, k), j, k);
 
                // Create key as (2D, 3D, 1D)
-               key = std::tr1::make_tuple(j_, k_, i_);
+               key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_, k_);
 
                // add key->coordinate to map
                localIdxMap.insert(std::pair<Coordinate,Coordinate>(key, coord));
@@ -365,7 +365,7 @@ namespace Parallel {
                   i_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
 
                   // Create key as (1D, 2D, 3D)
-                  key = std::tr1::make_tuple(i_, j_, k_);
+                  key = spRes->counter()->makeKey(fwdDim, i_, j_, k_);
 
                   // Add key to remote set
                   remoteKeys.insert(key);
@@ -373,7 +373,7 @@ namespace Parallel {
             }
          }
 
-         // Convert remote keys to matrix to send througg MPI
+         // Convert remote keys to matrix to send through MPI
          matRemote.resize(3, remoteKeys.size());
          int i = 0; 
          for(std::set<Coordinate>::iterator it = remoteKeys.begin(); it != remoteKeys.end(); ++it)

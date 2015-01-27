@@ -112,6 +112,9 @@ namespace Parallel {
       // Add the transform setups to the resolution
       this->mspScheme->addTransformSetups(spRes);
 
+      // Add index counter to resolution
+      this->mspScheme->addIndexCounter(spRes);
+
       // Compute the score of the obtained resolution
       int score = this->computeScore(spRes);
 
@@ -170,6 +173,11 @@ namespace Parallel {
 
       // Clear the communication structure
       std::vector<std::multimap<int,int> >().swap(this->mCommStructure);
+
+      Dimensions::Transform::Id dimId;
+      int i_;
+      int j_;
+      int k_;
 
       // Handle 1D resolution
       if(spRes->cpu(0)->nDim() == 1)
@@ -275,17 +283,24 @@ namespace Parallel {
             // initialise the position hint for inserts
             mapPos = bwdMap.begin();
 
+            dimId = static_cast<Dimensions::Transform::Id>(ex+1);
             // Loop over third dimension
-            for(int i = 0; i < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT3D>(); i++)
+            for(int k = 0; k < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT3D>(); k++)
             {
+               k_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT3D>(k);
+
                // Loop over second dimension
-               for(int j = 0; j < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DAT2D>(i); j++)
+               for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
+                  j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j,k);
+
                   // Loop over backward dimension
-                  for(int k = 0; k < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->dim<Dimensions::Data::DATB1D>(i); k++)
+                  for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATB1D>(k); i++)
                   {
+                     i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATB1D>(i,k);
+
                      // Generate point information
-                     point = std::tr1::make_tuple(spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT2D>(j, i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DAT3D>(i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex+1))->idx<Dimensions::Data::DATB1D>(k,i));
+                     point = spRes->counter()->makeKey(dimId, i_, j_, k_);
 
                      // Get insertion position to use as next starting point to speed up insertion
                      mapPos = bwdMap.insert(mapPos,point);
@@ -298,6 +313,7 @@ namespace Parallel {
             int matched = 0;
             int toMatch = -1;
             std::set<std::pair<int,int> > filter;
+            dimId = static_cast<Dimensions::Transform::Id>(ex);
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
                matched = 0;
@@ -306,16 +322,22 @@ namespace Parallel {
                if(cpu == FrameworkMacro::id())
                {
                   // Loop over third dimension
-                  for(int i = 0; i < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT3D>(); i++)
+                  for(int k = 0; k < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT3D>(); k++)
                   {
+                     k_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT3D>(k);
+
                      // Loop over second dimension
-                     for(int j = 0; j < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DAT2D>(i); j++)
+                     for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(k); j++)
                      {
+                        j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j,k);
+
                         // Loop over forward dimension
-                        for(int k = 0; k < spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->dim<Dimensions::Data::DATF1D>(i); k++)
+                        for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATF1D>(k); i++)
                         {
+                           i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATF1D>(i,k);
+
                            // Generate point information
-                           point = std::tr1::make_tuple(spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DATF1D>(k,i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT2D>(j,i), spRes->cpu()->dim(static_cast<Dimensions::Transform::Id>(ex))->idx<Dimensions::Data::DAT3D>(i));
+                           point = spRes->counter()->makeKey(dimId, i_, j_, k_);
 
                            // Look for same key in backward list
                            mapPos = bwdMap.find(point);

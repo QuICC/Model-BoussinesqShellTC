@@ -33,10 +33,6 @@ namespace Schemes {
 
    void ISpatialScheme::tuneResolution(SharedResolution spRes)
    {
-      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
       ISpatialScheme::tuneMpiResolution();
    }
 
@@ -47,6 +43,14 @@ namespace Schemes {
 
    ISpatialScheme::~ISpatialScheme()
    {
+   }
+
+   void ISpatialScheme::addIndexCounter(SharedResolution spRes)
+   {
+      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
+
    }
 
    void ISpatialScheme::init()

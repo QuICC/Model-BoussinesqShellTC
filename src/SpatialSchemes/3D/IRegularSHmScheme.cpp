@@ -25,15 +25,6 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
-   void IRegularSHmScheme::tuneResolution(SharedResolution spRes)
-   {
-      SharedSHmIndexCounter   spCounter(new SHmIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
-      ISpatialScheme::tuneMpiResolution();
-   }
-
    const int IRegularSHmScheme::DIMENSIONS = 3;
 
    bool IRegularSHmScheme::isRegular()
@@ -48,6 +39,13 @@ namespace Schemes {
 
    IRegularSHmScheme::~IRegularSHmScheme()
    {
+   }
+
+   void IRegularSHmScheme::addIndexCounter(SharedResolution spRes)
+   {
+      SharedSHmIndexCounter   spCounter(new SHmIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
    }
 
    void IRegularSHmScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
@@ -123,8 +121,28 @@ namespace Schemes {
          } else if(flag == Splitting::Locations::SECOND)
          {
             // Get restricted list of harmonics
-            std::multimap<int,int> tmp;
             this->buildMLMap(modes, id(0), bins(0));
+
+            // Loop over all modes
+            for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+            {
+               filter.insert(mapIt->first);
+            }
+
+            // Clear old modes
+            modes.clear();
+
+            // Fill with correct modes
+            for(setIt = filter.begin(); setIt != filter.end(); setIt++)
+            {
+               for(int l = *setIt; l < this->dim(transId, Dimensions::Data::DAT2D); l++)
+               {
+                  modes.insert(std::make_pair(*setIt, l));
+               }
+            }
+
+            // Clear filter
+            filter.clear();
 
             // Indexes structure is not regular
             isRegular = false;

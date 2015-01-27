@@ -100,6 +100,11 @@ namespace Schemes {
           * @brief Get the simulation wide spectral array dimensions (can be different from spectral resolution)
           */
          const ArrayI& getTransformSpace() const;
+
+         /**
+          * @brief Add index counter to shared resolution
+          */
+         virtual void addIndexCounter(SharedResolution spRes);
          
       protected:
          /**

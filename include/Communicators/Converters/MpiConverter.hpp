@@ -25,7 +25,6 @@
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Parallel {
@@ -259,7 +258,6 @@ namespace Parallel {
    {
       // Store the number of packs in the next communication
       this->mPacks = packs;
-      std::cerr << "SETEUP COMMUNICATION: " << this->mPacks << std::endl;
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
@@ -362,13 +360,16 @@ namespace Parallel {
       {
          int flag;
          // Make sure previous communication has finished
-         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), &flag, MPI_STATUSES_IGNORE);
-
-         // If not all are ready yet wait for completion
-         if(! flag)
+         if(this->mActiveBSendPacks > 0)
          {
-            MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), MPI_STATUSES_IGNORE);
+            // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+            MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), &flag, MPI_STATUSES_IGNORE);
+
+            // If not all are ready yet wait for completion
+            if(! flag)
+            {
+               MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), MPI_STATUSES_IGNORE);
+            }
          }
 
          // Make sure communication to be used are all finished
@@ -394,18 +395,20 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendBwd(const TBwdB& data)
    {
-      std::cerr << "SEND BWD: " << " sending: " << this->mIsSending << " packs: " << this->mActiveFSendPacks << std::endl;
       // Check if communication interface is busy
       if(this->mIsSending)
       {
          int flag;
          // Make sure previous communication has finished
-         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), &flag, MPI_STATUSES_IGNORE);
-         // If not all are ready yet wait for completion
-         if(! flag)
+         if(this->mActiveFSendPacks > 0)
          {
-            MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), MPI_STATUSES_IGNORE);
+            // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+            MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), &flag, MPI_STATUSES_IGNORE);
+            // If not all are ready yet wait for completion
+            if(! flag)
+            {
+               MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), MPI_STATUSES_IGNORE);
+            }
          }
 
          // Make sure communication to be used are all finished

@@ -23,15 +23,6 @@ namespace GeoMHDiSCC {
 
 namespace Schemes {
 
-   void TFFScheme::tuneResolution(SharedResolution spRes)
-   {
-      SharedDoublePeriodicIndexCounter   spCounter(new DoublePeriodicIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
-      ISpatialScheme::tuneMpiResolution();
-   }
-
    void TFFScheme::interpretConfigDimensions(ArrayI& rDim)
    {
       rDim(1) = 2*rDim(1);
@@ -40,6 +31,13 @@ namespace Schemes {
    std::string TFFScheme::type()
    {
       return "TFF";
+   }
+
+   void TFFScheme::addIndexCounter(SharedResolution spRes)
+   {
+      SharedDoublePeriodicIndexCounter   spCounter(new DoublePeriodicIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
    }
 
    void TFFScheme::addTransformSetups(SharedResolution spRes) const

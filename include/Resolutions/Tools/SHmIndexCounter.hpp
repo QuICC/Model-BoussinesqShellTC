@@ -71,6 +71,11 @@ namespace GeoMHDiSCC {
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
          virtual void computeOffsets(std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const;
+
+         /**
+          * @brief Generate index key
+          */
+         virtual std::tr1::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
          
       protected:
 

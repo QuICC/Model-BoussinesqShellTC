@@ -34,11 +34,6 @@ namespace Schemes {
    {
       public:
          /**
-          * @brief Tune the resolution
-          */
-         static void tuneResolution(SharedResolution spRes);
-
-         /**
           * @brief Dimensionality of the scheme
           */
          static const int DIMENSIONS;
@@ -85,6 +80,11 @@ namespace Schemes {
           * @param flag    Flag to specify location of splitting
           */
          virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag);
+
+         /**
+          * @brief Add index counter to shared resolution
+          */
+         virtual void addIndexCounter(SharedResolution spRes);
          
       protected:
          /**

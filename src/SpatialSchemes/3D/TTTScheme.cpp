@@ -35,10 +35,6 @@ namespace Schemes {
 
    void TTTScheme::tuneResolution(SharedResolution spRes)
    {
-      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
       // Create single rank communicator
       #ifdef GEOMHDISCC_MPI
          std::vector<int>  ranks;
