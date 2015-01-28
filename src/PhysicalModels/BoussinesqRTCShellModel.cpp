@@ -26,6 +26,8 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqRTCShellTransport.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqRTCShellMomentum.hpp"
+#include "IoVariable/SphericalScalarEnergyWriter.hpp"
+#include "IoVariable/SphericalTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -192,11 +194,15 @@ namespace GeoMHDiSCC {
 
    void BoussinesqRTCShellModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
-      
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
+      // Create temperature energy writer
+      IoVariable::SharedSphericalScalarEnergyWriter spScalar(new IoVariable::SphericalScalarEnergyWriter("temperature", SchemeType::type()));
+      spScalar->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spScalar);
+
+      // Create kinetic energy writer
+      IoVariable::SharedSphericalTorPolEnergyWriter spVector(new IoVariable::SphericalTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
    }
 
    void BoussinesqRTCShellModel::addHdf5OutputFiles(SharedSimulation spSim)

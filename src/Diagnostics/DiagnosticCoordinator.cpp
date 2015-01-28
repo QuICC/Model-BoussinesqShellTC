@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Diagnostics {
 
    DiagnosticCoordinator::DiagnosticCoordinator()
-      : mcCourant(0.65), mFixedStep(-1), mCfl(0.0), mKinetic(0.0), mStartTime(0.0), mStartTimestep(0.0)
+      : mcCourant(0.65), mFixedStep(-1), mCfl(0.0), mStartTime(0.0), mStartTimestep(0.0)
    {
    }
 
@@ -154,10 +154,6 @@ namespace Diagnostics {
       }
    }
 
-   void DiagnosticCoordinator::updateKineticEnergy()
-   {
-   }
-
    void DiagnosticCoordinator::synchronize()
    {
 
@@ -181,11 +177,6 @@ namespace Diagnostics {
    MHDFloat DiagnosticCoordinator::cfl() const
    {
       return this->mCfl;
-   }
-
-   MHDFloat DiagnosticCoordinator::kineticEnergy() const
-   {
-      return this->mKinetic;
    }
 
    MHDFloat DiagnosticCoordinator::startTime() const

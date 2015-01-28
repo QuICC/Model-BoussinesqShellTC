@@ -34,6 +34,7 @@
 #include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
+#include "Simulation/SimulationIoTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -258,9 +259,6 @@ namespace GeoMHDiSCC {
          // Update CFL condition
          this->mDiagnostics.updateCfl();
 
-         // Update kinetic energy condition
-         this->mDiagnostics.updateKineticEnergy();
-
          // Synchronise diagnostics
          this->mDiagnostics.synchronize();
 
@@ -320,6 +318,12 @@ namespace GeoMHDiSCC {
       ProfilerMacro_start(ProfilerMacro::IO);
       if(this->mTimestepCoordinator.finishedStep())
       {
+         if(this->mSimIoCtrl.isAsciiTime())
+         {
+            // Update heavy calculation required for ASCII output
+            SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
+         }
+
          // Write initial ASCII and HDF5 output files if applicable
          this->mSimIoCtrl.writeFiles(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       }
