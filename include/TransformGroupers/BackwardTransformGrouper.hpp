@@ -122,9 +122,6 @@ namespace Transform {
          {
             scalIt = scalars.find(it->name());
 
-            // Sychronize 
-            FrameworkMacro::synchronize();
-
             // Compute first step of transform for scalar fields
             TConfigurator::firstStep(*it, *(scalIt->second), coord);
 
@@ -132,9 +129,6 @@ namespace Transform {
          } else
          {
             vectIt = vectors.find(it->name());
-
-            // Sychronize 
-            FrameworkMacro::synchronize();
 
             // Compute first step of transform for vector fields
             TConfigurator::firstStep(*it, *(vectIt->second), coord);

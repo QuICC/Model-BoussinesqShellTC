@@ -66,6 +66,11 @@ namespace Transform {
 
       protected:
          /**
+          * @brief Find equation corresponding to name of scalar
+          */
+         template <typename TSharedEquation> typename std::vector<TSharedEquation>::iterator findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name);
+
+         /**
           * @brief Storage for named packet sizes for the first exchange
           */
          std::map<FieldIdType, int>  mNamedPacks1D;
@@ -115,6 +120,20 @@ namespace Transform {
 
       private: 
    };
+
+   template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator IForwardGrouper::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
+   {
+      typename std::vector<TSharedEquation>::iterator eqIt;
+      for(eqIt = eqs.begin(); eqIt != eqs.end(); ++eqIt)
+      {
+         if((*eqIt)->name() == name)
+         {
+            break;
+         }
+      }
+
+      return eqIt;
+   }
 
    /// Typdef for a smart reference counting pointer to a backward grouper base
    typedef SharedPtrMacro<IForwardGrouper>   SharedIForwardGrouper;

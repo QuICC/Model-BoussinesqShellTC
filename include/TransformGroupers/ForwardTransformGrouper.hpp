@@ -71,12 +71,12 @@ namespace Transform {
          /**
           * @brief Setup grouped first exchange communication
           */
-         void setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped1DCommunication(TransformCoordinatorType& coord);
 
          /**
           * @brief Setup grouped second exchange communication
           */
-         void setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
+         void setupGrouped2DCommunication(TransformCoordinatorType& coord);
 
          /**
           * @brief Storage for the size of the grouped first exchange communication
@@ -103,104 +103,123 @@ namespace Transform {
 
    template <typename TConfigurator> inline void ForwardTransformGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
    {
-      //
-      // Compute nonlinear interaction
-      // ... and forward transform 
-      //
-
-      // Setup the grouped second exchnage communication
+      // Setup the first exchange communication step for scalar fields
       this->setupGrouped2DCommunication(coord);
 
       //
-      // Compute first step
+      // Compute nonlinear interaction 
+      // ... and first step of forward transform
       //
-
-      // First treat the scalar equations
       std::vector<Equations::SharedIScalarEquation>::iterator scalEqIt;
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
-      {
-         // Compute first step of transform for scalar equation
-         TConfigurator::firstStep(*scalEqIt, coord);
-      }
-
-      // ... then the vector equations
       std::vector<Equations::SharedIVectorEquation>::iterator vectEqIt;
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
+      std::vector<Transform::IntegratorTree>::const_iterator it;
+      for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
-         // Compute first step of transform for vector equation
-         TConfigurator::firstStep(*vectEqIt, coord);
+         // Transform scalar equation variable
+         if(it->comp() == FieldComponents::Physical::SCALAR)
+         {
+            scalEqIt = this->findEquation(scalEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(scalEqIt != scalEqs.end())
+            {
+               // Compute first step of transform for scalar fields
+               TConfigurator::firstStep(*it, *scalEqIt, coord);
+            }
+
+         // Transform vector equation
+         } else
+         {
+            vectEqIt = this->findEquation(vectEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(vectEqIt != vectEqs.end())
+            {
+               // Compute first step of transform for vector fields
+               TConfigurator::firstStep(*it, *vectEqIt, coord);
+            }
+         }
       }
 
-      // Initiate the grouped second exchange communication
+      // Initiate the first exchange communication step for scalar fields
       TConfigurator::initiate2DCommunication(coord);
 
-      // Setup the grouped first exchange communication
+      // Setup the second exchange communication step for scalar fields
       this->setupGrouped1DCommunication(coord);
 
       //
-      // Compute intermediate step
+      // ... and second step of forward transform
       //
-
-      // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
-         // Compute second step of transform for scalar equation
-         TConfigurator::secondStep(*scalEqIt, coord);
+         // Transform scalar equation variable
+         if(it->comp() == FieldComponents::Physical::SCALAR)
+         {
+            scalEqIt = this->findEquation(scalEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(scalEqIt != scalEqs.end())
+            {
+               // Compute second step of transform for scalar fields
+               TConfigurator::secondStep(*it, *scalEqIt, coord);
+            }
+
+         // Transform vector equation
+         } else
+         {
+            vectEqIt = this->findEquation(vectEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(vectEqIt != vectEqs.end())
+            {
+               // Compute second step of transform for vector fields
+               TConfigurator::secondStep(*it, *vectEqIt, coord);
+            }
+         }
       }
 
-      // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
-      {
-         // Compute second step of transform for vector equation
-         TConfigurator::secondStep(*vectEqIt, coord);
-      }
-
-      // Initiate the grouped first exchange communication
+      // Initiate the second exchange communication step for vector fields
       TConfigurator::initiate1DCommunication(coord);
 
       //
-      // Compute last step
+      // ... and last step of forward transform
       //
-
-      // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
+      for(it = coord.integratorTree().begin(); it != coord.integratorTree().end(); ++it)
       {
-         // Compute last step of transform for scalar equation
-         TConfigurator::lastStep(*scalEqIt, coord);
+         // Transform scalar equation variable
+         if(it->comp() == FieldComponents::Physical::SCALAR)
+         {
+            scalEqIt = this->findEquation(scalEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(scalEqIt != scalEqs.end())
+            {
+               // Compute last step of transform for scalar fields
+               TConfigurator::lastStep(*it, *scalEqIt, coord);
+            }
+
+         // Transform vector equation
+         } else
+         {
+            vectEqIt = this->findEquation(vectEqs,it->name());
+
+            // Presolve might not provide all equations
+            if(vectEqIt != vectEqs.end())
+            {
+               // Compute last step of transform for vector fields
+               TConfigurator::lastStep(*it, *vectEqIt, coord);
+            }
+         }
       }
 
-      // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
-      {
-         // Compute last step of transform for vector equation
-         TConfigurator::lastStep(*vectEqIt, coord);
-      }
-
-      //
-      // Update equation variable after transforms
-      //
-
-      // First treat the scalar equations
-      for(scalEqIt = scalEqs.begin(); scalEqIt < scalEqs.end(); scalEqIt++)
-      {
-         // Update equation variable after transforms for scalar equation
-         TConfigurator::updateEquation(*scalEqIt, coord);
-      }
-
-      // ... then the vector equations
-      for(vectEqIt = vectEqs.begin(); vectEqIt < vectEqs.end(); vectEqIt++)
-      {
-         // Update equation variable after transforms for vector equation
-         TConfigurator::updateEquation(*vectEqIt, coord);
-      }
    }
 
-   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
    {
       TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
    }
 
-   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord)
+   template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped2DCommunication(TransformCoordinatorType& coord)
    {
       TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
    }
@@ -208,7 +227,7 @@ namespace Transform {
    template <typename TConfigurator> ArrayI ForwardTransformGrouper<TConfigurator>::packs1D(const std::vector<IntegratorTree>& integratorTree)
    {
       // Get size of grouped communication
-      ArrayI packs = this->groupPacks1D(varInfo, nonInfo);
+      ArrayI packs = this->groupPacks1D(integratorTree);
 
       // Store the number of grouped packs
       this->mGroupedPacks1D = packs(0);
@@ -219,7 +238,7 @@ namespace Transform {
    template <typename TConfigurator> ArrayI ForwardTransformGrouper<TConfigurator>::packs2D(const std::vector<IntegratorTree>& integratorTree)
    {  
       // Get size of grouped communication
-      ArrayI packs = this->groupPacks2D(varInfo, nonInfo);
+      ArrayI packs = this->groupPacks2D(integratorTree);
 
       // Store the number of grouped packs
       this->mGroupedPacks2D = packs(0);

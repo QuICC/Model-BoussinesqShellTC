@@ -80,7 +80,6 @@ namespace Transform {
          void setupGrouped2DCommunication(const IntegratorTree& tree, TransformCoordinatorType& coord);
 
       private: 
-         template <typename TSharedEquation> typename std::vector<TSharedEquation>::iterator findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name);
    };
 
    template <typename TConfigurator> ForwardEquationGrouper<TConfigurator>::ForwardEquationGrouper()
@@ -90,20 +89,6 @@ namespace Transform {
 
    template <typename TConfigurator> ForwardEquationGrouper<TConfigurator>::~ForwardEquationGrouper()
    {
-   }
-
-   template <typename TConfigurator> template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator ForwardEquationGrouper<TConfigurator>::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
-   {
-      typename std::vector<TSharedEquation>::iterator eqIt;
-      for(eqIt = eqs.begin(); eqIt != eqs.end(); ++eqIt)
-      {
-         if((*eqIt)->name() == name)
-         {
-            break;
-         }
-      }
-
-      return eqIt;
    }
 
    template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::vector<Equations::SharedIScalarEquation>& scalEqs, std::vector<Equations::SharedIVectorEquation>& vectEqs, TransformCoordinatorType& coord)
@@ -120,7 +105,7 @@ namespace Transform {
          // Transform scalar equation variable
          if(it->comp() == FieldComponents::Physical::SCALAR)
          {
-            scalEqIt = findEquation(scalEqs,it->name());
+            scalEqIt = this->findEquation(scalEqs,it->name());
 
             // Presolve might not provide all equations
             if(scalEqIt != scalEqs.end())
@@ -150,7 +135,7 @@ namespace Transform {
          // Transform vector equation
          } else
          {
-            vectEqIt = findEquation(vectEqs,it->name());
+            vectEqIt = this->findEquation(vectEqs,it->name());
 
             // Presolve might not provide all equations
             if(vectEqIt != vectEqs.end())
