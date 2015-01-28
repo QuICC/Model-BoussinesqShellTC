@@ -117,11 +117,11 @@ class BoussinesqTCSphere(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-10, 'r':0}
+                        bc = {0:-10, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-10, 'r':0}
+                        bc = {0:-10, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -134,9 +134,9 @@ class BoussinesqTCSphere(base_model.BaseModel):
             elif bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'r':0}
+                        bc = {0:-11, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -147,11 +147,11 @@ class BoussinesqTCSphere(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 1
+                    bc['rt'] = 1
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r'] = 1
+                    bc['rt'] = 1
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -159,28 +159,28 @@ class BoussinesqTCSphere(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-10, 'r':0}
+                        bc = {0:-10, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-10, 'r':0}
+                        bc = {0:-10, 'rt':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'r':0}
+                        bc = {0:-11, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-21, 'rt':0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 1
+                    bc['rt'] = 1
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r'] = 1
+                    bc['rt'] = 1
 
         else:
             bc = no_bc()

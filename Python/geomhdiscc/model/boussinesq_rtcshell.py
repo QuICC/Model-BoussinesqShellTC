@@ -117,11 +117,11 @@ class BoussinesqRTCShell(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-40, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -135,9 +135,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
                         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-                        bc = {0:-22, 'r':0, 'c':{'a':a, 'b':b}}
+                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-41, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -149,11 +149,11 @@ class BoussinesqRTCShell(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
+                    bc['rt'] = 4
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -161,29 +161,29 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-40, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
                         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-                        bc = {0:-22, 'r':0, 'c':{'a':a, 'b':b}}
+                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-41, 'rt':0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
+                    bc['rt'] = 4
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         else:
             bc = no_bc()

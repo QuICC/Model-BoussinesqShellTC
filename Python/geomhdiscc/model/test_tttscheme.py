@@ -125,13 +125,13 @@ class TestTTTScheme(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
@@ -146,21 +146,21 @@ class TestTTTScheme(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -168,34 +168,34 @@ class TestTTTScheme(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
 
         return bc
 

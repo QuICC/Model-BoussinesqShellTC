@@ -121,11 +121,11 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-40, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -138,9 +138,9 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'r':0}
+                        bc = {0:-22, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-41, 'rt':0}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
@@ -151,11 +151,11 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
+                    bc['rt'] = 4
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -163,28 +163,28 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'r':0}
+                        bc = {0:-40, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'r':0}
+                        bc = {0:-22, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'r':0}
+                        bc = {0:-41, 'rt':0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","tor"):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","pol"):
-                    bc['r'] = 4
+                    bc['rt'] = 4
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         else:
             bc = no_bc()
@@ -196,7 +196,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+        return shell.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
@@ -223,7 +223,8 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
                 if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
-                    mat = shell.qid(res[0], 0, no_bc())
+                    bc[0] = min(0,bc[0]//10)
+                    mat = shell.qid(res[0], 0, bc)
                 else:
                     mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
@@ -239,12 +240,14 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
-                    mat = shell.qid(res[0], 0, no_bc())
+                    bc[0] = min(0,bc[0]//10)
+                    mat = shell.qid(res[0], 0, bc)
                 else:
                     mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
             elif field_col == ("temperature",""):
                 if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
+                    bc[0] = min(0,bc[0]//10)
                     mat = shell.zblk(res[0], bc)
                 else:
                     mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))

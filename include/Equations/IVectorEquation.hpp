@@ -397,7 +397,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, i + start, j, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+                  Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
                }
             }
          } else
@@ -407,7 +407,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::addScalar(storage, i + start, j, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+                  Datatypes::internal::addScalar(storage, i - zeroRow + start, j - zeroCol, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
                }
             }
          }
@@ -605,7 +605,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
-                  Datatypes::internal::addScalar(storage, i + start, j, eq.sourceTerm(compId, i, j, matIdx));
+                  Datatypes::internal::addScalar(storage, i - zeroRow + start, j - zeroCol, eq.sourceTerm(compId, i, j, matIdx));
                }
             }
 
@@ -707,7 +707,7 @@ namespace Equations {
             for(int i = zeroRow; i < rows; i++)
             {
                // Set field to zero
-               Datatypes::internal::setScalar(storage, i + start, j, typename TData::Scalar(0.0));
+               Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, typename TData::Scalar(0.0));
             }
          }
 

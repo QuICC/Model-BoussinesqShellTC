@@ -115,13 +115,13 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_row == ("velocity","x") and field_col == ("velocity","x"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_row == ("velocity","y") and field_col == ("velocity","y"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_row == ("velocity","z") and field_col == ("velocity","z"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 else:
                     if field_row == ("velocity","x") and field_col == ("velocity","x"):
@@ -137,13 +137,13 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_row == ("velocity","x") and field_col == ("velocity","x"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-21, 'rt':0}
                     elif field_row == ("velocity","y") and field_col == ("velocity","y"):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-21, 'rt':0}
                     elif field_row == ("velocity","z") and field_col == ("velocity","z"):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                        bc = {0:-21, 'r':0}
+                        bc = {0:-21, 'rt':0}
 
                 else:
                     if field_row == ("velocity","x") and field_col == ("velocity","x"):
@@ -158,17 +158,13 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","x"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","y"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_ror == ("velocity","z"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -199,17 +195,13 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","x"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","y"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocity","z"):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['rt'] = 2
 
         return bc
 

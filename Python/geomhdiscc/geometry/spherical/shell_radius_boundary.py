@@ -24,7 +24,6 @@ def constrain(mat, bc, location = 't'):
         bc_mat = apply_tau(mat, bc, location = location)
     elif bc[0] < 0:
         bc_mat = apply_galerkin(mat, bc)
-        bc['rt'] = bc['r']
     else:
         bc_mat = mat
 
@@ -363,12 +362,14 @@ def stencil(nr, bc):
         mat = stencil_value_diff(nr, 0, bc.get('c',None))
     elif bc[0] == -41:
         mat = stencil_value_diff2(nr, 0, bc.get('c',None))
+    elif bc[0] < -1 and bc[0] > -5:
+        mat = restrict_eye(nr, 'cr', -bc[0])
 
     return mat
 
 def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
-
+    
     nr = mat.shape[0]
     mat = mat*stencil(nr, bc)
     return mat

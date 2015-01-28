@@ -98,6 +98,10 @@ namespace Equations {
       // Make sure it is safe to do nothing
       bool needInit = this->couplingInfo(FieldComponents::Spectral::SCALAR).hasQuasiInverse();
 
+      // Check for Galerkin stencils
+      needInit = needInit || this->couplingInfo(FieldComponents::Spectral::SCALAR).isGalerkin();
+
+      // Check explicit operators
       CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
       needInit = needInit || (std::distance(fRange.first,fRange.second) > 0);
 

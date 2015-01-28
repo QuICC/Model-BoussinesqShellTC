@@ -119,13 +119,13 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocity","r"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","theta"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","z"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("velocity","r") and field_col == ("velocity","r"):
@@ -141,13 +141,13 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             elif bcId == 2:
                 if self.use_galerkin:
                     if field_col == ("velocity","r"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","theta"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","z"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("velocity","r") and field_col == ("velocity","r"):
@@ -162,20 +162,20 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","r"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocity","theta"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocity","z"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("pressure",""):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 1
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 1
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -183,30 +183,30 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","r"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","theta"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocity","r"):
-                        bc = {'r':{0:-10, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-10, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'r':{0:-11, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'r':{0:-11, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocity","r"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocity","theta"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocity","z"):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r']['r'] = 1
-                    bc['z']['r'] = 2
+                    bc['r']['rt'] = 1
+                    bc['z']['rt'] = 2
 
         return bc
 

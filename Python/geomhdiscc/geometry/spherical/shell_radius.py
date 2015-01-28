@@ -1092,3 +1092,9 @@ def linear_r2x(ro, rratio):
     a = ro - b;
 
     return (a, b)
+
+def stencil(nr, bc):
+    """Create a galerkin stencil matrix"""
+
+    bc['rt'] = 0
+    return radbc.stencil(nr, bc)

@@ -125,13 +125,13 @@ class TestTFFScheme(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocityy",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("velocityz",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'r':0}
+                        bc = {0:-20, 'rt':0}
 
                 else:
                     if bcs["bcType"] == 0:
@@ -149,38 +149,38 @@ class TestTFFScheme(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
             if self.use_galerkin:
                 if field_col == ("velocityx",""):
-                    bc = {0:-20, 'r':0}
+                    bc = {0:-20, 'rt':0}
                 elif field_col == ("velocityy",""):
-                    bc = {0:-20, 'r':0}
+                    bc = {0:-20, 'rt':0}
                 elif field_col == ("velocityz",""):
-                    bc = {0:-20, 'r':0}
+                    bc = {0:-20, 'rt':0}
                 elif field_col == ("temperature",""):
-                    bc = {0:-20, 'r':0}
+                    bc = {0:-20, 'rt':0}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['r'] = 2
+                    bc['rt'] = 2
 
         else:
             bc = no_bc()
