@@ -16,7 +16,8 @@ fields = model.stability_fields()
 #res = [16, 16, 16]
 #res = [18, 18, 18]
 #res = [20, 20, 20]
-res = [18, 18, 18]
+res = [20, 20, 18]
+#res = [18, 18, 18]
 
 # SF/SF/SF, FF/FF/FT
 #bc_vel = 6 
@@ -51,10 +52,13 @@ res = [18, 18, 18]
 #eq_params = {'prandtl':1, 'rayleigh':711.3936909, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/3.0} # l = 1, m = 1, n = 2, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/3.0} # l = 0|1, m = 1|0, n = 3, aspect ratio 1:1:3
 #eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/3.0} # l = 1, m = 1, n = 3, aspect ratio 1:1:3
+
+# PAPER
+bc_vel = 6 
+bc_temp = 4 
 #eq_params = {'prandtl':1, 'rayleigh':(216./5.)*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Paper
-#eq_params = {'prandtl':1, 'rayleigh':(35937./8192.)*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/8.0} # Paper
-#eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0/8.0} # Paper
-#eq_params = {'prandtl':1, 'rayleigh':8.*np.pi**4, 'scale1d':2.0/8.0, 'scale2d':2.0, 'scale3d':2.0}/8.0 # Paper
+eq_params = {'prandtl':7, 'rayleigh':(61./9.)*np.pi**4, 'scale1d':2.0/8.0, 'scale2d':2.0/8.0, 'scale3d':2.0} # Paper
+#eq_params = {'prandtl':1, 'rayleigh':5989.0*np.pi**4, 'scale1d':2.0*8.0, 'scale2d':2.0*8.0, 'scale3d':2.0} # Paper
 
 # SF/SF/NS, FF/FF/FT
 #bc_vel = 4 
@@ -64,15 +68,15 @@ res = [18, 18, 18]
 #eq_params = {'prandtl':1, 'rayleigh':2000.0, 'scale1d':2.0/3.0, 'scale2d':2.0, 'scale3d':2.0} # Burroughs, Romero, Lehoucq, Salinger, 2001 (WARNING different scaling!)
 
 # NS/NS/NS, FF/FF/FT
-bc_vel = 0 
-bc_temp = 4
+#bc_vel = 0 
+#bc_temp = 4
 # NS/NS/NS, FF/FF/FT
 #eq_params = {'prandtl':1, 'rayleigh':1755.2, 'scale1d':2.0/6.0, 'scale2d':2.0/6.0, 'scale3d':2.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':1813.0, 'scale1d':2.0/4.0, 'scale2d':2.0/4.0, 'scale3d':2.0} # Michael Watson's thesis
 #eq_params = {'prandtl':1, 'rayleigh':2084.9, 'scale1d':2.0/2.0, 'scale2d':2.0/2.0, 'scale3d':2.0} # Michael Watson's thesis
-eq_params = {'prandtl':1, 'rayleigh':1e4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Primary bifurcation???
+#eq_params = {'prandtl':1, 'rayleigh':1e4, 'scale1d':2.0, 'scale2d':2.0, 'scale3d':2.0} # Primary bifurcation???
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 eigs = []
 
@@ -88,7 +92,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 # Setup visualization and IO
 show_spy = False
 write_mtx = True
-solve_evp = False
+solve_evp = True
 show_solution = (False and solve_evp)
 
 if show_spy or show_solution:
@@ -131,6 +135,12 @@ if solve_evp:
         # Extract continuity from velocity 
         sol_c = mod.c3d.d1(res[0], res[1], res[2], mod.no_bc(), xscale = xscale, sy = 0, sz = 0)*sol_u + mod.c3d.e1(res[0], res[1], res[2], mod.no_bc(), yscale = yscale, sx = 0, sz = 0)*sol_v + mod.c3d.f1(res[0], res[1], res[2], mod.no_bc(), zscale = zscale, sx = 0, sy = 0)*sol_w
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
+
+    tmp = np.sort(np.real(evp_lmb))[::-1]
+    row = '{:.10g}'.format(np.round(tmp[0],12))
+    for mode in range(1,5):
+        row = row + " & " + '{:.10g}'.format(tmp[mode])
+    print(row + '\\\\')
 
 if show_solution:
     viz_mode = 2
