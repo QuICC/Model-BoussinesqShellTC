@@ -23,6 +23,7 @@
 //
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
+#include "IoTools/IdToHuman.hpp"
 #include "IoVariable/EnergyTags.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
@@ -43,6 +44,11 @@ namespace IoVariable {
 
    void SphericalTorPolEnergyWriter::init()
    {
+      // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
+      MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
+      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
+      this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
+
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
@@ -65,14 +71,15 @@ namespace IoVariable {
       PyTuple_SetItem(pArgs, 3, pValue);
 
       // Get resolution
-      pValue = PyLong_FromLong(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL) + 2);
+      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
+      pValue = PyLong_FromLong(cols);
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Call x^2
       PythonWrapper::setFunction("x2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpR2;
+      SparseMatrix tmpR2(cols,cols);
       PythonWrapper::fillMatrix(tmpR2, pValue);
       Py_DECREF(pValue);
 
@@ -81,12 +88,16 @@ namespace IoVariable {
       PythonWrapper::setFunction("integral");
       pValue = PythonWrapper::callFunction(pTmp);
       // Fill matrix and cleanup
-      SparseMatrix tmpAvg;
+      SparseMatrix tmpAvg(cols,cols);
       PythonWrapper::fillMatrix(tmpAvg, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
 
-      this->mIntgOp = tmpAvg*tmpR2.leftCols(tmpR2.rows()-2);
+      // Store integral
+      this->mIntgOp = tmpAvg.leftCols(cols-2);
+
+      // Store spherical integral (include r^2 factor)
+      this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
       IVariableAsciiEWriter::init();
    }
@@ -94,65 +105,216 @@ namespace IoVariable {
    void SphericalTorPolEnergyWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       // get iterator to field
+      vector_iterator vIt;
       vector_iterator_range vRange = this->vectorRange();
       assert(std::distance(vRange.first, vRange.second) == 1);
       assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::TOR);
       assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::POL);
 
-      // Dealias variable data
-      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rComp(FieldComponents::SpectralTor).rTotal());
+      // Dealias toroidal variable data
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));
       
       // Recover dealiased BWD data
-      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
       // Get FWD storage
-      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+      coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
 
       // Compute |f|^2
-      rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
+      rOutVarTor.rData() = rOutVarTor.rData().array()*rOutVarTor.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+      coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute integral over Chebyshev expansion and sum harmonics
-      this->mEnergy = 0.0;
+      this->mTorEnergy = 0.0;
+      this->mPolEnergy = 0.0;
 
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+         MHDFloat lfactor = 0.0;
          int start = 0;
          if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
          {
-            this->mEnergy += (this->mIntgOp*rInVar.slice(0).topRows(this->mIntgOp.cols()).real()).sum();
-            start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
-         }
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
+               lfactor = lfactor*(lfactor+1.0);
 
-         this->mEnergy += 2.0*(this->mIntgOp*rInVar.data().topRightCorner(this->mIntgOp.cols(),rInVar.data().cols()-start).real()).sum();
+               this->mTorEnergy += lfactor*(this->mSphIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+            }
+            start = 1;
+         }
+         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = lfactor*(lfactor+1.0);
+
+               this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+            }
+         }
       #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         MHDFloat lfactor = 0.0;
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
+            lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = lfactor*(lfactor+1.0);
             int start = 0;
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mEnergy += (this->mIntgOp*rInVar.slice(k).topLeftCorner(this->mIntgOp.cols(),1).real())(0);
+               this->mTorEnergy += lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(0).real())(0);
                start = 1;
             }
-            this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).topRightCorner(this->mIntgOp.cols(),rInVar.slice(k).cols()-start).real()).sum();
+            this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).rightCols(rInVarTor.slice(k).cols()-start).real()).sum();
          }
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
-      MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
-      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
-      this->mEnergy /= (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
-
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
 
       // Free FWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
+
+      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
+      this->mTorEnergy /= this->mVolume;
+
+      // Dealias poloidal variable data for Q component
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+
+      // Recover dealiased BWD data
+      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPolQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Get FWD storage
+      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPolQ = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().project(rOutVarPolQ.rData(), rInVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+
+      // Compute |f|^2
+      rOutVarPolQ.rData() = rOutVarPolQ.rData().array()*rOutVarPolQ.rData().conjugate().array();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().integrate_full(rInVarPolQ.rData(), rOutVarPolQ.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+
+      // Compute energy in Q component of QST decomposition
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+         start = 0;
+         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         {
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
+               lfactor = std::pow(lfactor*(lfactor+1.0),2);
+
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+            }
+            start = 1;
+         }
+         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = std::pow(lfactor*(lfactor+1.0),2);
+
+               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+            }
+         }
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         lfactor = 0.0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = std::pow(lfactor*(lfactor+1.0),2);
+            int start = 0;
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
+            {
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolQ.slice(k).col(0).real())(0);
+               start = 1;
+            }
+            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolQ.slice(k).rightCols(rInVarPolQ.slice(k).cols()-start).real()).sum();
+         }
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
+      // Free BWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolQ);
+
+      // Free FWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolQ);
+
+      // Dealias poloidal variable data for S component
+      coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
+
+      // Recover dealiased BWD data
+      Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarPolS = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+
+      // Get FWD storage
+      Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPolS = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().project(rOutVarPolS.rData(), rInVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::DIFFR, Arithmetics::SET);
+
+      // Compute |f|^2
+      rOutVarPolS.rData() = rOutVarPolS.rData().array()*rOutVarPolS.rData().conjugate().array();
+
+      // Compute projection transform for first dimension 
+      coord.transform1D().integrate_full(rInVarPolS.rData(), rOutVarPolS.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+
+      // Compute energy in Q component of QST decomposition
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+         start = 0;
+         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         {
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, 0);
+               lfactor = lfactor*(lfactor+1.0);
+
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarTor.slice(0).col(j).real()).sum();
+            }
+            start = 1;
+         }
+         for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            {
+               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = lfactor*(lfactor+1.0);
+
+               this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
+            }
+         }
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         lfactor = 0.0;
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            lfactor = lfactor*(lfactor+1.0);
+            int start = 0;
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
+            {
+               this->mPolEnergy += lfactor*(this->mIntgOp*rInVarPolS.slice(k).col(0).real())(0);
+               start = 1;
+            }
+            this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarPolS.slice(k).rightCols(rInVarPolS.slice(k).cols()-start).real()).sum();
+         }
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
+      // Free BWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarPolS);
+
+      // Free FWD storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolS);
+
+      // Normalize by the volume
+      this->mPolEnergy /= this->mVolume;
    }
 
    void SphericalTorPolEnergyWriter::write()

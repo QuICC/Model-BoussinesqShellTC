@@ -28,7 +28,6 @@
 #include "IoTools/IdToHuman.hpp"
 #include "Python/PythonWrapper.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace IoVariable {
@@ -44,6 +43,11 @@ namespace IoVariable {
 
    void SphericalScalarEnergyWriter::init()
    {
+      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
+      MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
+      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
+      this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
+
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
@@ -66,7 +70,8 @@ namespace IoVariable {
       PyTuple_SetItem(pArgs, 3, pValue);
 
       // Get resolution
-      pValue = PyLong_FromLong(this->mspRes->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL) + 2);
+      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
+      pValue = PyLong_FromLong(cols);
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // Call x^2
@@ -87,7 +92,7 @@ namespace IoVariable {
       Py_DECREF(pValue);
       PythonWrapper::finalize();
 
-      this->mIntgOp = tmpAvg*tmpR2.leftCols(tmpR2.rows()-2);
+      this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
       IVariableAsciiEWriter::init();
    }
@@ -113,7 +118,7 @@ namespace IoVariable {
       rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
       // Compute projection transform for first dimension 
-      coord.transform1D().integrate(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+      coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute integral over Chebyshev expansion and sum harmonics
       this->mEnergy = 0.0;
@@ -122,11 +127,11 @@ namespace IoVariable {
          int start = 0;
          if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
          {
-            this->mEnergy += (this->mIntgOp*rInVar.slice(0).topRows(this->mIntgOp.cols()).real()).sum();
+            this->mEnergy += (this->mSphIntgOp*rInVar.slice(0).real()).sum();
             start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
          }
 
-         this->mEnergy += 2.0*(this->mIntgOp*rInVar.data().topRightCorner(this->mIntgOp.cols(),rInVar.data().cols()-start).real()).sum();
+         this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.data().rightCols(rInVar.data().cols()-start).real()).sum();
       #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
          for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
@@ -134,23 +139,21 @@ namespace IoVariable {
             int start = 0;
             if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
             {
-               this->mEnergy += (this->mIntgOp*rInVar.slice(k).topLeftCorner(this->mIntgOp.cols(),1).real())(0);
+               this->mEnergy += (this->mSphIntgOp*rInVar.slice(k).col(0).real())(0);
                start = 1;
             }
-            this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).topRightCorner(this->mIntgOp.cols(),rInVar.slice(k).cols()-start).real()).sum();
+            this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
          }
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
-
-      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
-      MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
-      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
-      this->mEnergy /= (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
 
       // Free FWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rInVar);
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
+
+      // Normalize by the spherical volume
+      this->mEnergy /= this->mVolume;
    }
 
    void SphericalScalarEnergyWriter::write()

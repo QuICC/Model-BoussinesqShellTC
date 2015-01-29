@@ -99,7 +99,11 @@ namespace Equations {
             nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               funcR = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+               funcR = 1.0;
+               for(int n = 1; n < 10; ++n)
+               {
+                  funcR += std::pow(r,n);
+               }
 
                theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
                for(it = modeRange.first; it != modeRange.second; ++it)

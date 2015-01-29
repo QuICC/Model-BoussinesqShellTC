@@ -56,10 +56,11 @@ namespace Transform {
           *    - DIFF2: D^2
           *    - DIVR: 1/r
           *    - DIVR2: 1/r^2
+          *    - DIFFR: D r
           *    - DIVRDIFFR: 1/r D r
           *    - RADLAPL: radial laplacian: D^2 + 2/r D
           */
-         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIVRDIFFR, RADLAPL};
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIFFR, DIVRDIFFR, RADLAPL};
       };
 
       /**
@@ -184,6 +185,30 @@ namespace Transform {
           * @param arithId    Arithmetic operation to perform
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C)
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space full output without spectral truncation
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**

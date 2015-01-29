@@ -71,6 +71,11 @@ namespace IoVariable {
 
       private:
          /**
+          * @brief Spherical volume to normalize energy to energy density
+          */
+         MHDFloat mVolume;
+
+         /**
           * @brief Storage for the Toroidal energy
           */
          MHDFloat mTorEnergy;
@@ -79,6 +84,16 @@ namespace IoVariable {
           * @brief Storage for the Poloidal energy
           */
          MHDFloat mPolEnergy;
+
+         /**
+          * @brief Chebyshev operator to integrate in radius
+          */
+         SparseMatrix mIntgOp;
+
+         /**
+          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
+          */
+         SparseMatrix mSphIntgOp;
    };
 
    inline bool SphericalTorPolEnergyWriter::isHeavy() const

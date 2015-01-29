@@ -1105,7 +1105,6 @@ def integral(nr, a, b):
     mat = spsp.lil_matrix((1,nr))
     mat[0,::2] = [4.0*a*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
     mat[0,0] = mat[0,0]/2.0
-    print(mat)
 
     return mat
 
