@@ -21,6 +21,7 @@
 #include "Resolutions/Resolution.hpp"
 #include "IoAscii/IAsciiEWriter.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TypeSelectors/TransformSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -96,9 +97,19 @@ namespace IoVariable {
          void addVector(const std::pair<PhysicalNames::Id,Datatypes::SharedVectorVariableType>& vector);
 
          /**
+          * @brief Perform heavy calculations
+          */
+         virtual void compute(Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Write State to file
           */
          virtual void write() = 0;
+
+         /**
+          * @brief Requires heavy calculation?
+          */
+         virtual bool isHeavy() const;
 
       protected:
          /// Typedef for the scalar const iterator
@@ -174,6 +185,11 @@ namespace IoVariable {
 
    /// Typedef for a smart reference counting pointer of a Variable HDF5 numbering writer
    typedef SharedPtrMacro<IVariableAsciiEWriter>   SharedIVariableAsciiEWriter;
+
+   inline bool IVariableAsciiEWriter::isHeavy() const
+   {
+      return false;
+   }
 
 }
 }

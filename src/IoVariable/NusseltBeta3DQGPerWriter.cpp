@@ -43,9 +43,9 @@ namespace IoVariable {
 
    void NusseltBeta3DQGPerWriter::init()
    {
-      NusseltBeta3DQGPerWriter::scalar_iterator_range sRange = this->scalarRange();
+      scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 2);
-      NusseltBeta3DQGPerWriter::scalar_iterator sit = sRange.first;
+      scalar_iterator sit = sRange.first;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -63,7 +63,7 @@ namespace IoVariable {
       PythonWrapper::setFunction("avg");
       pValue = PythonWrapper::callFunction(pArgs);
 
-      // Fill matrix and clenup
+      // Fill matrix and cleanup
       PythonWrapper::fillMatrix(this->mNusseltOp, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();

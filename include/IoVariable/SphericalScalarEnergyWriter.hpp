@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableHeavyAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field
     */
-   class SphericalScalarEnergyWriter: public IVariableHeavyAsciiEWriter
+   class SphericalScalarEnergyWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -61,12 +61,31 @@ namespace IoVariable {
           * @brief Write State to file
           */
          virtual void write();
+
+         /**
+          * @brief Requires heavy calculation?
+          */
+         virtual bool isHeavy() const; 
          
       protected:
 
       private:
+         /**
+          * @brief Storage for the scalar energy
+          */
+         MHDFloat mEnergy;
+
+         /**
+          * @brief Chebyshev operator to integrate in radius
+          */
+         SparseMatrix mIntgOp;
 
    };
+
+   inline bool SphericalScalarEnergyWriter::isHeavy() const
+   {
+      return true;
+   }
 
    /// Typedef for a shared pointer of a HDF5 state file writer
    typedef SharedPtrMacro<SphericalScalarEnergyWriter> SharedSphericalScalarEnergyWriter;

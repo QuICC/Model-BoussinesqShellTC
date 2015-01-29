@@ -196,6 +196,9 @@ namespace GeoMHDiSCC {
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
 
+      // Update heavy calculation required for ASCII output
+      SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
+
       // Write initial ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
@@ -349,6 +352,9 @@ namespace GeoMHDiSCC {
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
+
+      // Update heavy calculation required for ASCII output
+      SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
 
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());

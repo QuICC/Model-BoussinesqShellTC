@@ -115,5 +115,9 @@ namespace IoVariable {
       return std::make_pair(this->mVectors.begin(), this->mVectors.end());
    }
 
+   void IVariableAsciiEWriter::compute(Transform::TransformCoordinatorType& coord)
+   {
+   }
+
 }
 }

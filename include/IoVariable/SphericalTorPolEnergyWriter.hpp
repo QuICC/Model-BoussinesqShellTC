@@ -21,7 +21,7 @@
 //
 #include "Enums/FieldIds.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "IoVariable/IVariableHeavyAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -31,7 +31,7 @@ namespace IoVariable {
    /**
     * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field
     */
-   class SphericalTorPolEnergyWriter: public IVariableHeavyAsciiEWriter
+   class SphericalTorPolEnergyWriter: public IVariableAsciiEWriter
    {
       public:
          /**
@@ -61,12 +61,30 @@ namespace IoVariable {
           * @brief Write State to file
           */
          virtual void write();
+
+         /**
+          * @brief Requires heavy calculation?
+          */
+         virtual bool isHeavy() const;
          
       protected:
 
       private:
+         /**
+          * @brief Storage for the Toroidal energy
+          */
+         MHDFloat mTorEnergy;
 
+         /**
+          * @brief Storage for the Poloidal energy
+          */
+         MHDFloat mPolEnergy;
    };
+
+   inline bool SphericalTorPolEnergyWriter::isHeavy() const
+   {
+      return true;
+   }
 
    /// Typedef for a shared pointer of a HDF5 state file writer
    typedef SharedPtrMacro<SphericalTorPolEnergyWriter> SharedSphericalTorPolEnergyWriter;

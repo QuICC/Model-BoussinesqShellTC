@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "IoVariable/IVariableHeavyAsciiEWriter.hpp"
+#include "IoVariable/IVariableAsciiEWriter.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 
 namespace GeoMHDiSCC {
@@ -35,16 +35,6 @@ namespace GeoMHDiSCC {
          static void updateHeavyAscii(ascii_iterator asciiBegin, ascii_iterator asciiEnd, Transform::TransformCoordinatorType& coord);
 
       protected:
-         /**
-          * @brief Compute heavy calculation for file
-          */
-         static void updateHeavyFile(SharedPtrMacro<IoVariable::IVariableHeavyAsciiEWriter> spAscii, Transform::TransformCoordinatorType& coord);
-
-         /**
-          * @brief Do nothing in not heavy type
-          */
-         static void updateHeavyFile(SharedPtrMacro<IoVariable::IVariableAsciiEWriter> spAscii, Transform::TransformCoordinatorType& coord) {};
-
 
       private:
          /**

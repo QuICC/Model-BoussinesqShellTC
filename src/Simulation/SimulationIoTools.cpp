@@ -32,12 +32,10 @@ namespace GeoMHDiSCC {
       ascii_iterator it;
       for(it = asciiBegin; it != asciiEnd; ++it)
       {
-         updateHeavyFile(*it, coord);
+         if((*it)->isHeavy())
+         {
+            (*it)->compute(coord);
+         }
       }
-   }
-
-   void SimulationIoTools::updateHeavyFile(IoVariable::SharedIVariableHeavyAsciiEWriter spAscii, Transform::TransformCoordinatorType& coord)
-   {
-      spAscii->compute(coord);
    }
 }
