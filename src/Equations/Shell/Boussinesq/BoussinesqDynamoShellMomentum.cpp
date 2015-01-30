@@ -47,9 +47,19 @@ namespace Equations {
          int start = 0;
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
 
-      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::TOR, CouplingInformation::PROGNOSTIC, start, true, false, false);
+      this->setExplicitTiming(FieldComponents::Spectral::TOR, ExplicitTiming::LINEAR);
 
-      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::POL, CouplingInformation::PROGNOSTIC, start, true, false, false);
+      this->setExplicitTiming(FieldComponents::Spectral::POL, ExplicitTiming::LINEAR);
+
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         // Create cos(theta) and sin(theta) data for Coriolis term
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         this->mCosTheta = thGrid.array().cos();
+         this->mSinTheta = thGrid.array().sin();
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqDynamoShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -75,6 +85,16 @@ namespace Equations {
             assert(false);
             break;
       }
+
+      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+         // Get square root of Taylor number
+         MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+
+         ///
+         /// Compute Coriolis term
+         ///
+         Physical::SphericalCoriolis::add(rNLComp, compId, , this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
    void BoussinesqDynamoShellMomentum::setRequirements()

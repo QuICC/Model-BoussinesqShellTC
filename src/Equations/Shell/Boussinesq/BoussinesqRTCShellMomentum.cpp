@@ -92,8 +92,7 @@ namespace Equations {
          ///
          /// Compute Coriolis term
          ///
-         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         Physical::SphericalCoriolis::add(rNLComp, compId, nR, this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 

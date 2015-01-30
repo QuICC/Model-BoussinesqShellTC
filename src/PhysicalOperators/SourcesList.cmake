@@ -1,0 +1,3 @@
+set(MHDSources
+   SphericalCoriolis.cpp
+)

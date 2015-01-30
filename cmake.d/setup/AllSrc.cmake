@@ -45,6 +45,7 @@ set(MHDAllSrcDirs
    IoXml
    LoadSplitter
    PhysicalModels
+   PhysicalOperators
    PolynomialTransforms
    Profiler
    Python

@@ -64,6 +64,16 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Storage for the cos(theta) grid values (if required)
+          */
+         Array mCosTheta;
+
+         /**
+          * @brief Storage for the sin(theta) grid values (if required)
+          */
+         Array mSinTheta;
+
       private:
    };
 
