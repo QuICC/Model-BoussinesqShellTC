@@ -232,18 +232,27 @@ def shellXYZ(h5_file, g1D, g2D, g3D):
     g_th = h5_file['mesh']['grid_'+g2D]
     g_ph = h5_file['mesh']['grid_'+g3D]
     size = g_r.size*g_th.size*g_ph.size
-    shell = np.zeros([size,3])
-    i = 0
-    for pr in np.nditer(g_r):
-        for pth in np.nditer(g_th):
-            for pph in np.nditer(g_ph):
-                shell[i,:] = [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
-                i = i + 1
-    grid_file = h5py.File('shell_grid.hdf5', 'w')
-    mesh = grid_file.create_group('mesh')
-    dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
-    dset[:,:] = shell
-    grid_file.close()
+    grid_file = h5py.File('shell_grid.hdf5', 'a')
+    if 'mesh' in grid_file and grid_file['mesh'].attrs['n_'+g1D[0]] == g_r.size and grid_file['mesh'].attrs['n_'+g2D[0]] == g_th.size and grid_file['mesh'].attrs['n_'+g3D[0]] == g_ph.size:
+        grid_file.close()
+    else:
+        if 'mesh' in grid_file:
+            del grid_file['mesh']
+
+        shell = np.zeros([size,3])
+        i = 0
+        for pr in np.nditer(g_r):
+            for pth in np.nditer(g_th):
+                for pph in np.nditer(g_ph):
+                    shell[i,:] = [pr*cos(pth), pr*sin(pth)*cos(pph), pr*sin(pth)*sin(pph)]
+                    i = i + 1
+        mesh = grid_file.create_group('mesh')
+        mesh.attrs['n_'+g1D[0]] = g_r.size
+        mesh.attrs['n_'+g2D[0]] = g_th.size
+        mesh.attrs['n_'+g3D[0]] = g_ph.size
+        dset = mesh.create_dataset('grid_'+g1D[0]+g2D[0]+g3D[0], (size, 3), '=f8')
+        dset[:,:] = shell
+        grid_file.close()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
