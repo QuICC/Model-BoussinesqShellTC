@@ -115,11 +115,11 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-//#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
-//#error "The SINGLE1D parallelisation is not supported!" 
-//#endif //GEOMHDISCC_MPIALGO_SINGLE1D
-//#ifdef GEOMHDISCC_MPIALGO_TUBULAR
-//#error "The TUBULAR parallelisation is not supported!" 
-//#endif //GEOMHDISCC_MPIALGO_TUBULAR
+#ifdef GEOMHDISCC_MPIALGO_SINGLE1D
+#error "The SINGLE1D parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_SINGLE1D
+#ifdef GEOMHDISCC_MPIALGO_TUBULAR
+#error "The TUBULAR parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_TUBULAR
 
 #endif // BOUSSINESQRTCSHELLMODEL_HPP
