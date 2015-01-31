@@ -75,7 +75,7 @@ namespace Equations {
    {
       // Get square root of Taylor number
       MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
-      MHDFloat Pm = std::sqrt(this->eqParams().nd(NonDimensional::MAGPRANDTL));
+      MHDFloat Pm = this->eqParams().nd(NonDimensional::MAGPRANDTL);
 
       ///
       /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right) + \left(\nabla\wedge\vec B\right)\wedge\vec B\f$

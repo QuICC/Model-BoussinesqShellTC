@@ -286,6 +286,63 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, bc)
 
+def i2x3(nr, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^3 T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-5,6)
+    nzrow = 1
+
+    # Generate 5th subdiagonal
+    def d_5(n):
+        return a**5/(32.0*n*(n - 1.0))
+
+    # Generate 4th subdiagonal
+    def d_4(n):
+        return 3.0*a**4*b/(16.0*n*(n - 1.0))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*(a**2*n + 3.0*a**2 + 12.0*b**2*n + 12.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*b*(3.0*a**2 + 2.0*b**2*n + 2.0*b**2)/(8.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -a**3*(a**2 + 6.0*b**2)/(16.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return -a**2*b*(3.0*a**2 + 4.0*b**2)/(8.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a**3*(a**2 + 6.0*b**2)/(16.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(3.0*a**2 - 2.0*b**2*n + 2.0*b**2)/(8.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return a**3*(a**2*n - 3.0*a**2 + 12.0*b**2*n - 12.0*b**2)/(32.0*n*(n - 1.0)*(n + 1.0))
+
+    # Generate 4th superdiagonal
+    def d4(n):
+        return 3.0*a**4*b/(16.0*n*(n + 1.0))
+
+    # Generate 5th superdiagonal
+    def d5(n):
+        return a**5/(32.0*n*(n + 1.0))
+
+    ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
 def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
     """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
 
@@ -314,6 +371,47 @@ def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
         return -a**2*(l - n - 1.0)*(l + n + 2.0)/(4.0*n*(n + 1.0))
 
     ds = [d_2, d_1, d0, d1, d2]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, bc)
+
+def i2x3lapl(nr, l, a, b, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^3 Laplacian T_n(x)."""
+
+    ns = np.arange(0, nr)
+    offsets = np.arange(-3,4)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return -a**3*(l - n + 3.0)*(l + n - 2.0)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return -a**2*b*(l**2 + l - 3.0*n**2 + 11.0*n - 10.0)/(4.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return a*(a**2*l**2 + a**2*l + 3.0*a**2*n**2 - a**2*n - 6.0*a**2 + 12.0*b**2*n**2 - 4.0*b**2*n - 16.0*b**2)/(8.0*n*(n + 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return b*(a**2*l**2 + a**2*l + 3.0*a**2*n**2 - 5.0*a**2 + 2.0*b**2*n**2 - 2.0*b**2)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return a*(a**2*l**2 + a**2*l + 3.0*a**2*n**2 + a**2*n - 6.0*a**2 + 12.0*b**2*n**2 + 4.0*b**2*n - 16.0*b**2)/(8.0*n*(n - 1.0))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*b*(l**2 + l - 3.0*n**2 - 11.0*n - 10.0)/(4.0*n*(n + 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -a**3*(l - n - 2.0)*(l + n + 3.0)/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
     mat = coeff*spsp.diags(diags, offsets)

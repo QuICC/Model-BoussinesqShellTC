@@ -7,19 +7,24 @@ import geomhdiscc.model.boussinesq_rtcshell as mod
 # Create the model and activate linearization
 model = mod.BoussinesqRTCShell()
 model.linearize = True
-model.use_galerkin = False
+model.use_galerkin = True
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 l = 0
-m = 31
-res = [32, 32, 0]
+m = 3
+res = [32, 48, 0]
 eigs = [float(m)]
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.103005e7, 'ro':1, 'rratio':0.35} # m = 13, SF/SF
 #eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.2726e8, 'ro':1, 'rratio':0.35} # m = 30, NS/NS
-eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.302e8, 'ro':1, 'rratio':0.35} # m = 30, SF/SF
-bc_vel = 1 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
+#eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.302e8, 'ro':1, 'rratio':0.35} # m = 30, SF/SF
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.2e6, 'ro':20.0/13.0, 'rratio':0.35} # m = 4, NS/NS
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.0733e7, 'ro':1.0, 'rratio':0.35, 'heating':0} # m = 9, NS/NS, internal heating
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.243e6, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+#eq_params = {'taylor':4e6, 'prandtl':1, 'rayleigh':4.75992e4, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+eq_params = {'taylor':4e6, 'prandtl':1, 'rayleigh':28.9787, 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
@@ -31,7 +36,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = True
+show_spy = False
 write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)
@@ -63,17 +68,25 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e3, 1e2)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, 1e2)
     print(evp_lmb)
 
 if show_solution:
     viz_mode = 0
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
-    nL = res[1]-m+1
-    sol_tor = evp_vec[0:res[0]*nL,viz_mode]
-    sol_pol = evp_vec[res[0]*nL:2*res[0]*nL,viz_mode]
-    sol_t = evp_vec[2*res[0]*nL:3*res[0]*nL,viz_mode]
+    nL = res[1]-m
+    if model.use_galerkin == True:
+        nTor = 2
+        nPol = 4
+        nT = 2
+    else:
+        nTor = 0
+        nPol = 0
+        nT = 0
+    sol_tor = evp_vec[0:(res[0]-nTor)*nL,viz_mode]
+    sol_pol = evp_vec[(res[0]-nTor)*nL:(2*res[0]-nTor-nPol)*nL,viz_mode]
+    sol_t = evp_vec[(2*res[0]-nTor-nTor)*nL:(3*res[0]-nTor-nPol-nT)*nL,viz_mode]
     
     # Create spectrum plots
     pl.subplot(1,3,1)

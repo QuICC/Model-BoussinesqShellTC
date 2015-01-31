@@ -222,52 +222,8 @@ namespace Equations {
 
       } else if(typeId == ShellExactStateIds::BENCHVELC1)
       {
-         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
-         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
-         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+         rNLComp.rData().setConstant(1e-12);
 
-         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
-         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
-         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
-         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
-         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
-
-         Array funcPh(nPh);
-         MHDFloat funcR = 1.0;
-         MHDFloat funcTh = 1.0;
-         MHDFloat amplitude;
-
-         MHDFloat r;
-         MHDFloat theta;
-         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-         for(int iR = 0; iR < nR; ++iR)
-         {
-            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
-            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
-            for(int iTh = 0; iTh < nTh; ++iTh)
-            {
-               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
-
-               if(compId == FieldComponents::Physical::R)
-               {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
-               } else if(compId == FieldComponents::Physical::THETA)
-               {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
-               } else if(compId == FieldComponents::Physical::PHI)
-               {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
-               }
-
-               rNLComp.addProfile(amplitude*funcR*funcPh,iTh,iR);
-            }
-         }
       } else if(typeId == ShellExactStateIds::BENCHMAGC1)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
@@ -280,10 +236,10 @@ namespace Equations {
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
-         Array funcPh(nPh);
+         Array funcPh = Array::Ones(nPh);
          MHDFloat funcR = 1.0;
          MHDFloat funcTh = 1.0;
-         MHDFloat amplitude;
+         MHDFloat amplitude = 1.0;
 
          MHDFloat r;
          MHDFloat theta;
@@ -298,22 +254,22 @@ namespace Equations {
 
                if(compId == FieldComponents::Physical::R)
                {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
+                  amplitude = 5.0/8.0;
+                  funcR = 8.0*ro - 6.0*r - 2.0*std::pow(ro*rratio,4)/std::pow(r,3);
+                  funcTh = std::cos(theta);
                } else if(compId == FieldComponents::Physical::THETA)
                {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
+                  amplitude = -5.0/8.0;
+                  funcR = 8.0*ro - 9.0*r + std::pow(ro*rratio,4)/std::pow(r,3);
+                  funcTh = std::sin(theta);
                } else if(compId == FieldComponents::Physical::PHI)
                {
-                  amplitude = 1.0;
-                  funcR = 1.0;
-                  funcTh = 1.0;
+                  amplitude = 5.0;
+                  funcR = std::sin(Math::PI*(r - ro*rratio));
+                  funcTh = std::sin(2*theta);
                }
 
-               rNLComp.addProfile(amplitude*funcR*funcPh,iTh,iR);
+               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
             }
          }
       } else

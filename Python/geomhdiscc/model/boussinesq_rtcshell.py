@@ -18,7 +18,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "prandtl", "rayleigh", "ro", "rratio"]
+        return ["taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -208,7 +208,10 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
 
         return mat
 
@@ -220,6 +223,8 @@ class BoussinesqRTCShell(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
+        ro = eq_params['ro']
+        rratio = eq_params['rratio']
         T = Ta**0.5
 
         m = int(eigs[0])
@@ -249,24 +254,28 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+                #mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -(Ra*T/ro), with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                if self.linearize:
-                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
-
-                elif bcs["bcType"] == self.FIELD_TO_RHS:
-                    mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                    if eq_params["heating"] == 0:
+                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                    else:
+                        mat = shell.i2(res[0], res[1], m, a, b, bc, ro**2*rratio/(1.0-rratio), with_sh_coeff = 'laplh')
 
                 else:
                     mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1/Pr)
+                if eq_params["heating"] == 0:
+                    mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+                else:
+                    mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
 
         return mat
 
@@ -287,6 +296,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
             mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
 
         return mat

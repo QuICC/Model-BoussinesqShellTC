@@ -18,7 +18,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "ro", "rratio"]
+        return ["prandtl", "rayleigh", "ro", "rratio", "heating"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -202,24 +202,19 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+        return shell.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        l = eigs[0]
-
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], l, a, b, bc, -l*(l+1.0))
-
-        elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], a, b, bc)
+        if field_row == ("temperature",""):
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], a, b, bc)
 
         return mat
 
@@ -247,17 +242,20 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
-                if self.linearize:
-                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-                elif bcs["bcType"] == self.FIELD_TO_RHS:
-                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                    if eq_params["heating"] == 0:
+                        mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+                    else:
+                        mat = shell.i2(res[0], a, b, bc, l*(l+1.0))
 
                 else:
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                if eq_params["heating"] == 0:
+                    mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                else:
+                    mat = shell.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         return mat
 
@@ -276,6 +274,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
             mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], a, b, bc)
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], a, b, bc)
 
         return mat

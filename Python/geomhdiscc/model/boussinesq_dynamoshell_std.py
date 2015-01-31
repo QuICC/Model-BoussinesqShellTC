@@ -18,7 +18,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio"]
+        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -135,15 +135,15 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:20}
+                        bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
+                        bc = {0:40}
                     elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
-                            bc = {0:20}
+                        bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
                         bc = {0:23, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
-                            bc = {0:20}
+                        bc = {0:20}
 
             elif bcId == 1:
                 if self.use_galerkin:
@@ -223,13 +223,14 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        l = eigs[0]
-
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], a, b, bc)
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], a, b, bc)
 
         return mat
 
@@ -269,13 +270,19 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
-                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+                    if eq_params["heating"] == 0:
+                        mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+                    else:
+                        mat = shell.i2(res[0], a, b, bc, l*(l+1.0))
 
                 else:
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                if eq_params["heating"] == 0:
+                    mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                else:
+                    mat = shell.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         return mat
 
@@ -300,6 +307,9 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
             mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
-            mat = shell.i2x2(res[0], a, b, bc)
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], a, b, bc)
+            else:
+                mat = shell.i2x3(res[0], a, b, bc)
 
         return mat

@@ -70,7 +70,7 @@ namespace GeoMHDiSCC {
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::ShellExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         switch(0)
+         switch(1)
          {
             case 0:
                spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
@@ -93,7 +93,7 @@ namespace GeoMHDiSCC {
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(3)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
