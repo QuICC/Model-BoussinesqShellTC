@@ -121,6 +121,21 @@ def i2x2():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i2x1d1x1():
+    """Spherical shell 2nd integral of x D x operator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':2, 'p':2, 'd':1, 'c':1}, {'q':2, 'p':1, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2x2d1():
     """Spherical shell 2nd integral of x^2 D operator"""
 

@@ -64,6 +64,13 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
+   void BoussinesqRTCShellMomentum::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::TOR, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::POL, 0);
+   }
+
    void BoussinesqRTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {  
       ///

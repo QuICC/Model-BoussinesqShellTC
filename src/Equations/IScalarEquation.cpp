@@ -136,5 +136,10 @@ namespace Equations {
    {
       this->dispatchExplicitLinearBlock(compId, mat, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
+
+   void IScalarEquation::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::SCALAR, 0);
+   }
 }
 }

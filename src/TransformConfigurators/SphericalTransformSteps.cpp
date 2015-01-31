@@ -26,75 +26,99 @@ namespace Transform {
 
 namespace TransformSteps {
 
-   std::vector<IntegratorBranch>  forwardScalar()
+   std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 1);
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      FieldComponents::Spectral::Id scalId = components.at(0).first;
 
-      return transform;
-   }
-
-   std::vector<IntegratorBranch>  forwardScalarNL()
-   {
-      std::vector<IntegratorBranch> transform;
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      if(isNL)
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+      } else
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+      }
 
       return transform;
    }
 
    #if defined GEOMHDISCC_SPATIALSCHEME_SLFL_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_SLFM_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_BLF_TORPOL || defined GEOMHDISCC_SPATIALSCHEME_WLF_TORPOL
 
-   std::vector<IntegratorBranch>  forwardVector()
+   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 2);
       std::vector<IntegratorBranch> transform;
+      FieldComponents::Spectral::Id curlId = components.at(0).first;
+      int curlFlag = components.at(0).second;
+      FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
+      int curlcurlFlag = components.at(1).second;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVLLDIVSIN, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SET));
+      if(isNL)
+      {
+         // Integrate for standard second order equation
+         if(curlFlag == 0)
+         {
+            // Compute curl component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGT, curlId, FieldType::VECTOR, Arithmetics::SET));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLLDIFF, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGT, curlId, FieldType::VECTOR, Arithmetics::SUB));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLL, IntegratorBranch::Intg1DType::INTGR, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SET));
+         // Integrate for standard fourth order spherical equation
+         if(curlcurlFlag == 0)
+         {
+            // Compute curlcurl Q component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ4, curlcurlId, FieldType::VECTOR, Arithmetics::SETNEG));
 
-      return transform;
-   }
+            // Compute curlcurl S component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS4, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
 
-   std::vector<IntegratorBranch>  forwardVectorNL()
-   {
-      std::vector<IntegratorBranch> transform;
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS4, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
 
-      // Compute Toroidal component
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGT, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SET));
+         // Integrate for second order spherical equation
+         } else if(curlcurlFlag == 1)
+         {
+            // Compute curlcurl Q component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ2, curlcurlId, FieldType::VECTOR, Arithmetics::SETNEG));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGT, FieldComponents::Spectral::TOR, FieldType::VECTOR, Arithmetics::SUB));
+            // Compute curlcurl S component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
 
-      // Compute Q component
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::SETNEG));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-      // Compute S component
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
+      // The following assumes the physical values are obtained froma Toroidal/Poloidal decomposition
+      } else
+      {
+         if(curlFlag == 0 && curlcurlFlag == 0)
+         {
+            // Compute Toroidal component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVLLDIVSIN, IntegratorBranch::Intg1DType::INTG, curlId, FieldType::VECTOR, Arithmetics::SET));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS, FieldComponents::Spectral::POL, FieldType::VECTOR, Arithmetics::ADD));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLLDIFF, IntegratorBranch::Intg1DType::INTG, curlId, FieldType::VECTOR, Arithmetics::SUB));
+
+            // Compute Poloidal component
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIVLL, IntegratorBranch::Intg1DType::INTGR, curlcurlId, FieldType::VECTOR, Arithmetics::SET));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
+      }
 
       return transform;
    }
 
    #else
 
-   std::vector<IntegratorBranch>  forwardVector()
-   {
-      std::vector<IntegratorBranch> transform;
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::R, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THETA, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::PHI, FieldType::VECTOR));
-
-      return transform;
-   }
-
-   std::vector<IntegratorBranch>  forwardVectorNL()
+   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
       std::vector<IntegratorBranch> transform;
 

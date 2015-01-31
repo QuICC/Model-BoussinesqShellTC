@@ -119,6 +119,45 @@ namespace Equations {
                }
             }
          }
+      } else if(this->mTypeId == ShellExactStateIds::BENCHTEMPC1)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         MHDFloat funcR;
+         MHDFloat funcTh;
+         Array funcPh = (4.0*phGrid).array().cos();
+
+         MHDFloat amplitude = 21.0/std::sqrt(17920*Math::PI);
+
+         MHDFloat r;
+         MHDFloat x;
+         MHDFloat theta;
+
+         rNLComp.rData().setConstant(0);
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            x = 2.0*r - rratio*ro - ro;
+            funcR = 1.0 - 3.0*std::pow(x,2) + 3.0*std::pow(x,4) - std::pow(x,6);
+
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+               funcTh = std::pow(std::sin(theta),4);
+
+               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
+            }
+         }
       } else
       {
          throw Exception("Unknown exact state");

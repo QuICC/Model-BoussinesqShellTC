@@ -78,6 +78,11 @@ namespace Equations {
          virtual void setCoupling();
 
          /**
+          * @brief Set the nonliner integration components
+          */
+         virtual void setNLComponents();
+
+         /**
           * Generate Random value
           */
          void makeRandom(MHDFloat& val, const int i1D, const int i3D, const int i2D, const MHDFloat minVal, const MHDFloat maxVal) const;

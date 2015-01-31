@@ -172,17 +172,6 @@ namespace GeoMHDiSCC {
       std::vector<Transform::IntegratorBranch> scalarBranches;
       std::vector<Transform::IntegratorBranch> vectorBranches;
 
-      // Forward transform is from nonlinear calculation
-      if(forwardIsNonlinear)
-      {
-         scalarBranches = Transform::TransformSteps::forwardScalarNL();
-         vectorBranches = Transform::TransformSteps::forwardVectorNL();
-      } else
-      {
-         scalarBranches = Transform::TransformSteps::forwardScalar();
-         vectorBranches = Transform::TransformSteps::forwardVector();
-      }
-
       std::map<PhysicalNames::Id, std::vector<Transform::IntegratorBranch> > branches;
 
       // Loop over all scalar variables
@@ -208,7 +197,9 @@ namespace GeoMHDiSCC {
                   branches.insert(std::make_pair(scalIt->first, std::vector<Transform::IntegratorBranch>()));
 
                   // Create scalar forward transform
+                  scalarBranches = Transform::TransformSteps::forwardScalar((*scalEqIt)->nlComponents(), forwardIsNonlinear);
                   branches.find(scalIt->first)->second.insert(branches.find(scalIt->first)->second.end(),scalarBranches.begin(), scalarBranches.end());
+                  scalarBranches.clear();
                }
             }
 
@@ -265,7 +256,9 @@ namespace GeoMHDiSCC {
                   branches.insert(std::make_pair(vectIt->first, std::vector<Transform::IntegratorBranch>()));
 
                   // Create vector forward transform
+                  vectorBranches = Transform::TransformSteps::forwardVector((*vectEqIt)->nlComponents(), forwardIsNonlinear);
                   branches.find(vectIt->first)->second.insert(branches.find(vectIt->first)->second.end(),vectorBranches.begin(), vectorBranches.end());
+                  vectorBranches.clear();
                }
             }
 

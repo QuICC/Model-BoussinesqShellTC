@@ -157,5 +157,23 @@ namespace Equations {
       #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMDHDISCC_SPATIALSCHEME_TFF || defined GEOMDHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
    }
 
+   void RandomVectorState::setNLComponents()
+   {
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::ONE, 0);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::TWO, 0);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::THREE, 0);
+      }
+   }
+
 }
 }

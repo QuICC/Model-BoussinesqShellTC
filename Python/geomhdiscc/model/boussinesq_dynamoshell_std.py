@@ -40,15 +40,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
     
-        if self.linearize:
-            if field_row == ("velocity","pol") or field_row == ("temperature",""):
-                fields = [("velocity","pol"),("temperature","")]
-            else:
-                fields = [field_row]
-
-        else:
-            # fields are only coupled to themselves
-            fields = [field_row]
+        # fields are only coupled to themselves
+        fields = [field_row]
 
         return fields
 
@@ -69,9 +62,9 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         tau_n = res[0]
         if self.use_galerkin:
-            if field_row == ("velocity","tor") or field_row == ("magnetic","tor") or field_row == ("temperature",""):
+            if field_row == ("velocity","tor") or field_row == ("magnetic","tor") or field_row == ("magnetic","pol") or field_row == ("temperature",""):
                 shift_r = 2
-            elif field_row == ("velocity","pol") or field_row == ("magnetic","pol"):
+            elif field_row == ("velocity","pol"):
                 shift_r = 4
             else:
                 shift_r = 0
@@ -122,6 +115,9 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            l = eigs[0]
+            a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
@@ -133,7 +129,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-23, 'rt':0}
+                        bc = {0:-23, 'rt':0, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -145,7 +141,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                     elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
                             bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
-                            bc = {0:23}
+                        bc = {0:23, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
 
@@ -187,7 +183,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-23, 'rt':0}
+                        bc = {0:-23, 'rt':0, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -222,7 +218,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+        return shell.stencil(res[0], bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
@@ -232,19 +228,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], l, a, b, bc, -l*(l+1.0))
-
-        elif field_row == ("magnetic","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("magnetic","pol"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("temperature",""):
+        if field_row == ("temperature",""):
             mat = shell.i2x2(res[0], a, b, bc)
 
         return mat
@@ -252,10 +236,11 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
+        Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
-        T = Ta**0.5
+        ro = eq_params['ro']
+        T = eq_params['taylor']**0.5
 
         l = eigs[0]
 
@@ -264,33 +249,33 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","pol"):
                 mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
+                mat = shell.i4x4(res[0], a, b, bc, -(Ra*T/ro)*l*(l+1.0))
 
         elif field_row == ("magnetic","tor"):
             if field_col == ("magnetic","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
 
         elif field_row == ("magnetic","pol"):
             if field_col == ("magnetic","pol"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","pol"):
-                if self.linearize:
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
                 else:
                     mat = shell.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1/Pr)
+                mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         return mat
 
@@ -312,7 +297,7 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
             mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("magnetic","pol"):
-            mat = shell.i2x2(res[0], l, a, b, bc, l*(l+1.0))
+            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
             mat = shell.i2x2(res[0], a, b, bc)

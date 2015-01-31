@@ -172,6 +172,11 @@ namespace Equations {
           */
          SolveTiming::Id  solveTiming() const;
 
+         /**
+          * @brief Get the nonlinear integration components order
+          */
+         const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& nlComponents() const;
+
       protected:
          /**
           * @brief Set the unknown name of equation
@@ -187,6 +192,11 @@ namespace Equations {
           * @brief Set solver timing
           */
          void setSolveTiming(const SolveTiming::Id time);
+
+         /**
+          * @brief Add a nonlinear integration component
+          */
+         void addNLComponent(const FieldComponents::Spectral::Id compId, const int flag);
 
          /**
           * @brief Set scalar variable
@@ -248,6 +258,11 @@ namespace Equations {
           * @brief Storage for the solve timing
           */
          SolveTiming::Id   mSolveTiming;
+
+         /**
+          * @brief Nonlinear integration component order
+          */
+         std::vector<std::pair<FieldComponents::Spectral::Id,int> >   mNLComponents;
 
       private:
          /**

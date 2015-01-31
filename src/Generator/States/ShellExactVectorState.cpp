@@ -219,6 +219,103 @@ namespace Equations {
                }
             }
          }
+
+      } else if(typeId == ShellExactStateIds::BENCHVELC1)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+         MHDFloat amplitude;
+
+         MHDFloat r;
+         MHDFloat theta;
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+
+               if(compId == FieldComponents::Physical::R)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               }
+
+               rNLComp.addProfile(amplitude*funcR*funcPh,iTh,iR);
+            }
+         }
+      } else if(typeId == ShellExactStateIds::BENCHMAGC1)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+         MHDFloat amplitude;
+
+         MHDFloat r;
+         MHDFloat theta;
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+            for(int iTh = 0; iTh < nTh; ++iTh)
+            {
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+
+               if(compId == FieldComponents::Physical::R)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  amplitude = 1.0;
+                  funcR = 1.0;
+                  funcTh = 1.0;
+               }
+
+               rNLComp.addProfile(amplitude*funcR*funcPh,iTh,iR);
+            }
+         }
       } else
       {
          throw Exception("Unknown exact state");
@@ -571,6 +668,24 @@ namespace Equations {
          rField = (3.0*phi).array().cos() + (3.0*phi).array().sin();
       }
       rField *= factor;
+   }
+
+   void ShellExactVectorState::setNLComponents()
+   {
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::ONE, 0);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::TWO, 0);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::THREE, 0);
+      }
    }
 
 }

@@ -147,12 +147,16 @@ namespace Transform {
       //
       // Multiplication by R
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGR, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST Q operator
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
-      // QST S operator
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST Q operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST S operator (4th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS4, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
       // QST T operator
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGT, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST Q operator (2th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGQ2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
+      // QST S operator (2th order)
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Multiplication by R
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
@@ -197,18 +201,18 @@ namespace Transform {
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGR)->second, pValue);
       Py_DECREF(pValue);
 
-      // Call QST Q component
+      // Call QST Q component (4th order)
       PythonWrapper::setFunction("i4x3");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ)->second, pValue);
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ4)->second, pValue);
       Py_DECREF(pValue);
 
-      // Call QST S component
+      // Call QST S component (4th order)
       PythonWrapper::setFunction("i4x3d1x1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
-      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS)->second, pValue);
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS4)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST T component
@@ -216,6 +220,20 @@ namespace Transform {
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGT)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call QST Q component (2nd order)
+      PythonWrapper::setFunction("i2x1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ2)->second, pValue);
+      Py_DECREF(pValue);
+
+      // Call QST S component (2nd order)
+      PythonWrapper::setFunction("i2x1d1x1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS2)->second, pValue);
       Py_DECREF(pValue);
 
       // Change resoluton for solver matrices

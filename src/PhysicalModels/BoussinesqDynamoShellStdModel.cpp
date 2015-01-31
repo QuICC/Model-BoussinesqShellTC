@@ -27,6 +27,8 @@
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.hpp"
+#include "IoVariable/SphericalScalarEnergyWriter.hpp"
+#include "IoVariable/SphericalTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -63,20 +65,30 @@ namespace GeoMHDiSCC {
          Equations::SharedShellExactScalarState spScalar;
          Equations::SharedShellExactVectorState spVector;
 
+         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
+
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::ShellExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
-         tSH.clear(); 
-         tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
-         spScalar->setHarmonicOptions(tSH);
+         switch(0)
+         {
+            case 0:
+               spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+               spScalar->setHarmonicOptions(tSH);
+               break;
+
+            case 1:
+               spScalar->setStateType(Equations::ShellExactStateIds::BENCHTEMPC1);
+               break;
+         }
 
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
@@ -130,12 +142,14 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+            case 3:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
          }
 
          // Add magnetic initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::MAGNETIC);
-         switch(2)
+         switch(3)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -184,6 +198,8 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+            case 3:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHMAGC1);
          }
 
       // Generate random spectrum
@@ -208,7 +224,7 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-1e-3, 1e-3, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -264,11 +280,20 @@ namespace GeoMHDiSCC {
 
    void BoussinesqDynamoShellStdModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
-      
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
+      // Create temperature energy writer
+      IoVariable::SharedSphericalScalarEnergyWriter spScalar(new IoVariable::SphericalScalarEnergyWriter("temperature", SchemeType::type()));
+      spScalar->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spScalar);
+
+      // Create kinetic energy writer
+      IoVariable::SharedSphericalTorPolEnergyWriter spVector(new IoVariable::SphericalTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
+
+      // Create magnetic energy writer
+      spVector = IoVariable::SharedSphericalTorPolEnergyWriter(new IoVariable::SphericalTorPolEnergyWriter("magnetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::MAGNETIC);
+      spSim->addAsciiOutputFile(spVector);
    }
 
    void BoussinesqDynamoShellStdModel::addHdf5OutputFiles(SharedSimulation spSim)

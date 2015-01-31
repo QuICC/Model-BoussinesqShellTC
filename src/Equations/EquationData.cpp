@@ -203,5 +203,15 @@ namespace Equations {
    {
       return this->mSolveTiming;
    }
+
+   const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& EquationData::nlComponents() const
+   {
+      return this->mNLComponents;
+   }
+
+   void EquationData::addNLComponent(const FieldComponents::Spectral::Id compId, const int flag)
+   {
+      this->mNLComponents.push_back(std::make_pair(compId,flag));
+   }
 }
 }

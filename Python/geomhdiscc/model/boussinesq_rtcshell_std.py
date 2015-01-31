@@ -52,7 +52,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             fields = []
         elif field_row == ("velocity","pol"):
             fields = [("temperature","")]
-            #fields = []
         elif field_row == ("temperature",""):
             fields = [("velocity","pol")]
 
@@ -257,10 +256,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                 mat = shell.zblk(res[0], bc)
 
             elif field_col == ("velocity","pol"):
-                if self.linearize:
-                    mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-                elif bcs["bcType"] == self.FIELD_TO_RHS:
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
              
                 else:

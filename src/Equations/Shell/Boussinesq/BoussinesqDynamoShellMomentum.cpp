@@ -23,6 +23,8 @@
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "PhysicalOperators/Cross.hpp"
+#include "PhysicalOperators/SphericalCoriolis.hpp"
+#include "TypeSelectors/TransformSelector.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -62,24 +64,35 @@ namespace Equations {
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 
-   void BoussinesqDynamoShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqDynamoShellMomentum::setNLComponents()
    {
+      this->addNLComponent(FieldComponents::Spectral::TOR, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::POL, 0);
+   }
+
+   void BoussinesqDynamoShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
+   {
+      // Get square root of Taylor number
+      MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
+      MHDFloat Pm = std::sqrt(this->eqParams().nd(NonDimensional::MAGPRANDTL));
+
       ///
       /// Compute \f$\vec u\wedge\left(\nabla\wedge\vec u\right) + \left(\nabla\wedge\vec B\right)\wedge\vec B\f$
       ///
-      switch(id)
+      switch(compId)
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
+            Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T/Pm);
             break;
          case(FieldComponents::Physical::THETA):
             Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
+            Physical::Cross<FieldComponents::Physical::PHI,FieldComponents::Physical::R>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T/Pm);
             break;
          case(FieldComponents::Physical::PHI):
             Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::set(rNLComp, this->unknown().dom(0).curl(), this->unknown().dom(0).phys(), 1.0);
-            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), 1.0);
+            Physical::Cross<FieldComponents::Physical::R,FieldComponents::Physical::THETA>::add(rNLComp, this->vector(PhysicalNames::MAGNETIC).dom(0).phys(), this->vector(PhysicalNames::MAGNETIC).dom(0).curl(), T/Pm);
             break;
          default:
             assert(false);
@@ -87,13 +100,10 @@ namespace Equations {
       }
 
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
-         // Get square root of Taylor number
-         MHDFloat T = std::sqrt(this->eqParams().nd(NonDimensional::TAYLOR));
-
          ///
          /// Compute Coriolis term
          ///
-         Physical::SphericalCoriolis::add(rNLComp, compId, , this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
+         Physical::SphericalCoriolis::add(rNLComp, compId, this->unknown().dom(0).spRes(), this->mCosTheta, this->mSinTheta, this->unknown().dom(0).phys(), T);
       #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
    }
 

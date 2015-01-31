@@ -72,11 +72,13 @@ namespace Transform {
           * Enum of integrator IDs:
           *    - INTG: integration
           *    - INTGR: integration of r
-          *    - INTGQ: integration of QST Q component for Poloidal NL
-          *    - INTGS: integration of QST S component for Poloidal NL
-          *    - INTGT: integration of QST T component for Toroidal NL
+          *    - INTGQ4: integration of QST Q component for Poloidal NL (4th order equation)
+          *    - INTGS4: integration of QST S component for Poloidal NL (4th order equation)
+          *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
+          *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
+          *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
           */
-         enum Id {INTG, INTGR, INTGQ, INTGS, INTGT};
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
    };

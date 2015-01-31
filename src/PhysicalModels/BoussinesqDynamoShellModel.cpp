@@ -27,6 +27,8 @@
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.hpp"
 #include "Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.hpp"
+#include "IoVariable/SphericalScalarEnergyWriter.hpp"
+#include "IoVariable/SphericalTorPolEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/ShellExactStateIds.hpp"
@@ -57,7 +59,7 @@ namespace GeoMHDiSCC {
    void BoussinesqDynamoShellModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(true)
+      if(false)
       {
          // Shared pointer to equation
          Equations::SharedShellExactScalarState spScalar;
@@ -208,7 +210,7 @@ namespace GeoMHDiSCC {
          // Add scalar random initial state generator
          spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setSpectrum(-1e-3, 1e-3, 1e4, 1e4, 1e4);
+         spScalar->setSpectrum(-1e-4, 1e-4, 1e4, 1e4, 1e4);
       }
 
       // Add output file
@@ -264,11 +266,20 @@ namespace GeoMHDiSCC {
 
    void BoussinesqDynamoShellModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
-      
-      // Add ASCII output file
-      //pSim->addOutputFile(AN_ASCIIFILE);
+      // Create temperature energy writer
+      IoVariable::SharedSphericalScalarEnergyWriter spScalar(new IoVariable::SphericalScalarEnergyWriter("temperature", SchemeType::type()));
+      spScalar->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spScalar);
+
+      // Create kinetic energy writer
+      IoVariable::SharedSphericalTorPolEnergyWriter spVector(new IoVariable::SphericalTorPolEnergyWriter("kinetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spVector);
+
+      // Create magnetic energy writer
+      spVector = IoVariable::SharedSphericalTorPolEnergyWriter(new IoVariable::SphericalTorPolEnergyWriter("magnetic", SchemeType::type()));
+      spVector->expect(PhysicalNames::MAGNETIC);
+      spSim->addAsciiOutputFile(spVector);
    }
 
    void BoussinesqDynamoShellModel::addHdf5OutputFiles(SharedSimulation spSim)

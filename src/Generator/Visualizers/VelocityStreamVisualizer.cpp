@@ -72,5 +72,23 @@ namespace Equations {
       this->mRequirements.addField(this->name(), FieldRequirement(false, false, this->mViewField, this->mViewGradient));
    }
 
+   void VelocityStreamVisualizer::setNLComponents()
+   {
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::ONE, 0);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::TWO, 0);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::THREE, 0);
+      }
+   }
+
 }
 }

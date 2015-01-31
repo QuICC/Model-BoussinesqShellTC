@@ -54,6 +54,13 @@ namespace Equations {
       this->setExplicitTiming(FieldComponents::Spectral::POL, ExplicitTiming::LINEAR);
    }
 
+   void BoussinesqTCShellMomentum::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::TOR, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::POL, 0);
+   }
+
    void BoussinesqTCShellMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
    {
       ///

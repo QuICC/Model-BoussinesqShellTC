@@ -102,6 +102,11 @@ namespace Equations {
          
       protected:
          /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
+         /**
           * @brief Set the galerkin stencil
           */
          virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;

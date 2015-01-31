@@ -103,6 +103,11 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonliner integration components
+          */
+         virtual void setNLComponents();
+
       private:
          /**
           * @brief Type of the state to generate

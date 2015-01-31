@@ -65,6 +65,11 @@ namespace Equations {
          virtual void setCoupling();
 
          /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
+         /**
           * @brief Storage for the cos(theta) grid values (if required)
           */
          Array mCosTheta;

@@ -36,26 +36,18 @@ namespace GeoMHDiSCC {
       {
          /**
           * @brief Generate the list of branches in scalar integration transform
+          *
+          * @brief isNL Flag to either compute NL projection or pure Toroidal/Poloidal
           */
-         std::vector<IntegratorBranch>  forwardScalar();
-
-         /**
-          * @brief Generate the list of branches in scalar nonlinear term integration transform
-          */
-         std::vector<IntegratorBranch>  forwardScalarNL();
+         std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in vector integration transform
-          */
-         std::vector<IntegratorBranch>  forwardVector();
-
-         /**
-          * @brief Generate the list of branches in vector nonlinear term integration transform
           *
-          * Toroidal component is radial component of curl: \f$\vec r \nabla\wedge N\f$
-          * Poloidal component is radial component of curl curl: \f$\vec r \nabla\wedge\nabla\wedge N\f$
+          * @brief components Spectral components where to stor results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
+          * @brief isNL       Flag to either compute NL projection or pure Toroidal/Poloidal
           */
-         std::vector<IntegratorBranch>  forwardVectorNL();
+         std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
 
          /**
           * @brief Generate the list of branches in scalar projection transform

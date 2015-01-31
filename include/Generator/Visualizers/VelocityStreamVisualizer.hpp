@@ -61,6 +61,11 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonliner integration components
+          */
+         virtual void setNLComponents();
+
       private:
          /**
           * @brief Storage for output field flag

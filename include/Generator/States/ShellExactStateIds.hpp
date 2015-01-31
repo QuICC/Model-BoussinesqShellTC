@@ -43,10 +43,17 @@ namespace Equations {
       enum Id {
          // Special states
          CONSTANT = 0,  // All constant
+
          HARMONIC = 10, // Generate spherical harmonic state
+
          TOROIDAL = 20, // Toroidal Y_l^m
-         POLOIDAL = 21, // Poloidal Y_l^m
+         POLOIDAL,      // Poloidal Y_l^m
+
          TORPOL = 30, // Toroidal+Poloidal state
+
+         BENCHTEMPC1 = 50, // Initial temperature perturbation state for Christensen's benchmark C1
+         BENCHVELC1,       // Initial velocity perturbation state for Christensen's benchmark C1
+         BENCHMAGC1,       // Initial magnetic perturbation state for Christensen's benchmark C1
       };
 
       /**

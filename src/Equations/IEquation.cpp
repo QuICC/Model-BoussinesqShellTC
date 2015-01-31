@@ -39,7 +39,11 @@ namespace Equations {
 
    void IEquation::init()
    {
+      // Set the coupling
       this->setCoupling();
+
+      // Add the nonlinear integration components
+      this->setNLComponents();
    }
 
    void IEquation::initSpectralMatricesComponent(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)

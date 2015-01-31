@@ -140,6 +140,11 @@ namespace Equations {
          virtual void setCoupling() = 0;
 
          /**
+          * @brief Set the default nonlinear components
+          */
+         virtual void setNLComponents() = 0;
+
+         /**
           * @brief Initialise the spectral equation matrices for given component
           *
           * @param spBcIds List of boundary condition IDs

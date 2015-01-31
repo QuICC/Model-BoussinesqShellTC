@@ -97,6 +97,11 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonliner integration components
+          */
+         virtual void setNLComponents();
+
       private:
          /**
           * @brief Generate Toroidal Y_0^0
