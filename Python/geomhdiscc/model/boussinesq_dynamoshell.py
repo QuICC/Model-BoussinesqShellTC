@@ -272,12 +272,12 @@ class BoussinesqDynamoShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + shell.i2x2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
+                mat = mat + shell.i2x2(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i2x2coriolis(res[0], res[1], m, a, b, bc, -T, l_zero_fix = 'zero')
+                mat = shell.i2x2coriolis(res[0], res[1], m, a, b, bc, -T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("magnetic","tor"):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -290,12 +290,12 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero')
+                mat = shell.i4x4coriolis(res[0], res[1], m, a, b, bc, T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
+                mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("magnetic","tor"):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -304,7 +304,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra_eff, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra_eff, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("magnetic","tor"):
             if field_col == ("velocity","tor"):
@@ -314,7 +314,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
             elif field_col == ("magnetic","pol"):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -333,7 +333,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("magnetic","pol"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pm, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = shell.zblk(res[0], res[1], m, bc)
@@ -345,9 +345,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             elif field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
+                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
                     else:
-                        mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
+                        mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
 
                 else:
                     mat = shell.zblk(res[0], res[1], m, bc)
@@ -360,9 +360,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
             elif field_col == ("temperature",""):
                 if eq_params["heating"] == 0:
-                    mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+                    mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
                 else:
-                    mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+                    mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
 
         return mat
 
@@ -377,21 +377,21 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("magnetic","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("magnetic","pol"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc, restriction = restriction)
             else:
-                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x3(res[0], res[1], m, a, b, bc, restriction = restriction)
 
         return mat

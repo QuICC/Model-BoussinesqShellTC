@@ -235,9 +235,9 @@ namespace GeoMHDiSCC {
 
             rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
 
-            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<dimensions::Data::DAT2D>(k); ++j)
+            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<dimensions::Data::DAT2D>(j, k));
+               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
             }
 
          #else

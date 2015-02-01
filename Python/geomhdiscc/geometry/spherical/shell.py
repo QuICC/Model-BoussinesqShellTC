@@ -50,35 +50,86 @@ def fix_l_zero(nr, m, mat, bc, fix):
     else:
         raise RuntimeError("Unkown l=0 fix!")
 
-def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False)
+def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Generic function to create a coupled spherical harmonics operator"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*op(nr, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    if restriction is None or m in restriction:
+        bcr = sphbc.ldependent_bc(bcr, m)
+        mat = coeff*shc(m)*op(nr, a, b, bcr)
+        mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    else:
+        mat = rad.zblk(nr, bcr)
+
     for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)))
+        if restriction is None or l in restriction:
+            bcr = sphbc.ldependent_bc(bcr, l)
+            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)))
+        else:
+            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)))
 
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
-def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False)
+def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Generic function to create a coupled l dependent spherical harmonics operator"""
 
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*op(nr, m, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)))
+    if restriction is None or m in restriction:
+        bcr = sphbc.ldependent_bc(bcr, m)
+        mat = coeff*shc(m)*op(nr, m, a, b, bcr)
+        mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    else:
+        mat = rad.zblk(nr, bcr)
 
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
+    for l in range(m+1, maxnl):
+        if restriction is None or l in restriction:
+            bcr = sphbc.ldependent_bc(bcr, l)
+            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)))
+        else:
+            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)))
+
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
+
+def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create the coupled operator for the coriolis Q term"""
+
+    # Only compute if there are at least 2 harmonic degrees
+    if maxnl - m > 1:
+        cor_r = sh.coriolis_r(maxnl, m)
+        cordr = sh.coriolisdr(maxnl, m)
+
+        if restriction is not None:
+            cor_r = cor_r.tolil()
+            cordr = cordr.tolil()
+            res_cols = list(set(range(0,cor_r.shape[1])) - set(restriction-m))
+            cor_r[:,res_cols] = 0
+            cordr[:,res_cols] = 0
+
+        cor_r = cor_r.tocsr()
+        cordr = cordr.tocsr()
+
+        bcr = convert_bc(bc)
+        shc = sh_coeff(with_sh_coeff)
+
+        assert(l_zero_fix == 'zero')
+        bcr = sphbc.ldependent_bc(bcr, m)
+        rmat1 = opl(nr, a, b, bcr)
+        rmat2 = opr(nr, a, b, bcr)
+        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
+        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
+        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2)
+        for ir,l in enumerate(range(m+1, maxnl)):
+            bcr = sphbc.ldependent_bc(bcr, l)
+            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],opl(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],opr(nr, a, b, bcr))
+            mat = spsp.vstack([mat,row])
+    else:
+        mat = rad.zblk(nr, bc)
+
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
 def zblk(nr, maxnl, m, bc):
     """Create a block of zeros"""
@@ -89,180 +140,55 @@ def zblk(nr, maxnl, m, bc):
     mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr))
     return sphbc.constrain(mat, nr, maxnl, m, bc)
 
-def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2 radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_operator(rad.i2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i2(nr, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2(nr, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2x2 radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_operator(rad.i2x2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i2x2(nr, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2(nr, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i2x3(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2x3(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2x3 radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_operator(rad.i2x3, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i2x3(nr, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x3(nr, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2x2 radial operator kronecker with coriolis Q term"""
 
-    # Only compute if there are at least 2 harmonic degrees
-    if maxnl - m > 1:
-        cor_r = sh.coriolis_r(maxnl, m).tocsr()
-        cordr = sh.coriolisdr(maxnl, m).tocsr()
+    return make_sh_qoperator(rad.i2x1, rad.i2x2d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-        bcr = convert_bc(bc)
-        shc = sh_coeff(with_sh_coeff)
-
-        assert(l_zero_fix == 'zero')
-        bcr = sphbc.ldependent_bc(bcr, m)
-        rmat1 = rad.i2x1(nr, a, b, bcr)
-        rmat2 = rad.i2x2d1(nr, a, b, bcr)
-        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
-        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
-        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2)
-        for ir,l in enumerate(range(m+1, maxnl)):
-            bcr = sphbc.ldependent_bc(bcr, l)
-            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
-            mat = spsp.vstack([mat,row])
-    else:
-        mat = rad.zblk(nr, bc)
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i2x2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2x2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2x2lapl radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_loperator(rad.i2x2lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i2x2lapl(nr, m, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2lapl(nr, l, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i2x3lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i2x3lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i2x3lapl radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_loperator(rad.i2x3lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i2x3lapl(nr, m, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x3lapl(nr, l, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4x4 radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_operator(rad.i4x4, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i4x4(nr, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4(nr, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4x4 radial operator kronecker with coriolis Q term"""
 
-    # Only compute if there are at least 2 harmonic degrees
-    if maxnl - m > 1:
-        cor_r = sh.coriolis_r(maxnl, m).tocsr()
-        cordr = sh.coriolisdr(maxnl, m).tocsr()
+    return make_sh_qoperator(rad.i4x3, rad.i4x4d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-        bcr = convert_bc(bc)
-        shc = sh_coeff(with_sh_coeff)
-
-        assert(l_zero_fix == 'zero')
-        bcr = sphbc.ldependent_bc(bcr, m)
-        rmat1 = rad.i4x3(nr, a, b, bcr)
-        rmat2 = rad.i4x4d1(nr, a, b, bcr)
-        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
-        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
-        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:],rmat2)
-        for ir,l in enumerate(range(m+1, maxnl)):
-            bcr = sphbc.ldependent_bc(bcr, l)
-            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
-            mat = spsp.vstack([mat,row])
-
-    else:
-        mat = rad.zblk(nr, bc)
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i4x4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i4x4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4x4lapl radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
+    return make_sh_loperator(rad.i4x4lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i4x4lapl(nr, m, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl(nr, l, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
-
-def i4x4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False):
+def i4x4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4x4lapl2 radial operator kronecker with an identity"""
 
-    bcr = convert_bc(bc)
-    shc = sh_coeff(with_sh_coeff)
-
-    bcr = sphbc.ldependent_bc(bcr, m)
-    mat = coeff*shc(m)*rad.i4x4lapl2(nr, m, a, b, bcr)
-    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
-    for l in range(m+1, maxnl):
-        bcr = sphbc.ldependent_bc(bcr, l)
-        mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
-
-    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
+    return make_sh_loperator(rad.i4x4lapl2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""
