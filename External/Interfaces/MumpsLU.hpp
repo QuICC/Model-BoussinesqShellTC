@@ -85,17 +85,17 @@ namespace Eigen {
 
       public:
 
-         MumpsLU() { init(); }
+         MumpsLU(const GeoMHDiSCC::FrameworkMacro::SubCommId commId = GeoMHDiSCC::FrameworkMacro::LOCAL) { init(commId); }
 
-         MumpsLU(const MatrixType& matrix)
+         MumpsLU(const MatrixType& matrix, const GeoMHDiSCC::FrameworkMacro::SubCommId commId = GeoMHDiSCC::FrameworkMacro::LOCAL)
          {
-            init();
+            init(commId);
             compute(matrix);
          }
 
          ~MumpsLU()
          {
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
             m_id.job = -2;
 
             if(m_isParallel)
@@ -112,7 +112,7 @@ namespace Eigen {
             free(m_id.rhs);
 
             MumpsLU_mumps(&m_id, Scalar());
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
          }
 
          inline Index rows() const { return m_id.n; }
@@ -178,7 +178,7 @@ namespace Eigen {
           */
          void analyzePattern(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
 
             m_id.job = 1;
             copyInput(matrix, true);
@@ -195,7 +195,7 @@ namespace Eigen {
             m_info = m_error ? InvalidInput : Success;
             m_analysisIsOk = m_error ? false : true;
             m_factorizationIsOk = false;
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
          }
 
          /** Performs a numeric decomposition of \a matrix
@@ -206,7 +206,7 @@ namespace Eigen {
           */
          void factorize(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
 
             eigen_assert(m_analysisIsOk && "MumpsLU: you must first call analyzePattern()");
 
@@ -218,7 +218,8 @@ namespace Eigen {
 
             m_info = m_error ? NumericalIssue : Success;
             m_factorizationIsOk = m_error ? false : true;
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
          }
 
          #ifndef EIGEN_PARSED_BY_DOXYGEN
@@ -228,17 +229,20 @@ namespace Eigen {
 
       protected:
 
-         void init()
+         void init(const GeoMHDiSCC::FrameworkMacro::SubCommId commId)
          {
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            // Set the communicator id
+            m_commId = commId;
+
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
 
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
-               m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::spectralComm());
+               m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId));
                int rank;
-               MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId), &rank);
                m_isHost = (rank == 0);
-               MPI_Comm_size(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               MPI_Comm_size(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId), &rank);
                m_isParallel = (rank > 1);
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
@@ -280,7 +284,7 @@ namespace Eigen {
             //m_id.cntl[1-1] = 1.0;
 
 
-            GeoMHDiSCC::FrameworkMacro::syncSpectral();
+            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
          }
 
          void copyInput(const MatrixType& mat, const bool freeMemory)
@@ -389,7 +393,7 @@ namespace Eigen {
             if(m_isParallel)
             {
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::spectralComm()); 
+               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId)); 
                pRhs = mTmp.data();
             } else
             {
@@ -436,7 +440,7 @@ namespace Eigen {
             #ifdef GEOMHDISCC_MPI
             if(m_isParallel)
             {
-               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::spectralComm());
+               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId));
             }
             #endif //GEOMHDISCC_MPI
          }
@@ -453,6 +457,8 @@ namespace Eigen {
          bool m_isHost;
          bool m_isParallel;
 
+         GeoMHDiSCC::FrameworkMacro::SubCommId  m_commId;
+
       private:
          mutable Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>   mTmp;
 
@@ -464,7 +470,7 @@ template<typename MatrixType>
 template<typename BDerived,typename XDerived>
 bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDerived> &x) const
 {
-   GeoMHDiSCC::FrameworkMacro::syncSpectral();
+   GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
 
    int rhsCols = b.cols();
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
@@ -492,7 +498,7 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
 
    copySolution(x.derived().data());
 
-   GeoMHDiSCC::FrameworkMacro::syncSpectral();
+   GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
 
    return true;
 }

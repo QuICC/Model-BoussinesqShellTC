@@ -114,7 +114,7 @@ namespace IoVariable {
 
       // Get the "global" field
       #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE 
-         MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, GeoMHDiSCC::FramworkMacro::spectralComm());
+         MPI_Reduce(MPI_IN_PLACE, field.data(), field.rows(), MPI_DOUBLE, MPI_SUM, 0, GeoMHDiSCC::FramworkMacro::getSubComm(MpiFramwork::LOCAL));
       #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       Matrix nusselt = -this->mNusseltOp*field;

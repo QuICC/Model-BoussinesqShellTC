@@ -105,7 +105,7 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coe
         if restriction is not None:
             cor_r = cor_r.tolil()
             cordr = cordr.tolil()
-            res_cols = list(set(range(0,cor_r.shape[1])) - set(restriction-m))
+            res_cols = list(set(range(0,cor_r.shape[1])) - set([i - m for i in restriction]))
             cor_r[:,res_cols] = 0
             cordr[:,res_cols] = 0
 

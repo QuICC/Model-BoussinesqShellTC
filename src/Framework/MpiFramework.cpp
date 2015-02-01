@@ -39,6 +39,20 @@ namespace GeoMHDiSCC {
 
       // Set MPI rank of local CPU
       MPI_Comm_rank(MPI_COMM_WORLD, &MpiFramework::mCpuId);
+
+      // Initialise local sub communicator
+      MPI_Group   world;
+      MPI_Comm_group(MPI_COMM_WORLD, &world);
+
+      // Create local group
+      MPI_Group group;
+      MPI_Group_incl(world, 1, &MpiFramework::mCpuId, &group);
+      mSubGroup.insert(std::make_pair(LOCAL, group));
+
+      // Create local communicator
+      MPI_Comm comm;
+      MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::getSubGroup(LOCAL), &comm);
+      mSubComm.insert(std::make_pair(LOCAL, comm));
    }
 
    void MpiFramework::setup(const int nCpu)
@@ -60,10 +74,26 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
-   void MpiFramework::syncSpectral()
+   void MpiFramework::syncSubComm(const MpiFramework::SubCommId id)
    {
+      assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
+
       // Create MPI barrier to force synchronisation
-      MPI_Barrier(MpiFramework::mSpecComm);
+      MPI_Barrier(MpiFramework::mSubComm.find(id)->second);
+   }
+
+   MPI_Group MpiFramework::getSubGroup(const MpiFramework::SubCommId id)
+   {
+      assert(MpiFramework::mSubGroup.find(id) != MpiFramework::mSubGroup.end());
+
+      return MpiFramework::mSubGroup.find(id)->second;
+   }
+
+   MPI_Comm MpiFramework::getSubComm(const MpiFramework::SubCommId id)
+   {
+      assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
+
+      return MpiFramework::mSubComm.find(id)->second;
    }
 
    void MpiFramework::finalize()
@@ -78,16 +108,6 @@ namespace GeoMHDiSCC {
       MPI_Finalize();
    }
 
-   MPI_Group MpiFramework::spectralGroup()
-   {
-      return MpiFramework::mSpecGroup;
-   }
-
-   MPI_Comm MpiFramework::spectralComm()
-   {
-      return MpiFramework::mSpecComm;
-   }
-
    void MpiFramework::setSpectralComm(const std::vector<int>& ranks)
    {
       if(ranks.size() > 0)
@@ -96,21 +116,29 @@ namespace GeoMHDiSCC {
          MPI_Comm_group(MPI_COMM_WORLD, &world);
 
          // Create spectral group
-         MPI_Group_incl(world, ranks.size(), &ranks.front(), &MpiFramework::mSpecGroup);
+         MPI_Group group;
+         MPI_Group_incl(world, ranks.size(), &ranks.front(), &group);
+         mSubGroup.insert(std::make_pair(SPECTRAL, group));
 
          // Create spectral communicator
-         MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::mSpecGroup, &MpiFramework::mSpecComm);
+         MPI_Comm comm;
+         MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::getSubGroup(SPECTRAL), &comm);
+         mSubComm.insert(std::make_pair(SPECTRAL, comm));
       
       // Spectral MPI group and communicator are WORLD
       } else
       {
-         MPI_Comm_group(MPI_COMM_WORLD, &MpiFramework::mSpecGroup);
-         MpiFramework::mSpecComm = MPI_COMM_WORLD;
+         MPI_Group   world;
+         MPI_Comm_group(MPI_COMM_WORLD, &world);
+
+         mSubGroup.insert(std::make_pair(SPECTRAL, world));
+
+         mSubComm.insert(std::make_pair(SPECTRAL, MPI_COMM_WORLD));
       }
    }
 
-   MPI_Group MpiFramework::mSpecGroup = 0;
+   std::map<MpiFramework::SubCommId,MPI_Group> MpiFramework::mSubGroup = std::map<MpiFramework::SubCommId,MPI_Group>();
 
-   MPI_Comm MpiFramework::mSpecComm = 0;
+   std::map<MpiFramework::SubCommId,MPI_Comm> MpiFramework::mSubComm = std::map<MpiFramework::SubCommId,MPI_Comm>();
 
 }
