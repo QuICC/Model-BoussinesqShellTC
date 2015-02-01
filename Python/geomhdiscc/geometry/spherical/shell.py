@@ -198,3 +198,18 @@ def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     nl = maxnl - m
     mat = coeff*spsp.kron(rad.qid(nl,0,rad.radbc.no_bc()), rad.qid(nr,qr,bcr))
     return sphbc.constrain(mat, nr, maxnl, m, bc)
+
+def stencil(nr, maxnl, m, bc):
+    """Create a galerkin stencil matrix"""
+    
+    bc['rt'] = 0
+    bcr = convert_bc(bc)
+
+    bcr = sphbc.ldependent_bc(bcr, m)
+    mat = rad.stencil(nr, bcr)
+
+    for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
+        mat = spsp.block_diag((mat,rad.stencil(nr, bcr)))
+
+    return mat

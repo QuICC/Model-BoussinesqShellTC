@@ -212,10 +212,12 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
     def stencil(self, res, eq_params, eigs, bcs, field_row):
         """Create the galerkin stencil"""
+
+        m = int(eigs[0])
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+        return shell.stencil(res[0], res[1], m, bc)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
