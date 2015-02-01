@@ -48,6 +48,11 @@ namespace GeoMHDiSCC {
          static void finalize();
 
          /**
+          * @brief Synchronise the spectral communicator
+          */
+         static void syncSpectral();
+
+         /**
           * @brief Spectral CPUs MPI group
           */
          static MPI_Group spectralGroup();

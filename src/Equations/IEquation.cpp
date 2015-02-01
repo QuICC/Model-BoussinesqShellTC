@@ -334,7 +334,7 @@ namespace Equations {
             std::vector<int> slow;
             std::vector<std::vector<int> > middle;
 
-            spRes->buildRestriction(slow, middle);
+            spRes->buildRestriction(slow, middle, matIdx);
             PyObject *pSlow, *pMiddle;
 
             if(middle.size() > 0)
@@ -425,7 +425,7 @@ namespace Equations {
             std::vector<int> slow;
             std::vector<std::vector<int> > middle;
 
-            spRes->buildRestriction(slow, middle);
+            spRes->buildRestriction(slow, middle, matIdx);
             PyObject *pSlow, *pMiddle;
 
             if(middle.size() > 0)
@@ -495,7 +495,7 @@ namespace Equations {
             std::vector<int> slow;
             std::vector<std::vector<int> > middle;
 
-            spRes->buildRestriction(slow, middle);
+            spRes->buildRestriction(slow, middle, matIdx);
             PyObject *pSlow, *pMiddle;
 
             if(middle.size() > 0)

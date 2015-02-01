@@ -195,7 +195,7 @@ namespace GeoMHDiSCC {
       return this->spFwdSetup(static_cast<Dimensions::Transform::Id>(this->cpu()->nDim()-1));
    }
 
-   void Resolution::buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle)
+   void Resolution::buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle, const int k)
    {
       // Make sure vectors are empty
       rSlow.clear();
@@ -227,14 +227,19 @@ namespace GeoMHDiSCC {
                   rMiddle.back().push_back(j_);
                }
             }
+
          // Two dimensional matrices
-         #elif defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT
+         #elif defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMHDISCC_SPATIALSCHEME_CFT || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM
             // Make sure middle is empty
             rMiddle.clear();
 
-            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
 
-            #error "MPI sparse solve restriction for two dimensional matrices not yet implemented."
+            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<dimensions::Data::DAT2D>(k); ++j)
+            {
+               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<dimensions::Data::DAT2D>(j, k));
+            }
+
          #else
             #error "Tried to setup MPI sparse solver for unimplemented scheme."
          #endif //defined GEOMHDISCC_SPATIALSCHEME_TTT

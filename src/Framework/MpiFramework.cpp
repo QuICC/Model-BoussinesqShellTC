@@ -60,6 +60,12 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
+   void MpiFramework::syncSpectral()
+   {
+      // Create MPI barrier to force synchronisation
+      MPI_Barrier(MpiFramework::mSpecComm);
+   }
+
    void MpiFramework::finalize()
    {
       // Make sure all finished and are synchronised

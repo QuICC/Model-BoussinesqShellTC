@@ -398,7 +398,7 @@ namespace GeoMHDiSCC {
       this->mspRes = best.first;
 
       // Set additional options on final resolution object
-      TScheme::tuneResolution(this->mspRes);
+      TScheme::tuneResolution(this->mspRes, best.second);
 
       // Extract box scale from configuration file
       Array box = this->mSimIoCtrl.configBoxScale();

@@ -28,6 +28,40 @@ namespace Schemes {
       return "SLFm";
    }
 
+   void SLFmScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
+   {
+      // Create single rank communicator
+      #ifdef GEOMHDISCC_MPI
+         std::vector<int>  ranks;
+
+         // Create communicator for 1D group CPUs 
+         #ifdef GEOMHDISCC_MPISPSOLVE
+
+         // Extract the communication group from structure
+         std::multimap<int,int>::const_iterator it;
+         std::set<int> filter;
+         filter.insert(FrameworkMacro::id());
+         for(it = descr.structure.at(0).equal_range(FrameworkMacro::id()).first; it != descr.structure.at(0).equal_range(FrameworkMacro::id()).second; ++it)
+         {
+            filter.insert(it->second);
+         }
+
+         // Create the ranks list
+         std::set<int>::iterator sIt;
+         for(sIt = filter.begin(); sIt != filter.end(); ++sIt)
+         {
+            ranks.push_back(*sIt);
+         }
+
+         // Make single core communicator
+         #else
+            ranks.push_back(FrameworkMacro::id());
+         #endif //GEOMHDISCC_MPISPSOLVE
+
+         FrameworkMacro::setSpectralComm(ranks);
+      #endif //GEOMHDISCC_MPI
+   }
+
    void SLFmScheme::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform

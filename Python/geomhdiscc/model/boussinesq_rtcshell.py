@@ -227,6 +227,23 @@ class BoussinesqRTCShell(base_model.BaseModel):
         rratio = eq_params['rratio']
         T = Ta**0.5
 
+        # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
+        # Parameters match as:  Dormy   Christensen 
+        #                       Ra      Ra/(R_o*R_i*Ta^0.5)
+        #                       Ta      Ta*(1-R_i/R_o)^4
+        if ro == 1.0:
+            # R_o rescaling
+            Ra_eff = Ra
+            bg_eff = 1.0
+        elif eq_params['heating'] == 0:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif eq_params['heating'] == 1:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = ro**2*rratio
+
         m = int(eigs[0])
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
@@ -254,8 +271,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 mat = mat + shell.i4x4lapl(res[0], res[1], m, a, b, bc, 1j*m*T, l_zero_fix = 'zero')
 
             elif field_col == ("temperature",""):
-                #mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -(Ra*T/ro), with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra_eff, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -264,9 +280,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
             elif field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
                     else:
-                        mat = shell.i2(res[0], res[1], m, a, b, bc, ro**2*rratio/(1.0-rratio), with_sh_coeff = 'laplh')
+                        mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
 
                 else:
                     mat = shell.zblk(res[0], res[1], m, bc)

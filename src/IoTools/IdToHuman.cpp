@@ -371,6 +371,9 @@ namespace IoTools {
          case NonDimensional::THETA:
             return "theta";
 
+         case NonDimensional::HEATING:
+            return "heating";
+
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
       }

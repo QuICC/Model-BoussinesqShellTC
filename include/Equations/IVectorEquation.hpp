@@ -544,7 +544,7 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).hasNonlinear())
       {
          if(isInitialized)
-         {
+         { 
             copyIsSet = false;
          }
 

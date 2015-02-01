@@ -12,18 +12,20 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 l = 0
-m = 3
-res = [32, 48, 0]
+m = 13
+res = [48, 64, 0]
 eigs = [float(m)]
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.073175e7, 'ro':1, 'rratio':0.35} # m = 13, NS/NS
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.103005e7, 'ro':1, 'rratio':0.35} # m = 13, SF/SF
 #eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.2726e8, 'ro':1, 'rratio':0.35} # m = 30, NS/NS
 #eq_params = {'taylor':1e12, 'prandtl':1, 'rayleigh':4.302e8, 'ro':1, 'rratio':0.35} # m = 30, SF/SF
 #eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.2e6, 'ro':20.0/13.0, 'rratio':0.35} # m = 4, NS/NS
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.0733e7, 'ro':1.0, 'rratio':0.35, 'heating':0} # m = 9, NS/NS, internal heating
-#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.243e6, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':2.07310821e7, 'ro':1.0, 'rratio':0.35, 'heating':0} # m = 13, NS/NS, internal heating
+#eq_params = {'taylor':1e10, 'prandtl':1, 'rayleigh':3.24308e6, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
 #eq_params = {'taylor':4e6, 'prandtl':1, 'rayleigh':4.75992e4, 'ro':1.0, 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
-eq_params = {'taylor':4e6, 'prandtl':1, 'rayleigh':28.9787, 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+#eq_params = {'taylor':4e6*0.65**4, 'prandtl':1, 'rayleigh':28.7296, 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+#eq_params = {'taylor':1e10*(1.0-0.35)**4, 'prandtl':1, 'rayleigh':3.24308e6/((20./13.)**2*0.35*1e10**0.5), 'ro':20./13., 'rratio':0.35, 'heating':1} # m = 9, NS/NS, differential heating
+eq_params = {'taylor':1e10*(1.0-0.35)**4, 'prandtl':1, 'rayleigh':2.07310821e7*(1.0+0.35)/(2.0*(20./13.)**2*1e10**0.5), 'ro':20./13., 'rratio':0.35, 'heating':0} # m = 13, NS/NS, internal heating
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}

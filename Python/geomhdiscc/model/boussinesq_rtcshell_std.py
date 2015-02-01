@@ -216,6 +216,27 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
+        Ta = eq_params['taylor']
+        ro = eq_params['ro']
+        rratio = eq_params['rratio']
+        T = Ta**0.5
+
+        # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
+        # Parameters match as:  Dormy   Christensen 
+        #                       Ra      Ra/(R_o*R_i*Ta^0.5)
+        #                       Ta      Ta*(1-R_i/R_o)^4
+        if ro == 1.0:
+            # R_o rescaling
+            Ra_eff = Ra
+            bg_eff = 1.0
+        elif eq_params['heating'] == 0:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif eq_params['heating'] == 1:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = ro**2*rratio
 
         l = eigs[0]
 
@@ -252,7 +273,7 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
                     bc[0] = min(0,bc[0]//10)
                     mat = shell.zblk(res[0], bc)
                 else:
-                    mat = shell.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
+                    mat = shell.i4x4(res[0], a, b, bc, -Ra_eff*l*(l+1.0))
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -261,9 +282,9 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
             elif field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
+                        mat = shell.i2x2(res[0], a, b, bc, bg_eff*l*(l+1.0))
                     else:
-                        mat = shell.i2(res[0], a, b, bc, l*(l+1.0))
+                        mat = shell.i2(res[0], a, b, bc, bg_eff*l*(l+1.0))
              
                 else:
                     mat = shell.zblk(res[0], bc)

@@ -181,7 +181,7 @@ namespace IoVariable {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
 
       // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
-      this->mTorEnergy /= this->mVolume;
+      this->mTorEnergy /= 2*this->mVolume;
 
       // Dealias poloidal variable data for Q component
       coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));
@@ -314,7 +314,7 @@ namespace IoVariable {
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarPolS);
 
       // Normalize by the volume
-      this->mPolEnergy /= this->mVolume;
+      this->mPolEnergy /= 2*this->mVolume;
    }
 
    void SphericalTorPolEnergyWriter::write()

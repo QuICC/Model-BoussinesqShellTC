@@ -112,6 +112,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            m = int(eigs[0])
+            a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             if bcId == 0:
@@ -123,7 +126,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-23, 'rt':0}
+                        bc = {0:-23, 'rt':0, 'c':{'a':a, 'b':b, 'l':float("nan")}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -135,7 +138,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
                             bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
-                            bc = {0:23}
+                            bc = {0:23, 'c':{'a':a, 'b':b, 'l':float("nan")}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
 
@@ -241,7 +244,26 @@ class BoussinesqDynamoShell(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         Ta = eq_params['taylor']
+        ro = eq_params['ro']
+        rratio = eq_params['rratio']
         T = Ta**0.5
+
+        # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
+        # Parameters match as:  Dormy   Christensen 
+        #                       Ra      Ra/(R_o*R_i*Ta^0.5)
+        #                       Ta      Ta*(1-R_i/R_o)^4
+        if ro == 1.0:
+            # R_o rescaling
+            Ra_eff = Ra
+            bg_eff = 1.0
+        elif eq_params['heating'] == 0:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif eq_params['heating'] == 1:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = ro**2*rratio
 
         m = int(eigs[0])
 
@@ -282,7 +304,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, bc, l_zero_fix = 'zero')
+                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra_eff, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("magnetic","tor"):
             if field_col == ("velocity","tor"):
@@ -323,9 +345,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             elif field_col == ("velocity","pol"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
                     else:
-                        mat = shell.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                        mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh')
 
                 else:
                     mat = shell.zblk(res[0], res[1], m, bc)

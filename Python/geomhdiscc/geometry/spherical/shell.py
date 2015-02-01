@@ -50,6 +50,36 @@ def fix_l_zero(nr, m, mat, bc, fix):
     else:
         raise RuntimeError("Unkown l=0 fix!")
 
+def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False)
+    """Generic function to create a coupled spherical harmonics operator"""
+
+    bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
+
+    bcr = sphbc.ldependent_bc(bcr, m)
+    mat = coeff*shc(m)*op(nr, a, b, bcr)
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
+        mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)))
+
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
+
+def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False)
+    """Generic function to create a coupled l dependent spherical harmonics operator"""
+
+    bcr = convert_bc(bc)
+    shc = sh_coeff(with_sh_coeff)
+
+    bcr = sphbc.ldependent_bc(bcr, m)
+    mat = coeff*shc(m)*op(nr, m, a, b, bcr)
+    mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
+    for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
+        mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)))
+
+    return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
+
 def zblk(nr, maxnl, m, bc):
     """Create a block of zeros"""
 
@@ -65,9 +95,11 @@ def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = F
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i2(nr, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2(nr, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -78,9 +110,11 @@ def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix =
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i2x2(nr, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2(nr, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -91,9 +125,11 @@ def i2x3(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix =
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i2x3(nr, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x3(nr, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -110,12 +146,14 @@ def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_ze
         shc = sh_coeff(with_sh_coeff)
 
         assert(l_zero_fix == 'zero')
+        bcr = sphbc.ldependent_bc(bcr, m)
         rmat1 = rad.i2x1(nr, a, b, bcr)
         rmat2 = rad.i2x2d1(nr, a, b, bcr)
         rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
         rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
         mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2)
         for ir,l in enumerate(range(m+1, maxnl)):
+            bcr = sphbc.ldependent_bc(bcr, l)
             row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i2x1(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i2x2d1(nr, a, b, bcr))
             mat = spsp.vstack([mat,row])
     else:
@@ -129,9 +167,11 @@ def i2x2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_f
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i2x2lapl(nr, m, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x2lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -142,9 +182,11 @@ def i2x3lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_f
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i2x3lapl(nr, m, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i2x3lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -155,9 +197,11 @@ def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix =
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i4x4(nr, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4(nr, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -174,12 +218,14 @@ def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_ze
         shc = sh_coeff(with_sh_coeff)
 
         assert(l_zero_fix == 'zero')
+        bcr = sphbc.ldependent_bc(bcr, m)
         rmat1 = rad.i4x3(nr, a, b, bcr)
         rmat2 = rad.i4x4d1(nr, a, b, bcr)
         rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
         rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
         mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:],rmat2)
         for ir,l in enumerate(range(m+1, maxnl)):
+            bcr = sphbc.ldependent_bc(bcr, l)
             row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rad.i4x3(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rad.i4x4d1(nr, a, b, bcr))
             mat = spsp.vstack([mat,row])
 
@@ -194,9 +240,11 @@ def i4x4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_f
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i4x4lapl(nr, m, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)
@@ -207,9 +255,11 @@ def i4x4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    bcr = sphbc.ldependent_bc(bcr, m)
     mat = coeff*shc(m)*rad.i4x4lapl2(nr, m, a, b, bcr)
     mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     for l in range(m+1, maxnl):
+        bcr = sphbc.ldependent_bc(bcr, l)
         mat = spsp.block_diag((mat,coeff*shc(l)*rad.i4x4lapl2(nr, l, a, b, bcr)))
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix)

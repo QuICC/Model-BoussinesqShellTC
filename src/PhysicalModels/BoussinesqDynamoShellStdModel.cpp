@@ -142,6 +142,7 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
          }
@@ -198,6 +199,7 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+
             case 3:
                spVector->setStateType(Equations::ShellExactStateIds::BENCHMAGC1);
          }

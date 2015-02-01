@@ -59,31 +59,41 @@ namespace GeoMHDiSCC {
    void BoussinesqDynamoShellModel::addStates(SharedStateGenerator spGen)
    {
       // Generate "exact" solutions (trigonometric or monomial)
-      if(false)
+      if(true)
       {
          // Shared pointer to equation
          Equations::SharedShellExactScalarState spScalar;
          Equations::SharedShellExactVectorState spVector;
 
+         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
+
          // Add temperature initial state generator
          spScalar = spGen->addScalarEquation<Equations::ShellExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
-         std::vector<std::tr1::tuple<int,int,MHDComplex> > tSH;
-         tSH.clear(); 
-         tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
-         tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
-         spScalar->setHarmonicOptions(tSH);
+         switch(1)
+         {
+            case 0:
+               spScalar->setStateType(Equations::ShellExactStateIds::HARMONIC);
+               tSH.clear(); 
+               tSH.push_back(std::tr1::make_tuple(0,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(1,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,1)));
+               tSH.push_back(std::tr1::make_tuple(5,5,MHDComplex(1,1)));
+               spScalar->setHarmonicOptions(tSH);
+               break;
+
+            case 1:
+               spScalar->setStateType(Equations::ShellExactStateIds::BENCHTEMPC1);
+               break;
+         }
 
          // Add velocity initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         switch(2)
+         switch(3)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -132,12 +142,15 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+
+            case 3:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHVELC1);
          }
 
          // Add magnetic initial state generator
          spVector = spGen->addVectorEquation<Equations::ShellExactVectorState>();
          spVector->setIdentity(PhysicalNames::MAGNETIC);
-         switch(2)
+         switch(3)
          {
             case 0:
                spVector->setStateType(Equations::ShellExactStateIds::TOROIDAL);
@@ -186,6 +199,9 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
+
+            case 3:
+               spVector->setStateType(Equations::ShellExactStateIds::BENCHMAGC1);
          }
 
       // Generate random spectrum

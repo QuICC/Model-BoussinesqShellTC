@@ -31,7 +31,7 @@ namespace Schemes {
    {
    }
 
-   void ISpatialScheme::tuneResolution(SharedResolution spRes)
+   void ISpatialScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
       ISpatialScheme::tuneMpiResolution();
    }

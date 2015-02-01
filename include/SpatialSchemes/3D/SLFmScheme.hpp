@@ -42,6 +42,11 @@ namespace Schemes {
          static std::string type();
 
          /**
+          * @brief Tune the shared resolution used by simulation
+          */
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
+
+         /**
           * @brief Constructor
           *
           * @param dim     Chebyshev truncations 

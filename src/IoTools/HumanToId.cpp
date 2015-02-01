@@ -94,6 +94,10 @@ namespace IoTools {
       {
          return NonDimensional::THETA;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::HEATING))
+      {
+         return NonDimensional::HEATING;
+
       } else
       {
          throw Exception("Unknown string to ID conversion requested (Nondimensional)");

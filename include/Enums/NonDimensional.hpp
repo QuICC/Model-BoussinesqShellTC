@@ -61,6 +61,8 @@ namespace GeoMHDiSCC {
             TAYLOR,
             /// Theta
             THETA,
+            /// Flag to switch between interal heating, differential heating, etc
+            HEATING,
          };
       };
 }

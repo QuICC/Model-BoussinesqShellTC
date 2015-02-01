@@ -127,7 +127,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Build restriction for MPI sparse solver
           */
-         void buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle);
+         void buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle, const int k);
 
       protected:
 

@@ -33,7 +33,7 @@ namespace Schemes {
       return "TTT";
    }
 
-   void TTTScheme::tuneResolution(SharedResolution spRes)
+   void TTTScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
       // Create single rank communicator
       #ifdef GEOMHDISCC_MPI
