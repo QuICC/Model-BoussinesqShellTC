@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
+
 // System includes
 //
 #include <set>
