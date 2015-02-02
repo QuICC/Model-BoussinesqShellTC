@@ -109,14 +109,15 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        l = eigs[0]
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            l = eigs[0]
-            a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
@@ -177,21 +178,21 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':4}
                     elif field_col == ("magnetic","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-23, 'rt':0, 'c':{'a':a, 'b':b, 'l':l}}
+                        bc = {0:-23, 'rt':2, 'c':{'a':a, 'b':b, 'l':l}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':0}
+                        bc = {0:-22, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':4}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -213,12 +214,12 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], bc)
+        return shell.stencil(res[0], bc, make_square)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""

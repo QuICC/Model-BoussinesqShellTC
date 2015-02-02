@@ -57,15 +57,19 @@ namespace internal {
 
    inline void solveWrapper(MatrixZ& rSolution, SparseSelector<SparseMatrix>::Type& solver, const MatrixZ& rhs)
    {
-      Matrix tmp(rhs.rows(), rhs.cols());
-      tmp = rhs.real();
-      rSolution.real() = solver.solve(tmp);
+      Matrix tmpIn(rhs.rows(), rhs.cols());
+      Matrix tmpOut(rhs.rows(), rhs.cols());
+
+      tmpIn = rhs.real();
+      tmpOut = solver.solve(tmpIn);
+      rSolution.real() = tmpOut;
 
       // Safety assert for successful solve
       assert(solver.info() == Eigen::Success);
 
-      tmp = rhs.imag();
-      rSolution.imag() = solver.solve(tmp);
+      tmpIn = rhs.imag();
+      tmpOut = solver.solve(tmpIn);
+      rSolution.imag() = tmpOut;
 
       // Safety assert for successful solve
       assert(solver.info() == Eigen::Success);

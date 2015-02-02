@@ -127,6 +127,11 @@ namespace Equations {
           * @param spBcIds   List of boundary condition IDs
           */
          virtual void initSpectralMatrices(const SharedSimulationBoundary spBcIds) = 0;
+
+         /**
+          * @brief Implementation of the galerkin stencil dispatch to python scripts
+          */
+         void dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs, const bool makeSquare = false) const;
          
       protected:
          /**
@@ -166,11 +171,6 @@ namespace Equations {
           * @brief Implementation of model operator dispatcher to python scripts
           */
          void dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
-
-         /**
-          * @brief Implementation of the galerkin stencil dispatch to python scripts
-          */
-         void dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const;
 
          /**
           * @brief Implementation of the quasi inverse matrix operator dispatch to python scripts

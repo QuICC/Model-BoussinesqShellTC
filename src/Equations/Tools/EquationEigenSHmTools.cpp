@@ -37,7 +37,7 @@ namespace EigenSHm {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #ifdef GEOMHDISCC_MPISPSOLVE
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rTauNs(m) = tauSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
@@ -51,7 +51,7 @@ namespace EigenSHm {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #ifdef GEOMHDISCC_MPISPSOLVE
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rGalerkinNs(m) = galerkinSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
@@ -69,7 +69,7 @@ namespace EigenSHm {
    {
       for(int m = 0; m < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
       {
-         #ifdef GEOMHDISCC_MPISPSOLVE
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
             int m_ = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
             rSystemNs(m) = systemSize*(spRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else

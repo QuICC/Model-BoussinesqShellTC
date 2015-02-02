@@ -11,7 +11,6 @@ import geomhdiscc.geometry.spherical.shell as shell
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.shell_boundary import no_bc
 
-
 class BoussinesqRTCShell(base_model.BaseModel):
     """Class to setup the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
 
@@ -161,18 +160,18 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':4}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
                         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
+                        bc = {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':4}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -190,14 +189,14 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
+    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
         """Create the galerkin stencil"""
 
         m = int(eigs[0])
         
         # Get boundary condition
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], m, bc)
+        return shell.stencil(res[0], res[1], m, bc, make_square)
 
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""

@@ -1232,11 +1232,15 @@ def linear_r2x(ro, rratio):
 
     return (a, b)
 
-def stencil(nr, bc):
+def stencil(nr, bc, make_square):
     """Create a galerkin stencil matrix"""
 
-    bc['rt'] = 0
-    return radbc.stencil(nr, bc)
+    mat = qid(nr, 0, radbc.no_bc())
+
+    if not make_square:
+        bc['rt'] = 0
+
+    return radbc.constrain(mat, bc)
 
 def integral(nr, a, b):
     """Compute the definite integral of the expansion"""

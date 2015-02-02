@@ -374,10 +374,10 @@ namespace Equations {
       PythonModelWrapper::cleanup();
    }
 
-   void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs) const
+   void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx, const SharedResolution spRes, const std::vector<MHDFloat>& eigs, const bool makeSquare) const
    {
       // Get first four standard arguments in a tuple of size 5
-      PyObject *pArgs = this->dispatchBaseArguments(5, ModelOperatorBoundary::STENCIL, spRes, eigs);
+      PyObject *pArgs = this->dispatchBaseArguments(6, ModelOperatorBoundary::STENCIL, spRes, eigs);
 
       // Prepare Python call arguments
       PyObject *pTmp, *pValue;
@@ -389,6 +389,15 @@ namespace Equations {
       pValue = PyUnicode_FromString(IoTools::IdToHuman::toTag(comp).c_str());
       PyTuple_SetItem(pTmp, 1, pValue);
       PyTuple_SetItem(pArgs, 4, pTmp);
+      if(makeSquare)
+      {
+         Py_INCREF(Py_True);
+         PyTuple_SetItem(pArgs, 5, Py_True);
+      } else
+      {
+         Py_INCREF(Py_False);
+         PyTuple_SetItem(pArgs, 5, Py_False);
+      }
 
       // Call model operator Python routine
       PythonModelWrapper::setMethod(IoTools::IdToHuman::toString(ModelOperator::STENCIL));
