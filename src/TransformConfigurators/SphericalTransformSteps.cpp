@@ -84,12 +84,12 @@ namespace TransformSteps {
          } else if(curlcurlFlag == 1)
          {
             // Compute curlcurl Q component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ2, curlcurlId, FieldType::VECTOR, Arithmetics::SET));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGLL, IntegratorBranch::Intg1DType::INTGQ2, curlcurlId, FieldType::VECTOR, Arithmetics::SETNEG));
 
             // Compute curlcurl S component
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTGDIFF, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
 
-            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::SUB));
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::PHI, IntegratorBranch::Intg3DType::INTGDIFF, IntegratorBranch::Intg2DType::INTGDIVSIN, IntegratorBranch::Intg1DType::INTGS2, curlcurlId, FieldType::VECTOR, Arithmetics::ADD));
          } else
          {
             throw Exception("Requested an unknown vector forward transform");

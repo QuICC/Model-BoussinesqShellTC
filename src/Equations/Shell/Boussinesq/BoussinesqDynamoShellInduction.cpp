@@ -61,12 +61,12 @@ namespace Equations {
       this->addNLComponent(FieldComponents::Spectral::TOR,1);
    }
 
-   void BoussinesqDynamoShellInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
+   void BoussinesqDynamoShellInduction::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
       ///
       /// Compute \f$\vec u\wedge\vec B\right)\f$
       ///
-      switch(id)
+      switch(compId)
       {
          case(FieldComponents::Physical::R):
             Physical::Cross<FieldComponents::Physical::THETA,FieldComponents::Physical::PHI>::set(rNLComp, this->unknown().dom(0).phys(), this->vector(PhysicalNames::VELOCITY).dom(0).phys(), 1.0);
