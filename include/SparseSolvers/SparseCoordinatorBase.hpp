@@ -396,7 +396,7 @@ namespace Solver {
             {
                getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
 
-               // System operator is real
+            // System operator is real
             } else
             {
                getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);

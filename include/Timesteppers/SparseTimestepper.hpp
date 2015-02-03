@@ -132,7 +132,7 @@ namespace Timestep {
          std::vector<TOperator>   mTMatrix;
 
          /**
-          * @brief Storage for old soltuion at t_(n-i)
+          * @brief Storage for old solution at t_(n-i)
           */
          std::vector<std::vector<TData> >  mOldSolution;
 

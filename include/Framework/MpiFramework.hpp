@@ -50,22 +50,22 @@ namespace GeoMHDiSCC {
          /**
           * @brief Synchronise a sub communicator
           */
-         static void syncSubComm(const SubCommId id);
+         static void syncSubComm(const SubCommId id, const int idx);
 
          /**
           * @brief Get a sub communicator
           */
-         static MPI_Comm getSubComm(const SubCommId id);
+         static MPI_Comm getSubComm(const SubCommId id, const int idx);
 
          /**
           * @brief Get a sub group
           */
-         static MPI_Group getSubGroup(const SubCommId id);
+         static MPI_Group getSubGroup(const SubCommId id, const int idx);
 
          /**
-          * @brief Set the spectral MPI group and communicator
+          * @brief Set the MPI sub group and sub communicator
           */
-         static void setSpectralComm(const std::vector<int>& ranks);
+         static void setSubComm(const SubCommId id, const std::vector<std::vector<int> >& ranks);
          
       protected:
 
@@ -83,12 +83,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Storage for the MPI sub groups
           */
-         static std::map<SubCommId, MPI_Group> mSubGroup;
+         static std::map<SubCommId, std::vector<MPI_Group> > mSubGroup;
 
          /**
           * @brief Storage for the spectral MPI communicator
           */
-         static std::map<SubCommId, MPI_Comm> mSubComm;
+         static std::map<SubCommId, std::vector<MPI_Comm> > mSubComm;
    };
 
 }

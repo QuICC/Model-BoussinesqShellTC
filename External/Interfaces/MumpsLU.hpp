@@ -85,17 +85,35 @@ namespace Eigen {
 
       public:
 
-         MumpsLU(const GeoMHDiSCC::FrameworkMacro::SubCommId commId = GeoMHDiSCC::FrameworkMacro::LOCAL) { init(commId); }
+         MumpsLU(MPI_Comm comm) 
+         { 
+            m_comm = comm;
+            init();
+         }
 
-         MumpsLU(const MatrixType& matrix, const GeoMHDiSCC::FrameworkMacro::SubCommId commId = GeoMHDiSCC::FrameworkMacro::LOCAL)
+         MumpsLU()
          {
-            init(commId);
+            setSingleComm();
+            init();
+         }
+
+         MumpsLU(const MatrixType& matrix, MPI_Comm comm)
+         {
+            m_comm = comm;
+            init();
+            compute(matrix);
+         }
+
+         MumpsLU(const MatrixType& matrix)
+         {
+            setSingleComm();
+            init();
             compute(matrix);
          }
 
          ~MumpsLU()
          {
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
             m_id.job = -2;
 
             if(m_isParallel)
@@ -112,7 +130,24 @@ namespace Eigen {
             free(m_id.rhs);
 
             MumpsLU_mumps(&m_id, Scalar());
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
+         }
+
+         void setSingleComm()
+         {
+            int rank;
+            MPI_Comm_rank(m_comm, &rank);
+
+            // Initialise local sub communicator
+            MPI_Group   world;
+            MPI_Comm_group(MPI_COMM_WORLD, &world);
+
+            // Create local group
+            MPI_Group group;
+            MPI_Group_incl(world, 1, &rank, &group);
+
+            // Create local communicator
+            MPI_Comm_create(MPI_COMM_WORLD, group, &m_comm);
          }
 
          inline Index rows() const { return m_id.n; }
@@ -178,7 +213,7 @@ namespace Eigen {
           */
          void analyzePattern(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
 
             m_id.job = 1;
             copyInput(matrix, true);
@@ -195,7 +230,7 @@ namespace Eigen {
             m_info = m_error ? InvalidInput : Success;
             m_analysisIsOk = m_error ? false : true;
             m_factorizationIsOk = false;
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
          }
 
          /** Performs a numeric decomposition of \a matrix
@@ -206,7 +241,7 @@ namespace Eigen {
           */
          void factorize(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
 
             eigen_assert(m_analysisIsOk && "MumpsLU: you must first call analyzePattern()");
 
@@ -219,7 +254,7 @@ namespace Eigen {
             m_info = m_error ? NumericalIssue : Success;
             m_factorizationIsOk = m_error ? false : true;
 
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
          }
 
          #ifndef EIGEN_PARSED_BY_DOXYGEN
@@ -229,20 +264,17 @@ namespace Eigen {
 
       protected:
 
-         void init(const GeoMHDiSCC::FrameworkMacro::SubCommId commId)
+         void init()
          {
-            // Set the communicator id
-            m_commId = commId;
-
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
 
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
-               m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId));
+               m_id.comm_fortran = MPI_Comm_c2f(m_comm);
                int rank;
-               MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId), &rank);
+               MPI_Comm_rank(m_comm, &rank);
                m_isHost = (rank == 0);
-               MPI_Comm_size(GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId), &rank);
+               MPI_Comm_size(m_comm, &rank);
                m_isParallel = (rank > 1);
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
@@ -284,7 +316,7 @@ namespace Eigen {
             //m_id.cntl[1-1] = 1.0;
 
 
-            GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+            MPI_Barrier(m_comm);
          }
 
          void copyInput(const MatrixType& mat, const bool freeMemory)
@@ -393,7 +425,7 @@ namespace Eigen {
             if(m_isParallel)
             {
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId)); 
+               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
                pRhs = mTmp.data();
             } else
             {
@@ -440,7 +472,7 @@ namespace Eigen {
             #ifdef GEOMHDISCC_MPI
             if(m_isParallel)
             {
-               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::getSubComm(m_commId));
+               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
             }
             #endif //GEOMHDISCC_MPI
          }
@@ -457,7 +489,7 @@ namespace Eigen {
          bool m_isHost;
          bool m_isParallel;
 
-         GeoMHDiSCC::FrameworkMacro::SubCommId  m_commId;
+         MPI_Comm  m_comm;
 
       private:
          mutable Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>   mTmp;
@@ -470,7 +502,7 @@ template<typename MatrixType>
 template<typename BDerived,typename XDerived>
 bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDerived> &x) const
 {
-   GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+   MPI_Barrier(m_comm);
 
    int rhsCols = b.cols();
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
@@ -498,7 +530,7 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
 
    copySolution(x.derived().data());
 
-   GeoMHDiSCC::FrameworkMacro::syncSubComm(m_commId);
+   MPI_Barrier(m_comm);
 
    return true;
 }

@@ -39,20 +39,6 @@ namespace GeoMHDiSCC {
 
       // Set MPI rank of local CPU
       MPI_Comm_rank(MPI_COMM_WORLD, &MpiFramework::mCpuId);
-
-      // Initialise local sub communicator
-      MPI_Group   world;
-      MPI_Comm_group(MPI_COMM_WORLD, &world);
-
-      // Create local group
-      MPI_Group group;
-      MPI_Group_incl(world, 1, &MpiFramework::mCpuId, &group);
-      mSubGroup.insert(std::make_pair(LOCAL, group));
-
-      // Create local communicator
-      MPI_Comm comm;
-      MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::getSubGroup(LOCAL), &comm);
-      mSubComm.insert(std::make_pair(LOCAL, comm));
    }
 
    void MpiFramework::setup(const int nCpu)
@@ -74,26 +60,26 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
-   void MpiFramework::syncSubComm(const MpiFramework::SubCommId id)
+   void MpiFramework::syncSubComm(const MpiFramework::SubCommId id, const int idx)
    {
       assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
 
       // Create MPI barrier to force synchronisation
-      MPI_Barrier(MpiFramework::mSubComm.find(id)->second);
+      MPI_Barrier(MpiFramework::mSubComm.find(id)->second.at(idx));
    }
 
-   MPI_Group MpiFramework::getSubGroup(const MpiFramework::SubCommId id)
+   MPI_Group MpiFramework::getSubGroup(const MpiFramework::SubCommId id, const int idx)
    {
       assert(MpiFramework::mSubGroup.find(id) != MpiFramework::mSubGroup.end());
 
-      return MpiFramework::mSubGroup.find(id)->second;
+      return MpiFramework::mSubGroup.find(id)->second.at(idx);
    }
 
-   MPI_Comm MpiFramework::getSubComm(const MpiFramework::SubCommId id)
+   MPI_Comm MpiFramework::getSubComm(const MpiFramework::SubCommId id, const int idx)
    {
       assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
 
-      return MpiFramework::mSubComm.find(id)->second;
+      return MpiFramework::mSubComm.find(id)->second.at(idx);
    }
 
    void MpiFramework::finalize()
@@ -108,37 +94,31 @@ namespace GeoMHDiSCC {
       MPI_Finalize();
    }
 
-   void MpiFramework::setSpectralComm(const std::vector<int>& ranks)
+   void MpiFramework::setSubComm(const MpiFramework::SubCommId id, const std::vector<std::vector<int> >& ranks)
    {
-      if(ranks.size() > 0)
-      {
-         MPI_Group   world;
-         MPI_Comm_group(MPI_COMM_WORLD, &world);
+      assert(ranks.size() > 0);
 
+      MPI_Group   world;
+      MPI_Comm_group(MPI_COMM_WORLD, &world);
+
+      MPI_Group group;
+      MPI_Comm comm;
+      mSubGroup.insert(std::make_pair(SPECTRAL, std::vector<MPI_Group>()));
+      mSubComm.insert(std::make_pair(SPECTRAL, std::vector<MPI_Comm>()));
+      for(size_t i = 0; i < ranks.size(); ++i)
+      {
          // Create spectral group
-         MPI_Group group;
-         MPI_Group_incl(world, ranks.size(), &ranks.front(), &group);
-         mSubGroup.insert(std::make_pair(SPECTRAL, group));
+         MPI_Group_incl(world, ranks.at(i).size(), &ranks.at(i).front(), &group);
+         mSubGroup.find(SPECTRAL)->second.push_back(group);
 
          // Create spectral communicator
-         MPI_Comm comm;
-         MPI_Comm_create(MPI_COMM_WORLD, MpiFramework::getSubGroup(SPECTRAL), &comm);
-         mSubComm.insert(std::make_pair(SPECTRAL, comm));
-      
-      // Spectral MPI group and communicator are WORLD
-      } else
-      {
-         MPI_Group   world;
-         MPI_Comm_group(MPI_COMM_WORLD, &world);
-
-         mSubGroup.insert(std::make_pair(SPECTRAL, world));
-
-         mSubComm.insert(std::make_pair(SPECTRAL, MPI_COMM_WORLD));
+         MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+         mSubComm.find(SPECTRAL)->second.push_back(comm);
       }
    }
 
-   std::map<MpiFramework::SubCommId,MPI_Group> MpiFramework::mSubGroup = std::map<MpiFramework::SubCommId,MPI_Group>();
+   std::map<MpiFramework::SubCommId,std::vector<MPI_Group> > MpiFramework::mSubGroup = std::map<MpiFramework::SubCommId,std::vector<MPI_Group> >();
 
-   std::map<MpiFramework::SubCommId,MPI_Comm> MpiFramework::mSubComm = std::map<MpiFramework::SubCommId,MPI_Comm>();
+   std::map<MpiFramework::SubCommId,std::vector<MPI_Comm> > MpiFramework::mSubComm = std::map<MpiFramework::SubCommId,std::vector<MPI_Comm> >();
 
 }

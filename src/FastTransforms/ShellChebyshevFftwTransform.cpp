@@ -280,7 +280,7 @@ namespace Transform {
 
       // Initialize solver and factorize division by R operator
       #ifdef GEOMHDISCC_MPISPSOLVE
-         SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type(GeoMHDiSCC::FrameworkMacro::LOCAL));
+         SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
       #else
          SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
       #endif //GEOMHDISCC_MPISPSOLVE
@@ -294,7 +294,7 @@ namespace Transform {
 
       // Initialize solver and factorize division by R^2 operator
       #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type(GeoMHDiSCC::FrameworkMacro::LOCAL));
+         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #else
          pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #endif //GEOMHDISCC_MPISPSOLVE
@@ -308,7 +308,7 @@ namespace Transform {
 
       // Initialize solver and factorize division by d1 operator
       #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type(GeoMHDiSCC::FrameworkMacro::LOCAL));
+         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #else
          pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #endif //GEOMHDISCC_MPISPSOLVE
@@ -322,7 +322,7 @@ namespace Transform {
 
       // Initialize solver and factorize division by d2 operator
       #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type(GeoMHDiSCC::FrameworkMacro::LOCAL));
+         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #else
          pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       #endif //GEOMHDISCC_MPISPSOLVE

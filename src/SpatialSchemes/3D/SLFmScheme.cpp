@@ -23,6 +23,7 @@
 //
 #include "PolynomialTransforms/PolynomialTools.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Schemes {
@@ -34,13 +35,8 @@ namespace Schemes {
 
    void SLFmScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
-      // Create single rank communicator
-      #ifdef GEOMHDISCC_MPI
-         std::vector<int>  ranks;
-
-         // Create communicator for 1D group CPUs 
-         #ifdef GEOMHDISCC_MPISPSOLVE
-
+      // Create spectral space sub communicators
+      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
          // Extract the communication group from structure
          std::multimap<int,int>::const_iterator it;
          std::set<int> filter;
@@ -49,21 +45,76 @@ namespace Schemes {
          {
             filter.insert(it->second);
          }
-
-         // Create the ranks list
-         std::set<int>::iterator sIt;
-         for(sIt = filter.begin(); sIt != filter.end(); ++sIt)
+         ArrayI groupCpu(filter.size());
          {
-            ranks.push_back(*sIt);
+            int i = 0;
+            for(std::set<int>::iterator it = filter.begin(); it != filter.end(); ++it)
+            {
+               groupCpu(i) = *it;
+               ++i;
+            }
          }
 
-         // Make single core communicator
-         #else
-            ranks.push_back(FrameworkMacro::id());
-         #endif //GEOMHDISCC_MPISPSOLVE
+         // Create minimial MPI communicator
+         MPI_Group world;
+         MPI_Group group;
+         MPI_Comm_group(MPI_COMM_WORLD, &world);
+         MPI_Group_incl(world, groupCpu.size(), groupCpu.data(), &group);
+         MPI_Comm comm;
+         MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
-         FrameworkMacro::setSpectralComm(ranks);
-      #endif //GEOMHDISCC_MPI
+         // Initialise the ranks with local rank
+         std::vector<std::vector<int> >  ranks;
+         ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+         std::map<int, int>  mapModes;
+         for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            ranks.push_back(std::vector<int>());
+            ranks.back().push_back(FrameworkMacro::id());
+            modes(k) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            mapModes.insert(std::make_pair(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k),k));
+         }
+
+         // Loop over all cpus
+         int localCpu;
+         MPI_Comm_rank(comm, &localCpu); 
+         ArrayI tmp;
+         for(int cpu = 0; cpu < static_cast<int>(filter.size()); ++cpu)
+         {
+            int size;
+            if(cpu == localCpu)
+            {
+               // Send the size
+               size = modes.size();
+               MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
+
+               // Send modes
+               MPI_Bcast(modes.data(), modes.size(), MPI_INT, cpu, comm);
+            } else
+            {
+               // Get size
+               MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
+
+               // Receive modes
+               tmp.resize(size);
+               MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, comm);
+
+               std::map<int,int>::iterator mapIt;
+               for(int i = 0; i < size; i++)
+               {
+                  mapIt = mapModes.find(tmp(i));
+                  if(mapIt != mapModes.end())
+                  {
+                     ranks.at(mapIt->second).push_back(groupCpu);
+                  }
+               }
+            }
+         }
+
+         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, ranks);
+
+         MPI_Comm_free(&comm);
+      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
    }
 
    void SLFmScheme::addTransformSetups(SharedResolution spRes) const

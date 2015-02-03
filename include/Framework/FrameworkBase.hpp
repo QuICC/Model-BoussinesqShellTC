@@ -29,8 +29,6 @@ namespace GeoMHDiSCC {
           * @name Enum for different sub communicators
           */
          enum SubCommId {
-            /// Local CPU (single CPU communicator)
-            LOCAL,
             /// Spectral space CPUs
             SPECTRAL,
          };

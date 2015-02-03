@@ -158,6 +158,10 @@ namespace Solver {
       // Solve other modes
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
+         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+
          //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
          internal::solveWrapper(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
       }
@@ -167,8 +171,13 @@ namespace Solver {
    {
       // Initialise solver
       this->mSolver.reserve(this->mLHSMatrix.size());
+
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
+         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+
          SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
 
          this->mSolver.push_back(solver);
@@ -185,6 +194,10 @@ namespace Solver {
       {
          if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
+            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
+            #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+
             // Safety assert to make sur matrix is compressed
             assert(this->mLHSMatrix.at(i).isCompressed());
 

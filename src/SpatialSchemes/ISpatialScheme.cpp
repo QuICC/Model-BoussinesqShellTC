@@ -119,12 +119,6 @@ namespace Schemes {
 
    void ISpatialScheme::tuneMpiResolution()
    {
-      // Create single rank communicator
-      #ifdef GEOMHDISCC_MPI
-         std::vector<int>  ranks;
-         ranks.push_back(FrameworkMacro::id());
-         FrameworkMacro::setSpectralComm(ranks);
-      #endif //GEOMHDISCC_MPI
    }
 
 }
