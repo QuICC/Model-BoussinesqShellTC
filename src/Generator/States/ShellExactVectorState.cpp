@@ -243,6 +243,7 @@ namespace Equations {
 
          MHDFloat r;
          MHDFloat theta;
+         MHDFloat scale = 0.5;
          nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {
@@ -254,17 +255,17 @@ namespace Equations {
 
                if(compId == FieldComponents::Physical::R)
                {
-                  amplitude = 5.0/8.0;
+                  amplitude = scale*5.0/8.0;
                   funcR = 8.0*ro - 6.0*r - 2.0*std::pow(ro*rratio,4)/std::pow(r,3);
                   funcTh = std::cos(theta);
                } else if(compId == FieldComponents::Physical::THETA)
                {
-                  amplitude = -5.0/8.0;
+                  amplitude = -scale*5.0/8.0;
                   funcR = 8.0*ro - 9.0*r + std::pow(ro*rratio,4)/std::pow(r,3);
                   funcTh = std::sin(theta);
                } else if(compId == FieldComponents::Physical::PHI)
                {
-                  amplitude = 5.0;
+                  amplitude = scale*5.0;
                   funcR = std::sin(Math::PI*(r - ro*rratio));
                   funcTh = std::sin(2*theta);
                }
