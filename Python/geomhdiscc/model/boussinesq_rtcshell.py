@@ -105,6 +105,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        m = int(eigs[0])
+        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
