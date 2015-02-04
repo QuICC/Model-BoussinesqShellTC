@@ -122,7 +122,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("magnetic","pol"):
@@ -134,7 +134,7 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
                             bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
+                            bc = {0:40, 'c':{'a':a, 'b':b}}
                     elif field_row == ("magnetic","tor") and field_col == ("magnetic","tor"):
                             bc = {0:20}
                     elif field_row == ("magnetic","pol") and field_col == ("magnetic","pol"):
@@ -145,15 +145,15 @@ class BoussinesqDynamoShell(base_model.BaseModel):
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':0}
+                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:22}
+                            bc = {0:22, 'c':{'a':a, 'b':b}}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:41}
+                            bc = {0:41, 'c':{'a':a, 'b':b}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -174,21 +174,21 @@ class BoussinesqDynamoShell(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':4}
+                        bc = {0:-40, 'rt':4, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","tor"):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("magnetic","pol"):
-                        bc = {0:-23, 'rt':2}
+                        bc = {0:-23, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
-                        bc = {0:-20, 'rt':2}
+                        bc = {0:-20, 'rt':2, 'c':{'a':a, 'b':b}}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':2}
+                        bc = {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':4}
+                        bc = {0:-41, 'rt':4, 'c':{'a':a, 'b':b}}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:

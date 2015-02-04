@@ -24,6 +24,19 @@ def x_to_phys(expr, grid):
     func = sy.lambdify(x, expr, 'mpmath')
     return func(grid)
 
+def test_bc(op, res_expr, sol, grid):
+    """Perform a boundary condition test"""
+
+    x = sy.Symbol('x')
+    lhs = transf.torcheb(x_to_phys(res_expr,grid))
+    lhs = lhs[0:op.shape[1]]
+    rhs = op*lhs
+    err = np.abs(rhs - sol)
+    if np.max(err) > 10*np.spacing(1):
+        print(rhs)
+        print(err)
+    print("\t\tMax BC error: " + str(np.max(err)))
+
 def test_forward(op, res_expr, sol_expr, grid, q):
     """Perform a forward operation test"""
 
@@ -78,6 +91,61 @@ def test_backward_galerkin(opA, opB, opS, res_expr, sol_expr, grid):
     if np.max(err) > 10*np.spacing(1):
         print(err)
     print("\t\tMax tau backward error: " + str(np.max(err)))
+
+def all_bc(nr, a, b, rg):
+    """Accuracy test for BC operators"""
+
+    print("\t Test BC 20:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 2, {0:20})[0:2,:]
+    sphys = x**2
+    fsol = sy.lambdify(x, sphys)
+    sol = np.array([fsol(a+b), fsol(-a+b)])
+    test_bc(A, sphys, sol, rg)
+
+    print("\t Test BC 21:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 2, {0:21, 'c':{'a':a, 'b':b}})[0:2,:]
+    sphys = x**2
+    fsol = sy.lambdify(x, sy.diff(sphys))
+    sol = np.array([fsol(a+b), fsol(-a+b)])
+    test_bc(A, sphys, sol, rg)
+
+    print("\t Test BC 22:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 2, {0:22, 'c':{'a':a, 'b':b}})[0:2,:]
+    sphys = x**5
+    fsol = sy.lambdify(x, x*sy.diff(sphys/x))
+    sol = np.array([fsol(a+b), fsol(-a+b)])
+    test_bc(A, sphys, sol, rg)
+
+    print("\t Test BC 23:")
+    x = sy.Symbol('x')
+    l = 5
+    A = shell.qid(nr, 2, {0:23, 'c':{'a':a, 'b':b, 'l':l}})[0:2,:]
+    sphys = x**2
+    fsolO = sy.lambdify(x, sy.diff(sphys) + (l+1.0)*sphys/x)
+    fsolI = sy.lambdify(x, sy.diff(sphys) - l*sphys/x)
+    sol = np.array([fsolO(a+b),fsolI(-a+b)])
+    test_bc(A, sphys, sol, rg)
+
+    print("\t Test BC 40:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 4, {0:40, 'c':{'a':a, 'b':b}})[0:4,:]
+    sphys = x**7
+    fsolV = sy.lambdify(x, sphys)
+    fsolD = sy.lambdify(x, sy.diff(sphys))
+    sol = np.array([fsolV(a+b), fsolD(a+b), fsolV(-a+b), fsolD(-a+b)])
+    test_bc(A, sphys, sol, rg)
+
+    print("\t Test BC 41:")
+    x = sy.Symbol('x')
+    A = shell.qid(nr, 4, {0:41, 'c':{'a':a, 'b':b}})[0:4,:]
+    sphys = x**7
+    fsolV = sy.lambdify(x, sphys)
+    fsolD = sy.lambdify(x, sy.diff(sphys,x,x))
+    sol = np.array([fsolV(a+b), fsolD(a+b), fsolV(-a+b), fsolD(-a+b)])
+    test_bc(A, sphys, sol, rg)
 
 def zblk(nr, a, b, rg):
     """Accuracy test for zblk operator"""
@@ -367,6 +435,7 @@ def i2x2lapl(nr, a, b, rg):
     ssol = sy.expand(x**2*sy.diff(sphys,x,x) + 2*x*sy.diff(sphys,x) - l*(l+1)*sphys)
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
+
 
     print("\t Forward: (full Chebyshev):")
     A = shell.i2x2lapl(nr, l, a, b, shell.radbc.no_bc())
@@ -719,9 +788,12 @@ if __name__ == "__main__":
     # Set test parameters
     nr = 14
     a, b = shell.linear_r2x(1.0, 0.35)
+    #a, b = shell.linear_r2x(20.0/13.0, 0.35)
+    print((a, b))
     rg = transf.rgrid(2*nr, a, b)
 
     # run tests
+    all_bc(nr, a, b, rg)
     #zblk(nr, a, b, rg)
 #    d1(nr, a, b, rg)
 #    d2(nr, a, b, rg)
@@ -736,7 +808,7 @@ if __name__ == "__main__":
 #    i2x2d1(nr, a, b, rg)
 #    i2x2(nr, a, b, rg)
 #    i2x3(nr, a, b, rg)
-    i2x2lapl(nr, a, b, rg)
+#    i2x2lapl(nr, a, b, rg)
 #    i2x3lapl(nr, a, b, rg)
 #    i4(nr, a, b, rg)
 #    i4x1(nr, a, b, rg)
@@ -748,7 +820,7 @@ if __name__ == "__main__":
 #    i4x4(nr, a, b, rg)
 #    i4x4laplrd1x1(nr, a, b, rg)
 #    i4x4lapl(nr, a, b, rg)
-    i4x4lapl2(nr, a, b, rg)
+#    i4x4lapl2(nr, a, b, rg)
 #    qid(nr, a, b, rg)
 
 #    divx(nr, a, b, rg)

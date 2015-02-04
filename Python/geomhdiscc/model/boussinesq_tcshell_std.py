@@ -116,6 +116,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        l = eigs[0]
+        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
@@ -129,7 +132,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -137,22 +140,22 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
                             bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
+                            bc = {0:40, 'c':{'a':a, 'b':b}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
 
             elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':0}
+                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
-                            bc = {0:22}
+                            bc = {0:22, 'c':{'a':a, 'b':b}}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:41}
+                            bc = {0:41, 'c':{'a':a, 'b':b}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -171,15 +174,15 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-22, 'rt':0}
+                        bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:

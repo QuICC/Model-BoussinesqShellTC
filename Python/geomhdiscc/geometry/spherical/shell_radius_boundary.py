@@ -111,18 +111,7 @@ def apply_tau(mat, bc, location = 't'):
 def tau_value(nr, pos, coeffs = None):
     """Create the boundary value tau line(s)"""
 
-    if coeffs is None:
-        it = itertools.cycle([1.0])
-    else:
-        try:
-            if len(coeffs) == (1 + (pos == 0)):
-                it = iter(coeffs)
-            elif len(coeffs) == 1:
-                it = itertools.cycle(coeffs)
-            else:
-                raise RuntimeError
-        except:
-            it = itertools.cycle([coeffs])
+    it = coeff_iterator(coeffs)
 
     cond = []
     c = next(it)
@@ -143,27 +132,25 @@ def tau_value(nr, pos, coeffs = None):
 def tau_diff(nr, pos, coeffs = None):
     """Create the first derivative tau line(s)"""
 
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+
     if coeffs is None:
-        it = itertools.cycle([1.0])
+        raise RuntimeError
     else:
-        try:
-            if len(coeffs) == (1 + (pos == 0)):
-                it = iter(coeffs)
-            elif len(coeffs) == 1:
-                it = itertools.cycle(coeffs)
-            else:
-                raise RuntimeError
-        except:
-            it = itertools.cycle([coeffs])
+        it = coeff_iterator(coeffs.get('c', None))
+
+    a = coeffs['a']
+    b = coeffs['b']
 
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*i**2 for i in np.arange(0,nr)])
+        cond.append([c*(2.0/a)*i**2 for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([(-1.0)**(i+1)*c*i**2 for i in np.arange(0,nr)])
+        cond.append([(-1.0)**(i+1)*(2.0/a)*c*i**2 for i in np.arange(0,nr)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -175,27 +162,25 @@ def tau_diff(nr, pos, coeffs = None):
 def tau_diff2(nr, pos, coeffs = None):
     """Create the second deriviative tau line(s)"""
 
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+
     if coeffs is None:
-        it = itertools.cycle([1.0])
+        raise RuntimeError
     else:
-        try:
-            if len(coeffs) == (1 + (pos == 0)):
-                it = iter(coeffs)
-            elif len(coeffs) == 1:
-                it = itertools.cycle(coeffs)
-            else:
-                raise RuntimeError
-        except:
-            it = itertools.cycle([coeffs])
+        it = coeff_iterator(coeffs.get('c', None))
+
+    a = coeffs['a']
+    b = coeffs['b']
 
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append([c*((2.0/(3.0*a**2))*(i**4 - i**2)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append([c*(((-1.0)**i*2.0/(3.0*a**2))*(i**4 - i**2)) for i in np.arange(0,nr)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -212,18 +197,8 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
 
     if coeffs is None:
         raise RuntimeError
-    elif coeffs.get('c',None) is None:
-        it = itertools.cycle([1.0])
     else:
-        try:
-            if len(coeffs['c']) == (1 + (pos == 0)):
-                it = iter(coeffs['c'])
-            elif len(coeffs['c']) == 1:
-                it = itertools.cycle(coeffs['c'])
-            else:
-                raise RuntimeError
-        except:
-            it = itertools.cycle([coeffs['c']])
+        it = coeff_iterator(coeffs.get('c', None))
 
     a = coeffs['a']
     b = coeffs['b']
@@ -231,11 +206,11 @@ def tau_rdiffdivr(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1.0/a)*i**2 - (1.0/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*((2.0/a)*i**2 - (1.0/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(-1.0)**(i+1)*((1.0/a)*i**2 + (1.0/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*(-1.0)**(i+1)*((2.0/a)*i**2 + (1.0/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -253,18 +228,8 @@ def tau_insulating(nr, pos, coeffs = None):
 
     if coeffs is None:
         raise RuntimeError
-    elif coeffs.get('c',None) is None:
-        it = itertools.cycle([1.0])
     else:
-        try:
-            if len(coeffs['c']) == (1 + (pos == 0)):
-                it = iter(coeffs['c'])
-            elif len(coeffs['c']) == 1:
-                it = itertools.cycle(coeffs['c'])
-            else:
-                raise RuntimeError
-        except:
-            it = itertools.cycle([coeffs['c']])
+        it = coeff_iterator(coeffs.get('c', None))
 
     a = coeffs['a']
     b = coeffs['b']
@@ -273,11 +238,11 @@ def tau_insulating(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1.0/a)*i**2 + ((l+1.0)/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*((2.0/a)*i**2 + ((l+1.0)/(a+b))*tau_c(i)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(-1.0)**(i+1)*((1.0/a)*i**2 + (l/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
+        cond.append([c*(-1.0)**(i+1)*((2.0/a)*i**2 + (l/(-a+b))*tau_c(i)) for i in np.arange(0,nr)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -289,13 +254,16 @@ def tau_insulating(nr, pos, coeffs = None):
 def tau_value_diff(nr, pos, coeffs = None):
     """Create the no penetration and no-slip tau line(s)"""
 
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nr,1,coeffs)[0]))
+        cond.append(list(tau_value(nr,1,coeffs.get('c',None))[0]))
         cond.append(list(tau_diff(nr,1,coeffs)[0]))
 
     if pos <= 0:
-        cond.append(list(tau_value(nr,-1,coeffs)[0]))
+        cond.append(list(tau_value(nr,-1,coeffs.get('c',None))[0]))
         cond.append(list(tau_diff(nr,-1,coeffs)[0]))
 
     if use_parity_bc and pos == 0:
@@ -311,13 +279,16 @@ def tau_value_diff(nr, pos, coeffs = None):
 def tau_value_diff2(nr, pos, coeffs = None):
     """Create the no penetration and stress-free tau line(s)"""
 
+    assert(coeffs.get('a', None) is not None)
+    assert(coeffs.get('b', None) is not None)
+
     cond = []
     if pos >= 0:
-        cond.append(list(tau_value(nr,1,coeffs)[0]))
+        cond.append(list(tau_value(nr,1,coeffs.get('c',None))[0]))
         cond.append(list(tau_diff2(nr,1,coeffs)[0]))
 
     if pos <= 0:
-        cond.append(list(tau_value(nr,-1,coeffs)[0]))
+        cond.append(list(tau_value(nr,-1,coeffs.get('c',None))[0]))
         cond.append(list(tau_diff2(nr,-1,coeffs)[0]))
 
     if use_parity_bc and pos == 0:
@@ -650,3 +621,21 @@ def galerkin_c(n):
         return 1
     else:
         return 0.5
+
+def coeff_iterator(coeffs):
+    """Return an iterator over the constants"""
+
+    if coeffs is None:
+        it = itertools.cycle([1.0])
+    else:
+        try:
+            if len(coeffs) == (1 + (pos == 0)):
+                it = iter(coeffs)
+            elif len(coeffs) == 1:
+                it = itertools.cycle(coeffs)
+            else:
+                raise RuntimeError
+        except:
+            it = itertools.cycle([coeffs])
+
+    return it

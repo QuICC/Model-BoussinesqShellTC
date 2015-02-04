@@ -118,7 +118,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':0}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':0}
+                        bc = {0:-40, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':0}
 
@@ -126,7 +126,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
                             bc = {0:20}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                            bc = {0:40}
+                            bc = {0:40, 'c':{'a':a, 'b':b}}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:20}
 
@@ -136,14 +136,14 @@ class BoussinesqRTCShell(base_model.BaseModel):
                         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
                         bc = {0:-22, 'rt':0, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-41, 'rt':0}
+                        bc = {0:-41, 'rt':0, 'c':{'a':a, 'b':b}}
 
                 else:
                     if field_row == ("velocity","tor") and field_col == ("velocity","tor"):
                         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
                         bc = {0:22, 'c':{'a':a, 'b':b}}
                     elif field_row == ("velocity","pol") and field_col == ("velocity","pol"):
-                        bc = {0:41}
+                        bc = {0:41, 'c':{'a':a, 'b':b}}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -162,7 +162,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
                     if field_col == ("velocity","tor"):
                         bc = {0:-20, 'rt':2}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-40, 'rt':4}
+                        bc = {0:-40, 'rt':4, 'c':{'a':a, 'b':b}}
                     elif field_col == ("temperature",""):
                         bc = {0:-20, 'rt':2}
 
