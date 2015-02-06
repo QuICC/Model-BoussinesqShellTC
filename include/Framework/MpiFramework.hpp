@@ -11,6 +11,7 @@
 //
 #include <mpi.h>
 #include <vector>
+#include <map>
 
 // External includes
 //

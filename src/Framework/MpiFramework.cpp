@@ -105,10 +105,20 @@ namespace GeoMHDiSCC {
       MPI_Comm comm;
       mSubGroup.insert(std::make_pair(SPECTRAL, std::vector<MPI_Group>()));
       mSubComm.insert(std::make_pair(SPECTRAL, std::vector<MPI_Comm>()));
+
+      ArrayI curRanks;
       for(size_t i = 0; i < ranks.size(); ++i)
       {
+         assert(ranks.at(i).size() > 0);
+         // Create array of ranks
+         curRanks.resize(ranks.at(i).size());
+         for(int j = 0; j < ranks.at(i).size(); j++)
+         {
+            curRanks(j) = ranks.at(i).at(j);
+         }
+
          // Create spectral group
-         MPI_Group_incl(world, ranks.at(i).size(), &ranks.at(i).front(), &group);
+         MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
          mSubGroup.find(SPECTRAL)->second.push_back(group);
 
          // Create spectral communicator
