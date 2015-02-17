@@ -118,5 +118,8 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
 #error "The SINGLE1D parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_SINGLE1D
+#if defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_SPLINALG_MUMPS && !defined GEOMHDISCC_MPISPSOLVE
+#error "The TUBULAR parallelisation is not supported!" 
+#endif //defined GEOMHDISCC_MPIALGO_TUBULAR && !defined GEOMHDISCC_SPLINALG_MUMPS && !defined GEOMHDISCC_MPISPSOLVE
 
 #endif // BOUSSINESQDYNAMOSHELLMODEL_HPP

@@ -11,6 +11,7 @@
 //
 #include <mpi.h>
 #include <vector>
+#include <set>
 #include <map>
 
 // External includes
@@ -64,9 +65,14 @@ namespace GeoMHDiSCC {
          static MPI_Group getSubGroup(const SubCommId id, const int idx);
 
          /**
+          * @brief Init the MPI sub group and sub communicator vectors
+          */
+         static void initSubComm(const SubCommId id, const int size);
+
+         /**
           * @brief Set the MPI sub group and sub communicator
           */
-         static void setSubComm(const SubCommId id, const std::vector<std::vector<int> >& ranks);
+         static void setSubComm(const SubCommId id, const int idx, const std::set<int>& ranks);
          
       protected:
 

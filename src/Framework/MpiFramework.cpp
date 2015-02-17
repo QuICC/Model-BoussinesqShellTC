@@ -24,6 +24,7 @@
 #include "Base/Precision.hpp"
 #include "IoHdf5/Hdf5File.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
    void MpiFramework::init()
@@ -94,37 +95,65 @@ namespace GeoMHDiSCC {
       MPI_Finalize();
    }
 
-   void MpiFramework::setSubComm(const MpiFramework::SubCommId id, const std::vector<std::vector<int> >& ranks)
+   void MpiFramework::initSubComm(const MpiFramework::SubCommId id, const int size)
+   {
+      // Add group and communicator
+      mSubGroup.insert(std::make_pair(id, std::vector<MPI_Group>()));
+      mSubComm.insert(std::make_pair(id, std::vector<MPI_Comm>()));
+
+      for(int i = 0; i < size; i++)
+      {
+         mSubGroup.find(id)->second.push_back(MPI_GROUP_NULL);
+         mSubComm.find(id)->second.push_back(MPI_COMM_NULL);
+      }
+   }
+
+   void MpiFramework::setSubComm(const MpiFramework::SubCommId id, const int idx, const std::set<int>& ranks)
    {
       assert(ranks.size() > 0);
+      assert(mSubGroup.find(id) != mSubGroup.end());
+      assert(mSubComm.find(id) != mSubComm.end());
+      assert(mSubGroup.find(id)->second.size() > static_cast<size_t>(idx));
+      assert(mSubComm.find(id)->second.size() > static_cast<size_t>(idx));
 
       MPI_Group   world;
       MPI_Comm_group(MPI_COMM_WORLD, &world);
 
       MPI_Group group;
       MPI_Comm comm;
-      mSubGroup.insert(std::make_pair(SPECTRAL, std::vector<MPI_Group>()));
-      mSubComm.insert(std::make_pair(SPECTRAL, std::vector<MPI_Comm>()));
 
+std::cerr << "--> INITED SETSUBCOMM" << std::endl;
       ArrayI curRanks;
-      for(size_t i = 0; i < ranks.size(); ++i)
+
+      // Create array of ranks
+      curRanks.resize(ranks.size());
+      int j = 0;
+      for(std::set<int>::iterator sIt = ranks.begin(); sIt != ranks.end(); ++sIt)
       {
-         assert(ranks.at(i).size() > 0);
-         // Create array of ranks
-         curRanks.resize(ranks.at(i).size());
-         for(int j = 0; j < ranks.at(i).size(); j++)
-         {
-            curRanks(j) = ranks.at(i).at(j);
-         }
-
-         // Create spectral group
-         MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
-         mSubGroup.find(SPECTRAL)->second.push_back(group);
-
-         // Create spectral communicator
-         MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
-         mSubComm.find(SPECTRAL)->second.push_back(comm);
+         curRanks(j) = *sIt;
+         j++;
+std::cerr << "--> SUBLOOPING SETSUBCOMM" << std::endl;
       }
+std::cerr << "--> CREEATING SETSUBCOMM" << std::endl;
+std::cerr << curRanks.transpose() << std::endl;
+
+      // Create spectral group
+      MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
+      if(group != MPI_GROUP_NULL)
+      {
+         mSubGroup.find(SPECTRAL)->second.at(idx) = group;
+      }
+std::cerr << "--> SET GROUP" << std::endl;
+
+            // Create spectral communicator
+      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+      if(comm != MPI_COMM_NULL)
+      {
+         mSubComm.find(SPECTRAL)->second.at(idx) = comm;
+      }
+std::cerr << "--> DONE LOOP SETSUBCOMM" << std::endl;
+
+      MpiFramework::synchronize();
    }
 
    std::map<MpiFramework::SubCommId,std::vector<MPI_Group> > MpiFramework::mSubGroup = std::map<MpiFramework::SubCommId,std::vector<MPI_Group> >();

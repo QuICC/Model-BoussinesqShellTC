@@ -6,6 +6,7 @@
 
 // Configuration includes
 //
+#include "Debug/DebuggerMacro.h"
 #include "Framework/FrameworkMacro.h"
 
 // System includes
@@ -35,8 +36,11 @@ namespace Schemes {
 
    void SLFmScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
+      // Debug statement
+      DebuggerMacro_enter("tuneResolution",1);
+      
       // Create spectral space sub communicators
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVEdfa
          // Extract the communication group from structure
          std::multimap<int,int>::const_iterator it;
          std::set<int> filter;
@@ -63,20 +67,29 @@ namespace Schemes {
          MPI_Comm comm;
          MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
+std::cerr << "CREATED Communicator" << std::endl;
+
          // Initialise the ranks with local rank
-         std::vector<std::vector<int> >  ranks;
+         std::set<int>  ranks;
          ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
          std::map<int, int>  mapModes;
-         for(int k = 0; k < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         int k_ = 0;
+         for(int k = 0; k < spRes->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); ++k)
          {
-            ranks.push_back(std::vector<int>());
-            ranks.back().push_back(FrameworkMacro::id());
-            modes(k) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            mapModes.insert(std::make_pair(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k),k));
+            ranks.push_back(std::set<int>());
+            if(k_ < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>() && k == spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_))
+            {
+               ranks.back().insert(FrameworkMacro::id());
+               modes(k_) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_);
+               mapModes.insert(std::make_pair(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_),k));
+               k_++;
+            }
          }
+std::cerr << "INITE MODES" << std::endl;
 
          // Loop over all cpus
          int localCpu;
+         int globalCpu = FrameworkMacro::id();
          MPI_Comm_rank(comm, &localCpu); 
          ArrayI tmp;
          for(int cpu = 0; cpu < static_cast<int>(filter.size()); ++cpu)
@@ -88,12 +101,19 @@ namespace Schemes {
                size = modes.size();
                MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
 
+               // Send global CPU rank 
+               globalCpu = FrameworkMacro::id();
+               MPI_Bcast(&globalCpu, 1, MPI_INT, cpu, comm);
+
                // Send modes
                MPI_Bcast(modes.data(), modes.size(), MPI_INT, cpu, comm);
             } else
             {
                // Get size
                MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
+
+               // Get global CPU rank 
+               MPI_Bcast(&globalCpu, 1, MPI_INT, cpu, comm);
 
                // Receive modes
                tmp.resize(size);
@@ -105,16 +125,22 @@ namespace Schemes {
                   mapIt = mapModes.find(tmp(i));
                   if(mapIt != mapModes.end())
                   {
-                     ranks.at(mapIt->second).push_back(groupCpu);
+                     ranks.at(mapIt->second).insert(globalCpu);
                   }
                }
             }
          }
+std::cerr << "COMPUTED SUB COMMS" << std::endl;
 
-         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, ranks);
+         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, idx, ranks);
+std::cerr << "SET SUB COMMS" << std::endl;
 
          MPI_Comm_free(&comm);
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+std::cerr << "FREED COMMS" << std::endl;
+      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVEsaf
+
+      // Debug statement
+      DebuggerMacro_leave("tuneResolution",1);
    }
 
    void SLFmScheme::addTransformSetups(SharedResolution spRes) const

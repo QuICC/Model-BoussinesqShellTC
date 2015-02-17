@@ -19,7 +19,6 @@
 #include <dmumps_c.h>
 #include <zmumps_c.h>
 
-#include "Framework/FrameworkMacro.h"
 #include "Base/MpiTypes.hpp"
 
 namespace Eigen {
@@ -135,19 +134,7 @@ namespace Eigen {
 
          void setSingleComm()
          {
-            int rank;
-            MPI_Comm_rank(m_comm, &rank);
-
-            // Initialise local sub communicator
-            MPI_Group   world;
-            MPI_Comm_group(MPI_COMM_WORLD, &world);
-
-            // Create local group
-            MPI_Group group;
-            MPI_Group_incl(world, 1, &rank, &group);
-
-            // Create local communicator
-            MPI_Comm_create(MPI_COMM_WORLD, group, &m_comm);
+            m_comm = MPI_COMM_SELF;
          }
 
          inline Index rows() const { return m_id.n; }

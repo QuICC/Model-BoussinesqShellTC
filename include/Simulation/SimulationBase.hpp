@@ -379,6 +379,9 @@ namespace GeoMHDiSCC {
 
    template <typename TScheme> void SimulationBase::initResolution()
    {
+      // Debug statement
+      DebuggerMacro_leave("initResolution",0);
+
       // Create the load splitter
       Parallel::LoadSplitter splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
 
@@ -408,6 +411,9 @@ namespace GeoMHDiSCC {
 
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+
+      // Debug statement
+      DebuggerMacro_leave("initResolution",0);
    }
 
    template <typename TModel> SharedSimulationBoundary SimulationBase::createBoundary()
