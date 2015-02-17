@@ -24,7 +24,6 @@
 //
 #include "PolynomialTransforms/PolynomialTools.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Schemes {
@@ -40,7 +39,7 @@ namespace Schemes {
       DebuggerMacro_enter("tuneResolution",1);
       
       // Create spectral space sub communicators
-      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVEdfa
+      #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
          // Extract the communication group from structure
          std::multimap<int,int>::const_iterator it;
          std::set<int> filter;
@@ -49,6 +48,8 @@ namespace Schemes {
          {
             filter.insert(it->second);
          }
+
+         // Make array of CPUs in group
          ArrayI groupCpu(filter.size());
          {
             int i = 0;
@@ -67,10 +68,8 @@ namespace Schemes {
          MPI_Comm comm;
          MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
-std::cerr << "CREATED Communicator" << std::endl;
-
          // Initialise the ranks with local rank
-         std::set<int>  ranks;
+         std::vector<std::set<int> >  ranks;
          ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
          std::map<int, int>  mapModes;
          int k_ = 0;
@@ -85,39 +84,38 @@ std::cerr << "CREATED Communicator" << std::endl;
                k_++;
             }
          }
-std::cerr << "INITE MODES" << std::endl;
 
          // Loop over all cpus
-         int localCpu;
+         int commId;
          int globalCpu = FrameworkMacro::id();
-         MPI_Comm_rank(comm, &localCpu); 
+         MPI_Comm_rank(comm, &commId); 
          ArrayI tmp;
-         for(int cpu = 0; cpu < static_cast<int>(filter.size()); ++cpu)
+         for(int commCpu = 0; commCpu < static_cast<int>(filter.size()); ++commCpu)
          {
             int size;
-            if(cpu == localCpu)
+            if(commCpu == commId)
             {
                // Send the size
                size = modes.size();
-               MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
+               MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
 
                // Send global CPU rank 
                globalCpu = FrameworkMacro::id();
-               MPI_Bcast(&globalCpu, 1, MPI_INT, cpu, comm);
+               MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
 
                // Send modes
-               MPI_Bcast(modes.data(), modes.size(), MPI_INT, cpu, comm);
+               MPI_Bcast(modes.data(), modes.size(), MPI_INT, commCpu, comm);
             } else
             {
                // Get size
-               MPI_Bcast(&size, 1, MPI_INT, cpu, comm);
+               MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
 
                // Get global CPU rank 
-               MPI_Bcast(&globalCpu, 1, MPI_INT, cpu, comm);
+               MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
 
                // Receive modes
                tmp.resize(size);
-               MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, comm);
+               MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, comm);
 
                std::map<int,int>::iterator mapIt;
                for(int i = 0; i < size; i++)
@@ -130,14 +128,64 @@ std::cerr << "INITE MODES" << std::endl;
                }
             }
          }
-std::cerr << "COMPUTED SUB COMMS" << std::endl;
 
-         FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, idx, ranks);
-std::cerr << "SET SUB COMMS" << std::endl;
+         FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
 
+         std::set<int>  subRanks;
+         int i_ = 0;
+         for(size_t i = 0; i < ranks.size(); i++)
+         {
+            subRanks.clear();
+            for(int cpu = 0; cpu < spRes->nCpu(); ++cpu)
+            {
+               int size;
+               if(cpu == FrameworkMacro::id())
+               {
+                  size = ranks.at(i).size();
+                  MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                  if(size > 0)
+                  {
+                     tmp.resize(size);
+                     int j = 0;
+                     for(std::set<int>::iterator sIt = ranks.at(i).begin(); sIt != ranks.at(i).end(); ++sIt)
+                     {
+                        tmp(j) = *sIt;
+                        ++j;
+                        subRanks.insert(*sIt);
+                     }
+                     MPI_Bcast(tmp.data(), size, MPI_INT, cpu, MPI_COMM_WORLD);
+                  }
+               } else
+               {
+                  // Get size
+                  MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+
+                  // Receive ranks
+                  if(size > 0)
+                  {
+                     tmp.resize(size);
+                     MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+
+                     for(int j = 0; j < size; ++j)
+                     {
+                        subRanks.insert(tmp(j));
+                     }
+                  }
+               }
+            }
+
+            FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, i_, subRanks);
+
+            if(i_ < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>() && i == static_cast<size_t>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i_)))
+            {
+               i_++;
+            }
+         }
+         
+         // Free communicator
          MPI_Comm_free(&comm);
-std::cerr << "FREED COMMS" << std::endl;
-      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVEsaf
+      #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       // Debug statement
       DebuggerMacro_leave("tuneResolution",1);

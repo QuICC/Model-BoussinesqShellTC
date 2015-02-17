@@ -24,7 +24,6 @@
 #include "Base/Precision.hpp"
 #include "IoHdf5/Hdf5File.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
    void MpiFramework::init()
@@ -113,8 +112,6 @@ namespace GeoMHDiSCC {
       assert(ranks.size() > 0);
       assert(mSubGroup.find(id) != mSubGroup.end());
       assert(mSubComm.find(id) != mSubComm.end());
-      assert(mSubGroup.find(id)->second.size() > static_cast<size_t>(idx));
-      assert(mSubComm.find(id)->second.size() > static_cast<size_t>(idx));
 
       MPI_Group   world;
       MPI_Comm_group(MPI_COMM_WORLD, &world);
@@ -122,36 +119,28 @@ namespace GeoMHDiSCC {
       MPI_Group group;
       MPI_Comm comm;
 
-std::cerr << "--> INITED SETSUBCOMM" << std::endl;
-      ArrayI curRanks;
-
       // Create array of ranks
-      curRanks.resize(ranks.size());
+      ArrayI curRanks(ranks.size());
       int j = 0;
       for(std::set<int>::iterator sIt = ranks.begin(); sIt != ranks.end(); ++sIt)
       {
          curRanks(j) = *sIt;
          j++;
-std::cerr << "--> SUBLOOPING SETSUBCOMM" << std::endl;
       }
-std::cerr << "--> CREEATING SETSUBCOMM" << std::endl;
-std::cerr << curRanks.transpose() << std::endl;
 
-      // Create spectral group
+      // Create sub group
       MPI_Group_incl(world, curRanks.size(), curRanks.data(), &group);
-      if(group != MPI_GROUP_NULL)
-      {
-         mSubGroup.find(SPECTRAL)->second.at(idx) = group;
-      }
-std::cerr << "--> SET GROUP" << std::endl;
-
-            // Create spectral communicator
+      // Create sub communicator
       MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+
       if(comm != MPI_COMM_NULL)
       {
+         assert(mSubGroup.find(id)->second.size() > static_cast<size_t>(idx));
+         assert(mSubComm.find(id)->second.size() > static_cast<size_t>(idx));
+
+         mSubGroup.find(SPECTRAL)->second.at(idx) = group;
          mSubComm.find(SPECTRAL)->second.at(idx) = comm;
       }
-std::cerr << "--> DONE LOOP SETSUBCOMM" << std::endl;
 
       MpiFramework::synchronize();
    }
