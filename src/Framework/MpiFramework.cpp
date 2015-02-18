@@ -63,6 +63,7 @@ namespace GeoMHDiSCC {
    void MpiFramework::syncSubComm(const MpiFramework::SubCommId id, const int idx)
    {
       assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
+      assert(MpiFramework::mSubComm.find(id)->second.size() > static_cast<size_t>(idx));
 
       // Create MPI barrier to force synchronisation
       MPI_Barrier(MpiFramework::mSubComm.find(id)->second.at(idx));

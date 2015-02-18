@@ -279,11 +279,7 @@ namespace Transform {
       this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
 
       // Initialize solver and factorize division by R operator
-      #ifdef GEOMHDISCC_MPISPSOLVE
-         SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
-      #else
-         SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
-      #endif //GEOMHDISCC_MPISPSOLVE
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver(new Solver::SparseSelector<SparseMatrix>::Type());
       this->mSolver.insert(std::make_pair(ProjectorType::DIVR, pSolver));
       this->mSolver.find(ProjectorType::DIVR)->second->compute(this->mSolveOp.find(ProjectorType::DIVR)->second);
       // Check for successful factorisation
@@ -293,11 +289,7 @@ namespace Transform {
       }
 
       // Initialize solver and factorize division by R^2 operator
-      #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #else
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #endif //GEOMHDISCC_MPISPSOLVE
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       this->mSolver.insert(std::make_pair(ProjectorType::DIVR2, pSolver));
       this->mSolver.find(ProjectorType::DIVR2)->second->compute(this->mSolveOp.find(ProjectorType::DIVR2)->second);
       // Check for successful factorisation
@@ -307,11 +299,7 @@ namespace Transform {
       }
 
       // Initialize solver and factorize division by d1 operator
-      #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #else
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #endif //GEOMHDISCC_MPISPSOLVE
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
       this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
       // Check for successful factorisation
@@ -321,11 +309,7 @@ namespace Transform {
       }
 
       // Initialize solver and factorize division by d2 operator
-      #ifdef GEOMHDISCC_MPISPSOLVE
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #else
-         pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
-      #endif //GEOMHDISCC_MPISPSOLVE
+      pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
       this->mSolver.insert(std::make_pair(ProjectorType::DIFF2, pSolver));
       this->mSolver.find(ProjectorType::DIFF2)->second->compute(this->mSolveOp.find(ProjectorType::DIFF2)->second);
       // Check for successful factorisation

@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 verbose_write_mtx = False
 if verbose_write_mtx:
     import scipy.io as io
+    import os
 
 import geomhdiscc.base.utils as utils
 
@@ -32,7 +33,7 @@ class BaseModel:
 
         mat = utils.build_diag_matrix(fields, self.time_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_time_" + str(bcs["bcType"])
+            fname = "matrix_time_" + str(bcs["bcType"]) + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -43,7 +44,7 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.linear_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_linear_" + str(bcs["bcType"])
+            fname = "matrix_linear_" + str(bcs["bcType"]) + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
@@ -54,7 +55,7 @@ class BaseModel:
 
         mat = -self.linear_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_" + str(bcs["bcType"])
+            fname = "matrix_explicit_" + str(bcs["bcType"]) + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)

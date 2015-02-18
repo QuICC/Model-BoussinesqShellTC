@@ -165,6 +165,12 @@ namespace Solver {
 
          //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
          internal::solveWrapper(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
+
+         // Stop simulation if solve failed
+         if(this->mSolver.at(i+start)->info() != Eigen::Success)
+         {
+            throw Exception("Sparse directo solve failed!");
+         }
       }
    }
 
@@ -176,10 +182,12 @@ namespace Solver {
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
-         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem());
 
-         SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
+            SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type(FrameworkMacro::getSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem())));
+         #else
+            SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
+         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          this->mSolver.push_back(solver);
       }
@@ -196,7 +204,7 @@ namespace Solver {
          if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
             #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-               FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
+               FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem());
             #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
             // Safety assert to make sur matrix is compressed
@@ -204,7 +212,7 @@ namespace Solver {
 
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
 
-            // Safety assert for successful factorisation
+            // Stop simulation if factorization failed
             if(this->mSolver.at(i)->info() != Eigen::Success)
             {
                throw Exception("Matrix factorization failed!");

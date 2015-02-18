@@ -207,11 +207,11 @@ namespace Eigen {
 
             #ifdef GEOMHDISCC_DEBUG
                // Write matrix to file
-               strncpy(m_id.write_problem, "timestep_matrix", sizeof(m_id.write_problem));
+               strncpy(m_id.write_problem, "mumps_matrix", sizeof(m_id.write_problem));
             #endif //GEOMHDISCC_DEBUG
 
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
 
             m_isInitialized = true;
             m_info = m_error ? InvalidInput : Success;
@@ -236,7 +236,7 @@ namespace Eigen {
             copyInput(matrix, false);
 
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
 
             m_info = m_error ? NumericalIssue : Success;
             m_factorizationIsOk = m_error ? false : true;
@@ -276,7 +276,7 @@ namespace Eigen {
             m_error          = 0;
 
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
             #ifdef GEOMHDISCC_NO_DEBUG
                m_id.icntl[1-1] = 0;
                m_id.icntl[2-1] = 0;
@@ -435,10 +435,13 @@ namespace Eigen {
                int nK = m_id.nrhs*m_id.lrhs;
                MumpsScalar * pVal = m_id.rhs;
 
+std::cerr << "RHS  ----------------------------------" << std::endl;
                for(int k = 0; k < nK; ++pRhs,++pVal,++k)
                {
                   *pVal = MumpsLU_convert(*pRhs);
+std::cerr << MumpsLU_convert(*pVal) <<  "  ";
                }
+               std::cerr << std::endl;
             }
          }
 
@@ -507,15 +510,22 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
       m_id.icntl[11-1] = 1;
    #endif // GEOMHDISCC_DEBUG
 
+std::cerr << "RHS INPUt  ----------------------------------" << std::endl;
+std::cerr << b.derived().transpose() << std::endl;
    copyRhs(b.derived().data(), (rhsCols > m_nrhsMem));
 
    MumpsLU_mumps(&m_id, Scalar());
-   m_error = m_id.info[1-1];
+   m_error = m_id.infog[1-1];
+   m_info = m_error < 0 ? NumericalIssue : Success;
 
-   if (m_error!=0)
+   if (m_error < 0)
+   {
       return false;
+   }
 
    copySolution(x.derived().data());
+std::cerr << "SOLUTION  ----------------------------------" << std::endl;
+std::cerr << x.derived().transpose() << std::endl;
 
    MPI_Barrier(m_comm);
 
