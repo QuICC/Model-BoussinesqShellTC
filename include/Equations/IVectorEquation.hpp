@@ -237,19 +237,38 @@ namespace Equations {
          int rows = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
          int cols = this->unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
 
-         // Copy data
-         int k = solStart;
-         for(int j = 0; j < cols; j++)
-         {
-            for(int i = 0; i < rows; i++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            // Add source data
+            int l;
+            int j_;
+            int dimI = this->spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int j = 0; j < cols; j++)
             {
-               // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
+               j_ = this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               for(int i = 0; i < rows; i++)
+               {
+                  // Compute correct position
+                  l = start + j_ + i;
 
-               // increase linear storage counter
-               k++;
+                  // Copy timestep output into field
+                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, l),i,j,matIdx);
+               }
             }
-         }
+         #else
+            // Copy data
+            int k = solStart;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy timestep output into field
+                  this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
+
+                  // increase linear storage counter
+                  k++;
+               }
+            }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       } else if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
       {
@@ -288,20 +307,24 @@ namespace Equations {
          assert(matIdx == 0);
 
          // Copy data
-         int l = solStart;
-         for(int k = 0; k < this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         int l;
+         int k_;
+         int j_;
+         int dimK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int dimJ = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         for(int k = 0; k < this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
-            int rows = this->unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-            int cols = this->unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-            for(int j = 0; j < cols; j++)
+            k_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            for(int j = 0; j < this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               for(int i = 0; i < rows; i++)
+               j_ = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               for(int i = 0; i < this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
+                  // Compute correct position
+                  l = solStart + k_ + j_ + i;
+
                   // Copy timestep output into field
                   this->rUnknown().rDom(0).rPerturbation().rComp(compId).setPoint(Datatypes::internal::getScalar(*solution, l),i,j,k);
-
-                  // increase linear storage counter
-                  l++;
                }
             }
          }
@@ -353,35 +376,75 @@ namespace Equations {
          //Safety assertion
          assert(start >= 0);
 
-         // Copy data
-         int k = start;
-         if(isSet)
-         {
-            for(int j = zeroCol; j < cols; j++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            // Add source data
+            int l;
+            int j_;
+            int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            if(isSet)
             {
-               for(int i = zeroRow; i < rows; i++)
-               {
-                  // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+               ///\mhdBug This is overkill
+               // Set storage to zero
+               setZeroNonlinear(eq, compId, storage, matIdx, start);
 
-                  // increase storage counter
-                  k++;
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
+
+                     // Copy field value into storage
+                     Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+                  }
+               }
+            } else
+            {
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
+
+                     // Copy field value into storage
+                     Datatypes::internal::addScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+                  }
                }
             }
-         } else
-         {
-            for(int j = zeroCol; j < cols; j++)
+         #else
+            // Copy data
+            int k = start;
+            if(isSet)
             {
-               for(int i = zeroRow; i < rows; i++)
+               for(int j = zeroCol; j < cols; j++)
                {
-                  // Copy field value into storage
-                  Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
 
-                  // increase storage counter
-                  k++;
+                     // increase storage counter
+                     k++;
+                  }
+               }
+            } else
+            {
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,matIdx));
+
+                     // increase storage counter
+                     k++;
+                  }
                }
             }
-         }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       // matIdx is the index of the slowest varying direction with single RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -457,47 +520,45 @@ namespace Equations {
          //Safety assertion
          assert(start >= 0);
 
-         int zeroBlock = 0;
-         if(useShift)
-         {
-            zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
-         }
-
          // Copy data
-         int l = start;
+         int l;
+         int k_;
+         int j_;
+         int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          if(isSet)
          {
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
                      // Copy field value into storage
                      Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,k));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }
          } else
          {
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
                      // Copy field value into storage
                      Datatypes::internal::addScalar(storage, l, eq.unknown().dom(0).perturbation().comp(compId).point(i,j,k));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }
@@ -577,19 +638,38 @@ namespace Equations {
             //Safety assertion
             assert(start >= 0);
 
-            // Copy data
-            int k = start;
-            for(int j = zeroCol; j < cols; j++)
-            {
-               for(int i = zeroRow; i < rows; i++)
+            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               // Add source data
+               int l;
+               int j_;
+               int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+               for(int j = zeroCol; j < cols; j++)
                {
-                  // Add source term
-                  Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
 
-                  // increase storage counter
-                  k++;
+                     // Add source value
+                     Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, matIdx));
+                  }
                }
-            }
+            #else
+               // Copy data
+               int k = start;
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Add source term
+                     Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+
+                     // increase storage counter
+                     k++;
+                  }
+               }
+            #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          // matIdx is the index of the slowest varying direction with multiple RHS
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -639,28 +719,32 @@ namespace Equations {
          {
             assert(matIdx == 0);
 
-            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-            int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
+            //int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            //int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+            //int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
 
             //Safety assertion
             assert(start >= 0);
 
-            // Copy data
-            int l = start;
-            for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+            // Add source data
+            int l;
+            int k_;
+            int j_;
+            int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+            int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
             {
-               int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-               int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-               for(int j = zeroCol; j < cols; j++)
+               k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
+                     // Compute correct position
+                     l = start + k_ + j_ + i;
+
                      // Add source value
                      Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
-
-                     // increase storage counter
-                     l++;
                   }
                }
             }
@@ -672,27 +756,35 @@ namespace Equations {
    {
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
-         int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
-         int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-
          //Safety assertion
          assert(start >= 0);
 
-         // Copy data
-         int k = start;
-         for(int j = zeroCol; j < cols; j++)
-         {
-            for(int i = zeroRow; i < rows; i++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            for(int k = start; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
-               // Set field to zero
+               // Set value to zero
                Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
-
-               // increase storage counter
-               k++;
             }
-         }
+         #else
+            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).cols();
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+            // Copy data
+            int k = start;
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Set field to zero
+                  Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
       {
@@ -737,29 +829,29 @@ namespace Equations {
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SINGLE)
       {
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
-         int zeroBlock = eq.couplingInfo(compId).galerkinShift(2);
-
          //Safety assertion
          assert(matIdx == 0);
          assert(start >= 0);
 
          // Set data to zero
-         int l = start;
-         for(int k = zeroBlock; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         int l;
+         int k_;
+         int j_;
+         int dimK = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)*eq.spRes()->sim()->dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+         int dimJ = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+         for(int k = 0; k < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
          {
-            int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(k).rows();
-            int cols = eq.unknown().dom(0).perturbation().comp(compId).slice(k).cols();
-            for(int j = zeroCol; j < cols; j++)
+            k_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            for(int j = 0; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               for(int i = zeroRow; i < rows; i++)
+               j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               for(int i = 0; i < eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
+                  // Compute correct position
+                  l = start + k_ + j_ + i;
+
                   // Set value to zero
                   Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
-
-                  // increase storage counter
-                  l++;
                }
             }
          }

@@ -125,7 +125,8 @@ namespace IoVariable {
 
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
          int start = 0;
-         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         int  m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
+         if(m == 0)
          {
             this->mEnergy += (this->mSphIntgOp*rInVar.slice(0).real()).sum();
             start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);

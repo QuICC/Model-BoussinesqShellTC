@@ -449,18 +449,38 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
          Eigen::Matrix<Datatypes::SpectralScalarType::PointType,Eigen::Dynamic,1>  tmp(op->cols());
-         int k = 0;
-         for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
-         {
-            for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            // Initialise storage to zero
+            tmp.setZero();
+            int l;
+            int j_;
+            int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
             {
-               // Copy slice into flat array
-               tmp(k) = explicitField.point(i,j,matIdx);
+               j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               {
+                  // Compute correct position
+                  l = j_ + i;
 
-               // increase storage counter
-               k++;
+                  // Copy field value into storage
+                  tmp(l) = explicitField.point(i,j,matIdx);
+               }
             }
-         }
+         #else
+            int k = 0;
+            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            {
+               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               {
+                  // Copy slice into flat array
+                  tmp(k) = explicitField.point(i,j,matIdx);
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          // Apply operator to field
          internal::addExplicitWrapper(eqField, eqStart, *op, tmp, isSet);

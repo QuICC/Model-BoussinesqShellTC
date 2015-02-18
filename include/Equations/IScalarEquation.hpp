@@ -229,19 +229,38 @@ namespace Equations {
          int rows = this->unknown().dom(0).perturbation().slice(matIdx).rows();
          int cols = this->unknown().dom(0).perturbation().slice(matIdx).cols();
 
-         // Copy data
-         int k = solStart;
-         for(int j = 0; j < cols; j++)
-         {
-            for(int i = 0; i < rows; i++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            // Add source data
+            int l;
+            int j_;
+            int dimI = this->spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            for(int j = 0; j < cols; j++)
             {
-               // Copy timestep output into field
-               this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
+               j_ = this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               for(int i = 0; i < rows; i++)
+               {
+                  // Compute correct position
+                  l = start + j_ + i;
 
-               // increase linear storage counter
-               k++;
+                  // Copy timestep output into field
+                  this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, l),i,j,matIdx);
+               }
             }
-         }
+         #else
+            // Copy data
+            int k = solStart;
+            for(int j = 0; j < cols; j++)
+            {
+               for(int i = 0; i < rows; i++)
+               {
+                  // Copy timestep output into field
+                  this->rUnknown().rDom(0).rPerturbation().setPoint(Datatypes::internal::getScalar(*solution, k),i,j,matIdx);
+
+                  // increase linear storage counter
+                  k++;
+               }
+            }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       } else if(this->couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
       {
@@ -353,35 +372,75 @@ namespace Equations {
          //Safety assertion
          assert(start >= 0);
 
-         // Copy data
-         int k = start;
-         if(isSet)
-         {
-            for(int j = zeroCol; j < cols; j++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            // Add source data
+            int l;
+            int j_;
+            int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+            if(isSet)
             {
-               for(int i = zeroRow; i < rows; i++)
-               {
-                  // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
+               ///\mhdBug This is overkill
+               // Set storage to zero
+               setZeroNonlinear(eq, compId, storage, matIdx, start);
 
-                  // increase storage counter
-                  k++;
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
+
+                     // Copy field value into storage
+                     Datatypes::internal::setScalar(storage, l, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
+                  }
+               }
+            } else
+            {
+               for(int j = zeroCol; j < eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(matIdx); j++)
+               {
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
+
+                     // Copy field value into storage
+                     Datatypes::internal::addScalar(storage, l, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
+                  }
                }
             }
-         } else
-         {
-            for(int j = zeroCol; j < cols; j++)
+         #else
+            // Copy data
+            int k = start;
+            if(isSet)
             {
-               for(int i = zeroRow; i < rows; i++)
+               for(int j = zeroCol; j < cols; j++)
                {
-                  // Copy field value into storage
-                  Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::setScalar(storage, k, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
 
-                  // increase storage counter
-                  k++;
+                     // increase storage counter
+                     k++;
+                  }
+               }
+            } else
+            {
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Copy field value into storage
+                     Datatypes::internal::addScalar(storage, k, eq.unknown().dom(0).perturbation().point(i,j,matIdx));
+
+                     // increase storage counter
+                     k++;
+                  }
                }
             }
-         }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
       // matIdx is the index of the slowest varying direction with multiple RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -582,19 +641,38 @@ namespace Equations {
             //Safety assertion
             assert(start >= 0);
 
-            // Copy data
-            int k = start;
-            for(int j = zeroCol; j < cols; j++)
-            {
-               for(int i = zeroRow; i < rows; i++)
+            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               // Add source data
+               int l;
+               int j_;
+               int dimI = eq.spRes()->sim()->dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+               for(int j = zeroCol; j < cols; j++)
                {
-                  // Add source value
-                  Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+                  j_ = eq.spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Compute correct position
+                     l = start + j_ + i;
 
-                  // increase storage counter
-                  k++;
+                     // Add source value
+                     Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, matIdx));
+                  }
                }
-            }
+            #else
+               // Copy data
+               int k = start;
+               for(int j = zeroCol; j < cols; j++)
+               {
+                  for(int i = zeroRow; i < rows; i++)
+                  {
+                     // Add source value
+                     Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+
+                     // increase storage counter
+                     k++;
+                  }
+               }
+            #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          // matIdx is the index of the slowest varying direction with multiple RHS
          } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)
@@ -682,27 +760,36 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
-         int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
-         int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
-         int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
-         int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
 
          //Safety assertion
          assert(start >= 0);
 
-         // Set data to zero
-         int k = start;
-         for(int j = zeroCol; j < cols; j++)
-         {
-            for(int i = zeroRow; i < rows; i++)
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            for(int k = start; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set value to zero
                Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
-
-               // increase storage counter
-               k++;
             }
-         }
+         #else
+            int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();
+            int cols = eq.unknown().dom(0).perturbation().slice(matIdx).cols();
+            int zeroRow = eq.couplingInfo(compId).galerkinShift(0);
+            int zeroCol = eq.couplingInfo(compId).galerkinShift(1);
+
+            // Set data to zero
+            int k = start;
+            for(int j = zeroCol; j < cols; j++)
+            {
+               for(int i = zeroRow; i < rows; i++)
+               {
+                  // Set value to zero
+                  Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+
+                  // increase storage counter
+                  k++;
+               }
+            }
+         #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          // matIdx is the index of the slowest varying direction with multiple RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_MULTI_RHS)

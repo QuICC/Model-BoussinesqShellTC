@@ -136,7 +136,8 @@ namespace IoVariable {
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
          MHDFloat lfactor = 0.0;
          int start = 0;
-         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         int m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
+         if(m == 0)
          {
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
             {
@@ -149,9 +150,10 @@ namespace IoVariable {
          }
          for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
+            m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = m + this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
                this->mTorEnergy += 2.0*lfactor*(this->mSphIntgOp*rInVarTor.slice(k).col(j).real()).sum();
@@ -204,7 +206,8 @@ namespace IoVariable {
       // Compute energy in Q component of QST decomposition
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
          start = 0;
-         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
+         if(m == 0)
          {
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
             {
@@ -217,9 +220,10 @@ namespace IoVariable {
          }
          for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
+            m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = m + this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(lfactor*(lfactor+1.0),2);
 
                this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();
@@ -269,7 +273,8 @@ namespace IoVariable {
       // Compute energy in Q component of QST decomposition
       #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
          start = 0;
-         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0)
+         m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
+         if(m == 0)
          {
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0); ++j)
             {
@@ -282,9 +287,10 @@ namespace IoVariable {
          }
          for(int k = start; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
+            m = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
             for(int j = 0; j < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               lfactor = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               lfactor = m + this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = lfactor*(lfactor+1.0);
 
                this->mPolEnergy += 2.0*lfactor*(this->mIntgOp*rInVarTor.slice(k).col(j).real()).sum();

@@ -435,13 +435,10 @@ namespace Eigen {
                int nK = m_id.nrhs*m_id.lrhs;
                MumpsScalar * pVal = m_id.rhs;
 
-std::cerr << "RHS  ----------------------------------" << std::endl;
                for(int k = 0; k < nK; ++pRhs,++pVal,++k)
                {
                   *pVal = MumpsLU_convert(*pRhs);
-std::cerr << MumpsLU_convert(*pVal) <<  "  ";
                }
-               std::cerr << std::endl;
             }
          }
 
@@ -510,8 +507,6 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
       m_id.icntl[11-1] = 1;
    #endif // GEOMHDISCC_DEBUG
 
-std::cerr << "RHS INPUt  ----------------------------------" << std::endl;
-std::cerr << b.derived().transpose() << std::endl;
    copyRhs(b.derived().data(), (rhsCols > m_nrhsMem));
 
    MumpsLU_mumps(&m_id, Scalar());
@@ -524,8 +519,6 @@ std::cerr << b.derived().transpose() << std::endl;
    }
 
    copySolution(x.derived().data());
-std::cerr << "SOLUTION  ----------------------------------" << std::endl;
-std::cerr << x.derived().transpose() << std::endl;
 
    MPI_Barrier(m_comm);
 
