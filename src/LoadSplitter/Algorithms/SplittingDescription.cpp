@@ -21,9 +21,19 @@ namespace GeoMHDiSCC {
 
 namespace Parallel {
 
-   SplittingDescription::SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score, const std::vector<std::multimap<int,int> >& structure)
-      :  algorithm(algorithm), grouper(grouper), dims(dims), factors(factors), score(score), structure(structure)
+   SplittingDescription::SplittingDescription()
    {
+      #ifdef GEOMHDISCC_DEBUG
+         IoXml::SharedVtpWriter pVtp(new IoXml::VtpWriter("Data_distribution_TRAB1D"));
+         pVtp->init();
+         this->vtpFiles.push_back(pVtp);
+         pVtp = IoXml::SharedVtpWriter(new IoXml::VtpWriter("Data_distribution_TRAB2D"));
+         pVtp->init();
+         this->vtpFiles.push_back(pVtp);
+         pVtp = IoXml::SharedVtpWriter(new IoXml::VtpWriter("Data_distribution_TRAB3D"));
+         pVtp->init();
+         this->vtpFiles.push_back(pVtp);
+      #endif //GEOMHDISCC_DEBUG
    }
 
    SplittingDescription::~SplittingDescription()

@@ -81,6 +81,9 @@ namespace Parallel {
       // Storage for all the shared transform resolutions
       std::vector<SharedTransformResolution>  transformRes;
 
+      // Initialise description
+      SplittingDescription descr;
+
       // Loop over all CPUs
       for(int id = 0; id < this->nCpu(); id++)
       {
@@ -91,6 +94,10 @@ namespace Parallel {
          for(int j = 0; j < this->dims(); j++)
          {
             SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id);
+
+            #ifdef GEOMHDISCC_DEBUG
+               descr.vtpFiles.at(j)->representResolution(spTRes, id);
+            #endif //GEOMHDISCC_DEBUG
 
             // Clear unused indexes for remote resolutions
             if(id != FrameworkMacro::id())
@@ -119,7 +126,12 @@ namespace Parallel {
       int score = this->computeScore(spRes);
 
       // Create splitting description
-      SplittingDescription descr(this->mAlgo, this->mGrouper, this->mDims, this->mFactors, score, this->mCommStructure);
+      descr.algorithm = this->mAlgo;
+      descr.grouper = this->mGrouper;
+      descr.dims = this->mDims;
+      descr.factors = this->mFactors;
+      descr.score = score;
+      descr.structure = this->mCommStructure;
 
       // Return combination of score and shared resolution/description
       return std::make_pair(score, std::make_pair(spRes,descr));

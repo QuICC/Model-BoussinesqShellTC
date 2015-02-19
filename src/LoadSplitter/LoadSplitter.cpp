@@ -35,6 +35,7 @@
 #include "LoadSplitter/Algorithms/TubularSplitting.hpp"
 #include "LoadSplitter/Algorithms/FixedSplitting.hpp"
 #include "IoXml/GxlWriter.hpp"
+#include "IoXml/VtpWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -163,6 +164,14 @@ namespace Parallel {
       {
          // Describe the splitting with the highest score
          this->describeSplitting(this->mScores.rbegin()->second.second);
+
+         #ifdef GEOMHDISCC_DEBUG
+            for(std::vector<IoXml::SharedVtpWriter>::const_iterator it = this->mScores.rbegin()->second.second.vtpFiles.begin(); it != this->mScores.rbegin()->second.second.vtpFiles.end(); ++it)
+            {
+               (*it)->write();
+               (*it)->finalize();
+            }
+         #endif //GEOMHDISCC_DEBUG
 
          // Return the splitting with the highest score
          return this->mScores.rbegin()->second;
