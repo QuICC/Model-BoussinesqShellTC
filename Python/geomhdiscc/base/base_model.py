@@ -33,7 +33,7 @@ class BaseModel:
 
         mat = utils.build_diag_matrix(fields, self.time_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_time_" + str(bcs["bcType"]) + str(os.getpid())
+            fname = "matrix_time_" + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -44,7 +44,7 @@ class BaseModel:
 
         mat = utils.build_block_matrix(fields, self.linear_block, (res,eq_params,eigs,bcs), restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_linear_" + str(bcs["bcType"]) + str(os.getpid())
+            fname = "matrix_linear_" + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname  + ".mtx", mat)
@@ -55,7 +55,7 @@ class BaseModel:
 
         mat = -self.linear_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_" + str(bcs["bcType"]) + str(os.getpid())
+            fname = "matrix_explicit_" + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)

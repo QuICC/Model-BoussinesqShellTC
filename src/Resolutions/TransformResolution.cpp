@@ -43,6 +43,8 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int k) const
    {
+      assert(this->mDimF1D.size() > k);
+
       return this->mDimF1D(k);
    }
 
@@ -53,6 +55,8 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int k) const
    {
+      assert(this->mDimB1D.size() > k);
+
       return this->mDimB1D(k);
    }
 
@@ -63,6 +67,8 @@ namespace GeoMHDiSCC {
 
    template <> int TransformResolution::dim<Dimensions::Data::DAT2D>(const int k) const
    {
+      assert(this->mDim2D.size() > k);
+
       return this->mDim2D(k);
    }
 
