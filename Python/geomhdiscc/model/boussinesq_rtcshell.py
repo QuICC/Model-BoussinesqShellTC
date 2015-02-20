@@ -213,9 +213,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("temperature",""):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc, restriction = restriction)
             else:
-                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
+                mat = shell.i2x3(res[0], res[1], m, a, b, bc, restriction = restriction)
 
         return mat
 
