@@ -778,15 +778,14 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingInformation::SLOWEST_SINGLE_RHS)
       {
-
          //Safety assertion
          assert(start >= 0);
 
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-            for(int k = start; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
+            for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set value to zero
-               Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+               Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
             }
          #else
             int rows = eq.unknown().dom(0).perturbation().slice(matIdx).rows();

@@ -778,10 +778,10 @@ namespace Equations {
          assert(start >= 0);
 
          #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-            for(int k = start; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
+            for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set value to zero
-               Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+               Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
             }
          #else
             int rows = eq.unknown().dom(0).perturbation().comp(compId).slice(matIdx).rows();
