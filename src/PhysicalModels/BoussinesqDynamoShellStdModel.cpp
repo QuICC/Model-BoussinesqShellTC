@@ -160,7 +160,6 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
                break;
@@ -173,7 +172,6 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
@@ -186,7 +184,6 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(5,4,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::TOR, tSH);
                tSH.clear(); 
@@ -195,7 +192,6 @@ namespace GeoMHDiSCC {
                tSH.push_back(std::tr1::make_tuple(1,1,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,0,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(2,1,MHDComplex(1,0)));
-               tSH.push_back(std::tr1::make_tuple(2,2,MHDComplex(1,0)));
                tSH.push_back(std::tr1::make_tuple(4,3,MHDComplex(1,0)));
                spVector->setHarmonicOptions(FieldComponents::Spectral::POL, tSH);
                break;
