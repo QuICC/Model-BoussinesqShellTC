@@ -76,11 +76,8 @@ namespace IoXml {
          for(int j = 0; j < spTRes->dim<Dimensions::Data::DAT2D>(k); ++j)
          {
             int j_ = spTRes->idx<Dimensions::Data::DAT2D>(j,k);
-            for(int i = 0; i < spTRes->dim<Dimensions::Data::DATB1D>(k); ++i)
-            {
-               oss << i << " " << j_ << " " << k_ << " ";
-               count++;
-            }
+            oss << 0 << " " << j_ << " " << k_ << " ";
+            count++;
          }
       }
       pData->value(this->mXML.allocate_string(oss.str().c_str()));
