@@ -26,46 +26,44 @@ namespace Transform {
 
 namespace TransformSteps {
 
-   std::vector<IntegratorBranch>  forwardScalar()
+   std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 1);
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      FieldComponents::Spectral::Id scalId = components.at(0).first;
+
+      if(isNL)
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+      } else
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, scalId, FieldType::SCALAR));
+      }
 
       return transform;
    }
 
-   std::vector<IntegratorBranch>  forwardScalarNL()
+   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 3);
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      if(isNL)
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
 
-      return transform;
-   }
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
 
-   std::vector<IntegratorBranch>  forwardVector()
-   {
-      std::vector<IntegratorBranch> transform;
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
+      } else
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
-
-      return transform;
-   }
-
-   std::vector<IntegratorBranch>  forwardVectorNL()
-   {
-      std::vector<IntegratorBranch> transform;
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::ONE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::ONE, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::TWO, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::TWO, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::THREE, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::THREE, FieldType::VECTOR));
+      }
 
       return transform;
    }

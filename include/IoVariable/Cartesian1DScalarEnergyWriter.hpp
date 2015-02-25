@@ -71,7 +71,7 @@ namespace IoVariable {
 
       private:
          /*
-          * @brief Spherical volume to normalize energy to energy density
+          * @brief Cartesian box volume to normalize energy to energy density
           */
          MHDFloat mVolume;
 
@@ -81,9 +81,9 @@ namespace IoVariable {
          MHDFloat mEnergy;
 
          /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
+          * @brief Chebyshev operator for integration
           */
-         SparseMatrix mSphIntgOp;
+         SparseMatrix mIntgOp;
 
    };
 

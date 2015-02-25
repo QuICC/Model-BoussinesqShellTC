@@ -43,56 +43,33 @@ namespace IoVariable {
 
    void Cartesian1DScalarEnergyWriter::init()
    {
-      // Normalize by sphere volume: 4/3*pi*(r_o^3 - r_i^3)
-      MHDFloat ro = this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second;
-      MHDFloat ri = ro*this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second;
-      this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
+      // Normalize by Cartesian volume: (2*pi)*(2*pi)*(2*
+      this->mVolume = std::pow(2.0*Math::PI,2)*2;
 
       // Initialise python wrapper
       PythonWrapper::init();
-      PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
+      PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
 
       // Prepare arguments
       PyObject *pArgs, *pValue;
-      pArgs = PyTuple_New(4);
-
-      // ... compute a, b factors
-      PyObject *pTmp = PyTuple_New(2);
-      PyTuple_SetItem(pTmp, 0, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RO))->second));
-      PyTuple_SetItem(pTmp, 1, PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::RRATIO))->second));
-      PythonWrapper::setFunction("linear_r2x");
-      pValue = PythonWrapper::callFunction(pTmp);
-      PyTuple_SetItem(pArgs, 1, PyTuple_GetItem(pValue, 0));
-      PyTuple_SetItem(pArgs, 2, PyTuple_GetItem(pValue, 1));
-      // ... create boundray condition (none)
-      pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-      PyTuple_SetItem(pArgs, 3, pValue);
+      pArgs = PyTuple_New(2);
 
       // Get resolution
-      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>() + 2;
+      int cols = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
       pValue = PyLong_FromLong(cols);
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call x^2
-      PythonWrapper::setFunction("x2");
+      // .. set scale factor
+      pValue = PyFloat_FromDouble(this->mPhysical.find(IoTools::IdToHuman::toTag(NonDimensional::SCALE1D))->second);
+      PyTuple_SetItem(pArgs, 1, pValue);
+
+      // Call integral
+      PythonWrapper::setFunction("integral");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpR2;
-      PythonWrapper::fillMatrix(tmpR2, pValue);
-      Py_DECREF(pValue);
-
-      pTmp = PyTuple_GetSlice(pArgs, 0, 3);
-      // Call avg
-      PythonWrapper::setFunction("integral");
-      pValue = PythonWrapper::callFunction(pTmp);
-      // Fill matrix and cleanup
-      SparseMatrix tmpAvg;
-      PythonWrapper::fillMatrix(tmpAvg, pValue);
+      PythonWrapper::fillMatrix(this->mIntgOp, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
-
-      this->mSphIntgOp = tmpAvg*tmpR2.leftCols(cols-2);
 
       IVariableAsciiEWriter::init();
    }
@@ -101,6 +78,9 @@ namespace IoVariable {
    {
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
+
+      // Initialize the energy
+      this->mEnergy = 0.0;
 
       // Dealias variable data
       coord.communicator().dealiasSpectral(sRange.first->second->rDom(0).rTotal());
@@ -117,35 +97,11 @@ namespace IoVariable {
       // Compute |f|^2
       rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
-      // Compute projection transform for first dimension 
+      // Compute integration transform for first dimension 
       coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
-      // Compute integral over Chebyshev expansion and sum harmonics
-      this->mEnergy = 0.0;
-
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
-         int start = 0;
-         int  m0 = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         if(m0 == 0)
-         {
-            this->mEnergy += (this->mSphIntgOp*rInVar.slice(0).real()).sum();
-            start = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(0);
-         }
-
-         this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.data().rightCols(rInVar.data().cols()-start).real()).sum();
-      #endif //defined GEOMHDISCC_SPATIALSCHEME_SLFM
-      #ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
-         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            int start = 0;
-            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
-            {
-               this->mEnergy += (this->mSphIntgOp*rInVar.slice(k).col(0).real())(0);
-               start = 1;
-            }
-            this->mEnergy += 2.0*(this->mSphIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
-         }
-      #endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+      // Compute integral over Chebyshev expansion and sum Fourier coefficients
+      this->mEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);

@@ -30,6 +30,8 @@
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGTransport.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGVorticityZ.hpp"
 #include "Equations/Asymptotics/FPlane3DQG/Boussinesq/BoussinesqFPlane3DQGMeanHeat.hpp"
+#include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DStreamEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -169,9 +171,20 @@ namespace GeoMHDiSCC {
    void BoussinesqFPlane3DQGModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create Nusselt number writer
-      IoVariable::SharedNusseltWriter spState(new IoVariable::NusseltWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::DZ_MEANTEMPERATURE);
-      spSim->addAsciiOutputFile(spState);
+      IoVariable::SharedNusseltWriter spNusselt(new IoVariable::NusseltWriter(SchemeType::type()));
+      spNusselt->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spSim->addAsciiOutputFile(spNusselt);
+
+      // Create temperature energy writer
+      IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
+      spTemp->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTemp);
+
+      // Create kinetic energy writer
+      IoVariable::SharedCartesian1DStreamEnergyWriter spStream(new IoVariable::Cartesian1DStreamEnergyWriter("kinetic", SchemeType::type()));
+      spStream->expect(PhysicalNames::STREAMFUNCTION);
+      spStream->expect(PhysicalNames::VELOCITYZ);
+      spSim->addAsciiOutputFile(spStream);
    }
 
    void BoussinesqFPlane3DQGModel::addHdf5OutputFiles(SharedSimulation spSim)

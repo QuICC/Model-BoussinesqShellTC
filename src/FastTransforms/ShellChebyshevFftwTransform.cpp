@@ -744,6 +744,7 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
+      // Do transform of real part
       this->mTmpIn = physVal.real();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -757,6 +758,7 @@ namespace Transform {
          rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
       }
 
+      // Do transform of imaginary part
       this->mTmpIn = physVal.imag();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());

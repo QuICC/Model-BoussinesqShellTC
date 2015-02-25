@@ -298,7 +298,11 @@ namespace Transform {
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
       // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
    }
 
    void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
@@ -368,14 +372,18 @@ namespace Transform {
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
       // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+      rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
       // Do transform of imaginary part
       this->mTmpIn = physVal.imag();
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
       // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+      rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
    }
 
    void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
@@ -451,6 +459,58 @@ namespace Transform {
       // Do transform of imaginary part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.imag() = this->mTmpOut;
+   }
+
+   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+
+      // Rescale to remove FFT scaling
+      rChebVal *= this->mspSetup->scale();
+   }
+
+   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform of real part
+      this->mTmpIn = physVal.real();
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      // Rescale FFT output
+      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+
+      // Do transform of imaginary part
+      this->mTmpIn = physVal.imag();
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      // Rescale FFT output
+      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

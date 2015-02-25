@@ -71,29 +71,29 @@ namespace IoVariable {
 
       private:
          /**
-          * @brief Spherical volume to normalize energy to energy density
+          * @brief Cartesian box volume to normalize energy to energy density
           */
          MHDFloat mVolume;
 
          /**
-          * @brief Storage for the Toroidal energy
+          * @brief Storage for the X component energy
           */
-         MHDFloat mTorEnergy;
+         MHDFloat mXEnergy;
 
          /**
-          * @brief Storage for the Poloidal energy
+          * @brief Storage for the Y component energy
           */
-         MHDFloat mPolEnergy;
+         MHDFloat mYEnergy;
 
          /**
-          * @brief Chebyshev operator to integrate in radius
+          * @brief Storage for the Z component energy
+          */
+         MHDFloat mZEnergy;
+
+         /**
+          * @brief Chebyshev operator to integrate
           */
          SparseMatrix mIntgOp;
-
-         /**
-          * @brief Chebyshev operator for spherical integral in radius (include r^2 factor)
-          */
-         SparseMatrix mSphIntgOp;
    };
 
    inline bool Cartesian1DPrimitiveEnergyWriter::isHeavy() const
