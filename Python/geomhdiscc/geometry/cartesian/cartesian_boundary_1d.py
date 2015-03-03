@@ -96,9 +96,9 @@ def apply_tau(mat, bc, location = 't'):
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
-    # Last mode is zero
-    elif bc[0] == 99:
-        cond = tau_last(mat.shape[1])
+    # Set last modes to zero
+    elif bc[0] > 990 and bc[0] < 1000:
+        cond = tau_last(mat.shape[1], bc[0]-990)
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -296,13 +296,14 @@ def tau_value_diff2(nx, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_last(nx):
+def tau_last(nx, nrow):
     """Create the last modes to zero value tau line(s)"""
 
-    cond = []
-    cond.append([0 for i in np.arange(0,nx-1)] +  [tau_c(nx)])
+    cond = np.zeros((nrow, nx))
+    for j in range(0, nrow):
+        cond[j,nx-nrow+j] = tau_c(nx-nrow+j)
 
-    return np.array(cond)
+    return cond
 
 def stencil(nx, bc):
     """Create a Galerkin stencil matrix"""

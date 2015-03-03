@@ -176,7 +176,7 @@ namespace Transform {
          PyTuple_SetItem(pArgs, 0, pValue);
          // ... create boundray condition (last mode is zero)
          pValue = PyDict_New();
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(99));
+         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
          PyTuple_SetItem(pArgs, 1, pValue);
          // ... set coefficient to 1.0
          pValue = PyFloat_FromDouble(1.0);
