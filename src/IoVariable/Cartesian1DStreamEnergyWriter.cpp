@@ -132,9 +132,15 @@ namespace IoVariable {
             }
          } else
          {
+            int nK = this->mspRes->sim()->dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
             for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
             {
                int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+               // Convert to double Fourier mode
+               if(k_ >= nK/2 + (nK % 2))
+               {
+                  k_ = k_ - nK;
+               }
 
                rOutVar.setSlice(std::pow(k_,2)*(rOutVar.slice(k).array()*rOutVar.slice(k).conjugate().array()).matrix(),k);
             }

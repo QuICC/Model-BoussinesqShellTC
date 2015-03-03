@@ -40,6 +40,7 @@ namespace Equations {
    void BoussinesqFPlane3DQGVorticityZ::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false, false);
+      this->setExplicitTiming(FieldComponents::Spectral::SCALAR, ExplicitTiming::LINEAR);
    }
 
    void BoussinesqFPlane3DQGVorticityZ::setRequirements()
