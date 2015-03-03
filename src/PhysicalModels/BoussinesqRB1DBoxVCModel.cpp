@@ -22,12 +22,14 @@
 #include "Enums/FieldIds.hpp"
 #include "IoVariable/StateFileReader.hpp"
 #include "IoVariable/StateFileWriter.hpp"
-#include "IoVariable/ContinuityWriter.hpp"
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRB1DBoxVCTransport.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRB1DBoxVCMomentum.hpp"
 #include "Equations/Box/Boussinesq/BoussinesqRB1DBoxVCContinuity.hpp"
+#include "IoVariable/ContinuityWriter.hpp"
+#include "IoVariable/Cartesian1DScalarEnergyWriter.hpp"
+#include "IoVariable/Cartesian1DPrimitiveEnergyWriter.hpp"
 #include "Generator/States/RandomScalarState.hpp"
 #include "Generator/States/RandomVectorState.hpp"
 #include "Generator/States/CartesianExactScalarState.hpp"
@@ -66,18 +68,18 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spVector = spGen->addVectorEquation<Equations::CartesianExactVectorState>();
          spVector->setIdentity(PhysicalNames::VELOCITY);
-         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYCOSCOS);
-         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 1.0, 1.0e0, 0.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYCOSCOS);
-         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 0.0, 1.0e0, 1.0, 1.0e0, 0.0);
-         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSCOS);
-         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 0.0, 1.0e0, 0.0, 1.0e0, 1.0);
+         spVector->setStateType(FieldComponents::Physical::X, Equations::CartesianExactStateIds::POLYSINSIN);
+         spVector->setModeOptions(FieldComponents::Physical::X, 1.0e0, 6.0, 1.0e0, 2.0, 1.0e0, 2.0);
+         spVector->setStateType(FieldComponents::Physical::Y, Equations::CartesianExactStateIds::POLYSINCOS);
+         spVector->setModeOptions(FieldComponents::Physical::Y, 1.0e0, 7.0, 1.0e0, 1.0, 1.0e0, 5.0);
+         spVector->setStateType(FieldComponents::Physical::Z, Equations::CartesianExactStateIds::POLYCOSSIN);
+         spVector->setModeOptions(FieldComponents::Physical::Z, 1.0e0, 3.0, 1.0e0, 3.0, 1.0e0, 1.0);
 
          // Add scalar exact initial state generator
          spScalar = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spScalar->setIdentity(PhysicalNames::TEMPERATURE);
-         spScalar->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
-         spScalar->setModeOptions(1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 1.0);
+         spScalar->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spScalar->setModeOptions(1.0e0, 1.0, 1.0e0, 1.0, 1.0e0, 0.0);
 
       // Generate random spectrum
       } else
@@ -145,10 +147,19 @@ namespace GeoMHDiSCC {
    void BoussinesqRB1DBoxVCModel::addAsciiOutputFiles(SharedSimulation spSim)
    {
       // Create maximal continuity writer
-      IoVariable::SharedContinuityWriter spState(new IoVariable::ContinuityWriter(SchemeType::type()));
-      spState->expect(PhysicalNames::VELOCITY);
+      IoVariable::SharedContinuityWriter spCont(new IoVariable::ContinuityWriter(SchemeType::type()));
+      spCont->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spCont);
 
-      spSim->addAsciiOutputFile(spState);
+      // Create temperature energy writer
+      IoVariable::SharedCartesian1DScalarEnergyWriter spTemp(new IoVariable::Cartesian1DScalarEnergyWriter("temperature", SchemeType::type()));
+      spTemp->expect(PhysicalNames::TEMPERATURE);
+      spSim->addAsciiOutputFile(spTemp);
+
+      // Create kinetic energy writer
+      IoVariable::SharedCartesian1DPrimitiveEnergyWriter spKinetic(new IoVariable::Cartesian1DPrimitiveEnergyWriter("kinetic", SchemeType::type()));
+      spKinetic->expect(PhysicalNames::VELOCITY);
+      spSim->addAsciiOutputFile(spKinetic);
    }
 
    void BoussinesqRB1DBoxVCModel::addHdf5OutputFiles(SharedSimulation spSim)

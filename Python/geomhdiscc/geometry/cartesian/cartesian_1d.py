@@ -122,6 +122,35 @@ def i2(nx, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return c1dbc.constrain(mat, bc)
 
+def i2x1(nx, bc, coeff = 1.0, cscale = 1.0):
+    """Create operator for 2nd integral in x of x T_n(x)"""
+    
+    ns = np.arange(0, nx, 1)
+    offsets = np.arange(-3,4,2)
+    nzrow = 1
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return 1.0/(8.0*n*(n - 1.0))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -1.0/(8.0*n*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -1.0/(8.0*n*(n - 1.0))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return 1.0/(8.0*n*(n + 1.0))
+
+    ds = [d_3, d_1, d1, d3]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*cscale*spsp.diags(diags, offsets)
+    return c1dbc.constrain(mat, bc)
+
 def i2d1(nx, bc, coeff = 1.0, cscale = 1.0):
     """Create operator for 2nd integral in x of T_n(x)"""
     

@@ -44,8 +44,8 @@ namespace IoVariable {
 
    void Cartesian1DStreamEnergyWriter::init()
    {
-      // Normalize by Cartesian volume: (2*pi)*(2*pi)*(2*
-      this->mVolume = std::pow(2.0*Math::PI,2)*2;
+      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -68,7 +68,6 @@ namespace IoVariable {
       PythonWrapper::setFunction("integral");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpAvg(cols,cols);
       PythonWrapper::fillMatrix(this->mIntgOp, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
@@ -87,10 +86,25 @@ namespace IoVariable {
       this->mYEnergy = 0.0;
       this->mZEnergy = 0.0;
 
-      for(sIt = sRange.first; sIt != sRange.second; ++sIt)
+      std::map<FieldComponents::Spectral::Id, scalar_iterator> comps;
+      sIt = sRange.first;
+      sIt++;
+      if(sRange.first->first == PhysicalNames::VELOCITYZ)
+      {
+         comps.insert(std::make_pair(FieldComponents::Spectral::X, sIt));
+         comps.insert(std::make_pair(FieldComponents::Spectral::Y, sIt));
+         comps.insert(std::make_pair(FieldComponents::Spectral::Z, sRange.first));
+      } else
+      {
+         comps.insert(std::make_pair(FieldComponents::Spectral::X, sRange.first));
+         comps.insert(std::make_pair(FieldComponents::Spectral::Y, sRange.first));
+         comps.insert(std::make_pair(FieldComponents::Spectral::Z, sIt));
+      }
+
+      for(std::map<FieldComponents::Spectral::Id,scalar_iterator>::iterator cIt = comps.begin(); cIt != comps.end(); ++cIt)
       {
          // Dealias variable data
-         coord.communicator().dealiasSpectral(sIt->second->rDom(0).rTotal());
+         coord.communicator().dealiasSpectral(cIt->second->second->rDom(0).rTotal());
 
          // Recover dealiased BWD data
          Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
@@ -101,11 +115,11 @@ namespace IoVariable {
          // Compute projection transform for first dimension 
          coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
 
-         if(sIt->first == PhysicalNames::VELOCITYZ)
+         if(cIt->first == FieldComponents::Spectral::Z)
          {
             // Compute |f|^2
             rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
-         } else
+         } else if(cIt->first == FieldComponents::Spectral::X)
          {
             for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
             {
@@ -116,41 +130,41 @@ namespace IoVariable {
                   rOutVar.setProfile(std::pow(j_,2)*(rOutVar.profile(j,k).array()*rOutVar.profile(j,k).conjugate().array()).matrix(),j,k);
                }
             }
-         }
-
-         // Compute integration transform for first dimension 
-         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
-
-         if(sIt->first == PhysicalNames::VELOCITYZ)
-         {
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mZEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
-
-            // Normalize by the spherical volume
-            this->mZEnergy /= this->mVolume; 
          } else
          {
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mXEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
-
-            // Normalize by the spherical volume
-            this->mXEnergy /= this->mVolume; 
-
             for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
             {
                int k_ = this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
 
                rOutVar.setSlice(std::pow(k_,2)*(rOutVar.slice(k).array()*rOutVar.slice(k).conjugate().array()).matrix(),k);
             }
+         }
 
-            // Compute integration transform for first dimension 
-            coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+         // Compute integration transform for first dimension 
+         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mYEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
+         MHDFloat *pEnergy;
+         if(cIt->first == FieldComponents::Spectral::X)
+         {
+            pEnergy = &this->mXEnergy;
+         } else if(cIt->first == FieldComponents::Spectral::Y)
+         {
+            pEnergy = &this->mYEnergy;
+         } else
+         {
+            pEnergy = &this->mZEnergy;
+         }
 
-            // Normalize by the spherical volume
-            this->mYEnergy /= this->mVolume; 
+         // Compute integral over Chebyshev expansion and sum Fourier coefficients
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int start = 0;
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
+            {
+               *pEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+               start = 1;
+            }
+            *pEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
          }
 
          // Free BWD storage
@@ -158,6 +172,9 @@ namespace IoVariable {
 
          // Free FWD storage
          coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
+
+         // Normalize by the Cartesian volume
+         *pEnergy /= this->mVolume;
       }
    }
 

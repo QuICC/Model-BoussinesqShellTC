@@ -45,40 +45,11 @@ namespace IoVariable {
       // Create file
       this->preWrite();
 
-      ContinuityWriter::scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 3);
-      std::vector<FieldComponents::Physical::Id>  comp;
-      std::vector<ContinuityWriter::scalar_iterator>  sIt;
-      for(ContinuityWriter::scalar_iterator it = sRange.first; it != sRange.second; ++it)
-      {
-         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
-            if(it->first == PhysicalNames::VELOCITYX)
-            {
-               comp.push_back(FieldComponents::Physical::TWO);
-            } else if(it->first == PhysicalNames::VELOCITYY)
-            {
-               comp.push_back(FieldComponents::Physical::THREE);
-            } else if(it->first == PhysicalNames::VELOCITYZ)
-            {
-               comp.push_back(FieldComponents::Physical::ONE);
-            }
-         #else
-            if(it->first == PhysicalNames::VELOCITYX)
-            {
-               comp.push_back(FieldComponents::Physical::ONE);
-            } else if(it->first == PhysicalNames::VELOCITYY)
-            {
-               comp.push_back(FieldComponents::Physical::TWO);
-            } else if(it->first == PhysicalNames::VELOCITYZ)
-            {
-               comp.push_back(FieldComponents::Physical::THREE);
-            }
-         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
-
-         sIt.push_back(it);
-      }
+      ContinuityWriter::vector_iterator_range vRange = this->vectorRange();
+      assert(std::distance(vRange.first, vRange.second) == 1);
+      ContinuityWriter::vector_iterator  vIt = vRange.first;
    
-      MHDFloat continuity = (sIt.at(0)->second->dom(0).grad().comp(comp.at(0)).data() + sIt.at(1)->second->dom(0).grad().comp(comp.at(1)).data() + sIt.at(2)->second->dom(0).grad().comp(comp.at(2)).data()).array().abs().maxCoeff();
+      MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::X).comp(FieldComponents::Physical::X).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Y).comp(FieldComponents::Physical::Y).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Z).comp(FieldComponents::Physical::Z).data()).array().abs().maxCoeff();
 
       // Get the "global" velocity divergence from MPI code
       #ifdef GEOMHDISCC_MPI

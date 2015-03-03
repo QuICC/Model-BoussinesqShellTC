@@ -44,8 +44,8 @@ namespace IoVariable {
 
    void Cartesian1DPrimitiveEnergyWriter::init()
    {
-      // Normalize by Cartesian volume: (2*pi)*(2*pi)*(2*
-      this->mVolume = std::pow(2.0*Math::PI,2)*2;
+      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -68,7 +68,6 @@ namespace IoVariable {
       PythonWrapper::setFunction("integral");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix and cleanup
-      SparseMatrix tmpAvg(cols,cols);
       PythonWrapper::fillMatrix(this->mIntgOp, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
@@ -82,9 +81,6 @@ namespace IoVariable {
       vector_iterator vIt;
       vector_iterator_range vRange = this->vectorRange();
       assert(std::distance(vRange.first, vRange.second) == 1);
-      assert(FieldComponents::Spectral::ONE == FieldComponents::Spectral::X);
-      assert(FieldComponents::Spectral::TWO == FieldComponents::Spectral::Y);
-      assert(FieldComponents::Spectral::THREE == FieldComponents::Spectral::Z);
 
       // Initialize the energy
       this->mXEnergy = 0.0;
@@ -102,47 +98,52 @@ namespace IoVariable {
          coord.communicator().dealiasSpectral(vRange.first->second->rDom(0).rTotal().rComp(*cIt));
 
          // Recover dealiased BWD data
-         Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+         Transform::TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
          // Get FWD storage
-         Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarTor = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
+         Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
          // Compute projection transform for first dimension 
-         coord.transform1D().project(rOutVarTor.rData(), rInVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
+         coord.transform1D().project(rOutVar.rData(), rInVar.data(), Transform::TransformCoordinatorType::Transform1DType::ProjectorType::PROJ, Arithmetics::SET);
 
          // Compute |f|^2
-         rOutVarTor.rData() = rOutVarTor.rData().array()*rOutVarTor.rData().conjugate().array();
+         rOutVar.rData() = rOutVar.rData().array()*rOutVar.rData().conjugate().array();
 
          // Compute integration transform for first dimension 
-         coord.transform1D().integrate_full(rInVarTor.rData(), rOutVarTor.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
+         coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
+         MHDFloat *pEnergy;
          if(*cIt == FieldComponents::Spectral::X)
          {
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mXEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
-            // Normalize by box volume
-            this->mXEnergy /= this->mVolume;
-
-         } else if(*cIt == FieldComponents::Spectral::X)
+            pEnergy = &this->mXEnergy;
+         } else if(*cIt == FieldComponents::Spectral::Y)
          {
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mYEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
-            // Normalize by box volume
-            this->mYEnergy /= this->mVolume;
-
+            pEnergy = &this->mYEnergy;
          } else
          {
-            // Compute integral over Chebyshev expansion and sum Fourier coefficients
-            this->mZEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
-            // Normalize by box volume
-            this->mZEnergy /= this->mVolume;
+            pEnergy = &this->mZEnergy;
+         }
+
+         // Compute integral over Chebyshev expansion and sum Fourier coefficients
+         for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            int start = 0;
+            if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
+            {
+               *pEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+               start = 1;
+            }
+            *pEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
          }
 
          // Free BWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVarTor);
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
 
          // Free FWD storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVarTor);
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
+
+         // Normalize by the Cartesian volume
+         *pEnergy /= this->mVolume;
       }
    }
 

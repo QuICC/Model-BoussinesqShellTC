@@ -145,7 +145,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                         bc = {0:-20, 'rt':0}
 
                 else:
-                    if bcs["bcType"] == 0:
+                    if bcs["bcType"] == self.SOLVER_HAS_BC:
                         if field_row == ("velocityz","") and field_col == ("velocityz",""):
                             bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
@@ -282,7 +282,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                 # Force temperature boundary condition
                 if self.force_temperature_bc and not self.use_galerkin:
                     mat = mat.tolil()
-                    if bcs['bcType'] == 0:
+                    if bcs['bcType'] == self.SOLVER_HAS_BC:
                         tmp = c1d.qid(res[0],2,{0:20})
                     else:
                         tmp = c1d.qid(res[0],2, no_bc())

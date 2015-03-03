@@ -91,7 +91,7 @@ def apply_tau(mat, bc, location = 't'):
     elif bc[0] == 21:
         cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
-        cond = tau_diff2(mat.shape[1], 0, bc.get('c',None))
+        cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
         cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
@@ -238,6 +238,17 @@ def tau_integral(nx, pos, coeffs = None):
         tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
         tmp[0,0] = tmp[0,0]/2.0
         cond.append(tmp[0,:])
+
+    return np.array(cond)
+
+def tau_valuediff(nx, pos, coeffs = None):
+    """Create the tau lines for a zero boundary value at top and a zero 1st derivative at bottom"""
+
+    assert(pos == 0)
+
+    cond = []
+    cond.append(list(tau_value(nx,1,coeffs)[0]))
+    cond.append(list(tau_diff(nx,-1,coeffs)[0]))
 
     return np.array(cond)
 

@@ -134,7 +134,7 @@ class TestTFFScheme(base_model.BaseModel):
                         bc = {0:-20, 'rt':0}
 
                 else:
-                    if bcs["bcType"] == 0:
+                    if bcs["bcType"] == self.SOLVER_HAS_BC:
                         if field_row == ("velocityx","") and field_col == ("velocityx",""):
                             bc = {0:20}
                         elif field_row == ("velocityy","") and field_col == ("velocityy",""):

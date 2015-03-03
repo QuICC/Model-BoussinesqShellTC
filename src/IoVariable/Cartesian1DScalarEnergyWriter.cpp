@@ -43,8 +43,8 @@ namespace IoVariable {
 
    void Cartesian1DScalarEnergyWriter::init()
    {
-      // Normalize by Cartesian volume: (2*pi)*(2*pi)*(2*
-      this->mVolume = std::pow(2.0*Math::PI,2)*2;
+      // Normalize by Cartesian volume V = (2*pi)*(2*pi)*2 but FFT already includes 1/(2*pi)
+      this->mVolume = 2.0;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -101,7 +101,16 @@ namespace IoVariable {
       coord.transform1D().integrate_full(rInVar.rData(), rOutVar.data(), Transform::TransformCoordinatorType::Transform1DType::IntegratorType::INTG, Arithmetics::SET);
 
       // Compute integral over Chebyshev expansion and sum Fourier coefficients
-      this->mEnergy += (this->mIntgOp*rInVar.data().rightCols(rInVar.data().cols()).real()).sum();
+      for(int k = 0; k < this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+      {
+         int start = 0;
+         if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,k) == 0)
+         {
+            this->mEnergy += (this->mIntgOp*rInVar.slice(k).col(0).real())(0);
+            start = 1;
+         }
+         this->mEnergy += 2.0*(this->mIntgOp*rInVar.slice(k).rightCols(rInVar.slice(k).cols()-start).real()).sum();
+      }
 
       // Free BWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
@@ -109,7 +118,7 @@ namespace IoVariable {
       // Free FWD storage
       coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rOutVar);
 
-      // Normalize by the spherical volume
+      // Normalize by the Cartesian volume
       this->mEnergy /= this->mVolume;
    }
 

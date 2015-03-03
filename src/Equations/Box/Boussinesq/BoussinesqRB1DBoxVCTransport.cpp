@@ -22,7 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "Base/MathConstants.hpp"
 #include "Enums/NonDimensional.hpp"
-#include "PhysicalOperators/VelocityHeatAdvection.hpp"
+#include "PhysicalOperators/VelocityAdvection.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -42,6 +42,7 @@ namespace Equations {
    void BoussinesqRB1DBoxVCTransport::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
+      this->setExplicitTiming(FieldComponents::Spectral::SCALAR, ExplicitTiming::LINEAR);
    }
 
    void BoussinesqRB1DBoxVCTransport::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
@@ -53,7 +54,7 @@ namespace Equations {
       /// Computation of the advection:
       ///   \f$ \left(\vec u\cdot\nabla\right)\theta\f$
       ///
-      Physical::VelocityHeatAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
+      Physical::VelocityAdvection<FieldComponents::Physical::X,FieldComponents::Physical::Y,FieldComponents::Physical::Z>::set(rNLComp, this->vector(PhysicalNames::VELOCITY).dom(0).phys(), this->unknown().dom(0).grad(), 1.0);
    }
 
    void BoussinesqRB1DBoxVCTransport::setRequirements()

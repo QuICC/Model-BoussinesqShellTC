@@ -194,6 +194,23 @@ def i2(nx, xg):
     ssol = sy.integrate(sphys,x,x)
     test_forward(A, sphys, ssol, xg, 2)
 
+def i2x1(nx, xg):
+    """Accuracy test for i2x1 operator"""
+
+    print("i2x1:")
+    print("\t Forward: (polynomial):")
+    x = sy.Symbol('x')
+    A = c1d.i2x1(nx, c1d.c1dbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**i for i in np.arange(0,nx-2,1)])
+    ssol = sy.integrate(sy.expand(x*sphys),x,x)
+    test_forward(A, sphys, ssol, xg, 2)
+
+    print("\t Forward: (full Chebyshev):")
+    A = c1d.i2x1(nx, c1d.c1dbc.no_bc())
+    sphys = np.sum([sy.chebyshevt(int(i),x) for i in np.arange(0,nx,1)])
+    ssol = sy.integrate(x*sphys,x,x)
+    test_forward(A, sphys, ssol, xg, 2)
+
 def i2d2(nx, xg):
     """Accuracy test for i2d2 operator"""
 
@@ -641,6 +658,7 @@ if __name__ == "__main__":
 #    lapl2h(nx, xg)
     i1(nx, xg)
     i2(nx, xg)
+    i2x1(nx, xg)
     i2d1(nx, xg)
     i2d2(nx, xg)
     i2lapl(nx, xg)

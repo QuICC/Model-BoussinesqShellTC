@@ -18,7 +18,7 @@ bc_vel = 1
 bc_temp = 0
 kx = 0
 ky = 3.710
-eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1d':2.0}
 
 eigs = [kx, ky]
 

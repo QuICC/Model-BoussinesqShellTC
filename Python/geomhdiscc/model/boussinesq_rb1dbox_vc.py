@@ -18,7 +18,7 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d"]
+        return ["prandtl", "rayleigh", "heating", "scale1d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -47,7 +47,10 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        if field_row == ("temperature",""):
+            fields = [("velocity","z")]
+        else:
+            fields = []
 
         return fields
 
@@ -154,6 +157,16 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                         bc = {0:20}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {0:21}
+
+            # Fixed temperature at top/Fixed flux at bottom
+            elif bcId == 2:
+                if self.use_galerkin:
+                    if field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {0:-22, 'rt':0}
+
+                else:
+                    if field_row == ("temperature","") and field_col == ("temperature",""):
+                        bc = {0:22}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -189,6 +202,10 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                         bc = {0:-20, 'x':0}
                     elif field_col == ("temperature",""):
                         bc = {0:-21, 'x':0}
+
+                elif bcId == 2:
+                    if field_col == ("temperature",""):
+                        bc = {0:-22, 'x':0}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -318,9 +335,14 @@ class BoussinesqRB1DBoxVC(base_model.BaseModel):
                 mat = c1d.zblk(res[0], bc)
 
             elif field_col == ("velocity","z"):
-                if self.linearize:
-                    mat = c1d.i2(res[0], bc)
-                    mat = mat*utils.qid_from_idx(idx_w, res[0])
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                    if eq_params['heating'] == 0:
+                        mat = c1d.i2(res[0], bc)
+                        mat = mat*utils.qid_from_idx(idx_w, res[0])
+
+                    elif eq_params['heating'] == 1:
+                        mat = c1d.i2x1(res[0], bc)
+                        mat = mat*utils.qid_from_idx(idx_w, res[0])
                 else:
                     mat = c1d.zblk(res[0], bc)
 

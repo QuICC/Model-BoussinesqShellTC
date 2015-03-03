@@ -1,10 +1,5 @@
 # Create list of sources
 set(MHDSources
-   ContinuityTags.cpp
-   ContinuityWriter.cpp
-   NusseltTags.cpp
-   NusseltWriter.cpp
-   KineticEnergyTags.cpp
    StateFileTags.cpp
    StateFileWriter.cpp
    StateFileReader.cpp

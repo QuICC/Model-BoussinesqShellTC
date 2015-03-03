@@ -19,7 +19,7 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale1d", "scale3d"]
+        return ["prandtl", "rayleigh", "heating", "scale1d", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -48,7 +48,10 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
     def explicit_fields(self, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        if field_row == ("temperature",""):
+            fields = [("velocity","z")]
+        else:
+            fields = []
 
         return fields
 
@@ -357,9 +360,10 @@ class BoussinesqRB2DBoxVC(base_model.BaseModel):
                 mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                if self.linearize:
-                    mat = c2d.i2j2(res[0], res[2], bc)
-                    mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
+                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                    if eq_params['heating'] == 0:
+                        mat = c2d.i2j2(res[0], res[2], bc)
+                        mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 else:
                     mat = c2d.zblk(res[0], res[2], 2, 2, bc)
 

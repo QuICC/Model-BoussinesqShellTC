@@ -64,6 +64,11 @@ namespace Equations {
           */
          virtual void setCoupling();
 
+         /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents();
+
       private:
    };
 

@@ -58,9 +58,42 @@ bc_temp = 0
 # Minimum n = 2: k_ = 4.442882938
 phi = 35
 kp = np.sqrt(2)*np.pi
+eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'heating':0, 'scale1d':2.0}
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
-eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'scale1d':2.0}
+
+#kp = 3
+#eq_params = {'prandtl':1, 'rayleigh':2.19e4, 'heating':1, 'scale1d':2.0}
+#kp = 4
+#eq_params = {'prandtl':1, 'rayleigh':1.9137e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.05
+#eq_params = {'prandtl':1, 'rayleigh':1.9119e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.09
+#eq_params = {'prandtl':1, 'rayleigh':1.9111e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.1
+#eq_params = {'prandtl':1, 'rayleigh':1.91099e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.11
+#eq_params = {'prandtl':1, 'rayleigh':1.91091e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.12
+#eq_params = {'prandtl':1, 'rayleigh':1.91086e4, 'heating':1, 'scale1d':2.0}
+kp = 4.1296
+eq_params = {'prandtl':1, 'rayleigh':1.910844559e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.13
+#eq_params = {'prandtl':1, 'rayleigh':1.910844591e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.14
+#eq_params = {'prandtl':1, 'rayleigh':1.910863e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.15
+#eq_params = {'prandtl':1, 'rayleigh':1.91092e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.25
+#eq_params = {'prandtl':1, 'rayleigh':1.9132e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.5
+#eq_params = {'prandtl':1, 'rayleigh':1.932e4, 'heating':1, 'scale1d':2.0}
+#kp = 5
+#eq_params = {'prandtl':1, 'rayleigh':2.018e4, 'heating':1, 'scale1d':2.0}
+phi = 0
+kx = kp*np.cos(phi*np.pi/180.0);
+ky = (kp**2-kx**2)**0.5;
+
 
 eigs = [kx, ky]
 
