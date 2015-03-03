@@ -48,7 +48,7 @@ namespace Schemes {
       spRes->setIndexCounter(spCounter);
    }
 
-   void IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   void IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -70,8 +70,8 @@ namespace Schemes {
       std::set<int>::iterator setIt;
 
       // Initialise useful variables
-      int i0 = -1;
-      int iN = -1;
+      int k0 = -1;
+      int kN = -1;
       ArrayI j0, jN;
       int c0 = -1;
       int cN = -1;
@@ -92,12 +92,10 @@ namespace Schemes {
             isRegular = false;
          } else
          {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
+            k0 = 0;
+            kN = this->dim(transId, Dimensions::Data::DAT3D);
+            j0 = ArrayI::Zero(kN);
+            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -184,12 +182,10 @@ namespace Schemes {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
          {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(n0(0));
-            jN.setConstant(nN(0));
+            k0 = 0;
+            kN = this->dim(transId, Dimensions::Data::DAT3D);
+            j0 = ArrayI::Constant(kN, n0(0));
+            jN = ArrayI::Constant(kN, nN(0));
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -265,12 +261,10 @@ namespace Schemes {
          // Splitting is on first transform
          if(flag == Splitting::Locations::FIRST)
          {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
+            k0 = n0(0);
+            kN = nN(0);
+            j0 = ArrayI::Zero(kN);
+            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -280,12 +274,10 @@ namespace Schemes {
          // Splitting is on second transform
          } else if(flag == Splitting::Locations::SECOND)
          {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
+            k0 = 0;
+            kN = this->dim(transId, Dimensions::Data::DAT3D);
+            j0 = ArrayI::Zero(kN);
+            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
             c0 = n0(0);
             cN = n0(0) + nN(0);
 
@@ -295,12 +287,10 @@ namespace Schemes {
          // Splitting is on both transforms
          } else if(flag == Splitting::Locations::BOTH)
          {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0 = n0.tail(iN);
-            jN = nN.tail(iN);
+            k0 = n0(0);
+            kN = nN(0);
+            j0 = n0.tail(kN);
+            jN = nN.tail(kN);
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -312,7 +302,7 @@ namespace Schemes {
       // Create modes list for dimensions second and third transform
       if(isRegular)
       {
-         RegularTools::buildMap(modes, i0, iN, j0, jN, c0, cN);
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
       }
 
       // Fill indexes for 2D and 3D
