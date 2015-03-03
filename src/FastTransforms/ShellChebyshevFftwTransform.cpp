@@ -56,6 +56,8 @@ namespace Transform {
    ShellChebyshevFftwTransform::ShellChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL), mRo(-1), mRRatio(-1), mCnstA(0.0), mCnstB(0.0)
    {
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
    }
 
    ShellChebyshevFftwTransform::~ShellChebyshevFftwTransform()
@@ -158,6 +160,9 @@ namespace Transform {
       // QST S operator (2th order)
       this->mIntgOp.insert(std::make_pair(IntegratorType::INTGS2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
+      //
+      // Initialise solver operators
+      //
       // Multiplication by R
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIVR, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
       // Multiplication by R^2
@@ -168,7 +173,6 @@ namespace Transform {
       this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF2, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
-      PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.shell_radius");
 
       // Prepare arguments to Chebyshev matrices call
@@ -490,6 +494,9 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
+      // 
+      // Transform real part
+      //
       this->mTmpIn = physVal.real();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -503,6 +510,9 @@ namespace Transform {
          rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
       }
 
+      // 
+      // Transform imaginary part
+      //
       this->mTmpIn = physVal.imag();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -744,7 +754,9 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform of real part
+      //
+      // Transform real part
+      //
       this->mTmpIn = physVal.real();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -758,7 +770,9 @@ namespace Transform {
          rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
       }
 
-      // Do transform of imaginary part
+      //
+      // Transform imaginary part
+      //
       this->mTmpIn = physVal.imag();
 
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());

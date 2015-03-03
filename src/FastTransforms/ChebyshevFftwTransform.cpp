@@ -42,9 +42,8 @@ namespace Transform {
    ChebyshevFftwTransform::ChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL), mCScale(0.0)
    {
-      #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
-         PythonWrapper::init();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
    }
 
    ChebyshevFftwTransform::~ChebyshevFftwTransform()
@@ -64,10 +63,8 @@ namespace Transform {
       // Initialise FFTW interface
       this->initFft();
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Initialise Chebyshev operator(s)
-         this->initOperators();
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+      // Initialise Chebyshev operator(s)
+      this->initOperators();
 
       // Register the FFTW object
       FftwLibrary::registerFft();
@@ -140,123 +137,64 @@ namespace Transform {
       this->mBPlan = fftw_plan_many_r2r(1, fftSize, howmany, this->mTmpOut.data(), NULL, 1, bwdSize, this->mTmpIn.data(), NULL, 1, fwdSize, bwdKind, FftwLibrary::planFlag());
    }
 
-   #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
    void ChebyshevFftwTransform::initOperators()
    {
-      // Storage for the differentiation operator
-      this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      //
+      // Initialise projector operators
+      //
+
+      //
+      // Initialise integrator operators
+      //
+
+      //
+      // Initialise solver operators
+      //
+      // First derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
 
-      #if defined GEOMHDISCC_TRANSOP_FORWARD
-         // Prepare arguments to d1(...) call
-         PyObject *pArgs, *pValue;
-         pArgs = PyTuple_New(3);
-         // ... get operator size
-         pValue = PyLong_FromLong(this->mspSetup->specSize());
-         PyTuple_SetItem(pArgs, 0, pValue);
-         // ... create boundray condition (none)
-         pValue = PyDict_New();
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
-         PyTuple_SetItem(pArgs, 1, pValue);
-         // ... set coefficient to scale factor
-         pValue = PyFloat_FromDouble(this->mCScale);
-         PyTuple_SetItem(pArgs, 2, pValue);
+      // Prepare arguments to Chebyshev matrices call
+      PyObject *pArgs, *pValue;
+      pArgs = PyTuple_New(3);
+      // ... create boundray condition (last mode is zero)
+      pValue = PyDict_New();
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
+      PyTuple_SetItem(pArgs, 1, pValue);
+      // ... set coefficient to 1.0
+      pValue = PyFloat_FromDouble(1.0);
+      PyTuple_SetItem(pArgs, 2, pValue);
 
-         // Call d1
-         PythonWrapper::setFunction("d1");
-         pValue = PythonWrapper::callFunction(pArgs);
-      #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Prepare arguments to i1(...) call
-         PyObject *pArgs, *pValue;
-         pArgs = PyTuple_New(3);
-         // ... get operator size
-         pValue = PyLong_FromLong(this->mspSetup->specSize());
-         PyTuple_SetItem(pArgs, 0, pValue);
-         // ... create boundray condition (last mode is zero)
-         pValue = PyDict_New();
-         PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
-         PyTuple_SetItem(pArgs, 1, pValue);
-         // ... set coefficient to 1.0
-         pValue = PyFloat_FromDouble(1.0);
-         PyTuple_SetItem(pArgs, 2, pValue);
+      // ... set resoluton for solver matrices
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
 
-         // Call i1
-         PythonWrapper::setFunction("i1");
-         pValue = PythonWrapper::callFunction(pArgs);
-      #endif //defined GEOMHDISCC_TRANSOP_FORWARD
-
-      // Fill matrix and cleanup
-      PythonWrapper::fillMatrix(this->mDiff, pValue);
+      // Call i1 for solver
+      PythonWrapper::setFunction("i1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
       Py_DECREF(pValue);
+
+      // Initialize solver storage
+      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
+      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
+
+      // Initialize solver and factorize division by d1 operator
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 1st derivative failed!");
+      }
+
+      // Cleanup
       PythonWrapper::finalize();
-
-      #if defined GEOMHDISCC_TRANSOP_BACKWARD
-         // Factorize matrix and free memory
-         this->mSDiff.compute(this->mDiff);
-         // Check for successful factorisation
-         if(this->mSDiff.info() != Eigen::Success)
-         {
-            throw Exception("Factorization of backward differentiation failed!");
-         }
-      #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
    }
-   #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
-
-   #if defined GEOMHDISCC_TRANSOP_RECURRENCE
-   void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Matrix& chebVal) const
-   {
-      int i = chebVal.rows()-1;
-
-      // Set T_N to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      // Compute T_N-1
-      rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      --i;
-
-      // Compute remaining modes
-      for(; i >= 0; --i)
-      {
-         rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
-      }
-   }
-
-   void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const MatrixZ& chebVal, const bool useImag) const
-   {
-      int i = chebVal.rows()-1;
-
-      // Set T_N to zero
-      rDealiased.row(i).setConstant(0.0);
-      --i;
-
-      if(useImag)
-      {
-         // Compute T_N-1
-         rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).imag();
-          --i;
-
-         // Compute remaining modes
-         for(; i >= 0; --i)
-         {
-            rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).imag();
-         }
-      } else
-      {
-         // Compute T_N-1
-         rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).real();
-         --i;
-
-         // Compute remaining modes
-         for(; i >= 0; --i)
-         {
-            rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1).real();
-         }
-      }
-   }
-   #endif //defined GEOMHDISCC_TRANSOP_RECURRENCE
 
    void ChebyshevFftwTransform::cleanupFft()
    {
@@ -297,8 +235,15 @@ namespace Transform {
       // Do transform
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
-      // Rescale to remove FFT scaling
-      rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
+      }
 
       #ifdef GEOMHDISCC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
@@ -327,26 +272,23 @@ namespace Transform {
       // Compute first derivative
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
-         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
-            this->recurrenceDiff(this->mTmpIn, chebVal);
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute simple projection
       } else
       {
          // Copy into other array
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
@@ -367,19 +309,37 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform of real part
+      // 
+      // Transform real part
+      //
       this->mTmpIn = physVal.real();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
-      // Do transform of imaginary part
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
+
+      // 
+      // Transform imaginary part
+      //
       this->mTmpIn = physVal.imag();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
 
       #ifdef GEOMHDISCC_DEBUG
          rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
@@ -408,26 +368,23 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
-         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
-            this->recurrenceDiff(this->mTmpIn, chebVal, false);
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).real(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute simple projection of real part
       } else
       {
          // Copy values into simple matrix
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of real part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -436,25 +393,23 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
-         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
-            this->recurrenceDiff(this->mTmpIn, chebVal, true);
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-            this->mTmpInS = chebVal.topRows(this->mspSetup->specSize()).imag(); 
-            this->mTmpInS.topRows(1).setZero();
-            Solver::internal::solveWrapper(this->mTmpOutS, this->mSDiff, this->mTmpInS);
-            this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Compute simple projection of imaginary part
       } else
       {
+         // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of imaginary part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -479,8 +434,15 @@ namespace Transform {
       // Do transform
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*rChebVal;
+      }
    }
 
    void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
@@ -498,19 +460,38 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform of real part
+      //
+      // Transform real part
+      //
       this->mTmpIn = physVal.real();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
 
-      // Do transform of imaginary part
+      } else
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
+
+      //
+      // Transform imaginary part
+      //
       this->mTmpIn = physVal.imag();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+
+      } else
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
+
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

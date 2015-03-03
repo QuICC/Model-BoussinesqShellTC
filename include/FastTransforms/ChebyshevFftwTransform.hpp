@@ -236,18 +236,25 @@ namespace Transform {
           */
          Matrix   mTmpOut;
 
-         #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mDiff;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
 
-         #if defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
-          * @brief Storage for the sparse solver for differentiation
+          * @brief Storage for the integrator operators
           */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiff;
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices
+          */
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
 
          /**
           * @brief Storage for the backward operators input data
@@ -258,38 +265,46 @@ namespace Transform {
           * @brief Storage for the backward operators output data
           */
          Matrix mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_BACKWARD
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
           */
          void initFft();
 
-         #if defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
          /**
           * @brief Initialise the spectral operators
           */
          void initOperators();
 
-         #elif defined GEOMHDISCC_TRANSOP_RECURRENCE
-
          /**
           * @brief Compute derivative by recurrence relation
           */
-         void recurrenceDiff(Matrix& rDealiased, const Matrix& rChebVal) const;
-
-         /**
-          * @brief Compute derivative by recurrence relation
-          */
-         void recurrenceDiff(Matrix& rDealiased, const MatrixZ& rChebVal, const bool useImag) const;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD || defined GEOMHDISCC_TRANSOP_BACKWARD
-
+         template <typename TDerived> void recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
 
          /**
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
    };
+
+   template <typename TDerived> void ChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
+   {
+      int i = chebVal.rows()-1;
+
+      // Set T_N to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
+
+      // Compute T_N-1
+      rDealiased.row(i) = static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      --i;
+
+      // Compute remaining modes
+      for(; i >= 0; --i)
+      {
+         rDealiased.row(i) = rDealiased.row(i+2) + static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      }
+   }
 
 }
 }
