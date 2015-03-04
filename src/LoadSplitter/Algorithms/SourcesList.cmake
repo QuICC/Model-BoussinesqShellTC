@@ -5,5 +5,5 @@ set(MHDSources
    SerialSplitting.cpp
    SingleSplitting.cpp
    TubularSplitting.cpp
-   FixedSplitting.cpp
+   Coupled2DSplitting.cpp
 )

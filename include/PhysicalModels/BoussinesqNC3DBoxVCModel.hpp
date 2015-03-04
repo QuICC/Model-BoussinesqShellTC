@@ -112,9 +112,9 @@ namespace GeoMHDiSCC {
 // 
 // Block compilation of unusable parallelisation algorithms
 //
-#ifdef GEOMHDISCC_MPIALGO_FIXED
-#error "The FIXED parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_FIXED
+#ifdef GEOMHDISCC_MPIALGO_COUPLED2D
+#error "The COUPLED2D parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_COUPLED2D
 #ifdef GEOMHDISCC_MPIALGO_SINGLE1D
 #error "The SINGLE1D parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_SINGLE1D

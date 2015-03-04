@@ -1,6 +1,6 @@
 /** 
- * @file FixedSplitting.cpp
- * @brief Source of the implementation of a fixed load splitting algorithm
+ * @file Coupled2DSplitting.cpp
+ * @brief Source of the implementation of a load splitting algorithm for coupled 2D matrices
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -16,7 +16,7 @@
 
 // Class include
 //
-#include "LoadSplitter/Algorithms/FixedSplitting.hpp"
+#include "LoadSplitter/Algorithms/Coupled2DSplitting.hpp"
 
 // Project includes
 //
@@ -26,18 +26,18 @@ namespace GeoMHDiSCC {
 
 namespace Parallel {
 
-   FixedSplitting::FixedSplitting(const int id, const int nCpu, const ArrayI& dim)
-      : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::FIXED)
+   Coupled2DSplitting::Coupled2DSplitting(const int id, const int nCpu, const ArrayI& dim)
+      : SplittingAlgorithm(id, nCpu, dim, Splitting::Algorithms::COUPLED2D)
    {
       // Initialise the NCpu factors
       this->initFactors(1);
    }
 
-   FixedSplitting::~FixedSplitting()
+   Coupled2DSplitting::~Coupled2DSplitting()
    {
    }
 
-   bool FixedSplitting::applicable() const
+   bool Coupled2DSplitting::applicable() const
    {
       bool status = true;
 
@@ -50,10 +50,10 @@ namespace Parallel {
       return status;
    }
 
-   SharedTransformResolution  FixedSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
+   SharedTransformResolution  Coupled2DSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
    {
       // Get size of the splittable dimension(s)
-      int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::FIXED);
+      int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::COUPLED2D);
 
       // Build a simple balanced split
       ArrayI ids(1);
@@ -72,13 +72,13 @@ namespace Parallel {
 
       // Compute the indexes
       ids(0) = cpuId;
-      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::FIXED);
+      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::COUPLED2D);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
    }
 
-   void FixedSplitting::selectGrouper()
+   void Coupled2DSplitting::selectGrouper()
    {
       // SINGLE1D or TRANSFORM grouper setup
       #if defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
@@ -88,7 +88,7 @@ namespace Parallel {
       #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
    }
 
-   int FixedSplitting::computeScore(SharedResolution spResolution)
+   int Coupled2DSplitting::computeScore(SharedResolution spResolution)
    {
       // Initialise the score
       double score = 100;

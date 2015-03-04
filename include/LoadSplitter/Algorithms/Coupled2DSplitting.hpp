@@ -1,11 +1,11 @@
 /** 
- * @file FixedSplitting.hpp
- * @brief Implementation of a fixed load splitting algorithm (only splits the slowest dimension)
+ * @file Coupled2DSplitting.hpp
+ * @brief Implementation of a load splitting algorithm for coupled 2D matrices (only slowest dimension can be split for serial solver)
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
-#ifndef FIXEDSPLITTING_HPP
-#define FIXEDSPLITTING_HPP
+#ifndef COUPLED2DSPLITTING_HPP
+#define COUPLED2DSPLITTING_HPP
 
 // System includes
 //
@@ -27,9 +27,9 @@ namespace GeoMHDiSCC {
 namespace Parallel {
 
    /**
-    * @brief Implementation of a single fixed splitting algorithm (only splits the slowest dimension)
+    * @brief Implementation of a load splitting algorithm for coupled 2D matrices (only slowest dimension can be split for serial solver)
     */
-   class FixedSplitting: public SplittingAlgorithm
+   class Coupled2DSplitting: public SplittingAlgorithm
    {
       public:
          /**
@@ -39,12 +39,12 @@ namespace Parallel {
           * @param nCpu    Number of cores used
           * @param dim     Dimensions
           */
-         FixedSplitting(const int id, const int nCpu, const ArrayI& dim);
+         Coupled2DSplitting(const int id, const int nCpu, const ArrayI& dim);
 
          /**
           * @brief Destructor
           */
-         virtual ~FixedSplitting();
+         virtual ~Coupled2DSplitting();
 
          /**
           * @brief Check if factorisation is applicable to scheme
@@ -80,4 +80,4 @@ namespace Parallel {
 }
 }
 
-#endif // FIXEDSPLITTING_HPP
+#endif // COUPLED2DSPLITTING_HPP

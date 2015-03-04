@@ -33,7 +33,7 @@
 #include "LoadSplitter/Algorithms/SerialSplitting.hpp"
 #include "LoadSplitter/Algorithms/SingleSplitting.hpp"
 #include "LoadSplitter/Algorithms/TubularSplitting.hpp"
-#include "LoadSplitter/Algorithms/FixedSplitting.hpp"
+#include "LoadSplitter/Algorithms/Coupled2DSplitting.hpp"
 #include "IoXml/GxlWriter.hpp"
 #include "IoXml/VtpWriter.hpp"
 
@@ -74,10 +74,10 @@ namespace Parallel {
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST)));
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
-               #ifdef GEOMHDISCC_MPIALGO_FIXED
+               #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
                   // Add the single splitting algorithm for first data exchange
-                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new FixedSplitting(this->mId, this->mNCpu, dim)));
-               #endif //GEOMHDISCC_MPIALGO_FIXED
+                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new Coupled2DSplitting(this->mId, this->mNCpu, dim)));
+               #endif //GEOMHDISCC_MPIALGO_COUPLED2D
 
 
                // Check if problem is 3D
@@ -235,8 +235,8 @@ namespace Parallel {
             case(Splitting::Algorithms::TUBULAR):
                tmpStr = "Tubular";
                break;
-            case(Splitting::Algorithms::FIXED):
-               tmpStr = "Fixed";
+            case(Splitting::Algorithms::COUPLED2D):
+               tmpStr = "Coupled 2D";
                break;
          }
          IoTools::Formatter::printCentered(std::cout, "Algorithm: " + tmpStr);
@@ -254,7 +254,7 @@ namespace Parallel {
                tmpStr += " x ";
             }
          }
-         if(descr.algorithm == Splitting::Algorithms::SINGLE1D || descr.algorithm == Splitting::Algorithms::FIXED)
+         if(descr.algorithm == Splitting::Algorithms::SINGLE1D || descr.algorithm == Splitting::Algorithms::COUPLED2D)
          {
             tmpStr += " x 1";
          } else if(descr.algorithm == Splitting::Algorithms::SINGLE2D)

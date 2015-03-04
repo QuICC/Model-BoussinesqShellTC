@@ -44,7 +44,7 @@ namespace GeoMHDiSCC {
             /// Splitting is done between first/second and second/third transform
             BOTH,
             /// Splitting is ONLY on slowest dimension for the first transform,
-            FIXED
+            COUPLED2D,
          };
       };
 
@@ -66,7 +66,7 @@ namespace GeoMHDiSCC {
             /// Load splitting on first and second transform (tubular, pencils)
             TUBULAR,
             /// Single load splitting on slowest direction on first transform
-            FIXED
+            COUPLED2D,
          };
       };
 

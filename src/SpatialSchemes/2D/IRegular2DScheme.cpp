@@ -106,7 +106,7 @@ namespace Schemes {
 
    int IRegular2DScheme::splittableTotal(const  Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
-      if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::FIXED)
+      if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::COUPLED2D)
       {
          return this->dim(transId, Dimensions::Data::DAT2D);
       }

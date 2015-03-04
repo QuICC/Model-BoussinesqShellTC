@@ -3,7 +3,7 @@
  * @brief This class defines the forward transform single first exchange splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
+#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
 
 #ifndef FORWARDSINGLE1DCONFIGURATOR_HPP
 #define FORWARDSINGLE1DCONFIGURATOR_HPP
@@ -213,4 +213,4 @@ namespace Transform {
 
 #endif // FORWARDSINGLE1DCONFIGURATOR_HPP
 
-#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
+#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D

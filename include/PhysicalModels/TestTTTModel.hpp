@@ -121,8 +121,8 @@ namespace GeoMHDiSCC {
 #ifdef GEOMHDISCC_MPIALGO_TUBULAR
 #error "The TUBULAR parallelisation is not supported!" 
 #endif //GEOMHDISCC_MPIALGO_TUBULAR
-#ifdef GEOMHDISCC_MPIALGO_FIXED
-#error "The FIXED parallelisation is not supported!" 
-#endif //GEOMHDISCC_MPIALGO_FIXED
+#ifdef GEOMHDISCC_MPIALGO_COUPLED2D
+#error "The COUPLED2D parallelisation is not supported!" 
+#endif //GEOMHDISCC_MPIALGO_COUPLED2D
 
 #endif // TESTTTTMODEL_HPP

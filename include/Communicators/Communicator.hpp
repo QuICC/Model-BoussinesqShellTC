@@ -269,7 +269,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
             // Create shared MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
@@ -371,7 +371,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
             // Create shared serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
