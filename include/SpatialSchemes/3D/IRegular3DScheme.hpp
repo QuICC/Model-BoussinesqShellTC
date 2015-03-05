@@ -83,62 +83,45 @@ namespace Schemes {
          /**
           * @brief Compute mode distribution for serial algorithm
           *
-          * @param j0   Starting 2D mode (for each 3D mode)
-          * @param jN   Number of 2D modes (for each 3D mode)
-          * @param k0   Starting 3D mode
-          * @param kN   Number of 3D modes
-          * @param c0   Global counter starting mode
-          * @param cN   Global counter last mode
+          * @param modes   Map of all modes
           */
-         void splitSerial(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+         void splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId);
 
          /**
           * @brief Compute mode distribution for single splitting on 1D algorithm
           *
-          * @param j0   Starting 2D mode (for each 3D mode)
-          * @param jN   Number of 2D modes (for each 3D mode)
-          * @param k0   Starting 3D mode
-          * @param kN   Number of 3D modes
-          * @param c0   Global counter starting mode
-          * @param cN   Global counter last mode
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
           */
-         void splitSingle1D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+         void splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
 
          /**
           * @brief Compute mode distribution for single splitting on 2D algorithm
           *
-          * @param j0   Starting 2D mode (for each 3D mode)
-          * @param jN   Number of 2D modes (for each 3D mode)
-          * @param k0   Starting 3D mode
-          * @param kN   Number of 3D modes
-          * @param c0   Global counter starting mode
-          * @param cN   Global counter last mode
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
           */
-         void splitSingle2D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+         void splitSingle2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
 
          /**
           * @brief Compute mode distribution for coupled 2D algorithm
           *
-          * @param j0   Starting 2D mode (for each 3D mode)
-          * @param jN   Number of 2D modes (for each 3D mode)
-          * @param k0   Starting 3D mode
-          * @param kN   Number of 3D modes
-          * @param c0   Global counter starting mode
-          * @param cN   Global counter last mode
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
           */
-         void splitCoupled2D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+         void splitCoupled2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
 
          /**
           * @brief Compute mode distribution for tubular 2D decomposition algorithm
           *
-          * @param j0   Starting 2D mode (for each 3D mode)
-          * @param jN   Number of 2D modes (for each 3D mode)
-          * @param k0   Starting 3D mode
-          * @param kN   Number of 3D modes
-          * @param c0   Global counter starting mode
-          * @param cN   Global counter last mode
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
           */
-         void splitTubular(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+         void splitTubular(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
 
          /**
           * @brief First regular truncation

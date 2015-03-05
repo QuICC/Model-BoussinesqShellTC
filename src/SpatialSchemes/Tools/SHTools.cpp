@@ -98,30 +98,30 @@ namespace Schemes {
 
       // Create first part of list as pairs
       std::queue<std::pair<int,int> >  modeQueue;
-      for(int l=0; l < maxL/2; ++l)
+      for(int l = 0; l < maxL/2; ++l)
       {
-         for(int m=0; m < SHTools::nM(l,nM); ++m)
+         for(int m = 0; m < SHTools::nM(l,nM); ++m)
          {
             modeQueue.push(std::make_pair(l, m));
          }
 
-         for(int m=0; m < SHTools::nM(maxL-l-1, nM); ++m)
+         for(int m = 0; m < SHTools::nM(maxL-l-1, nM); ++m)
          {
             modeQueue.push(std::make_pair(maxL-l-1, m));
          }
       }
 
       // Add in the missing ones
-      for(int l=maxL; l < nL; ++l)
+      for(int l = maxL; l < nL; ++l)
       {
-         for(int m=0; m < SHTools::nM(l, nM); ++m)
+         for(int m = 0; m < SHTools::nM(l, nM); ++m)
          {
             modeQueue.push(std::make_pair(l, m));
          }
       }
 
       // Remove unused modes from queue
-      for(int h=0; h < h0; ++h)
+      for(int h = 0; h < h0; ++h)
       {
          modeQueue.pop();
       }

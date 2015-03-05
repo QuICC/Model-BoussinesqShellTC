@@ -55,40 +55,31 @@ namespace Schemes {
       // Multimap for the modes
       std::multimap<int,int> modes;
 
-      int k0 = -1;
-      int kN = -1;
-      ArrayI j0, jN;
-      int c0 = -1;
-      int cN = -1;
-
       // No splitting
       if(flag == Splitting::Locations::NONE)
       {
-         this->splitSerial(j0, jN, k0, kN, c0, cN, n0, nN, transId);
+         this->splitSerial(modes, transId);
 
       // Splitting is on first transform
       } else if(flag == Splitting::Locations::FIRST)
       {
-         this->splitSingle1D(j0, jN, k0, kN, c0, cN, n0, nN, transId);
+         this->splitSingle1D(modes, n0, nN, transId);
 
       // Splitting is on second transform
       } else if(flag == Splitting::Locations::SECOND)
       {
-         this->splitSingle2D(j0, jN, k0, kN, c0, cN, n0, nN, transId);
+         this->splitSingle2D(modes, n0, nN, transId);
 
       // Splitting is on both transforms
       } else if(flag == Splitting::Locations::BOTH)
       {
-         this->splitTubular(j0, jN, k0, kN, c0, cN, n0, nN, transId);
+         this->splitTubular(modes, n0, nN, transId);
 
       // Splitting is on slowest index on first transforms
       } else if(flag == Splitting::Locations::COUPLED2D)
       {
-         this->splitCoupled2D(j0, jN, k0, kN, c0, cN, n0, nN, transId);
+         this->splitCoupled2D(modes, n0, nN, transId);
       }
-
-      // Generate map for regular indexes
-      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
 
       // Fill indexes for 2D and 3D
       RegularTools::fillIndexes2D3D(idx2D, idx3D, modes);
@@ -181,18 +172,27 @@ namespace Schemes {
       return -1;
    }
 
-   void IRegular3DScheme::splitSerial(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular3DScheme::splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId)
    {
-      k0 = 0;
-      kN = this->dim(transId, Dimensions::Data::DAT3D);
-      j0 = ArrayI::Zero(kN);
-      jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
-      c0 = 0;
-      cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+      int k0 = 0;
+      int kN = this->dim(transId, Dimensions::Data::DAT3D);
+      ArrayI j0 = ArrayI::Zero(kN);
+      ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+      int c0 = 0;
+      int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 
-   void IRegular3DScheme::splitSingle1D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular3DScheme::splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
@@ -223,10 +223,19 @@ namespace Schemes {
          c0 = 0;
          cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
       }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 
-   void IRegular3DScheme::splitSingle2D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular3DScheme::splitSingle2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
@@ -257,10 +266,19 @@ namespace Schemes {
          c0 = n0(0);
          cN = n0(0) + nN(0);
       }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 
-   void IRegular3DScheme::splitCoupled2D(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular3DScheme::splitCoupled2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
@@ -291,10 +309,19 @@ namespace Schemes {
             c0 = 0;
             cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
       }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 
-   void IRegular3DScheme::splitTubular(ArrayI& j0, ArrayI& jN, int& k0, int& kN, int& c0, int& cN, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular3DScheme::splitTubular(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
@@ -325,6 +352,9 @@ namespace Schemes {
          c0 = 0;
          cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
       }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 }
 }

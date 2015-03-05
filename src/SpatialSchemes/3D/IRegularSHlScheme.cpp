@@ -63,246 +63,26 @@ namespace Schemes {
 
       // Multimap for the modes
       std::multimap<int,int> modes;
-      std::multimap<int,int>::iterator mapIt;
-
-      // Set to extract unique indexes
-      std::set<int>  filter;
-      std::set<int>::iterator setIt;
-
-      // Initialise useful variables
-      int k0 = -1;
-      int kN = -1;
-      ArrayI j0, jN;
-      int c0 = -1;
-      int cN = -1;
-      bool isRegular = true;
-
-      int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-      int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // No splitting
       if(flag == Splitting::Locations::NONE)
       {
-         if(transId == Dimensions::Transform::TRA1D)
-         {
-            // Get full list of harmonics mapped by harmonic degree l
-            SHTools::buildLMap(modes, nL, nM);
+         this->splitSerial(modes, transId);
 
-            // Indexes structure is NOT regular
-            isRegular = false;
-         } else
-         {
-            k0 = 0;
-            kN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0 = ArrayI::Zero(kN);
-            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-            // Indexes structure is regular
-            isRegular = true;
-         }
-
-      // Create index list for first transform
-      } else if(transId == Dimensions::Transform::TRA1D)
+      // Splitting is on first transform
+      } else if(flag == Splitting::Locations::FIRST)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
-         {
-            // Get restricted sorted list of harmonics
-            SHTools::buildLHSortedMap(modes, nL, nM, n0(0), nN(0));
+         this->splitSingle1D(modes, n0, nN, transId);
 
-            // Indexes structure is not regular
-            isRegular = false;
-
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            // Get restricted list of harmonics
-            std::multimap<int,int> tmp;
-            this->buildMLMap(tmp, id(0), bins(0));
-
-            // invert order of the map
-            std::multimap<int,int>::iterator it;
-            for(it = tmp.begin(); it != tmp.end(); it++)
-            {
-               modes.insert(std::make_pair(it->second, it->first));
-            }
-
-            // Indexes structure is not regular
-            isRegular = false;
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            // Get restricted list of harmonics
-            this->buildMLMap(modes, id(1), bins(1));
-
-            std::multimap<int,int> tmp;
-
-            // invert order of the map
-            for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-            {
-               tmp.insert(std::make_pair(mapIt->second, mapIt->first));
-            }
-
-            // Clear modes
-            modes.clear();
-
-            int tN = 0;
-            int t0 = 0;
-            for(int i = 0; i < static_cast<int>(tmp.size()); i++)
-            {
-               if(i % bins(0) == id(0))
-               {
-                  tN++;
-               }
-               else if(i % bins(0) < id(0))
-               {
-                  t0++;
-               }
-            }
-
-            // invert order of the map
-            mapIt = tmp.begin();
-            std::advance(mapIt, t0);
-            for(int i = 0; i < tN; i++)
-            {
-               modes.insert(*mapIt);
-               mapIt++;
-            }
-
-            // Indexes structure is not regular
-            isRegular = false;
-         }
-
-      // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
+      // Splitting is on second transform
+      } else if(flag == Splitting::Locations::SECOND)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
-         {
-            k0 = 0;
-            kN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0 = ArrayI::Constant(kN, n0(0));
-            jN = ArrayI::Constant(kN, nN(0));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+         this->splitSingle2D(modes, id, bins, n0, nN, transId);
 
-            // Indexes structure is regular
-            isRegular = true;
-
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            // Get restricted list of harmonics
-            this->buildMLMap(modes, id(0), bins(0));
-
-            // Loop over all modes
-            for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-            {
-               filter.insert(mapIt->first);
-            }
-
-            // Clear old modes
-            modes.clear();
-
-            // Fill with correct modes
-            for(setIt = filter.begin(); setIt != filter.end(); setIt++)
-            {
-               for(int r = 0; r < this->dim(transId, Dimensions::Data::DAT2D); r++)
-               {
-                  modes.insert(std::make_pair(*setIt, r));
-               }
-            }
-
-            // Clear filter
-            filter.clear();
-
-            // Indexes structure is not regular
-            isRegular = false;
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            // Get restricted list of harmonics
-            this->buildMLMap(modes, id(1), bins(1));
-
-            // Loop over all modes
-            for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-            {
-               filter.insert(mapIt->first);
-            }
-
-            // Clear old modes
-            modes.clear();
-
-            // Fill with correct modes
-            int i = 0;
-            for(setIt = filter.begin(); setIt != filter.end(); setIt++)
-            {
-               for(int r = 0; r < nN(1); r++)
-               {
-                  modes.insert(std::make_pair(*setIt, n0(1) + r));
-               }
-               i++;
-            }
-
-            // Clear filter
-            filter.clear();
-
-            // Indexes structure is not regular
-            isRegular = false;
-         }
-
-      // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
+      // Splitting is on both transforms
+      } else if(flag == Splitting::Locations::BOTH)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
-         {
-            k0 = n0(0);
-            kN = nN(0);
-            j0 = ArrayI::Zero(kN);
-            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-            // Indexes structure is regular
-            isRegular = true;
-
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            k0 = 0;
-            kN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0 = ArrayI::Zero(kN);
-            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = n0(0);
-            cN = n0(0) + nN(0);
-
-            // Indexes structure is regular
-            isRegular = true;
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            k0 = n0(0);
-            kN = nN(0);
-            j0 = n0.tail(kN);
-            jN = nN.tail(kN);
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-            // Indexes structure is regular
-            isRegular = true;
-         }
-      }
- 
-      // Create modes list for dimensions second and third transform
-      if(isRegular)
-      {
-         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+         this->splitTubular(modes, id, bins, n0, nN, transId);
       }
 
       // Fill indexes for 2D and 3D
@@ -312,6 +92,7 @@ namespace Schemes {
       if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::TRA3D)
       {
          RegularTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+
       } else if(transId == Dimensions::Transform::TRA2D)
       {
          SHTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
@@ -385,6 +166,209 @@ namespace Schemes {
       throw Exception("Tried to split in a unknown dimension for regular spherical harmonics case");
 
       return -1;
+   }
+
+   void IRegularSHlScheme::splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId)
+   {
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         int nL = this->dim(transId, Dimensions::Data::DAT3D);
+         int nM = this->dim(transId, Dimensions::Data::DAT2D);
+
+         // Get full list of harmonics mapped by harmonic degree l
+         SHTools::buildLMap(modes, nL, nM);
+
+      // Create index list for second and third transform
+      } else
+      {
+         int k0 = 0;
+         int kN = this->dim(transId, Dimensions::Data::DAT3D);
+         ArrayI j0 = ArrayI::Zero(kN);
+         ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         int c0 = 0;
+         int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+      }
+   }
+
+   void IRegularSHlScheme::splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         int nL = this->dim(transId, Dimensions::Data::DAT3D);
+         int nM = this->dim(transId, Dimensions::Data::DAT2D);
+
+         // Get restricted sorted list of harmonics
+         SHTools::buildLHSortedMap(modes, nL, nM, n0(0), nN(0));
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         int k0 = 0;
+         int kN = this->dim(transId, Dimensions::Data::DAT3D);
+         ArrayI j0 = ArrayI::Constant(kN, n0(0));
+         ArrayI jN = ArrayI::Constant(kN, nN(0));
+         int c0 = 0;
+         int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         int k0 = n0(0);
+         int kN = nN(0);
+         ArrayI j0 = ArrayI::Zero(kN);
+         ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         int c0 = 0;
+         int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+      }
+   }
+
+   void IRegularSHlScheme::splitSingle2D(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         // Get restricted list of harmonics
+         std::multimap<int,int> tmp;
+         this->buildMLMap(tmp, id(0), bins(0));
+
+         // invert order of the map
+         for(std::multimap<int,int>::iterator mapIt = tmp.begin(); mapIt != tmp.end(); mapIt++)
+         {
+            modes.insert(std::make_pair(mapIt->second, mapIt->first));
+         }
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         // Get restricted list of harmonics
+         this->buildMLMap(modes, id(0), bins(0));
+
+         // Set to extract unique indexes
+         std::set<int>  filter;
+
+         // Loop over all modes
+         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+         {
+            filter.insert(mapIt->first);
+         }
+
+         // Clear old modes
+         modes.clear();
+
+         // Fill with correct modes
+         for(std::set<int>::iterator setIt = filter.begin(); setIt != filter.end(); setIt++)
+         {
+            for(int r = 0; r < this->dim(transId, Dimensions::Data::DAT2D); r++)
+            {
+               modes.insert(std::make_pair(*setIt, r));
+            }
+         }
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         int k0 = 0;
+         int kN = this->dim(transId, Dimensions::Data::DAT3D);
+         ArrayI j0 = ArrayI::Zero(kN);
+         ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         int c0 = n0(0);
+         int cN = n0(0) + nN(0);
+
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+      }
+   }
+
+   void IRegularSHlScheme::splitTubular(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         // Get restricted list of harmonics
+         this->buildMLMap(modes, id(1), bins(1));
+
+         std::multimap<int,int> tmp;
+
+         // invert order of the map
+         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+         {
+            tmp.insert(std::make_pair(mapIt->second, mapIt->first));
+         }
+
+         // Clear modes
+         modes.clear();
+
+         int tN = 0;
+         int t0 = 0;
+         for(int i = 0; i < static_cast<int>(tmp.size()); i++)
+         {
+            if(i % bins(0) == id(0))
+            {
+               tN++;
+            }
+            else if(i % bins(0) < id(0))
+            {
+               t0++;
+            }
+         }
+
+         // invert order of the map
+         std::multimap<int,int>::iterator mapIt = tmp.begin();
+         std::advance(mapIt, t0);
+         for(int i = 0; i < tN; i++)
+         {
+            modes.insert(*mapIt);
+            mapIt++;
+         }
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         // Get restricted list of harmonics
+         this->buildMLMap(modes, id(1), bins(1));
+
+         // Set to extract unique indexes
+         std::set<int>  filter;
+
+         // Loop over all modes
+         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+         {
+            filter.insert(mapIt->first);
+         }
+
+         // Clear old modes
+         modes.clear();
+
+         // Fill with correct modes
+         int i = 0;
+         for(std::set<int>::iterator setIt = filter.begin(); setIt != filter.end(); setIt++)
+         {
+            for(int r = 0; r < nN(1); r++)
+            {
+               modes.insert(std::make_pair(*setIt, n0(1) + r));
+            }
+            i++;
+         }
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         int k0 = n0(0);
+         int kN = nN(0);
+         ArrayI j0 = n0.tail(kN);
+         ArrayI jN = nN.tail(kN);
+         int c0 = 0;
+         int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+         RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+      }
    }
 
    void IRegularSHlScheme::buildMLMap(std::multimap<int,int>& harmonics, const int id, const int bins)
