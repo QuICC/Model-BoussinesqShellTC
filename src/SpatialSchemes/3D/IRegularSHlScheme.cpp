@@ -48,7 +48,7 @@ namespace Schemes {
       spRes->setIndexCounter(spCounter);
    }
 
-   void IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
+   int IRegularSHlScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -97,6 +97,15 @@ namespace Schemes {
       {
          SHTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
       }
+
+      // Set status (0 for success, 1 for failure)
+      int status = 0;
+      if(modes.size() == 0)
+      {
+         status = 1;
+      }
+
+      return status;
    }
 
    int IRegularSHlScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
@@ -235,40 +244,38 @@ namespace Schemes {
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
-         // Get restricted list of harmonics
-         std::multimap<int,int> tmp;
-         this->buildMLMap(tmp, id(0), bins(0));
+         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
-         // invert order of the map
-         for(std::multimap<int,int>::iterator mapIt = tmp.begin(); mapIt != tmp.end(); mapIt++)
+         // Get restricted list of harmonics
+         std::vector<int> binOrders;
+         SHTools::binMLLoad(binOrders, nL, nM, id(0), bins(0));
+
+         // Fill with correct modes
+         for(std::vector<int>::iterator vIt = binOrders.begin(); vIt != binOrders.end(); ++vIt)
          {
-            modes.insert(std::make_pair(mapIt->second, mapIt->first));
+            for(int l = *vIt; l < this->dim(transId, Dimensions::Data::DAT2D); l++)
+            {
+               modes.insert(std::make_pair(l, *vIt));
+            }
          }
 
       // Create index list for second transform
       } else if(transId == Dimensions::Transform::TRA2D)
       {
+         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+
          // Get restricted list of harmonics
-         this->buildMLMap(modes, id(0), bins(0));
-
-         // Set to extract unique indexes
-         std::set<int>  filter;
-
-         // Loop over all modes
-         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-         {
-            filter.insert(mapIt->first);
-         }
-
-         // Clear old modes
-         modes.clear();
+         std::vector<int> binOrders;
+         SHTools::binMLLoad(binOrders, nL, nM, id(0), bins(0));
 
          // Fill with correct modes
-         for(std::set<int>::iterator setIt = filter.begin(); setIt != filter.end(); setIt++)
+         for(std::vector<int>::iterator vIt = binOrders.begin(); vIt != binOrders.end(); ++vIt)
          {
             for(int r = 0; r < this->dim(transId, Dimensions::Data::DAT2D); r++)
             {
-               modes.insert(std::make_pair(*setIt, r));
+               modes.insert(std::make_pair(*vIt, r));
             }
          }
 
@@ -291,70 +298,142 @@ namespace Schemes {
       // Create index list for first transform
       if(transId == Dimensions::Transform::TRA1D)
       {
-         // Get restricted list of harmonics
-         this->buildMLMap(modes, id(1), bins(1));
+         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
+         // Get restricted list of harmonic orders
+         std::vector<int> binOrders;
+         SHTools::binMLLoad(binOrders, nL, nM, id(1), bins(1));
+
+         // Fill with correct modes
          std::multimap<int,int> tmp;
-
-         // invert order of the map
-         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
+         for(std::vector<int>::iterator vIt = binOrders.begin(); vIt != binOrders.end(); ++vIt)
          {
-            tmp.insert(std::make_pair(mapIt->second, mapIt->first));
+            for(int l = *vIt; l < this->dim(transId, Dimensions::Data::DAT2D); l++)
+            {
+               tmp.insert(std::make_pair(l, *vIt));
+            }
          }
 
-         // Clear modes
-         modes.clear();
-
-         int tN = 0;
-         int t0 = 0;
+         // Get count of balanced harmonic distribution
+         ArrayI binLoad = ArrayI::Zero(bins(0));
          for(int i = 0; i < static_cast<int>(tmp.size()); i++)
          {
-            if(i % bins(0) == id(0))
+            binLoad(i % bins(0)) += 1;
+         }
+         int curLoad = binLoad(id(0));
+
+         std::multimap<int,int> incomplete;
+         std::multimap<int,int>::iterator mapIt;
+         std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;
+         int curId = 0;
+         int counter = 0;
+         int l = nL-1; 
+         size_t maxLoop = tmp.size() + 5*bins(0);
+         for(size_t loop = 0; loop < maxLoop; ++loop)
+         {
+            if(binLoad(curId) > 0)
             {
-               tN++;
+               // Extract modes from full list
+               if(incomplete.size() == 0 || tmp.count(l) > static_cast<size_t>(incomplete.rbegin()->first))
+               {
+                  // Get range of m for current l
+                  mapRange = tmp.equal_range(l);
+                  --l;
+
+               // Get modes from incomplete storage
+               } else
+               {
+                  // Get range for largest incomplete set
+                  mapRange = tmp.equal_range(incomplete.rbegin()->second);
+
+                  // Delete it from incomplete map
+                  mapIt = incomplete.end();
+                  --mapIt;
+                  incomplete.erase(mapIt);
+               }
+
+               // Get number of harmonic orders in range
+               int lCount = std::distance(mapRange.first, mapRange.second);
+
+               // Extract all m
+               if(lCount <= binLoad(curId))
+               {
+                  // Store the modes
+                  if(curId == id(0))
+                  {
+                     modes.insert(mapRange.first, mapRange.second);
+                  }
+
+                  // Delete used entries
+                  tmp.erase(mapRange.first, mapRange.second);
+
+                  // Substract used modes
+                  binLoad(curId) -= lCount;
+
+               // Extract partial m
+               } else
+               {
+                  // Add information about remaining modes in incomplete list
+                  incomplete.insert(std::make_pair(lCount - binLoad(curId), mapRange.first->first));
+
+                  // Create proper range
+                  mapRange.second = mapRange.first;
+                  std::advance(mapRange.second, binLoad(curId));
+
+                  // Store the modes
+                  if(curId == id(0))
+                  {
+                     modes.insert(mapRange.first, mapRange.second);
+                  }
+
+                  // Delete used entries
+                  tmp.erase(mapRange.first, mapRange.second);
+
+                  // bin is full
+                  binLoad(curId) = 0;
+               }
             }
-            else if(i % bins(0) < id(0))
+
+            // Shortcut out of loop
+            if(binLoad(id(0)) == 0 || tmp.size() == 0)
             {
-               t0++;
+               break;
             }
+
+            // Update loop counter
+            ++counter;
+
+            // Fill by alternating directions
+            curId = counter % bins(0);
+            if(counter/bins(0) % 2 == 1)
+            {
+               curId = bins(0) - curId - 1;
+            }
+
+            assert(l >= 0);
          }
 
-         // invert order of the map
-         std::multimap<int,int>::iterator mapIt = tmp.begin();
-         std::advance(mapIt, t0);
-         for(int i = 0; i < tN; i++)
-         {
-            modes.insert(*mapIt);
-            mapIt++;
-         }
+         assert(binLoad(id(0)) == 0);
+         assert(modes.size() == static_cast<size_t>(curLoad));
 
       // Create index list for second transform
       } else if(transId == Dimensions::Transform::TRA2D)
       {
+         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+
          // Get restricted list of harmonics
-         this->buildMLMap(modes, id(1), bins(1));
-
-         // Set to extract unique indexes
-         std::set<int>  filter;
-
-         // Loop over all modes
-         for(std::multimap<int,int>::iterator mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-         {
-            filter.insert(mapIt->first);
-         }
-
-         // Clear old modes
-         modes.clear();
+         std::vector<int> binOrders;
+         SHTools::binMLLoad(binOrders, nL, nM, id(1), bins(1));
 
          // Fill with correct modes
-         int i = 0;
-         for(std::set<int>::iterator setIt = filter.begin(); setIt != filter.end(); setIt++)
+         for(std::vector<int>::iterator vIt = binOrders.begin(); vIt != binOrders.end(); ++vIt)
          {
             for(int r = 0; r < nN(1); r++)
             {
-               modes.insert(std::make_pair(*setIt, n0(1) + r));
+               modes.insert(std::make_pair(*vIt, n0(1) + r));
             }
-            i++;
          }
 
       // Create index list for third transform

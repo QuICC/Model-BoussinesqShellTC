@@ -56,15 +56,16 @@ namespace Parallel {
           *
           * @param transId Split the ith dimension
           * @param cpuId   ID of the CPU
+          * @param status  Status output
           */
-         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId);
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status);
 
          /**
           * @brief Compute the score of the Resolution
           *
           * @param spResolution Shared resolution object
           */
-         virtual int computeScore(SharedResolution spResolution);
+         virtual Array computeScore(SharedResolution spResolution);
 
       private:
    };

@@ -73,7 +73,11 @@ namespace Schemes {
           */
          static void buildMHSortedMap(std::multimap<int,int>& harmonics, const int nL, const int nM, const int h0, const int nH);
 
-         static void initMLLoad(std::deque<int>& list, std::vector<int>& load, std::queue<int>& optimal, const int nL, const int nM, const int bins);
+         static void binMLLoad(std::vector<int>& binOrders, const int nL, const int nM, const int id, const int bins);
+         /**
+          * @brief Compute list of loads for harmonic order m distribution, initialise load per bin and compute optimal load
+          */
+         static void initMLLoad(std::deque<int>& loadList, std::vector<int>& binLoad, std::queue<int>& optimal, const int nL, const int nM, const int bins);
 
          static void combineMPairs(std::deque<int>& list, std::multimap<int, int>& regular, const int nM, const int bins);
 

@@ -84,6 +84,9 @@ namespace Parallel {
       // Initialise description
       SplittingDescription descr;
 
+      // Load splitting might fail
+      int status = 0;
+
       // Loop over all CPUs
       for(int id = 0; id < this->nCpu(); id++)
       {
@@ -93,7 +96,17 @@ namespace Parallel {
          // Loop over all dimensions
          for(int j = 0; j < this->dims(); j++)
          {
-            SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id);
+            SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id, status);
+
+            #ifdef GEOMHDISCC_MPI
+               MPI_Allreduce(MPI_IN_PLACE, &status, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            #endif //GEOMHDISCC_MPI
+
+            // Splitting fail, abort
+            if(status != 0)
+            {
+               break;
+            }
 
             #ifdef GEOMHDISCC_DEBUG
                descr.vtpFiles.at(j)->representResolution(spTRes, id);
@@ -108,22 +121,42 @@ namespace Parallel {
             transformRes.push_back(spTRes);
          }
 
+         // Splitting fail, abort
+         if(status != 0)
+         {
+            break;
+         }
+
          // Create new shared core resolution
          coreRes.push_back(SharedCoreResolution(new CoreResolution(transformRes)));
       }
 
-      // Create shared resolution
-      ArrayI transDim = this->mspScheme->getTransformSpace();
-      SharedResolution  spRes(new Resolution(coreRes, this->mSimDim, transDim));
+      SharedResolution  spRes;
 
-      // Add the transform setups to the resolution
-      this->mspScheme->addTransformSetups(spRes);
+      // Splitting was successful
+      Array score = Array::Constant(4,1.0);
+      if(status == 0)
+      {
+         // Create shared resolution
+         ArrayI transDim = this->mspScheme->getTransformSpace();
+         spRes = SharedResolution(new Resolution(coreRes, this->mSimDim, transDim));
 
-      // Add index counter to resolution
-      this->mspScheme->addIndexCounter(spRes);
+         // Add the transform setups to the resolution
+         this->mspScheme->addTransformSetups(spRes);
 
-      // Compute the score of the obtained resolution
-      int score = this->computeScore(spRes);
+         // Add index counter to resolution
+         this->mspScheme->addIndexCounter(spRes);
+
+         // Compute the score of the obtained resolution
+         score = this->computeScore(spRes);
+      } else
+      {
+         // Set large negative score (splitting is unusable)
+         score(0) = -9999;
+
+         // Clear communication structure
+         std::vector<std::multimap<int,int> >().swap(this->mCommStructure);
+      }
 
       // Create splitting description
       descr.algorithm = this->mAlgo;
@@ -134,7 +167,7 @@ namespace Parallel {
       descr.structure = this->mCommStructure;
 
       // Return combination of score and shared resolution/description
-      return std::make_pair(score, std::make_pair(spRes,descr));
+      return std::make_pair(static_cast<int>(score.prod()), std::make_pair(spRes,descr));
    }
 
    void SplittingAlgorithm::initFactors(const int nFactors)

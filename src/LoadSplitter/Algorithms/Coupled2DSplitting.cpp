@@ -50,7 +50,7 @@ namespace Parallel {
       return status;
    }
 
-   SharedTransformResolution  Coupled2DSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
+   SharedTransformResolution  Coupled2DSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
       // Get size of the splittable dimension(s)
       int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::COUPLED2D);
@@ -72,7 +72,7 @@ namespace Parallel {
 
       // Compute the indexes
       ids(0) = cpuId;
-      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::COUPLED2D);
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::COUPLED2D);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
@@ -88,26 +88,27 @@ namespace Parallel {
       #endif //defined GEOMHDISCC_TRANSGROUPER_SINGLE1D
    }
 
-   int Coupled2DSplitting::computeScore(SharedResolution spResolution)
+   Array Coupled2DSplitting::computeScore(SharedResolution spResolution)
    {
       // Initialise the score
-      double score = 100;
+      Array details(4);
+      details(0) = 100;
 
       // Multiply by communication score
       ArrayI comm;
-      score *= this->communicationScore(spResolution, comm);
+      details(1) = this->communicationScore(spResolution, comm);
 
       // Multiply by load balancing score
       Array balance = this->mspScheme->loadWeights();
-      score *= this->balancingScore(spResolution, balance);
+      details(2) = this->balancingScore(spResolution, balance);
 
       // Use additional memory related weighting
-      score *= this->mspScheme->memoryScore(spResolution);
+      details(3) = this->mspScheme->memoryScore(spResolution);
 
       // Select best transform grouper algorithm
       this->selectGrouper();
 
-      return static_cast<int>(score);
+      return details;
    }
 
 }

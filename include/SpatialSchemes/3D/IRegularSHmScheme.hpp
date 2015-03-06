@@ -58,8 +58,6 @@ namespace Schemes {
          /**
           * @brief Create indexes for a possibly restricted set
           *
-          * \mhdTodo Partial splitting needs to be optimized
-          *
           * @param transId Transform ID
           * @param fwd1D   Storage for forward indexes of first dimension
           * @param bwd1D   Storage for backward indexes of first dimension
@@ -71,7 +69,7 @@ namespace Schemes {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), const Splitting::Locations::Id flag = Splitting::Locations::NONE);
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), const Splitting::Locations::Id flag = Splitting::Locations::NONE);
 
          /**
           * @brief Get total of splittable indexes 
@@ -87,6 +85,40 @@ namespace Schemes {
          virtual void addIndexCounter(SharedResolution spRes);
          
       protected:
+         /**
+          * @brief Compute mode distribution for serial algorithm
+          *
+          * @param modes   Map of all modes
+          */
+         void splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Compute mode distribution for single splitting on 1D algorithm
+          *
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
+          */
+         void splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Compute mode distribution for single splitting on 2D algorithm
+          *
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
+          */
+         void splitSingle2D(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Compute mode distribution for tubular 2D decomposition algorithm
+          *
+          * @param modes   Map of all modes
+          * @param n0      Starting mode
+          * @param nN      Number of modes
+          */
+         void splitTubular(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId);
+
          /**
           * @brief Regular truncation
           */

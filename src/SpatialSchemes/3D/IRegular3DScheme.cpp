@@ -39,7 +39,7 @@ namespace Schemes {
    {
    }
 
-   void IRegular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
+   int IRegular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -86,6 +86,15 @@ namespace Schemes {
 
       // Fill indexes for 1D
       RegularTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+
+      // Set status (0 for success, 1 for failure)
+      int status = 0;
+      if(modes.size() == 0)
+      {
+         status = 1;
+      }
+
+      return status;
    }
 
    int IRegular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)

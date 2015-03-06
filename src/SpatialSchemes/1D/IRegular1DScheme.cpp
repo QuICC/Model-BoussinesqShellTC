@@ -38,7 +38,7 @@ namespace Schemes {
    {
    }
 
-   void IRegular1DScheme::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
+   int IRegular1DScheme::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
    {
       // Assert for right transform (1D case)
       assert(transId == Dimensions::Transform::TRA1D);
@@ -75,6 +75,8 @@ namespace Schemes {
       {
          bwd1D.at(0)(i) = i;
       }
+
+      return 0;
    }
 
    int IRegular1DScheme::splittableTotal(Dimensions::Transform::Id transId, Splitting::Locations::Id flag)

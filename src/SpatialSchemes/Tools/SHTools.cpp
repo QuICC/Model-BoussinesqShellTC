@@ -190,7 +190,26 @@ namespace Schemes {
       }
    }
 
-   void SHTools::initMLLoad(std::deque<int>& list, std::vector<int>& load, std::queue<int>& optimal, const int nL, const int nM, const int bins)
+   void SHTools::binMLLoad(std::vector<int>& binOrders, const int nL, const int nM, const int id, const int bins)
+   {
+      // Distribute the heterogeneous harmonic order load by going back and forth
+      for(int i = 0; i < nM; ++i)
+      {
+         // Is right bin while going left -> right
+         bool isLeftToRight = ((i/bins) % 2 == 0 && (i % bins) == id);
+
+         // Is right bin while going right -> left
+         bool isRightToLeft = ((i/bins) % 2 == 1 && (i % bins) == (bins - id - 1));
+
+         if(isLeftToRight || isRightToLeft)
+         {
+            // for a given harmonic order m there are (maxL + 1 - m) degrees
+            binOrders.push_back(i);
+         }
+      }
+   }
+
+   void SHTools::initMLLoad(std::deque<int>& loadList, std::vector<int>& binLoad, std::queue<int>& optimal, const int nL, const int nM, const int bins)
    {
       // Initialise total load
       double totalLoad = 0.0;
@@ -199,10 +218,10 @@ namespace Schemes {
       for(int i = 0; i < nM; ++i)
       {
          // for a given harmonic order m there are (maxL + 1 - m) degrees
-         list.push_back(nL - i);
+         loadList.push_back(nL - i);
 
          // increment total load
-         totalLoad += static_cast<double>(nL -i);
+         totalLoad += static_cast<double>(nL - i);
       }
 
       // Compute the ideal load per CPU
@@ -221,7 +240,7 @@ namespace Schemes {
       // Initialise the load per part
       for(int i = 0; i < bins; ++i)
       {
-         load.push_back(0);
+         binLoad.push_back(0);
       }
    }
 
@@ -428,24 +447,24 @@ namespace Schemes {
    void SHTools::fillIndexes1D(std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, const ArrayI& idx3D, const int nF1D, const int nB1D)
    {
       // Make full list of indexes for first dimension
-      for(int i = 0; i < idx3D.size(); i++)
+      for(int k = 0; k < idx3D.size(); k++)
       {
          // Create storage for indexes
          fwd1D.push_back(ArrayI(nF1D));
 
          // Fill array with indexes
-         for(int k = 0; k < fwd1D.at(i).size(); k++)
+         for(int i = 0; i < fwd1D.at(k).size(); i++)
          {
-            fwd1D.at(i)(k) = k;
+            fwd1D.at(k)(i) = i;
          }
 
          // Create storage for indexes
-         bwd1D.push_back(ArrayI(nB1D - idx3D(i)));
+         bwd1D.push_back(ArrayI(nB1D - idx3D(k)));
 
          // Fill array with indexes
-         for(int k = 0; k < bwd1D.at(i).size(); k++)
+         for(int i = 0; i < bwd1D.at(k).size(); i++)
          {
-            bwd1D.at(i)(k) = idx3D(i) + k;
+            bwd1D.at(k)(i) = idx3D(k) + i;
          }
       }
    }

@@ -71,7 +71,7 @@ namespace Parallel {
          /**
           * @brief Score of the splitting
           */
-         MHDFloat score;
+         Array score;
 
          /**
           * @brief Communication structure

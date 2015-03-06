@@ -272,8 +272,11 @@ namespace Parallel {
          gxl.finalize();
 
          oss.str("");
-         oss << descr.score;
+         oss << static_cast<int>(descr.score.prod());
          IoTools::Formatter::printCentered(std::cout, "Score: " + oss.str());
+         oss.str("");
+         oss << " (" << descr.score(0) << ", " << std::setprecision(2)<< descr.score(1) << ", " << descr.score(2) << ", " << descr.score(3) << ")";
+         IoTools::Formatter::printCentered(std::cout, oss.str());
 
          IoTools::Formatter::printNewline(std::cout);
       }
