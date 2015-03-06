@@ -271,11 +271,15 @@ namespace Parallel {
          // Store the number of packs in active send
          this->mActiveBSendPacks = this->mPacks;
 
+         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
+         MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Prepost the receive calls
          MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
          this->resetRecvPositions();
          this->mIsReceiving = true;
 
+         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
+         MPI_Waitall(this->nBCpu(), this->pSendBRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Post non blocking send calls 
          MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
          this->resetSendPositions();
@@ -294,11 +298,15 @@ namespace Parallel {
          // Store the number of packs in active send
          this->mActiveFSendPacks = this->mPacks;
 
+         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
+         MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Prepost the receive calls
          MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
          this->resetRecvPositions();
          this->mIsReceiving = true;
 
+         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
+         MPI_Waitall(this->nFCpu(), this->pSendFRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Post non blocking send calls 
          MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
          this->resetSendPositions();
