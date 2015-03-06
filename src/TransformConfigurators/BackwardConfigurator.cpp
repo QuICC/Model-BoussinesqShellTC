@@ -110,8 +110,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD1DTRA);
+
       // Compute projection transform for first dimension 
       coord.transform1D().project(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD1DTRA);
 
       // Hold spectral input
       if(hold)
@@ -151,8 +157,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Fwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideFwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD2DTRA);
+
       // Compute projection transform for second dimension 
       coord.transform2D().project(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD2DTRA);
 
       // Hold temporary storage
       if(hold)
@@ -193,8 +205,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Fwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().recoverFwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWD3DTRA);
+
       // Compute projection transform for third dimension 
       coord.transform3D().project(rOutVar.rData(), pInVar->data(), edge.opId(),  edge.arithId());
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWD3DTRA);
 
       // Hold temporary storage
       if(hold)

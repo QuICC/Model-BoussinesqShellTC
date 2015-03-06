@@ -197,50 +197,34 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertFwd(const TFwdA &in, StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::FWDCONVSEND);
-
       // Send the data
       this->sendFwd(in);
-
-      DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVSEND);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertBwd(const TBwdB &in, StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::BWDCONVSEND);
-
       // Send the data
       this->sendBwd(in);
-
-      DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVSEND);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TFwdA& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getFwd(StoragePairProviderMacro<TFwdA, TBwdA>  &storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::BWDCONVRECV);
-
       // Get storage for output value 
       TFwdA &rOut = storage.provideFwd();
 
       // Receive converted data
       this->receiveFwd(rOut);
 
-      DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVRECV);
-
       return rOut;
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> TBwdB& MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::getBwd(StoragePairProviderMacro<TFwdB, TBwdB>  &storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::FWDCONVRECV);
-
       // Get storage for output value 
       TBwdB &rOut = storage.provideBwd();
 
       // Receive converted data
       this->receiveBwd(rOut);
-
-      DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVRECV);
 
       return rOut;
    }
@@ -363,6 +347,9 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendFwd(const TFwdA& data)
    {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWDSENDWAIT);
+
       // Check if communication interface is busy
       if(this->mIsSending)
       {
@@ -394,15 +381,27 @@ namespace Parallel {
          this->mIsSending = false;
       }
 
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWDSENDWAIT);
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWDSENDCONV);
+
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
       {
          MPI_Pack(const_cast<typename TFwdA::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWDSENDCONV);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::sendBwd(const TBwdB& data)
    {
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWDSENDWAIT);
+
       // Check if communication interface is busy
       if(this->mIsSending)
       {
@@ -432,11 +431,20 @@ namespace Parallel {
          this->mIsSending = false;
       }
 
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWDSENDWAIT);
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWDSENDCONV);
+
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)
       {
          MPI_Pack(const_cast<typename TBwdB::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mSendPositions.at(id)), MPI_COMM_WORLD);
       }
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWDSENDCONV);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::receiveFwd(TFwdA &rData)
@@ -452,14 +460,26 @@ namespace Parallel {
          // Wait until everything has been received
          while(keepWaiting != 0)
          {
+            // Start detailed profiler
+            DetailedProfilerMacro_start(ProfilerMacro::FWDRECVWAIT);
+
             // Wait for some of the requests to finish
             MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+
+            // Stop detailed profiler
+            DetailedProfilerMacro_stop(ProfilerMacro::FWDRECVWAIT);
+
+            // Start detailed profiler
+            DetailedProfilerMacro_start(ProfilerMacro::FWDRECVCONV);
 
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
                MPI_Unpack(this->mspFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mFTypes.at(idx(id)), MPI_COMM_WORLD);
             }
+
+            // Stop detailed profiler
+            DetailedProfilerMacro_stop(ProfilerMacro::FWDRECVCONV);
 
             // Update the number of missing receives
             keepWaiting -= count;
@@ -469,11 +489,17 @@ namespace Parallel {
          this->mIsReceiving = false;
       } else
       {
+         // Start detailed profiler
+         DetailedProfilerMacro_start(ProfilerMacro::FWDRECVCONV);
+
          // Unpack data from receive buffer
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
          }
+
+         // Stop detailed profiler
+         DetailedProfilerMacro_stop(ProfilerMacro::FWDRECVCONV);
       }
    }
 
@@ -490,14 +516,26 @@ namespace Parallel {
          // Wait until everything has been received
          while(keepWaiting != 0)
          {
+            // Start detailed profiler
+            DetailedProfilerMacro_start(ProfilerMacro::BWDRECVWAIT);
+
             // Wait for some of the requests to finish
             MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+
+            // Stop detailed profiler
+            DetailedProfilerMacro_stop(ProfilerMacro::BWDRECVWAIT);
+
+            // Start detailed profiler
+            DetailedProfilerMacro_start(ProfilerMacro::BWDRECVCONV);
 
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
                MPI_Unpack(this->mspBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mBTypes.at(idx(id)), MPI_COMM_WORLD);
             }
+
+            // Stop detailed profiler
+            DetailedProfilerMacro_stop(ProfilerMacro::BWDRECVCONV);
 
             // Update the number of missing receives
             keepWaiting -= count;
@@ -507,11 +545,17 @@ namespace Parallel {
          this->mIsReceiving = false;
       } else
       {
+         // Start detailed profiler
+         DetailedProfilerMacro_start(ProfilerMacro::BWDRECVCONV);
+
          // Unpack data from receive buffer
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
          }
+
+         // Stop detailed profiler
+         DetailedProfilerMacro_stop(ProfilerMacro::BWDRECVCONV);
       }
    }
 

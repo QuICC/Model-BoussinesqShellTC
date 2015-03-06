@@ -107,7 +107,8 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertBwd(const TBwdB& in, StoragePairProviderMacro<TFwdA, TBwdA>& storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::BWDCONVSEND);
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::BWDSENDCONV);
 
       // Get storage for output value 
       TFwdA &rOut = storage.provideFwd();
@@ -154,12 +155,14 @@ namespace Parallel {
       // Hold the output data
       storage.holdFwd(rOut);
 
-      DetailedProfilerMacro_stop(ProfilerMacro::BWDCONVSEND);
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::BWDSENDCONV);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::convertFwd(const TFwdA& in, StoragePairProviderMacro<TFwdB, TBwdB>& storage)
    {
-      DetailedProfilerMacro_start(ProfilerMacro::FWDCONVSEND);
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWDSENDCONV);
 
       // Get storage for output value 
       TBwdB &rOut = storage.provideBwd();
@@ -204,7 +207,8 @@ namespace Parallel {
       // Hold the output data
       storage.holdBwd(rOut);
 
-      DetailedProfilerMacro_stop(ProfilerMacro::FWDCONVSEND);
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWDSENDCONV);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> typename TBwdB::PointType SerialConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::bwdPoint(const TBwdB& in, const int i, const int j, const int k)

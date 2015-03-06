@@ -54,8 +54,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD3DTRA);
+
       // Compute integration transform of third dimension
       coord.transform3D().integrate(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD3DTRA);
 
       // Hold temporary input storage
       if(hold)
@@ -94,8 +100,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD2DTRA);
+
       // Compute integration transform of second dimension
       coord.transform2D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD2DTRA);
 
       // Hold temporary storage
       if(hold)
@@ -136,8 +148,14 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRA);
+
       // Compute integration transform of first dimension
       coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRA);
 
       // Hold temporary storage
       if(hold)
