@@ -108,6 +108,8 @@ namespace Transform {
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs);
 
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareForwardReceive();
+
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
    }
@@ -121,7 +123,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardSend();
 
       // Stop profiler
       ProfilerMacro_stop(ProfilerMacro::FWDTRANSFORM);
