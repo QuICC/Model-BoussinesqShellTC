@@ -100,9 +100,29 @@ namespace Parallel {
          virtual void setupCommunication(const int packs);
 
          /**
+          * @brief Start persistent send for forward transform
+          */
+         virtual void initiateForwardSend();
+
+         /**
+          * @brief Post persistent receive for forward transform
+          */
+         virtual void prepareForwardReceive();
+
+         /**
           * @brief Start communication for forward transform
           */
          virtual void initiateForwardCommunication();
+
+         /**
+          * @brief Start persistent send for backward transform
+          */
+         virtual void initiateBackwardSend();
+
+         /**
+          * @brief Post persistent receive for backward transform
+          */
+         virtual void prepareBackwardReceive();
 
          /**
           * @brief Start communication for backward transform
@@ -244,26 +264,42 @@ namespace Parallel {
       this->mPacks = packs;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareForwardReceive()
    {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
-         // Synchronize CPUs
-         FrameworkMacro::synchronize();
+         // Make sure calls are posted at the right moment
+         int flag;
+         MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         if(!flag)
+         {
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         }
 
-         // Store the number of packs in active send
-         this->mActiveBSendPacks = this->mPacks;
-
-         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
-         MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Prepost the receive calls
          MPI_Startall(this->nFCpu(), this->pRecvFRequests(this->mPacks));
          this->resetRecvPositions();
          this->mIsReceiving = true;
+      }
+   }
 
-         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
-         MPI_Waitall(this->nBCpu(), this->pSendBRequests(this->mPacks), MPI_STATUSES_IGNORE);
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardSend()
+   {
+      // Don't do anything if the number of packs is zero
+      if(this->mPacks > 0)
+      {
+         // Store the number of packs in active send
+         this->mActiveBSendPacks = this->mPacks;
+
+         // Make sure calls are posted at the right moment
+         int flag;
+         MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         if(!flag)
+         {
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         }
+
          // Post non blocking send calls 
          MPI_Startall(this->nBCpu(), this->pSendBRequests(this->mPacks));
          this->resetSendPositions();
@@ -271,31 +307,65 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardCommunication()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
+   {
+      // Prepose forward receive
+      this->prepareForwardReceive();
+
+      // Start backward send
+      this->initiateBackwardSend();
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareBackwardReceive()
    {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
-         // Synchronize CPUs
-         FrameworkMacro::synchronize();
+         // Make sure calls are posted at the right moment
+         int flag;
+         MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         if(!flag)
+         {
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         }
 
-         // Store the number of packs in active send
-         this->mActiveFSendPacks = this->mPacks;
-
-         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
-         MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mPacks), MPI_STATUSES_IGNORE);
          // Prepost the receive calls
          MPI_Startall(this->nBCpu(), this->pRecvBRequests(this->mPacks));
          this->resetRecvPositions();
          this->mIsReceiving = true;
+      }
+   }
 
-         // (depending on MPI implementation the Waitall is required to initialize the requests properly)
-         MPI_Waitall(this->nFCpu(), this->pSendFRequests(this->mPacks), MPI_STATUSES_IGNORE);
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardSend()
+   {
+      // Don't do anything if the number of packs is zero
+      if(this->mPacks > 0)
+      {
+         // Store the number of packs in active send
+         this->mActiveFSendPacks = this->mPacks;
+
+         // Make sure calls are posted at the right moment
+         int flag;
+         MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
+         if(!flag)
+         {
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         }
+
          // Post non blocking send calls 
          MPI_Startall(this->nFCpu(), this->pSendFRequests(this->mPacks));
          this->resetSendPositions();
          this->mIsSending = true;
       }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardCommunication()
+   {
+      // Prepose backward receive
+      this->prepareBackwardReceive();
+
+      // Start forward send
+      this->initiateForwardSend();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)

@@ -185,21 +185,25 @@ namespace Transform {
    inline void BackwardTubularConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
+
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareBackwardReceive();
    }
 
    inline void BackwardTubularConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs);
+
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareBackwardReceive();
    }
 
    inline void BackwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
    }
 
    inline void BackwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardSend();
    }
 
 }

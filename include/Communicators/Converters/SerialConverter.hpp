@@ -81,9 +81,29 @@ namespace Parallel {
          virtual void setupCommunication(const int packs);
 
          /**
+          * @brief Start persistent send for forward transform
+          */
+         virtual void initiateForwardSend();
+
+         /**
+          * @brief Post persistent receive for forward transform
+          */
+         virtual void prepareForwardReceive();
+
+         /**
           * @brief Start communication for forward transform
           */
          virtual void initiateForwardCommunication();
+
+         /**
+          * @brief Start persistent send for backward transform
+          */
+         virtual void initiateBackwardSend();
+
+         /**
+          * @brief Post persistent receive for backward transform
+          */
+         virtual void prepareBackwardReceive();
 
          /**
           * @brief Start communication for backward transform
@@ -141,7 +161,23 @@ namespace Parallel {
    {
    }
 
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardSend()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareForwardReceive()
+   {
+   }
+
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardSend()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareBackwardReceive()
    {
    }
 

@@ -75,12 +75,32 @@ namespace Parallel {
          virtual void setupCommunication(const int packs) = 0;
 
          /**
-          * @brief Initiate communication for forward transform
+          * @brief Start persistent send for forward transform
+          */
+         virtual void initiateForwardSend() = 0;
+
+         /**
+          * @brief Post persistent receive for forward transform
+          */
+         virtual void prepareForwardReceive() = 0;
+
+         /**
+          * @brief Start communication for forward transform
           */
          virtual void initiateForwardCommunication() = 0;
 
          /**
-          * @brief Initiate communication for backward transform
+          * @brief Start persistent send for backward transform
+          */
+         virtual void initiateBackwardSend() = 0;
+
+         /**
+          * @brief Post persistent receive for backward transform
+          */
+         virtual void prepareBackwardReceive() = 0;
+
+         /**
+          * @brief Start communication for backward transform
           */
          virtual void initiateBackwardCommunication() = 0;
 
