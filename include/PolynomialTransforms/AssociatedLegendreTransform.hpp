@@ -156,19 +156,9 @@ namespace Transform {
          void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
 
          /**
-          * @brief l(l+1) Compute integration with vector of operators
+          * @brief f(l) Compute integration with vector of operators
           */
-         void setLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
-
-         /**
-          * @brief Compute l^2(l+1)^2 integration with vector of operators
-          */
-         void setLl2Integrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
-
-         /**
-          * @brief Compute 1/l(l+1) integration with vector of operators
-          */
-         void setDivLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+         void setMultLIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops, const Array& mult);
 
          /**
           * @brief Compute projection with vector of operators
@@ -176,9 +166,9 @@ namespace Transform {
          void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
 
          /**
-          * @brief Compute  l(l+1) projection with vector of operators
+          * @brief Compute f(l) projection with vector of operators
           */
-         void setLlProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+         void setMultLProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops, const Array& mult);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]
@@ -216,19 +206,14 @@ namespace Transform {
          SharedPolySetup    mspSetup;
 
          /**
-          * @brief Projector matrix
+          * @brief Storage for the projector operators 
           */
-         std::vector<Matrix>  mProj;
+         std::map<ProjectorType::Id,std::vector<Matrix> >  mProjOp;
 
          /**
-          * @brief Derivative matrix
+          * @brief Storage for the integrator operators 
           */
-         std::vector<Matrix>  mDiff;
-
-         /**
-          * @brief \f$1/\sin\theta\f$ projector matrix
-          */
-         std::vector<Matrix>  mDivSin;
+         std::map<IntegratorType::Id,std::vector<Matrix> >  mIntgOp;
    };
 
 }

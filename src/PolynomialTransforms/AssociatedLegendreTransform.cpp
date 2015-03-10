@@ -102,9 +102,22 @@ namespace Transform {
       this->mDivLl(0) = 0.0;
 
       // Reserve storage for the projectors, 1/sin projectors and derivative
-      this->mProj.reserve(this->mspSetup->slow().size());
-      this->mDivSin.reserve(this->mspSetup->slow().size());
-      this->mDiff.reserve(this->mspSetup->slow().size());
+      this->mProjOp.insert(std::make_pair(ProjectorType::PROJ,std::vector<Matrix>()));
+      this->mProjOp.find(ProjectorType::PROJ)->second.reserve(this->mspSetup->slow().size());
+      this->mProjOp.insert(std::make_pair(ProjectorType::DIFF,std::vector<Matrix>()));
+      this->mProjOp.find(ProjectorType::DIFF)->second.reserve(this->mspSetup->slow().size());
+      this->mProjOp.insert(std::make_pair(ProjectorType::DIVSIN,std::vector<Matrix>()));
+      this->mProjOp.find(ProjectorType::DIVSIN)->second.reserve(this->mspSetup->slow().size());
+
+      #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+      // Reserve storage for the weighted projectors, 1/sin projectors and derivative
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTG,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::INTG)->second.reserve(this->mspSetup->slow().size());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGDIFF,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::INTGDIFF)->second.reserve(this->mspSetup->slow().size());
+      this->mIntgOp.insert(std::make_pair(IntegratorType::INTGDIVSIN,std::vector<Matrix>()));
+      this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.reserve(this->mspSetup->slow().size());
+      #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       // Loop over harmonic orders
       Matrix op;
@@ -115,38 +128,52 @@ namespace Transform {
          int maxL = this->mspSetup->fast().at(iM)(this->mspSetup->fast().at(iM).size()-1);
 
          // Allocate memory for the projector, 1/sin projector and derivatives
-         this->mProj.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
-         this->mDivSin.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
-         this->mDiff.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mProjOp.find(ProjectorType::PROJ)->second.push_back(Matrix(this->mspSetup->fast().at(iM).size(), this->mThGrid.size()));
+         this->mProjOp.find(ProjectorType::DIVSIN)->second.push_back(Matrix(this->mspSetup->fast().at(iM).size(), this->mThGrid.size()));
+         this->mProjOp.find(ProjectorType::DIFF)->second.push_back(Matrix(this->mspSetup->fast().at(iM).size(), this->mThGrid.size()));
 
          op.resize(this->mThGrid.size(), maxL - m + 1);
 
          // Loop over harmonic degrees for projectors
          Polynomial::AssociatedLegendrePolynomial::Plm(op, ipoly, m, igrid);
+         std::map<ProjectorType::Id,std::vector<Matrix> >::iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
          {
             int l = this->mspSetup->fast().at(iM)(iL);
 
-            this->mProj.at(iM).col(iL) = op.col(l - m);
+            projIt->second.at(iM).row(iL) = op.col(l - m).transpose();
          }
 
          // Loop over harmonic degrees for derivative
          Polynomial::AssociatedLegendrePolynomial::dPlm(op, itmp, m, ipoly, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIFF);
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
          {
             int l = this->mspSetup->fast().at(iM)(iL);
 
-            this->mDiff.at(iM).col(iL) = op.col(l - m);
+            projIt->second.at(iM).row(iL) = op.col(l - m).transpose();
          }
 
          // Loop over harmonic degrees for 1/\sin\theta
          Polynomial::AssociatedLegendrePolynomial::sin_1Plm(op, itmp, m, igrid);
+         projIt = this->mProjOp.find(ProjectorType::DIVSIN);
          for(int iL = 0; iL < this->mspSetup->fast().at(iM).size(); iL++)
          {
             int l = this->mspSetup->fast().at(iM)(iL);
 
-            this->mDivSin.at(iM).col(iL) = op.col(l - m);
+            projIt->second.at(iM).row(iL) = op.col(l - m).transpose();
          }
+
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         // Allocate memory for the weighted projector, 1/sin projector and derivatives
+         this->mIntgOp.find(IntegratorType::INTG)->second.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+         this->mIntgOp.find(IntegratorType::INTGDIFF)->second.push_back(Matrix(this->mThGrid.size(), this->mspSetup->fast().at(iM).size()));
+
+         this->mIntgOp.find(IntegratorType::INTG)->second.at(iM) = (this->mProjOp.find(ProjectorType::PROJ)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second.at(iM) = (this->mProjOp.find(ProjectorType::DIVSIN)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
+         this->mIntgOp.find(IntegratorType::INTGDIFF)->second.at(iM) = (this->mProjOp.find(ProjectorType::DIFF)->second.at(iM)*this->mWeights.asDiagonal()).transpose();
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
       }
 
    }
@@ -165,43 +192,83 @@ namespace Transform {
       // Compute first derivative integration
       if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIFF)
       {
-         this->setIntegrator(rSpecVal, physVal, this->mDiff);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
+         #else
+         this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIFF)
       { 
-         this->setLlIntegrator(rSpecVal, physVal, this->mDiff);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIFF)->second, this->mLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second, this->mLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIFF)
       { 
-         this->setDivLlIntegrator(rSpecVal, physVal, this->mDiff);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIFF)->second, this->mDivLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIFF)->second, this->mDivLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIVSIN)
       { 
-         this->setLlIntegrator(rSpecVal, physVal, this->mDivSin);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIVSIN)
       { 
-         this->setDivLlIntegrator(rSpecVal, physVal, this->mDivSin);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTGDIVSIN)->second, this->mDivLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mDivLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSIN)
       { 
-         this->setIntegrator(rSpecVal, physVal, this->mDivSin);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
+         #else
+         this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::DIVSIN)->second);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL2)
       { 
-         this->setLl2Integrator(rSpecVal, physVal, this->mProj);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mLl2);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mLl2);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL)
       { 
-         this->setLlIntegrator(rSpecVal, physVal, this->mProj);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL)
       { 
-         this->setDivLlIntegrator(rSpecVal, physVal, this->mProj);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setMultLIntegrator(rSpecVal, physVal, this->mIntgOp.find(IntegratorType::INTG)->second, this->mDivLl);
+         #else
+         this->setMultLIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mDivLl);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTG)
       {
-         this->setIntegrator(rSpecVal, physVal, this->mProj);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+         this->setIntegrator(rSpecVal, physVal, this->mIntgOp.find(integrator)->second);
+         #else
+         this->setIntegrator(rSpecVal, physVal, this->mProjOp.find(ProjectorType::PROJ)->second);
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       } else
       {
@@ -223,22 +290,22 @@ namespace Transform {
       // Compute first derivative
       if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
       {
-         this->setProjector(rPhysVal, specVal, this->mDiff);
+         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute \f$l(l+1)D\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIFFLL)
       {
-         this->setLlProjector(rPhysVal, specVal, this->mDiff);
+         this->setMultLProjector(rPhysVal, specVal, this->mProjOp.find(ProjectorType::DIFF)->second, this->mLl);
 
       // Compute \f$l(l+1)/\sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSIN)
       {
-         this->setProjector(rPhysVal, specVal, this->mDivSin);
+         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       // Compute \f$1/\sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINLL)
       {
-         this->setLlProjector(rPhysVal, specVal, this->mDivSin);
+         this->setMultLProjector(rPhysVal, specVal, this->mProjOp.find(ProjectorType::DIVSIN)->second, this->mLl);
 
       // Compute \f$1/\sin\theta \partial \sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINDIFFSIN)
@@ -248,12 +315,12 @@ namespace Transform {
       // Compute \f$l(l+1)\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJLL)
       {
-         this->setLlProjector(rPhysVal, specVal, this->mProj);
+         this->setMultLProjector(rPhysVal, specVal, this->mProjOp.find(ProjectorType::PROJ)->second, this->mLl);
 
       // Compute simple projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJ)
       {
-         this->setProjector(rPhysVal, specVal, this->mProj);
+         this->setProjector(rPhysVal, specVal, this->mProjOp.find(projector)->second);
 
       } else
       {
@@ -269,13 +336,18 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         rSpecVal.block(0, start, specRows, cols) = ops.at(i).transpose()*physVal.block(0,start, physRows, cols);
+         #else
+         int specRows = ops.at(i).rows();
+         rSpecVal.block(0, start, specRows, cols) = ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
 
-   void AssociatedLegendreTransform::setLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   void AssociatedLegendreTransform::setMultLIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops, const Array& mult)
    {
       // Compute integration
       int start = 0;
@@ -283,36 +355,13 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
+         #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
          int specRows = ops.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-         start += cols;
-      }
-   }
-
-   void AssociatedLegendreTransform::setLl2Integrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
-   {
-      // Compute integration
-      int start = 0;
-      int physRows = this->mspSetup->fwdSize(); 
-      for(size_t i = 0; i < ops.size(); i++)
-      {
-         int cols = this->mspSetup->mult()(i);
-         int specRows = ops.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-         start += cols;
-      }
-   }
-
-   void AssociatedLegendreTransform::setDivLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
-   {
-      // Compute integration
-      int start = 0;
-      int physRows = this->mspSetup->fwdSize(); 
-      for(size_t i = 0; i < ops.size(); i++)
-      {
-         int cols = this->mspSetup->mult()(i);
-         int specRows = ops.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(ops.at(i).transpose()*physVal.block(0,start, physRows, cols));
+         #else
+         int specRows = ops.at(i).rows();
+         rSpecVal.block(0, start, specRows, cols) = mult.bottomRows(specRows).asDiagonal()*(ops.at(i)*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols)));
+         #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
          start += cols;
       }
    }
@@ -324,21 +373,21 @@ namespace Transform {
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         int specRows = ops.at(i).cols();
-         rPhysVal.block(0, start, physRows, cols) = ops.at(i)*specVal.block(0,start, specRows, cols);
+         int specRows = ops.at(i).rows();
+         rPhysVal.block(0, start, physRows, cols) = ops.at(i).transpose()*specVal.block(0,start, specRows, cols);
          start += cols;
       }
    }
 
-   void AssociatedLegendreTransform::setLlProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
+   void AssociatedLegendreTransform::setMultLProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops, const Array& mult)
    {
       int start = 0;
       int physRows = this->mspSetup->fwdSize(); 
       for(size_t i = 0; i < ops.size(); i++)
       {
          int cols = this->mspSetup->mult()(i);
-         int specRows = ops.at(i).cols();
-         rPhysVal.block(0, start, physRows, cols) = ops.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
+         int specRows = ops.at(i).rows();
+         rPhysVal.block(0, start, physRows, cols) = ops.at(i).transpose()*(mult.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
          start += cols;
       }
    }
@@ -354,22 +403,48 @@ namespace Transform {
       mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mWeights.size();
 
       // Storage for the projector
-      for(size_t i = 0; i < this->mProj.size(); i++)
+      std::map<ProjectorType::Id,std::vector<Matrix> >::const_iterator projIt = this->mProjOp.find(ProjectorType::PROJ);
+      for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mProj.at(i).rows()*this->mProj.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
       }
 
       // Storage for the derivative
-      for(size_t i = 0; i < this->mDiff.size(); i++)
+      projIt = this->mProjOp.find(ProjectorType::DIFF);
+      for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDiff.at(i).rows()*this->mDiff.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
       }
 
       // Storage for the 1/\sin\theta
-      for(size_t i = 0; i < this->mDivSin.size(); i++)
+      projIt = this->mProjOp.find(ProjectorType::DIVSIN);
+      for(size_t i = 0; i < projIt->second.size(); i++)
       {
-         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*this->mDivSin.at(i).rows()*this->mDivSin.at(i).cols();
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*projIt->second.at(i).rows()*projIt->second.at(i).cols();
       }
+
+      #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+      // Storage for the integrator
+      std::map<IntegratorType::Id,std::vector<Matrix> >::const_iterator intgIt = this->mIntgOp.find(IntegratorType::INTG);
+      for(size_t i = 0; i < intgIt->second.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+      }
+
+      // Storage for the derivative
+      intgIt = this->mIntgOp.find(IntegratorType::INTGDIFF);
+      for(size_t i = 0; i < intgIt->second.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+      }
+
+      // Storage for the 1/\sin\theta
+      intgIt = this->mIntgOp.find(IntegratorType::INTGDIVSIN);
+      for(size_t i = 0; i < intgIt->second.size(); i++)
+      {
+         mem += static_cast<MHDFloat>(Debug::MemorySize<MHDFloat>::BYTES)*intgIt->second.at(i).rows()*intgIt->second.at(i).cols();
+      }
+      #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
       return mem;
    }
