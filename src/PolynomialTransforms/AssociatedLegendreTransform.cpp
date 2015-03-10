@@ -172,7 +172,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -185,7 +185,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -198,7 +198,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -211,7 +211,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -224,7 +224,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -237,7 +237,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivSin.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -250,7 +250,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -263,7 +263,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -276,7 +276,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -289,7 +289,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
+            rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
             start += cols;
          }
 
@@ -332,7 +332,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
             start += cols;
          }
 
@@ -358,7 +358,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
             start += cols;
          }
 
@@ -376,7 +376,7 @@ namespace Transform {
          {
             int cols = this->mspSetup->mult()(i);
             int specRows = this->mProj.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols);
+            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
             start += cols;
          }
 

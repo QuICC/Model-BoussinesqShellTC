@@ -135,7 +135,7 @@ namespace Transform {
          }
       }
 
-      // Initiate the grouped first exchnage communication
+      // Initiate the grouped first exchange communication
       TConfigurator::initiate1DCommunication(coord);
 
       // Setup the grouped second exchange communication
