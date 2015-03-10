@@ -151,6 +151,36 @@ namespace Transform {
          void initOperators();
 
          /**
+          * @brief Compute integration with vector of operators
+          */
+         void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief l(l+1) Compute integration with vector of operators
+          */
+         void setLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute l^2(l+1)^2 integration with vector of operators
+          */
+         void setLl2Integrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute 1/l(l+1) integration with vector of operators
+          */
+         void setDivLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute projection with vector of operators
+          */
+         void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute  l(l+1) projection with vector of operators
+          */
+         void setLlProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+
+         /**
           * @brief Storage for the quadrature points x = [-1, 1]
           */
          Array mXGrid;

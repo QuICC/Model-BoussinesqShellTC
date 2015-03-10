@@ -165,133 +165,43 @@ namespace Transform {
       // Compute first derivative integration
       if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIFF)
       {
-         // Compute integration of derivative
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setIntegrator(rSpecVal, physVal, this->mDiff);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIFF)
       { 
-         // Compute integration of derivative
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setLlIntegrator(rSpecVal, physVal, this->mDiff);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIFF)
       { 
-         // Compute integration of derivative
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDiff.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDiff.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setDivLlIntegrator(rSpecVal, physVal, this->mDiff);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLLDIVSIN)
       { 
-         // Compute integration of 1/sin
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setLlIntegrator(rSpecVal, physVal, this->mDivSin);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLLDIVSIN)
       { 
-         // Compute integration of 1/sin
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setDivLlIntegrator(rSpecVal, physVal, this->mDivSin);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVSIN)
       { 
-         // Compute integration of 1/sin
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivSin.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setIntegrator(rSpecVal, physVal, this->mDivSin);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL2)
       { 
-         // Compute integration
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setLl2Integrator(rSpecVal, physVal, this->mProj);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGLL)
       { 
-         // Compute integration
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setLlIntegrator(rSpecVal, physVal, this->mProj);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTGDIVLL)
       { 
-         // Compute integration
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setDivLlIntegrator(rSpecVal, physVal, this->mProj);
 
       } else if(integrator == AssociatedLegendreTransform::IntegratorType::INTG)
       {
-         // Compute integration
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rSpecVal.block(0, start, specRows, cols) = this->mProj.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
-            start += cols;
-         }
+         this->setIntegrator(rSpecVal, physVal, this->mProj);
 
       } else
       {
@@ -313,54 +223,22 @@ namespace Transform {
       // Compute first derivative
       if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDiff.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDiff.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
+         this->setProjector(rPhysVal, specVal, this->mDiff);
 
       // Compute \f$l(l+1)D\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIFFLL)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDiff.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
-            start += cols;
-         }
+         this->setLlProjector(rPhysVal, specVal, this->mDiff);
 
       // Compute \f$l(l+1)/\sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSIN)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
+         this->setProjector(rPhysVal, specVal, this->mDivSin);
 
       // Compute \f$1/\sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINLL)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDivSin.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDivSin.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDivSin.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
-            start += cols;
-         }
+         this->setLlProjector(rPhysVal, specVal, this->mDivSin);
 
       // Compute \f$1/\sin\theta \partial \sin\theta\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::DIVSINDIFFSIN)
@@ -370,32 +248,98 @@ namespace Transform {
       // Compute \f$l(l+1)\f$ projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJLL)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mProj.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
-            start += cols;
-         }
+         this->setLlProjector(rPhysVal, specVal, this->mProj);
 
       // Compute simple projection
       } else if(projector == AssociatedLegendreTransform::ProjectorType::PROJ)
       {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mProj.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProj.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProj.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
+         this->setProjector(rPhysVal, specVal, this->mProj);
 
       } else
       {
          throw Exception("Requested an unknown projector");
+      }
+   }
+
+   void AssociatedLegendreTransform::setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   {
+      // Compute integration
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         start += cols;
+      }
+   }
+
+   void AssociatedLegendreTransform::setLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   {
+      // Compute integration
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = this->mLl.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         start += cols;
+      }
+   }
+
+   void AssociatedLegendreTransform::setLl2Integrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   {
+      // Compute integration
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = this->mLl2.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         start += cols;
+      }
+   }
+
+   void AssociatedLegendreTransform::setDivLlIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops)
+   {
+      // Compute integration
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rSpecVal.block(0, start, specRows, cols) = this->mDivLl.bottomRows(specRows).asDiagonal()*ops.at(i).transpose()*(this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols));
+         start += cols;
+      }
+   }
+
+   void AssociatedLegendreTransform::setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
+   {
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rPhysVal.block(0, start, physRows, cols) = ops.at(i)*specVal.block(0,start, specRows, cols);
+         start += cols;
+      }
+   }
+
+   void AssociatedLegendreTransform::setLlProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops)
+   {
+      int start = 0;
+      int physRows = this->mspSetup->fwdSize(); 
+      for(size_t i = 0; i < ops.size(); i++)
+      {
+         int cols = this->mspSetup->mult()(i);
+         int specRows = ops.at(i).cols();
+         rPhysVal.block(0, start, physRows, cols) = ops.at(i)*(this->mLl.bottomRows(specRows).asDiagonal()*specVal.block(0,start, specRows, cols));
+         start += cols;
       }
    }
 
