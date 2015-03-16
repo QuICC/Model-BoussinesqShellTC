@@ -150,9 +150,6 @@ namespace Parallel {
 
    template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
-      // Synchronize 
-      FrameworkMacro::synchronize();
-
       // Create map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
 
@@ -286,9 +283,6 @@ namespace Parallel {
 
    template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
-      // Synchronize 
-      FrameworkMacro::synchronize();
-
       // Create  map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
 

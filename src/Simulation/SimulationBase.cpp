@@ -168,9 +168,6 @@ namespace GeoMHDiSCC {
       // Execute post-run operations
       this->postRun();
 
-      // Synchronise computation nodes
-      FrameworkMacro::synchronize();
-
       // Stop post-run timing
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::POSTRUN);

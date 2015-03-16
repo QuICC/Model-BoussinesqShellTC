@@ -211,7 +211,6 @@ namespace Transform {
             }
          }
       }
-
    }
 
    template <typename TConfigurator> void ForwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
