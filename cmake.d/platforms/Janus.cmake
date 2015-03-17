@@ -71,6 +71,12 @@ set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
 
 ###################################################
+#-------------- MPI IMPLEMENTATION ---------------#
+###################################################
+
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
+
+###################################################
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 

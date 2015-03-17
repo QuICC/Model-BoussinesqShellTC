@@ -227,7 +227,7 @@ namespace Parallel {
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
             return in.point(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 
-         } else if(TBwdB::FieldDimension == Dimensions::ONED)
+         } else
          {
             return in.point(this->mspIdxConv->i(i));
          }
@@ -240,7 +240,7 @@ namespace Parallel {
          {
             return in.point(this->mspIdxConv->iS(i,j),this->mspIdxConv->jS(i,j));
 
-         } else if(TBwdB::FieldDimension == Dimensions::ONED)
+         } else
          {
             return in.point(this->mspIdxConv->i(i));
          }
@@ -264,7 +264,7 @@ namespace Parallel {
             int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
             return rOut.rPoint(this->mspIdxConv->i(i,j,idxI,idxJ),this->mspIdxConv->j(i,j,idxI,idxJ));
 
-         } else if(TBwdB::FieldDimension == Dimensions::TWOD)
+         } else
          {
             return rOut.rPoint(this->mspIdxConv->i(i));
          }
@@ -277,7 +277,7 @@ namespace Parallel {
          {
             return rOut.rPoint(this->mspIdxConv->iS(i,j),this->mspIdxConv->jS(i,j));
 
-         } else if(TBwdB::FieldDimension == Dimensions::TWOD)
+         } else
          {
             return rOut.rPoint(this->mspIdxConv->i(i));
          }

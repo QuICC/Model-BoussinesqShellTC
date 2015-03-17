@@ -402,12 +402,21 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
    {
+      // Synchronize 
+      FrameworkMacro::synchronize();
+
       // Loop over all the cpus
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)
       {
+      	 // Synchronize 
+     	 FrameworkMacro::synchronize();
+
          // Create TBwdB datatypes
          MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id, this->mspIdxConv);
          this->mBTypes.push_back(type);
+
+      	 // Synchronize 
+     	 FrameworkMacro::synchronize();
 
          // Create TFwdA datatypes
          type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id, this->mspIdxConv);
