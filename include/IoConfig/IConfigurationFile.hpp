@@ -427,7 +427,8 @@ namespace IoConfig {
 
       // Broadcast the information
       MPI_Bcast(MPI_BOTTOM, 1, cfgType, FrameworkMacro::IO_RANK, MPI_COMM_WORLD);
-      
+      FrameworkMacro::synchronize();
+
       // Free the datatype
       MPI_Type_free(&cfgType);
 

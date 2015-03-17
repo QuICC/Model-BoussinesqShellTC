@@ -454,8 +454,13 @@ namespace Parallel {
                         matched++;
                      }
                   }
-               #endif // GEOMHDISCC_MPI
                }
+
+               // Synchronize
+               FrameworkMacro::synchronize();
+               #else
+               }
+               #endif // GEOMHDISCC_MPI
             }
 
             #ifdef GEOMHDISCC_MPI
@@ -508,6 +513,9 @@ namespace Parallel {
                         filter.insert(std::make_pair(matRemote(0,i), matRemote(1,i)));
                      }
                   }
+
+                  // Synchronize
+                  FrameworkMacro::synchronize();
                }
             #endif // GEOMHDISCC_MPI
 

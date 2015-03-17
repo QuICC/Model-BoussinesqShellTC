@@ -127,6 +127,9 @@ namespace Schemes {
                   }
                }
             }
+
+            // Synchronize
+            FrameworkMacro::synchronize();
          }
 
          FrameworkMacro::initSubComm(FrameworkMacro::SPECTRAL, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
@@ -173,6 +176,9 @@ namespace Schemes {
                      }
                   }
                }
+
+               // Synchronize
+               FrameworkMacro::synchronize();
             }
 
             FrameworkMacro::setSubComm(FrameworkMacro::SPECTRAL, i_, subRanks);

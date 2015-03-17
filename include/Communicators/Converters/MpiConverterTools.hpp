@@ -271,6 +271,9 @@ namespace Parallel {
          }
       }
 
+      // Synchronize
+      FrameworkMacro::synchronize();
+
       // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
       MpiConverterTools<Dimensions::THREED>::extractShared(sharedMap, localIdxMap, remoteKeys);
@@ -403,6 +406,9 @@ namespace Parallel {
             remoteKeys.insert(key);
          }
       }
+
+      // Synchronize
+      FrameworkMacro::synchronize();
 
       // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;

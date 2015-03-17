@@ -88,12 +88,25 @@ if(largeioTest)
    geomhdiscc_add_definition(GEOMHDISCC_LARGEIO)
 endif(largeioTest)
 
+
+###################################################
+#--------------- MPI IMPLEMENTATION --------------#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_MPIIMPLS "MPI implementation" GEOMHDISCC_MPIIMPL mpiimplTest)
+
+if(mpiimplTest)
+   geomhdiscc_add_definition(GEOMHDISCC_MPIIMPL)
+endif(mpiimplTest)
+
+
 ###################################################
 #----------------- SH NORMALIZATION --------------#
 ###################################################
 
 set(GEOMHDISCC_SHNORM "Unity")
 geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
+
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#

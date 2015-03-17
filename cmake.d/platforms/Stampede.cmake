@@ -67,6 +67,12 @@ set(GEOMHDISCC_INCLUDES_HDF5 $ENV{TACC_HDF5_INC} PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_HDF5 "$ENV{TACC_HDF5_LIB}" PARENT_SCOPE)
 
 ###################################################
+#-------------- MPI IMPLEMENTATION ---------------#
+###################################################
+
+set(GEOMHDISCC_MPIIMPLS "MVAPICH" PARENT_SCOPE)
+
+###################################################
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 
