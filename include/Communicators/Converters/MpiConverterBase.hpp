@@ -136,7 +136,7 @@ namespace Parallel {
          /**
           * @brief Setup the MPI communication requests requests
           */
-         void setupRequests();
+         void setupRequests(const Dimensions::Transform::Id transId);
 
          /**
           * @brief Cleanup the MPI communication requests
@@ -408,7 +408,7 @@ namespace Parallel {
       return ((size - 1 - id + ref) % size);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests(const Dimensions::Transform::Id transId)
    {
       // Storage for global location flags
       int dest;
@@ -418,6 +418,19 @@ namespace Parallel {
       int grpMe;
       int grpDest;
       int grpSrc;
+
+      // Shift tag to produce unique tag in 2D distribution
+      int tagShift = 0;
+      if(transId == Dimensions::Transform::TRA2D)
+      {
+         tagShift = 0;
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         tagShift = FrameworkMacro::nCpu();
+      } else
+      {
+         MPI_Abort(MPI_COMM_WORLD, 999);
+      }
 
       // Storage for the number of packs
       int packs;
@@ -455,7 +468,7 @@ namespace Parallel {
             src = this->fCpu(grpSrc);
 
             // Set MPI tag
-            tag = src;
+            tag = src + tagShift;
 
             //Safety asserts
             assert(static_cast<size_t>(grpSrc) < this->mFSizes.size());
@@ -469,7 +482,7 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             // Set MPI tag
-            tag = FrameworkMacro::id();
+            tag = FrameworkMacro::id() + tagShift;
             // Get CPU group index of local node
             grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), tag));
             // Get destination index in CPU group
@@ -516,7 +529,7 @@ namespace Parallel {
             // Get global MPI source rank
             src = this->bCpu(grpSrc);
             // Set MPI tag
-            tag = src;
+            tag = src + tagShift;
             // initialise the Recv request
             MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
          }
@@ -525,7 +538,7 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             // Set MPI tag
-            tag = FrameworkMacro::id();
+            tag = FrameworkMacro::id() + tagShift;
             // Get CPU group index of local node
             grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), tag));
             // Get destination index in CPU group

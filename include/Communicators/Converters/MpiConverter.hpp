@@ -60,7 +60,7 @@ namespace Parallel {
          /**
           * @brief Finish the setup of the converter
           */
-         virtual void setup();
+         virtual void setup(const Dimensions::Transform::Id transId);
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -249,13 +249,13 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup(const Dimensions::Transform::Id transId)
    {
       // initialise the send and receive positions
       this->initPositions();
 
       // setup the communication requests
-      this->setupRequests();
+      this->setupRequests(transId);
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs)
@@ -543,7 +543,13 @@ namespace Parallel {
             DetailedProfilerMacro_start(ProfilerMacro::FWDRECVWAIT);
 
             // Wait for some of the requests to finish
-            MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+            #ifdef GEOMHDISCC_DEBUG
+               MPI_Status stats[this->nFCpu()];
+               int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), stats);
+               assert(ierr == MPI_SUCCESS);
+            #else
+               MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+            #endif //GEOMHDISCC_DEBUG
 
             // Stop detailed profiler
             DetailedProfilerMacro_stop(ProfilerMacro::FWDRECVWAIT);
@@ -599,7 +605,13 @@ namespace Parallel {
             DetailedProfilerMacro_start(ProfilerMacro::BWDRECVWAIT);
 
             // Wait for some of the requests to finish
-            MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+            #ifdef GEOMHDISCC_DEBUG
+               MPI_Status stats[this->nBCpu()];
+               int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), stats);
+               assert(ierr == MPI_SUCCESS);
+            #else 
+               MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
+            #endif //GEOMHDISCC_DEBUG
 
             // Stop detailed profiler
             DetailedProfilerMacro_stop(ProfilerMacro::BWDRECVWAIT);

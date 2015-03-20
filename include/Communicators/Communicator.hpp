@@ -351,7 +351,7 @@ namespace Parallel {
       if(split != Splitting::Locations::BOTH)
       {
          // Setup converter
-         this->template converter<Dimensions::Transform::TRA2D>().setup();
+         this->template converter<Dimensions::Transform::TRA2D>().setup(Dimensions::Transform::TRA2D);
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
@@ -531,12 +531,12 @@ namespace Parallel {
       #endif // GEOMHDISCC_MPI
 
       // Setup converter
-      this->template converter<Dimensions::Transform::TRA3D>().setup();
+      this->template converter<Dimensions::Transform::TRA3D>().setup(Dimensions::Transform::TRA3D);
 
       // If both dimensions are split. In the other cases setup() has already been called.
       if(split == Splitting::Locations::BOTH)
       {
-         this->template converter<Dimensions::Transform::TRA2D>().setup();
+         this->template converter<Dimensions::Transform::TRA2D>().setup(Dimensions::Transform::TRA2D);
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE

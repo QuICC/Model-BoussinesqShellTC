@@ -45,7 +45,7 @@ namespace Parallel {
          /**
           * @brief Set up the converter
           */
-         virtual void setup() = 0;
+         virtual void setup(const Dimensions::Transform::Id transId) = 0;
 
          /**
           * @brief Convert data from TFwdA to TBwdB
