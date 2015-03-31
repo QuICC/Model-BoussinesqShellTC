@@ -41,6 +41,7 @@ namespace Equations {
    void BoussinesqRRBAnnulusVCContinuity::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, true, false);
+      this->setExplicitTiming(FieldComponents::Spectral::SCALAR, ExplicitTiming::LINEAR);
    }
 
    void BoussinesqRRBAnnulusVCContinuity::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

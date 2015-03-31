@@ -57,7 +57,7 @@ namespace Transform {
           *    - DIVRDIFFR: 1/r D r
           *    - DIFFDIVR: D 1/r
           */
-         enum Id {PROJ, DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIVRDIFFR, DIFFDIVR};
       };
 
       /**
@@ -176,6 +176,30 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
@@ -212,48 +236,24 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mDiff;
-
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
 
          /**
-          * @brief Storage for the division by R physical array
+          * @brief Storage for the integrator operators
           */
-         Array   mDivR;
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
 
          /**
-          * @brief Storage for the division by R physical array
+          * @brief Storage for the sparse solver matrices
           */
-         Array   mDivR2;
-
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
 
          /**
-          * @brief Storage for the division by R matrix
+          * @brief Storage for the sparse solvers
           */
-         SparseMatrix   mDivR;
-
-         /**
-          * @brief Storage for the division by R^2 matrix
-          */
-         SparseMatrix   mDivR2;
-
-         /**
-          * @brief Storage for the sparse solver for differentiation
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiff;
-
-         /**
-          * @brief Storage for the sparse solver for division by R
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR;
-
-         /**
-          * @brief Storage for the sparse solver for division by R^2
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR2;
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
 
          /**
           * @brief Storage for the backward operators input data
@@ -264,7 +264,6 @@ namespace Transform {
           * @brief Storage for the backward operators output data
           */
          Matrix mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

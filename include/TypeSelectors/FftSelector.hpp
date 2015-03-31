@@ -26,10 +26,15 @@
    #include "FastTransforms/FftwTools.hpp"
    #include "FastTransforms/FftwTransform.hpp"
    #include "FastTransforms/ChebyshevFftwTransform.hpp"
-   #include "FastTransforms/CylinderChebyshevFftwTransform.hpp"
-   #include "FastTransforms/AnnulusChebyshevFftwTransform.hpp"
-   #include "FastTransforms/SphereChebyshevFftwTransform.hpp"
-   #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
+   #if defined GEOMHDISCC_SPATIALSCHEME_CFT
+      #include "FastTransforms/CylinderChebyshevFftwTransform.hpp"
+   #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
+      #include "FastTransforms/AnnulusChebyshevFftwTransform.hpp"
+   #elif defined GEOMHDISCC_SPATIALSCHEME_BLF
+      #include "FastTransforms/SphereChebyshevFftwTransform.hpp"
+   #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFm
+      #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
+   #endif //defined GEOMHDISCC_SPATIALSCHEME_CFT
 
    namespace GeoMHDiSCC {
 
@@ -46,17 +51,22 @@
             /// Typedef for FFTW's Chebyshev FFT implementation
             typedef ChebyshevFftwTransform ChebyshevSelector;
 
-            /// Typedef for FFTW's cylinder Chebyshev FFT implementation
-            typedef CylinderChebyshevFftwTransform CylinderChebyshevSelector;
+            #if defined GEOMHDISCC_SPATIALSCHEME_CFT
+               /// Typedef for FFTW's cylinder Chebyshev FFT implementation
+               typedef CylinderChebyshevFftwTransform CylinderChebyshevSelector;
 
-            /// Typedef for FFTW's annulus Chebyshev FFT implementation
-            typedef AnnulusChebyshevFftwTransform AnnulusChebyshevSelector;
+            #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
+               /// Typedef for FFTW's annulus Chebyshev FFT implementation
+               typedef AnnulusChebyshevFftwTransform AnnulusChebyshevSelector;
 
-            /// Typedef for FFTW's sphere Chebyshev FFT implementation
-            typedef SphereChebyshevFftwTransform SphereChebyshevSelector;
+            #elif defined GEOMHDISCC_SPATIALSCHEME_AFT
+               /// Typedef for FFTW's sphere Chebyshev FFT implementation
+               typedef SphereChebyshevFftwTransform SphereChebyshevSelector;
 
-            /// Typedef for FFTW's shell Chebyshev FFT implementation
-            typedef ShellChebyshevFftwTransform ShellChebyshevSelector;
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFm
+               /// Typedef for FFTW's shell Chebyshev FFT implementation
+               typedef ShellChebyshevFftwTransform ShellChebyshevSelector;
+            #endif //defined GEOMHDISCC_SPATIALSCHEME_CFT
          }
       }
    }

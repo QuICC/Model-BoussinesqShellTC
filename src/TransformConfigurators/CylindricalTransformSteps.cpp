@@ -27,46 +27,84 @@ namespace Transform {
 
 namespace TransformSteps {
 
-   std::vector<IntegratorBranch>  forwardScalar()
+   std::vector<IntegratorBranch>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 1);
       std::vector<IntegratorBranch> transform;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      if(isNL)
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      } else
+      {
+         transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      }
 
       return transform;
    }
 
-   std::vector<IntegratorBranch>  forwardScalarNL()
+   std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL)
    {
+      assert(components.size() == 2);
       std::vector<IntegratorBranch> transform;
+      FieldComponents::Spectral::Id radialId = components.at(0).first;
+      int radialFlag = components.at(0).second;
+      FieldComponents::Spectral::Id thetaId = components.at(1).first;
+      int thetaFlag = components.at(1).second;
+      FieldComponents::Spectral::Id zId = components.at(1).first;
+      int zFlag = components.at(1).second;
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::SCALAR, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
+      if(isNL)
+      {
+         if(radialFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, radialId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-      return transform;
-   }
+         if(thetaFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, thetaId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-   std::vector<IntegratorBranch>  forwardVector()
-   {
-      std::vector<IntegratorBranch> transform;
+         if(zFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, zId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
+      } else
+      {
+         if(radialFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, radialId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::R, FieldType::VECTOR));
+         if(thetaFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, thetaId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
 
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::THETA, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::Z, FieldType::VECTOR));
-
-      return transform;
-   }
-
-   std::vector<IntegratorBranch>  forwardVectorNL()
-   {
-      std::vector<IntegratorBranch> transform;
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::R, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::R, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::THETA, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGO, FieldComponents::Spectral::THETA, FieldType::VECTOR));
-
-      transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTGE, FieldComponents::Spectral::Z, FieldType::VECTOR));
+         if(zFlag == 0)
+         {
+            transform.push_back(IntegratorBranch(FieldComponents::Physical::Z, IntegratorBranch::Intg3DType::INTG, IntegratorBranch::Intg2DType::INTG, IntegratorBranch::Intg1DType::INTG, zId, FieldType::VECTOR));
+         } else
+         {
+            throw Exception("Requested an unknown vector forward transform");
+         }
+      }
 
       return transform;
    }

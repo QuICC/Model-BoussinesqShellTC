@@ -183,6 +183,30 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
@@ -251,76 +275,24 @@ namespace Transform {
          Matrix   mTmpOOut;
 
          /**
-          * @brief Storage for the even Chebyshev differentiation matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mDiffE;
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
 
          /**
-          * @brief Storage for the odd Chebyshev differentiation matrix
+          * @brief Storage for the integrator operators
           */
-         SparseMatrix   mDiffO;
-
-         #if defined GEOMHDISCC_TRANSOP_FORWARD
-         /**
-          * @brief Storage for the division by R physical array
-          */
-         Array   mDivR;
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
 
          /**
-          * @brief Storage for the division by R^2 physical array
+          * @brief Storage for the sparse solver matrices
           */
-         Array   mDivR2;
-
-         #elif defined GEOMHDISCC_TRANSOP_BACKWARD
-         /**
-          * @brief Storage for the even division by R matrix
-          */
-         SparseMatrix   mDivRE;
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
 
          /**
-          * @brief Storage for the odd division by R matrix
+          * @brief Storage for the sparse solvers
           */
-         SparseMatrix   mDivRO;
-
-         /**
-          * @brief Storage for the even division by R^2 matrix
-          */
-         SparseMatrix   mDivR2E;
-
-         /**
-          * @brief Storage for the odd division by R^2 matrix
-          */
-         SparseMatrix   mDivR2O;
-
-         /**
-          * @brief Storage for the sparse solver for even differentiation
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiffE;
-
-         /**
-          * @brief Storage for the sparse solver for odd differentiation
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDiffO;
-
-         /**
-          * @brief Storage for the sparse solver for even division by R
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivRE;
-
-         /**
-          * @brief Storage for the sparse solver for odd division by R
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivRO;
-
-         /**
-          * @brief Storage for the sparse solver for even division by R^2
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR2E;
-
-         /**
-          * @brief Storage for the sparse solver for odd division by R^2
-          */
-         Solver::SparseSelector<SparseMatrix>::Type mSDivR2O;
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
 
          /**
           * @brief Storage for the backward operators input data
@@ -331,7 +303,6 @@ namespace Transform {
           * @brief Storage for the backward operators output data
           */
          Matrix mTmpOutS;
-         #endif //defined GEOMHDISCC_TRANSOP_FORWARD
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

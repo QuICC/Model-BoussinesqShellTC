@@ -42,10 +42,22 @@ namespace Equations {
    void BoussinesqRBAnnulusVCMomentum::setCoupling()
    {
       this->defineCoupling(FieldComponents::Spectral::R, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+      this->setExplicitTiming(FieldComponents::Spectral::R, ExplicitTiming::LINEAR);
 
       this->defineCoupling(FieldComponents::Spectral::THETA, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+      this->setExplicitTiming(FieldComponents::Spectral::THETA, ExplicitTiming::LINEAR);
 
       this->defineCoupling(FieldComponents::Spectral::Z, CouplingInformation::PROGNOSTIC, 0, true, true, false);
+      this->setExplicitTiming(FieldComponents::Spectral::Z, ExplicitTiming::LINEAR);
+   }
+
+   void BoussinesqRBAnnulusVCMomentum::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::R, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::THETA, 0);
+
+      this->addNLComponent(FieldComponents::Spectral::Z, 0);
    }
 
    void BoussinesqRBAnnulusVCMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const
