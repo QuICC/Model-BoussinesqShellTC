@@ -46,7 +46,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         else:
-            fields = []
+            fields = [field_row]
 
         return fields
 

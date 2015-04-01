@@ -9,6 +9,7 @@
 
 // Configuration includes
 //
+#include "Debug/DebuggerMacro.h"
 #include "Framework/FrameworkMacro.h"
 
 // System includes
@@ -547,6 +548,7 @@ namespace Parallel {
                MPI_Status stats[this->nFCpu()];
                int ierr = MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), stats);
                assert(ierr == MPI_SUCCESS);
+               DebuggerMacro_msg("Received FWD packs", 5);
             #else
                MPI_Waitsome(this->nFCpu(), this->pRecvFRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
             #endif //GEOMHDISCC_DEBUG
@@ -560,7 +562,9 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mspFBuffers->at(idx(id)), this->sizeFPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mFTypes.at(idx(id)), MPI_COMM_WORLD);
+               DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
+               int pos = idx(id);
+               MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), MPI_COMM_WORLD);
             }
 
             // Stop detailed profiler
@@ -609,6 +613,7 @@ namespace Parallel {
                MPI_Status stats[this->nBCpu()];
                int ierr = MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), stats);
                assert(ierr == MPI_SUCCESS);
+               DebuggerMacro_msg("Received BWD packs", 5);
             #else 
                MPI_Waitsome(this->nBCpu(), this->pRecvBRequests(this->mPacks), &count, idx.data(), MPI_STATUSES_IGNORE);
             #endif //GEOMHDISCC_DEBUG
@@ -622,7 +627,9 @@ namespace Parallel {
             // Unpack already received data from receive buffer
             for(int id = 0; id < count; ++id)
             {
-               MPI_Unpack(this->mspBBuffers->at(idx(id)), this->sizeBPacket(idx(id)), &(this->mRecvPositions.at(idx(id))), rData.rData().data(), 1, this->mBTypes.at(idx(id)), MPI_COMM_WORLD);
+               DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
+               int pos = idx(id);
+               MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), MPI_COMM_WORLD);
             }
 
             // Stop detailed profiler

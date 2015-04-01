@@ -75,25 +75,32 @@ namespace GeoMHDiSCC {
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
          spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
-         spExact->setModeOptions(1e0, 4.0, 1e0, 2.0, 1e0, 3.0);
+         spExact->setModeOptions(1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
          // Add streamfunction initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::STREAMFUNCTION);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINCOS);
-         spExact->setModeOptions(1e0, 3.0, 1e0, 5.0, 1e0, 7.0);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(2e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
          // Add vertical velocity initial state generation equation
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSSIN);
-         spExact->setModeOptions(1e0, 5.0, 1e0, 5.0, 1e0, 3.0);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(3e0, 0.0, 1e0, 0.0, 1e0, 0.0);
+
+         // Add vertical velocity initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
 
       // Generate random spectrum
       } else
       {
          // Shared pointer to random initial state equation
          Equations::SharedRandomScalarState spRand;
+         Equations::SharedCartesianExactScalarState spExact;
 
          // Add transport initial state generation equation
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
@@ -109,6 +116,12 @@ namespace GeoMHDiSCC {
          spRand = spGen->addScalarEquation<Equations::RandomScalarState>();
          spRand->setIdentity(PhysicalNames::VELOCITYZ);
          spRand->setSpectrum(-0.001, 0.001, 1e4, 1e4, 1e4);
+
+         // Add vertical velocity initial state generation equation
+         spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
+         spExact->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSCOS);
+         spExact->setModeOptions(-1e0, 0.0, 1e0, 0.0, 1e0, 0.0);
       }
 
       // Add output file
@@ -116,6 +129,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
       spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spGen->addHdf5OutputFile(spOut);
    }
 
@@ -124,32 +138,32 @@ namespace GeoMHDiSCC {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
 
-      // Add transport field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
-      
+//      // Add transport field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::TEMPERATURE);
+//      
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, true);
+      spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
+//      
+//      // Add vertical velocity field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::VELOCITYZ);
       
-      // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYZ);
-      
-      // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+//      // Add vertical velocity field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-      spOut->expect(PhysicalNames::TEMPERATURE);
+//      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+//      spOut->expect(PhysicalNames::VELOCITYZ);
+//      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
