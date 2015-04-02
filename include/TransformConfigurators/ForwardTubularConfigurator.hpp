@@ -102,7 +102,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, true);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareForwardReceive();
 
@@ -115,7 +115,7 @@ namespace Transform {
       // Start profiler
       ProfilerMacro_start(ProfilerMacro::FWDTRANSFORM);
 
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, true);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareForwardReceive();
 

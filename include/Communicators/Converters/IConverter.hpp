@@ -72,7 +72,7 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs) = 0;
+         virtual void setupCommunication(const int packs, const bool isForward) = 0;
 
          /**
           * @brief Start persistent send for forward transform

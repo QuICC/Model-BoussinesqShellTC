@@ -98,7 +98,7 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs);
+         virtual void setupCommunication(const int packs, const bool isForward);
 
          /**
           * @brief Start persistent send for forward transform
@@ -184,6 +184,36 @@ namespace Parallel {
          void receiveBwd(TBwdB &rData);
 
          /**
+          * @brief Make sure forward buffer is available
+          */
+         void syncFwdBuffer();
+
+         /**
+          * @brief Make sure backward buffer is available
+          */
+         void syncBwdBuffer();
+
+         /**
+          * @brief Make sure forward buffer used by send is available
+          */
+         void syncFwdSendBuffer();
+
+         /**
+          * @brief Make sure backward buffer used by send is available
+          */
+         void syncBwdSendBuffer();
+
+         /**
+          * @brief Make sure forward buffer used by receive is available
+          */
+         void syncFwdRecvBuffer();
+
+         /**
+          * @brief Make sure backward buffer used by receive is available
+          */
+         void syncBwdRecvBuffer();
+
+         /**
           * @brief Cleanup the data types
           */
          void cleanupTypes();
@@ -259,8 +289,13 @@ namespace Parallel {
       this->setupRequests(transId);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const bool isForward)
    {
+      // Store the number of packs in active transfer
+      this->mActiveSend = this->mPacks;
+      this->mActiveReceive = this->mPacks;
+      this->mActiveIsForward = isForward;
+
       // Store the number of packs in the next communication
       this->mPacks = packs;
    }
@@ -290,9 +325,6 @@ namespace Parallel {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
-         // Store the number of packs in active send
-         this->mActiveBSendPacks = this->mPacks;
-
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
@@ -342,9 +374,6 @@ namespace Parallel {
       // Don't do anything if the number of packs is zero
       if(this->mPacks > 0)
       {
-         // Store the number of packs in active send
-         this->mActiveFSendPacks = this->mPacks;
-
          // Make sure calls are posted at the right moment
          int flag;
          MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
@@ -375,21 +404,9 @@ namespace Parallel {
       this->mForwardPacks = fwdPacks;
       this->mBackwardPacks = bwdPacks;
 
-      // initialise the previous active packs to a possible value
-      if(this->mForwardPacks.size() > 0 && this->mBackwardPacks.size() > 0)
-      {
-         this->mActiveBSendPacks = this->mForwardPacks(0);
-      } else
-      {
-         this->mActiveBSendPacks = 0;
-      }
-      if(this->mBackwardPacks.size() > 0 && this->mForwardPacks.size() > 0)
-      {
-         this->mActiveFSendPacks = this->mBackwardPacks(0);
-      } else
-      {
-         this->mActiveFSendPacks = 0;
-      }
+      // Initialise the active packs
+      this->mActiveSend = 0;
+      this->mActiveReceive = 0;
       
       // Create index converter
       this->mspIdxConv = SharedPtrMacro<TIdx>(new TIdx(spRes, fwdDim));
@@ -410,18 +427,120 @@ namespace Parallel {
       for(int id = 0; id < FrameworkMacro::nCpu(); id++)
       {
       	 // Synchronize 
-     	 FrameworkMacro::synchronize();
+     	   FrameworkMacro::synchronize();
 
          // Create TBwdB datatypes
          MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id, this->mspIdxConv);
          this->mBTypes.push_back(type);
 
       	 // Synchronize 
-     	 FrameworkMacro::synchronize();
+     	   FrameworkMacro::synchronize();
 
          // Create TFwdA datatypes
          type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id, this->mspIdxConv);
          this->mFTypes.push_back(type);
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdBuffer()
+   {
+      if(this->mActiveIsForward)
+      {
+         this->syncFwdRecvBuffer();
+      } else
+      {
+         this->syncFwdSendBuffer();
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncBwdBuffer()
+   {
+      if(this->mActiveIsForward)
+      {
+         this->syncBwdRecvBuffer();
+      } else
+      {
+         this->syncBwdSendBuffer();
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdRecvBuffer()
+   {
+      // Make sure previous communication has finished
+      if(this->mActiveReceive > 0)
+      {
+         int flag;
+         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+         MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
+         if(! flag)
+         {
+            MPI_Waitall(this->nFCpu(), this->pRecvFRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+         }
+
+         // Clear active packs
+         this->mActiveReceive = 0;
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncBwdRecvBuffer()
+   {
+      // Make sure previous communication has finished
+      if(this->mActiveReceive > 0)
+      {
+         int flag;
+         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+         MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
+         if(! flag)
+         {
+            MPI_Waitall(this->nBCpu(), this->pRecvBRequests(this->mActiveReceive), MPI_STATUSES_IGNORE);
+         }
+
+         // Clear active packs
+         this->mActiveReceive = 0;
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdSendBuffer()
+   {
+      // Make sure previous communication has finished
+      if(this->mActiveSend > 0)
+      {
+         int flag;
+         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+         MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
+         if(! flag)
+         {
+            MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+         }
+
+         // Clear active packs
+         this->mActiveSend = 0;
+      }
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncBwdSendBuffer()
+   {
+      // Make sure previous communication has finished
+      if(this->mActiveSend > 0)
+      {
+         int flag;
+         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
+         MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), &flag, MPI_STATUSES_IGNORE);
+
+         // If not all are ready yet wait for completion
+         if(! flag)
+         {
+            MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveSend), MPI_STATUSES_IGNORE);
+         }
+
+         // Clear active packs
+         this->mActiveSend = 0;
       }
    }
 
@@ -430,36 +549,8 @@ namespace Parallel {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWDSENDWAIT);
 
-      // Check if communication interface is busy
-      if(this->mIsSending)
-      {
-         int flag;
-         // Make sure previous communication has finished
-         if(this->mActiveBSendPacks > 0)
-         {
-            // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-            MPI_Testall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), &flag, MPI_STATUSES_IGNORE);
-
-            // If not all are ready yet wait for completion
-            if(! flag)
-            {
-               MPI_Waitall(this->nFCpu(), this->pSendBRequests(this->mActiveBSendPacks), MPI_STATUSES_IGNORE);
-            }
-         }
-
-         // Make sure communication to be used are all finished
-         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
-
-         // If not all are ready yet wait for completion
-         if(! flag)
-         {
-            MPI_Waitall(this->nFCpu(), this->pSendFRequests(this->mPacks), MPI_STATUSES_IGNORE);
-         }
-
-         // Reset communication status
-         this->mIsSending = false;
-      }
+      // Make sure the buffer is free
+      this->syncFwdBuffer();
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDSENDWAIT);
@@ -482,34 +573,8 @@ namespace Parallel {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWDSENDWAIT);
 
-      // Check if communication interface is busy
-      if(this->mIsSending)
-      {
-         int flag;
-         // Make sure previous communication has finished
-         if(this->mActiveFSendPacks > 0)
-         {
-            // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-            MPI_Testall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), &flag, MPI_STATUSES_IGNORE);
-            // If not all are ready yet wait for completion
-            if(! flag)
-            {
-               MPI_Waitall(this->nBCpu(), this->pSendFRequests(this->mActiveFSendPacks), MPI_STATUSES_IGNORE);
-            }
-         }
-
-         // Make sure communication to be used are all finished
-         // (depending on MPI implementation the double test (test+wait) is required for the expected result)
-         MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
-         // If not all are ready yet wait for completion
-         if(! flag)
-         {
-            MPI_Waitall(this->nBCpu(), this->pSendBRequests(this->mPacks), MPI_STATUSES_IGNORE);
-         }
-
-         // Reset communication status
-         this->mIsSending = false;
-      }
+      // Make sure the buffer is free
+      this->syncBwdBuffer();
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDSENDWAIT);
@@ -529,9 +594,12 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::receiveFwd(TFwdA &rData)
    {
-      // Check if communication interface is busy
+      // Communication interface is receiving the data 
       if(this->mIsReceiving)
       {
+         // Make sure the buffer is free
+         this->syncFwdBuffer();
+
          // Number of receive calls in total
          int keepWaiting = this->nFCpu();
          int count = 0;
@@ -563,6 +631,7 @@ namespace Parallel {
             for(int id = 0; id < count; ++id)
             {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
+               DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
                MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), MPI_COMM_WORLD);
             }
@@ -576,6 +645,8 @@ namespace Parallel {
 
          // Reset communication status
          this->mIsReceiving = false;
+
+      // Data is here and just need to be unpacked
       } else
       {
          // Start detailed profiler
@@ -594,9 +665,12 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::receiveBwd(TBwdB &rData)
    {
-      // Check if communication interface is busy
+      // Communication interface is receiving the data 
       if(this->mIsReceiving)
       {
+         // Make sure the buffer is free
+         this->syncBwdBuffer();
+
          // Number of receive calls in total
          int keepWaiting = this->nBCpu();
          int count = 0;
@@ -628,6 +702,7 @@ namespace Parallel {
             for(int id = 0; id < count; ++id)
             {
                DebuggerMacro_showValue("Tag: ", 6, stats[id].MPI_TAG);
+               DebuggerMacro_showValue("-> From: ", 6, stats[id].MPI_SOURCE);
                int pos = idx(id);
                MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mRecvPositions.at(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), MPI_COMM_WORLD);
             }
@@ -641,6 +716,8 @@ namespace Parallel {
 
          // Reset communication status
          this->mIsReceiving = false;
+
+      // Data is here and just need to be unpacked
       } else
       {
          // Start detailed profiler

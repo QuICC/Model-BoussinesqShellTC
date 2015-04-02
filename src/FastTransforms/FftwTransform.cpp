@@ -20,8 +20,6 @@
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
 
-#include <iostream>
-#include "Framework/FrameworkMacro.h"
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -182,7 +180,6 @@ namespace Transform {
 
    void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
    {
-      std::cerr << fftVal << std::endl;
       // Assert that a mixed transform was setup
       assert(this->mspSetup->type() == FftSetup::MIXED);
 
@@ -337,7 +334,6 @@ namespace Transform {
          fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
          rPhysVal -= this->mTmpZOut;
       }
-      rPhysVal.setConstant(FrameworkMacro::id()+1);
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

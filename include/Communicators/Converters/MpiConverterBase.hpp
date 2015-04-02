@@ -197,14 +197,19 @@ namespace Parallel {
          int mPacks;
 
          /**
-          * @brief The number of packs in the "previous/active" forward send
+          * @brief Active operations are for forward direction
           */
-         int   mActiveFSendPacks;
+         bool   mActiveIsForward;
 
          /**
-          * @brief The number of packs in the "previous/active" backward send
+          * @brief The number of packs in the "previous/active" send operations
           */
-         int   mActiveBSendPacks;
+         int   mActiveSend;
+
+         /**
+          * @brief The number of packs in the "previous/active" receive operations
+          */
+         int   mActiveReceive;
 
          /**
           * @brief Storage for the receive position pointers
@@ -348,7 +353,7 @@ namespace Parallel {
    }
       
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverterBase()
-      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveFSendPacks(0), mActiveBSendPacks(0)
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveSend(0), mActiveReceive(0)
    {
    }
 
