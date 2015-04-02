@@ -6,6 +6,7 @@
 
 // Configuration includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // System includes
 //
@@ -101,6 +102,9 @@ namespace Transform {
 
    void BackwardConfigurator::project1D(const ProjectorTree::Projector1DEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Project 1D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD1D);
 
@@ -139,6 +143,9 @@ namespace Transform {
 
    void BackwardConfigurator::project2D(const ProjectorTree::Projector2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Project 2D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD2D);
 
@@ -186,6 +193,9 @@ namespace Transform {
 
    void BackwardConfigurator::project3D(const ProjectorTree::Projector3DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Project 3D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::BWD3D);
 

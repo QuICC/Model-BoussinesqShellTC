@@ -467,7 +467,7 @@ namespace Parallel {
             // Get global MPI source rank
             src = this->fCpu(grpSrc);
 
-            // Set MPI tag
+            // Set shifted MPI tag to make it unique
             tag = src + tagShift;
 
             //Safety asserts
@@ -481,12 +481,15 @@ namespace Parallel {
          // Create send backward requests
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            // Set MPI tag
-            tag = FrameworkMacro::id() + tagShift;
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), tag));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+
+            // Set shifted MPI tag to make it unique
+            tag = FrameworkMacro::id() + tagShift;
+
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nBCpu());
+
             // Get global MPI destination rank
             dest = this->bCpu(grpDest);
 
@@ -524,12 +527,16 @@ namespace Parallel {
          {
             // Get CPU group index of local node
             grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nBCpu());
+
             // Get global MPI source rank
             src = this->bCpu(grpSrc);
-            // Set MPI tag
+
+            // Set shifted MPI tag to make it unique
             tag = src + tagShift;
+
             // initialise the Recv request
             MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
          }
@@ -537,14 +544,18 @@ namespace Parallel {
          // Create send forward requests
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            // Set MPI tag
-            tag = FrameworkMacro::id() + tagShift;
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), tag));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
+
+            // Set shifted MPI tag to make it unique
+            tag = FrameworkMacro::id() + tagShift;
+
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nFCpu());
+
             // Get global MPI destination rank
             dest = this->fCpu(grpDest);
+
             // initialise the Send request
             MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests.at(packs).at(grpDest)));
          }

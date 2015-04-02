@@ -6,6 +6,7 @@
 
 // Configuration includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // System includes
 //
@@ -45,6 +46,9 @@ namespace Transform {
 
    void ForwardConfigurator::integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Integrate 3D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD3D);
 
@@ -83,6 +87,9 @@ namespace Transform {
 
    void ForwardConfigurator::integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Integrate 2D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD2D);
 
@@ -129,6 +136,9 @@ namespace Transform {
 
    void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
    {
+      // Debugger message
+      DebuggerMacro_msg("Integrate 1D", 4);
+
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
 
