@@ -68,17 +68,6 @@ endif(splinalgTest)
 
 
 ###################################################
-#---- FORWARD OR BACKWARD TRANSFORM OPERATOR -----#
-###################################################
-
-geomhdiscc_provide_choice(GEOMHDISCC_TRANSOPS "Forward/Backward transform operators" GEOMHDISCC_TRANSOP transopTest)
-
-if(transopTest)
-   geomhdiscc_add_definition(GEOMHDISCC_TRANSOP)
-endif(transopTest)
-
-
-###################################################
 #------------------ LARGE IO FORMAT --------------#
 ###################################################
 

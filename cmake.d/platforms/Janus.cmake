@@ -58,12 +58,6 @@ set(GEOMHDISCC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/include" PARENT_
 set(GEOMHDISCC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/lib" PARENT_SCOPE)
 
 ###################################################
-#--------- AVAILABLE TRANSFORM OPERATORS ---------#
-###################################################
-
-set(GEOMHDISCC_TRANSOPS "Forward" "Recurrence" "Backward" PARENT_SCOPE)
-
-###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 

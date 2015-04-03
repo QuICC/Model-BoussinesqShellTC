@@ -45,12 +45,6 @@ set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 ###################################################
-#--------- AVAILABLE TRANSFORM OPERATORS ---------#
-###################################################
-
-set(GEOMHDISCC_TRANSOPS "Forward" "Recurrence" "Backward" PARENT_SCOPE)
-
-###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
 ###################################################
 
