@@ -457,10 +457,10 @@ namespace Parallel {
    {
       if(this->mActiveIsForward)
       {
-         this->syncBwdRecvBuffer();
+         this->syncBwdSendBuffer();
       } else
       {
-         this->syncBwdSendBuffer();
+         this->syncBwdRecvBuffer();
       }
    }
 
