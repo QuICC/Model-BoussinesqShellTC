@@ -179,7 +179,7 @@ namespace Transform {
 
    inline void BackwardSingle2DConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, false);
+      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::BACKWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareBackwardReceive();
    }

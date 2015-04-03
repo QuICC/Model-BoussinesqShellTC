@@ -98,7 +98,7 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs, const bool isForward);
+         virtual void setupCommunication(const int packs, const TransformDirection::Id direction);
 
          /**
           * @brief Start persistent send for forward transform
@@ -186,12 +186,12 @@ namespace Parallel {
          /**
           * @brief Make sure forward buffer is available
           */
-         void syncFwdBuffer();
+         void syncFwdBuffer(const TransformDirection::Id direction);
 
          /**
           * @brief Make sure backward buffer is available
           */
-         void syncBwdBuffer();
+         void syncBwdBuffer(const TransformDirection::Id direction);
 
          /**
           * @brief Make sure forward buffer used by send is available
@@ -289,12 +289,12 @@ namespace Parallel {
       this->setupRequests(transId);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const bool isForward)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const TransformDirection::Id direction)
    {
       // Store the number of packs in active transfer
       this->mActiveSend = this->mPacks;
       this->mActiveReceive = this->mPacks;
-      this->mActiveIsForward = isForward;
+      this->mActiveDirection = direction;
 
       // Store the number of packs in the next communication
       this->mPacks = packs;
@@ -442,23 +442,25 @@ namespace Parallel {
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdBuffer()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdBuffer(const TransformDirection::Id direction)
    {
-      if(this->mActiveIsForward)
+      if(this->mActiveDirection == TransformDirection::FORWARD && direction == TransformDirection::BACKWARD)
       {
          this->syncFwdRecvBuffer();
-      } else
+
+      } else if(this->mActiveDirection == TransformDirection::BACKWARD && direction == TransformDirection::FORWARD)
       {
          this->syncFwdSendBuffer();
       }
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncBwdBuffer()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncBwdBuffer(const TransformDirection::Id direction)
    {
-      if(this->mActiveIsForward)
+      if(this->mActiveDirection == TransformDirection::FORWARD && direction == TransformDirection::BACKWARD)
       {
          this->syncBwdSendBuffer();
-      } else
+
+      } else if(this->mActiveDirection == TransformDirection::BACKWARD && direction == TransformDirection::FORWARD)
       {
          this->syncBwdRecvBuffer();
       }
@@ -550,7 +552,7 @@ namespace Parallel {
       DetailedProfilerMacro_start(ProfilerMacro::FWDSENDWAIT);
 
       // Make sure the buffer is free
-      this->syncFwdBuffer();
+      this->syncFwdBuffer(TransformDirection::BACKWARD);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWDSENDWAIT);
@@ -574,7 +576,7 @@ namespace Parallel {
       DetailedProfilerMacro_start(ProfilerMacro::BWDSENDWAIT);
 
       // Make sure the buffer is free
-      this->syncBwdBuffer();
+      this->syncBwdBuffer(TransformDirection::FORWARD);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::BWDSENDWAIT);
@@ -598,7 +600,7 @@ namespace Parallel {
       if(this->mIsReceiving)
       {
          // Make sure the buffer is free
-         this->syncFwdBuffer();
+         this->syncFwdBuffer(TransformDirection::FORWARD);
 
          // Number of receive calls in total
          int keepWaiting = this->nFCpu();
@@ -655,6 +657,7 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nFCpu(); ++id)
          {
+            DebuggerMacro_msg("Unpacking FWD packs", 5);
             MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mFTypes.at(id), MPI_COMM_WORLD);
          }
 
@@ -669,7 +672,7 @@ namespace Parallel {
       if(this->mIsReceiving)
       {
          // Make sure the buffer is free
-         this->syncBwdBuffer();
+         this->syncBwdBuffer(TransformDirection::BACKWARD);
 
          // Number of receive calls in total
          int keepWaiting = this->nBCpu();
@@ -726,6 +729,7 @@ namespace Parallel {
          // Unpack data from receive buffer
          for(int id = 0; id < this->nBCpu(); ++id)
          {
+            DebuggerMacro_msg("Unpacking BWD packs", 5);
             MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mRecvPositions.at(id)), rData.rData().data(), 1, this->mBTypes.at(id), MPI_COMM_WORLD);
          }
 

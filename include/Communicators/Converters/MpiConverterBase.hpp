@@ -29,6 +29,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MpiTypes.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
@@ -199,7 +200,7 @@ namespace Parallel {
          /**
           * @brief Active operations are for forward direction
           */
-         bool   mActiveIsForward;
+         TransformDirection::Id   mActiveDirection;
 
          /**
           * @brief The number of packs in the "previous/active" send operations

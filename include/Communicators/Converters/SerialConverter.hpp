@@ -27,6 +27,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/DimensionTools.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
@@ -78,7 +79,7 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs, const bool isForward);
+         virtual void setupCommunication(const int packs, const TransformDirection::Id direction);
 
          /**
           * @brief Start persistent send for forward transform
@@ -157,7 +158,7 @@ namespace Parallel {
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const bool isForward)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const TransformDirection::Id direction)
    {
    }
 

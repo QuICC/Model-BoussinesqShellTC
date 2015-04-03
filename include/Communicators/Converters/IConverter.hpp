@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 
 namespace GeoMHDiSCC {
@@ -72,7 +73,7 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs, const bool isForward) = 0;
+         virtual void setupCommunication(const int packs, const TransformDirection::Id direction) = 0;
 
          /**
           * @brief Start persistent send for forward transform
