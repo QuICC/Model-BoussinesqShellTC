@@ -138,32 +138,32 @@ namespace GeoMHDiSCC {
       // Shared pointer to basic field visualizer
       Equations::SharedScalarFieldVisualizer spField;
 
-//      // Add transport field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::TEMPERATURE);
-//      
+      // Add transport field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      
       // Add streamfunction field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::STREAMFUNCTION);
-//      
-//      // Add vertical velocity field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::VELOCITYZ);
       
-//      // Add vertical velocity field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VELOCITYZ);
+      
+      // Add background temperature profile visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
-//      spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::TEMPERATURE);
       spOut->expect(PhysicalNames::STREAMFUNCTION);
-//      spOut->expect(PhysicalNames::VELOCITYZ);
-//      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
       spVis->addHdf5OutputFile(spOut);
    }
 
