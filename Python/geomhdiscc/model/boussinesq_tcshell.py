@@ -203,7 +203,6 @@ class BoussinesqTCShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
@@ -224,7 +223,6 @@ class BoussinesqTCShell(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         m = int(eigs[0])
-
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -276,7 +274,6 @@ class BoussinesqTCShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)

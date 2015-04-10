@@ -105,14 +105,14 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        m = int(eigs[0])
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            m = eigs[0]
-
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             # No-slip/No-slip, Fixed temperature/Fixed temperature
@@ -220,7 +220,9 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        m = eigs[0]
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -248,10 +250,12 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        Ra = eq_params['rayleigh']
-        m = eigs[0]
+        assert(eigs[0].is_integer())
 
+        Ra = eq_params['rayleigh']
         zscale = eq_params['scale3d']
+
+        m = int(eigs[0])
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -409,9 +413,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        assert(eigs[0].is_integer())
+
         Pr = eq_params['prandtl']
 
-        m = eigs[0]
+        m = int(eigs[0])
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 

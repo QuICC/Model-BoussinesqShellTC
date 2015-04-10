@@ -197,7 +197,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        m = eigs[1]
+        m = int(eigs[1])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
@@ -217,7 +217,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
         
-        m = eigs[1]
+        m = int(eigs[1])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
