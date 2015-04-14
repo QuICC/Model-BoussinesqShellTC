@@ -347,15 +347,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
                 if field_col == ("velocity","r"):
                     if m%2 == 1:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
@@ -365,15 +365,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
                 elif field_col == ("velocity","theta"):
                     if m%2 == 1:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
@@ -383,15 +383,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
                 elif field_col == ("velocity","z"):
                     if m%2 == 1:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['rt'] = 1
                         bc['r']['cr'] = 1
+                        bc['r']['rt'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['rt'] = 1
                     bc['z']['cr'] = 1
+                    bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
@@ -448,7 +448,11 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
-        if eigs[0]%2 == 1:
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+
+        if m%2 == 1:
             # U: T_Ni
             idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 
@@ -471,16 +475,16 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     #        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
             # W: TiN
-            idx_w = utils.qidx(res[2], res[2])
             idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
 
             # P:
             idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+#            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
             idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2)))
     #        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-1)))
             # Pressure: T_00
-            if eigs[0] == 0:
+            if m == 0:
+                idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], 0), utils.sidx(res[0], res[0]-1)))
                 idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
         return (idx_u, idx_v, idx_w, idx_p)

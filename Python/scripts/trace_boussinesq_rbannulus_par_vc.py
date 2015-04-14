@@ -13,8 +13,8 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-m = 3
-res = [36, 0, 36]
+m = 2
+res = [16, 0, 16]
 #eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':5e3, 'ro':1, 'rratio':0.35, 'scale3d':2.0}
 eigs = [float(m)]
@@ -30,7 +30,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = False
 solve_evp = True
 show_solution = (True and solve_evp)
