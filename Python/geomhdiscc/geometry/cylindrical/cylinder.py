@@ -189,11 +189,22 @@ def i2j2x2lapl(nr, nz, m, parity, bc, coeff = 1.0, zscale = 1.0):
     mat = coeff*mat
     return cylbc.constrain(mat, nr, nz, parity, 1, 2, bc)
 
-def i2j2x3laplx_1(nr, nz, m, parity, bc, coeff = 1.0, zscale = 1.0):
-    """Create a i2x3laplx_1 in R kronecker with i2 in Z"""
+def i2j2x2vlapl(nr, nz, m, parity, bc, coeff = 1.0, zscale = 1.0):
+    """Create a i2x2vlapl in R kronecker with i2 in Z"""
 
     bcr, bcz = convert_bc(bc)
-    mat = spsp.kron(c1d.i2(nz,bcz), rad.i2x3laplhx_1(nr, m, parity, bcr))
+    mat = spsp.kron(c1d.i2(nz,bcz), rad.i2x2vlaplh(nr, m, parity, bcr))
+    bcr[0] = min(bcr[0], 0)
+    bcz[0] = min(bcz[0], 0)
+    mat = mat + spsp.kron(c1d.i2d2(nz, bcz, cscale = zscale), rad.i2x2(nr, parity, bcr))
+    mat = coeff*mat
+    return cylbc.constrain(mat, nr, nz, parity, 1, 2, bc)
+
+def i2j2x3vlaplx_1(nr, nz, m, parity, bc, coeff = 1.0, zscale = 1.0):
+    """Create a i2x3vlaplx_1 in R kronecker with i2 in Z"""
+
+    bcr, bcz = convert_bc(bc)
+    mat = spsp.kron(c1d.i2(nz,bcz), rad.i2x3vlaplhx_1(nr, m, parity, bcr))
     bcr[0] = min(bcr[0], 0)
     bcz[0] = min(bcz[0], 0)
     mat = mat + spsp.kron(c1d.i2d2(nz, bcz, cscale = zscale), rad.i2x2(nr, parity, bcr))

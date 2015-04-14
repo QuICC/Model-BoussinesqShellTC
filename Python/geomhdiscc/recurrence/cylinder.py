@@ -231,7 +231,21 @@ def i2x2laplh():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x3laplhx_1():
+def i2x2vlaplh():
+    """Cylinder 2nd integral of x^2 horizontal vector laplacian operator"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-(m**2 + 1)}]
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3vlaplhx_1():
     """Cylinder 2nd integral of x^3 horizontal laplacian 1/x operator"""
 
     # Setup terms in recurrence

@@ -466,8 +466,33 @@ def i2x2laplh(nr, m, parity, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets)
     return radbc.constrain(mat, parity, bc)
 
-def i2x3laplhx_1(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^3 Laplacian 1/x T_n(x)."""
+def i2x2vlaplh(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^2 vector Laplacian T_n(x)."""
+
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = np.arange(-1,2)
+    nzrow = 1
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return  -(m**2 - n**2 + 4.0*n - 3.0)/(4.0*n*(n - 1.0))
+
+    # Generate main diagonal
+    def d0(n):
+        return (m**2 + n**2 - 1.0)/(2.0*(n - 1.0)*(n + 1.0))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -(m**2 - n**2 - 4.0*n - 3.0)/(4.0*n*(n + 1.0))
+
+    ds = [d_1, d0, d1]
+    diags = utils.build_diagonals(ns, nzrow, ds, offsets)
+
+    mat = coeff*spsp.diags(diags, offsets)
+    return radbc.constrain(mat, parity, bc)
+
+def i2x3vlaplhx_1(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of x^3 vector Laplacian 1/x T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
