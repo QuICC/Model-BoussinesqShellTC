@@ -32,7 +32,7 @@
       #include "FastTransforms/AnnulusChebyshevFftwTransform.hpp"
    #elif defined GEOMHDISCC_SPATIALSCHEME_BLF
       #include "FastTransforms/SphereChebyshevFftwTransform.hpp"
-   #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFm
+   #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
       #include "FastTransforms/ShellChebyshevFftwTransform.hpp"
    #endif //defined GEOMHDISCC_SPATIALSCHEME_CFT
 
@@ -63,7 +63,7 @@
                /// Typedef for FFTW's sphere Chebyshev FFT implementation
                typedef SphereChebyshevFftwTransform SphereChebyshevSelector;
 
-            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFm
+            #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_SLFM
                /// Typedef for FFTW's shell Chebyshev FFT implementation
                typedef ShellChebyshevFftwTransform ShellChebyshevSelector;
             #endif //defined GEOMHDISCC_SPATIALSCHEME_CFT

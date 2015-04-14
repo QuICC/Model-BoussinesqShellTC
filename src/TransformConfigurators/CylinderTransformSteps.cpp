@@ -1,6 +1,6 @@
 /** 
- * @file CylindricalTransformSteps.cpp
- * @brief Source of the implementation of the cylindrical transform steps
+ * @file CylinderTransformSteps.cpp
+ * @brief Source of the implementation of the phyiscal <-> spectral transform steps in a whole cylinder
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -15,7 +15,7 @@
 
 // Class include
 //
-#include "TransformConfigurators/CylindricalTransformSteps.hpp"
+#include "TransformConfigurators/CylinderTransformSteps.hpp"
 
 // Project includes
 //

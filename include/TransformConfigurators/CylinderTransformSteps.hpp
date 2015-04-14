@@ -1,14 +1,11 @@
 /** 
- * @file SphericalTransformSteps.hpp
- * @brief Definition of some useful enums for steps involved in a full spherical transform
+ * @file CylinderTransformSteps.hpp
+ * @brief Definition of some useful enums for the steps involved in the physical <-> spectral transforms in a whole cylinder
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
- *
- *  \mhdBug Needs documentation and splitting out model/scheme part
- *  \mhdBug Might depend on model/scheme
  */
 
-#ifndef SPHERICALTRANSFORMSTEPS_HPP
-#define SPHERICALTRANSFORMSTEPS_HPP
+#ifndef CYLINDERTRANSFORMSTEPS_HPP
+#define CYLINDERTRANSFORMSTEPS_HPP
 
 // Configuration includes
 //
@@ -30,7 +27,7 @@ namespace GeoMHDiSCC {
    namespace Transform {
 
       /**
-       * @brief Struct to contain the full field transform steps
+       * @brief Struct to contain the steps involved in a the physical <-> spectral transforms in a whole cylinder
        */
       namespace TransformSteps
       {
@@ -44,7 +41,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Generate the list of branches in vector integration transform
           *
-          * @brief components Spectral components where to stor results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
+          * @brief components Spectral components where to store results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
           * @brief isNL Flag to either compute NL projection or pure Physical <-> Spectral
           */
          std::vector<IntegratorBranch>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components, const bool isNL);
@@ -82,4 +79,4 @@ namespace GeoMHDiSCC {
    }
 }
 
-#endif // SPHERICALTRANSFORMSTEPS_HPP
+#endif // CYLINDERTRANSFORMSTEPS_HPP
