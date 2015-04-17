@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [16, 0, 0]
+res = [128, 0, 0]
 
 # SF, FT,
 bc_vel = 1
@@ -19,6 +19,46 @@ bc_temp = 0
 kx = 0
 ky = 3.710
 eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1d':2.0}
+ky = 129
+eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+ky = 131
+eq_params = {'prandtl':1, 'rayleigh':8.7012659e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+ky = 130
+eq_params = {'prandtl':1, 'rayleigh':8.7011095e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+ky = 132
+eq_params = {'prandtl':1, 'rayleigh':8.7054933e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+ky = 65
+eq_params = {'prandtl':1, 'rayleigh':4.0000000e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+## NS, FT,
+#bc_vel = 0
+#ky = 54
+#eq_params = {'prandtl':1, 'rayleigh':3.455838e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 55
+#eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 56
+#eq_params = {'prandtl':1, 'rayleigh':3.450893e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60
+#eq_params = {'prandtl':1, 'rayleigh':3.515608e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 70
+#eq_params = {'prandtl':1, 'rayleigh':4.134931e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 100
+#eq_params = {'prandtl':1, 'rayleigh':1.094775e8, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 120
+#eq_params = {'prandtl':1, 'rayleigh':7.7971364e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 121
+#eq_params = {'prandtl':1, 'rayleigh':7.7892799e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 122
+#eq_params = {'prandtl':1, 'rayleigh':7.7846430e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 123
+#eq_params = {'prandtl':1, 'rayleigh':7.7832219e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 124
+#eq_params = {'prandtl':1, 'rayleigh':7.7850143e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 128
+#eq_params = {'prandtl':1, 'rayleigh':7.8420000e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 130
+#eq_params = {'prandtl':1, 'rayleigh':7.8632272e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 131
+#eq_params = {'prandtl':1, 'rayleigh':7.8875224e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 
 eigs = [kx, ky]
 
@@ -32,7 +72,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = True
+show_spy = False
 write_mtx = True
 solve_evp = True
 show_solution = (True and solve_evp)
@@ -63,11 +103,11 @@ if write_mtx:
 # Solve EVP with sptarn
 if solve_evp:
     import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e0, np.inf)
+    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e3, np.inf)
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = 0
+    viz_mode = -1
     zscale = eq_params['scale1d']
 
     for mode in range(0,len(evp_lmb)):
@@ -113,30 +153,42 @@ if show_solution:
 
     # Compute physical space values
     grid_x = transf.grid(res[0])
-    phys_u = transf.tophys(sol_u.real)
-    phys_v = transf.tophys(sol_v.real)
-    phys_w = transf.tophys(sol_w.real)
-    phys_t = transf.tophys(sol_t.real)
+    phys_ur = transf.tophys(sol_u.real)
+    phys_ui = transf.tophys(sol_u.imag)
+    phys_vr = transf.tophys(sol_v.real)
+    phys_vi = transf.tophys(sol_v.imag)
+    phys_wr = transf.tophys(sol_w.real)
+    phys_wi = transf.tophys(sol_w.imag)
+    phys_tr = transf.tophys(sol_t.real)
+    phys_ti = transf.tophys(sol_t.imag)
+    phys_pr = transf.tophys(sol_p.real)
+    phys_pi = transf.tophys(sol_p.imag)
     phys_cr = transf.tophys(sol_c.real)
     phys_ci = transf.tophys(sol_c.imag)
     
     # Show physical plot
     pl.subplot(2,3,1)
-    pl.plot(grid_x, phys_u)
+    pl.plot(grid_x, phys_ur)
+    pl.plot(grid_x, phys_ui)
     pl.title('u')
     pl.subplot(2,3,2)
-    pl.plot(grid_x, phys_v)
+    pl.plot(grid_x, phys_vr)
+    pl.plot(grid_x, phys_vi)
     pl.title('v')
     pl.subplot(2,3,3)
-    pl.plot(grid_x, phys_w)
+    pl.plot(grid_x, phys_wr)
+    pl.plot(grid_x, phys_wi)
     pl.title('w')
     pl.subplot(2,3,4)
-    pl.plot(grid_x, phys_t)
+    pl.plot(grid_x, phys_tr)
+    pl.plot(grid_x, phys_ti)
     pl.title('T')
     pl.subplot(2,3,5)
-    pl.plot(grid_x, phys_cr)
-    pl.title('Continuity (real)')
+    pl.plot(grid_x, phys_pr)
+    pl.plot(grid_x, phys_pi)
+    pl.title('Pressure (real)')
     pl.subplot(2,3,6)
     pl.plot(grid_x, phys_ci)
+    pl.plot(grid_x, phys_cr)
     pl.title('Continuity (imag)')
     pl.show()

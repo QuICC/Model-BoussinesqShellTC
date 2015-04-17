@@ -94,6 +94,12 @@ phi = 0
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 
+kp = 4.1296
+eq_params = {'prandtl':1, 'rayleigh':5e6, 'heating':1, 'scale1d':2.0}
+phi = 0
+kx = kp*np.cos(phi*np.pi/180.0);
+ky = (kp**2-kx**2)**0.5;
+
 
 eigs = [kx, ky]
 
@@ -108,9 +114,9 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = True
+write_mtx = False
 solve_evp = True
-show_solution = (False and solve_evp)
+show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -150,7 +156,7 @@ if solve_evp:
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
 
 if show_solution:
-    viz_mode = 0
+    viz_mode = -1
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     # Get solution vectors
     sol_u = evp_vec[0:res[0],viz_mode]
