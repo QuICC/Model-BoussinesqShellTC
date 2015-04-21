@@ -228,7 +228,6 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
         elif field_row == ("velocity","y"):
             mat = c1d.i2(res[0], bc)
             mat = utils.qid_from_idx(idx_v, res[0])*mat
-            mat[idx_v,:] = 0;
 
         elif field_row == ("velocity","z"):
             mat = c1d.i2(res[0], bc)

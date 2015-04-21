@@ -13,6 +13,7 @@
 
 // Configuration includes
 //
+#include "Framework/FrameworkMacro.h"
 
 // System includes
 //
@@ -56,6 +57,14 @@ namespace GeoMHDiSCC {
 
    template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
    {
+      // Print message to signal start simulation initialisation
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, "... initializing simulation ...", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+      }
+
       // Create simulation
       SharedSimulation  spSim(new Simulation);
 
@@ -87,6 +96,13 @@ namespace GeoMHDiSCC {
 
       // Initialise simulation
       spSim->initBase();
+
+      // Print message to signal start of load distribution calculation
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... optimizing load distribution ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
 
       // Initialise resolution
       spSim->initResolution<typename TModel::SchemeType>();

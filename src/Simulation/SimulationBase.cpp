@@ -88,6 +88,13 @@ namespace GeoMHDiSCC {
       // Transform projector tree
       std::vector<Transform::ProjectorTree> projectorTree;
 
+      // Print message to signal start of variable initialisation
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... initializing variables ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
       // Initialise the variables and set general variable requirements
       RequirementTools::initVariables(projectorTree, this->mScalarVariables, this->mVectorVariables, this->mScalarEquations, this->mVectorEquations, this->mspRes);
 
@@ -97,8 +104,22 @@ namespace GeoMHDiSCC {
       // Map variables to the equations and set nonlinear requirements
       RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
 
+      // Print message to signal start of variable initialisation
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... initializing transforms ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
       // Initialise the transform coordinator
       this->initTransformCoordinator(integratorTree, projectorTree);
+
+      // Print message to signal start of equations setup
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... setup equations ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
 
       // Initialise the equations (generate operators, etc)
       this->setupEquations(spBcs);
@@ -106,11 +127,25 @@ namespace GeoMHDiSCC {
       // Sort the equations by type: time/solver/trivial
       this->sortEquations();
 
+      // Print message to signal start of output files setup
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... setup output files ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
       // Setup output files (ASCII diagnostics, state files, etc)
       this->setupOutput();
 
       // Get timestep information from configuration file
       Array tstep = this->mSimIoCtrl.configTimestepping();
+
+      // Print message to signal start of initialisation of diagnostics
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... initializing diagnostics ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
 
       // Initialise the diagnostics
       this->mDiagnostics.init(this->mTransformCoordinator.mesh(), this->mScalarVariables, this->mVectorVariables, tstep);

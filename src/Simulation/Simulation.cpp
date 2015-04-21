@@ -107,6 +107,12 @@ namespace GeoMHDiSCC {
 
    void Simulation::preSolveEquations()
    {  
+      // Print message to signal start of diagnostic/trivial presolve
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... diagnostic and trivial equations ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
       /// \mhdBug This is not sufficient to recover all fields from previous computation
 
       // Solve diagnostic equations
@@ -196,12 +202,25 @@ namespace GeoMHDiSCC {
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
 
+      // Print message to signal start of initial ASCII output
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... write initial ASCII files ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+
       // Update heavy calculation required for ASCII output
       SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
 
       // Write initial ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
+      // Print message to signal start of initial HDF5 output
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printCentered(std::cout, "(... write initial HDF5 files ...)", ' ');
+         IoTools::Formatter::printNewline(std::cout);
+      }
       // Write initial state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
