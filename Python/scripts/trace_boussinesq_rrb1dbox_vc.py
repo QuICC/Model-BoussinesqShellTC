@@ -13,28 +13,50 @@ fields = model.stability_fields()
 # Set resolution, parameters, boundary conditions
 res = [128, 0, 0]
 
-# SF, FT,
-bc_vel = 1
+# FT
 bc_temp = 0
+
+# SF, FT,
+#bc_vel = 1
 kx = 0
 ky = 3.710
 eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1d':2.0}
-ky = 129
-eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-ky = 131
-eq_params = {'prandtl':1, 'rayleigh':8.7012659e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-ky = 130
-eq_params = {'prandtl':1, 'rayleigh':8.7011095e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-ky = 132
-eq_params = {'prandtl':1, 'rayleigh':8.7054933e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-ky = 65
-eq_params = {'prandtl':1, 'rayleigh':4.0000000e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 129
+#eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 131
+#eq_params = {'prandtl':1, 'rayleigh':8.7012659e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 130
+#eq_params = {'prandtl':1, 'rayleigh':8.7011095e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 132
+#eq_params = {'prandtl':1, 'rayleigh':8.7054933e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#ky = 65
+#eq_params = {'prandtl':1, 'rayleigh':4.13360252e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60
+#eq_params = {'prandtl':1, 'rayleigh':4.04824521e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 61
+#eq_params = {'prandtl':1, 'rayleigh':4.04803724e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 62
+#eq_params = {'prandtl':1, 'rayleigh':4.05657944e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60.5
+#eq_params = {'prandtl':1, 'rayleigh':4.04703887e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60.52
+#eq_params = {'prandtl':1, 'rayleigh':4.04703659e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60.523
+#eq_params = {'prandtl':1, 'rayleigh':4.04703656e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#ky = 60.5229
+#eq_params = {'prandtl':1, 'rayleigh':4.04703656e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 ## NS, FT,
-#bc_vel = 0
+bc_vel = 0
 #ky = 54
 #eq_params = {'prandtl':1, 'rayleigh':3.455838e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 55
-#eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+ky = 55
+eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+ky = 55.4
+eq_params = {'prandtl':1, 'rayleigh':3.44979010e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+ky = 55.402
+eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+ky = 55.4023
+eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 56
 #eq_params = {'prandtl':1, 'rayleigh':3.450893e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 60
@@ -73,7 +95,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
 show_spy = False
-write_mtx = True
+write_mtx = False
 solve_evp = True
 show_solution = (True and solve_evp)
 
