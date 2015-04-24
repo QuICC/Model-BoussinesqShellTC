@@ -57,14 +57,6 @@ namespace GeoMHDiSCC {
 
    template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
    {
-      // Print message to signal start simulation initialisation
-      if(FrameworkMacro::allowsIO())
-      {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "... initializing simulation ...", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
-      }
-
       // Create simulation
       SharedSimulation  spSim(new Simulation);
 
