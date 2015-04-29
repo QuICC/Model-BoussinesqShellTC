@@ -36,7 +36,7 @@ namespace GeoMHDiSCC {
       PyObject *pValue;
 
       // Call model operator Python routine
-      PythonModelWrapper::setMethod((char *)"all_fields");
+      PythonModelWrapper::setMethod((char *)"config_fields");
       pValue = PythonModelWrapper::callMethod();
 
       // Create storage

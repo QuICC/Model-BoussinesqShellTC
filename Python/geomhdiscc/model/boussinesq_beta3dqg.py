@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
+import geomhdiscc.geometry.cartesian.cartesian_2d as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 
@@ -15,17 +15,17 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 class BoussinesqBeta3DQG(base_model.BaseModel):
     """Class to setup the Boussinesq Beta 3DQG model"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, True, False]
 
-    def all_fields(self):
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "gamma", "chi", "scale1d", "scale3d"]
+
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["streamfunction", "velocityz", "temperature", "vorticityz"]
@@ -47,10 +47,21 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        fields = []
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("streamfunction",""), ("velocityz",""), ("temperature",""), ("vorticityz","")]:
+                fields = [field_row]
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
 
         return fields
 
@@ -85,27 +96,10 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         # Matrix operator is complex
         is_complex = True
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -304,32 +298,28 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c2d.stencil(res[0], res[2], bc)
-
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("streamfunction",""):
-            mat = c2d.i2(res[0],res[2], bc)
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("streamfunction","") and field_col == field_row:
+            mat = geo.i2(res[0],res[2], bc)
 
-        elif field_row == ("velocityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+        elif field_row == ("velocityz","") and field_col == field_row:
+            mat = geo.i2j1(res[0],res[2], bc)
 
-        elif field_row == ("temperature",""):
-            mat = c2d.i2(res[0],res[2], bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2(res[0],res[2], bc)
 
-        elif field_row == ("vorticityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+        elif field_row == ("vorticityz","") and field_col == field_row:
+            mat = geo.i2j1(res[0],res[2], bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block of linear operator"""
 
         Pr = eq_params['prandtl']
@@ -345,58 +335,61 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2laplh(res[0],res[2], k, bc, -1.0, xscale = xscale)
+                mat = geo.i2laplh(res[0],res[2], k, bc, -1.0, xscale = xscale)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("vorticityz",""):
-                mat = c2d.i2(res[0],res[2], bc)
+                mat = geo.i2(res[0],res[2], bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.i2j1e1(res[0],res[2], bc, (-1.0/G**2), zscale = zscale)
+                mat = geo.i2j1e1(res[0],res[2], bc, (-1.0/G**2), zscale = zscale)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j1laplh(res[0],res[2], k, bc, xscale = xscale)
+                mat = geo.i2j1laplh(res[0],res[2], k, bc, xscale = xscale)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+                mat = geo.zblk(res[0],res[2], 2, 1, bc)
 
             elif field_col == ("vorticityz",""):
-                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+                mat = geo.zblk(res[0],res[2], 2, 1, bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
                 if self.linearize:
-                    mat = c2d.i2(res[0],res[2], bc, 1j*k)
+                    mat = geo.i2(res[0],res[2], bc, 1j*k)
                 else:
-                    mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                    mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2laplh(res[0],res[2],k, bc, (1/Pr), xscale = xscale)
+                mat = geo.i2laplh(res[0],res[2],k, bc, (1/Pr), xscale = xscale)
 
             elif field_col == ("vorticityz",""):
-                mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+                mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
         elif field_row == ("vorticityz",""):
             if field_col == ("streamfunction",""):
-                mat = c2d.zblk(res[0],res[2], 2, 1, bc)
+                mat = geo.zblk(res[0],res[2], 2, 1, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c2d.i2j1e1(res[0],res[2], bc, zscale = zscale)
+                mat = geo.i2j1e1(res[0],res[2], bc, zscale = zscale)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16.0*Pr)))
+                mat = geo.i2j1(res[0],res[2], bc, 1j*k*(Ra/(16.0*Pr)))
 
             elif field_col == ("vorticityz",""):
-                mat = c2d.i2j1laplh(res[0],res[2],k, bc, xscale = xscale)
+                mat = geo.i2j1laplh(res[0],res[2],k, bc, xscale = xscale)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -405,15 +398,18 @@ class BoussinesqBeta3DQG(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c2d.zblk(res[0],res[2], 2, 0, bc)
+            mat = geo.zblk(res[0],res[2], 2, 0, bc)
 
         elif field_row == ("velocityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+            mat = geo.i2j1(res[0],res[2], bc)
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2(res[0],res[2], bc)
+            mat = geo.i2(res[0],res[2], bc)
 
         elif field_row == ("vorticityz",""):
-            mat = c2d.i2j1(res[0],res[2], bc)
+            mat = geo.i2j1(res[0],res[2], bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat

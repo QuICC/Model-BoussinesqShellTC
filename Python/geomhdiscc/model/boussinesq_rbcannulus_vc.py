@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,20 +13,20 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
 
 
-class BoussinesqRRBAnnulusVC(base_model.BaseModel):
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+class BoussinesqRBCAnnulusVC(base_model.BaseModel):
+    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "taylor", "ro", "rratio", "scale3d"]
+        return ["prandtl", "rayleigh", "ro", "rratio", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
@@ -105,15 +105,15 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
+        m = int(eigs[0])
+        a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
-            m = eigs[0]
-            a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             # No-slip/No-slip, Fixed temperature/Fixed temperature
@@ -159,7 +159,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:21}, 'priority':'sr'}
-
+            
             # Stress-free/No-slip, Fixed flux/Fixed temperature
             elif bcId == 2:
                 if self.use_galerkin:
@@ -181,7 +181,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                         bc = {'r':{0:21}, 'z':{0:20}, 'priority':'z'}
-            
+
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocity","r"):
@@ -256,11 +256,11 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = annulus.i2j2x3(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta"):
-            mat = annulus.i2j2x3(res[0], res[2], a, b, bc)
+            mat = annulus.i2j2x2(res[0], res[2], a, b, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
         elif field_row == ("velocity","z"):
@@ -278,13 +278,12 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
-        T = Ta**0.5
-        m = eigs[0]
+        assert(eigs[0].is_integer())
 
+        Ra = eq_params['rayleigh']
         zscale = eq_params['scale3d']
 
+        m = int(eigs[0])
         a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
@@ -292,16 +291,13 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = annulus.i2j2x3laplx_1(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = annulus.i2j2x2vlapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","theta"):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, -2.0*1j*m)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, T)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
             elif field_col == ("velocity","z"):
@@ -311,19 +307,16 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2x3d1x_2(res[0], res[2], a, b, bc, -1.0)
+                mat = annulus.i2j2x2d1(res[0], res[2], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","theta"):
             if field_col == ("velocity","r"):
                 mat = annulus.i2j2(res[0], res[2], a, b, bc, 2.0*1j*m)
-                bc['r'][0] = min(bc['r'][0], 0)
-                bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + annulus.i2j2x2(res[0], res[2], a, b, bc, -T)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = annulus.i2j2x3laplx_1(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = annulus.i2j2x2vlapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
@@ -335,7 +328,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = annulus.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2(res[0], res[2], a, b, bc, -1j*m)
+                mat = annulus.i2j2x1(res[0], res[2], a, b, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
@@ -356,7 +349,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = annulus.i2j2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
+                mat = annulus.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
@@ -388,7 +381,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = annulus.i1j1x1d1(res[0]+1, res[2]+1, a, b, bc)
+                    mat = annulus.i1j1x1div(res[0]+1, res[2]+1, a, b, bc)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","theta"):
@@ -408,7 +401,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = annulus.i1j1x2e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
+                    mat = annulus.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
@@ -416,7 +409,7 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = annulus.zblk(res[0], res[2], 1, 1, bc)
-                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
                 mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
 
@@ -425,10 +418,12 @@ class BoussinesqRRBAnnulusVC(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        assert(eigs[0].is_integer())
+
         Pr = eq_params['prandtl']
 
+        m = int(eigs[0])
         a, b = annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
-        m = eigs[0]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 

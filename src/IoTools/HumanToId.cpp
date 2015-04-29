@@ -106,11 +106,7 @@ namespace IoTools {
 
    ModelOperator::Id HumanToId::toModOp(const std::string& id)
    {
-      if(id == IdToHuman::toString(ModelOperator::QI))
-      {
-         return ModelOperator::QI;
-
-      } else if(id == IdToHuman::toString(ModelOperator::TIME))
+      if(id == IdToHuman::toString(ModelOperator::TIME))
       {
          return ModelOperator::TIME;
 
@@ -121,6 +117,14 @@ namespace IoTools {
       } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
       {
          return ModelOperator::EXPLICIT_LINEAR;
+
+      } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_NONLINEAR))
+      {
+         return ModelOperator::EXPLICIT_NONLINEAR;
+
+      } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_NEXTSTEP))
+      {
+         return ModelOperator::EXPLICIT_NEXTSTEP;
 
       } else if(id == IdToHuman::toString(ModelOperator::STENCIL))
       {

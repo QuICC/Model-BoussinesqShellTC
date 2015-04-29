@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell_radius as shell
+import geomhdiscc.geometry.spherical.shell_radius as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 
@@ -15,27 +15,20 @@ from geomhdiscc.geometry.spherical.shell_radius_boundary import no_bc
 class BoussinesqDynamoShellStd(base_model.BaseModel):
     """Class to setup the Boussinesq thermal convection dynamo in a spherical shell (Toroidal/Poloidal formulation) without field coupling (standard implementation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["magnetic_prandtl", "taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
+
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "magnetic", "temperature"]
-
-    def stability_fields(self):
-        """Get the list of fields needed for linear stability calculations"""
-
-        fields =  []
-
-        return fields
 
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
@@ -45,15 +38,30 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        if field_row == ("velocity","tor") or field_row == ("magnetic","tor") or field_row == ("magnetic","pol"):
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row in [("velocity","tor"), ("magnetic","tor"), ("magnetic","pol")]:
+                fields = []
+            elif field_row == ("velocity","pol"):
+                fields = [("temperature","")]
+            elif field_row == ("temperature",""):
+                fields = [("velocity","pol")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row == ("temperature",""):
+                fields = [("temperature","")]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
             fields = []
-        elif field_row == ("velocity","pol"):
-            fields = [("temperature","")]
-        elif field_row == ("temperature",""):
-            fields = [("velocity","pol")]
 
         return fields
 
@@ -84,33 +92,16 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         # Matrix operator is complex except for vorticity and mean temperature
         is_complex = False
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_MULTI_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
         l = eigs[0]
-        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -214,32 +205,116 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], bc, make_square)
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
 
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create the quasi-inverse operator"""
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
-        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        l = eigs[0]
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("temperature",""):
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","pol") and field_col == ("temperature",""):
+            mat = geo.i4x4(res[0], a, b, bc, -Ra_eff*l*(l+1.0))
+
+        elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], a, b, bc)
+                mat = geo.i2x2(res[0], a, b, bc, bg_eff*l*(l+1.0))
             else:
-                mat = shell.i2x3(res[0], a, b, bc)
+                mat = geo.i2(res[0], a, b, bc, bg_eff*l*(l+1.0))
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit nonlinear term"""
+
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == field_row:
+            if eq_params["heating"] == 0:
+                mat = geo.i2x2(res[0], a, b, bc)
+            else:
+                mat = geo.i2x3(res[0], a, b, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
+
+        l = eigs[0]
+
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
+
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+
+        elif field_row == ("magnetic","tor") and field_col == field_row:
+            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
+
+        elif field_row == ("magnetic","pol") and field_col == field_row:
+            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
+
+        elif field_row == ("temperature","") and field_col == field_row:
+            if eq_params["heating"] == 0:
+                mat = geo.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+            else:
+                mat = geo.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+        """Create matrix block of time operator"""
+
+        l = eigs[0]
+
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
+        if field_row == ("velocity","tor"):
+            mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
+
+        elif field_row == ("velocity","pol"):
+            mat = geo.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
+
+        elif field_row == ("magnetic","tor"):
+            mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
+
+        elif field_row == ("magnetic","pol"):
+            mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
+
+        elif field_row == ("temperature",""):
+            if eq_params["heating"] == 0:
+                mat = geo.i2x2(res[0], a, b, bc)
+            else:
+                mat = geo.i2x3(res[0], a, b, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def nondimensional_factors(self, eq_params):
+        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
+
         Ra = eq_params['rayleigh']
         ro = eq_params['ro']
         rratio = eq_params['rratio']
@@ -262,73 +337,4 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
             Ra_eff = (Ra*T/ro)
             bg_eff = ro**2*rratio
 
-        l = eigs[0]
-
-        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
-
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor"):
-            if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
-
-        elif field_row == ("velocity","pol"):
-            if field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
-
-            elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], a, b, bc, -Ra_eff*l*(l+1.0))
-
-        elif field_row == ("magnetic","tor"):
-            if field_col == ("magnetic","tor"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
-
-        elif field_row == ("magnetic","pol"):
-            if field_col == ("magnetic","pol"):
-                mat = shell.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0)/Pm)
-
-        elif field_row == ("temperature",""):
-            if field_col == ("velocity","pol"):
-                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
-                    if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], a, b, bc, bg_eff*l*(l+1.0))
-                    else:
-                        mat = shell.i2(res[0], a, b, bc, bg_eff*l*(l+1.0))
-
-                else:
-                    mat = shell.zblk(res[0], bc)
-
-            elif field_col == ("temperature",""):
-                if eq_params["heating"] == 0:
-                    mat = shell.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
-                else:
-                    mat = shell.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
-
-        return mat
-
-    def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create matrix block of time operator"""
-
-        l = eigs[0]
-
-        a, b = shell.linear_r2x(eq_params['ro'], eq_params['rratio'])
-
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
-
-        elif field_row == ("magnetic","tor"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("magnetic","pol"):
-            mat = shell.i2x2(res[0], a, b, bc, l*(l+1.0))
-
-        elif field_row == ("temperature",""):
-            if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], a, b, bc)
-            else:
-                mat = shell.i2x3(res[0], a, b, bc)
-
-        return mat
+        return (Ra_eff, bg_eff)

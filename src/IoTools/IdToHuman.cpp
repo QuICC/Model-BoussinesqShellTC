@@ -383,9 +383,6 @@ namespace IoTools {
    {
       switch(id)
       {
-         case ModelOperator::QI:
-            return "qi";
-
          case ModelOperator::TIME:
             return "time";
 
@@ -394,6 +391,12 @@ namespace IoTools {
 
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";
+
+         case ModelOperator::EXPLICIT_NONLINEAR:
+            return "explicit_nonlinear";
+
+         case ModelOperator::EXPLICIT_NEXTSTEP:
+            return "explicit_nextstep";
 
          case ModelOperator::STENCIL:
             return "stencil";

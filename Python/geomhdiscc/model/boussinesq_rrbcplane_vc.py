@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a 1D box (2 periodic directions) (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -12,8 +12,8 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 
 
-class BoussinesqRRB1DBoxVC(base_model.BaseModel):
-    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a 1D box (2 periodic directions) (velocity-continuity formulation)"""
+class BoussinesqRRBCPlaneVC(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
@@ -25,7 +25,7 @@ class BoussinesqRRB1DBoxVC(base_model.BaseModel):
 
         return [False, True, True]
 
-    def all_fields(self):
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]

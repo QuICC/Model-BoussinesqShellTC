@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylinder modified for parity (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,20 +13,20 @@ import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
 
 
-class BoussinesqRBCylinderVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylinder modified for parity (velocity-continuity formulation)"""
+class BoussinesqRRBCCylinderVC(base_model.BaseModel):
+    """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)"""
 
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "scale3d"]
+        return ["taylor", "prandtl", "rayleigh", "scale3d"]
 
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
@@ -58,7 +58,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         tau_n = res[0]*res[2]
         if self.use_galerkin:
             if field_row == ("velocity","r") or field_row == ("velocity","theta") or field_row == ("velocity","z") or field_row == ("temperature",""):
-                shift_r = 1
+                shift_r = 2
                 shift_z = 2
             else:
                 shift_r = 0
@@ -85,7 +85,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         # Additional explicit linear fields
         ex_fields = self.explicit_fields(field_row)
 
-        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE 
+        # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
         # Compute block info
@@ -105,14 +105,14 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        m = int(eigs[0])
-
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
             bc = no_bc()
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            m = eigs[0]
+
             bc = no_bc()
             bcId = bcs.get(field_col[0], -1)
             # No-slip/No-slip, Fixed temperature/Fixed temperature
@@ -173,9 +173,6 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                 elif field_row == ("temperature",""):
                     bc['r']['rt'] = 1
                     bc['z']['rt'] = 2
-                elif field_row == ("pressure",""):
-                    bc['r']['rt'] = 1
-                    bc['z']['rt'] = 1
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -220,9 +217,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create the quasi-inverse operator"""
 
-        assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
+        m = eigs[0]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -235,7 +230,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","z"):
+        elif field_row == ("velocity","theta"):
             mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
@@ -250,25 +245,28 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
-        assert(eigs[0].is_integer())
-
         Ra = eq_params['rayleigh']
-        zscale = eq_params['scale3d']
+        Ta = eq_params['taylor']
+        T = Ta**0.5
+        m = eigs[0]
 
-        m = int(eigs[0])
+        zscale = eq_params['scale3d']
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2j2x3vlaplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","theta"):
                 mat = cylinder.i2j2(res[0], res[2], m%2, bc, -2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2x2(res[0], res[2], m%2, bc, T)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
             elif field_col == ("velocity","z"):
@@ -284,10 +282,13 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
         elif field_row == ("velocity","theta"):
             if field_col == ("velocity","r"):
                 mat = cylinder.i2j2(res[0], res[2], m%2, bc, 2.0*1j*m)
+                bc['r'][0] = min(bc['r'][0], 0)
+                bc['z'][0] = min(bc['z'][0], 0)
+                mat = mat + cylinder.i2j2x2(res[0], res[2], m%2, bc, -T)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2j2x3vlaplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
@@ -347,15 +348,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
                 if field_col == ("velocity","r"):
                     if m%2 == 1:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
+                    bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
@@ -365,15 +366,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
                 elif field_col == ("velocity","theta"):
                     if m%2 == 1:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
+                    bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
@@ -383,15 +384,15 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
 
                 elif field_col == ("velocity","z"):
                     if m%2 == 1:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
                     else:
-                        bc['r']['cr'] = 1
                         bc['r']['rt'] = 1
+                        bc['r']['cr'] = 1
                         #bc['r']['zb'] = 1
-                    bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
+                    bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
                         mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
@@ -406,18 +407,16 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
                     mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
                     mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, no_bc())
+                mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        assert(eigs[0].is_integer())
-
         Pr = eq_params['prandtl']
 
-        m = int(eigs[0])
+        m = eigs[0]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
@@ -448,11 +447,7 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
-        assert(eigs[0].is_integer())
-
-        m = int(eigs[0])
-
-        if m%2 == 1:
+        if eigs[0]%2 == 1:
             # U: T_Ni
             idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
 
@@ -475,16 +470,16 @@ class BoussinesqRBCylinderVC(base_model.BaseModel):
     #        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
             # W: TiN
+            idx_w = utils.qidx(res[2], res[2])
             idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1))
 
             # P:
             idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
-#            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
+            idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
             idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-2)))
     #        idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-1)))
             # Pressure: T_00
-            if m == 0:
-                idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], 0), utils.sidx(res[0], res[0]-1)))
+            if eigs[0] == 0:
                 idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 
         return (idx_u, idx_v, idx_w, idx_p)

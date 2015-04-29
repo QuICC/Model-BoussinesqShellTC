@@ -14,17 +14,17 @@ from geomhdiscc.geometry.spherical.shell_boundary import no_bc
 class BoussinesqRTCShell(base_model.BaseModel):
     """Class to setup the Boussinesq rotating thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["taylor", "prandtl", "rayleigh", "ro", "rratio", "heating"]
+
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
@@ -43,12 +43,25 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
+    def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        if field_row == ("temperature",""):
-            fields = [("velocity","pol")]
-        else:
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row == ("temperature",""):
+                fields = [("velocity","pol")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row == ("temperature",""):
+                fields = [("temperature","")]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
             fields = []
 
         return fields
@@ -80,27 +93,10 @@ class BoussinesqRTCShell(base_model.BaseModel):
         # Matrix operator is complex except for vorticity and mean temperature
         is_complex = True
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -192,16 +188,30 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row, make_square):
-        """Create the galerkin stencil"""
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
+
+        assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], m, bc, make_square)
 
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
+
+        a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == ("velocity","pol"):
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+            else:
+                mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
         assert(eigs[0].is_integer())
@@ -210,43 +220,27 @@ class BoussinesqRTCShell(base_model.BaseModel):
 
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("temperature",""):
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
                 mat = shell.i2x2(res[0], res[1], m, a, b, bc, restriction = restriction)
             else:
                 mat = shell.i2x3(res[0], res[1], m, a, b, bc, restriction = restriction)
 
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
 
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        Ta = eq_params['taylor']
-        ro = eq_params['ro']
-        rratio = eq_params['rratio']
-        T = Ta**0.5
-
-        # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
-        # Parameters match as:  Dormy   Christensen 
-        #                       Ra      Ra/(R_o*R_i*Ta^0.5)
-        #                       Ta      Ta*(1-R_i/R_o)^4
-        if ro == 1.0:
-            # R_o rescaling
-            Ra_eff = Ra
-            bg_eff = 1.0
-        elif eq_params['heating'] == 0:
-            # (R_o - R_i) rescaling
-            Ra_eff = (Ra*T/ro)
-            bg_eff = 2.0/(ro*(1.0 + rratio))
-        elif eq_params['heating'] == 1:
-            # (R_o - R_i) rescaling
-            Ra_eff = (Ra*T/ro)
-            bg_eff = ro**2*rratio
+        T = eq_params['taylor']**0.5
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         m = int(eigs[0])
 
@@ -282,7 +276,7 @@ class BoussinesqRTCShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
+                if self.linearize:
                     if eq_params["heating"] == 0:
                         mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
                     else:
@@ -296,6 +290,9 @@ class BoussinesqRTCShell(base_model.BaseModel):
                     mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
                 else:
                     mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr, restriction = restriction)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -321,4 +318,34 @@ class BoussinesqRTCShell(base_model.BaseModel):
             else:
                 mat = shell.i2x3(res[0], res[1], m, a, b, bc, restriction = restriction)
 
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
         return mat
+
+    def nondimensional_factors(self, eq_params):
+        """Compute the effective Rayleigh number and background depending on nondimensionalisation"""
+
+        Ra = eq_params['rayleigh']
+        ro = eq_params['ro']
+        rratio = eq_params['rratio']
+        T = eq_params['taylor']**0.5
+
+        # Easy switch from nondimensionalistion by R_o (Dormy) and (R_o - R_i) (Christensen)
+        # Parameters match as:  Dormy   Christensen 
+        #                       Ra      Ra/(R_o*R_i*Ta^0.5)
+        #                       Ta      Ta*(1-R_i/R_o)^4
+        if ro == 1.0:
+            # R_o rescaling
+            Ra_eff = Ra
+            bg_eff = 1.0
+        elif eq_params['heating'] == 0:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = 2.0/(ro*(1.0 + rratio))
+        elif eq_params['heating'] == 1:
+            # (R_o - R_i) rescaling
+            Ra_eff = (Ra*T/ro)
+            bg_eff = ro**2*rratio
+
+        return (Ra_eff, bg_eff)

@@ -15,17 +15,17 @@ from geomhdiscc.geometry.spherical.shell_boundary import no_bc
 class BoussinesqTCShell(base_model.BaseModel):
     """Class to setup the Boussinesq thermal convection in a spherical shell (Toroidal/Poloidal formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "ro", "rratio", "heating"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "ro", "rratio", "heating"]
+
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocity", "temperature"]
@@ -44,12 +44,23 @@ class BoussinesqTCShell(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
+    def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        if field_row == ("temperature",""):
-            fields = [("velocity","pol")]
-        else:
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row == ("temperature",""):
+                fields = [("velocity","pol")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row == ("temperature",""):
+                fields = [("temperature","")]
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
             fields = []
 
         return fields
@@ -81,27 +92,10 @@ class BoussinesqTCShell(base_model.BaseModel):
         # Matrix operator is complex except for vorticity and mean temperature
         is_complex = False
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -190,14 +184,27 @@ class BoussinesqTCShell(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return shell.stencil(res[0], res[1], bc)
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block linear operator"""
 
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
+        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == ("velocity","pol"):
+            if eq_params["heating"] == 0:
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+            else:
+                mat = shell.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
+        return mat
+
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
         assert(eigs[0].is_integer())
@@ -205,16 +212,19 @@ class BoussinesqTCShell(base_model.BaseModel):
         m = int(eigs[0])
         a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("temperature",""):
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
                 mat = shell.i2x2(res[0], res[1], m, a, b, bc)
             else:
                 mat = shell.i2x3(res[0], res[1], m, a, b, bc)
 
+        else:
+            raise RuntimeError("Equations are not setup properly!")
+
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         assert(eigs[0].is_integer())
@@ -251,7 +261,7 @@ class BoussinesqTCShell(base_model.BaseModel):
                 mat = shell.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                if self.linearize or bcs['bcType'] == self.FIELD_TO_RHS:
+                if self.linearize:
                     if eq_params["heating"] == 0:
                         mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
                     else:
@@ -265,6 +275,9 @@ class BoussinesqTCShell(base_model.BaseModel):
                     mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
                 else:
                     mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -288,5 +301,8 @@ class BoussinesqTCShell(base_model.BaseModel):
                 mat = shell.i2x2(res[0], res[1], m, a, b, bc)
             else:
                 mat = shell.i2x3(res[0], res[1], m, a, b, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat

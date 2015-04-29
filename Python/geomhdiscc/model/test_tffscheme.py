@@ -27,7 +27,7 @@ class TestTFFScheme(base_model.BaseModel):
 
         return [False, True, True]
 
-    def all_fields(self):
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
         return ["velocityx", "velocityy", "velocityz", "temperature"]
