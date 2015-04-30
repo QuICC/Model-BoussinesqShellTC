@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a 2D box (1 periodic direction) (velocity-continuity formulation)"""
+"""Script to run a marginal curve trace for the Boussinesq Rayleigh-Benard convection in a infinite duct(1 periodic direction) (velocity-continuity formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rb2dbox_vc as mod
+import geomhdiscc.model.boussinesq_rbcduct_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRB2DBoxVC()
+model = mod.BoussinesqRBCDuctVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()

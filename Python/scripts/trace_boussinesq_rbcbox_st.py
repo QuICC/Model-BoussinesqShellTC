@@ -2,10 +2,10 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_rb3dbox_st as mod
+import geomhdiscc.model.boussinesq_rbcbox_st as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRB3DBoxST()
+model = mod.BoussinesqRBCBoxST()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
