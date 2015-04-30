@@ -195,6 +195,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction","") and field_col == field_row:
             mat = geo.i4j4k4(res[0], res[1], res[2], bc)
@@ -202,7 +203,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -216,6 +217,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
         yscale = eq_params['scale2d']
         zscale = eq_params['scale3d']
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
@@ -231,7 +233,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -245,6 +247,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
         yscale = eq_params['scale2d']
         zscale = eq_params['scale3d']
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
             mat = geo.i4j4k4lapl(res[0], res[1], res[2], bc, 1.0/Pr, xscale = xscale, yscale = yscale, zscale = zscale)
@@ -252,7 +255,7 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
         elif field_row == ("temperature",""):
             mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

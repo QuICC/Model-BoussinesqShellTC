@@ -191,6 +191,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         m = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
             mat = geo.i2x2(res[0], res[1], m, bc)
@@ -201,7 +202,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2x2(res[0], res[1], m, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -216,6 +217,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         
         m = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
@@ -255,7 +257,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.i2x2lapl(res[0], res[1], m, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -266,6 +268,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         Pr = eq_params['prandtl']
         m = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
             mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
@@ -276,7 +279,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
         elif field_row == ("temperature",""):
             mat = geo.i2x2(res[0], res[1], m, bc, Pr)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

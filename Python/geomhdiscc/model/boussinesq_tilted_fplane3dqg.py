@@ -168,6 +168,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.qid(res[0], 0, bc)
@@ -184,7 +185,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -200,6 +201,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
@@ -296,7 +298,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
             elif field_col == ("velocityz",""):
                 mat = geo.qid(res[0],0, bc, 1j*eta2*kx*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -308,6 +310,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
             mat = geo.i1(res[0], bc, -(kx**2 + (1/eta3**2)*ky**2))
@@ -324,7 +327,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                 mat[-2:,:] = 0
                 mat = mat.tocsr()
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

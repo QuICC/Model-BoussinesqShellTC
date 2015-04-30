@@ -198,9 +198,10 @@ class TestTFTScheme(base_model.BaseModel):
 
         return bc
 
-    def nonlinera_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create the explicit nonlinear operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
             mat = geo.i2j2(res[0],res[2], bc)
@@ -214,7 +215,7 @@ class TestTFTScheme(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2(res[0],res[2], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -223,6 +224,8 @@ class TestTFTScheme(base_model.BaseModel):
         """Create matrix block of linear operator"""
 
         k = eigs[0]/2.0
+
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
@@ -276,7 +279,7 @@ class TestTFTScheme(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.i2j2lapl(res[0], res[2], k, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -284,6 +287,7 @@ class TestTFTScheme(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
             mat = geo.i2j2(res[0],res[2], bc)
@@ -297,7 +301,7 @@ class TestTFTScheme(base_model.BaseModel):
         elif field_row == ("temperature",""):
             mat = geo.i2j2(res[0],res[2], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

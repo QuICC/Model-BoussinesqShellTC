@@ -248,6 +248,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x") and field_col == field_row:
             mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
@@ -264,7 +265,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -282,6 +283,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
@@ -417,7 +419,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
                     mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
                     mat = mat + utils.id_from_idx_3d(idx_p, res[1], res[2], res[0], restriction = restriction)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -429,6 +431,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
             mat = geo.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
@@ -451,7 +454,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

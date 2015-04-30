@@ -195,6 +195,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
             mat = geo.i4x4(res[0], a, b, bc, -Ra*l*(l+1.0))
@@ -205,7 +206,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
             else:
                 mat = geo.i2(res[0], a, b, bc, l*(l+1.0))
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -215,6 +216,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
@@ -222,7 +224,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
             else:
                 mat = geo.i2x3(res[0], a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -237,6 +239,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
             mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
@@ -261,7 +264,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
                 else:
                     mat = geo.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -273,6 +276,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
             mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
@@ -286,7 +290,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
             else:
                 mat = geo.i2x3(res[0], a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

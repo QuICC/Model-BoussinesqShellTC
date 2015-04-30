@@ -167,6 +167,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit nonlinear term"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             mat = geo.qid(res[0], 0, bc)
@@ -189,7 +190,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -201,11 +202,12 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
             mat = geo.qid(res[0],0, bc, (kx**2 + ky**2))
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -219,6 +221,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
@@ -273,7 +276,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     mat[-2:,:] = tmp[0:2,:]
                     mat = mat.tocsr()
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -284,6 +287,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
             mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
@@ -300,7 +304,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 mat[-2:,:] = 0
                 mat = mat.tocsr()
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

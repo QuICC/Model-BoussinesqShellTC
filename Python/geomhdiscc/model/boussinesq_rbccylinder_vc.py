@@ -231,6 +231,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r") and field_col == field_row:
             mat = geo.i2j2x2(res[0], res[2], m%2, bc)
@@ -247,7 +248,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2x2(res[0], res[2], m%2, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -264,6 +265,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
@@ -413,7 +415,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], res[2], m%2, 1, 1, no_bc())
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -429,6 +431,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
             mat = geo.i2j2x2(res[0], res[2], (m+1)%2, bc, 1.0/Pr)
@@ -451,7 +454,7 @@ class BoussinesqRBCCylinderVC(base_model.BaseModel):
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

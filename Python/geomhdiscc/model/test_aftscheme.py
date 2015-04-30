@@ -203,6 +203,7 @@ class TestAFTScheme(base_model.BaseModel):
 
         a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r") and field_col == field_row:
             mat = geo.i2j2x2(res[0],res[2], a, b, bc)
@@ -216,7 +217,7 @@ class TestAFTScheme(base_model.BaseModel):
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.i2j2x2(res[0],res[2], a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -227,6 +228,7 @@ class TestAFTScheme(base_model.BaseModel):
         a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
         m = eigs[0]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
@@ -286,7 +288,7 @@ class TestAFTScheme(base_model.BaseModel):
             elif field_col == ("temperature",""):
                 mat = geo.i2j2x2lapl(res[0], res[2], m, a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -296,6 +298,7 @@ class TestAFTScheme(base_model.BaseModel):
 
         a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
             mat = geo.i2j2x2(res[0],res[2], a, b, bc)
@@ -309,7 +312,7 @@ class TestAFTScheme(base_model.BaseModel):
         elif field_row == ("temperature",""):
             mat = geo.i2j2x2(res[0],res[2], a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat

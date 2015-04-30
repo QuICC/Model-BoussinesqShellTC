@@ -181,6 +181,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityz","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
@@ -197,7 +198,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif field_row == ("kinetic_energy","") and field_col == field_row:
             mat = geo.avg(res[0])
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -214,6 +215,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
@@ -270,7 +272,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
             elif field_col == ("vorticityz",""):
                 mat = geo.i1(res[0], bc, -(kx**2 + ky**2))
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -278,6 +280,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
             mat = geo.zblk(res[0], bc)
@@ -291,7 +294,7 @@ class BoussinesqBeta3DQGPer(base_model.BaseModel):
         elif field_row == ("vorticityz",""):
             mat = geo.i1(res[0], bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
