@@ -116,11 +116,11 @@ namespace GeoMHDiSCC {
       /// \mhdBug This is not sufficient to recover all fields from previous computation
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::PROGNOSTIC, ExplicitTiming::LINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::PROGNOSTIC, ExplicitTiming::LINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Compute physical values
@@ -148,19 +148,19 @@ namespace GeoMHDiSCC {
       this->mspFwdGrouper->transform(scalEqs, vectEqs, this->mTransformCoordinator);
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::BEFORE, ExplicitTiming::NONLINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solveDiagnosticEquations(SolveTiming::BEFORE);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::BEFORE, ExplicitTiming::NONLINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solveTrivialEquations(SolveTiming::BEFORE);
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
    }
 
@@ -234,13 +234,13 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("explicitEquations",2);
 
       // Explicit trivial equations
-      this->explicitTrivialEquations(SolveTiming::BEFORE, ExplicitTiming::LINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_LINEAR);
 
       // Explicit diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::BEFORE, ExplicitTiming::LINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_LINEAR);
 
       // Explicit prognostic equations
-      this->explicitPrognosticEquations(SolveTiming::BEFORE, ExplicitTiming::LINEAR);
+      this->explicitPrognosticEquations(ModelOperator::EXPLICIT_LINEAR);
 
       // Debug statement
       DebuggerMacro_leave("explicitEquations",2);
@@ -252,23 +252,23 @@ namespace GeoMHDiSCC {
       DebuggerMacro_enter("solveEquations",2);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::BEFORE, ExplicitTiming::NONLINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solveTrivialEquations(SolveTiming::BEFORE);
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::BEFORE, ExplicitTiming::NONLINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solveDiagnosticEquations(SolveTiming::BEFORE);
 
       // Solve prognostic equations (timestep)
-      this->explicitPrognosticEquations(SolveTiming::PROGNOSTIC, ExplicitTiming::NONLINEAR);
+      this->explicitPrognosticEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solvePrognosticEquations();
 
       // Solve diagnostic equations
-      this->explicitDiagnosticEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
+      this->explicitDiagnosticEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveDiagnosticEquations(SolveTiming::AFTER);
 
       // Solve trivial equations
-      this->explicitTrivialEquations(SolveTiming::AFTER, ExplicitTiming::NONLINEAR);
+      this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
 
       // Update conditions at the end of timestep
@@ -299,16 +299,14 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("solveEquations",2);
    }
 
-   void Simulation::explicitPrognosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime)
+   void Simulation::explicitPrognosticEquations(const ModelOperator::Id opId)
    {
       // Debug statement
       DebuggerMacro_enter("explicitPrognostic",3);
 
       DebuggerMacro_start("Explicit prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
-      this->mTimestepCoordinator.setSolveTime(time);
-      this->mTimestepCoordinator.setExplicitTime(expTime);
-      this->mTimestepCoordinator.getExplicitInput(this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
+      this->mTimestepCoordinator.getExplicitInput(opId, this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
       DebuggerMacro_stop("Explicit prognostic t = ",4);
 

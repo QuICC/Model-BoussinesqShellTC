@@ -39,7 +39,7 @@ namespace Equations {
 
    void BoussinesqTiltedFPlane3DQGNoVorticityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
    void BoussinesqTiltedFPlane3DQGNoVorticityZ::setRequirements()

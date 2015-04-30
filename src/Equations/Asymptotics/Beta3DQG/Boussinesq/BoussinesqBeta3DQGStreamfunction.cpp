@@ -39,7 +39,7 @@ namespace Equations {
 
    void BoussinesqBeta3DQGStreamfunction::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, false, false);
    }
 
    void BoussinesqBeta3DQGStreamfunction::setRequirements()

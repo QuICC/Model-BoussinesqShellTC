@@ -45,10 +45,10 @@ namespace Equations {
    {
       if(this->solveTiming() == SolveTiming::BEFORE)
       {
-         this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false, false, false);
+         this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, true, false, false);
       } else
       {
-         this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false, false);
+         this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
       }
    }
 

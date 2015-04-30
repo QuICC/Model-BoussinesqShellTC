@@ -322,16 +322,14 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("computeNonlinear",2);
    }
 
-   void SimulationBase::explicitTrivialEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime)
+   void SimulationBase::explicitTrivialEquations(const ModelOperator::Id opId)
    {
       // Debug statement
       DebuggerMacro_enter("explicitTrivialEquations",3);
 
       DebuggerMacro_start("Explicit trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
-      this->mTrivialCoordinator.setSolveTime(time);
-      this->mTrivialCoordinator.setExplicitTime(expTime);
-      this->mTrivialCoordinator.getExplicitInput(this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
+      this->mTrivialCoordinator.getExplicitInput(opId, this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
       DebuggerMacro_stop("Explicit trivial t = ",4);
 
@@ -339,16 +337,14 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("explicitTrivialEquations",3);
    }
 
-   void SimulationBase::explicitDiagnosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime)
+   void SimulationBase::explicitDiagnosticEquations(const ModelOperator::Id opId)
    {
       // Debug statement
       DebuggerMacro_enter("explicitDiagnosticEquations",3);
 
       DebuggerMacro_start("Explicit diagnostic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-      this->mTrivialCoordinator.setSolveTime(time);
-      this->mLinearCoordinator.setExplicitTime(expTime);
-      this->mLinearCoordinator.getExplicitInput(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
+      this->mLinearCoordinator.getExplicitInput(opId, this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
       DebuggerMacro_stop("Explicit diagnostic t = ",4);
 

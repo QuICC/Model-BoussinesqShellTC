@@ -85,7 +85,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Explicit linear for the prognostic equations
           */
-         void explicitPrognosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
+         void explicitPrognosticEquations(const ModelOperator::Id opId);
 
          /**
           * @brief Timestep the prognostic equations

@@ -40,9 +40,9 @@ namespace Equations {
 
    void BoussinesqSphereMomentum::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::PROGNOSTIC, 1, false, false);
 
-      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::PROGNOSTIC, 1, false, false);
    }
 
    void BoussinesqSphereMomentum::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

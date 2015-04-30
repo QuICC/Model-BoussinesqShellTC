@@ -40,7 +40,7 @@ namespace Equations {
 
    void BoussinesqBeta3DQGPerVorticityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, true, false);
    }
 
    void BoussinesqBeta3DQGPerVorticityZ::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id id) const

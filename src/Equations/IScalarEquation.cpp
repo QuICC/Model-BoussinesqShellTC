@@ -101,8 +101,14 @@ namespace Equations {
       // Check for Galerkin stencils
       needInit = needInit || this->couplingInfo(FieldComponents::Spectral::SCALAR).isGalerkin();
 
-      // Check explicit operators
-      CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange();
+      // Check explicit linear operators
+      CouplingInformation::FieldId_range fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange(ModelOperator::EXPLICIT_LINEAR);
+      needInit = needInit || (std::distance(fRange.first,fRange.second) > 0);
+      // Check explicit nonlinear operators
+      fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange(ModelOperator::EXPLICIT_NONLINEAR);
+      needInit = needInit || (std::distance(fRange.first,fRange.second) > 0);
+      // Check explicit nextstep operators
+      fRange = this->couplingInfo(FieldComponents::Spectral::SCALAR).explicitRange(ModelOperator::EXPLICIT_NEXTSTEP);
       needInit = needInit || (std::distance(fRange.first,fRange.second) > 0);
 
       // Initialise spectral matrices
@@ -112,9 +118,9 @@ namespace Equations {
       }
    }
 
-   void IScalarEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const bool allowExplicit)
+   void IScalarEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool allowExplicit)
    {
-      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasQI, hasSource, this->unknown().dom(0).spRes(), allowExplicit);
+      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasSource, this->unknown().dom(0).spRes(), allowExplicit);
    }
 
    void  IScalarEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const
@@ -127,14 +133,9 @@ namespace Equations {
       this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 
-   void IScalarEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
+   void IScalarEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const
    {
-      this->dispatchQuasiInverse(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
-   }
-
-   void IScalarEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const
-   {
-      this->dispatchExplicitLinearBlock(compId, mat, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 
    void IScalarEquation::setNLComponents()

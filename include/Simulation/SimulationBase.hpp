@@ -184,12 +184,12 @@ namespace GeoMHDiSCC {
          /**
           * @brief Explicit linear the trivial equations
           */
-         void explicitTrivialEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
+         void explicitTrivialEquations(const ModelOperator::Id opId);
 
          /**
           * @brief Explicit linear for the diagnostic equations
           */
-         void explicitDiagnosticEquations(const SolveTiming::Id time, const ExplicitTiming::Id expTime);
+         void explicitDiagnosticEquations(const ModelOperator::Id opId);
 
          /**
           * @brief Solve the trivial equations

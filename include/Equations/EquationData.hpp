@@ -23,7 +23,6 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/FieldIds.hpp"
 #include "Enums/SolveTiming.hpp"
-#include "Enums/ExplicitTiming.hpp"
 #include "Equations/EquationParameters.hpp"
 #include "Equations/CouplingInformation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
@@ -96,37 +95,51 @@ namespace Equations {
          const SparseMatrix& galerkinStencil(const FieldComponents::Spectral::Id compId, const int j) const;
 
          /**
-          * @brief Get the quasi-inverse matrix for the nonlinear terms
+          * @brief Check if real quasi inverse matrices exist
+          *
+          * @param compId  Field component ID
+          */
+         bool hasQID(const FieldComponents::Spectral::Id compId) const;
+
+         /**
+          * @brief Check if complex quasi inverse matrices exist
+          *
+          * @param compId  Field component ID
+          */
+         bool hasQIZ(const FieldComponents::Spectral::Id compId) const;
+
+         /**
+          * @brief Check if real explicit matrices exist
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          */
+         bool hasExplicitDTerm(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
+
+         /**
+          * @brief Check if complex explicit matrices exist
+          *
+          * @param compId  Field component ID
+          * @param fieldId Spectral field ID
+          */
+         bool hasExplicitZTerm(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
+
+         /**
+          * @brief Get the quasi inverse matrices
           *
           * @param compId  Field component ID
           * @param j       Matrix index
           */
-         const SparseMatrix& quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const;
+         template <typename TOperator> const TOperator& quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const;
 
          /**
-          * @brief Check if real explicit linear matrices exist
-          *
-          * @param compId  Field component ID
-          * @param fieldId Spectral field ID
-          */
-         bool hasExplicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
-
-         /**
-          * @brief Check if complex explicit linear matrices exist
-          *
-          * @param compId  Field component ID
-          * @param fieldId Spectral field ID
-          */
-         bool hasExplicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const;
-
-         /**
-          * @brief Get the explicit linear matrices
+          * @brief Get the explicit matrices
           *
           * @param compId  Field component ID
           * @param fieldId Spectral field ID
           * @param j       Matrix index
           */
-         template <typename TOperator> const TOperator& explicitLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
+         template <typename TOperator> const TOperator& explicitOperator(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const;
 
          /**
           * @brief Get the coupling information
@@ -163,11 +176,6 @@ namespace Equations {
          void setSolverIndex(const FieldComponents::Spectral::Id, const int idx);
 
          /**
-          * @brief Timing of the explicit linear term for the equation
-          */
-         ExplicitTiming::Id  explicitTiming(const FieldComponents::Spectral::Id compId) const;
-
-         /**
           * @brief Timing of the solver for the equation
           */
          SolveTiming::Id  solveTiming() const;
@@ -184,11 +192,6 @@ namespace Equations {
          void setName(PhysicalNames::Id name);
 
          /**
-          * @brief Set explicit timing
-          */
-         void setExplicitTiming(const FieldComponents::Spectral::Id compId, const ExplicitTiming::Id time);
-
-         /**
           * @brief Set solver timing
           */
          void setSolveTiming(const SolveTiming::Id time);
@@ -197,6 +200,16 @@ namespace Equations {
           * @brief Add a nonlinear integration component
           */
          void addNLComponent(const FieldComponents::Spectral::Id compId, const int flag);
+
+         /**
+          * @brief Set map of component and explicit matrices (real operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> >& rEDMatrices(const ModelOperator::Id opId);
+
+         /**
+          * @brief Set map of component and explicit matrices (complex operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> >& rEZMatrices(const ModelOperator::Id opId);
 
          /**
           * @brief Set scalar variable
@@ -225,19 +238,14 @@ namespace Equations {
          std::map<FieldComponents::Spectral::Id, CouplingInformation>  mCouplingInfos;
 
          /**
-          * @brief Map of component and explicit linear matrices (real operators)
+          * @brief Map of component and quasi inverse matrices (real operators)
           */
-         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> > mLDMatrices;
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mQIDMatrices;
 
          /**
-          * @brief Map of component and explicit linear matrices (complex operators)
+          * @brief Map of component and quasi inverse matrices (complex operators)
           */
-         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> > mLZMatrices;
-
-         /**
-          * @brief Map of component and nonlinear term multiplication matrices
-          */
-         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrix> > mNLMatrices;
+         std::map<FieldComponents::Spectral::Id, std::vector<SparseMatrixZ> > mQIZMatrices;
 
          /**
           * @brief Map of component and galerkin stencil matrices
@@ -248,11 +256,6 @@ namespace Equations {
           * @brief Storage for the shared boundary condition list
           */
          SharedSimulationBoundary mspBcIds;
-
-         /**
-          * @brief Storage for the explicit timing
-          */
-         std::map<FieldComponents::Spectral::Id, ExplicitTiming::Id>   mExplicitTiming;
 
          /**
           * @brief Storage for the solve timing
@@ -284,6 +287,36 @@ namespace Equations {
           * @brief Name ID of the unknown
           */
          PhysicalNames::Id mName;
+
+         /**
+          * @brief Map of component and explicit linear matrices (real operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> > mELDMatrices;
+
+         /**
+          * @brief Map of component and explicit linear matrices (complex operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> > mELZMatrices;
+
+         /**
+          * @brief Map of component and explicit nonlinear matrices (real operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> > mENLDMatrices;
+
+         /**
+          * @brief Map of component and explicit nonlinear matrices (complex operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> > mENLZMatrices;
+
+         /**
+          * @brief Map of component and explicit nextstep matrices (real operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> > mENSDMatrices;
+
+         /**
+          * @brief Map of component and explicit nextstep matrices (complex operators)
+          */
+         std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> > mENSZMatrices;
    };
 
    /// Typedef for a smart EquationData

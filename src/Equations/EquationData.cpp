@@ -99,50 +99,162 @@ namespace Equations {
       return this->mGStencils.find(compId)->second.at(j);
    }
 
-   const SparseMatrix& EquationData::quasiInverse(const FieldComponents::Spectral::Id compId, const int j) const
+   bool EquationData::hasQID(const FieldComponents::Spectral::Id compId) const
+   {
+      return (this->mQIDMatrices.count(compId) > 0);
+   }
+
+   bool EquationData::hasQIZ(const FieldComponents::Spectral::Id compId) const
+   {
+      return (this->mQIZMatrices.count(compId) > 0);
+   }
+
+   bool EquationData::hasExplicitDTerm(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
+   {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
+
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         return (this->mELDMatrices.count(key) > 0);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      {
+         return (this->mENLDMatrices.count(key) > 0);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      {
+         return (this->mENSDMatrices.count(key) > 0);
+      }
+   }
+
+   bool EquationData::hasExplicitZTerm(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
+   {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
+
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         return (this->mELZMatrices.count(key) > 0);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      {
+         return (this->mENLZMatrices.count(key) > 0);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      {
+         return (this->mENSZMatrices.count(key) > 0);
+      }
+   }
+
+   template <> const SparseMatrix& EquationData::quasiInverse<SparseMatrix>(const FieldComponents::Spectral::Id compId, const int j) const
    {
       // Safety assert
-      assert(this->mNLMatrices.count(compId) > 0);
+      assert(this->mQIDMatrices.count(compId) > 0);
       
-      return this->mNLMatrices.find(compId)->second.at(j);
+      return this->mQIDMatrices.find(compId)->second.at(j);
    }
 
-   bool EquationData::hasExplicitDLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
+   template <> const SparseMatrixZ& EquationData::quasiInverse<SparseMatrixZ>(const FieldComponents::Spectral::Id compId, const int j) const
    {
-      // Make key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
-
-      return (this->mLDMatrices.count(key) > 0);
-   }
-
-   bool EquationData::hasExplicitZLinear(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId) const
-   {
-      // Make key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
-
-      return (this->mLZMatrices.count(key) > 0);
-   }
-
-   template <> const SparseMatrix& EquationData::explicitLinear<SparseMatrix>(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
-   {
-      // Make key
-      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
-
       // Safety assert
-      assert(this->mLDMatrices.count(key) > 0);
+      assert(this->mQIZMatrices.count(compId) > 0);
       
-      return this->mLDMatrices.find(key)->second.at(j);
+      return this->mQIZMatrices.find(compId)->second.at(j);
    }
 
-   template <> const SparseMatrixZ& EquationData::explicitLinear<SparseMatrixZ>(const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   template <> const SparseMatrix& EquationData::explicitOperator<SparseMatrix>(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
    {
       // Make key
       std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
 
-      // Safety assert
-      assert(this->mLZMatrices.count(key) > 0);
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         // Safety assert
+         assert(this->mELDMatrices.count(key) > 0);
       
-      return this->mLZMatrices.find(key)->second.at(j);
+         return this->mELDMatrices.find(key)->second.at(j);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         // Safety assert
+         assert(this->mENLDMatrices.count(key) > 0);
+      
+         return this->mENLDMatrices.find(key)->second.at(j);
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         // Safety assert
+         assert(this->mENSDMatrices.count(key) > 0);
+      
+         return this->mENSDMatrices.find(key)->second.at(j);
+      }
+   }
+
+   template <> const SparseMatrixZ& EquationData::explicitOperator<SparseMatrixZ>(const ModelOperator::Id opId, const FieldComponents::Spectral::Id compId, const SpectralFieldId fieldId, const int j) const
+   {
+      // Make key
+      std::pair<FieldComponents::Spectral::Id, SpectralFieldId> key = std::make_pair(compId, fieldId);
+
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         // Safety assert
+         assert(this->mELZMatrices.count(key) > 0);
+      
+         return this->mELZMatrices.find(key)->second.at(j);
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         // Safety assert
+         assert(this->mENLZMatrices.count(key) > 0);
+      
+         return this->mENLZMatrices.find(key)->second.at(j);
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         // Safety assert
+         assert(this->mENSZMatrices.count(key) > 0);
+      
+         return this->mENSZMatrices.find(key)->second.at(j);
+      }
+   }
+
+   std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> >& EquationData::rEDMatrices(const ModelOperator::Id opId)
+   {
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         return this->mELDMatrices;
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         return this->mENLDMatrices;
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         return this->mENSDMatrices;
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
+      }
+   }
+
+   std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrixZ> >& EquationData::rEZMatrices(const ModelOperator::Id opId)
+   {
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         return this->mELZMatrices;
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         return this->mENLZMatrices;
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         return this->mENSZMatrices;
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
+      }
    }
 
    const CouplingInformation& EquationData::couplingInfo(const FieldComponents::Spectral::Id compId) const
@@ -181,22 +293,9 @@ namespace Equations {
       this->mCouplingInfos.find(compId)->second.setSolverIndex(idx);
    }
 
-   void EquationData::setExplicitTiming(const FieldComponents::Spectral::Id compId, const ExplicitTiming::Id time)
-   {
-      this->mExplicitTiming.insert(std::make_pair(compId, time));
-   }
-
    void EquationData::setSolveTiming(const SolveTiming::Id time)
    {
       this->mSolveTiming = time;
-   }
-
-   ExplicitTiming::Id  EquationData::explicitTiming(const FieldComponents::Spectral::Id compId) const
-   {
-      // Safety assert
-      assert(this->mExplicitTiming.count(compId) > 0);
-      
-      return this->mExplicitTiming.find(compId)->second;
    }
 
    SolveTiming::Id  EquationData::solveTiming() const

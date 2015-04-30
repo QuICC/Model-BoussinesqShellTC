@@ -126,19 +126,14 @@ namespace Equations {
          virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;
 
          /**
-          * @brief Set the quasi inverse matrix operator
+          * @brief Set the explicit matrix operator
           */
-         virtual void setQuasiInverse(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const;
-
-         /**
-          * @brief Set the explicit linear matrix operator
-          */
-         virtual void setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const;
+         virtual void setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const;
 
          /**
           * @brief Build coupling information from Python scripts
           */
-         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const bool allowExplicit = true);
+         void defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool allowExplicit = true);
 
          /**
           * @brief Set the unknown variable
@@ -580,7 +575,7 @@ namespace Equations {
 
    template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
-      bool isInitialized = (eq.explicitTiming(compId) == ExplicitTiming::LINEAR && eq.couplingInfo(compId).nExplicit() > 0);
+      bool isInitialized = true;
       bool copyIsSet = true;
       bool applyIsSet = true;
 

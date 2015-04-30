@@ -111,8 +111,14 @@ namespace Equations {
          // Check for Galerkin stencils
          needInit = needInit || this->couplingInfo(*it).isGalerkin();
 
-         // Check for explicit operators
-         CouplingInformation::FieldId_range fRange = this->couplingInfo(*it).explicitRange();
+         // Check for explicit linear operators
+         CouplingInformation::FieldId_range fRange = this->couplingInfo(*it).explicitRange(ModelOperator::EXPLICIT_LINEAR);
+         needInit = needInit || (std::distance(fRange.first, fRange.second) > 0);
+         // Check for explicit nonlinear operators
+         fRange = this->couplingInfo(*it).explicitRange(ModelOperator::EXPLICIT_NONLINEAR);
+         needInit = needInit || (std::distance(fRange.first, fRange.second) > 0);
+         // Check for explicit nextstep operators
+         fRange = this->couplingInfo(*it).explicitRange(ModelOperator::EXPLICIT_NEXTSTEP);
          needInit = needInit || (std::distance(fRange.first, fRange.second) > 0);
 
          // Initialise spectral matrices
@@ -123,9 +129,9 @@ namespace Equations {
       }
    }
 
-   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasQI, const bool hasSource, const bool allowExplicit)
+   void IVectorEquation::defineCoupling(FieldComponents::Spectral::Id comp, CouplingInformation::EquationTypeId eqType, const int iZero, const bool hasNL, const bool hasSource, const bool allowExplicit)
    {
-      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasQI, hasSource, this->unknown().dom(0).spRes(), allowExplicit);
+      this->dispatchCoupling(comp, eqType, iZero, hasNL, hasSource, this->unknown().dom(0).spRes(), allowExplicit);
    }
 
    void  IVectorEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const ModelOperator::Id opId, FieldComponents::Spectral::Id comp, const int matIdx, const ModelOperatorBoundary::Id bcType) const
@@ -138,14 +144,9 @@ namespace Equations {
       this->dispatchGalerkinStencil(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 
-   void IVectorEquation::setQuasiInverse(FieldComponents::Spectral::Id comp, SparseMatrix &mat, const int matIdx) const
+   void IVectorEquation::setExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const ModelOperator::Id opId, const SpectralFieldId fieldId, const int matIdx) const
    {
-      this->dispatchQuasiInverse(comp, mat, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
-   }
-
-   void IVectorEquation::setExplicitLinearBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const SpectralFieldId fieldId, const int matIdx) const
-   {
-      this->dispatchExplicitLinearBlock(compId, mat, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
+      this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->unknown().dom(0).spRes(), EigenSelector::getEigs(*this, matIdx));
    }
 }
 }
