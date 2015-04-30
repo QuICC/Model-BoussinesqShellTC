@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.shell as shell
+import geomhdiscc.geometry.spherical.shell as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.shell_boundary import no_bc
 
@@ -101,7 +101,7 @@ class BoussinesqTCShell(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -190,14 +190,14 @@ class BoussinesqTCShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = geo.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
             else:
-                mat = shell.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = geo.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
         else:
             raise RuntimeError("Equations are not setup properly!")
@@ -205,19 +205,19 @@ class BoussinesqTCShell(base_model.BaseModel):
         return mat
 
     def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
-        """Create the quasi-inverse operator"""
+        """Create the explicit nonlinear operator"""
 
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+                mat = geo.i2x2(res[0], res[1], m, a, b, bc)
             else:
-                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
+                mat = geo.i2x3(res[0], res[1], m, a, b, bc)
 
         else:
             raise RuntimeError("Equations are not setup properly!")
@@ -233,48 +233,48 @@ class BoussinesqTCShell(base_model.BaseModel):
         Ra = eq_params['rayleigh']
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = geo.i2x2lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
 
             elif field_col == ("velocity","pol"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = shell.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
+                mat = geo.i4x4lapl2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set')
 
             elif field_col == ("temperature",""):
-                mat = shell.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+                mat = geo.i4x4(res[0], res[1], m, a, b, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
-                mat = shell.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
                     if eq_params["heating"] == 0:
-                        mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                        mat = geo.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
                     else:
-                        mat = shell.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                        mat = geo.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
 
                 else:
-                    mat = shell.zblk(res[0], res[1], m, bc)
+                    mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
                 if eq_params["heating"] == 0:
-                    mat = shell.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+                    mat = geo.i2x2lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
                 else:
-                    mat = shell.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
+                    mat = geo.i2x3lapl(res[0], res[1], m, a, b, bc, 1.0/Pr)
 
         else:
             raise RuntimeError("Equations are not setup properly!")
@@ -287,20 +287,20 @@ class BoussinesqTCShell(base_model.BaseModel):
         assert(eigs[0].is_integer())
 
         m = int(eigs[0])
-        a, b = shell.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = shell.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = geo.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("velocity","pol"):
-            mat = shell.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
+            mat = geo.i4x4lapl(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero')
 
         elif field_row == ("temperature",""):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc)
+                mat = geo.i2x2(res[0], res[1], m, a, b, bc)
             else:
-                mat = shell.i2x3(res[0], res[1], m, a, b, bc)
+                mat = geo.i2x3(res[0], res[1], m, a, b, bc)
 
         else:
             raise RuntimeError("Equations are not setup properly!")

@@ -7,8 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-import geomhdiscc.geometry.cylindrical.cylinder as cylinder
+import geomhdiscc.geometry.cylindrical.cylinder as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
 
@@ -16,15 +15,15 @@ from geomhdiscc.geometry.cylindrical.cylinder_boundary import no_bc
 class BoussinesqRRBCCylinderVC(base_model.BaseModel):
     """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a cylinder (velocity-continuity formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["taylor", "prandtl", "rayleigh", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["taylor", "prandtl", "rayleigh", "scale3d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -45,10 +44,23 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        fields = []
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("velocity","r"), ("velocity","theta"), ("velocity","z"), ("temperature","")]:
+                fields = [field_row]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
 
         return fields
 
@@ -80,27 +92,10 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
         # Matrix operator is complex except for vorticity and mean temperature
         is_complex = True
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -207,42 +202,35 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return cylinder.stencil(res[0], res[2], bc)
-
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create the quasi-inverse operator"""
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
 
         m = eigs[0]
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","r"):
-            mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","r") and field_col == field_row:
+            mat = geo.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x3(res[0], res[2], m%2, bc)
+        elif field_row == ("velocity","theta") and field_col == field_row:
+            mat = geo.i2j2x3(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+        elif field_row == ("velocity","theta") and field_col == field_row:
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc)
             mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
-        elif field_row == ("temperature",""):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc)
 
-        elif field_row == ("pressure",""):
-            mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -257,92 +245,92 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = geo.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2j2(res[0], res[2], m%2, bc, -2.0*1j*m)
+                mat = geo.i2j2(res[0], res[2], m%2, bc, -2.0*1j*m)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2x2(res[0], res[2], m%2, bc, T)
+                mat = mat + geo.i2j2x2(res[0], res[2], m%2, bc, T)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
             elif field_col == ("velocity","z"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2x3d1x_2(res[0], res[2], m%2, bc, -1.0)
+                mat = geo.i2j2x3d1x_2(res[0], res[2], m%2, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","theta"):
             if field_col == ("velocity","r"):
-                mat = cylinder.i2j2(res[0], res[2], m%2, bc, 2.0*1j*m)
+                mat = geo.i2j2(res[0], res[2], m%2, bc, 2.0*1j*m)
                 bc['r'][0] = min(bc['r'][0], 0)
                 bc['z'][0] = min(bc['z'][0], 0)
-                mat = mat + cylinder.i2j2x2(res[0], res[2], m%2, bc, -T)
+                mat = mat + geo.i2j2x2(res[0], res[2], m%2, bc, -T)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = geo.i2j2x3laplx_1(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
 
             elif field_col == ("velocity","z"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2(res[0], res[2], m%2, bc, -1j*m)
+                mat = geo.i2j2(res[0], res[2], m%2, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","r"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","z"):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = geo.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
 
             elif field_col == ("temperature",""):
-                mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, Ra)
+                mat = geo.i2j2x2(res[0], res[2], m%2, bc, Ra)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = cylinder.i2j2e1(res[0], res[2], m%2, bc, -1.0, zscale = zscale)
+                mat = geo.i2j2e1(res[0], res[2], m%2, bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","r"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","theta"):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("velocity","z"):
                 if self.linearize:
-                    mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+                    mat = geo.i2j2x2(res[0], res[2], m%2, bc)
                     mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 else:
-                    mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                    mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = cylinder.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
+                mat = geo.i2j2x2lapl(res[0], res[2], m, m%2, bc, zscale = zscale)
 
             elif field_col == ("pressure",""):
-                mat = cylinder.zblk(res[0], res[2], m%2, 1, 2, bc)
+                mat = geo.zblk(res[0], res[2], m%2, 1, 2, bc)
 
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -359,9 +347,9 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
-                        mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
+                        mat = geo.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
                     else:
-                        mat = cylinder.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
+                        mat = geo.i1j1x1d1(res[0]+1, res[2]+1, m%2, bc)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","theta"):
@@ -377,9 +365,9 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
-                        mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
+                        mat = geo.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
                     else:
-                        mat = cylinder.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
+                        mat = geo.i1j1(res[0]+1, res[2]+1, m%2, bc, 1j*m)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
                 elif field_col == ("velocity","z"):
@@ -395,19 +383,22 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['zb'] = 1
                     if m%2 == 1:
-                        mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
+                        mat = geo.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
                     else:
-                        mat = cylinder.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
+                        mat = geo.i1j1x2e1(res[0]+1, res[2]+1, m%2, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
-                    mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
+                    mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
+                    mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)
                     mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
                 mat = annulus.zblk(res[0], res[2], 1, 1, no_bc())
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -422,25 +413,28 @@ class BoussinesqRRBCCylinderVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_w, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = cylinder.i2j2x2(res[0], res[2], m%2, bc)
+            mat = geo.i2j2x2(res[0], res[2], m%2, bc)
 
         elif field_row == ("pressure",""):
-            mat = cylinder.zblk(res[0], res[2], m%2, 1, 1, bc)
+            mat = geo.zblk(res[0], res[2], m%2, 1, 1, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 

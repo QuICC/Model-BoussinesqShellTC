@@ -7,9 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import geomhdiscc.geometry.cartesian.cartesian_3d as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
@@ -17,15 +15,15 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 class BoussinesqRBCBoxST(base_model.BaseModel):
     """Class to setup the Boussinesq Rayleigh-Benard convection in a 3D box (streamfunction formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "heating", "scale1d", "scale2d", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "heating", "scale1d", "scale2d", "scale3d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -46,10 +44,23 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        fields = []
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("streamfunction",""), ("temperature","")]:
+                fields = [field_row]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
 
         return fields
 
@@ -181,26 +192,22 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c3d.stencil(res[0], res[2], bc)
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
 
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create the quasi-inverse operator"""
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("streamfunction","") and field_col == field_row:
+            mat = geo.i4j4k4(res[0], res[1], res[2], bc)
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("streamfunction",""):
-            mat = c3d.i4j4k4(res[0], res[1], res[2], bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
-        elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -212,17 +219,20 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
-                mat = c3d.i4j4k4lapl2(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+                mat = geo.i4j4k4lapl2(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i4j4k4(res[0], res[1], res[2], bc, -Ra)
+                mat = geo.i4j4k4(res[0], res[1], res[2], bc, -Ra)
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
-                mat = c3d.i2j2k2laplh(res[0], res[1], res[2], bc, -1.0, xscale = xscale, yscale = yscale)
+                mat = geo.i2j2k2laplh(res[0], res[1], res[2], bc, -1.0, xscale = xscale, yscale = yscale)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -237,9 +247,12 @@ class BoussinesqRBCBoxST(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
-            mat = c3d.i4j4k4lapl(res[0], res[1], res[2], bc, 1.0/Pr, xscale = xscale, yscale = yscale, zscale = zscale)
+            mat = geo.i4j4k4lapl(res[0], res[1], res[2], bc, 1.0/Pr, xscale = xscale, yscale = yscale, zscale = zscale)
 
         elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat

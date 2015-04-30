@@ -7,9 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
+import geomhdiscc.geometry.cartesian.cartesian_3d as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
@@ -17,15 +15,15 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 class BoussinesqRRBCBoxVC(base_model.BaseModel):
     """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a 3D box (velocity-continuity formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "taylor", "heating", "scale1d", "scale2d", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "taylor", "heating", "scale1d", "scale2d", "scale3d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -46,12 +44,25 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        if field_row == ("temperature",""):
-            fields = [("velocity","z")]
-        else:
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row == ("temperature",""):
+                fields = [("velocity","z")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]:
+                fields = [field_row]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
             fields = []
 
         return fields
@@ -232,40 +243,33 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c3d.stencil(res[0], res[2], bc)
-
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the quasi-inverse operator"""
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","x"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","x") and field_col == field_row:
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_u, np.prod(res))*mat
 
-        elif field_row == ("velocity","y"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+        elif field_row == ("velocity","y") and field_col == field_row:
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_v, np.prod(res))*mat
 
-        elif field_row == ("velocity","z"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+        elif field_row == ("velocity","z") and field_col == field_row:
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
             mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
-        elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
 
-        elif field_row == ("pressure",""):
-            mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -281,91 +285,91 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_3d(idx_u, res[1], res[2], res[0], restriction = restriction)
 
             elif field_col == ("velocity","y"):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, T, restriction = restriction)
+                mat = geo.i2j2k2(res[0], res[1], res[2], bc, T, restriction = restriction)
                 mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
             elif field_col == ("velocity","z"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale, restriction = restriction)
+                mat = geo.i2j2k2d1(res[0], res[1], res[2], bc, -1.0, xscale = xscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_u, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, -T, restriction = restriction)
+                mat = geo.i2j2k2(res[0], res[1], res[2], bc, -T, restriction = restriction)
                 mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
             elif field_col == ("velocity","y"):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_3d(idx_v, res[1], res[2], res[0], restriction = restriction)
 
             elif field_col == ("velocity","z"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale, restriction = restriction)
+                mat = geo.i2j2k2e1(res[0], res[1], res[2], bc, -1.0, yscale = yscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_v, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocity","y"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_3d(idx_w, res[1], res[2], res[0], restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2(res[0], res[1], res[2], bc, Ra, restriction = restriction)
+                mat = geo.i2j2k2(res[0], res[1], res[2], bc, Ra, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat
 
             elif field_col == ("pressure",""):
-                mat = c3d.i2j2k2f1(res[0], res[1], res[2], bc, -1.0, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2k2f1(res[0], res[1], res[2], bc, -1.0, zscale = zscale, restriction = restriction)
                 mat = utils.qid_from_idx(idx_w, np.prod(res))*mat*utils.qid_from_idx(idx_p, np.prod(res))
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocity","y"):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocity","z"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS: 
                     if eq_params['heating'] == 0:
-                        mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+                        mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
                         mat = mat*utils.qid_from_idx(idx_w, np.prod(res))
                 else:
-                    mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                    mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc, xscale = xscale, yscale = yscale, zscale = zscale, restriction = restriction)
 
             elif field_col == ("pressure",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_NO_TAU:
-                mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
+                mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, no_bc())
             else:
                 if field_col == ("velocity","x"):
                     bc['x']['cr'] = 1
@@ -377,7 +381,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
+                    mat = geo.i1j1k1d1(res[0]+1, res[1]+1, res[2]+1, bc, xscale = xscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_u, np.prod(res))
 
                 elif field_col == ("velocity","y"):
@@ -390,7 +394,7 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
+                    mat = geo.i1j1k1e1(res[0]+1, res[1]+1, res[2]+1, bc, yscale = yscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_v, np.prod(res))
 
                 elif field_col == ("velocity","z"):
@@ -403,15 +407,18 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c3d.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction)
+                    mat = geo.i1j1k1f1(res[0]+1, res[1]+1, res[2]+1, bc, zscale = zscale, restriction = restriction)
                     mat = utils.qid_from_idx(idx_p, np.prod(res))*mat*utils.qid_from_idx(idx_w, np.prod(res))
 
                 elif field_col == ("temperature",""):
-                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+                    mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+                    mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
                     mat = mat + utils.id_from_idx_3d(idx_p, res[1], res[2], res[0], restriction = restriction)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -424,25 +431,28 @@ class BoussinesqRRBCBoxVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_u, np.prod(res))
             mat = S*mat*S
 
         elif field_row == ("velocity","y"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_v, np.prod(res))
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, 1.0/Pr, restriction = restriction)
             S = utils.qid_from_idx(idx_w, np.prod(res))
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc, restriction = restriction)
 
         elif field_row == ("pressure",""):
-            mat = c3d.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+            mat = geo.zblk(res[0], res[1], res[2], 1, 1, 1, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 

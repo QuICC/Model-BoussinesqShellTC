@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.spherical.sphere as sphere
+import geomhdiscc.geometry.spherical.sphere as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
 
@@ -15,15 +15,15 @@ from geomhdiscc.geometry.spherical.sphere_boundary import no_bc
 class BoussinesqTCSphere(base_model.BaseModel):
     """Class to setup the Boussinesq thermal convection in a sphere (Toroidal/Poloidal formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -47,10 +47,24 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
+    def explicit_fields(self, timing, field_row):
         """Get the list of fields with explicit linear dependence"""
 
-        fields = []
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row == ("temperature",""):
+                fields = [("velocity","pol")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row == ("temperature",""):
+                fields = [("temperature","")]
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
 
         return fields
 
@@ -81,27 +95,10 @@ class BoussinesqTCSphere(base_model.BaseModel):
         # Matrix operator is complex except for vorticity and mean temperature
         is_complex = False
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
         index_mode = self.SLOWEST_SINGLE_RHS
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -187,31 +184,27 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return sphere.stencil(res[0], res[1], bc)
-
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create the quasi-inverse operator"""
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
 
         m = int(eigs[1])
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","tor"):
-            mat = sphere.i2x2(res[0], res[1], m, bc)
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","tor") and field_col == field_row:
+            mat = geo.i2x2(res[0], res[1], m, bc)
 
-        elif field_row == ("velocity","pol"):
-            mat = sphere.i4x4(res[0], res[1], m, bc)
+        elif field_row == ("velocity","pol") and field_col == field_row:
+            mat = geo.i4x4(res[0], res[1], m, bc)
 
-        elif field_row == ("temperature",""):
-            mat = sphere.i2x2(res[0], res[1], m, bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2x2(res[0], res[1], m, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
@@ -222,37 +215,40 @@ class BoussinesqTCSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = sphere.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("velocity","pol"):
-                mat = sphere.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = sphere.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = sphere.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = sphere.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("temperature",""):
-                mat = sphere.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
+                mat = geo.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
-                mat = sphere.zblk(res[0], res[1], m, bc)
+                mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = sphere.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+                    mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
 
                 else:
-                    mat = sphere.zblk(res[0], res[1], m, bc)
+                    mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = sphere.i2x2lapl(res[0], res[1], m, bc)
+                mat = geo.i2x2lapl(res[0], res[1], m, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -264,12 +260,15 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = sphere.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = sphere.i4x4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i4x4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = sphere.i2x2(res[0], res[1], m, bc, Pr)
+            mat = geo.i2x2(res[0], res[1], m, bc, Pr)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat

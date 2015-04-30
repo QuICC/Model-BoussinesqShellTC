@@ -7,8 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_1d as c1d
-import geomhdiscc.geometry.cartesian.cartesian_2d as c2d
+import geomhdiscc.geometry.cartesian.cartesian_2d as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 
@@ -16,15 +15,15 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_2d import no_bc
 class BoussinesqRRBCDuctVC(base_model.BaseModel):
     """Class to setup the Boussinesq rotating Rayleigh-Benard convection in a infinite duct (1 periodic direction) (velocity-continuity formulation)"""
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "taylor", "heating", "scale1d", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, True, False]
+
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "taylor", "heating", "scale1d", "scale3d"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -45,12 +44,25 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        if field_row == ("temperature",""):
-            fields = [("velocity","z")]
-        else:
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            if field_row == ("temperature",""):
+                fields = [("velocity","z")]
+            else:
+                fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]:
+                fields = [field_row]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
             fields = []
 
         return fields
@@ -228,40 +240,33 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c2d.stencil(res[0], res[2], bc)
-
-    def qi(self, res, eq_params, eigs, bcs, field_row, restriction = None):
-        """Create the quasi-inverse operator"""
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocity","x"):
-            mat = c2d.i2j2(res[0], res[2], bc)
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","x") and field_col == field_row:
+            mat = geo.i2j2(res[0], res[2], bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","y"):
-            mat = c2d.i2j2(res[0], res[2], bc)
+        elif field_row == ("velocity","y") and field_col == field_row:
+            mat = geo.i2j2(res[0], res[2], bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
-        elif field_row == ("velocity","z"):
-            mat = c2d.i2j2(res[0], res[2], bc)
+        elif field_row == ("velocity","z") and field_col == field_row:
+            mat = geo.i2j2(res[0], res[2], bc)
             mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
-        elif field_row == ("temperature",""):
-            mat = c2d.i2j2(res[0], res[2], bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2j2(res[0], res[2], bc)
 
-        elif field_row == ("pressure",""):
-            mat = c2d.zblk(res[0], res[2], 1, 1, bc)
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
 
         Ra = eq_params['rayleigh']
@@ -278,87 +283,87 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","x"):
             if field_col == ("velocity","x"):
-                mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
 
             elif field_col == ("velocity","y"):
-                mat = c2d.i2j2(res[0], res[2], bc, T)
+                mat = geo.i2j2(res[0], res[2], bc, T)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
             elif field_col == ("velocity","z"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c2d.i2j2d1(res[0], res[2], bc, -1.0, xscale = xscale)
+                mat = geo.i2j2d1(res[0], res[2], bc, -1.0, xscale = xscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","y"):
             if field_col == ("velocity","x"):
-                mat = c2d.i2j2(res[0], res[2], bc, -T)
+                mat = geo.i2j2(res[0], res[2], bc, -T)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","y"):
-                mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
 
             elif field_col == ("velocity","z"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = c2d.i2j2(res[0], res[2], bc, -1j*k)
+                mat = geo.i2j2(res[0], res[2], bc, -1j*k)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
             if field_col == ("velocity","x"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","y"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2(res[0], res[2], bc, Ra)
+                mat = geo.i2j2(res[0], res[2], bc, Ra)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = c2d.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale)
+                mat = geo.i2j2e1(res[0], res[2], bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","x"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","y"):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
                 if self.linearize or bcs["bcType"] == self.FIELD_TO_RHS:
                     if eq_params['heating'] == 0:
-                        mat = c2d.i2j2(res[0], res[2], bc)
+                        mat = geo.i2j2(res[0], res[2], bc)
                         mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 else:
-                    mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                    mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c2d.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
+                mat = geo.i2j2lapl(res[0], res[2], k, bc, xscale = xscale, zscale = zscale)
 
             elif field_col == ("pressure",""):
-                mat = c2d.zblk(res[0], res[2], 2, 2, bc)
+                mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
         elif field_row == ("pressure",""):
             if bcs["bcType"] == self.SOLVER_HAS_BC:
@@ -369,7 +374,7 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c2d.i1j1d1(res[0]+1, res[2]+1, bc, xscale = xscale)
+                    mat = geo.i1j1d1(res[0]+1, res[2]+1, bc, xscale = xscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","y"):
@@ -379,7 +384,7 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c2d.i1j1(res[0]+1, res[2]+1, bc, 1j*k)
+                    mat = geo.i1j1(res[0]+1, res[2]+1, bc, 1j*k)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
 
                 elif field_col == ("velocity","z"):
@@ -389,18 +394,20 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = c2d.i1j1e1(res[0]+1, res[2]+1, bc, zscale = zscale)
+                    mat = geo.i1j1e1(res[0]+1, res[2]+1, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
-                    mat = c2d.zblk(res[0], res[2], 1, 1, bc)
+                    mat = geo.zblk(res[0], res[2], 1, 1, bc)
 
                 elif field_col == ("pressure",""):
-                    mat = c2d.zblk(res[0], res[2], 1, 1, bc)
+                    mat = geo.zblk(res[0], res[2], 1, 1, bc)
                     mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
-                mat = c2d.zblk(res[0], res[2], 1, 1, no_bc())
+                mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
 
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
@@ -413,25 +420,28 @@ class BoussinesqRRBCDuctVC(base_model.BaseModel):
 
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","x"):
-            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","y"):
-            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = c2d.i2j2(res[0], res[2], bc, 1.0/Pr)
+            mat = geo.i2j2(res[0], res[2], bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_w, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = c2d.i2j2(res[0], res[2], bc)
+            mat = geo.i2j2(res[0], res[2], bc)
 
         elif field_row == ("pressure",""):
-            mat = c2d.zblk(res[0], res[2], 1, 1, bc)
+            mat = geo.zblk(res[0], res[2], 1, 1, bc)
+
+        else:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
