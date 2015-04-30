@@ -29,8 +29,8 @@ class BaseModel:
     SINGLE = 3
 
     EXPLICIT_LINEAR = 0
-    EXPLICIT_NONLINEAR = 0
-    EXPLICIT_NEXTSTEP = 0
+    EXPLICIT_NONLINEAR = 1
+    EXPLICIT_NEXTSTEP = 2
 
     def time(self, res, eq_params, eigs, bcs, fields, restriction = None):
         """Create the time derivative operator"""
@@ -59,7 +59,7 @@ class BaseModel:
 
         mat = self.explicit_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_linear_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_linear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -70,7 +70,7 @@ class BaseModel:
 
         mat = self.nonlinear_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nonlinear_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nonlinear_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
@@ -81,7 +81,7 @@ class BaseModel:
 
         mat = self.nextstep_block(res, eq_params, eigs, bcs, field_row, field_col, restriction = restriction)
         if verbose_write_mtx:
-            fname = "matrix_explicit_nextstep_" + str(bcs["bcType"]) + "_" + str(os.getpid())
+            fname = "matrix_explicit_nextstep_" + ''.join(field_row) + '_' + ''.join(field_col) + '_' + str(bcs["bcType"]) + "_" + str(os.getpid())
             for e in eigs:
                 fname = fname + "_" + str(e)
             io.mmwrite(fname + ".mtx", mat)
