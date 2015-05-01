@@ -41,6 +41,10 @@ namespace Equations {
 
    namespace internal
    {
+      void applyOperatorWrapper(Matrix& rField, const int start, const SparseMatrix& mat, const Matrix& rhs, const bool isSet);
+
+      void applyOperatorWrapper(Matrix& rField, const int start, const SparseMatrixZ& mat, const Matrix& rhs, const bool isSet);
+
       void applyOperatorWrapper(MatrixZ& rField, const int start, const SparseMatrix& mat, const MatrixZ& rhs, const bool isSet);
 
       void applyOperatorWrapper(MatrixZ& rField, const int start, const SparseMatrixZ& mat, const Eigen::Ref<const MatrixZ>& rhs, const bool isSet);
@@ -252,6 +256,22 @@ namespace Equations {
 
    namespace internal
    {
+      inline void applyOperatorWrapper(Matrix& rField, const int start, const SparseMatrixZ& mat, const Matrix& rhs, const bool isSet)
+      {
+         throw Exception("Tried to use complex operator on real fields");
+      }
+
+      inline void applyOperatorWrapper(Matrix& rField, const int start, const SparseMatrix& mat, const Matrix& rhs, const bool isSet)
+      {
+         if(isSet)
+         {
+            rField.block(start, 0, mat.rows(), rField.cols()) = mat*rhs;
+         } else
+         {
+            rField.block(start, 0, mat.rows(), rField.cols()) += mat*rhs;
+         }
+      }
+
       inline void applyOperatorWrapper(MatrixZ& rField, const int start, const SparseMatrix& mat, const MatrixZ& rhs, const bool isSet)
       {
          if(isSet)

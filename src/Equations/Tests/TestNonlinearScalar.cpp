@@ -103,7 +103,7 @@ namespace Equations {
 
    void TestNonlinearScalar::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 0, true, false);
    }
 
    void TestNonlinearScalar::setRequirements()

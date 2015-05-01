@@ -7,7 +7,7 @@ import scipy.sparse.linalg as spsplin
 import geomhdiscc.model.boussinesq_rbccylinder_vc as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqRBCylinderVC()
+model = mod.BoussinesqRBCCylinderVC()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
