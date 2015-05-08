@@ -63,6 +63,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("mainRun",1);
 
+      // Clear equation data for next step
+      this->clearBaseSolvers();
+
       // Solve the trivial equations
       this->solveTrivialEquations(SolveTiming::AFTER);
 

@@ -348,7 +348,7 @@ namespace Equations {
       // solve for galerkin expansion
       TData lhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       Solver::internal::solveWrapper(lhs, solver, rhs);
-      internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
+      Datatypes::internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
    }
 
    template <typename TData> void copyUnknown(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start, const bool useShift, const bool isSet)
@@ -575,57 +575,24 @@ namespace Equations {
       assert(compId == FieldComponents::Spectral::SCALAR);
       assert((!eq.couplingInfo(compId).isGalerkin() || eq.couplingInfo(compId).indexType() != CouplingInformation::SINGLE) && "Current version does not support galerkin basis");
 
-      bool isInitialized = true;
-      bool copyIsSet = true;
-      bool applyIsSet = true;
-
       // Check if a nonlinear computation took place and a quasi-inverse has to be applied
       if(eq.couplingInfo(compId).hasNonlinear() && eq.couplingInfo(compId).hasQuasiInverse())
       {
-         TData * rhs;
-         bool useShift;
-         int copyStart;
+         // Temporary storage is required
          TData tmp;
-         if(eq.couplingInfo(compId).isGalerkin() || isInitialized)
-         {
-            // Temporary storage is required
-            tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-            rhs = &tmp;
-            useShift = false;
-            copyStart = 0;
-            if(isInitialized)
-            {
-               applyIsSet = false;
-            }
-         } else
-         {
-            // Storage can be used a RHS and LHS
-            rhs = &storage;
-            useShift = true;
-            copyStart = start;
-         }
+         tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
 
          // simply copy values from unknown
-         copyUnknown(eq, compId, *rhs, matIdx, copyStart, useShift, copyIsSet);
+         copyUnknown(eq, compId, tmp, matIdx, 0, false, true);
 
          // Multiply nonlinear term by quasi-inverse
-         applyQuasiInverse(eq, compId, storage, start, matIdx, copyStart, *rhs, applyIsSet);
+         applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp);
 
-      /// Nonlinear computation took place but no quas-inverse is required
+      /// Nonlinear computation took place but no quasi-inverse is required
       } else if(eq.couplingInfo(compId).hasNonlinear())
       {
-         if(isInitialized)
-         {
-            copyIsSet = false;
-         }
-
          // simply copy values from unknown
-         copyUnknown(eq, compId, storage, matIdx, start, true, copyIsSet);
-
-      // Without nonlinear computation the values have to be initialised to zero   
-      } else if(! isInitialized)
-      {
-         setZeroNonlinear(eq, compId, storage, matIdx, start);
+         copyUnknown(eq, compId, storage, matIdx, start, true, false);
       }
    }
 

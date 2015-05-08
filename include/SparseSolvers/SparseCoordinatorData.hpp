@@ -108,6 +108,11 @@ namespace Solver {
           * @brief Set solve time
           */
          void setSolveTime(const SolveTiming::Id time);
+
+         /**
+          * @brief Clear the RHS data of all solvers
+          */
+         void clearSolvers();
          
       protected:
          /**
@@ -260,6 +265,19 @@ namespace Solver {
       for(typename std::vector<SharedComplexSolverType>::iterator zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
       {
          (*zIt)->initStartRow();
+      }
+   }
+
+   template <template <class,class> class TSolver> void SparseCoordinatorData<TSolver>::clearSolvers()
+   {
+      for(typename std::vector<SharedRealSolverType>::iterator rIt = this->mRealSolvers.begin(); rIt != this->mRealSolvers.end(); ++rIt)
+      {
+         (*rIt)->zeroSolver();
+      }
+
+      for(typename std::vector<SharedComplexSolverType>::iterator zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
+      {
+         (*zIt)->zeroSolver();
       }
    }
 

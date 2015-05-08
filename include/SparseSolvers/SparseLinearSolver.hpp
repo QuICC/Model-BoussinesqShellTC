@@ -66,6 +66,11 @@ namespace Solver {
          void updateSolver();
 
          /**
+          * @brief Set solver RHS data to zero
+          */
+         void zeroSolver();
+
+         /**
           * @brief Solve linear systems
           *
           * @param step    Current substep
@@ -171,6 +176,15 @@ namespace Solver {
          {
             throw Exception("Sparse directo solve failed!");
          }
+      }
+   }
+
+   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::zeroSolver()
+   {
+      // Set solver RHS to zero
+      for(int i = 0; i < this->mRHSData.size(); ++i)
+      {
+         this->mRHSData.at(i).setZero();
       }
    }
 

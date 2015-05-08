@@ -47,8 +47,10 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                 fields = []
             elif field_row == ("velocity","pol"):
                 fields = [("temperature","")]
+                fields = []
             elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]
+                fields = []
             else:
                 fields = []
 
@@ -217,13 +219,13 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4x4(res[0], a, b, bc, -Ra_eff*l*(l+1.0))
+            mat = geo.i4x4(res[0], a, b, bc, Ra_eff*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc, bg_eff*l*(l+1.0))
+                mat = geo.i2x2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
             else:
-                mat = geo.i2(res[0], a, b, bc, bg_eff*l*(l+1.0))
+                mat = geo.i2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -253,7 +255,6 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
 
         Pm = eq_params['magnetic_prandtl']
         Pr = eq_params['prandtl']
-        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         l = eigs[0]
 

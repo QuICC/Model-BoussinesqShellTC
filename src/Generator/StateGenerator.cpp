@@ -58,11 +58,13 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("preRun",1);
    }
 
-
    void StateGenerator::mainRun()
    {
       // Debug statement
       DebuggerMacro_enter("mainRun",1);
+
+      // Clear equation data for next step
+      this->clearBaseSolvers();
 
       // Compute nonlinear terms
       this->computeNonlinear();

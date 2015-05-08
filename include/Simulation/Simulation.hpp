@@ -73,6 +73,11 @@ namespace GeoMHDiSCC {
          virtual void postRun();
 
          /**
+          * @brief Clear all the solvers data
+          */
+         void clearSolvers();
+
+         /**
           * @brief Explicit linear term for all equations
           */
          void explicitEquations();

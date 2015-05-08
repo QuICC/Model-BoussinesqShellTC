@@ -122,7 +122,7 @@ namespace Equations {
       {
          return (this->mENLDMatrices.count(key) > 0);
 
-      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP) 
       {
          return (this->mENSDMatrices.count(key) > 0);
       }
@@ -141,7 +141,7 @@ namespace Equations {
       {
          return (this->mENLZMatrices.count(key) > 0);
 
-      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR) 
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP) 
       {
          return (this->mENSZMatrices.count(key) > 0);
       }

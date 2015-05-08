@@ -82,6 +82,9 @@ namespace GeoMHDiSCC {
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
       {
+         // Clear equation data for next step
+         this->clearSolvers();
+
          // Compute explicit linear terms
          this->explicitEquations();
 
@@ -107,6 +110,9 @@ namespace GeoMHDiSCC {
 
    void Simulation::preSolveEquations()
    {  
+      // Clear equation data for next step
+      this->clearSolvers();
+
       // Print message to signal start of diagnostic/trivial presolve
       if(FrameworkMacro::allowsIO())
       {
@@ -122,6 +128,9 @@ namespace GeoMHDiSCC {
       // Solve trivial equations
       this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
+
+      // Clear equation data for next step
+      this->clearSolvers();
 
       // Compute physical values
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
@@ -226,6 +235,21 @@ namespace GeoMHDiSCC {
 
       // Debug statement
       DebuggerMacro_leave("preRun",1);
+   }
+
+   void Simulation::clearSolvers()
+   {
+      // Debug statement
+      DebuggerMacro_enter("clearSolvers",2);
+
+      // Clear trivial and diagnostic solvers
+      this->clearBaseSolvers();
+
+      // Clear timestep solvers
+      this->mTimestepCoordinator.clearSolvers();
+
+      // Debug statement
+      DebuggerMacro_leave("clearSolvers",2);
    }
 
    void Simulation::explicitEquations()

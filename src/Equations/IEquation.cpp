@@ -24,6 +24,7 @@
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {
@@ -92,50 +93,53 @@ namespace Equations {
 
    void IEquation::initQIMatrices(const SharedSimulationBoundary spBcIds, FieldComponents::Spectral::Id compId)
    {
-      // Get the number of systems
-      int nSystems = this->couplingInfo(compId).nSystems();
-
-      //
-      // Initialise the quasi inverse operators
-      //
-      SpectralFieldId  fieldId = std::make_pair(this->name(), compId);
-
-      std::vector<DecoupledZSparse> tmpMat;
-      tmpMat.reserve(nSystems);
-
-      bool isComplex = false;
-
-      // Create matrices
-      for(int i = 0; i < nSystems; ++i)
+      if(this->couplingInfo(compId).hasQuasiInverse())
       {
-         // Get block
-         tmpMat.push_back(DecoupledZSparse());
-         this->setExplicitBlock(compId, tmpMat.at(i), ModelOperator::EXPLICIT_NONLINEAR, fieldId, i);
+         // Get the number of systems
+         int nSystems = this->couplingInfo(compId).nSystems();
 
-         isComplex = isComplex || (tmpMat.at(i).imag().nonZeros() > 0);
-      }
+         //
+         // Initialise the quasi inverse operators
+         //
+         SpectralFieldId  fieldId = std::make_pair(this->name(), compId);
 
-      // Select real or complex operator
-      if(isComplex)
-      {
-         this->mQIZMatrices.insert(std::make_pair(compId, std::vector<SparseMatrixZ>()));
-         this->mQIZMatrices.find(compId)->second.reserve(nSystems);
+         std::vector<DecoupledZSparse> tmpMat;
+         tmpMat.reserve(nSystems);
 
+         bool isComplex = false;
+
+         // Create matrices
          for(int i = 0; i < nSystems; ++i)
          {
-            SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + Math::cI*tmpMat.at(i).imag();
-            this->mQIZMatrices.find(compId)->second.push_back(tmp);
+            // Get block
+            tmpMat.push_back(DecoupledZSparse());
+            this->setExplicitBlock(compId, tmpMat.at(i), ModelOperator::EXPLICIT_NONLINEAR, fieldId, i);
+
+            isComplex = isComplex || (tmpMat.at(i).imag().nonZeros() > 0);
          }
-      } else
-      {
-         this->mQIDMatrices.insert(std::make_pair(compId, std::vector<SparseMatrix>()));
-         this->mQIDMatrices.find(compId)->second.reserve(nSystems);
 
-         for(int i = 0; i < nSystems; ++i)
+         // Select real or complex operator
+         if(isComplex)
          {
-            this->mQIDMatrices.find(compId)->second.push_back(SparseMatrix());
+            this->mQIZMatrices.insert(std::make_pair(compId, std::vector<SparseMatrixZ>()));
+            this->mQIZMatrices.find(compId)->second.reserve(nSystems);
 
-            this->mQIDMatrices.find(compId)->second.back().swap(tmpMat.at(i).real());
+            for(int i = 0; i < nSystems; ++i)
+            {
+               SparseMatrixZ tmp = tmpMat.at(i).real().cast<MHDComplex>() + Math::cI*tmpMat.at(i).imag();
+               this->mQIZMatrices.find(compId)->second.push_back(tmp);
+            }
+         } else
+         {
+            this->mQIDMatrices.insert(std::make_pair(compId, std::vector<SparseMatrix>()));
+            this->mQIDMatrices.find(compId)->second.reserve(nSystems);
+
+            for(int i = 0; i < nSystems; ++i)
+            {
+               this->mQIDMatrices.find(compId)->second.push_back(SparseMatrix());
+
+               this->mQIDMatrices.find(compId)->second.back().swap(tmpMat.at(i).real());
+            }
          }
       }
    }

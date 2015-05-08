@@ -60,6 +60,11 @@ namespace Solver {
          virtual void addStorage(const int rows, const int cols);
 
          /**
+          * @brief Set solver RHS data to zero
+          */
+         void zeroSolver();
+
+         /**
           * @brief Set RHS data
           *
           * @param idx   Index of the data
@@ -108,6 +113,15 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
+   }
+
+   template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::zeroSolver()
+   {
+      // Set solver RHS to zero
+      for(int i = 0; i < this->mSolution.size(); ++i)
+      {
+         this->mSolution.at(i).setZero();
+      }
    }
 
    template <typename TOperator,typename TData> int SparseTrivialSolver<TOperator,TData>::nSystem() const

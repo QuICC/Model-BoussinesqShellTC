@@ -352,6 +352,21 @@ namespace GeoMHDiSCC {
       DebuggerMacro_leave("explicitDiagnosticEquations",3);
    }
 
+   void SimulationBase::clearBaseSolvers()
+   {
+      // Debug statement
+      DebuggerMacro_enter("clearBaseSolvers",2);
+
+      // Clear trivial solvers
+      this->mTrivialCoordinator.clearSolvers();
+
+      // Clear diagnostic solvers
+      this->mLinearCoordinator.clearSolvers();
+
+      // Debug statement
+      DebuggerMacro_leave("clearBaseSolvers",2);
+   }
+
    void SimulationBase::solveTrivialEquations(const SolveTiming::Id time)
    {
       // Debug statement
