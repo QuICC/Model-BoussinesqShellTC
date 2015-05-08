@@ -214,9 +214,9 @@ class BoussinesqDynamoShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = shell.i2x2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+                mat = shell.i2x2(res[0], res[1], m, a, b, bc, -bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
             else:
-                mat = shell.i2(res[0], res[1], m, a, b, bc, bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
+                mat = shell.i2(res[0], res[1], m, a, b, bc, -bg_eff, with_sh_coeff = 'laplh', restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

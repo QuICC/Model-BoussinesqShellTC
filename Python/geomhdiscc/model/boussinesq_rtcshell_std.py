@@ -42,17 +42,19 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
 
         # Explicit linear terms
         if timing == self.EXPLICIT_LINEAR:
-            if field_row == ("velocity","tor"):
-                fields = []
-            elif field_row == ("velocity","pol"):
+            if field_row == ("velocity","pol"):
                 fields = [("temperature","")]
             elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]
+            else:
+                fields = []
 
         # Explicit nonlinear terms
         elif timing == self.EXPLICIT_NONLINEAR:
             if field_row == ("temperature",""):
                 fields = [("temperature","")]
+            else:
+                fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -191,13 +193,13 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4x4(res[0], a, b, bc, -Ra_eff*l*(l+1.0))
+            mat = geo.i4x4(res[0], a, b, bc, Ra_eff*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc, bg_eff*l*(l+1.0))
+                mat = geo.i2x2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
             else:
-                mat = geo.i2(res[0], a, b, bc, bg_eff*l*(l+1.0))
+                mat = geo.i2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -226,7 +228,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
-        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         l = eigs[0]
 
@@ -235,18 +236,10 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
-                bc[0] = min(0,bc[0]//10)
-                mat = geo.qid(res[0], 0, bc)
-            else:
-                mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            if l == 0 and bcs['bcType'] == self.SOLVER_HAS_BC:
-                bc[0] = min(0,bc[0]//10)
-                mat = geo.qid(res[0], 0, bc)
-            else:
-                mat = geo.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:

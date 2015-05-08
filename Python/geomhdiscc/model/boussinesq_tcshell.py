@@ -58,6 +58,8 @@ class BoussinesqTCShell(base_model.BaseModel):
         elif timing == self.EXPLICIT_NONLINEAR:
             if field_row == ("temperature",""):
                 fields = [("temperature","")]
+            else:
+                fields = []
 
         # Explicit update terms for next step
         elif timing == self.EXPLICIT_NEXTSTEP:
@@ -196,9 +198,9 @@ class BoussinesqTCShell(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = geo.i2x2(res[0], res[1], m, a, b, bc, -1.0, with_sh_coeff = 'laplh')
             else:
-                mat = geo.i2(res[0], res[1], m, a, b, bc, with_sh_coeff = 'laplh')
+                mat = geo.i2(res[0], res[1], m, a, b, bc, -1.0, with_sh_coeff = 'laplh')
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

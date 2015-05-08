@@ -47,10 +47,8 @@ class BoussinesqDynamoShellStd(base_model.BaseModel):
                 fields = []
             elif field_row == ("velocity","pol"):
                 fields = [("temperature","")]
-                fields = []
             elif field_row == ("temperature",""):
                 fields = [("velocity","pol")]
-                fields = []
             else:
                 fields = []
 
