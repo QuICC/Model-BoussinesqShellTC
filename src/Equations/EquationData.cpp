@@ -125,6 +125,10 @@ namespace Equations {
       } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP) 
       {
          return (this->mENSDMatrices.count(key) > 0);
+
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
       }
    }
 
@@ -144,6 +148,10 @@ namespace Equations {
       } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP) 
       {
          return (this->mENSZMatrices.count(key) > 0);
+
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
       }
    }
 
@@ -188,6 +196,10 @@ namespace Equations {
          assert(this->mENSDMatrices.count(key) > 0);
       
          return this->mENSDMatrices.find(key)->second.at(j);
+
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
       }
    }
 
@@ -216,6 +228,10 @@ namespace Equations {
          assert(this->mENSZMatrices.count(key) > 0);
       
          return this->mENSZMatrices.find(key)->second.at(j);
+
+      } else
+      {
+         throw Exception("Requested inexistant explicit matrices");
       }
    }
 
@@ -232,6 +248,7 @@ namespace Equations {
       } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
       {
          return this->mENSDMatrices;
+
       } else
       {
          throw Exception("Requested inexistant explicit matrices");
@@ -251,6 +268,7 @@ namespace Equations {
       } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
       {
          return this->mENSZMatrices;
+
       } else
       {
          throw Exception("Requested inexistant explicit matrices");
