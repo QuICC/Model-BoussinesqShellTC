@@ -205,7 +205,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("vorticityz","") and field_col == ("streamfunction",""):
-            mat = geo.qid(res[0],0, bc, (kx**2 + ky**2))
+            mat = geo.qid(res[0],0, bc, -(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
