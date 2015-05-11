@@ -320,7 +320,7 @@ namespace Equations {
          // explicit nonlinear
          for(fIt = exNLFields.begin(); fIt != exNLFields.end(); ++fIt)
          {
-            if(fIt->first != this->name() && fIt->second != compId)
+            if(!(fIt->first == this->name() && fIt->second == compId))
             {
                infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::EXPLICIT_NONLINEAR);
             }

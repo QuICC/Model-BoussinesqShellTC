@@ -46,6 +46,9 @@ namespace Solver {
 
       // Update the internal step counter
       this->updateStep();
+
+      // Clear the solver RHS
+      this->clearSolvers();
    }
 
    void SparseTrivialCoordinator::init(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)

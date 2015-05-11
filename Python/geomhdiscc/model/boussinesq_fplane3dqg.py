@@ -42,7 +42,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("streamfunction","") or field_row == ("velocityz","") or field_row == ("temperature",""):
+        if field_row in [("streamfunction",""), ("velocityz",""), ("temperature","")]:
             fields =  [("streamfunction",""), ("velocityz",""), ("temperature","")]
 
         else:
@@ -263,7 +263,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.qid(res[0],0, bc, -(1/Pr)*(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
                 # Force temperature boundary condition
                 if self.force_temperature_bc and not self.use_galerkin:

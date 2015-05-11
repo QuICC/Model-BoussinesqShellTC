@@ -177,11 +177,6 @@ namespace GeoMHDiSCC {
          virtual void initSolvers();
 
          /**
-          * @brief Clear all the solvers data
-          */
-         void clearBaseSolvers();
-
-         /**
           * @brief Compute the nonlinear terms
           */
          void computeNonlinear();

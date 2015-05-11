@@ -50,6 +50,9 @@ namespace Solver {
 
       // Update the internal step counter
       this->updateStep();
+
+      // Clear the solver RHS
+      this->clearSolvers();
    }
 
    void SparseLinearCoordinator::buildSolverMatrix(SparseLinearCoordinator::SharedRealSolverType spSolver, const int matIdx, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx)
