@@ -175,6 +175,8 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        S = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -189,19 +191,20 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                 if kx == 0 and ky == 0:
                     mat = geo.zblk(res[0], bc)
                 else:
-                    mat = geo.i1(res[0], bc, -1j*eta2*kx/(kx**2 + (1/eta3**2)*ky**2))
+                    mat = geo.i1(res[0], bc, -1j*eta2*kx/(kx**2 + (1.0/eta3**2)*ky**2))
+                    mat = S*mat
 
             elif field_col == ("no_velocityz",""):
                 mat = geo.i1(res[0], bc, eta3)
+                mat = S*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
             mat = geo.qid(res[0], 0, bc)
 
             # Force temperature boundary condition
             if self.force_temperature_bc and not self.use_galerkin:
-                mat = mat.tolil()
-                mat[-2:,:] = 0
-                mat = mat.tocsr()
+                ST = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
+                mat = ST*mat
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
@@ -229,7 +232,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
             if kx == 0 and ky == 0:
                 mat = geo.zblk(res[0], bc)
             elif field_col == ("streamfunction",""):
-                mat = geo.qid(res[0],0, bc, eta3*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, eta3*(kx**2 + (1.0/eta3**2)*ky**2)/(kx**2 + ky**2))
 
             elif field_col == ("velocityz",""):
                 mat = geo.qid(res[0],0, bc, 1j*eta2*kx/(kx**2 + ky**2))
@@ -238,19 +241,19 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
             if kx == 0 and ky == 0:
                 mat = geo.zblk(res[0], bc)
             elif field_col == ("streamfunction",""):
-                mat = geo.qid(res[0],0, bc, 1j*eta2*kx*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, 1j*eta2*kx*(kx**2 + (1.0/eta3**2)*ky**2)/(kx**2 + ky**2))
 
             elif field_col == ("velocityz",""):
-                mat = geo.qid(res[0],0, bc, eta3*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, eta3*(kx**2 + (1.0/eta3**2)*ky**2)/(kx**2 + ky**2))
 
         elif field_row == ("no_vorticityz",""):
             if kx == 0 and ky == 0:
                 mat = geo.zblk(res[0], bc)
             elif field_col == ("streamfunction",""):
-                mat = geo.qid(res[0],0, bc, -eta3*(kx**2 + (1/eta3**2)*ky**2)**2/(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, -eta3*(kx**2 + (1.0/eta3**2)*ky**2)**2/(kx**2 + ky**2))
 
             elif field_col == ("velocityz",""):
-                mat = geo.qid(res[0],0, bc, -1j*eta2*kx*(kx**2 + (1/eta3**2)*ky**2)/(kx**2 + ky**2))
+                mat = geo.qid(res[0],0, bc, -1j*eta2*kx*(kx**2 + (1.0/eta3**2)*ky**2)/(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -268,11 +271,14 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        S = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
             if field_col == ("streamfunction",""):
                 mat = geo.i1(res[0], bc, (kx**2 + (1.0/eta3**2)*ky**2)**2)
+                mat = mat*S
 
             elif field_col == ("velocityz",""):
                 mat = geo.i1d1(res[0], bc, eta3, cscale = zscale)
@@ -283,15 +289,20 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         elif field_row == ("velocityz",""):
             if field_col == ("streamfunction",""):
                 mat = geo.i1d1(res[0], bc, -eta3, cscale = zscale)
+                mat = S*mat*S
+                if bcs["bcType"] == self.SOLVER_HAS_BC:
+                    mat = mat + utils.id_from_idx_1d(utils.qidx(res[0], res[0]-1), res[0])
 
             elif field_col == ("velocityz",""):
                 mat = geo.i1(res[0], bc, -(kx**2 + (1.0/eta3**2)*ky**2))
+                mat = S*mat
 
             elif field_col == ("temperature",""):
                 if kx == 0 and ky == 0:
                     mat = geo.zblk(res[0], bc)
                 else:
-                    mat = geo.i1(res[0], bc, (Ra/Pr)*(kx**2 + ky**2)/(kx**2 + (1/eta3**2)*ky**2))
+                    mat = geo.i1(res[0], bc, (Ra/Pr)*(kx**2 + ky**2)/(kx**2 + (1.0/eta3**2)*ky**2))
+                    mat = S*mat
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -303,9 +314,8 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
 
                     # Force temperature boundary condition
                     if self.force_temperature_bc and not self.use_galerkin:
-                        mat = mat.tolil()
-                        mat[-2:,:] = 0
-                        mat = mat.tocsr()
+                        ST = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
+                        mat = ST*mat
                 else:
                     mat = geo.zblk(res[0], bc)
 
@@ -335,22 +345,25 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+        S = utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("streamfunction",""):
             mat = geo.i1(res[0], bc, -(kx**2 + (1.0/eta3**2)*ky**2))
+            mat = mat*S
 
         elif field_row == ("velocityz",""):
             mat = geo.i1(res[0], bc)
+            mat = S*mat*S
 
         elif field_row == ("temperature",""):
             mat = geo.qid(res[0],0, bc)
 
             # Force temperature boundary condition
             if self.force_temperature_bc and not self.use_galerkin:
-                mat = mat.tolil()
-                mat[-2:,:] = 0
-                mat = mat.tocsr()
+                ST = utils.qid_from_idx(utils.qidx(res[0], res[0]-2), res[0])
+                mat = ST*mat
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
