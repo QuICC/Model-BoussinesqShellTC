@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_tilted_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_tilted_fplane3dqg_2 as mod
 
 # Create the model and activate linearization
 model = mod.BoussinesqTiltedFPlane3DQG()
@@ -11,20 +11,18 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [48, 0, 0]
+res = [64, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 kp = 1.3048
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
 kp = 1.1624
-eq_params = {'prandtl':1, 'rayleigh':400.0, 'theta':45.0, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0, 'epsilon':1e-6}
 kp = 1.1624
 
 # Set wave number
 phi = 0
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
-kx = 1.0
-ky = 0
 eigs = [kx, ky]
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
@@ -40,7 +38,7 @@ B = model.time(res, eq_params, eigs, bcs, fields)
 show_spy = False
 write_mtx = False
 solve_evp = True
-show_solution = (False and solve_evp)
+show_solution = (True and solve_evp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
