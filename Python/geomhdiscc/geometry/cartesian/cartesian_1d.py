@@ -462,7 +462,7 @@ def sid(nx, s, bc, coeff = 1.0):
     diags = [[1]*(nx-s) + [0]*s]
 
     mat = coeff*spsp.diags(diags, offsets)
-    return c1dbc.constrain(mat, bc)
+    return c1dbc.constrain(mat, bc, location = 'b')
 
 def stencil(nx, bc):
     """Create a galerkin stencil matrix"""
