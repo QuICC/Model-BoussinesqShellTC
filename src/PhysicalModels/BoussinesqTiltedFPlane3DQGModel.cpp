@@ -140,93 +140,93 @@ namespace GeoMHDiSCC {
       Equations::SharedScalarFieldVisualizer spField;
       Equations::SharedTiltedScalarFieldVisualizer spTilted;
 
-      // Add non orthogonal streamfunction equation
-      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoStreamfunction>(SolveTiming::AFTER);
-      // Add non orthogonal vertical velocity equation
-      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVelocityZ>(SolveTiming::AFTER);
-      // Add non orthogonal vertical vorticity equation
-      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVorticityZ>();
-
       // Add transport field visualization
       spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
-      // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
-      
-      // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::VELOCITYZ);
-      
-      // Add streamfunction field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::NO_STREAMFUNCTION);
-      
-      // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::NO_VELOCITYZ);
-      
-      // Add vertical velocity field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
-
-      // Add transport field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::TEMPERATURE);
-      spTilted->setIdentity(PhysicalNames::TILTED_TEMPERATURE);
-      
-      // Add nonorthogonal streamfunction field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::NO_STREAMFUNCTION);
-      spTilted->setIdentity(PhysicalNames::TILTED_NO_STREAMFUNCTION);
-      
-      // Add nonorthogonal vertical velocity field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::NO_VELOCITYZ);
-      spTilted->setIdentity(PhysicalNames::TILTED_NO_VELOCITYZ);
-      
-      // Add nonorthogonal vertical vorticity field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::NO_VORTICITYZ);
-      spTilted->setIdentity(PhysicalNames::TILTED_NO_VORTICITYZ);
-      
-      // Add nonorthogonal streamfunction field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::STREAMFUNCTION);
-      spTilted->setIdentity(PhysicalNames::TILTED_STREAMFUNCTION);
-      
-      // Add nonorthogonal vertical velocity field visualization
-      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
-      spTilted->setFields(true, false);
-      spTilted->setDataField(PhysicalNames::VELOCITYZ);
-      spTilted->setIdentity(PhysicalNames::TILTED_VELOCITYZ);
+//      // Add streamfunction field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
+//      
+//      // Add vertical velocity field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::VELOCITYZ);
+//      
+//      // Add vertical velocity field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+//
+//      // Add transport field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::TEMPERATURE);
+//      spTilted->setIdentity(PhysicalNames::TILTED_TEMPERATURE);
+//      
+//      // Add nonorthogonal streamfunction field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::STREAMFUNCTION);
+//      spTilted->setIdentity(PhysicalNames::TILTED_STREAMFUNCTION);
+//      
+//      // Add nonorthogonal vertical velocity field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::VELOCITYZ);
+//      spTilted->setIdentity(PhysicalNames::TILTED_VELOCITYZ);
+//
+//      // Add non orthogonal streamfunction equation
+//      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoStreamfunction>(SolveTiming::AFTER);
+//      // Add non orthogonal vertical velocity equation
+//      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVelocityZ>(SolveTiming::AFTER);
+//      // Add non orthogonal vertical vorticity equation
+//      spVis->addScalarEquation<Equations::BoussinesqTiltedFPlane3DQGNoVorticityZ>();
+//      
+//      // Add streamfunction field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::NO_STREAMFUNCTION);
+//      
+//      // Add vertical velocity field visualization
+//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+//      spField->setFields(true, false);
+//      spField->setIdentity(PhysicalNames::NO_VELOCITYZ);
+//      
+//      // Add nonorthogonal streamfunction field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::NO_STREAMFUNCTION);
+//      spTilted->setIdentity(PhysicalNames::TILTED_NO_STREAMFUNCTION);
+//      
+//      // Add nonorthogonal vertical velocity field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::NO_VELOCITYZ);
+//      spTilted->setIdentity(PhysicalNames::TILTED_NO_VELOCITYZ);
+//      
+//      // Add nonorthogonal vertical vorticity field visualization
+//      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
+//      spTilted->setFields(true, false);
+//      spTilted->setDataField(PhysicalNames::NO_VORTICITYZ);
+//      spTilted->setIdentity(PhysicalNames::TILTED_NO_VORTICITYZ);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-      spOut->expect(PhysicalNames::STREAMFUNCTION);
-      spOut->expect(PhysicalNames::VELOCITYZ);
-      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
-      spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
-      spOut->expect(PhysicalNames::NO_VELOCITYZ);
-      spOut->expect(PhysicalNames::NO_VORTICITYZ);
-      spOut->expect(PhysicalNames::TILTED_NO_STREAMFUNCTION);
-      spOut->expect(PhysicalNames::TILTED_NO_VELOCITYZ);
-      spOut->expect(PhysicalNames::TILTED_NO_VORTICITYZ);
-      spOut->expect(PhysicalNames::TILTED_STREAMFUNCTION);
-      spOut->expect(PhysicalNames::TILTED_VELOCITYZ);
+//      spOut->expect(PhysicalNames::STREAMFUNCTION);
+//      spOut->expect(PhysicalNames::VELOCITYZ);
+//      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+//      spOut->expect(PhysicalNames::TILTED_STREAMFUNCTION);
+//      spOut->expect(PhysicalNames::TILTED_VELOCITYZ);
+//      spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
+//      spOut->expect(PhysicalNames::NO_VELOCITYZ);
+//      spOut->expect(PhysicalNames::NO_VORTICITYZ);
+//      spOut->expect(PhysicalNames::TILTED_NO_STREAMFUNCTION);
+//      spOut->expect(PhysicalNames::TILTED_NO_VELOCITYZ);
+//      spOut->expect(PhysicalNames::TILTED_NO_VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

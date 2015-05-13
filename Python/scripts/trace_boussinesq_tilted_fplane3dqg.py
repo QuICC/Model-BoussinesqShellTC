@@ -16,8 +16,8 @@ eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 kp = 1.3048
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
 kp = 1.1624
-eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0, 'epsilon':1e-6}
-eq_params = {'prandtl':1, 'rayleigh':50.4780, 'theta':45.0, 'scale1d':2.0, 'epsilon':1e-6}
+eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0, 'delta':1e-2, 'epsilon':1e-6}
+eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0, 'delta':1e-2, 'epsilon':1e-2}
 kp = 1.1624
 
 # Set wave number
@@ -26,7 +26,7 @@ kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'velocityz':1, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -36,7 +36,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = False
 solve_evp = True
 show_solution = (True and solve_evp)

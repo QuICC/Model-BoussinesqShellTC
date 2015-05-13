@@ -23,7 +23,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["prandtl", "rayleigh", "theta", "scale1d", "epsilon"]
+        return ["prandtl", "rayleigh", "theta", "scale1d", "delta", "epsilon"]
 
     def config_fields(self):
         """Get the list of fields that need a configuration entry"""
@@ -114,6 +114,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
 
         # Solver: tau and Galerkin
         elif bcs["bcType"] == self.SOLVER_HAS_BC or bcs["bcType"] == self.SOLVER_NO_TAU:
+            epsilon = eq_params['epsilon']
             eta3 = np.cos(np.pi*eq_params['theta']/180)
             kx = eigs[0]
             ky = eigs[1]
@@ -135,6 +136,25 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                             bc = {0:10}
                         if field_row == ("temperature","") and field_col == field_row:
                             bc = {0:20}
+                    else:
+                        bc = no_bc()
+
+            # Ekman pumping
+            elif bcId == 1: 
+                if self.use_galerkin:
+                    if field_col == ("velocityz",""):
+                        bc = {0:-20, 'rt':0}
+
+                else:
+                    if bcs["bcType"] == self.SOLVER_HAS_BC:
+                        if field_row == ("velocityz","") and field_col == field_row:
+                            bc = {0:11}
+                        elif field_row == ("velocityz","") and field_col == ("streamfunction",""):
+                            bc = {0:11, 'c':(epsilon/np.sqrt(2))*(kx**2 + (1.0/eta3**2)*ky**2)}
+                        elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
+                            bc = {0:10}
+                        elif field_row == ("streamfunction","") and field_col == field_row:
+                            bc = {0:10, 'c':-(epsilon/np.sqrt(2))*(kx**2 + (1.0/eta3**2)*ky**2)}
                     else:
                         bc = no_bc()
             
@@ -199,7 +219,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                 mat = SS*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2(res[0], 2, bc)
+            mat = geo.i2(res[0], bc)
 
         elif field_row == ("dz_meantemperature","") and field_col == field_row:
             if eigs[0] == 0 and eigs[1] == 0:
@@ -263,7 +283,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
         zscale = eq_params['scale1d']
         eta2 = np.sin(np.pi*eq_params['theta']/180)
         eta3 = np.cos(np.pi*eq_params['theta']/180)
-        eps = eq_params['epsilon']
+        delta = eq_params['delta']
         kx = eigs[0]
         ky = eigs[1]
 
@@ -312,7 +332,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2(res[0], no_bc(), -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2)) + geo.i2d2(res[0], bc, eps, cscale = zscale)
+                mat = geo.i2(res[0], no_bc(), -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2)) + geo.i2d2(res[0], bc, (delta/Pr), cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
