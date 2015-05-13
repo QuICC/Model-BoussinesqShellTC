@@ -11,12 +11,13 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [64, 0, 0]
+res = [2048, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 kp = 1.3048
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
 kp = 1.1624
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0, 'epsilon':1e-6}
+eq_params = {'prandtl':1, 'rayleigh':50.4780, 'theta':45.0, 'scale1d':2.0, 'epsilon':1e-6}
 kp = 1.1624
 
 # Set wave number

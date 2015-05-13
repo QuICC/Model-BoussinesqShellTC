@@ -323,14 +323,10 @@ namespace IoTools {
    {
       switch(id)
       {
-         case NonDimensional::CHI:
-            return "chi";
-
+         //
+         // Nondimensional numbers
          case NonDimensional::EKMAN:
             return "ekman";
-
-         case NonDimensional::GAMMA:
-            return "gamma";
 
          case NonDimensional::MAGEKMAN:
             return "magnetic_ekman";
@@ -350,12 +346,24 @@ namespace IoTools {
          case NonDimensional::ROSSBY:
             return "rossby";
 
+         case NonDimensional::TAYLOR:
+            return "taylor";
+        
+         //
+         // Geometrical numbers
          case NonDimensional::RO:
             return "ro";
 
          case NonDimensional::RRATIO:
             return "rratio";
 
+         //
+         // Flags
+         case NonDimensional::HEATING:
+            return "heating";
+
+         //
+         // Axis scalings
          case NonDimensional::SCALE1D:
             return "scale1d";
 
@@ -365,14 +373,79 @@ namespace IoTools {
          case NonDimensional::SCALE3D:
             return "scale3d";
 
-         case NonDimensional::TAYLOR:
-            return "taylor";
+         // 
+         // Greek alphabet
+         case NonDimensional::ALPHA:
+            return "alpha";
+
+         case NonDimensional::BETA:
+            return "beta";
+
+         case NonDimensional::GAMMA:
+            return "gamma";
+
+         case NonDimensional::DELTA:
+            return "delta";
+
+         case NonDimensional::EPSILON:
+            return "epsilon";
+
+         case NonDimensional::ZETA:
+            return "zeta";
+
+         case NonDimensional::ETA:
+            return "eta";
 
          case NonDimensional::THETA:
             return "theta";
 
-         case NonDimensional::HEATING:
-            return "heating";
+         case NonDimensional::IOTA:
+            return "iota";
+
+         case NonDimensional::KAPPA:
+            return "kappa";
+
+         case NonDimensional::LAMBDA:
+            return "lambda";
+
+         case NonDimensional::MU:
+            return "mu";
+
+         case NonDimensional::NU:
+            return "nu";
+
+         case NonDimensional::XI:
+            return "xi";
+
+         case NonDimensional::OMICRON:
+            return "omicron";
+
+         case NonDimensional::PI:
+            return "pi";
+
+         case NonDimensional::RHO:
+            return "rho";
+
+         case NonDimensional::SIGMA:
+            return "sigma";
+
+         case NonDimensional::TAU:
+            return "tau";
+
+         case NonDimensional::UPSILON:
+            return "upsilon";
+
+         case NonDimensional::PHI:
+            return "phi";
+
+         case NonDimensional::CHI:
+            return "chi";
+
+         case NonDimensional::PSI:
+            return "psi";
+
+         case NonDimensional::OMEGA:
+            return "omega";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");

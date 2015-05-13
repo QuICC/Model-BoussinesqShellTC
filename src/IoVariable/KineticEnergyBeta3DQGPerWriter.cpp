@@ -69,6 +69,16 @@ namespace IoVariable {
 
       // Close file
       this->postWrite();
+
+      // Abort if kinetic energy is NaN
+      if(std::isnan(energy))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Kinetic energy is NaN!");
+      }
    }
 
 }

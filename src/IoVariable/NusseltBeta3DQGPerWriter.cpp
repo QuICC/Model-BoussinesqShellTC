@@ -141,6 +141,16 @@ namespace IoVariable {
 
       // Close file
       this->postWrite();
+
+      // Abort if Nusselt number is NaN
+      if(std::isnan(nusselt(0)) || std::isnan(nusselt(1)))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Nusselt number is NaN!");
+      }
    }
 
 }

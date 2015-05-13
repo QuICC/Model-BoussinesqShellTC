@@ -312,7 +312,7 @@ class BoussinesqTiltedFPlane3DQG(base_model.BaseModel):
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2(res[0], no_bc(), -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2)) + geo.qid(res[0],2, bc, eps)
+                mat = geo.i2(res[0], no_bc(), -(1.0/Pr)*(kx**2 + (1.0/eta3**2)*ky**2)) + geo.i2d2(res[0], bc, eps, cscale = zscale)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
