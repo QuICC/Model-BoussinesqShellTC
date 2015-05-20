@@ -11,12 +11,12 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [2048, 0, 0]
+res = [128, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'theta':0.0, 'scale1d':2.0}
 kp = 1.3048
 eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':10.0, 'theta':45.0, 'scale1d':2.0}
-eq_params = {'prandtl':1, 'rayleigh':1e-4, 'theta':45.0, 'scale1d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':40, 'theta':45.0, 'scale1d':2.0}
 kp = 1.1624
 kp = 0.21999999999
 
@@ -36,7 +36,7 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Setup visualization and IO
-show_spy = False
+show_spy = True
 write_mtx = False
 solve_evp = True
 show_solution = (True and solve_evp)
@@ -71,7 +71,7 @@ if solve_evp:
     print(evp_lmb)
 
 if show_solution:
-    viz_mode = -1
+    viz_mode = 0
     print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
     sol_s = evp_vec[0:res[0],viz_mode]
     sol_w = evp_vec[res[0]:2*res[0],viz_mode]
