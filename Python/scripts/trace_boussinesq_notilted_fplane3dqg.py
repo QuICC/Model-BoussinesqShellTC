@@ -1,11 +1,11 @@
-"""Script to run a marginal curve trace for the Boussinesq tilted F-plane 3DQG model"""
+"""Script to run a marginal curve trace for the Boussinesq tilted F-plane 3DQG model (nonorthogonal formulation)"""
 
 import numpy as np
 
-import geomhdiscc.model.boussinesq_tilted_fplane3dqg as mod
+import geomhdiscc.model.boussinesq_notilted_fplane3dqg as mod
 
 # Create the model and activate linearization
-model = mod.BoussinesqTiltedFPlane3DQG()
+model = mod.BoussinesqNoTiltedFPlane3DQG()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
@@ -18,16 +18,15 @@ eq_params = {'prandtl':1, 'rayleigh':5.4780, 'theta':45.0, 'scale1d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':10.0, 'theta':45.0, 'scale1d':2.0}
 eq_params = {'prandtl':1, 'rayleigh':1e-4, 'theta':45.0, 'scale1d':2.0}
 kp = 1.1624
-kp = 0.2199999999999
-kp = 0.1
+kp = 0.21999999999
 
 # Set wave number
-phi = 90
+phi = 0
 kx = kp*np.cos(phi*np.pi/180.0);
 ky = (kp**2-kx**2)**0.5;
 eigs = [kx, ky]
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'no_streamfunction':0, 'no_velocityz':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

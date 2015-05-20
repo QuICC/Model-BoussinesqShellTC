@@ -3,6 +3,7 @@ set(MHDPhysicalModels
    BoussinesqBeta3DQGPerModel.hpp
    BoussinesqFPlane3DQGModel.hpp
    BoussinesqTiltedFPlane3DQGModel.hpp
+   BoussinesqNoTiltedFPlane3DQGModel.hpp
    BoussinesqRBCDuctVCModel.hpp
    BoussinesqRBCPlaneVCModel.hpp
    BoussinesqRBCBoxVCModel.hpp

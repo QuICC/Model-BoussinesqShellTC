@@ -145,20 +145,20 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::TEMPERATURE);
       
-//      // Add streamfunction field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
-//      
-//      // Add vertical velocity field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::VELOCITYZ);
-//      
-//      // Add vertical velocity field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
+      // Add streamfunction field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::STREAMFUNCTION);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::VELOCITYZ);
+      
+      // Add vertical velocity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
 //
 //      // Add transport field visualization
 //      spTilted = spVis->addScalarEquation<Equations::TiltedScalarFieldVisualizer>();
@@ -216,9 +216,9 @@ namespace GeoMHDiSCC {
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
-//      spOut->expect(PhysicalNames::STREAMFUNCTION);
-//      spOut->expect(PhysicalNames::VELOCITYZ);
-//      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
+      spOut->expect(PhysicalNames::STREAMFUNCTION);
+      spOut->expect(PhysicalNames::VELOCITYZ);
+      spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
 //      spOut->expect(PhysicalNames::TILTED_STREAMFUNCTION);
 //      spOut->expect(PhysicalNames::TILTED_VELOCITYZ);
 //      spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
