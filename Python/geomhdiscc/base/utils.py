@@ -62,7 +62,8 @@ def build_diag_matrix(fields, func, func_args, restriction = None):
     return spsp.block_diag(tmp)
 
 def triplets(mat):
-    mat = mat.tocoo();
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo();
 
     return list(zip(mat.row,mat.col,mat.data))
 

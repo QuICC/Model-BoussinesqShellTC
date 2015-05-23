@@ -15,8 +15,6 @@ from geomhdiscc.geometry.cartesian.cartesian_boundary_1d import no_bc
 class BoussinesqFPlane3DQG(base_model.BaseModel):
     """Class to setup the Boussinesq F-Plane 3DQG model"""
 
-    force_temperature_bc = True
-
     def periodicity(self):
         """Get the domain periodicity"""
 
@@ -128,12 +126,24 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
                 else:
                     if bcs["bcType"] == self.SOLVER_HAS_BC:
-                        if field_row == ("velocityz","") and field_col == ("velocityz",""):
+                        if field_row == ("velocityz","") and field_col == field_row:
                             bc = {0:11}
                         elif field_row == ("streamfunction","") and field_col == ("velocityz",""):
                             bc = {0:10}
+                        elif field_row == ("temperature","") and field_col == field_row:
+                            bc = {0:991}
                     else:
                         bc = no_bc()
+
+            elif bcId == 1:
+                if self.use_galerkin:
+                    if field_col == ("temperature",""):
+                        bc = {0:-20, 'rt':0}
+
+                else:
+                    if bcs["bcType"] == self.SOLVER_HAS_BC:
+                        if field_row == ("temperature","") and field_col == field_row:
+                            bc = {0:20}
             
             # Set LHS galerkin restriction
             if self.use_galerkin:
@@ -170,13 +180,10 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
-            mat = geo.qid(res[0], 0, bc)
-
-            # Force temperature boundary condition
-            if self.force_temperature_bc and not self.use_galerkin:
-                mat = mat.tolil()
-                mat[-2:,:] = 0
-                mat = mat.tocsr()
+            if bcs["temperature"] == 1 and not self.use_galerkin:
+                mat = geo.sid(res[0], 2, bc)
+            else:
+                mat = geo.sid(res[0], 1, bc)
 
         elif field_row == ("streamfunction","") and field_col == field_row:
             mat = geo.i1(res[0], bc)
@@ -221,6 +228,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
         kx = eigs[0]
         ky = eigs[1]
 
+
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("streamfunction",""):
@@ -244,7 +252,7 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
                 if kx == 0 and ky == 0:
                     mat = geo.zblk(res[0], bc)
                 else:
-                    mat = geo.i1(res[0], bc, (Ra/Pr))
+                    mat = geo.i1(res[0], bc, (Ra/Pr))*utils.qid_from_idx(utils.qidx(res[0], res[0]-1), res[0])
 
         elif field_row == ("temperature",""):
             if field_col == ("streamfunction",""):
@@ -252,29 +260,18 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
 
             elif field_col == ("velocityz",""):
                 if self.linearize:
-                    mat = geo.qid(res[0],0, bc)
-
-                    # Force temperature boundary condition
-                    if self.force_temperature_bc and not self.use_galerkin:
-                        mat = mat.tolil()
-                        mat[-2:,:] = 0
-                        mat = mat.tocsr()
+                    if bcs["temperature"] == 1 and not self.use_galerkin:
+                        mat = geo.sid(res[0],2, bc)
+                    else:
+                        mat = geo.sid(res[0],1, bc)
                 else:
                     mat = geo.zblk(res[0], bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.qid(res[0],0, bc, -(1.0/Pr)*(kx**2 + ky**2))
-
-                # Force temperature boundary condition
-                if self.force_temperature_bc and not self.use_galerkin:
-                    mat = mat.tolil()
-                    if bcs['bcType'] == self.SOLVER_HAS_BC:
-                        tmp = geo.qid(res[0],2,{0:20})
-                    else:
-                        tmp = geo.qid(res[0],2, no_bc())
-                    tmp = tmp.tolil()
-                    mat[-2:,:] = tmp[0:2,:]
-                    mat = mat.tocsr()
+                if bcs["temperature"] == 1 and not self.use_galerkin:
+                    mat = geo.sid(res[0],2, bc, -(1.0/Pr)*(kx**2 + ky**2))
+                else:
+                    mat = geo.sid(res[0],1, bc, -(1.0/Pr)*(kx**2 + ky**2))
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -296,13 +293,10 @@ class BoussinesqFPlane3DQG(base_model.BaseModel):
             mat = geo.i1(res[0], bc)
 
         elif field_row == ("temperature",""):
-            mat = geo.qid(res[0],0, bc)
-
-            # Force temperature boundary condition
-            if self.force_temperature_bc and not self.use_galerkin:
-                mat = mat.tolil()
-                mat[-2:,:] = 0
-                mat = mat.tocsr()
+            if bcs["temperature"] == 1 and not self.use_galerkin:
+                mat = geo.sid(res[0],2, bc)
+            else:
+                mat = geo.sid(res[0],1, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

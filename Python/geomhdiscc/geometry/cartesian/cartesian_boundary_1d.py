@@ -110,7 +110,7 @@ def apply_tau(mat, bc, location = 't'):
     elif location == 'b':
         bc_mat[-cond.shape[0]:,:] = cond
 
-    return bc_mat
+    return bc_mat.tocoo()
 
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
