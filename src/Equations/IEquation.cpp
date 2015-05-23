@@ -24,7 +24,6 @@
 #include "TypeSelectors/EquationEigenSelector.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Equations {

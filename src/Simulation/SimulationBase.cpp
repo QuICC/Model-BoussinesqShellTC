@@ -29,6 +29,7 @@
 //
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
+#include "Timers/StageTimer.hpp"
 #include "Variables/RequirementTools.hpp"
 #include "TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "Equations/Tools/EquationTools.hpp"
@@ -88,11 +89,10 @@ namespace GeoMHDiSCC {
       // Transform projector tree
       std::vector<Transform::ProjectorTree> projectorTree;
 
-      // Print message to signal start of variable initialisation
+      // Print message for computation stage
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... initializing variables ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::start("initializing variables");
       }
 
       // Initialise the variables and set general variable requirements
@@ -104,21 +104,27 @@ namespace GeoMHDiSCC {
       // Map variables to the equations and set nonlinear requirements
       RequirementTools::mapEquationVariables(integratorTree, this->mScalarEquations, this->mVectorEquations, this->mScalarVariables, this->mVectorVariables, this->mForwardIsNonlinear);
 
-      // Print message to signal start of variable initialisation
+      // Print message for computation stage
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... initializing transforms ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         // Initialization done
+         StageTimer::done();
+
+         // Start initialization of transforms
+         StageTimer::start("initializing transforms");
       }
 
       // Initialise the transform coordinator
       this->initTransformCoordinator(integratorTree, projectorTree);
 
-      // Print message to signal start of equations setup
+      // Print message for computation stage
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... setup equations ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         // Initialization done
+         StageTimer::done();
+
+         // Start initialization of equations
+         StageTimer::start("setup equations");
       }
 
       // Initialise the equations (generate operators, etc)
@@ -127,11 +133,14 @@ namespace GeoMHDiSCC {
       // Sort the equations by type: time/solver/trivial
       this->sortEquations();
 
-      // Print message to signal start of output files setup
+      // Print message for computation stage
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... setup output files ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         // Initialization done
+         StageTimer::done();
+
+         // Start initialization of output files
+         StageTimer::start("setup output files");
       }
 
       // Setup output files (ASCII diagnostics, state files, etc)
@@ -143,8 +152,11 @@ namespace GeoMHDiSCC {
       // Print message to signal start of initialisation of diagnostics
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... initializing diagnostics ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         // Initialization done
+         StageTimer::done();
+
+         // Start initialization of diagnostics
+         StageTimer::start("initializing diagnostics");
       }
 
       // Initialise the diagnostics
@@ -156,9 +168,8 @@ namespace GeoMHDiSCC {
       // Print message to signal successful completion of initialisation step
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "Simulation initialisation successfull", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
+         // Initialization done
+         StageTimer::done();
       }
 
       // Debug statement
@@ -186,6 +197,9 @@ namespace GeoMHDiSCC {
       // Stop pre-run timing
       this->mExecutionTimer.stop();
       this->mExecutionTimer.update(ExecutionTimer::PRERUN);
+
+      // Stage done
+      StageTimer::completed("Simulation initialisation successfull");
 
       // Start timer
       this->mExecutionTimer.start();
@@ -283,24 +297,31 @@ namespace GeoMHDiSCC {
 
    void SimulationBase::initSolvers()
    {
-      // Debug statement
-      DebuggerMacro_enter("initSolvers",1);
-
-      // Print message to signal start of timestepper building
+      // Print stage message
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... Building Solvers ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::start("building trivial solvers");
       }
 
       // Init trivial solver for trivial equations
       this->mTrivialCoordinator.init(this->mScalarTrivialRange, this->mVectorTrivialRange);
 
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {  
+         StageTimer::done();
+
+         StageTimer::start("building diagnostic solvers");
+      }
+
       // Init linear solver for trivial equations
       this->mLinearCoordinator.init(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange);
 
-      // Debug statement
-      DebuggerMacro_leave("initSolvers",1);
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::done();
+      }
    }
 
    void SimulationBase::computeNonlinear()

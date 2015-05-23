@@ -34,6 +34,7 @@
 #include "Python/PythonModelWrapper.hpp"
 #include "Exceptions/Exception.hpp"
 #include "IoTools/Formatter.hpp"
+#include "Timers/StageTimer.hpp"
 #include "Simulation/SimulationIoTools.hpp"
 
 namespace GeoMHDiSCC {
@@ -73,10 +74,7 @@ namespace GeoMHDiSCC {
       // Print message to signal successful completion of initialisation step
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "... Starting simulation ...", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::newStage("Starting simulation");
       }
 
       // Start main loop of simulation
@@ -107,12 +105,12 @@ namespace GeoMHDiSCC {
 
    void Simulation::preSolveEquations()
    {  
-      // Print message to signal start of diagnostic/trivial presolve
+      // Print stage message
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... diagnostic and trivial equations ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::start("initializing fields");
       }
+
       /// \mhdBug This is not sufficient to recover all fields from previous computation
 
       // Solve diagnostic equations
@@ -162,27 +160,27 @@ namespace GeoMHDiSCC {
       // Solve trivial equations
       this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
+
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::done();
+      }
+
+      // Synchronise all nodes of simulation
+      FrameworkMacro::synchronize();
    }
 
    void Simulation::preRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("preRun",1);
-
-      // Print message to signal start of pre simulation computation
-      if(FrameworkMacro::allowsIO())
-      {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "... Pre simulation ...", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printNewline(std::cout);
-      }
-
       // Initialise all values (solve and nonlinear computations except timestep)
       this->preSolveEquations();
 
-      // Synchronise all nodes of simulation
-      FrameworkMacro::synchronize();
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::start("Building timestepper");
+      }
 
       // Update CFL condition
       this->mDiagnostics.initialCfl();
@@ -190,23 +188,18 @@ namespace GeoMHDiSCC {
       // Synchronise diagnostics
       this->mDiagnostics.synchronize();
 
-      // Print message to signal start of timestepper building
-      if(FrameworkMacro::allowsIO())
-      {
-         IoTools::Formatter::printCentered(std::cout, "(... Building timestepper ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
-      }
       // Init timestepper using clf/100 as starting timestep
       this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mScalarPrognosticRange, this->mVectorPrognosticRange);
 
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
 
-      // Print message to signal start of initial ASCII output
+      // Print stage message
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... write initial ASCII files ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::done();
+
+         StageTimer::start("write initial ASCII files");
       }
 
       // Update heavy calculation required for ASCII output
@@ -215,17 +208,22 @@ namespace GeoMHDiSCC {
       // Write initial ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Print message to signal start of initial HDF5 output
+      // Print stage message
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printCentered(std::cout, "(... write initial HDF5 files ...)", ' ');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::done();
+
+         StageTimer::start("write initial HDF5 files");
       }
+
       // Write initial state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Debug statement
-      DebuggerMacro_leave("preRun",1);
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::done();
+      }
    }
 
    void Simulation::explicitEquations()
@@ -355,20 +353,20 @@ namespace GeoMHDiSCC {
 
    void Simulation::postRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("postRun",1);
-
       // Print message to signal start of post simulation computation
       if(FrameworkMacro::allowsIO())
       {
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printCentered(std::cout, "... Post simulation ...", '*');
-         IoTools::Formatter::printLine(std::cout, '-');
-         IoTools::Formatter::printNewline(std::cout);
+         StageTimer::newStage("Post simulation");
       }
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
+
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::start("write final ASCII files");
+      }
 
       // Update heavy calculation required for ASCII output
       SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
@@ -376,14 +374,25 @@ namespace GeoMHDiSCC {
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::done();
+
+         StageTimer::start("write final HDF5 files");
+      }
+
       // Write final state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
 
-      // Debug statement
-      DebuggerMacro_leave("postRun",1);
+      // Print stage message
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::done();
+      }
    }
 
 }

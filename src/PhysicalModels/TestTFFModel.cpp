@@ -44,17 +44,17 @@ namespace GeoMHDiSCC {
       {
          Equations::SharedTestLinearScalar   spLin;
 
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYX);
-
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYY);
-
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYZ);
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYX);
+//
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYY);
+//
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
          // Add scalar test equation
          spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
@@ -63,17 +63,17 @@ namespace GeoMHDiSCC {
       {
          Equations::SharedTestNonlinearScalar   spNL;
 
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYX);
-
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYY);
-
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYZ);
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYX);
+//
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYY);
+//
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYZ);
 
          // Add scalar test equation
          spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
