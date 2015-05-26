@@ -71,11 +71,7 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_enter("mainRun",1);
 
-      // Print message to signal successful completion of initialisation step
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::newStage("Starting simulation");
-      }
+      StageTimer::stage("Starting simulation");
 
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GOON)
@@ -105,11 +101,8 @@ namespace GeoMHDiSCC {
 
    void Simulation::preSolveEquations()
    {  
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::start("initializing fields");
-      }
+      StageTimer stage;
+      stage.start("initializing fields");
 
       /// \mhdBug This is not sufficient to recover all fields from previous computation
 
@@ -161,11 +154,7 @@ namespace GeoMHDiSCC {
       this->explicitTrivialEquations(ModelOperator::EXPLICIT_NEXTSTEP);
       this->solveTrivialEquations(SolveTiming::AFTER);
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-      }
+      stage.done();
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
@@ -173,14 +162,12 @@ namespace GeoMHDiSCC {
 
    void Simulation::preRun()
    {
+      StageTimer stage;
+
       // Initialise all values (solve and nonlinear computations except timestep)
       this->preSolveEquations();
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::start("Building timestepper");
-      }
+      stage.start("Building timestepper");
 
       // Update CFL condition
       this->mDiagnostics.initialCfl();
@@ -194,13 +181,8 @@ namespace GeoMHDiSCC {
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-
-         StageTimer::start("write initial ASCII files");
-      }
+      stage.done();
+      stage.start("write initial ASCII files");
 
       // Update heavy calculation required for ASCII output
       SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
@@ -208,22 +190,13 @@ namespace GeoMHDiSCC {
       // Write initial ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-
-         StageTimer::start("write initial HDF5 files");
-      }
+      stage.done();
+      stage.start("write initial HDF5 files");
 
       // Write initial state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-      }
+      stage.done();
    }
 
    void Simulation::explicitEquations()
@@ -353,20 +326,13 @@ namespace GeoMHDiSCC {
 
    void Simulation::postRun()
    {
-      // Print message to signal start of post simulation computation
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::newStage("Post simulation");
-      }
+      StageTimer::stage("Post simulation");
+      StageTimer  stage;
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::start("write final ASCII files");
-      }
+      stage.start("write final ASCII files");
 
       // Update heavy calculation required for ASCII output
       SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mTransformCoordinator);
@@ -374,13 +340,8 @@ namespace GeoMHDiSCC {
       // Write final ASCII output
       this->mSimIoCtrl.writeAscii(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-
-         StageTimer::start("write final HDF5 files");
-      }
+      stage.done();
+      stage.start("write final HDF5 files");
 
       // Write final state file
       this->mSimIoCtrl.writeHdf5(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
@@ -388,11 +349,7 @@ namespace GeoMHDiSCC {
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
 
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-      }
+      stage.done();
    }
 
 }

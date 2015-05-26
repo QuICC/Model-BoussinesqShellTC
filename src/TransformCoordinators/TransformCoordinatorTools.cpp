@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Timers/StageTimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -32,6 +33,9 @@ namespace Transform {
 
    void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree, SharedResolution spRes, const std::map<NonDimensional::Id,MHDFloat>& runOptions)
    {
+      StageTimer stage;
+      stage.start("initializing transforms");
+
       // Get the list of required options
       std::set<NonDimensional::Id>  requests;
       rCoord.requiredOptions(requests);
@@ -61,8 +65,14 @@ namespace Transform {
       // Initialise the transform coordinator
       rCoord.initTransforms(spRes, integratorTree, projectorTree);
 
+      stage.done();
+      stage.start("initializing communicators");
+
       // Initialise the communicator
       rCoord.initCommunicator(spRes);
+
+      stage.done();
+      stage.start("initializing converters");
 
       // Get the buffer pack sizes
       ArrayI packs1DFwd = spFwdGrouper->packs1D(integratorTree);
@@ -72,6 +82,8 @@ namespace Transform {
 
       // Initialise the converters
       rCoord.communicator().initConverter(spRes, packs1DFwd, packs1DBwd, packs2DFwd, packs2DBwd, spFwdGrouper->split);
+
+      stage.done();
    }
 }
 }
