@@ -25,6 +25,7 @@
 #include "Communicators/Converters/MpiConverterTools.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Resolutions/Resolution.hpp"
+#include "Timers/StageTimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -400,6 +401,9 @@ namespace Parallel {
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fwdTmp, TBwdB &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks)
    {
+      StageTimer stage;
+      stage.start("creating MPI datatypes",1);
+
       // Store the possible pack sizes
       this->mForwardPacks = fwdPacks;
       this->mBackwardPacks = bwdPacks;
@@ -414,8 +418,12 @@ namespace Parallel {
       // initialise the data types
       this->initTypes(spRes, fwdDim, fwdTmp, bwdTmp);
 
+      stage.done();
+      stage.start("cleaning empty datatypes",1);
+
       // initialise the size and CPU lists
       this->initLists();
+      stage.done();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initTypes(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwdA &fTmp, TBwdB &bTmp)
@@ -423,23 +431,45 @@ namespace Parallel {
       // Synchronize 
       FrameworkMacro::synchronize();
 
-      // Loop over all the cpus
-      for(int id = 0; id < FrameworkMacro::nCpu(); id++)
-      {
-      	 // Synchronize 
-     	   FrameworkMacro::synchronize();
+      std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localFwdMap;
+      MpiConverterTools<TFwdA::FieldDimension>::buildLocalFwdMap(localFwdMap, spRes, fwdDim);
+      std::map<typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate, typename MpiConverterTools<TBwdB::FieldDimension>::Coordinate> localBwdMap;
+      MpiConverterTools<TBwdB::FieldDimension>::buildLocalBwdMap(localBwdMap, spRes, fwdDim, this->mspIdxConv);
 
+      std::cerr << "FRAMEWORK F GROUP: " << FrameworkMacro::transformCpus(fwdDim).transpose() << std::endl;
+
+      // Loop over group cpus
+std::cerr << "Start 0 " << std::endl;
+      for(int i = 0; i < FrameworkMacro::transformCpus(fwdDim).size(); i++)
+      //for(int id = 0; id < FrameworkMacro::nCpu(); id++)
+      {
+std::cerr << "Start 1 " << std::endl;
+         int id = FrameworkMacro::transformCpus(fwdDim)(i);
+
+std::cerr << "Start 2 " << std::endl;
+      	 // Synchronize 
+     	   FrameworkMacro::syncTransform(fwdDim);
+
+std::cerr << "Start 3 " << std::endl;
          // Create TBwdB datatypes
-         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(spRes, fwdDim, bTmp, id, this->mspIdxConv);
+         MPI_Datatype type = MpiConverterTools<TBwdB::FieldDimension>::buildBwdDatatype(localBwdMap, spRes, fwdDim, bTmp, id);
+std::cerr << "Start 4 " << std::endl;
          this->mBTypes.push_back(type);
 
+std::cerr << "Start 5 " << std::endl;
       	 // Synchronize 
-     	   FrameworkMacro::synchronize();
+     	   FrameworkMacro::syncTransform(fwdDim);
 
+std::cerr << "Start 6 " << std::endl;
          // Create TFwdA datatypes
-         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(spRes, fwdDim, fTmp, id, this->mspIdxConv);
+         type = MpiConverterTools<TFwdA::FieldDimension>::buildFwdDatatype(localFwdMap, spRes, fwdDim, fTmp, id);
+std::cerr << "Start 7 " << std::endl;
          this->mFTypes.push_back(type);
+std::cerr << "Start 8 " << std::endl;
       }
+
+      // Synchronize 
+      FrameworkMacro::synchronize();
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::syncFwdBuffer(const TransformDirection::Id direction)
@@ -774,6 +804,8 @@ namespace Parallel {
          }
       }
 
+      std::cerr << "EMPTY FORWARD DATATYPES: " << unusedF.size() << "/" << this->mFTypes.size() << std::endl;
+      std::cerr << "EMPTY BACKWARD DATATYPES: " << unusedB.size() << "/" << this->mBTypes.size() << std::endl;
       std::vector<int>::reverse_iterator rit;
       // Erase the unused forward datatypes
       for(rit = unusedF.rbegin(); rit != unusedF.rend(); ++rit)
