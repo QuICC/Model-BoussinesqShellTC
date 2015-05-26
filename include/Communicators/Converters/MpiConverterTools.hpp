@@ -31,6 +31,7 @@
 #include "Enums/Dimensions.hpp"
 #include "Enums/DimensionTools.hpp"
 #include "Resolutions/Resolution.hpp"
+#include "Timers/StageTimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -150,6 +151,9 @@ namespace Parallel {
 
    template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
+      StageTimer  stage;
+      stage.start("building FWD local keys");
+
       // Create map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
 
@@ -198,6 +202,9 @@ namespace Parallel {
             }
          }
       }
+
+      stage.done();
+      stage.start("building FWD remote keys");
 
       //
       // Create the list of remote indexes in next transform
@@ -274,18 +281,29 @@ namespace Parallel {
       // Synchronize
       FrameworkMacro::synchronize();
 
+      stage.done();
+      stage.start("computing FWD key intersection");
+
       // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
       MpiConverterTools<Dimensions::THREED>::extractShared(sharedMap, localIdxMap, remoteKeys);
 
+      stage.done();
+      stage.start("building FWD MPI datatype");
+
       // Create the datatype
       MPI_Datatype type = MpiConverterTools<Dimensions::THREED>::buildType(data, sharedMap);
+
+      stage.done();
 
       return type;
    }
 
    template <typename TData, typename TIdx> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, SharedPtrMacro<TIdx> spIdxConv)
    {
+      StageTimer  stage;
+      stage.start("building BWD local keys");
+
       // Create  map of the local indexes to unique keys
       std::map<Coordinate,Coordinate>  localIdxMap;
 
@@ -334,6 +352,9 @@ namespace Parallel {
             }
          }
       }
+      
+      stage.done();
+      stage.start("building BWD remote keys");
 
       //
       // Create the list of remote indexes
@@ -410,12 +431,20 @@ namespace Parallel {
       // Synchronize
       FrameworkMacro::synchronize();
 
+      stage.done();
+      stage.start("computing BWD keys intersetion");
+
       // Extract map of shared indexes (stored as keys)
       std::map<Coordinate,Coordinate>  sharedMap;
       MpiConverterTools<Dimensions::THREED>::extractShared(sharedMap, localIdxMap, remoteKeys);
 
+      stage.done();
+      stage.start("building BWD MPI datatype");
+
       // Create the datatype
       MPI_Datatype type = MpiConverterTools<Dimensions::THREED>::buildType(data, sharedMap);
+
+      stage.done();
 
       return type;
    }
