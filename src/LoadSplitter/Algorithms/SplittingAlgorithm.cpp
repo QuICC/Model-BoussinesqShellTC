@@ -25,6 +25,7 @@
 // Project includes
 //
 #include "Exceptions/Exception.hpp"
+#include "Timers/StageTimer.hpp"
 #include "LoadSplitter/Algorithms/SplittingTools.hpp"
 
 namespace GeoMHDiSCC {
@@ -75,6 +76,15 @@ namespace Parallel {
 
    std::pair<int, std::pair<SharedResolution, SplittingDescription> > SplittingAlgorithm::scoreSplitting()
    {
+      StageTimer stage;
+      std::stringstream ss;
+      ss << this->factor(0);
+      for(int i = 1; i < this->mFactors.size(); i++)
+      {
+         ss << " x " << this->factor(i);
+      }
+      stage.start("computing load splitting " + ss.str(), 1);
+
       // Storage for all the shared core resolutions
       std::vector<SharedCoreResolution>  coreRes;
 
@@ -131,6 +141,9 @@ namespace Parallel {
          coreRes.push_back(SharedCoreResolution(new CoreResolution(transformRes)));
       }
 
+      stage.done();
+      stage.start("creating resolution for " + ss.str(), 1);
+
       SharedResolution  spRes;
 
       // Splitting was successful
@@ -165,6 +178,8 @@ namespace Parallel {
       descr.factors = this->mFactors;
       descr.score = score;
       descr.structure = this->mCommStructure;
+
+      stage.done();
 
       // Return combination of score and shared resolution/description
       return std::make_pair(static_cast<int>(score.prod()), std::make_pair(spRes,descr));
