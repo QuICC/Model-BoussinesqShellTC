@@ -85,6 +85,11 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MpiFramework::mTransformComms.at(traId));
    }
 
+   int MpiFramework::transformId(const int traId)
+   {
+      return MpiFramework::mTransformIds.at(traId);
+   }
+
    const ArrayI& MpiFramework::transformCpus(const int traId)
    {
       return MpiFramework::mTransformCpus.at(traId);

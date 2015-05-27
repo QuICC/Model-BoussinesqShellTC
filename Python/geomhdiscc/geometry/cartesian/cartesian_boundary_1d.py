@@ -71,6 +71,8 @@ def constrain(mat, bc, location = 't'):
 
 def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
+    
+    nbc = bc[0]//10
 
     if bc[0] == 10:
         cond = tau_value(mat.shape[1], 1, bc.get('c',None))
@@ -99,18 +101,22 @@ def apply_tau(mat, bc, location = 't'):
     # Set last modes to zero
     elif bc[0] > 990 and bc[0] < 1000:
         cond = tau_last(mat.shape[1], bc[0]-990)
+        nbc = bc[0]-990
 
-    if cond.dtype == 'complex_':
-        bc_mat = mat.astype('complex_').tolil()
-    else:
-        bc_mat = mat.tolil()
-
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
     if location == 't':
-        bc_mat[0:cond.shape[0],:] = cond
+        s = 0
     elif location == 'b':
-        bc_mat[-cond.shape[0]:,:] = cond
+        s = mat.shape[0]-nbc
 
-    return bc_mat.tocoo()
+    conc = np.concatenate
+    for i,c in enumerate(cond):
+        mat.data = conc((mat.data, c))
+        mat.row = conc((mat.row, [s+i]*mat.shape[1]))
+        mat.col = conc((mat.col, np.arange(0,mat.shape[1])))
+
+    return mat
 
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
@@ -131,11 +137,15 @@ def tau_value(nx, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*tau_c(i) for i in np.arange(0,nx)])
+        cnst = c*tau_c()
+        cond.append(cnst*np.ones(nx))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nx)])
+        cnst = c*tau_c()
+        cond.append(-cnst*np.cumprod(-np.ones(nx)))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -301,7 +311,7 @@ def tau_last(nx, nrow):
 
     cond = np.zeros((nrow, nx))
     for j in range(0, nrow):
-        cond[j,nx-nrow+j] = tau_c(nx-nrow+j)
+        cond[j,nx-nrow+j] = tau_c()
 
     return cond
 
@@ -510,13 +520,10 @@ def stencil_value_diff2(nx, pos):
 
     return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
-def tau_c(n):
+def tau_c():
     """Compute the chebyshev normalisation c factor for tau boundary"""
 
-    if n > 0:
-        return 2
-    else:
-        return 1
+    return 2.0
 
 def galerkin_c(n):
     """Compute the chebyshev normalisation c factor for galerkin boundary"""

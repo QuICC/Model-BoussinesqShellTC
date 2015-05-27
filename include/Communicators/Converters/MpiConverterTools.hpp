@@ -62,7 +62,7 @@ namespace Parallel {
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildFwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, const int groupId);
+         template <typename TData> static MPI_Datatype buildFwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
 
          /**
           * @brief Build a backward MPI Datatype
@@ -72,7 +72,7 @@ namespace Parallel {
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildBwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, const int groupId);
+         template <typename TData> static MPI_Datatype buildBwdDatatype(const std::map<Coordinate,Coordinate>& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId);
 
          /**
           * @brief Extract shared indexes
@@ -250,7 +250,7 @@ namespace Parallel {
    }
 
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, const int groupId)
+   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildFwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
    {
       // List of remote keys
       std::set<Coordinate>  remoteKeys;
@@ -267,25 +267,25 @@ namespace Parallel {
 
       // Remote is also local CPU
       MatrixI  matRemote;
-      if(cpuId == FrameworkMacro::id())
+      if(cpuId == FrameworkMacro::transformId(fwdDim))
       {
          // Loop over slow data dimension
-         for(int k=0; k < spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k=0; k < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // Extract "physical" index of slow data dimension
-            k_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT3D>(k);
+            k_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT3D>(k);
 
             // Loop over middle data dimension
-            for(int j=0; j < spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
+            for(int j=0; j < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
                // Extract "physical" index of middle data dimension
-               j_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
+               j_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DAT2D>(j,k);
 
                // Loop over backward data dimension
-               for(int i=0; i < spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
+               for(int i=0; i < spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->dim<Dimensions::Data::DATB1D>(k); ++i)
                {
                   // Extract "physical" index of backward data dimension
-                  i_ = spRes->cpu(cpuId)->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
+                  i_ = spRes->cpu()->dim(Dimensions::jump(fwdDim,1))->idx<Dimensions::Data::DATB1D>(i,k);
 
                   // Create key as (2D, 3D, 1D) indexes (i.e. data gets transposed during communication)
                   key = spRes->counter()->makeKey(Dimensions::jump(fwdDim,1), i_, j_, k_);
@@ -309,25 +309,21 @@ namespace Parallel {
    
          // Broadcast size
          i = remoteKeys.size();
-         //MPI_Bcast(&i, 1, MPI_INT, cpuId, MPI_COMM_WORLD);
-         MPI_Bcast(&i, 1, MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim));
+         MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
 
          // Broadcast data
-         //MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, MPI_COMM_WORLD); 
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim)); 
+         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
-         //MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, MPI_COMM_WORLD);
-         MPI_Bcast(&nCoords, 1, MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim));
+         MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
 
          // Get remote keys as matrix
          matRemote.resize(3, nCoords);
-         //MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, MPI_COMM_WORLD); 
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim)); 
+         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < nCoords; i++)
@@ -350,7 +346,7 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId, const int groupId)
+   template <typename TData> MPI_Datatype MpiConverterTools<Dimensions::THREED>::buildBwdDatatype(const std::map<Coordinate,Coordinate>&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Datatypes::FlatScalarField<TData,Dimensions::THREED> &data, const int cpuId)
    {
       // List of remote keys
       std::set<Coordinate>  remoteKeys;
@@ -367,25 +363,25 @@ namespace Parallel {
 
       // Remote is also local CPU
       MatrixI  matRemote;
-      if(cpuId == FrameworkMacro::id())
+      if(cpuId == FrameworkMacro::transformId(fwdDim))
       {
          // Loop over slow data dimension
-         for(int k=0; k < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k=0; k < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // Extract "physical" index of slow data dimension
-            k_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DAT3D>(k);
+            k_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT3D>(k);
 
             // Loop over middle data dimension
-            for(int j=0; j < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            for(int j=0; j < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DAT2D>(k); ++j)
             {
                // Extract "physical" index of middle data dimension
-               j_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j,k);
+               j_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DAT2D>(j,k);
 
                // Loop over forward data dimension
-               for(int i=0; i < spRes->cpu(cpuId)->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(k); ++i)
+               for(int i=0; i < spRes->cpu()->dim(fwdDim)->dim<Dimensions::Data::DATF1D>(k); ++i)
                {
                   // Extract "physical" index of forward data dimension
-                  i_ = spRes->cpu(cpuId)->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
+                  i_ = spRes->cpu()->dim(fwdDim)->idx<Dimensions::Data::DATF1D>(i,k);
 
                   // Create key as (1D, 2D, 3D)
                   key = spRes->counter()->makeKey(fwdDim, i_, j_, k_);
@@ -409,25 +405,21 @@ namespace Parallel {
 
          // Broadcast size
          i = remoteKeys.size();
-         //MPI_Bcast(&i, 1, MPI_INT, cpuId, MPI_COMM_WORLD);
-         MPI_Bcast(&i, 1, MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim));
+         MPI_Bcast(&i, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
 
          // Broadcast data
-         //MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, cpuId, MPI_COMM_WORLD); 
-         MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim)); 
+         MPI_Bcast(matRemote.data(), matRemote.rows()*matRemote.cols(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
 
       // Remote CPU needs to generate list 
       } else
       {
          // Get size
          int nCoords;
-         //MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, MPI_COMM_WORLD);
-         MPI_Bcast(&nCoords, 1, MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim));
+         MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim));
 
          // Get remot ekeys as matrix
          matRemote.resize(3, nCoords);
-         //MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, MPI_COMM_WORLD); 
-         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, groupId, FrameworkMacro::transformComm(fwdDim)); 
+         MPI_Bcast(matRemote.data(), matRemote.cols()*matRemote.rows(), MPI_INT, cpuId, FrameworkMacro::transformComm(fwdDim)); 
 
          // Convert matrix to remoteKeys set
          for(int i = 0; i < nCoords; i++)

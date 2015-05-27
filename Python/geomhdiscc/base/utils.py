@@ -50,7 +50,7 @@ def build_block_matrix(fields, func, func_args, restriction = None):
             row.append(func(*args, restriction = restriction))
         tmp.append(row)
 
-    return spsp.bmat(tmp)
+    return spsp.bmat(tmp, format='coo')
 
 def build_diag_matrix(fields, func, func_args, restriction = None):
 
@@ -59,7 +59,7 @@ def build_diag_matrix(fields, func, func_args, restriction = None):
         args = func_args + (field_row,)
         tmp.append(func(*args, restriction = restriction))
    
-    return spsp.block_diag(tmp)
+    return spsp.block_diag(tmp, format='coo')
 
 def triplets(mat):
     if not spsp.isspmatrix_coo(mat):

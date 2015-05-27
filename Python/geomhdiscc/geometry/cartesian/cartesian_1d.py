@@ -458,19 +458,25 @@ def i4lapl2h(nx, k, bc, coeff = 1.0, cscale = 1.0):
 def qid(nx, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 
-    offsets = [0]
-    diags = [[0]*q + [coeff]*(nx-q)]
-
-    mat = spsp.diags(diags, offsets, format='coo')
+    mat = spsp.coo_matrix((nx,nx))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nx-q))
+    else:
+        mat.data = np.ones((nx-q))
+    mat.row = np.arange(q,nx)
+    mat.col = mat.row
     return c1dbc.constrain(mat, bc)
 
 def sid(nx, s, bc, coeff = 1.0):
     """Create a identity block with last s rows zeroed"""
 
-    offsets = [0]
-    diags = [[coeff]*(nx-s) + [0]*s]
-
-    mat = spsp.diags(diags, offsets, format='coo')
+    mat = spsp.coo_matrix((nx,nx))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nx-s))
+    else:
+        mat.data = np.ones((nx-s))
+    mat.row = np.arange(0,nx-s)
+    mat.col = mat.row
     return c1dbc.constrain(mat, bc, location = 'b')
 
 def stencil(nx, bc):

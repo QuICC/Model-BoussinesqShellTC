@@ -63,7 +63,7 @@ namespace GeoMHDiSCC {
          /**
           * @brief Get transform rank
           */
-         static void transformId(const int traId);
+         static int transformId(const int traId);
 
          /**
           * @brief Get transform CPU group IDs
