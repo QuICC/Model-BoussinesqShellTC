@@ -202,6 +202,11 @@ namespace Equations {
          void addNLComponent(const FieldComponents::Spectral::Id compId, const int flag);
 
          /**
+          * @brief Update field requirements information
+          */
+         FieldRequirement& updateFieldRequirements(PhysicalNames::Id id);
+
+         /**
           * @brief Set map of component and explicit matrices (real operators)
           */
          std::map<std::pair<FieldComponents::Spectral::Id, SpectralFieldId>, std::vector<SparseMatrix> >& rEDMatrices(const ModelOperator::Id opId);

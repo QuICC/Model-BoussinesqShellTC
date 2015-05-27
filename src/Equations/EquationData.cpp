@@ -303,6 +303,11 @@ namespace Equations {
       return this->mRequirements.field(id);
    }
 
+   FieldRequirement&  EquationData::updateFieldRequirements(PhysicalNames::Id id)
+   {
+      return this->mRequirements.rField(id);
+   }
+
    void EquationData::setSolverIndex(const FieldComponents::Spectral::Id compId, const int idx)
    {
       // Safety assert

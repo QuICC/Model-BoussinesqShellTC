@@ -218,14 +218,20 @@ namespace GeoMHDiSCC {
       this->mPhysicalComps = this->mPhysicalComps + req.physicalComps();
 
       // Do OR operation of physical gradient components requirement
-      std::vector<FieldComponents::Spectral::Id>::const_iterator it;
-      for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
+      if(req.needPhysicalGradient())
       {
-         this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second + req.gradientComps(*it);
+         std::vector<FieldComponents::Spectral::Id>::const_iterator it;
+         for(it = this->mSpectralIds.begin(); it != this->mSpectralIds.end(); ++it)
+         {
+            this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second + req.gradientComps(*it);
+         }
       }
 
       // Do OR operation of physical curl components requirement
-      this->mCurlComps = this->mCurlComps + req.curlComps();
+      if(req.needPhysicalCurl())
+      {
+         this->mCurlComps = this->mCurlComps + req.curlComps();
+      }
    }
 
 }

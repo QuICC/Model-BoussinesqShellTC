@@ -53,7 +53,7 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
    }
 
 }

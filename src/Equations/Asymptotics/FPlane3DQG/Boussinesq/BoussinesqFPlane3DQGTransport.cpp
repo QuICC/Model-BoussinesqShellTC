@@ -80,6 +80,18 @@ namespace Equations {
 
       // Add streamfunction to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(PhysicalNames::DZ_MEANTEMPERATURE, FieldRequirement(true, false, true, false));
+
+      // Gradient does not require Z component
+      ArrayB   comps = ArrayB::Constant(3, true);
+      comps(0) = false;
+      std::map<FieldComponents::Spectral::Id,ArrayB>  gradComps;
+      gradComps.insert(std::make_pair(FieldComponents::Spectral::SCALAR, comps));
+
+      // Update temperature gradient requirements
+      this->updateFieldRequirements(PhysicalNames::TEMPERATURE).updateGradient(gradComps);
+
+      // Update streamfunction gradient requirements
+      this->updateFieldRequirements(PhysicalNames::STREAMFUNCTION).updateGradient(gradComps);
    }
 
 }
