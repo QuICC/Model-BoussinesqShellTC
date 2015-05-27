@@ -58,7 +58,7 @@ namespace Parallel {
          /**
           * @brief Get splitting information of the best splitting
           */
-         std::pair<SharedResolution,SplittingDescription> bestSplitting() const;
+         std::pair<SharedResolution,SplittingDescription> bestSplitting();
 
          /**
           * @brief Show description of some splittings

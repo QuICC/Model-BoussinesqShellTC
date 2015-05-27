@@ -157,11 +157,14 @@ namespace Parallel {
       }
    }
 
-   std::pair<SharedResolution,SplittingDescription> LoadSplitter::bestSplitting() const
+   std::pair<SharedResolution,SplittingDescription> LoadSplitter::bestSplitting()
    {
       // Make sure there is at least one successful splitting (score > 0)
       if(this->mScores.size() > 0)
       {
+         // Build communication structure
+         SplittingAlgorithm::buildCommunicationStructure(this->mScores.rbegin()->second.first, this->mScores.rbegin()->second.second.structure);
+
          // Describe the splitting with the highest score
          this->describeSplitting(this->mScores.rbegin()->second.second);
 

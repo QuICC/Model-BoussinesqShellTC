@@ -399,6 +399,7 @@ namespace GeoMHDiSCC {
       splitter.init<TScheme>(dim);
 
       stage.done();
+      stage.start("extracting communication structure");
 
       // Get best splitting resolution object
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
@@ -408,6 +409,8 @@ namespace GeoMHDiSCC {
 
       // Set additional options on final resolution object
       TScheme::tuneResolution(this->mspRes, best.second);
+
+      stage.done();
 
       // Extract box scale from configuration file
       Array box = this->mSimIoCtrl.configBoxScale();

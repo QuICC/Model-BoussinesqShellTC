@@ -70,7 +70,13 @@ namespace GeoMHDiSCC {
 
       if(FrameworkMacro::allowsIO())
       {
-         StageTimer::msg( "--> " + msg, 8 + this->mLevel*4);
+         if(this->mLevel == 0)
+         {
+            StageTimer::msg( "(-- " + msg + " --)", 4 + this->mLevel*4);
+         } else
+         {
+            StageTimer::msg( "- " + msg, 4 + this->mLevel*4);
+         }
          TimerMacro::start();
       }
    }
@@ -83,7 +89,7 @@ namespace GeoMHDiSCC {
 
          std::stringstream ss;
          ss << std::ceil(10.0*this->time())/10.0;
-         StageTimer::msg("    done (" + ss.str() + " s)", 8 + this->mLevel*4);
+         StageTimer::msg("    done (" + ss.str() + " s)", 4 + this->mLevel*4);
          IoTools::Formatter::printNewline(std::cout);
       }
    }

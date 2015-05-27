@@ -71,6 +71,13 @@ namespace Parallel {
           * @brief Check if factorisation is applicable to scheme
           */
          virtual bool applicable() const = 0;
+
+         /**
+          * @brief Build the exact communication structure
+          *
+          * @param spRes   Shared resolution object
+          */
+         static void buildCommunicationStructure(SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure);
          
       protected:
          /**
@@ -189,11 +196,6 @@ namespace Parallel {
           * @brief Storage for the simulation resolution
           */
          ArrayI mSimDim;
-
-         /**
-          * @brief Storage for the communication structure
-          */
-         std::vector<std::multimap<int,int> >   mCommStructure;
    };
 
    template <typename TSchemeType> void SplittingAlgorithm::initScheme(const ArrayI& dim)

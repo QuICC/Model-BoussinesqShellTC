@@ -166,9 +166,6 @@ namespace Parallel {
       {
          // Set large negative score (splitting is unusable)
          score(0) = -9999;
-
-         // Clear communication structure
-         std::vector<std::multimap<int,int> >().swap(this->mCommStructure);
       }
 
       // Create splitting description
@@ -177,7 +174,7 @@ namespace Parallel {
       descr.dims = this->mDims;
       descr.factors = this->mFactors;
       descr.score = score;
-      descr.structure = this->mCommStructure;
+      descr.structure = std::vector<std::multimap<int,int> >();
 
       stage.done();
 
@@ -231,8 +228,127 @@ namespace Parallel {
       details.resize(spRes->cpu(0)->nDim()-1);
       details.setConstant(worst);
 
+      if(spRes->cpu()->nDim()-1 == this->mFactors.size())
+      {
+         details = this->mFactors;
+      }
+
+      // Return ratio of both structures (higher is better)
+      return static_cast<double>(worst)/static_cast<double>(this->mFactors.sum());
+   }
+
+   double SplittingAlgorithm::balancingScore(SharedResolution spRes, Array& balance)
+   {
+      // Storage for the per CPU loads for each dimension
+      std::vector<std::map<int, double> >   loads;
+
+      // Handle 1D resolution
+      if(spRes->cpu(0)->nDim() == 1)
+      {
+         throw Exception("Requested computation of load balancing score for 1D resolution!");
+
+      // Handle 2D resolution
+      } else if(spRes->cpu(0)->nDim() == 2)
+      {
+         // Loop over dimensions
+         for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
+         {
+            // Create storage
+            loads.push_back(std::map<int, double>());
+
+            // Loop over CPUs
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            {
+               // Initialise CPU load to zero
+               loads.at(d)[cpu] = 0.0;
+
+               // Loop over second dimension
+               for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(); j++)
+               {
+                  // Increment load by 1
+                  loads.at(d).find(cpu)->second += 1.0;
+               }
+            }
+         }
+
+      // Handle 3D resolution
+      } else if(spRes->cpu(0)->nDim() == 3)
+      {
+         // Loop over dimensions
+         for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
+         {
+            // Create storage
+            loads.push_back(std::map<int, double>());
+
+            // Loop over CPUs
+            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
+            {
+               // Initialise CPU fload to zero
+               loads.at(d)[cpu] = 0.0;
+
+               // Loop over third dimension
+               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT3D>(); i++)
+               {
+                  // Loop over second dimension
+                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(i); j++)
+                  {
+                     // Increment load by 1
+                     loads.at(d).find(cpu)->second += 1.0;
+                  }
+               }
+            }
+         }
+      }
+
+      // Get total load
+      double optimal = 0.0;
+      Array perCpu(spRes->nCpu());
+
+      // Loop over dimensions
+      std::map<int, double>::const_iterator  it;
+      for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
+      {
+         // Reset loads
+         optimal = 0.0;
+         perCpu.setConstant(0.0);
+
+         for(it = loads.at(d).begin(); it != loads.at(d).end(); it++)
+         {
+            perCpu(it->first) += it->second;
+            optimal += it->second;
+         }
+
+         // Convert total load to optimal load per CPU
+         optimal = optimal/spRes->nCpu();
+
+         // Load balance
+         if(perCpu.minCoeff() > optimal)
+         {
+            balance(d) *= optimal/perCpu.maxCoeff();
+         } else if(perCpu.maxCoeff() < optimal)
+         {
+            balance(d) *= perCpu.minCoeff()/optimal;
+         } else
+         {
+            balance(d) *= std::min(perCpu.minCoeff()/optimal, optimal/perCpu.maxCoeff());
+         }
+      }
+
+      // Compute score
+      double score = 1.0;
+
+      for(int i = 0; i < balance.size(); i++)
+      {
+         score *= balance(i);
+      }
+
+      return score;
+   }
+
+   void SplittingAlgorithm::buildCommunicationStructure(SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure)
+   {
       // Clear the communication structure
-      std::vector<std::multimap<int,int> >().swap(this->mCommStructure);
+      std::vector<std::multimap<int,int> >().swap(commStructure);
 
       Dimensions::Transform::Id dimId;
       int i_;
@@ -248,7 +364,7 @@ namespace Parallel {
       } else if(spRes->cpu(0)->nDim() == 2)
       {
          // Create storage for structure
-         this->mCommStructure.push_back(std::multimap<int,int>());
+         commStructure.push_back(std::multimap<int,int>());
 
          // Storage for the communication structure
          std::map<std::tr1::tuple<int,int>, int> bwdMap;
@@ -312,7 +428,7 @@ namespace Parallel {
          std::set<std::pair<int,int> >::iterator filIt;
          for(filIt = filter.begin(); filIt != filter.end(); filIt++)
          {
-            this->mCommStructure.at(static_cast<int>(Dimensions::Transform::TRA1D)).insert(*filIt);
+            commStructure.at(static_cast<int>(Dimensions::Transform::TRA1D)).insert(*filIt);
          }
 
          // Clear all the data
@@ -338,7 +454,7 @@ namespace Parallel {
          for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
          {
             // Create storage for structure
-            this->mCommStructure.push_back(std::multimap<int,int>());
+            commStructure.push_back(std::multimap<int,int>());
 
             // initialise the position hint for inserts
             mapPos = bwdMap.begin();
@@ -402,7 +518,7 @@ namespace Parallel {
                            // Look for same key in backward list
                            mapPos = bwdMap.find(point);
 
-                           // Key was present, drop enntry and extend filter
+                           // Key was present, drop entry and extend filter
                            if(mapPos != bwdMap.end())
                            {
                               // Add corresponding communication edge to filter
@@ -538,7 +654,7 @@ namespace Parallel {
             std::set<std::pair<int,int> >::iterator filIt;
             for(filIt = filter.begin(); filIt != filter.end(); filIt++)
             {
-               this->mCommStructure.at(ex).insert(*filIt);
+               commStructure.at(ex).insert(*filIt);
             }
 
             // Clear all the data for next loop
@@ -546,133 +662,6 @@ namespace Parallel {
             fwdMap.clear();
          }
       }
-
-      // Loop over possible data exchanges
-      for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
-      {
-         // Storage for the group sizes
-         std::set<int>  groups;
-
-         // Loop over CPUs
-         for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-         {
-            groups.insert(this->mCommStructure.at(ex).count(cpu));
-         }
-
-         // Store the group size (use the last one in set, to take into account case with unequal sizes. End score will be bad due to inbalance)
-         details(ex) = *groups.rbegin();
-      }
-
-      // Return ratio of both structures (higher is better)
-      return static_cast<double>(worst)/static_cast<double>(details.sum());
-   }
-
-   double SplittingAlgorithm::balancingScore(SharedResolution spRes, Array& balance)
-   {
-      // Storage for the per CPU loads for each dimension
-      std::vector<std::map<int, double> >   loads;
-
-      // Handle 1D resolution
-      if(spRes->cpu(0)->nDim() == 1)
-      {
-         throw Exception("Requested computation of load balancing score for 1D resolution!");
-
-      // Handle 2D resolution
-      } else if(spRes->cpu(0)->nDim() == 2)
-      {
-         // Loop over dimensions
-         for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
-         {
-            // Create storage
-            loads.push_back(std::map<int, double>());
-
-            // Loop over CPUs
-            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-            {
-               // Initialise CPU load to zero
-               loads.at(d)[cpu] = 0.0;
-
-               // Loop over second dimension
-               for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(); j++)
-               {
-                  // Increment load by 1
-                  loads.at(d).find(cpu)->second += 1.0;
-               }
-            }
-         }
-
-      // Handle 3D resolution
-      } else if(spRes->cpu(0)->nDim() == 3)
-      {
-         // Loop over dimensions
-         for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
-         {
-            // Create storage
-            loads.push_back(std::map<int, double>());
-
-            // Loop over CPUs
-            for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
-            {
-               // Initialise CPU fload to zero
-               loads.at(d)[cpu] = 0.0;
-
-               // Loop over third dimension
-               for(int i = 0; i < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT3D>(); i++)
-               {
-                  // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu(cpu)->dim(static_cast<Dimensions::Transform::Id>(d))->dim<Dimensions::Data::DAT2D>(i); j++)
-                  {
-                     // Increment load by 1
-                     loads.at(d).find(cpu)->second += 1.0;
-                  }
-               }
-            }
-         }
-      }
-
-      // Get total load
-      double optimal = 0.0;
-      Array perCpu(spRes->nCpu());
-
-      // Loop over dimensions
-      std::map<int, double>::const_iterator  it;
-      for(int d = 0; d < spRes->cpu(0)->nDim(); d++)
-      {
-         // Reset loads
-         optimal = 0.0;
-         perCpu.setConstant(0.0);
-
-         for(it = loads.at(d).begin(); it != loads.at(d).end(); it++)
-         {
-            perCpu(it->first) += it->second;
-            optimal += it->second;
-         }
-
-         // Convert total load to optimal load per CPU
-         optimal = optimal/spRes->nCpu();
-
-         // Load balance
-         if(perCpu.minCoeff() > optimal)
-         {
-            balance(d) *= optimal/perCpu.maxCoeff();
-         } else if(perCpu.maxCoeff() < optimal)
-         {
-            balance(d) *= perCpu.minCoeff()/optimal;
-         } else
-         {
-            balance(d) *= std::min(perCpu.minCoeff()/optimal, optimal/perCpu.maxCoeff());
-         }
-      }
-
-      // Compute score
-      double score = 1.0;
-
-      for(int i = 0; i < balance.size(); i++)
-      {
-         score *= balance(i);
-      }
-
-      return score;
    }
 
 }
