@@ -140,7 +140,7 @@ namespace Schemes {
          /**
           * @brief Tune resolution with MPI related conditions
           */
-         static void tuneMpiResolution();
+         static void tuneMpiResolution(const Parallel::SplittingDescription& descr);
 
       private:
          /**

@@ -30,6 +30,7 @@
 #include "SparseSolvers/SparseCoordinatorBase.hpp"
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
+#include "Timers/StageTimer.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -150,11 +151,13 @@ namespace Solver {
 
    template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::init(const typename SparseLinearCoordinatorBase<TSolver>::ScalarEquation_range& scalEq, const typename SparseLinearCoordinatorBase<TSolver>::VectorEquation_range& vectEq)
    {
+      StageTimer  stage;
       //
       // Create real/complex solvers
       //
 
-      DebuggerMacro_start("Linear: create solvers", 2);
+      stage.start("creating linear solvers", 1);
+
       // Loop over all scalar equations
       std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
       for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
@@ -179,14 +182,16 @@ namespace Solver {
             this->createSolver((*vectEqIt), *compIt);
          }
       }
-      DebuggerMacro_stop("Linear: create solvers t = ", 2);
+
+      stage.done();
 
       //
       // Initialise the solver storage
       //
 
+      stage.start("initializing solver storage", 1);
+
       // Loop over all substeps of solver
-      DebuggerMacro_start("Linear: create storage", 2);
       for(this->mStep = 0; this->mStep < this->mNStep; this->mStep++)
       {
          // Loop over all scalar equations
@@ -215,13 +220,15 @@ namespace Solver {
 
       // Initialise the start rows
       this->initStartRow();
-      DebuggerMacro_stop("Linear: create storage t = ", 2);
+
+      stage.done();
 
       //
       // Create the problem matrices
       //
 
-      DebuggerMacro_start("Linear: create operators", 2);
+      stage.start("building solver matrices", 1);
+
       // Loop over all scalar equations
       for(scalEqIt = scalEq.first; scalEqIt < scalEq.second; scalEqIt++)
       {
@@ -244,27 +251,32 @@ namespace Solver {
             this->createMatrices((*vectEqIt), *compIt);
          }
       }
-      DebuggerMacro_stop("Linear: create operators t = ", 2);
+
+      stage.done();
 
       //
       // Initialise the solvers and the initial state
       //
+      
+      stage.start("factorizing solver matrices", 1);
 
       // Initialise solvers from complex equation steppers
-      DebuggerMacro_start("Linear: complex operator init", 2);
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this);
-      DebuggerMacro_stop("Linear: complex operator init t = ", 2);
 
       // Initialise solvers from real equation steppers
-      DebuggerMacro_start("Linear: real operator init", 2);
       initSolvers<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this);
-      DebuggerMacro_stop("Linear: real operator init t = ", 2);
+
+      stage.done();
 
       // Reset the step index
       this->mStep = 0;
 
+      stage.start("initializing solutions", 1);
+
       // Initialise with initial state
       this->initSolution(scalEq, vectEq);
+
+      stage.done();
    }
 
    template <template <class,class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)

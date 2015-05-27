@@ -26,7 +26,6 @@
 #include "Python/PythonModelWrapper.hpp"
 #include "Simulation/Simulation.hpp"
 #include "IoTools/IdToHuman.hpp"
-#include "Timers/StageTimer.hpp"
 #include "PhysicalModels/PhysicalModelBase.hpp"
 
 namespace GeoMHDiSCC {
@@ -90,20 +89,8 @@ namespace GeoMHDiSCC {
       // Initialise simulation
       spSim->initBase();
 
-      // Print message to signal start of load distribution calculation
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::start("optimizing load distribution");
-      }
-
       // Initialise resolution
       spSim->initResolution<typename TModel::SchemeType>();
-
-      // Print stage message
-      if(FrameworkMacro::allowsIO())
-      {
-         StageTimer::done();
-      }
 
       // Add equations
       TModel::addEquations(spSim);

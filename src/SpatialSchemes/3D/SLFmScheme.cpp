@@ -37,34 +37,16 @@ namespace Schemes {
    {
       // Debug statement
       DebuggerMacro_enter("tuneResolution",1);
+
+      SLFmScheme::tuneMpiResolution(descr);
       
       // Create spectral space sub communicators
       #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-         // Extract the communication group from structure
-         std::multimap<int,int>::const_iterator it;
-         std::set<int> filter;
-         filter.insert(FrameworkMacro::id());
-         for(it = descr.structure.at(0).equal_range(FrameworkMacro::id()).first; it != descr.structure.at(0).equal_range(FrameworkMacro::id()).second; ++it)
-         {
-            filter.insert(it->second);
-         }
-
-         // Make array of CPUs in group
-         ArrayI groupCpu(filter.size());
-         {
-            int i = 0;
-            for(std::set<int>::iterator it = filter.begin(); it != filter.end(); ++it)
-            {
-               groupCpu(i) = *it;
-               ++i;
-            }
-         }
-
          // Create minimial MPI communicator
          MPI_Group world;
          MPI_Group group;
          MPI_Comm_group(MPI_COMM_WORLD, &world);
-         MPI_Group_incl(world, groupCpu.size(), groupCpu.data(), &group);
+         MPI_Group_incl(world, FrameworkMacro::groupCpuIds(0).size(), FrameworkMacro::groupCpuIds(0).data(), &group);
          MPI_Comm comm;
          MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
 
@@ -90,7 +72,7 @@ namespace Schemes {
          int globalCpu = FrameworkMacro::id();
          MPI_Comm_rank(comm, &commId); 
          ArrayI tmp;
-         for(int commCpu = 0; commCpu < static_cast<int>(filter.size()); ++commCpu)
+         for(int commCpu = 0; commCpu < FrameworkMacro::groupCpuIds(0).size(); ++commCpu)
          {
             int size;
             if(commCpu == commId)

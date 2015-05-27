@@ -144,10 +144,10 @@ namespace GeoMHDiSCC {
       spField->setFields(true, false);
       spField->setIdentity(PhysicalNames::DZ_MEANTEMPERATURE);
       
-//      // Add vertical vorticity field visualization
-//      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-//      spField->setFields(true, false);
-//      spField->setIdentity(PhysicalNames::NO_VORTICITYZ);
+      // Add vertical vorticity field visualization
+      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spField->setFields(true, false);
+      spField->setIdentity(PhysicalNames::NO_VORTICITYZ);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
@@ -155,7 +155,7 @@ namespace GeoMHDiSCC {
       spOut->expect(PhysicalNames::NO_STREAMFUNCTION);
       spOut->expect(PhysicalNames::NO_VELOCITYZ);
       spOut->expect(PhysicalNames::DZ_MEANTEMPERATURE);
-//      spOut->expect(PhysicalNames::NO_VORTICITYZ);
+      spOut->expect(PhysicalNames::NO_VORTICITYZ);
       spVis->addHdf5OutputFile(spOut);
    }
 

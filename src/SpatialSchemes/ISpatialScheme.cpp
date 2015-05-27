@@ -33,7 +33,7 @@ namespace Schemes {
 
    void ISpatialScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
-      ISpatialScheme::tuneMpiResolution();
+      ISpatialScheme::tuneMpiResolution(descr);
    }
 
    ISpatialScheme::ISpatialScheme(const int dims)
@@ -117,8 +117,32 @@ namespace Schemes {
       return this->mDims;
    }
 
-   void ISpatialScheme::tuneMpiResolution()
+   void ISpatialScheme::tuneMpiResolution(const Parallel::SplittingDescription& descr)
    {
+      #if defined GEOMHDISCC_MPI
+         for(std::vector<std::multimap<int,int> >::const_iterator vIt = descr.structure.begin(); vIt != descr.structure.end(); ++vIt)
+         {
+            // Extract the communication group from structure
+            std::multimap<int,int>::const_iterator it;
+            std::set<int> filter;
+            filter.insert(FrameworkMacro::id());
+            for(it = vIt->equal_range(FrameworkMacro::id()).first; it != vIt->equal_range(FrameworkMacro::id()).second; ++it)
+            {
+               filter.insert(it->second);
+            }
+
+            // Convert set to array of CPUs in group
+            ArrayI groupCpu(filter.size());
+            int i = 0;
+            for(std::set<int>::iterator it = filter.begin(); it != filter.end(); ++it)
+            {
+               groupCpu(i) = *it;
+               ++i;
+            }
+
+            FrameworkMacro::addTransformComm(groupCpu);
+         }
+      #endif //defined GEOMHDISCC_MPI
    }
 
 }

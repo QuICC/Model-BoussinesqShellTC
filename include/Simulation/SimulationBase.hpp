@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Timers/StageTimer.hpp"
 #include "Timers/ExecutionTimer.hpp"
 #include "Simulation/SimulationRunControl.hpp"
 #include "Simulation/SimulationIoControl.hpp"
@@ -382,6 +383,9 @@ namespace GeoMHDiSCC {
       // Debug statement
       DebuggerMacro_leave("initResolution",0);
 
+      StageTimer stage;
+      stage.start("optimizing load distribution");
+
       // Create the load splitter
       Parallel::LoadSplitter splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
 
@@ -393,6 +397,8 @@ namespace GeoMHDiSCC {
 
       // Initialise the load splitter
       splitter.init<TScheme>(dim);
+
+      stage.done();
 
       // Get best splitting resolution object
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
@@ -409,8 +415,12 @@ namespace GeoMHDiSCC {
       // Set the box scale
       this->mspRes->setBoxScale(box);
 
+      stage.start("intializing transform grouper");
+
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+
+      stage.done();
 
       // Debug statement
       DebuggerMacro_leave("initResolution",0);

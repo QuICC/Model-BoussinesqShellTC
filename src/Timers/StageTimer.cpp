@@ -4,6 +4,10 @@
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
+// Configuration includes
+//
+#include "Framework/FrameworkMacro.h"
+
 // System includes
 //
 #include <iostream>
@@ -21,43 +25,67 @@
 
 namespace GeoMHDiSCC {
 
-   TimerMacro StageTimer::timer = TimerMacro();
-
-   void StageTimer::msg(const std::string& msg)
+   StageTimer::StageTimer()
+      : TimerMacro(false), mLevel(0)
    {
-      IoTools::Formatter::printCentered(std::cout, "(... " + msg + "...)", ' ');
    }
 
-   void StageTimer::start(const std::string& msg)
+   StageTimer::~StageTimer()
    {
-      StageTimer::timer.start();
-      StageTimer::msg(msg);
    }
 
-   void StageTimer::done()
+   void StageTimer::stage(const std::string& msg)
    {
-      StageTimer::timer.stop();
-
-      std::stringstream ss;
-      ss << std::ceil(10.0*StageTimer::timer.time())/10.0;
-
-      IoTools::Formatter::printCentered(std::cout, "(... done (" + ss.str() + " s) ...)" , ' ');
-      IoTools::Formatter::printNewline(std::cout);
-   }
-
-   void StageTimer::newStage(const std::string& msg)
-   {
-      IoTools::Formatter::printLine(std::cout, '-');
-      IoTools::Formatter::printCentered(std::cout, "... " + msg + " ...", '*');
-      IoTools::Formatter::printLine(std::cout, '-');
-      IoTools::Formatter::printNewline(std::cout);
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printHalfLine(std::cout, '/', '\\');
+         IoTools::Formatter::printCentered(std::cout, "... " + msg + " ...", '*');
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printNewline(std::cout);
+      }
    }
 
    void StageTimer::completed(const std::string& msg)
    {
-      IoTools::Formatter::printLine(std::cout, '-');
-      IoTools::Formatter::printCentered(std::cout, msg, '*');
-      IoTools::Formatter::printLine(std::cout, '-');
+      if(FrameworkMacro::allowsIO())
+      {
+         IoTools::Formatter::printLine(std::cout, '-');
+         IoTools::Formatter::printCentered(std::cout, msg, '*');
+         IoTools::Formatter::printHalfLine(std::cout, '\\', '/');
+         IoTools::Formatter::printNewline(std::cout);
+      }
+   }
+
+   void StageTimer::msg(const std::string& msg, const int space)
+   {
+      if(FrameworkMacro::allowsIO())
+      {
+         std::cout << std::setfill(' ') << std::setw(space) << "" << msg << std::endl;
+      }
+   }
+
+   void StageTimer::start(const std::string& msg, const int level)
+   {
+      this->mLevel = level;
+
+      if(FrameworkMacro::allowsIO())
+      {
+         StageTimer::msg( "--> " + msg, 8 + this->mLevel*4);
+         TimerMacro::start();
+      }
+   }
+
+   void StageTimer::done()
+   {
+      if(FrameworkMacro::allowsIO())
+      {
+         TimerMacro::stop();
+
+         std::stringstream ss;
+         ss << std::ceil(10.0*this->time())/10.0;
+         StageTimer::msg("    done (" + ss.str() + " s)", 8 + this->mLevel*4);
+         IoTools::Formatter::printNewline(std::cout);
+      }
    }
 
 }

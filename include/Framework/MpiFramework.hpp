@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Framework/FrameworkBase.hpp"
+#include "Base/Typedefs.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -48,6 +49,36 @@ namespace GeoMHDiSCC {
           * @brief Finalise the MPI system
           */
          static void finalize();
+
+         /**
+          * @brief Add CPU group IDs
+          */
+         static void addTransformComm(const ArrayI& ids);
+
+         /**
+          * @brief Synchronize transform comm
+          */
+         static void syncTransform(const int traId);
+
+         /**
+          * @brief Get transform rank
+          */
+         static void transformId(const int traId);
+
+         /**
+          * @brief Get transform CPU group IDs
+          */
+         static const ArrayI& transformCpus(const int traId);
+
+         /**
+          * @brief Get transform MPI group
+          */
+         static MPI_Group transformGroup(const int traId);
+
+         /**
+          * @brief Get transform MPI comm
+          */
+         static MPI_Comm transformComm(const int traId);
 
          /**
           * @brief Synchronise a sub communicator
@@ -86,6 +117,26 @@ namespace GeoMHDiSCC {
           * @brief Destructor
           */
          ~MpiFramework();
+
+         /**
+          * @brief Local CPU rank in transform group
+          */
+         static std::vector<int> mTransformIds;
+
+         /**
+          * @brief IDs of the CPUs in transform communication groups
+          */
+         static std::vector<ArrayI> mTransformCpus;
+
+         /**
+          * @brief MPI groups of the CPUs in transform communication groups
+          */
+         static std::vector<MPI_Group> mTransformGroups;
+
+         /**
+          * @brief MPI communicators of the CPUs in transform communication groups
+          */
+         static std::vector<MPI_Comm> mTransformComms;
 
          /**
           * @brief Storage for the MPI sub groups

@@ -60,6 +60,46 @@ namespace GeoMHDiSCC {
       MPI_Barrier(MPI_COMM_WORLD);
    }
 
+   void MpiFramework::addTransformComm(const ArrayI& ids)
+   {
+      MpiFramework::mTransformCpus.push_back(ids);
+
+      MPI_Group world;
+      MPI_Group group;
+      MPI_Comm_group(MPI_COMM_WORLD, &world);
+      MPI_Group_incl(world, ids.size(), ids.data(), &group);
+      MPI_Comm comm;
+      MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+
+      MpiFramework::mTransformGroups.push_back(group);
+
+      MpiFramework::mTransformComms.push_back(comm);
+
+      int rank;
+      MPI_Comm_rank(comm, &rank);
+      MpiFramework::mTransformIds.push_back(rank);
+   }
+
+   void MpiFramework::syncTransform(const int traId)
+   {
+      MPI_Barrier(MpiFramework::mTransformComms.at(traId));
+   }
+
+   const ArrayI& MpiFramework::transformCpus(const int traId)
+   {
+      return MpiFramework::mTransformCpus.at(traId);
+   }
+
+   MPI_Group MpiFramework::transformGroup(const int traId)
+   {
+      return MpiFramework::mTransformGroups.at(traId);
+   }
+
+   MPI_Comm MpiFramework::transformComm(const int traId)
+   {
+      return MpiFramework::mTransformComms.at(traId);
+   }
+
    void MpiFramework::syncSubComm(const MpiFramework::SubCommId id, const int idx)
    {
       assert(MpiFramework::mSubComm.find(id) != MpiFramework::mSubComm.end());
@@ -145,6 +185,14 @@ namespace GeoMHDiSCC {
 
       MpiFramework::synchronize();
    }
+
+   std::vector<int>  MpiFramework::mTransformIds = std::vector<int>();
+
+   std::vector<ArrayI>  MpiFramework::mTransformCpus = std::vector<ArrayI>();
+
+   std::vector<MPI_Group>  MpiFramework::mTransformGroups = std::vector<MPI_Group>();
+
+   std::vector<MPI_Comm>  MpiFramework::mTransformComms = std::vector<MPI_Comm>();
 
    std::map<MpiFramework::SubCommId,std::vector<MPI_Group> > MpiFramework::mSubGroup = std::map<MpiFramework::SubCommId,std::vector<MPI_Group> >();
 

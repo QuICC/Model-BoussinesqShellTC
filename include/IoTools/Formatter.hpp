@@ -48,9 +48,19 @@ namespace IoTools {
          static void printLine(std::ostream& stream, char fill);
 
          /**
+          * @brief Output a line of a combination of two characters
+          */
+         static void printHalfLine(std::ostream& stream, char fillLeft, char fillRight);
+
+         /**
           * @brief Output a centered text with fill characters
           */
          static void printCentered(std::ostream& stream, const std::string& text, char fill = ' ', int base = -1);
+
+         /**
+          * @brief Output a centered text with fill characters on the left
+          */
+         static void printLeftCentered(std::ostream& stream, const std::string& text, char fill = ' ', int base = -1, bool hasNewLine = true);
          
       protected:
 
