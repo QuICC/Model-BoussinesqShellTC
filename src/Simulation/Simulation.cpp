@@ -10,10 +10,10 @@
 
 // Debug includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // Configuration includes
 //
-#include "Debug/DebuggerMacro.h"
 #include "Profiler/ProfilerMacro.h"
 #include "StorageProfiler/StorageProfilerMacro.h"
 #include "Framework/FrameworkMacro.h"
@@ -50,9 +50,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::initAdditionalBase()
    {
-      // Debug statement
-      DebuggerMacro_enter("initAdditionalBase",1);
-
       // Get the run configuration
       Array cfgRun = this->mSimIoCtrl.configRun();
 
@@ -61,16 +58,10 @@ namespace GeoMHDiSCC {
 
       // Set the maximum wall time
       this->mSimRunCtrl.setMaxWallTime(cfgRun(1));
-
-      // Debug statement
-      DebuggerMacro_leave("initAdditionalBase",1);
    }
 
    void Simulation::mainRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("mainRun",1);
-
       StageTimer::stage("Starting simulation");
 
       // Start main loop of simulation
@@ -94,9 +85,6 @@ namespace GeoMHDiSCC {
          // Update simulation run control
          this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
       }
-
-      // Debug statement
-      DebuggerMacro_leave("mainRun",1);
    }
 
    void Simulation::preSolveEquations()
@@ -201,9 +189,6 @@ namespace GeoMHDiSCC {
 
    void Simulation::explicitEquations()
    {
-      // Debug statement
-      DebuggerMacro_enter("explicitEquations",2);
-
       // Explicit trivial equations
       this->explicitTrivialEquations(ModelOperator::EXPLICIT_LINEAR);
 
@@ -212,16 +197,10 @@ namespace GeoMHDiSCC {
 
       // Explicit prognostic equations
       this->explicitPrognosticEquations(ModelOperator::EXPLICIT_LINEAR);
-
-      // Debug statement
-      DebuggerMacro_leave("explicitEquations",2);
    }
 
    void Simulation::solveEquations()
    {
-      // Debug statement
-      DebuggerMacro_enter("solveEquations",2);
-
       // Solve trivial equations
       this->explicitTrivialEquations(ModelOperator::EXPLICIT_NONLINEAR);
       this->solveTrivialEquations(SolveTiming::BEFORE);
@@ -265,47 +244,25 @@ namespace GeoMHDiSCC {
          this->mSimIoCtrl.update();
       }
       ProfilerMacro_stop(ProfilerMacro::CONTROL);
-
-      // Debug statement
-      DebuggerMacro_leave("solveEquations",2);
    }
 
    void Simulation::explicitPrognosticEquations(const ModelOperator::Id opId)
    {
-      // Debug statement
-      DebuggerMacro_enter("explicitPrognostic",3);
-
-      DebuggerMacro_start("Explicit prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
       this->mTimestepCoordinator.getExplicitInput(opId, this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
-      DebuggerMacro_stop("Explicit prognostic t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("explicitPrognostic",3);
    }
 
    void Simulation::solvePrognosticEquations()
    {
-      // Debug statement
-      DebuggerMacro_enter("solvePrognostic",3);
-
-      DebuggerMacro_start("Solve prognostic",4);
       ProfilerMacro_start(ProfilerMacro::PROGNOSTICEQUATION);
       this->mTimestepCoordinator.setSolveTime(SolveTiming::PROGNOSTIC);
       this->mTimestepCoordinator.stepForward(this->mScalarPrognosticRange, this->mVectorPrognosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::PROGNOSTICEQUATION);
-      DebuggerMacro_stop("Solve prognostic t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("solvePrognostic",3);
    }
 
    void Simulation::writeOutput()
    {
-      // Debug statement
-      DebuggerMacro_enter("writeOutput",2);
-
       ProfilerMacro_start(ProfilerMacro::IO);
       if(this->mTimestepCoordinator.finishedStep())
       {
@@ -319,9 +276,6 @@ namespace GeoMHDiSCC {
          this->mSimIoCtrl.writeFiles(this->mTimestepCoordinator.time(), this->mTimestepCoordinator.timestep());
       }
       ProfilerMacro_stop(ProfilerMacro::IO);
-
-      // Debug statement
-      DebuggerMacro_leave("writeOutput",2);
    }
 
    void Simulation::postRun()

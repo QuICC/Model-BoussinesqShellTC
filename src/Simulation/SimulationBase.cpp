@@ -46,9 +46,6 @@ namespace GeoMHDiSCC {
 
    void SimulationBase::initBase()
    {
-      // Debug statement
-      DebuggerMacro_enter("initBase",0);
-
       // Make sure to catch raised exception in initialisation steps
       try{
          // Initialise the IO system
@@ -75,16 +72,10 @@ namespace GeoMHDiSCC {
 
       // Make sure nodes are synchronised after initialisation
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("initBase",0);
    }
 
    void SimulationBase::init(const SharedSimulationBoundary spBcs)
    {
-      // Debug statement
-      DebuggerMacro_enter("init",0);
-
       StageTimer stage;
 
       // Transform projector tree
@@ -133,18 +124,12 @@ namespace GeoMHDiSCC {
       this->mSimIoCtrl.cleanup();
 
       stage.done();
-
-      // Debug statement
-      DebuggerMacro_leave("init",0);
    }
 
    void SimulationBase::run()
    {
       // Final initialisation of the solvers
       this->initSolvers();
-
-      // Debug statement
-      DebuggerMacro_enter("run",0);
 
       // Stop timer and update initialisation time
       this->mExecutionTimer.stop();
@@ -184,16 +169,10 @@ namespace GeoMHDiSCC {
 
       // Synchronise computation nodes
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("run",0);
    }
 
    void SimulationBase::finalize()
    {
-      // Debug statement
-      DebuggerMacro_enter("finalize",0);
-
       // Print simulation run infos
       this->mSimRunCtrl.printInfo(std::cout);
 
@@ -205,9 +184,6 @@ namespace GeoMHDiSCC {
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();
-
-      // Debug statement
-      DebuggerMacro_leave("finalize",0);
    }
 
    void SimulationBase::setInitialState(IoVariable::SharedStateFileReader spInitFile)
@@ -275,10 +251,6 @@ namespace GeoMHDiSCC {
 
    void SimulationBase::computeNonlinear()
    {
-      // Debug statement
-      DebuggerMacro_enter("computeNonlinear",2);
-      DebuggerMacro_start("computeNonlinear",3);
-
       // Compute backward transform
       ProfilerMacro_start(ProfilerMacro::BWDTRANSFORM);
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
@@ -286,72 +258,36 @@ namespace GeoMHDiSCC {
 
       // compute nonlinear interaction and forward transform
       this->mspFwdGrouper->transform(this->mScalarEquations, this->mVectorEquations, this->mTransformCoordinator);
-
-      // Debug statement
-      DebuggerMacro_stop("computeNonlinear t = ",3);
-      DebuggerMacro_leave("computeNonlinear",2);
    }
 
    void SimulationBase::explicitTrivialEquations(const ModelOperator::Id opId)
    {
-      // Debug statement
-      DebuggerMacro_enter("explicitTrivialEquations",3);
-
-      DebuggerMacro_start("Explicit trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
       this->mTrivialCoordinator.getExplicitInput(opId, this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
-      DebuggerMacro_stop("Explicit trivial t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("explicitTrivialEquations",3);
    }
 
    void SimulationBase::explicitDiagnosticEquations(const ModelOperator::Id opId)
    {
-      // Debug statement
-      DebuggerMacro_enter("explicitDiagnosticEquations",3);
-
-      DebuggerMacro_start("Explicit diagnostic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
       this->mLinearCoordinator.getExplicitInput(opId, this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-      DebuggerMacro_stop("Explicit diagnostic t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("explicitDiagnosticEquations",3);
    }
 
    void SimulationBase::solveTrivialEquations(const SolveTiming::Id time)
    {
-      // Debug statement
-      DebuggerMacro_enter("solveTrivialEquations",3);
-
-      DebuggerMacro_start("Solve trivial",4);
       ProfilerMacro_start(ProfilerMacro::TRIVIALEQUATION);
       this->mTrivialCoordinator.setSolveTime(time);
       this->mTrivialCoordinator.solve(this->mScalarTrivialRange, this->mVectorTrivialRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::TRIVIALEQUATION);
-      DebuggerMacro_stop("Solve trivial t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("solveTrivialEquations",3);
    }
 
    void SimulationBase::solveDiagnosticEquations(const SolveTiming::Id time)
    {
-      // Debug statement
-      DebuggerMacro_enter("solveDiagnosticEquations",3);
-
-      DebuggerMacro_start("Solve diagnostic",4);
       ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
       this->mLinearCoordinator.setSolveTime(time);
       this->mLinearCoordinator.solve(this->mScalarDiagnosticRange, this->mVectorDiagnosticRange, this->mScalarVariables, this->mVectorVariables);
       ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-      DebuggerMacro_stop("Solve diagnostic t = ",4);
-
-      // Debug statement
-      DebuggerMacro_leave("solveDiagnosticEquations",3);
    }
       
    void SimulationBase::initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)

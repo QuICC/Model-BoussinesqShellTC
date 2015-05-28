@@ -18,7 +18,6 @@
 
 // Project includes
 //
-#include "Debug/DebuggerMacro.h"
 
 namespace GeoMHDiSCC {
 

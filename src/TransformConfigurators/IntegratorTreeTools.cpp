@@ -31,7 +31,7 @@ namespace Transform {
    void IntegratorTreeTools::generateTrees(std::vector<IntegratorTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<IntegratorBranch> >& branches)
    {
       // Debugging info 
-      DebuggerMacro_enter("IntegratorTreeTools::generateTrees", 1);
+      DebuggerMacro_enter("Generating integrator trees", 1);
 
       // Loop over all physical fields
       std::map<PhysicalNames::Id, std::vector<IntegratorBranch> >::const_iterator nameIt;
@@ -129,7 +129,7 @@ namespace Transform {
       }
 
       // Debugging info 
-      DebuggerMacro_leave("IntegratorTreeTools::generateTrees", 1);
+      DebuggerMacro_leave("Integrator trees done", 1);
    }
 
 }

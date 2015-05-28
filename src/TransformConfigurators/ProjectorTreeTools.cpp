@@ -31,7 +31,7 @@ namespace Transform {
    void ProjectorTreeTools::generateTrees(std::vector<ProjectorTree>& rTrees, const std::map<PhysicalNames::Id, std::vector<ProjectorBranch> >& branches)
    {
       // Debugging info 
-      DebuggerMacro_enter("ProjectorTreeTools::generateTrees", 1);
+      DebuggerMacro_enter("Generating projector trees", 1);
 
       // Loop over all physical fields
       std::map<PhysicalNames::Id, std::vector<ProjectorBranch> >::const_iterator nameIt;
@@ -135,7 +135,7 @@ namespace Transform {
       }
 
       // Debugging info 
-      DebuggerMacro_leave("ProjectorTreeTools::generateTrees", 1);
+      DebuggerMacro_leave("Projector trees done", 1);
    }
 
 }

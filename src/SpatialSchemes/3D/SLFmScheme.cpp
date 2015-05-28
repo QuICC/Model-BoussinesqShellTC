@@ -6,7 +6,6 @@
 
 // Configuration includes
 //
-#include "Debug/DebuggerMacro.h"
 #include "Framework/FrameworkMacro.h"
 
 // System includes
@@ -35,9 +34,6 @@ namespace Schemes {
 
    void SLFmScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
-      // Debug statement
-      DebuggerMacro_enter("tuneResolution",1);
-
       SLFmScheme::tuneMpiResolution(descr);
       
       // Create spectral space sub communicators
@@ -174,9 +170,6 @@ namespace Schemes {
          // Free communicator
          MPI_Comm_free(&comm);
       #endif //defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
-
-      // Debug statement
-      DebuggerMacro_leave("tuneResolution",1);
    }
 
    void SLFmScheme::addTransformSetups(SharedResolution spRes) const

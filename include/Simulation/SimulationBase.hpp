@@ -380,9 +380,6 @@ namespace GeoMHDiSCC {
 
    template <typename TScheme> void SimulationBase::initResolution()
    {
-      // Debug statement
-      DebuggerMacro_leave("initResolution",0);
-
       StageTimer stage;
       stage.start("optimizing load distribution");
 
@@ -424,9 +421,6 @@ namespace GeoMHDiSCC {
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
 
       stage.done();
-
-      // Debug statement
-      DebuggerMacro_leave("initResolution",0);
    }
 
    template <typename TModel> SharedSimulationBoundary SimulationBase::createBoundary()
