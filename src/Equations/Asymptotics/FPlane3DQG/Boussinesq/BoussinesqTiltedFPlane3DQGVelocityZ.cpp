@@ -41,7 +41,7 @@ namespace Equations {
 
    void BoussinesqTiltedFPlane3DQGVelocityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false);
    }
 
    void BoussinesqTiltedFPlane3DQGVelocityZ::setRequirements()
@@ -53,7 +53,7 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::PROGNOSTIC);
 
       // Add vertical velocity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, true, false));
+      this->mRequirements.addField(PhysicalNames::VELOCITYZ, FieldRequirement(true, true, false, false));
    }
 
 }

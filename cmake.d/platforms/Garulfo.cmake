@@ -34,14 +34,13 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 #------- AVAILABLE LINEAR ALGEBRA LIBRARIES ------#
 ###################################################
 
-set(GEOMHDISCC_LINALGS "LAPACK" "Eigen" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
+set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "Mumps" "Pardiso" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "MUMPS" "Pardiso" "SPQR" "SparseQR" "BiCGSTAB" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "umfpack" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "superlu" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU "/usr/include/superlu" PARENT_SCOPE)
@@ -60,6 +59,12 @@ set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
 
 ###################################################
+#-------------- MPI IMPLEMENTATION ---------------#
+###################################################
+
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
+
+###################################################
 #-------------- MULTIPLE PRECISION ---------------#
 ###################################################
 
@@ -74,7 +79,7 @@ set(GEOMHDISCC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
-set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2 -fopenmp" PARENT_SCOPE)
+set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_GCC "" PARENT_SCOPE)
 

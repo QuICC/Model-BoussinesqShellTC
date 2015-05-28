@@ -124,6 +124,11 @@ namespace GeoMHDiSCC {
           */
          SharedIndexCounter counter();
 
+         /**
+          * @brief Build restriction for MPI sparse solver
+          */
+         void buildRestriction(std::vector<int>& rSlow, std::vector<std::vector<int> >& rMiddle, const int k);
+
       protected:
 
       private:

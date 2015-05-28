@@ -41,6 +41,15 @@ namespace Transform {
          TransformSetup(const int size, const int howmany, const int specSize);
 
          /**
+          * @brief Constructor
+          *
+          * @param size       Size of the transform
+          * @param howmany    Number of similar transforms split in even and odd
+          * @param specSize   Spectral output size (i.e without the padding)
+          */
+         TransformSetup(const int size, const ArrayI& howmany, const int specSize);
+
+         /**
           * @brief Empty destructor
           */
          ~TransformSetup();
@@ -51,9 +60,14 @@ namespace Transform {
          int fwdSize() const;
 
          /**
-          * @brief Get the number of similar transforms
+          * @brief Get the total number of similar transforms
           */
          int howmany() const;
+
+         /**
+          * @brief Get the number of similar transforms with given parity
+          */
+         int howmany(const int parity) const;
 
          /**
           * @brief Get the spectral size of the transform
@@ -74,7 +88,7 @@ namespace Transform {
          /**
           * @brief Number of similar transforms
           */
-         int mHowmany;
+         ArrayI mHowmany;
 
          /**
           * @brief Spectral size

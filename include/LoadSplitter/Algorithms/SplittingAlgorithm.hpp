@@ -71,6 +71,13 @@ namespace Parallel {
           * @brief Check if factorisation is applicable to scheme
           */
          virtual bool applicable() const = 0;
+
+         /**
+          * @brief Build the exact communication structure
+          *
+          * @param spRes   Shared resolution object
+          */
+         static void buildCommunicationStructure(SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure);
          
       protected:
          /**
@@ -100,15 +107,16 @@ namespace Parallel {
           *
           * @param transId Split the ith dimension
           * @param cpuId   ID of the CPU
+          * @param status  Status output
           */
-         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId) = 0;
+         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status) = 0;
 
          /**
           * @brief Compute the score of the Resolution
           *
           * @param spResolution Shared resolution object
           */
-         virtual int computeScore(SharedResolution spResolution) = 0;
+         virtual Array computeScore(SharedResolution spResolution) = 0;
 
          /**
           * @brief Compute score related to communication structure
@@ -188,12 +196,6 @@ namespace Parallel {
           * @brief Storage for the simulation resolution
           */
          ArrayI mSimDim;
-
-         /**
-          * @brief Storage for the communication structure
-          */
-         std::vector<std::multimap<int,int> >   mCommStructure;
-
    };
 
    template <typename TSchemeType> void SplittingAlgorithm::initScheme(const ArrayI& dim)

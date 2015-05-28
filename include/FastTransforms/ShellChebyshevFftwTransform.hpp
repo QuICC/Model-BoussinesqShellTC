@@ -27,10 +27,13 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -46,8 +49,18 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** 
+          * Enum of projector IDs:
+          *    - PROJ: projection
+          *    - DIFF: D
+          *    - DIFF2: D^2
+          *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
+          *    - DIFFR: D r
+          *    - DIVRDIFFR: 1/r D r
+          *    - RADLAPL: radial laplacian: D^2 + 2/r D
+          */
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIFFR, DIVRDIFFR, RADLAPL};
       };
 
       /**
@@ -55,8 +68,17 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
-         enum Id {INTG};
+         /** 
+          * Enum of integrator IDs:
+          *    - INTG: integration
+          *    - INTGR: integration of r
+          *    - INTGQ4: integration of QST Q component for Poloidal NL (4th order equation)
+          *    - INTGS4: integration of QST S component for Poloidal NL (4th order equation)
+          *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
+          *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
+          *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
+          */
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
    };
@@ -126,10 +148,9 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -139,40 +160,57 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (R2R)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projectors should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projectors should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C)
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space full output without spectral truncation
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -210,9 +248,34 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mDiff;
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
+
+         /**
+          * @brief Storage for the integrator operators
+          */
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices
+          */
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+
+         /**
+          * @brief Storage for the backward operators input data
+          */
+         Matrix mTmpInS;
+
+         /**
+          * @brief Storage for the backward operators output data
+          */
+         Matrix mTmpOutS;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -223,6 +286,21 @@ namespace Transform {
           * @brief Initialise the spectral operators
           */
          void initOperators();
+
+         /**
+          * @brief Compute derivative by recurrence relation
+          */
+         template <typename TDerived> void recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
+
+         /**
+          * @brief Compute division by R by recurrence relation
+          */
+         template <typename TDerived> void recurrenceDivR(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
+
+         /**
+          * @brief Compute division by R^2 by recurrence relation
+          */
+         template <typename TDerived> void recurrenceDivR2(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& rChebVal) const;
 
          /**
           * @brief Cleanup memory used by FFTW on destruction
@@ -238,158 +316,81 @@ namespace Transform {
           * @brief Storage for the ratio of the radii (R_i / R_o)
           */
          MHDFloat mRRatio;
+
+         /**
+          * @brief Constant a for linear change of variable r = ax + b 
+          */
+         MHDFloat mCnstA;
+
+         /**
+          * @brief Constant b for linear change of variable r = ax + b 
+          */
+         MHDFloat mCnstB;
    };
 
-   template <Arithmetics::Id TOperation> void ShellChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDiff(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
+      int i = chebVal.rows()-1;
+      MHDFloat scale = 1.0/this->mCnstA;
 
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
+      // Set T_N to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
 
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
+      // Compute T_N-1
+      rDealiased.row(i) = scale*static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      --i;
 
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
-
-      // Do transform
-      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
-
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      // Compute remaining modes
+      for(; i >= 0; --i)
+      {
+         rDealiased.row(i) = rDealiased.row(i+2) + scale*static_cast<MHDFloat>(2*(i+1))*chebVal.row(i+1);
+      }
    }
 
-   template <Arithmetics::Id TOperation> void ShellChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
+   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDivR(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
+      int i = chebVal.rows()-1;
+      MHDFloat scaleA = 2.0/this->mCnstA;
+      MHDFloat scaleB = 2.0*this->mCnstB/this->mCnstA;
 
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
+      // Set T_N to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
 
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+      // Compute T_N-1
+      rDealiased.row(i) = scaleA*chebVal.row(i+1);
+      --i;
 
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
+      // Compute remaining modes
+      for(; i >= 0; --i)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
-
-      // Compute simple projection
-      } else
-      {
-         // Copy into other array
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         rDealiased.row(i) = scaleA*chebVal.row(i+1) - scaleB*rDealiased.row(i+1) - rDealiased.row(i+2);
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   template <Arithmetics::Id TOperation> void ShellChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ShellChebyshevFftwTransform::IntegratorType::Id integrator)
+   template <typename TDerived> void ShellChebyshevFftwTransform::recurrenceDivR2(Matrix& rDealiased, const Eigen::MatrixBase<TDerived>& chebVal) const
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
+      int i = chebVal.rows()-1;
+      MHDFloat scaleA = 4.0/std::pow(this->mCnstA,2);
+      MHDFloat scaleB = 4.0*this->mCnstB/this->mCnstA;
+      MHDFloat scaleC = 2.0*(std::pow(this->mCnstA,2) + 2.0*std::pow(this->mCnstB,2))/std::pow(this->mCnstA,2);
 
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+      // Set T_N and T_N-1 to zero
+      rDealiased.row(i).setConstant(0.0);
+      --i;
+      rDealiased.row(i).setConstant(0.0);
+      --i;
 
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
+      // Compute T_N-2
+      rDealiased.row(i) = scaleA*chebVal.row(i+2);
+      --i;
 
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
-
-      // Do transform of real part
-      this->mTmpIn = physVal.real();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
-
-      // Do transform of imaginary part
-      this->mTmpIn = physVal.imag();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
-   }
-
-   template <Arithmetics::Id TOperation> void ShellChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ShellChebyshevFftwTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative of real part
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
+      // Compute remaining modes
+      for(; i >= 0; --i)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
-
-      // Compute simple projection of real part
-      } else
-      {
-         // Copy values into simple matrix
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         rDealiased.row(i) = scaleA*chebVal.row(i+2) - scaleB*rDealiased.row(i+1) - scaleC*rDealiased.row(i+2) - scaleB*rDealiased.row(i+3) - scaleB*rDealiased.row(i+4);
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform of real part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.real() = this->mTmpOut;
-
-      // Compute first derivative of imaginary part
-      if(projector == ShellChebyshevFftwTransform::ProjectorType::DIFF)
-      {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
-
-      // Compute simple projection of imaginary part
-      } else
-      {
-         // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
-      }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform of imaginary part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.imag() = this->mTmpOut;
    }
 
 }

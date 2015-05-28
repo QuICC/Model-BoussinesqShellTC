@@ -80,11 +80,21 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << energy(0) << "\t" << energy(1) << "\t" << energy(2) << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << energy(0) << "\t" << energy(1) << "\t" << energy(2) << std::endl;
       }
 
       // Close file
       this->postWrite();
+
+      // Abort if kinetic energy is NaN
+      if(std::isnan(energy))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Kinetic energy is NaN!");
+      }
    }
 
 }

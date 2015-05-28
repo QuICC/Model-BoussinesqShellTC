@@ -9,6 +9,7 @@
 
 // Configuration includes
 //
+#include "Framework/FrameworkMacro.h"
 #include "SmartPointers/SharedPtrMacro.h"
 
 // System includes
@@ -63,6 +64,11 @@ namespace Solver {
           * @brief Update solver
           */
          void updateSolver();
+
+         /**
+          * @brief Set solver RHS data to zero
+          */
+         void zeroSolver();
 
          /**
           * @brief Solve linear systems
@@ -158,8 +164,27 @@ namespace Solver {
       // Solve other modes
       for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
       {
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i);
+         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+
          //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
          internal::solveWrapper(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
+
+         // Stop simulation if solve failed
+         if(this->mSolver.at(i+start)->info() != Eigen::Success)
+         {
+            throw Exception("Sparse directo solve failed!");
+         }
+      }
+   }
+
+   template <typename TOperator,typename TData> void SparseLinearSolver<TOperator,TData>::zeroSolver()
+   {
+      // Set solver RHS to zero
+      for(int i = 0; i < this->mRHSData.size(); ++i)
+      {
+         this->mRHSData.at(i).setZero();
       }
    }
 
@@ -167,9 +192,16 @@ namespace Solver {
    {
       // Initialise solver
       this->mSolver.reserve(this->mLHSMatrix.size());
+
       for(size_t i = 0; i < this->mLHSMatrix.size(); i++)
       {
-         SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
+         #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+            FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem());
+
+            SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type(FrameworkMacro::getSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem())));
+         #else
+            SharedPtrMacro<typename SparseSelector<TOperator>::Type >  solver(new typename SparseSelector<TOperator>::Type());
+         #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
 
          this->mSolver.push_back(solver);
       }
@@ -185,13 +217,20 @@ namespace Solver {
       {
          if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
          {
+            #if defined GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+               FrameworkMacro::syncSubComm(FrameworkMacro::SPECTRAL, i % this->nSystem());
+            #endif //define GEOMHDISCC_MPI && defined GEOMHDISCC_MPISPSOLVE
+
             // Safety assert to make sur matrix is compressed
             assert(this->mLHSMatrix.at(i).isCompressed());
 
             this->mSolver.at(i)->compute(this->mLHSMatrix.at(i));
 
-            // Safety assert for successful factorisation
-            assert(this->mSolver.at(i)->info() == Eigen::Success);
+            // Stop simulation if factorization failed
+            if(this->mSolver.at(i)->info() != Eigen::Success)
+            {
+               throw Exception("Matrix factorization failed!");
+            }
          }
       }
    }

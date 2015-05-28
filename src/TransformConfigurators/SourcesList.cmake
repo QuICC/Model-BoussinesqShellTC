@@ -1,28 +1,32 @@
 set(MHDSources
    BackwardConfigurator.cpp
    ForwardConfigurator.cpp
-   BackwardSerialConfigurator.cpp
-   ForwardSerialConfigurator.cpp
+   ProjectorBranch.cpp
+   ProjectorTree.cpp
+   ProjectorTreeTools.cpp
+   IntegratorBranch.cpp
+   IntegratorTree.cpp
+   IntegratorTreeTools.cpp
 )
 
-# Add in the MPI based configuration if required
-if(GEOMHDISCC_MPI)
-   if(GEOMHDISCC_MPIALGO STREQUAL "Single1D" OR GEOMHDISCC_MPIALGO STREQUAL "Fixed")
-      list(APPEND MHDSources
-         BackwardSingle1DConfigurator.cpp
-         ForwardSingle1DConfigurator.cpp
+if(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")
+   list(APPEND MHDSources
+      CartesianTransformSteps.cpp
       )
-   endif(GEOMHDISCC_MPIALGO STREQUAL "Single1D" OR GEOMHDISCC_MPIALGO STREQUAL "Fixed")
-   if(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
-      list(APPEND MHDSources
-         BackwardSingle2DConfigurator.cpp
-         ForwardSingle2DConfigurator.cpp
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "AFT")
+   list(APPEND MHDSources
+      AnnulusTransformSteps.cpp
       )
-   endif(GEOMHDISCC_MPIALGO STREQUAL "Single2D")
-   if(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
-      list(APPEND MHDSources
-         BackwardTubularConfigurator.cpp
-         ForwardTubularConfigurator.cpp
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "CFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WFT")
+   list(APPEND MHDSources
+      CylinderTransformSteps.cpp
       )
-   endif(GEOMHDISCC_MPIALGO STREQUAL "Tubular")
-endif(GEOMHDISCC_MPI)
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFL" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "SLFM")
+   list(APPEND MHDSources
+      ShellTransformSteps.cpp
+      )
+elseif(GEOMHDISCC_SPATIALSCHEME STREQUAL "BLF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "WFL")
+   list(APPEND MHDSources
+      SphereTransformSteps.cpp
+      )
+endif(GEOMHDISCC_SPATIALSCHEME STREQUAL "TTT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFT" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "TFF" OR GEOMHDISCC_SPATIALSCHEME STREQUAL "FFF")

@@ -50,6 +50,11 @@ namespace GeoMHDiSCC {
       // Nothing to be done in serial framework
    }
 
+   void SerialFramework::syncSubComm(const SerialFramework::SubCommId id)
+   {
+      // Nothing to be done in serial framework
+   }
+
    void SerialFramework::finalize()
    {
       // Nothing to be done in serial framework

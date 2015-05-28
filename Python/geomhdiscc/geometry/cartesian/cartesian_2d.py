@@ -304,3 +304,9 @@ def sid(nx, nz, sx, sz, bc, coeff = 1.0, restriction = None):
     bcx, bcz = convert_bc(bc)
     mat = coeff*utils.restricted_kron_2d(c1d.sid(nz,sz,bcz), c1d.sid(nx,sx,bcx), restriction = restriction)
     return c2dbc.constrain(mat, nx, nz, sx, sz, bc, restriction = restriction)
+
+def surfaceAvg(nx, nz):
+    """Compute a surface average"""
+
+    mat = c1d.avg(nz)*spsp.kron(c1d.qid(nz,0,c1d.c1dbc.no_bc()), c1d.avg(nx))
+    return mat

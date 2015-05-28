@@ -43,9 +43,9 @@ namespace IoVariable {
 
    void NusseltBeta3DQGPerWriter::init()
    {
-      NusseltBeta3DQGPerWriter::scalar_iterator_range sRange = this->scalarRange();
+      scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 2);
-      NusseltBeta3DQGPerWriter::scalar_iterator sit = sRange.first;
+      scalar_iterator sit = sRange.first;
 
       // Initialise python wrapper
       PythonWrapper::init();
@@ -63,7 +63,7 @@ namespace IoVariable {
       PythonWrapper::setFunction("avg");
       pValue = PythonWrapper::callFunction(pArgs);
 
-      // Fill matrix and clenup
+      // Fill matrix and cleanup
       PythonWrapper::fillMatrix(this->mNusseltOp, pValue);
       Py_DECREF(pValue);
       PythonWrapper::finalize();
@@ -136,11 +136,21 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << 1.0 - nusselt(0) << "\t" << nusselt(1) << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << 1.0 - nusselt(0) << "\t" << nusselt(1) << std::endl;
       }
 
       // Close file
       this->postWrite();
+
+      // Abort if Nusselt number is NaN
+      if(std::isnan(nusselt(0)) || std::isnan(nusselt(1)))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Nusselt number is NaN!");
+      }
    }
 
 }

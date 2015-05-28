@@ -85,9 +85,24 @@ namespace IoVariable {
             this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).phys().data());
          }
 
+         if(vit->second->dom(0).hasGrad())
+         {
+            std::vector<FieldComponents::Spectral::Id> fId;
+            fId.push_back(FieldComponents::Spectral::ONE);
+            fId.push_back(FieldComponents::Spectral::TWO);
+            fId.push_back(FieldComponents::Spectral::THREE);
+            for(unsigned int i = 0; i < fId.size(); i ++)
+            {
+               if(fId.at(i) != FieldComponents::Spectral::NOTUSED)
+               {
+                  this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first)+"_grad_"+IoTools::IdToHuman::toTag(fId.at(i)), vit->second->dom(0).grad(fId.at(i)).data());
+               }
+            }
+         }
+
          if(vit->second->dom(0).hasCurl())
          {
-            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first), vit->second->dom(0).curl().data());
+            this->writePhysicalVector(IoTools::IdToHuman::toTag(vit->first)+"_curl", vit->second->dom(0).curl().data());
          }
       }
 
@@ -99,9 +114,16 @@ namespace IoVariable {
    {
       // Create the Physical parameters group
       hid_t group = H5Gcreate(this->file(), VisualizationFileTags::MESH.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      std::vector<FieldComponents::Physical::Id> gridId;
+      gridId.push_back(FieldComponents::Physical::ONE);
+      gridId.push_back(FieldComponents::Physical::TWO);
+      gridId.push_back(FieldComponents::Physical::THREE);
       for(int i = 0; i < this->mspRes->cpu()->nDim(); i ++)
       {
-         this->writeArray(group, VisualizationFileTags::GRID+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), this->mMesh.at(i));
+         if(gridId.at(i) != FieldComponents::Physical::NOTUSED)
+         {
+            this->writeArray(group, VisualizationFileTags::GRID+"_"+IoTools::IdToHuman::toTag(gridId.at(i)), this->mMesh.at(i));
+         }
       }
       
       // close group
@@ -123,7 +145,7 @@ namespace IoVariable {
       H5Gclose(group);
    }
 
-   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::vector<Datatypes::PhysicalScalarType>& vector)
+   void VisualizationFileWriter::writePhysicalVector(const std::string& name, const std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>& vector)
    {
       // Create the Magnetic Field group
       hid_t group = H5Gcreate(this->file(), name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -131,13 +153,14 @@ namespace IoVariable {
       // Storage for the field information
       std::vector<std::tr1::tuple<int,int, const Datatypes::PhysicalScalarType::PointType *> > fieldInfo;
 
-      for(size_t i = 0; i < vector.size(); i++)
+      std::map<FieldComponents::Physical::Id,Datatypes::PhysicalScalarType>::const_iterator it;
+      for(it = vector.begin(); it != vector.end(); ++it)
       {
          // create component field information
-         fieldInfo = Datatypes::FieldTools::createInfo(vector.at(i));
+         fieldInfo = Datatypes::FieldTools::createInfo(it->second);
 
          // Write the vector field
-         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(static_cast<FieldComponents::Physical::Id>(i)), fieldInfo);
+         this->writeRegularField(group, name+"_"+IoTools::IdToHuman::toTag(it->first), fieldInfo);
       }
       
       // close group

@@ -32,10 +32,12 @@ namespace GeoMHDiSCC {
       enum Id {
          /// Set new value
          SET,
+         /// Set new negative value
+         SETNEG,
          /// Add to value
          ADD,
          /// Substract from value
-         SUB
+         SUB,
       };
    };
 }

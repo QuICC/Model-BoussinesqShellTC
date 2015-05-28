@@ -3,7 +3,7 @@
  * @brief This defines the backward transform first exchange single splitting operations
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
-#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
+#if defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D
 
 #ifndef BACKWARDSINGLE1DCONFIGURATOR_HPP
 #define BACKWARDSINGLE1DCONFIGURATOR_HPP
@@ -41,35 +41,35 @@ namespace Transform {
          /**
           * @brief Compute the first step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void firstStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the second step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void secondStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the last step in the backward transform
           *
-          * @param name       Name of the field
+          * @param tree       Transform projector tree
           * @param rVariable  Variable corresponding to the name
           * @param coord      Transform coordinator
           *
           * \tparam TVariable Type of the physical variable
           */
-         template <typename TVariable> static void lastStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord);
+         template <typename TVariable> static void lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Setup first exchange communication
@@ -93,102 +93,6 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Compute the first step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward (gradient) transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the first step of the backward (curl) transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void firstPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward (gradient) transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the second step of the backward (curl) transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void secondPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysical(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward (gradient) transform for a scalar variable
-          *
-          * @param rScalar Scalar variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalDiff(Datatypes::ScalarVariableType& rScalar, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysical(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Compute the last step of the backward (curl) transform for a vector variable
-          *
-          * @param rVector Vector variable
-          * @param coord   Transform coordinator
-          */
-         static void lastPhysicalDiff(Datatypes::VectorVariableType& rVector, TransformCoordinatorType& coord);
-
-         /**
           * @brief Empty constructor
           */
          BackwardSingle1DConfigurator(){};
@@ -201,43 +105,73 @@ namespace Transform {
       private:
    };
 
-   template <typename TVariable> void BackwardSingle1DConfigurator::firstStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSingle1DConfigurator::firstStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Compute physical projection if required
-      if(coord.needPhysical(name))
-      {
-         BackwardSingle1DConfigurator::firstPhysical(rVariable, coord);
-      }
+      // Iterators for the three transforms
+      ProjectorTree::Projector1DEdge_iterator it1D;
 
-      // Compute physical differential projection (gradient or curl) if required
-      if(coord.needPhysicalDiff(name))
+      // Ranges for the vector of edges for the three transforms
+      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
+
+      // Prepare required spectral data
+      BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
+
+      // Loop over first transform
+      int hold1D = std::distance(range1D.first, range1D.second) - 1;
+      for(it1D = range1D.first; it1D != range1D.second; ++it1D, --hold1D)
       {
-         BackwardSingle1DConfigurator::firstPhysicalDiff(rVariable, coord);
+         // Compute first transform
+         BackwardConfigurator::project1D(*it1D, coord, hold1D);
       }
    }
 
-   template <typename TVariable> void BackwardSingle1DConfigurator::secondStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSingle1DConfigurator::secondStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
    }
 
-   template <typename TVariable> void BackwardSingle1DConfigurator::lastStep(PhysicalNames::Id name, TVariable& rVariable, TransformCoordinatorType& coord)
+   template <typename TVariable> void BackwardSingle1DConfigurator::lastStep(const ProjectorTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      // Compute physical projection if required
-      if(coord.needPhysical(name))
-      {
-         BackwardSingle1DConfigurator::lastPhysical(rVariable, coord);
-      }
+      // Iterators for the three transforms
+      ProjectorTree::Projector1DEdge_iterator it1D;
+      ProjectorTree::Projector2DEdge_iterator it2D;
+      ProjectorTree::Projector3DEdge_iterator it3D;
 
-      // Compute physical differential projection (gradient or curl) if required
-      if(coord.needPhysicalDiff(name))
+      // Ranges for the vector of edges for the three transforms
+      ProjectorTree::Projector1DEdge_range range1D = tree.edgeRange();
+      ProjectorTree::Projector2DEdge_range range2D;
+      ProjectorTree::Projector3DEdge_range range3D;
+
+      // Loop over first transform
+      for(it1D = range1D.first; it1D != range1D.second; ++it1D)
       {
-         BackwardSingle1DConfigurator::lastPhysicalDiff(rVariable, coord);
+         range2D = it1D->edgeRange();
+         int recover2D = 0;
+         int hold2D = std::distance(range2D.first, range2D.second) - 1;
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D, ++recover2D, --hold2D)
+         {
+            // Compute second transform
+            BackwardConfigurator::project2D(*it2D, coord, recover2D, hold2D);
+
+            range3D = it2D->edgeRange();
+            int recover3D = 0;
+            int hold3D = std::distance(range3D.first, range3D.second) - 1;
+            for(it3D = range3D.first; it3D != range3D.second; ++it3D, ++recover3D, --hold3D)
+            {
+               // Prepare physical output data
+               BackwardConfigurator::preparePhysical(tree, *it3D, rVariable, coord);
+
+               // Compute third transform
+               BackwardConfigurator::project3D(*it3D, coord, recover3D, hold3D);
+            }
+         }
       }
    }
 
    inline void BackwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs);
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::BACKWARD);
+
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareBackwardReceive();
    }
 
    inline void BackwardSingle1DConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
@@ -246,7 +180,7 @@ namespace Transform {
 
    inline void BackwardSingle1DConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardCommunication();
+      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
    }
 
    inline void BackwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
@@ -258,4 +192,4 @@ namespace Transform {
 
 #endif // BACKWARDSINGLE1DCONFIGURATOR_HPP
 
-#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_FIXED
+#endif //defined GEOMHDISCC_MPIALGO_SINGLE1D  || defined GEOMHDISCC_MPIALGO_COUPLED2D

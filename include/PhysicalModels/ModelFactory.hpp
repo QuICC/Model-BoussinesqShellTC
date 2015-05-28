@@ -13,6 +13,7 @@
 
 // Configuration includes
 //
+#include "Framework/FrameworkMacro.h"
 
 // System includes
 //

@@ -29,10 +29,10 @@ namespace GeoMHDiSCC {
    namespace Datatypes {
 
       /// Typedef for a ScalarVariable
-      typedef Variable<ScalarVariable<SpectralScalarType,2,PhysicalScalarType,3>, 1> ScalarVariableType;
+      typedef Variable<ScalarVariable<SpectralScalarType,PhysicalScalarType>, 1> ScalarVariableType;
 
       /// Typedef for a VectorVariable
-      typedef Variable<VectorVariable<SpectralScalarType,2,PhysicalScalarType,3>, 1> VectorVariableType;
+      typedef Variable<VectorVariable<SpectralScalarType,PhysicalScalarType>, 1> VectorVariableType;
 
       /// Typedef for a shared ScalarVariable
       typedef SharedPtrMacro<ScalarVariableType>  SharedScalarVariableType;

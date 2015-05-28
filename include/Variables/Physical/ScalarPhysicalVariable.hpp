@@ -31,7 +31,7 @@ namespace Datatypes {
    /**
     * @brief Base of the implementation of the physical components of a scalar variable
     */
-   template <typename TScalar, int COMPONENTS> class ScalarPhysicalVariable : public VariableBase
+   template <typename TScalar> class ScalarPhysicalVariable : public VariableBase
    {
       public:
          /**
@@ -62,12 +62,12 @@ namespace Datatypes {
          /**
           * @brief Get the physical gradient values
           */
-         const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   grad() const;
+         const VectorField<TScalar,FieldComponents::Physical::Id>&   grad() const;
 
          /**
           * @brief Set the physical gradient values
           */
-         VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&   rGrad();
+         VectorField<TScalar,FieldComponents::Physical::Id>&   rGrad();
 
          /**
           * @brief Initialise to zero
@@ -77,12 +77,12 @@ namespace Datatypes {
          /**
           * @brief Initialise the physical values storage
           */
-         void initPhysical();
+         void initPhysical(const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Initialise the physical gradient storage
           */
-         void initPhysicalDiff();
+         void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
 
          /**
           * @brief Check if variable has physical data setup
@@ -112,20 +112,20 @@ namespace Datatypes {
          /**
           * @brief Smart pointer for the physical gradient values
           */
-         SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> > mspGrad;
+         SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> > mspGrad;
    };
 
-   template <typename TScalar, int COMPONENTS> inline bool ScalarPhysicalVariable<TScalar,COMPONENTS>::hasPhys() const
+   template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasPhys() const
    {
       return this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline bool ScalarPhysicalVariable<TScalar,COMPONENTS>::hasGrad() const
+   template <typename TScalar> inline bool ScalarPhysicalVariable<TScalar>::hasGrad() const
    {
       return this->mspGrad;
    }
 
-   template <typename TScalar, int COMPONENTS> inline const TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::phys() const
+   template <typename TScalar> inline const TScalar&  ScalarPhysicalVariable<TScalar>::phys() const
    {
       // Safety assertion
       assert(this->mspPhys);
@@ -133,7 +133,7 @@ namespace Datatypes {
       return *this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline TScalar&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rPhys()
+   template <typename TScalar> inline TScalar&  ScalarPhysicalVariable<TScalar>::rPhys()
    {
       // Safety assertion
       assert(this->mspPhys);
@@ -141,7 +141,7 @@ namespace Datatypes {
       return *this->mspPhys;
    }
 
-   template <typename TScalar, int COMPONENTS> inline const VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::grad() const
+   template <typename TScalar> inline const VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::grad() const
    {
       // Safety assertion
       assert(this->mspGrad);
@@ -149,7 +149,7 @@ namespace Datatypes {
       return *this->mspGrad;
    }
 
-   template <typename TScalar, int COMPONENTS> inline VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar,COMPONENTS>::rGrad()
+   template <typename TScalar> inline VectorField<TScalar,FieldComponents::Physical::Id>&  ScalarPhysicalVariable<TScalar>::rGrad()
    {
       // Safety assertion
       assert(this->mspGrad);
@@ -157,16 +157,16 @@ namespace Datatypes {
       return *this->mspGrad;
    }
 
-   template <typename TScalar, int COMPONENTS> ScalarPhysicalVariable<TScalar,COMPONENTS>::ScalarPhysicalVariable(SharedResolution spRes)
+   template <typename TScalar> ScalarPhysicalVariable<TScalar>::ScalarPhysicalVariable(SharedResolution spRes)
       : VariableBase(spRes)
    {
    }
 
-   template <typename TScalar, int COMPONENTS> ScalarPhysicalVariable<TScalar,COMPONENTS>::~ScalarPhysicalVariable()
+   template <typename TScalar> ScalarPhysicalVariable<TScalar>::~ScalarPhysicalVariable()
    {
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::setZeros()
+   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::setZeros()
    {
       // Initialise physical values to zero if required
       if(this->mspPhys)
@@ -181,18 +181,25 @@ namespace Datatypes {
       }
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysical()
+   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysical(const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
+      // Safety assert
+      assert(! this->mspPhys);
+
       this->mspPhys = SharedPtrMacro<TScalar>(new TScalar(this->spRes()->spPhysicalSetup()));
    }
 
-   template <typename TScalar, int COMPONENTS> void ScalarPhysicalVariable<TScalar,COMPONENTS>::initPhysicalDiff()
+   template <typename TScalar> void ScalarPhysicalVariable<TScalar>::initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
-      this->mspGrad = SharedPtrMacro<VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id> >(new VectorField<TScalar,COMPONENTS,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup()));
+      // Safety assert
+      assert(! this->mspGrad);
+      assert(id == FieldComponents::Spectral::SCALAR);
+
+      this->mspGrad = SharedPtrMacro<VectorField<TScalar,FieldComponents::Physical::Id> >(new VectorField<TScalar,FieldComponents::Physical::Id>(this->spRes()->spPhysicalSetup(), comps));
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TScalar, int COMPONENTS> MHDFloat ScalarPhysicalVariable<TScalar,COMPONENTS>::requiredStorage() const
+   template <typename TScalar> MHDFloat ScalarPhysicalVariable<TScalar>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

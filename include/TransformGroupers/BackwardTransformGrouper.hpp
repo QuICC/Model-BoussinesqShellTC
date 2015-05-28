@@ -55,16 +55,16 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo);
+         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the number of required packs for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo);
+         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree);
 
       protected:
          /**
@@ -112,24 +112,30 @@ namespace Transform {
       //
       // Compute first step of backward transform
       //
-
-      // First treat the scalar variables
       std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>::iterator scalIt;
-      for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
-      {
-         // Compute first step of transform for scalar fields
-         TConfigurator::firstStep(scalIt->first, *(scalIt->second), coord);
-      }
-
-      // .. then the vector variables
       std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>::iterator vectIt;
-      for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
+      std::vector<Transform::ProjectorTree>::const_iterator it;
+      for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
-         // Compute first step of transform for vector fields
-         TConfigurator::firstStep(vectIt->first, *(vectIt->second), coord);
+         // Transform scalar variable
+         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         {
+            scalIt = scalars.find(it->name());
+
+            // Compute first step of transform for scalar fields
+            TConfigurator::firstStep(*it, *(scalIt->second), coord);
+
+         // Transform vector variable
+         } else
+         {
+            vectIt = vectors.find(it->name());
+
+            // Compute first step of transform for vector fields
+            TConfigurator::firstStep(*it, *(vectIt->second), coord);
+         }
       }
 
-      // Initiate the grouped first exchnage communication
+      // Initiate the grouped first exchange communication
       TConfigurator::initiate1DCommunication(coord);
 
       // Setup the grouped second exchange communication
@@ -138,19 +144,27 @@ namespace Transform {
       //
       // Compute intermediate step
       //
-
-      // First treat the scalar variables
-      for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
+      for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
-         // Compute first step of transform for scalar fields
-         TConfigurator::secondStep(scalIt->first, *(scalIt->second), coord);
-      }
+         // Transform scalar variable
+         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         {
+            scalIt = scalars.find(it->name());
 
-      // .. then the vector variables
-      for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
-      {
-         // Compute second step of transform for vector fields
-         TConfigurator::secondStep(vectIt->first, *(vectIt->second), coord);
+            // Sychronize 
+            FrameworkMacro::synchronize();
+
+            // Compute second step of transform for scalar fields
+            TConfigurator::secondStep(*it, *(scalIt->second), coord);
+
+         // Transform vector variable
+         } else
+         {
+            vectIt = vectors.find(it->name());
+
+            // Compute second step of transform for vector fields
+            TConfigurator::secondStep(*it, *(vectIt->second), coord);
+         }
       }
 
       // Initiate the grouped second exchange communication
@@ -159,19 +173,24 @@ namespace Transform {
       //
       // Compute last step
       //
-
-      // First treat the scalar variables
-      for(scalIt = scalars.begin(); scalIt != scalars.end(); scalIt++)
+      for(it = coord.projectorTree().begin(); it != coord.projectorTree().end(); ++it)
       {
-         // Compute last step of transform for scalar fields
-         TConfigurator::lastStep(scalIt->first, *(scalIt->second), coord);
-      }
+         // Transform scalar variable
+         if(it->comp() == FieldComponents::Spectral::SCALAR)
+         {
+            scalIt = scalars.find(it->name());
 
-      // .. then the vector variables
-      for(vectIt = vectors.begin(); vectIt != vectors.end(); vectIt++)
-      {
-         // Compute last step of transform for vector fields
-         TConfigurator::lastStep(vectIt->first, *(vectIt->second), coord);
+            // Compute last step of transform for scalar fields
+            TConfigurator::lastStep(*it, *(scalIt->second), coord);
+
+         // Transform vector variable
+         } else
+         {
+            vectIt = vectors.find(it->name());
+
+            // Compute last step of transform for vector fields
+            TConfigurator::lastStep(*it, *(vectIt->second), coord);
+         }
       }
    }
 
@@ -191,10 +210,10 @@ namespace Transform {
       }
    }
 
-   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs1D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs1D(const std::vector<ProjectorTree>& projectorTree)
    {
       // Get size of grouped communication
-      ArrayI packs = this->groupPacks1D(varInfo);
+      ArrayI packs = this->groupPacks1D(projectorTree);
 
       // Store the number of grouped packs
       this->mGroupedPacks1D = packs(0);
@@ -202,10 +221,10 @@ namespace Transform {
       return packs;
    }
 
-   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs2D(const VariableRequirement& varInfo)
+   template <typename TConfigurator> ArrayI BackwardTransformGrouper<TConfigurator>::packs2D(const std::vector<ProjectorTree>& projectorTree)
    {
       // Get size of grouped communication
-      ArrayI packs = this->groupPacks2D(varInfo);
+      ArrayI packs = this->groupPacks2D(projectorTree);
 
       // Store the number of grouped packs
       this->mGroupedPacks2D = packs(0);

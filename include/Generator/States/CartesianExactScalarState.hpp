@@ -22,6 +22,7 @@
 #include "Base/Typedefs.hpp"
 #include "TypeSelectors/ScalarSelector.hpp"
 #include "Equations/IScalarEquation.hpp"
+#include "Generator/States/CartesianExactStateIds.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -33,43 +34,6 @@ namespace Equations {
    class CartesianExactScalarState: public IScalarEquation
    {
       public:
-         /// Polynomial approximation to Cosine
-         static const MHDFloat PCOS = 99999;
-
-         /// Polynomial approximation to Sine
-         static const MHDFloat PSIN = -99999;
-
-         /**
-          * @brief Enums for the avaialable exact states
-          */
-         enum StateTypeId {
-            // Special states
-            CONSTANT = 0,  // All constant
-            // TTT states
-            POLYPOLYPOLY = 10,  // Polynomial, Polynomial, Polynomial
-            // TFT states
-            POLYCOSPOLY = 20, // Polynomial, Cosine, Polynomial
-            POLYSINPOLY,      // Polynomial, Sine, Polynomial
-            // TFF states
-            POLYCOSCOS = 30,  // Polynomial, Cosine, Cosine
-            POLYSINSIN,       // Polynomial, Sine, Sine
-            POLYSINCOS,       // Polynomial, Sine, Cosine
-            POLYCOSSIN,       // Polynomial, Cosine, Sine
-            // FFF states
-            COSCOSCOS = 50,   // Cosine, Cosine, Cosine
-            SINSINSIN,        // Sine, Sine, Sine
-            COSCOSSIN,        // Cosine, Cosine, Sine
-            SINSINCOS,        // Sine, Sine, Cosine
-            COSSINSIN,        // Cosine, Sine, Sine
-            SINCOSCOS,        // Sine, Cosine, Cosine
-            COSSINCOS,        // Cosine, Sine, Cosine
-            SINCOSSIN,        // Sine, Cosine, Sine
-            // Special
-            SPECIAL1 = 1000,  // Kind of a place holder for tests
-            SPECIAL2,         // Kind of a place holder for tests
-            SPECIAL3,         // Kind of a place holder for tests
-         };
-
          /**
           * @brief Simple constructor
           *
@@ -108,7 +72,7 @@ namespace Equations {
          /**
           * @brief Set the state type id
           */
-         void setStateType(const CartesianExactScalarState::StateTypeId id);
+         void setStateType(const CartesianExactStateIds::Id id);
 
          /**
           * @brief Set the options for the solution states
@@ -135,24 +99,9 @@ namespace Equations {
 
       private:
          /**
-          * @brief Compute even periodic mode
-          */
-         MHDFloat cos(const int idx, const MHDFloat theta) const;
-
-         /**
-          * @brief Compute odd periodic mode
-          */
-         MHDFloat sin(const int idx, const MHDFloat theta) const;
-
-         /**
-          * @brief Compute polynomial mode
-          */
-         MHDFloat poly(const int idx, const MHDFloat x) const;
-
-         /**
           * @brief Type of the state to generate
           */
-         StateTypeId mTypeId;
+         CartesianExactStateIds::Id mTypeId;
 
          /**
           * @brief Amplitude of the state

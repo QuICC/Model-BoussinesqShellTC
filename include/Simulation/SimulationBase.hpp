@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Timers/StageTimer.hpp"
 #include "Timers/ExecutionTimer.hpp"
 #include "Simulation/SimulationRunControl.hpp"
 #include "Simulation/SimulationIoControl.hpp"
@@ -34,6 +35,7 @@
 #include "TypeSelectors/ParallelSelector.hpp"
 #include "TransformGroupers/IForwardGrouper.hpp"
 #include "TransformGroupers/IBackwardGrouper.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 #include "LoadSplitter/LoadSplitter.hpp"
 #include "IoConfig/ConfigParts/PhysicalPart.hpp"
 #include "IoConfig/ConfigParts/BoundaryPart.hpp"
@@ -181,6 +183,16 @@ namespace GeoMHDiSCC {
          void computeNonlinear();
 
          /**
+          * @brief Explicit linear the trivial equations
+          */
+         void explicitTrivialEquations(const ModelOperator::Id opId);
+
+         /**
+          * @brief Explicit linear for the diagnostic equations
+          */
+         void explicitDiagnosticEquations(const ModelOperator::Id opId);
+
+         /**
           * @brief Solve the trivial equations
           */
          void solveTrivialEquations(const SolveTiming::Id time);
@@ -295,6 +307,11 @@ namespace GeoMHDiSCC {
           */
          Diagnostics::DiagnosticCoordinator  mDiagnostics;
 
+         /**
+          * @brief Flag for forward transform
+          */
+         bool mForwardIsNonlinear;
+
       private:
          /**
           * @brief Add addition configuration file parts
@@ -326,10 +343,10 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise the transform coordinator
           *
-          * @param varInfo Global variable requirements
-          * @param nonInfo Global nonlinear requirements
+          * @param integratorTree   Transform integrator tree
+          * @param projectorTree    Transform projector tree
           */
-         void initTransformCoordinator(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         void initTransformCoordinator(const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
 
          /**
           * @brief Initialise the equations (generate operators, etc)
@@ -363,6 +380,9 @@ namespace GeoMHDiSCC {
 
    template <typename TScheme> void SimulationBase::initResolution()
    {
+      StageTimer stage;
+      stage.start("optimizing load distribution");
+
       // Create the load splitter
       Parallel::LoadSplitter splitter(FrameworkMacro::id(), FrameworkMacro::nCpu());
 
@@ -375,6 +395,9 @@ namespace GeoMHDiSCC {
       // Initialise the load splitter
       splitter.init<TScheme>(dim);
 
+      stage.done();
+      stage.start("extracting communication structure");
+
       // Get best splitting resolution object
       std::pair<SharedResolution, Parallel::SplittingDescription>  best = splitter.bestSplitting();
 
@@ -382,7 +405,9 @@ namespace GeoMHDiSCC {
       this->mspRes = best.first;
 
       // Set additional options on final resolution object
-      TScheme::tuneResolution(this->mspRes);
+      TScheme::tuneResolution(this->mspRes, best.second);
+
+      stage.done();
 
       // Extract box scale from configuration file
       Array box = this->mSimIoCtrl.configBoxScale();
@@ -390,8 +415,12 @@ namespace GeoMHDiSCC {
       // Set the box scale
       this->mspRes->setBoxScale(box);
 
+      stage.start("intializing transform grouper");
+
       // Initialise the transform grouper
       Parallel::setGrouper(best.second, this->mspFwdGrouper, this->mspBwdGrouper);
+
+      stage.done();
    }
 
    template <typename TModel> SharedSimulationBoundary SimulationBase::createBoundary()

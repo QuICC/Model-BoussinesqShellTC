@@ -44,17 +44,17 @@ namespace GeoMHDiSCC {
       {
          Equations::SharedTestLinearScalar   spLin;
 
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYX);
-
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYY);
-
-         // Add scalar test equation
-         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
-         spLin->setIdentity(PhysicalNames::VELOCITYZ);
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYX);
+//
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYY);
+//
+//         // Add scalar test equation
+//         spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
+//         spLin->setIdentity(PhysicalNames::VELOCITYZ);
 
          // Add scalar test equation
          spLin = spSim->addScalarEquation<Equations::TestLinearScalar>();
@@ -63,17 +63,17 @@ namespace GeoMHDiSCC {
       {
          Equations::SharedTestNonlinearScalar   spNL;
 
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYX);
-
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYY);
-
-         // Add scalar test equation
-         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
-         spNL->setIdentity(PhysicalNames::VELOCITYZ);
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYX);
+//
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYY);
+//
+//         // Add scalar test equation
+//         spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
+//         spNL->setIdentity(PhysicalNames::VELOCITYZ);
 
          // Add scalar test equation
          spNL = spSim->addScalarEquation<Equations::TestNonlinearScalar>();
@@ -92,25 +92,25 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINCOS);
          spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, 1e0, 1.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINCOS);
          spExact->setModeOptions(-1e0, 1.0, -2e0, 1.0, 1e1, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINCOS);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINCOS);
          spExact->setModeOptions(1e1, 2.0, 5e0, 2.0, 2e1, 1.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINSIN);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINSIN);
          spExact->setModeOptions(-1e2, 10.0, 3e0, 10.0, -3e1, 10.0);
 
       // Generate random spectrum

@@ -10,10 +10,10 @@
 
 // Debug includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // Configuration includes
 //
-#include "Debug/DebuggerMacro.h"
 #include "Profiler/ProfilerMacro.h"
 #include "StorageProfiler/StorageProfilerMacro.h"
 #include "Framework/FrameworkMacro.h"
@@ -39,6 +39,7 @@ namespace GeoMHDiSCC {
    StateGenerator::StateGenerator()
       : SimulationBase()
    {
+      this->mForwardIsNonlinear = false;
    }
 
    StateGenerator::~StateGenerator()
@@ -47,22 +48,12 @@ namespace GeoMHDiSCC {
 
    void StateGenerator::preRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("preRun",1);
-
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
-
-      // Debug statement
-      DebuggerMacro_leave("preRun",1);
    }
-
 
    void StateGenerator::mainRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("mainRun",1);
-
       // Compute nonlinear terms
       this->computeNonlinear();
 
@@ -74,16 +65,10 @@ namespace GeoMHDiSCC {
 
       // Synchronise computation nodes
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("mainRun",1);
    }
 
    void StateGenerator::postRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("postRun",1);
-
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
 
@@ -92,16 +77,10 @@ namespace GeoMHDiSCC {
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("postRun",1);
    }
 
    void StateGenerator::tuneOutput()
    {
-      // Debug statement
-      DebuggerMacro_enter("tuneOutput",2);
-
       // Get time and timestep from configuration
       Array tstep = this->mSimIoCtrl.configTimestepping();
 
@@ -121,24 +100,15 @@ namespace GeoMHDiSCC {
       {
          (*fIt)->setSimTime(tstep(0), tstep(1));
       }
-
-      // Debug statement
-      DebuggerMacro_leave("tuneOutput",2);
    }
 
    void StateGenerator::writeOutput()
    {
-      // Debug statement
-      DebuggerMacro_enter("writeOutput",1);
-
       // Write final state file (using store time and timestep)
       this->mSimIoCtrl.writeHdf5(-1, -1);
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("writeOutput",1);
    }
 
 }

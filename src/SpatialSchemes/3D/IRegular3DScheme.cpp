@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "SpatialSchemes/Tools/RegularTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -38,7 +39,7 @@ namespace Schemes {
    {
    }
 
-   void IRegular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, Splitting::Locations::Id flag)
+   int IRegular3DScheme::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
    {
       // Safety assertions for default values
       assert( (id.size() == 0) || (bins.size() > 0) );
@@ -54,246 +55,46 @@ namespace Schemes {
       // Multimap for the modes
       std::multimap<int,int> modes;
 
-      int i0 = -1;
-      int iN = -1;
-      ArrayI j0, jN;
-      int c0 = -1;
-      int cN = -1;
-
       // No splitting
       if(flag == Splitting::Locations::NONE)
       {
-         i0 = 0;
-         iN = this->dim(transId, Dimensions::Data::DAT3D);
-         j0.resize(iN);
-         jN.resize(iN);
-         j0.setConstant(0);
-         jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-         c0 = 0;
-         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+         this->splitSerial(modes, transId);
 
-      // Create index list for first transform
-      } else if(transId == Dimensions::Transform::TRA1D)
+      // Splitting is on first transform
+      } else if(flag == Splitting::Locations::FIRST)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST)
-         {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = n0(0);
-            cN = n0(0) + nN(0);
+         this->splitSingle1D(modes, n0, nN, transId);
 
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(n0(0));
-            jN.setConstant(nN(0));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0 = n0.tail(iN);
-            jN = nN.tail(iN);
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-         // Splitting is on slowest index on first transforms
-         } else if(flag == Splitting::Locations::FIXED)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*iN;
-         }
-
-      // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
+      // Splitting is on second transform
+      } else if(flag == Splitting::Locations::SECOND)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::FIXED)
-         {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(n0(0));
-            jN.setConstant(nN(0));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+         this->splitSingle2D(modes, n0, nN, transId);
 
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(n0(1));
-            jN.setConstant(nN(1));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-         }
-
-      // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
+      // Splitting is on both transforms
+      } else if(flag == Splitting::Locations::BOTH)
       {
-         // Splitting is on first transform
-         if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::FIXED)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+         this->splitTubular(modes, n0, nN, transId);
 
-         // Splitting is on second transform
-         } else if(flag == Splitting::Locations::SECOND)
-         {
-            i0 = 0;
-            iN = this->dim(transId, Dimensions::Data::DAT3D);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0.setConstant(0);
-            jN.setConstant(this->dim(transId, Dimensions::Data::DAT2D));
-            c0 = n0(0);
-            cN = n0(0) + nN(0);
-
-         // Splitting is on both transforms
-         } else if(flag == Splitting::Locations::BOTH)
-         {
-            i0 = n0(0);
-            iN = nN(0);
-            j0.resize(iN);
-            jN.resize(iN);
-            j0 = n0.tail(iN);
-            jN = nN.tail(iN);
-            c0 = 0;
-            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
-         }
+      // Splitting is on slowest index on first transforms
+      } else if(flag == Splitting::Locations::COUPLED2D)
+      {
+         this->splitCoupled2D(modes, n0, nN, transId);
       }
 
-      // Counter
-      int c = 0;
+      // Fill indexes for 2D and 3D
+      RegularTools::fillIndexes2D3D(idx2D, idx3D, modes);
 
-      // Loop over third dimension
-      for(int i = 0; i < iN; i++)
+      // Fill indexes for 1D
+      RegularTools::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+
+      // Set status (0 for success, 1 for failure)
+      int status = 0;
+      if(modes.size() == 0)
       {
-         // Loop over second dimension
-         for(int j = 0; j < jN(i); j++)
-         {
-            // Check for first mode
-            if(c >= c0)
-            {
-               if(c >= cN)
-               {
-                  break;
-               } else
-               {
-                  modes.insert(std::make_pair(i0 + i,j0(i) + j));
-               }
-            }
-            c++;
-         }
-         if(c >= cN)
-         {
-            break;
-         }
+         status = 1;
       }
 
-      // Multimap iterator
-      std::multimap<int,int>::iterator mapIt;
-
-      // Set to extract the 3D indexes
-      std::set<int>  filter;
-
-      // Loop over all modes
-      for(mapIt = modes.begin(); mapIt != modes.end(); mapIt++)
-      {
-         filter.insert(mapIt->first);
-      }
-
-      // Set third dimension
-      idx3D.resize(filter.size());
-
-      // Make full list of index in third dimension
-      std::set<int>::iterator setIt = filter.begin();
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         idx3D(i) = *setIt;
-         setIt++;
-      }
-
-      // Make full list of indexes for second dimension
-      std::pair<std::multimap<int,int>::iterator, std::multimap<int,int>::iterator> mapRange;
-      for(int i = 0; i < idx3D.size(); i++)
-      {
-         // Create storage for indexes
-         idx2D.push_back(ArrayI(modes.count(idx3D(i))));
-
-         // Get range
-         mapRange = modes.equal_range(idx3D(i));
-
-         // Loop over range
-         int j = 0;
-         for(mapIt = mapRange.first; mapIt != mapRange.second; mapIt++)
-         {
-            idx2D.at(i)(j) = mapIt->second;
-            j++;
-         }
-      }
-
-      // Make full list of indexes for first dimension
-      for(int i = 0; i < this->dim(transId, Dimensions::Data::DAT3D); i++)
-      {
-         // Create storage for indexes
-         fwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATF1D)));
-
-         // Fill array with indexes
-         for(int j = 0; j < fwd1D.at(i).size(); j++)
-         {
-            fwd1D.at(i)(j) = j;
-         }
-
-         // Create storage for indexes
-         bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D)));
-
-         // Fill array with indexes
-         for(int j = 0; j < bwd1D.at(i).size(); j++)
-         {
-            bwd1D.at(i)(j) = j;
-         }
-      }
+      return status;
    }
 
    int IRegular3DScheme::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
@@ -354,8 +155,8 @@ namespace Schemes {
             return this->dim(transId, Dimensions::Data::DAT2D);
          }
 
-      // Splittable size for FIXEd first transforms splitting
-      } else if(flag == Splitting::Locations::FIXED)
+      // Splittable size for coupled 2d matrices first transforms splitting
+      } else if(flag == Splitting::Locations::COUPLED2D)
       {
          // Get total size for first transform
          if(transId == Dimensions::Transform::TRA1D)
@@ -378,6 +179,191 @@ namespace Schemes {
       throw Exception("Tried to split in a unknown dimension for 3D regular case");
 
       return -1;
+   }
+
+   void IRegular3DScheme::splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId)
+   {
+      int k0 = 0;
+      int kN = this->dim(transId, Dimensions::Data::DAT3D);
+      ArrayI j0 = ArrayI::Zero(kN);
+      ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+      int c0 = 0;
+      int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+   }
+
+   void IRegular3DScheme::splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         k0 = 0;
+         kN = this->dim(transId, Dimensions::Data::DAT3D);
+         j0 = ArrayI::Zero(kN);
+         jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         c0 = n0(0);
+         cN = n0(0) + nN(0);
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         k0 = 0;
+         kN = this->dim(transId, Dimensions::Data::DAT3D);
+         j0 = ArrayI::Constant(kN, n0(0));
+         jN = ArrayI::Constant(kN, nN(0));
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         k0 = n0(0);
+         kN = nN(0);
+         j0 = ArrayI::Zero(kN);
+         jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+      }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+   }
+
+   void IRegular3DScheme::splitSingle2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         k0 = 0;
+         kN = this->dim(transId, Dimensions::Data::DAT3D);
+         j0 = ArrayI::Constant(kN, n0(0));
+         jN = ArrayI::Constant(kN, nN(0));
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         k0 = n0(0);
+         kN = nN(0);
+         j0 = ArrayI::Zero(kN);
+         jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         k0 = 0;
+         kN = this->dim(transId, Dimensions::Data::DAT3D);
+         j0 = ArrayI::Zero(kN);
+         jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+         c0 = n0(0);
+         cN = n0(0) + nN(0);
+      }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+   }
+
+   void IRegular3DScheme::splitCoupled2D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+            k0 = n0(0);
+            kN = nN(0);
+            j0 = ArrayI::Zero(kN);
+            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+            c0 = 0;
+            cN = this->dim(transId, Dimensions::Data::DAT2D)*kN;
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+            k0 = 0;
+            kN = this->dim(transId, Dimensions::Data::DAT3D);
+            j0 = ArrayI::Constant(kN, n0(0));
+            jN = ArrayI::Constant(kN, nN(0));
+            c0 = 0;
+            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+            k0 = n0(0);
+            kN = nN(0);
+            j0 = ArrayI::Zero(kN);
+            jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
+            c0 = 0;
+            cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+      }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
+   }
+
+   void IRegular3DScheme::splitTubular(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   {
+      int k0 = -1;
+      int kN = -1;
+      ArrayI j0, jN;
+      int c0 = -1;
+      int cN = -1;
+
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         k0 = n0(0);
+         kN = nN(0);
+         j0 = n0.tail(kN);
+         jN = nN.tail(kN);
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for second transform
+      } else if(transId == Dimensions::Transform::TRA2D)
+      {
+         k0 = n0(0);
+         kN = nN(0);
+         j0 = ArrayI::Constant(kN, n0(1));
+         jN = ArrayI::Constant(kN, nN(1));
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+
+      // Create index list for third transform
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         k0 = n0(0);
+         kN = nN(0);
+         j0 = n0.tail(kN);
+         jN = nN.tail(kN);
+         c0 = 0;
+         cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
+      }
+
+      // Generate map for regular indexes
+      RegularTools::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
 }
 }

@@ -15,14 +15,14 @@ def no_bc():
 
     return radbc.no_bc()
 
-def constrain(mat, nr, maxl, m, bc):
+def constrain(mat, nr, maxnl, m, bc):
     """Contrain the matrix with the tau boundary condition"""
 
     bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
         bc_mat = radbc.constrain(bcMat, m, bc)
-        for l in range(m+1, maxl+1):
+        for l in range(m+1, maxnl):
             bcMat = spsp.lil_matrix((nr,nr))
             bcMat = radbc.constrain(bcMat, l, bc)
             bc_mat = spsp.block_diag((bc_mat,bcMat))

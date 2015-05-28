@@ -60,7 +60,7 @@ namespace Equations {
 
    void TiltedScalarFieldVisualizer::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, true, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::WRAPPER, 0, true, false);
    }
 
    void TiltedScalarFieldVisualizer::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
@@ -76,7 +76,7 @@ namespace Equations {
 
       // Compute forward transform
       MatrixZ tmp(spSetup->bwdSize(), spSetup->howmany());
-      transform.integrate<Arithmetics::SET>(tmp, this->scalar(this->mDataField).dom(0).phys().data(), Transform::Fft::FftSelector::IntegratorType::INTG);
+      transform.integrate(tmp, this->scalar(this->mDataField).dom(0).phys().data(), Transform::Fft::FftSelector::IntegratorType::INTG, Arithmetics::SET);
 
       // Get Z grid
       int nK = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
@@ -103,7 +103,7 @@ namespace Equations {
       }
 
       // Compute backward transform
-      transform.project<Arithmetics::SET>(rNLComp.rData(), tmp, Transform::FftIds::Projectors::PROJ);
+      transform.project(rNLComp.rData(), tmp, Transform::FftIds::Projectors::PROJ, Arithmetics::SET);
    }
 
    void TiltedScalarFieldVisualizer::useNonlinear(const Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId)

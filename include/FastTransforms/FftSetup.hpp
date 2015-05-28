@@ -57,6 +57,18 @@ namespace Transform {
          FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type);
 
          /**
+          * @brief Constructor
+          *
+          * @param size       Size of the transform
+          * @param howmany    Number of similar transforms slip in even and odd
+          * @param evenBlocks Distribution of the even blocks in full data
+          * @param oddBlocks  Distribution of the odd blocks in full data
+          * @param specSize   Spectral output size (i.e without the padding)
+          * @param type       Type of the transform involved
+          */
+         FftSetup(const int size, const ArrayI& howmany, const MatrixI& evenBlocks, const MatrixI& oddBlocks, const int specSize, const FftSetup::Type type);
+
+         /**
           * @brief Empty destructor
           */
          ~FftSetup();
@@ -95,6 +107,16 @@ namespace Transform {
           * @brief Get box size scaling factor
           */
          MHDFloat boxScale() const;
+
+         /**
+          * @brief Get the even block distribution
+          */
+         const MatrixI& evenBlocks() const; 
+
+         /**
+          * @brief Get the odd block distribution
+          */
+         const MatrixI& oddBlocks() const; 
          
       protected:
 
@@ -118,6 +140,16 @@ namespace Transform {
           * @brief Storage for the box scale factor for derivatives
           */
          MHDFloat mBoxScale;
+
+         /**
+          * @brief Storage for the even blocks distribution description
+          */
+         MatrixI mEvenBlocks;
+
+         /**
+          * @brief Storage for the even blocks distribution description
+          */
+         MatrixI mOddBlocks;
    };
 
    /// Typedef for an smart reference counting pointer for a FftSetup

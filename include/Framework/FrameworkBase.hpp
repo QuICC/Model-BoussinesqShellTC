@@ -26,6 +26,14 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
+          * @name Enum for different sub communicators
+          */
+         enum SubCommId {
+            /// Spectral space CPUs
+            SPECTRAL,
+         };
+
+         /**
           * @brief ID of node allowed to do serial IO
           */
          static const int IO_RANK;

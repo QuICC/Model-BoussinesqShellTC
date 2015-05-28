@@ -3,4 +3,5 @@ set(MHDSources
    IXmlReader.cpp
    IXmlWriter.cpp
    GxlWriter.cpp
+   VtpWriter.cpp
 )

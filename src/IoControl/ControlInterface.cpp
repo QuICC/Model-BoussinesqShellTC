@@ -80,6 +80,9 @@ namespace IoControl {
       // Share the status over all MPI processes
       #ifdef GEOMHDISCC_MPI
          MPI_Bcast(&this->mStatus, 1, MPI_INT, FrameworkMacro::IO_RANK, MPI_COMM_WORLD);
+
+         // Synchronize
+         FrameworkMacro::synchronize();
       #endif // GEOMHDISCC_MPI
    }
 

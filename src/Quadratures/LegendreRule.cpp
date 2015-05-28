@@ -23,9 +23,18 @@ namespace GeoMHDiSCC {
    void LegendreRule::computeQuadrature(Array& grid, Array& weights, const int size)
    {
       // Internal grid and weights arrays
-      internal::Array   igrid(size);
+      internal::Array   igrid;
+      internal::Array   iweights;
+
+      LegendreRule::computeQuadrature(grid, weights, igrid, iweights, size);
+   }
+
+   void LegendreRule::computeQuadrature(Array& grid, Array& weights, internal::Array& igrid, internal::Array& iweights, const int size)
+   {
+      // Internal grid and weights arrays
+      igrid.resize(size);
       igrid.setConstant(MHD_MP(0.0));
-      internal::Array   iweights(size);
+      iweights.resize(size);
       iweights.setConstant(MHD_MP(0.0));
 
       internal::Array   taylor(std::min(size+1,PrueferAlgorithm::TAYLOR_ORDER+1));
@@ -65,7 +74,7 @@ namespace GeoMHDiSCC {
 
          // If solution is too far from estimate, redo full loop starting from solution
          // This should only be required for "small" number of grid points (estimate is asymptotic formulae)
-         if(std::abs((igrid(i) - LegendreRule::estimateNode(i - size%2, size))/igrid(i)) > 1.0e-8)
+         if(precision::abs((igrid(i) - LegendreRule::estimateNode(i - size%2, size))/igrid(i)) > 1.0e-8)
          {
             PrueferAlgorithm::computeTaylor<LegendreRule>(taylor, size, MHD_MP(0.0), iweights(i-1), igrid(i-1));
             PrueferAlgorithm::refineNode(igrid, iweights, i, taylor);

@@ -20,13 +20,14 @@
 
 // Project includes
 //
+#include "TransformConfigurators/TransformStepsMacro.h"
 
 namespace GeoMHDiSCC {
 
 namespace Transform {
 
    IForwardGrouper::IForwardGrouper()
-      : split(Splitting::Locations::NONE), mcScalarPacks1D(1), mcScalarPacks2D(1), mcVectorPacks1D(3), mcVectorPacks2D(3)
+      : split(Splitting::Locations::NONE)
    {
    }
 
@@ -34,36 +35,18 @@ namespace Transform {
    {
    }
 
-   ArrayI IForwardGrouper::namePacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   ArrayI IForwardGrouper::namePacks1D(const std::vector<IntegratorTree>& integratorTree)
    {
       // Create list of packet sizes
       std::set<int>  list;
 
-      int count = 0;
-
-      // loop over all variable information
-      VariableRequirement::const_iterator infoIt;
-      for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
+      std::vector<IntegratorTree>::const_iterator treeIt;
+      for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         // add physical field packs for first exchange
-         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
-         {
-            if(infoIt->second.isScalar())
-            {
-               count = this->mcScalarPacks1D;
-            } else
-            {
-               count = this->mcVectorPacks1D;
-            }
+         int counter = treeIt->nEdges2D();
+         list.insert(counter);
 
-            list.insert(count);
-         }
-
-         // Add named pack size
-         this->mNamedPacks1D.insert(std::make_pair(infoIt->first, count));
-
-         // reset counter
-         count = 0;
+         this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
       }
 
       // Initialise the number of packs
@@ -80,36 +63,19 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::namePacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   ArrayI IForwardGrouper::namePacks2D(const  std::vector<IntegratorTree>& integratorTree)
    {  
       // Create list of packet sizes
       std::set<int>  list;
 
-      int count = 0;
-
-      // loop over all variable information
-      VariableRequirement::const_iterator infoIt;
-      for(infoIt = varInfo.begin(); infoIt != varInfo.end(); infoIt++)
+      // Loop over all edges
+      std::vector<IntegratorTree>::const_iterator treeIt;
+      for(treeIt = integratorTree.begin(); treeIt != integratorTree.end(); ++treeIt)
       {
-         // add physical field packs for second exchange
-         if(infoIt->second.needSpectral() && nonInfo.count(infoIt->first) > 0)
-         {
-            if(infoIt->second.isScalar())
-            {
-               count = this->mcScalarPacks2D;
-            } else
-            {
-               count = this->mcVectorPacks2D;
-            }
+         int counter = treeIt->nEdges3D();
+         list.insert(counter);
 
-            list.insert(count);
-         }
-
-         // Add named pack size
-         this->mNamedPacks2D.insert(std::make_pair(infoIt->first, count));
-
-         // reset counter
-         count = 0;
+         this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp()), counter));
       }
 
       // Initialise the number of packs
@@ -126,16 +92,16 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::groupPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   ArrayI IForwardGrouper::groupPacks1D(const std::vector<IntegratorTree>& integratorTree)
    {
       // Initialise the number of packs
-      ArrayI packs = this->namePacks1D(varInfo, nonInfo);
+      ArrayI packs = this->namePacks1D(integratorTree);
 
       // Resize packs to single value
       packs.resize(1);
       packs.setConstant(0);
 
-      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks1D.begin(); it != this->mNamedPacks1D.end(); ++it)
+      for(std::map<FieldIdType, int>::const_iterator it = this->mNamedPacks1D.begin(); it != this->mNamedPacks1D.end(); ++it)
       {
          packs(0) = packs(0) + it->second;
       }
@@ -143,16 +109,16 @@ namespace Transform {
       return packs;
    }
 
-   ArrayI IForwardGrouper::groupPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo)
+   ArrayI IForwardGrouper::groupPacks2D(const std::vector<IntegratorTree>& integratorTree)
    {  
       // Initialise the number of packs
-      ArrayI packs = this->namePacks2D(varInfo, nonInfo);
+      ArrayI packs = this->namePacks2D(integratorTree);
 
       // Resize packs to single value
       packs.resize(1);
       packs.setConstant(0);
 
-      for(std::map<PhysicalNames::Id, int>::const_iterator it = this->mNamedPacks2D.begin(); it != this->mNamedPacks2D.end(); ++it)
+      for(std::map<FieldIdType, int>::const_iterator it = this->mNamedPacks2D.begin(); it != this->mNamedPacks2D.end(); ++it)
       {
          packs(0) = packs(0) + it->second;
       }

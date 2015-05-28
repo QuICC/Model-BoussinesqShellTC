@@ -64,27 +64,49 @@ namespace Debug {
          case IO:
             return "IO";
 
-         // Below this line are the "detailed" break points
+         // Below this line are the "detailed" break points level 1
          case BWD1D:
             return "Bwd 1D";
          case BWD2D:
             return "Bwd 2D";
          case BWD3D:
             return "Bwd 3D";
-         case FWD3D:
+         case FWD1D:
             return "Fwd 1D";
          case FWD2D:
             return "Fwd 2D";
-         case FWD1D:
+         case FWD3D:
             return "Fwd 3D";
-         case BWDCONVSEND: 
-            return "send 2D";
-         case BWDCONVRECV:
-            return "receive 2D";
-         case FWDCONVSEND:
-            return "send 3D";
-         case FWDCONVRECV:
-            return "receive 3D";
+
+         // Below this line are the "detailed" break points level 2
+         case BWD1DTRA:
+            return "Bwd 1D Transform";
+         case BWD2DTRA:
+            return "Bwd 2D Transform";
+         case BWD3DTRA:
+            return "Bwd 3D Transform";
+         case FWD1DTRA:
+            return "Fwd 1D Transform";
+         case FWD2DTRA:
+            return "Fwd 2D Transform";
+         case FWD3DTRA:
+            return "Fwd 3D Transform";
+         case BWDSENDWAIT: 
+            return "Send BWD: wait";
+         case BWDSENDCONV: 
+            return "Send BWD: convert";
+         case BWDRECVWAIT:
+            return "Receive BWD: wait";
+         case BWDRECVCONV:
+            return "Receive BWD: convert";
+         case FWDSENDWAIT:
+            return "Send FWD: wait";
+         case FWDSENDCONV:
+            return "Send FWD: convert";
+         case FWDRECVWAIT:
+            return "Receive FWD: wait";
+         case FWDRECVCONV:
+            return "Receive FWD: convert";
          case TSTEPIN:
             return "timestep input";
          case TSTEPRHS:

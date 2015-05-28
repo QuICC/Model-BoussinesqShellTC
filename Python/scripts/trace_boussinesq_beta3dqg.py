@@ -11,7 +11,7 @@ model.use_galerkin = False
 fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [30, 0, 30]
+res = [16, 0, 16]
 chi = 1
 eq_params = {'prandtl':1, 'rayleigh':700.0, 'gamma':1, 'chi':chi}
 eigs = [2.221403788]
@@ -31,11 +31,15 @@ bcs['bcType'] = model.SOLVER_NO_TAU
 B = model.time(res, eq_params, eigs, bcs, fields)
 
 # Show the "spy" of the two matrices
-if False:
+if True:
     import matplotlib.pylab as pl
-    pl.spy(A, markersize=0.2)
+    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
-    pl.spy(B, markersize=0.2)
+    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
+    pl.tick_params(axis='x', labelsize=30)
+    pl.tick_params(axis='y', labelsize=30)
     pl.show()
 
 # Export the two matrices to matrix market format

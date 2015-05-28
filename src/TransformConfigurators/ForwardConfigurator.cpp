@@ -6,6 +6,7 @@
 
 // Configuration includes
 //
+#include "Debug/DebuggerMacro.h"
 
 // System includes
 //
@@ -24,110 +25,30 @@ namespace GeoMHDiSCC {
 
 namespace Transform {
 
-   void ForwardConfigurator::updateEquation(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::nonlinearTerm(const IntegratorTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord)
    {
-      // Only compute for equations requiring nonlinear terms
-      if(spEquation->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
-      {
-         // Start profiler
-         ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
+      // Start profiler
+      ProfilerMacro_start(ProfilerMacro::NONLINEAR);
 
-         // Recover temporary storage
-         TransformCoordinatorType::CommunicatorType::Bwd1DType &rScalar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
+      // Get physical storage
+      TransformCoordinatorType::CommunicatorType::Fwd3DType &rNLComp = coord.communicator().providePhysical();
 
-         // Compute linear term component
-         spEquation->updateDealiasedUnknown(rScalar, FieldComponents::Spectral::SCALAR);
+      // Compute nonlinear term component
+      spEquation->computeNonlinear(rNLComp, tree.comp());
+      spEquation->useNonlinear(rNLComp, tree.comp());
 
-         // Free the temporary storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rScalar);
+      // Transfer physical storage to next step
+      coord.communicator().holdPhysical(rNLComp);
 
-         // Stop profiler
-         ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-      }
+      // Stop profiler
+      ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
    }
 
-   void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
+   void ForwardConfigurator::integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold)
    {
-      // Only compute for equations requiring nonlinear terms
-      if(spEquation->couplingInfo(FieldComponents::Spectral::ONE).hasNonlinear())
-      {
-         // Prepare the toroidal timestep RHS
-         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_ONE>(spEquation, coord);
+      // Debugger message
+      DebuggerMacro_msg("Integrate 3D", 4);
 
-         // Prepare the toroidal timestep RHS
-         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_TWO>(spEquation, coord);
-
-         // Prepare the poloidal timestep RHS
-         ForwardConfigurator::updateEquation<TransformSteps::Forward<Dimensions::Transform::TRA1D>::SPECTOR_THREE>(spEquation, coord);
-      }
-   }
-
-   template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-   }
-
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
-   {
-   }
-
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
-   {
-      // Start detailed profiler
-      DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
-
-      // Get the transfered input data
-      TransformCoordinatorType::CommunicatorType::Fwd1DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA1D>();
-
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
-
-      // Compute integration transform of first dimension
-      coord.transform1D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform1DType::IntegratorType::INTG);
-
-      // Free temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(rInVar);
-
-      // Hold temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rOutVar);
-
-      // Stop detailed profiler
-      DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
-   }
-
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
-   {
-   }
-
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
-   {
-      // Start detailed profiler
-      DetailedProfilerMacro_start(ProfilerMacro::FWD2D);
-
-      // Get the transfered input data
-      TransformCoordinatorType::CommunicatorType::Fwd2DType &rInVar = coord.communicator().receiveForward<Dimensions::Transform::TRA2D>();
-
-      // Get temporary storage
-      TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
-
-      // Compute integration transform of second dimension
-      coord.transform2D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform2DType::IntegratorType::INTG);
-
-      // Free temporary storage
-      coord.communicator().storage<Dimensions::Transform::TRA2D>().freeFwd(rInVar);
-
-      // Transfer output data to next step
-      coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(rOutVar);
-
-      // Stop detailed profiler
-      DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
-   }
-
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord)
-   {
-   }
-
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord)
-   {
       // Start detailed profiler
       DetailedProfilerMacro_start(ProfilerMacro::FWD3D);
 
@@ -137,17 +58,131 @@ namespace Transform {
       // Get temporary storage
       TransformCoordinatorType::CommunicatorType::Bwd3DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA3D>().provideBwd();
 
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD3DTRA);
+
       // Compute integration transform of third dimension
-      coord.transform3D().integrate<Arithmetics::SET>(rOutVar.rData(), rInVar.data(), TransformCoordinatorType::Transform3DType::IntegratorType::INTG);
+      coord.transform3D().integrate(rOutVar.rData(), rInVar.data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD3DTRA);
+
+      // Hold temporary input storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA3D>().holdFwd(rInVar);
 
       // Free temporary input storage
-      coord.communicator().storage<Dimensions::Transform::TRA3D>().freeFwd(rInVar);
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA3D>().freeFwd(rInVar);
+      }
 
       // Transfer output data to next step
       coord.communicator().transferBackward<Dimensions::Transform::TRA3D>(rOutVar);
 
       // Stop detailed profiler
       DetailedProfilerMacro_stop(ProfilerMacro::FWD3D);
+   }
+
+   void ForwardConfigurator::integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   {
+      // Debugger message
+      DebuggerMacro_msg("Integrate 2D", 4);
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD2D);
+
+      TransformCoordinatorType::CommunicatorType::Fwd2DType* pInVar;
+      if(recover)
+      {
+         pInVar = &coord.communicator().storage<Dimensions::Transform::TRA2D>().recoverFwd();
+
+      // Get the transfered input data
+      } else
+      {
+         pInVar = &coord.communicator().receiveForward<Dimensions::Transform::TRA2D>();
+      }
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Bwd2DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA2D>().provideBwd();
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD2DTRA);
+
+      // Compute integration transform of second dimension
+      coord.transform2D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD2DTRA);
+
+      // Hold temporary storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().holdFwd(*pInVar);
+
+      // Free temporary storage
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA2D>().freeFwd(*pInVar);
+      }
+
+      // Transfer output data to next step
+      coord.communicator().transferBackward<Dimensions::Transform::TRA2D>(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD2D);
+   }
+
+   void ForwardConfigurator::integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold)
+   {
+      // Debugger message
+      DebuggerMacro_msg("Integrate 1D", 4);
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1D);
+
+      TransformCoordinatorType::CommunicatorType::Fwd1DType* pInVar;
+
+      // Recover hold input data
+      if(recover)
+      {
+         pInVar = &coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverFwd();
+
+      // Get the transfered input data
+      } else
+      {
+         pInVar = &coord.communicator().receiveForward<Dimensions::Transform::TRA1D>();
+      }
+
+      // Get temporary storage
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rOutVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideBwd();
+
+      // Start detailed profiler
+      DetailedProfilerMacro_start(ProfilerMacro::FWD1DTRA);
+
+      // Compute integration transform of first dimension
+      coord.transform1D().integrate(rOutVar.rData(), pInVar->data(), edge.opId(), Arithmetics::SET);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1DTRA);
+
+      // Hold temporary storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(*pInVar);
+
+      // Free temporary storage
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeFwd(*pInVar);
+      }
+
+      // Hold temporary storage
+      coord.communicator().storage<Dimensions::Transform::TRA1D>().holdBwd(rOutVar);
+
+      // Stop detailed profiler
+      DetailedProfilerMacro_stop(ProfilerMacro::FWD1D);
    }
 
 }

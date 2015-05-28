@@ -22,6 +22,20 @@ def x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def x2():
+    """Cylindrical annulus x^2 multiplication operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':0, 'p':2, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i1():
     """Cylindrical annulus first integral operator"""
 
@@ -79,6 +93,20 @@ def i1x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i1x2():
+    """Cylindrical annulus first integral of x^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':1, 'p':2, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2():
     """Cylindrical annulus second integral operator"""
 
@@ -107,20 +135,6 @@ def i2x1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
-def i2x2d2():
-    """Cylindrical annulus second integral of x^2 of second derivative operator"""
-
-    # Setup terms in recurrence
-    terms = [{'q':2, 'p':2, 'd':2, 'c':1}]
-    terms = symbolic.change_variable(terms, 'linear_r2x')
-    r = symbolic.build_recurrence(terms, {0:1})
-    n = sympy.Symbol('n')
-
-    # Print recurrence relation per diagonals
-    for k,rec in sorted(r.items()):
-        print("\t" + str(k) + ": \t" + str(rec))
-    print("\n")
-
 def i2x2d1():
     """Cylindrical annulus second integral of x^2 of first derivative operator"""
 
@@ -135,11 +149,67 @@ def i2x2d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i2x3d1():
+    """Cylindrical annulus second integral of x^3 of first derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':3, 'd':1, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3d1x_2():
+    """Cylindrical annulus second integral of x^3 of first derivative 1/x^2 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-2}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x2d2():
+    """Cylindrical annulus second integral of x^2 of second derivative operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i2x2():
     """Cylindrical annulus second integral of x^2 operator"""
 
     # Setup terms in recurrence
     terms = [{'q':2, 'p':2, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3():
+    """Cylindrical annulus second integral of x^3 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':2, 'p':3, 'd':0, 'c':1}]
     terms = symbolic.change_variable(terms, 'linear_r2x')
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')
@@ -169,7 +239,37 @@ def i2x2laplh():
 
     # Setup terms in recurrence
     m = sympy.Symbol('m')
-    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-m*m}]
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-m**2}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x2vlaplh():
+    """Cylindrical annulus second integral of x^2 horizontal vector laplacian operator"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':1}, {'q':2, 'p':0, 'd':0, 'c':-(m**2 + 1)}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i2x3vlaplhx_1():
+    """Cylindrical annulus second integral of x^3 horizontal vector laplacian operator of f/x"""
+
+    # Setup terms in recurrence
+    m = sympy.Symbol('m')
+    terms = [{'q':2, 'p':2, 'd':2, 'c':1}, {'q':2, 'p':1, 'd':1, 'c':-1}, {'q':2, 'p':0, 'd':0, 'c':-m**2}]
     terms = symbolic.change_variable(terms, 'linear_r2x')
     r = symbolic.build_recurrence(terms, {0:1})
     n = sympy.Symbol('n')

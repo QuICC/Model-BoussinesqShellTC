@@ -57,14 +57,24 @@ namespace GeoMHDiSCC {
       this->mSteps++;
    }
 
+   bool SimulationIoControl::isAsciiTime() const
+   {
+      return (this->mAsciiRate > 0 && this->mSteps % this->mAsciiRate == 0);
+   }
+
+   bool SimulationIoControl::isHdf5Time() const
+   {
+      return (this->mHdf5Rate > 0 && this->mSteps % this->mHdf5Rate == 0);
+   }
+
    void SimulationIoControl::writeFiles(const MHDFloat time, const MHDFloat timestep)
    {
-      if(this->mAsciiRate > 0 && this->mSteps % this->mAsciiRate == 0)
+      if(this->isAsciiTime())
       {
          this->writeAscii(time,timestep);
       }
 
-      if(this->mHdf5Rate > 0 && this->mSteps % this->mHdf5Rate == 0)
+      if(this->isHdf5Time())
       {
          this->writeHdf5(time,timestep);
       }

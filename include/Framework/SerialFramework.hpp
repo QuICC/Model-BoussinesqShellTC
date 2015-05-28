@@ -39,6 +39,11 @@ namespace GeoMHDiSCC {
           * @brief Synchronise
           */
          static void synchronize();
+
+         /**
+          * @brief Synchronise a sub communicator
+          */
+         static void syncSubComm(const SubCommId id);
   
          /**
           * @brief Finalise the Serial system

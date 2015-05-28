@@ -24,6 +24,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
 #include "SpatialSchemes/ISchemeCosts.hpp"
+#include "LoadSplitter/Algorithms/SplittingDescription.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -43,7 +44,7 @@ namespace Schemes {
          /**
           * @brief Tune the shared resolution used by simulation
           */
-         static void tuneResolution(SharedResolution spRes);
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
 
          /**
           * @brief Constructor
@@ -76,7 +77,7 @@ namespace Schemes {
           * @param nN      Length of restricted set
           * @param flag    Flag to specify location of splitting
           */
-         virtual void fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), const Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
 
          /**
           * @brief Get total of splittable indexes 
@@ -100,6 +101,11 @@ namespace Schemes {
           * @brief Get the simulation wide spectral array dimensions (can be different from spectral resolution)
           */
          const ArrayI& getTransformSpace() const;
+
+         /**
+          * @brief Add index counter to shared resolution
+          */
+         virtual void addIndexCounter(SharedResolution spRes);
          
       protected:
          /**
@@ -134,7 +140,7 @@ namespace Schemes {
          /**
           * @brief Tune resolution with MPI related conditions
           */
-         static void tuneMpiResolution();
+         static void tuneMpiResolution(const Parallel::SplittingDescription& descr);
 
       private:
          /**

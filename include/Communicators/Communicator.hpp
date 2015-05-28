@@ -32,6 +32,8 @@ namespace Parallel {
 
    /**
     * @brief Implementation of 3D communicator
+    *
+    * \mhdBug Desactivated reduced memory usage in buffers. Need to add additional cross transform synchronization to bring it back.
     */ 
    template <Dimensions::Type DIMENSION, template <Dimensions::Transform::Id> class TTypes> class Communicator: public CommunicatorStorage<DIMENSION,TTypes>
    {
@@ -198,7 +200,7 @@ namespace Parallel {
       typename TTypes<Dimensions::Transform::TRA1D>::BwdType &rOutData = this->template storage<Dimensions::Transform::TRA1D>().provideBwd();
 
       // Dealias the data
-      rOutData.rData().topRows(rInData.data().rows()) = rInData.data(); 
+      rOutData.rData().topRows(rInData.data().rows()) = rInData.data();
 
       // Hold the input data
       this->template storage<Dimensions::Transform::TRA1D>().holdBwd(rOutData);
@@ -269,7 +271,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
             // Create shared MPI converter
             SharedPtrMacro<MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type> > spConv(new MpiConverter<typename TTypes<Dimensions::Transform::TRA1D>::FwdType, typename TTypes<Dimensions::Transform::TRA1D>::BwdType, typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA2D>::Type>());
@@ -351,7 +353,7 @@ namespace Parallel {
       if(split != Splitting::Locations::BOTH)
       {
          // Setup converter
-         this->template converter<Dimensions::Transform::TRA2D>().setup();
+         this->template converter<Dimensions::Transform::TRA2D>().setup(Dimensions::Transform::TRA2D);
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
@@ -371,7 +373,7 @@ namespace Parallel {
       //
       #ifdef GEOMHDISCC_MPI
          // Load splitting has been done on first dimension
-         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::FIXED)
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
             // Create shared serial converter
             SharedPtrMacro<SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type> > spConv(new SerialConverter<typename TTypes<Dimensions::Transform::TRA2D>::FwdType, typename TTypes<Dimensions::Transform::TRA2D>::BwdType, typename TTypes<Dimensions::Transform::TRA3D>::FwdType, typename TTypes<Dimensions::Transform::TRA3D>::BwdType, IndexConverterSelector<Dimensions::Transform::TRA3D>::Type>());
@@ -457,6 +459,12 @@ namespace Parallel {
             SharedCommunicationBuffer  spBufferOne(new CommunicationBuffer());
             SharedCommunicationBuffer  spBufferTwo(new CommunicationBuffer());
             SharedCommunicationBuffer  spBufferThree(new CommunicationBuffer());
+            #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+               SharedCommunicationBuffer  spBufferFour(new CommunicationBuffer());
+            #else
+               // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
+               SharedCommunicationBuffer  spBufferFour(new CommunicationBuffer());
+            #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
             // Get maximum number of packs
             int p1DFwd;
@@ -497,7 +505,16 @@ namespace Parallel {
             int max3D = std::max(p2DFwd, p2DBwd);
 
             // Allocate shared buffer
-            spBufferOne->allocateMax(spConv12->fwdSizes(), max2D, spConv23->bwdSizes(), max3D);
+            #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+               spBufferOne->allocate(spConv12->fwdSizes(), max2D);
+               spBufferFour->allocate(spConv23->bwdSizes(), max3D);
+            #else
+               // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
+               spBufferOne->allocate(spConv12->fwdSizes(), max2D);
+               spBufferFour->allocate(spConv23->bwdSizes(), max3D);
+               // This should be possible but requires cross transform synchronization
+               //spBufferOne->allocateMax(spConv12->fwdSizes(), max2D, spConv23->bwdSizes(), max3D);
+            #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
             // Allocate 2D buffers
             spBufferTwo->allocate(spConv12->bwdSizes(), max2D);
@@ -509,7 +526,14 @@ namespace Parallel {
             spConv12->setBuffers(spBufferOne, spBufferTwo);
 
             // Set communication buffers for 2D/3D converter
-            spConv23->setBuffers(spBufferThree, spBufferOne);
+            #ifdef GEOMHDISCC_MEMORYUSAGE_HIGH
+               spConv23->setBuffers(spBufferThree, spBufferFour);
+            #else
+               // SAME AS HIGH MEM, THIS IS A PLACEHOLDER
+               spConv23->setBuffers(spBufferThree, spBufferFour);
+               // This should be possible but requires cross transform synchronization
+               //spConv23->setBuffers(spBufferThree, spBufferOne);
+            #endif //GEOMHDISCC_MEMORYUSAGE_HIGH
 
             // Set 1D/2D converter
             this->mspConverter2D = spConv12;
@@ -531,12 +555,12 @@ namespace Parallel {
       #endif // GEOMHDISCC_MPI
 
       // Setup converter
-      this->template converter<Dimensions::Transform::TRA3D>().setup();
+      this->template converter<Dimensions::Transform::TRA3D>().setup(Dimensions::Transform::TRA3D);
 
       // If both dimensions are split. In the other cases setup() has already been called.
       if(split == Splitting::Locations::BOTH)
       {
-         this->template converter<Dimensions::Transform::TRA2D>().setup();
+         this->template converter<Dimensions::Transform::TRA2D>().setup(Dimensions::Transform::TRA2D);
       }
 
       #ifdef GEOMHDISCC_STORAGEPROFILE

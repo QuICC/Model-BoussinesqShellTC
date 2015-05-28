@@ -198,6 +198,184 @@ namespace Transform {
       CuFftLibrary::cleanupFft();
    }
 
+   void ChebyshevCuFftTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevCuFftTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Copy data to perform 2N R2C
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal;
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.colwise().reverse();
+
+      // Do transform
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
+
+      // Extract real part and rescale to remove FFT scaling
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
+   }
+
+   void ChebyshevCuFftTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevCuFftTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(chebVal.rows() == this->mspSetup->bwdSize());
+      assert(chebVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative
+      if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
+      {
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+
+      // Compute simple projection
+      } else
+      {
+         // Copy into other array
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize());
+      }
+
+      // Set the padded values to zero
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
+
+      // Do transform
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
+
+      // Extract physical values
+      rPhysVal = this->mTmpR.topRows(this->mspSetup->fwdSize());
+   }
+
+   void ChebyshevCuFftTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevCuFftTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform of real part
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.real().colwise().reverse();
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.real();
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
+
+      // Rescale FFT output
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal.real() = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
+
+      // Do transform of imaginary part
+      this->mTmpR.topRows(this->mspSetup->fwdSize()) = physVal.imag().colwise().reverse();
+      this->mTmpR.bottomRows(this->mspSetup->fwdSize()) = physVal.imag();
+      checkCudaErrors(cudaMemcpy(this->mDevR, this->mTmpR.data(), sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecD2Z(this->mFPlan, this->mDevR, this->mDevZ));
+      checkCudaErrors(cudaMemcpy(this->mTmpZ.data(), this->mDevZ, sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyDeviceToHost));
+
+      // Rescale FFT output
+      this->mTmpZ = this->mPhase_1.asDiagonal()*this->mTmpZ;
+      rChebVal.imag() = this->mspSetup->scale()*this->mTmpZ.topRows(this->mspSetup->bwdSize()).real();
+   }
+
+   void ChebyshevCuFftTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevCuFftTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(chebVal.rows() == this->mspSetup->bwdSize());
+      assert(chebVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative of real part
+      if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
+      {
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+
+      // Compute simple projection of real part
+      } else
+      {
+         // Copy values into simple matrix
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize()).real();
+      }
+
+      // Set the padded values to zero
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
+
+      // Do transform of real part
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
+      rPhysVal.real() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
+
+      // Compute first derivative of imaginary part
+      if(projector == ChebyshevCuFftTransform::ProjectorType::DIFF)
+      {
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+
+      // Compute simple projection of imaginary part
+      } else
+      {
+         // Rescale results
+         this->mTmpZ.topRows(this->mspSetup->specSize()).real() = chebVal.topRows(this->mspSetup->specSize()).imag();
+      }
+
+      // Set the padded values to zero
+      this->mTmpZ.imag().setZero();
+      this->mTmpZ.bottomRows(this->mspSetup->padSize()+1).real().setZero();
+      this->mTmpZ = this->mPhase.asDiagonal()*this->mTmpZ;
+
+      // Do transform of imaginary part
+      checkCudaErrors(cudaMemcpy(this->mDevZ, this->mTmpZ.data(), sizeof(cufftDoubleComplex)*this->mTmpZ.size(), cudaMemcpyHostToDevice));
+      checkCudaErrors(cufftExecZ2D(this->mBPlan, this->mDevZ, this->mDevR));
+      checkCudaErrors(cudaMemcpy(this->mTmpR.data(), this->mDevR, sizeof(cufftDoubleReal)*this->mTmpR.size(), cudaMemcpyDeviceToHost));
+      rPhysVal.imag() = this->mTmpR.bottomRows(this->mspSetup->fwdSize());
+   }
+
 #ifdef GEOMHDISCC_STORAGEPROFILE
    MHDFloat ChebyshevCuFftTransform::requiredStorage() const
    {

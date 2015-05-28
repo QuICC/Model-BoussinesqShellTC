@@ -22,7 +22,7 @@
 // Project includes
 //
 #include "Enums/FieldIds.hpp"
-#include "Variables/VariableRequirement.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -34,6 +34,9 @@ namespace Transform {
    class IBackwardGrouper
    {
       public:
+         /// Typedef for field and component ID
+         typedef std::pair<PhysicalNames::Id,FieldComponents::Spectral::Id> FieldIdType;
+
          /**
           * @brief Setup the full backward transform structure
           *
@@ -46,16 +49,16 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo) = 0;
+         virtual ArrayI packs1D(const std::vector<ProjectorTree>& projectorTree) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo) = 0;
+         virtual ArrayI packs2D(const std::vector<ProjectorTree>& projectorTree) = 0;
 
          /**
           * @brief Location of the split in the configurator
@@ -64,82 +67,42 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Number of first exchange packets required for a scalar
-          */
-         const int mcScalarPacks1D;
-
-         /**
-          * @brief Number of first exchange packets required for a scalar
-          */
-         const int mcGradientPacks1D;
-
-         /**
-          * @brief Number of first exchange packets required for a vector field
-          */
-         const int mcVectorPacks1D;
-
-         /**
-          * @brief Number of first exchange packets required for a vector curl
-          */
-         const int mcCurlPacks1D;
-
-         /**
-          * @brief Number of second exchange packets required for a scalar
-          */
-         const int mcScalarPacks2D;
-
-         /**
-          * @brief Number of second exchange packets required for a gradient
-          */
-         const int mcGradientPacks2D;
-
-         /**
-          * @brief Number of second exchange packets required for a vector field
-          */
-         const int mcVectorPacks2D;
-
-         /**
-          * @brief Number of second exchange packets required for a vector curl
-          */
-         const int mcCurlPacks2D;
-
-         /**
           * @brief Storage for named packet sizes for the first exchange
           */
-         std::map<PhysicalNames::Id, int>  mNamedPacks1D;
+         std::map<FieldIdType, int>  mNamedPacks1D;
 
          /**
           * @brief Storage for named packet sizes for the second exchange
           */
-         std::map<PhysicalNames::Id, int>  mNamedPacks2D;
+         std::map<FieldIdType, int>  mNamedPacks2D;
 
          /**
           * @brief Get and set the name pack numbers for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         ArrayI namePacks1D(const VariableRequirement& varInfo);
+         ArrayI namePacks1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get and set the named pack numbers for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         ArrayI namePacks2D(const VariableRequirement& varInfo);
+         ArrayI namePacks2D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         ArrayI groupPacks1D(const VariableRequirement& varInfo);
+         ArrayI groupPacks1D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
-          * @param varInfo Variable information
+          * @param projectorTree Transform projector tree
           */
-         ArrayI groupPacks2D(const VariableRequirement& varInfo);
+         ArrayI groupPacks2D(const std::vector<ProjectorTree>& projectorTree);
 
          /**
           * @brief Empty constructor

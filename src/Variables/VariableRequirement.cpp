@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -38,6 +39,16 @@ namespace GeoMHDiSCC {
       {
          return this->mInfo.find(id)->second;
       }
+   }
+
+   FieldRequirement& VariableRequirement::rField(const PhysicalNames::Id id)
+   {
+      if(this->mInfo.count(id) == 0)
+      {
+         throw Exception("Tried to modify requirements of inexistant field!");
+      }
+
+      return this->mInfo.find(id)->second;
    }
 
    void VariableRequirement::addField(const PhysicalNames::Id id, const FieldRequirement& req)

@@ -47,22 +47,13 @@ namespace GeoMHDiSCC {
 
    void VisualizationGenerator::preRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("preRun",1);
-
       // Finalizing the Python model wrapper
       PythonModelWrapper::finalize();
-
-      // Debug statement
-      DebuggerMacro_leave("preRun",1);
    }
 
 
    void VisualizationGenerator::mainRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("mainRun",1);
-
       // Solve the trivial equations
       this->solveTrivialEquations(SolveTiming::AFTER);
 
@@ -71,16 +62,10 @@ namespace GeoMHDiSCC {
 
       // Synchronise computation nodes
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("mainRun",1);
    }
 
    void VisualizationGenerator::postRun()
    {
-      // Debug statement
-      DebuggerMacro_enter("postRun",1);
-
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
 
@@ -89,33 +74,19 @@ namespace GeoMHDiSCC {
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("postRun",1);
    }
 
    void VisualizationGenerator::tuneOutput()
    {
-      // Debug statement
-      DebuggerMacro_enter("tuneOutput",2);
-
-      // Debug statement
-      DebuggerMacro_leave("tuneOutput",2);
    }
 
    void VisualizationGenerator::writeOutput()
    {
-      // Debug statement
-      DebuggerMacro_enter("writeOutput",1);
-
       // Write final state file (using store time and timestep)
       this->mSimIoCtrl.writeHdf5(this->mDiagnostics.startTime(), this->mDiagnostics.startTimestep());
 
       // Synchronise all nodes of simulation
       FrameworkMacro::synchronize();
-
-      // Debug statement
-      DebuggerMacro_leave("writeOutput",1);
    }
 
    void VisualizationGenerator::tuneInitialState(IoVariable::SharedStateFileReader spInitFile)

@@ -45,7 +45,7 @@ namespace Equations {
 
    void TestLinearScalar::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::PROGNOSTIC, 1, false, false);
    }
 
    void TestLinearScalar::setRequirements()

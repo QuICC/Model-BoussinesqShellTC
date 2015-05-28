@@ -53,7 +53,7 @@ namespace Equations {
 
    void TestSpatialSchemeBackwardScalar::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false);
    }
 
    void TestSpatialSchemeBackwardScalar::setRequirements()

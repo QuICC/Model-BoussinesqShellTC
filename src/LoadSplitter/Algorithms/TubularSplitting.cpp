@@ -54,7 +54,7 @@ namespace Parallel {
       return status;
    }
 
-   SharedTransformResolution  TubularSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
+   SharedTransformResolution  TubularSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
@@ -197,7 +197,7 @@ namespace Parallel {
       }
 
       // Compute the indexes
-      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::BOTH);
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::BOTH);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
@@ -223,25 +223,27 @@ namespace Parallel {
       #endif //defined GEOMHDISCC_TRANSGROUPER_TRANSFORM
    }
 
-   int TubularSplitting::computeScore(SharedResolution spResolution)
+   Array TubularSplitting::computeScore(SharedResolution spResolution)
    {
-      double score = 100;
+      // Initialise the score
+      Array details(4);
+      details(0) = 100;
 
       // Multiply by communication score
       ArrayI comm;
-      score *= this->communicationScore(spResolution, comm);
+      details(1) = this->communicationScore(spResolution, comm);
 
       // Multiply by load balancing score
       Array balance = this->mspScheme->loadWeights();
-      score *= this->balancingScore(spResolution, balance);
+      details(2) = this->balancingScore(spResolution, balance);
 
       // Use additional memory related weighting
-      score *= this->mspScheme->memoryScore(spResolution);
+      details(3) = this->mspScheme->memoryScore(spResolution);
 
       // Select best transform grouper algorithm
       this->selectGrouper();
 
-      return static_cast<int>(score);
+      return details;
    }
 
 }

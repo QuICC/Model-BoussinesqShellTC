@@ -48,6 +48,7 @@ if(linalgTest)
    geomhdiscc_add_definition(GEOMHDISCC_LINALG)
 endif(linalgTest)
 
+
 ###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
@@ -56,7 +57,15 @@ geomhdiscc_provide_choice(GEOMHDISCC_SPLINALGS "Sparse linear algebra" GEOMHDISC
 
 if(splinalgTest)
    geomhdiscc_add_definition(GEOMHDISCC_SPLINALG)
+
+   if(GEOMHDISCC_SPLINALG STREQUAL "MUMPS")
+      option(GEOMHDISCC_MPISPSOLVE "Use MPI sparse solver?" OFF)
+      if(GEOMHDISCC_MPISPSOLVE)
+         add_definitions("-DGEOMHDISCC_MPISPSOLVE")
+      endif(GEOMHDISCC_MPISPSOLVE)
+   endif(GEOMHDISCC_SPLINALG STREQUAL "MUMPS")
 endif(splinalgTest)
+
 
 ###################################################
 #------------------ LARGE IO FORMAT --------------#
@@ -67,6 +76,25 @@ geomhdiscc_provide_choice(GEOMHDISCC_LARGEIOS "Large IO format" GEOMHDISCC_LARGE
 if(largeioTest)
    geomhdiscc_add_definition(GEOMHDISCC_LARGEIO)
 endif(largeioTest)
+
+
+###################################################
+#--------------- MPI IMPLEMENTATION --------------#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_MPIIMPLS "MPI implementation" GEOMHDISCC_MPIIMPL mpiimplTest)
+
+if(mpiimplTest)
+   geomhdiscc_add_definition(GEOMHDISCC_MPIIMPL)
+endif(mpiimplTest)
+
+
+###################################################
+#----------------- SH NORMALIZATION --------------#
+###################################################
+
+set(GEOMHDISCC_SHNORM "Unity")
+geomhdiscc_add_definition(GEOMHDISCC_SHNORM)
 
 
 ###################################################

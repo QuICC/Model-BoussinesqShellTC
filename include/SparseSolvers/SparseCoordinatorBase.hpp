@@ -69,6 +69,14 @@ namespace Solver {
           * @param vectEq  Shared vector equations
           */
          virtual void init(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq) = 0;
+
+         /**
+          * @brief Update equation explicit linear input to solver
+          *
+          * @param scalEq Scalar equations
+          * @param vectEq Vector equations
+          */
+         void getExplicitInput(const ModelOperator::Id opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const typename SparseCoordinatorBase<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorBase<TSolver>::VectorVariable_map& vectVar);
          
       protected:
          /**
@@ -298,6 +306,61 @@ namespace Solver {
       }
    }
 
+   template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::getExplicitInput(const ModelOperator::Id opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const typename SparseCoordinatorBase<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorBase<TSolver>::VectorVariable_map& vectVar)
+   {
+      // Storage for information and identity
+      SpectralFieldId myId;
+
+      // Loop over all scalar equations
+      std::vector<Equations::SharedIScalarEquation>::const_iterator scalEqIt;
+      for(scalEqIt = scalEq.first; scalEqIt != scalEq.second; scalEqIt++)
+      {
+         // Get field identity
+         myId = std::make_pair((*scalEqIt)->name(), FieldComponents::Spectral::SCALAR);
+
+         // Get index of solver
+         int myIdx = (*scalEqIt)->couplingInfo(myId.second).solverIndex();
+
+         // System operator is complex
+         if((*scalEqIt)->couplingInfo(myId.second).isComplex())
+         {
+            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar);
+
+            // System operator is real
+         } else
+         {
+            getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, opId, scalVar, vectVar);
+         }
+      }
+
+      // Loop over all vector equations
+      std::vector<Equations::SharedIVectorEquation>::const_iterator vectEqIt;
+      for(vectEqIt = vectEq.first; vectEqIt != vectEq.second; vectEqIt++)
+      {
+         Equations::IVectorEquation::SpectralComponent_iterator compIt;
+         Equations::IVectorEquation::SpectralComponent_range  compRange = (*vectEqIt)->spectralRange();
+         for(compIt = compRange.first; compIt != compRange.second; ++compIt)
+         {
+            // Get field identity for first component
+            myId = std::make_pair((*vectEqIt)->name(), *compIt);
+
+            // Get index of solver
+            int myIdx = (*vectEqIt)->couplingInfo(myId.second).solverIndex();
+
+            // Linear solve matrices are complex
+            if((*vectEqIt)->couplingInfo(myId.second).isComplex())
+            {
+               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar);
+
+               // Linear solve matrices are real
+            } else
+            {
+               getExplicitSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, vectEqIt, myIdx, myId, opId, scalVar, vectVar);
+            }
+         }
+      }
+   }
+
    template <template <class,class> class TSolver> void SparseCoordinatorBase<TSolver>::getInput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const typename SparseCoordinatorBase<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorBase<TSolver>::VectorVariable_map& vectVar)
    {
       // Storage for information and identity
@@ -320,7 +383,7 @@ namespace Solver {
             {
                getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::ComplexSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);
 
-               // System operator is real
+            // System operator is real
             } else
             {
                getSolverInput<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, scalEqIt, myIdx, myId, scalVar, vectVar);

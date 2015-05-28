@@ -26,9 +26,14 @@ namespace GeoMHDiSCC {
    {
       public:
          /**
-          * @brief Compute the quadrature
+          * @brief Compute the quadrature and return standard precision values
           */
          static void computeQuadrature(Array& grid, Array& weights, const int size);
+
+         /**
+          * @brief Compute the quadrature and return standard and internal precision values
+          */
+         static void computeQuadrature(Array& grid, Array& weights, internal::Array& igrid, internal::Array& iweights, const int size);
 
          /**
           * @brief Get p polynomial

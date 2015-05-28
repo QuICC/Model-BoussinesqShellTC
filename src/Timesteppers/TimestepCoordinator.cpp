@@ -146,6 +146,9 @@ namespace Timestep {
 
       // Update the internal step counter
       this->updateStep();
+
+      // Clear the solver RHS
+      this->clearSolvers();
    }
 
    void TimestepCoordinator::init(const MHDFloat time, const MHDFloat dt, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)

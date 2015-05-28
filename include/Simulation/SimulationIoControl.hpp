@@ -144,6 +144,16 @@ namespace GeoMHDiSCC {
          hdf5_iterator endHdf5();
 
          /**
+          * @brief Is is time to write ASCII file?
+          */
+         bool isAsciiTime() const;
+
+         /**
+          * @brief Is is time to write HDF5 file?
+          */
+         bool isHdf5Time() const;
+
+         /**
           * @brief Update IO status
           */
          void update();

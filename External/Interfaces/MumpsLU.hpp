@@ -19,7 +19,6 @@
 #include <dmumps_c.h>
 #include <zmumps_c.h>
 
-#include "Framework/FrameworkMacro.h"
 #include "Base/MpiTypes.hpp"
 
 namespace Eigen {
@@ -85,17 +84,35 @@ namespace Eigen {
 
       public:
 
-         MumpsLU() { init(); }
+         MumpsLU(MPI_Comm comm) 
+         { 
+            m_comm = comm;
+            init();
+         }
+
+         MumpsLU()
+         {
+            setSingleComm();
+            init();
+         }
+
+         MumpsLU(const MatrixType& matrix, MPI_Comm comm)
+         {
+            m_comm = comm;
+            init();
+            compute(matrix);
+         }
 
          MumpsLU(const MatrixType& matrix)
          {
+            setSingleComm();
             init();
             compute(matrix);
          }
 
          ~MumpsLU()
          {
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
             m_id.job = -2;
 
             if(m_isParallel)
@@ -112,7 +129,12 @@ namespace Eigen {
             free(m_id.rhs);
 
             MumpsLU_mumps(&m_id, Scalar());
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
+         }
+
+         void setSingleComm()
+         {
+            m_comm = MPI_COMM_SELF;
          }
 
          inline Index rows() const { return m_id.n; }
@@ -178,19 +200,24 @@ namespace Eigen {
           */
          void analyzePattern(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
 
             m_id.job = 1;
             copyInput(matrix, true);
 
+            #ifdef GEOMHDISCC_DEBUG
+               // Write matrix to file
+               strncpy(m_id.write_problem, "mumps_matrix", sizeof(m_id.write_problem));
+            #endif //GEOMHDISCC_DEBUG
+
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
 
             m_isInitialized = true;
             m_info = m_error ? InvalidInput : Success;
             m_analysisIsOk = m_error ? false : true;
             m_factorizationIsOk = false;
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
          }
 
          /** Performs a numeric decomposition of \a matrix
@@ -201,7 +228,7 @@ namespace Eigen {
           */
          void factorize(const MatrixType& matrix)
          {
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
 
             eigen_assert(m_analysisIsOk && "MumpsLU: you must first call analyzePattern()");
 
@@ -209,11 +236,12 @@ namespace Eigen {
             copyInput(matrix, false);
 
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
 
             m_info = m_error ? NumericalIssue : Success;
             m_factorizationIsOk = m_error ? false : true;
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+
+            MPI_Barrier(m_comm);
          }
 
          #ifndef EIGEN_PARSED_BY_DOXYGEN
@@ -225,15 +253,15 @@ namespace Eigen {
 
          void init()
          {
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            MPI_Barrier(m_comm);
 
             m_id.job = -1;
             #ifdef GEOMHDISCC_MPI
-               m_id.comm_fortran = MPI_Comm_c2f(GeoMHDiSCC::FrameworkMacro::spectralComm());
+               m_id.comm_fortran = MPI_Comm_c2f(m_comm);
                int rank;
-               MPI_Comm_rank(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               MPI_Comm_rank(m_comm, &rank);
                m_isHost = (rank == 0);
-               MPI_Comm_size(GeoMHDiSCC::FrameworkMacro::spectralComm(), &rank);
+               MPI_Comm_size(m_comm, &rank);
                m_isParallel = (rank > 1);
             #else
                m_id.comm_fortran = MUMPS_FORTRAN_COMM;
@@ -248,7 +276,7 @@ namespace Eigen {
             m_error          = 0;
 
             MumpsLU_mumps(&m_id, Scalar());
-            m_error = m_id.info[1-1];
+            m_error = m_id.infog[1-1];
             #ifdef GEOMHDISCC_NO_DEBUG
                m_id.icntl[1-1] = 0;
                m_id.icntl[2-1] = 0;
@@ -256,6 +284,8 @@ namespace Eigen {
                m_id.icntl[4-1] = 0;
             #endif // GEOMHDISCC_NO_DEBUG
 
+            // Force specific ordering algorithm
+            //m_id.icntl[7-1] = 3;
             if(m_isParallel)
             {
                // Matrix distribution
@@ -267,9 +297,13 @@ namespace Eigen {
             }
 
             // increase memory relaxation
-            m_id.icntl[14-1] = 35;
+            //m_id.icntl[14-1] = 45;
 
-            GeoMHDiSCC::FrameworkMacro::synchronize();
+            // Set drop threshold
+            //m_id.cntl[1-1] = 1.0;
+
+
+            MPI_Barrier(m_comm);
          }
 
          void copyInput(const MatrixType& mat, const bool freeMemory)
@@ -348,6 +382,7 @@ namespace Eigen {
                if(m_isHost)
                {
                   m_id.rhs = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.n);
+                  m_nrhsMem = 1;
                }
 
                for(int k = 0; k < mat.outerSize(); ++k)
@@ -369,7 +404,7 @@ namespace Eigen {
             }
          }
 
-         void copyRhs(const Scalar* pData) const
+         void copyRhs(const Scalar* pData, const bool reallocRhs) const
          {
             const Scalar* pRhs;
 
@@ -377,7 +412,11 @@ namespace Eigen {
             if(m_isParallel)
             {
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, GeoMHDiSCC::FrameworkMacro::spectralComm()); 
+               #ifdef GEOMHDISCC_MPIIMPL_MVAPICH
+                  MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+               #else
+                  MPI_Reduce(pData, mTmp.data(), m_id.nrhs*m_id.lrhs, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+               #endif //GEOMHDISCC_MPIIMPL_MVAPICH
                pRhs = mTmp.data();
             } else
             {
@@ -389,6 +428,14 @@ namespace Eigen {
 
             if(m_isHost)
             {
+               // Memory allocated  is not sufficient
+               if(reallocRhs)
+               {
+                  free(m_id.rhs);
+                  m_id.rhs = (MumpsScalar *) malloc(sizeof(MumpsScalar)*m_id.nrhs*m_id.n);
+                  m_nrhsMem = m_id.nrhs;
+               }
+
                int nK = m_id.nrhs*m_id.lrhs;
                MumpsScalar * pVal = m_id.rhs;
 
@@ -416,7 +463,7 @@ namespace Eigen {
             #ifdef GEOMHDISCC_MPI
             if(m_isParallel)
             {
-               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, GeoMHDiSCC::FrameworkMacro::spectralComm());
+               MPI_Bcast(pData, nK, GeoMHDiSCC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
             }
             #endif //GEOMHDISCC_MPI
          }
@@ -427,10 +474,13 @@ namespace Eigen {
          int m_analysisIsOk;
 
          mutable int m_error;
+         mutable int m_nrhsMem;
          mutable typename MumpsStrucType<Scalar>::StrucType m_id;
 
          bool m_isHost;
          bool m_isParallel;
+
+         MPI_Comm  m_comm;
 
       private:
          mutable Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>   mTmp;
@@ -443,13 +493,13 @@ template<typename MatrixType>
 template<typename BDerived,typename XDerived>
 bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDerived> &x) const
 {
-   GeoMHDiSCC::FrameworkMacro::synchronize();
+   MPI_Barrier(m_comm);
 
    int rhsCols = b.cols();
    eigen_assert((BDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major rhs yet");
    eigen_assert((XDerived::Flags&RowMajorBit)==0 && "MumpsLU backend does not support non col-major result yet");
-   eigen_assert(b.cols() == 1 && "MumpsLU is implemented for a single RHS");
    #ifdef GEOMHDISCC_MPI
+      eigen_assert((!m_isParallel || b.cols() == 1) && "Parallel MumpsLU is implemented for a single RHS");
       eigen_assert(b.derived().data() != x.derived().data() && "Parallel execution does not allow x and b to be the same");
    #endif //GEOMHDISCC_MPI
 
@@ -461,17 +511,20 @@ bool MumpsLU<MatrixType>::_solve(const MatrixBase<BDerived> &b, MatrixBase<XDeri
       m_id.icntl[11-1] = 1;
    #endif // GEOMHDISCC_DEBUG
 
-   copyRhs(b.derived().data());
+   copyRhs(b.derived().data(), (rhsCols > m_nrhsMem));
 
    MumpsLU_mumps(&m_id, Scalar());
-   m_error = m_id.info[1-1];
+   m_error = m_id.infog[1-1];
+   m_info = m_error < 0 ? NumericalIssue : Success;
 
-   if (m_error!=0)
+   if (m_error < 0)
+   {
       return false;
+   }
 
    copySolution(x.derived().data());
 
-   GeoMHDiSCC::FrameworkMacro::synchronize();
+   MPI_Barrier(m_comm);
 
    return true;
 }

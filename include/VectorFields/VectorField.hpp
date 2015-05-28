@@ -12,7 +12,7 @@
 
 // System includes
 //
-#include <vector>
+#include <map>
 
 // External includes
 //
@@ -29,7 +29,7 @@ namespace Datatypes {
    /**
     * @brief Implementation of a generic vector field
     */
-   template <typename TScalar, int COMPONENTS, typename TType> class VectorField
+   template <typename TScalar, typename TType> class VectorField
    {
       public:
          /**
@@ -37,7 +37,7 @@ namespace Datatypes {
           *
           * @param spSetup Shared setup object for the scalar fields
           */
-         VectorField(typename TScalar::SharedSetupType spSetup);
+         VectorField(typename TScalar::SharedSetupType spSetup, const typename std::map<TType,bool>& comps);
 
          /**
           * @brief Destructor
@@ -59,14 +59,14 @@ namespace Datatypes {
          TScalar& rComp(const TType id);
 
          /**
-          * @brief Get field components
-          */
-         const std::vector<TScalar>& data() const;
-
-         /**
           * @brief Set field components to zero
           */
          void setZeros();
+
+         /**
+          * @brief Get field components
+          */
+         const std::map<TType,TScalar>& data() const;
 
       #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -74,80 +74,84 @@ namespace Datatypes {
           */
          MHDFloat requiredStorage() const;
      #endif // GEOMHDISCC_STORAGEPROFILE
-
+         
          /**
           * @brief Set internal storage field data
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
-          */
-         std::vector<TScalar>& rData();
-         
+         */
+         std::map<TType,TScalar>& rData();
+
       protected:
          /**
           * @brief Storage for the field components
           */
-         std::vector<TScalar> mComponents;
+         std::map<TType,TScalar> mComponents;
 
       private:
    };
 
-   template <typename TScalar, int COMPONENTS, typename TType> inline const TScalar& VectorField<TScalar,COMPONENTS,TType>::comp(const TType id) const
+   template <typename TScalar, typename TType> inline const TScalar& VectorField<TScalar,TType>::comp(const TType id) const
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > static_cast<size_t>(id));
+      assert(this->mComponents.count(id) == 1);
 
-      return this->mComponents.at(static_cast<int>(id));
+      return this->mComponents.find(id)->second;
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> inline TScalar& VectorField<TScalar,COMPONENTS,TType>::rComp(const TType id)
+   template <typename TScalar, typename TType> inline TScalar& VectorField<TScalar,TType>::rComp(const TType id)
    {
       // Assert that index is valid
-      assert(this->mComponents.size() > static_cast<size_t>(id));
+      assert(this->mComponents.count(id) == 1);
 
-      return this->mComponents.at(static_cast<int>(id));
+      return this->mComponents.find(id)->second;
+   }
+   
+   template <typename TScalar, typename TType> inline const std::map<TType,TScalar>& VectorField<TScalar,TType>::data() const
+   {
+      return this->mComponents;
+   }
+   
+   template <typename TScalar, typename TType> inline std::map<TType,TScalar>& VectorField<TScalar,TType>::rData()
+   {
+      return this->mComponents;
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::VectorField(typename TScalar::SharedSetupType spSetup)
+   template <typename TScalar, typename TType> VectorField<TScalar,TType>::VectorField(typename TScalar::SharedSetupType spSetup, const typename std::map<TType,bool>& comps)
    {
       // Initialise the components
-      for(int i = 0; i < COMPONENTS; i++)
+      typename std::map<TType,bool>::const_iterator   it;
+      for(it = comps.begin(); it != comps.end(); ++it)
       {
-         this->mComponents.push_back(TScalar(spSetup));
+         if(it->second)
+         {
+            this->mComponents.insert(std::make_pair(it->first, TScalar(spSetup)));
+         }
       }
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> VectorField<TScalar, COMPONENTS, TType>::~VectorField()
+   template <typename TScalar, typename TType> VectorField<TScalar, TType>::~VectorField()
    {
    }
 
-   template <typename TScalar, int COMPONENTS, typename TType> inline const std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::data() const
-   {
-      return this->mComponents;
-   }
-
-   template <typename TScalar, int COMPONENTS, typename TType> inline std::vector<TScalar>& VectorField<TScalar,COMPONENTS,TType>::rData()
-   {
-      return this->mComponents;
-   }
-
-   template <typename TScalar, int COMPONENTS, typename TType> void VectorField<TScalar, COMPONENTS, TType>::setZeros()
+   template <typename TScalar, typename TType> void VectorField<TScalar,TType>::setZeros()
    {
       // Initialise the components
-      typename std::vector<TScalar>::iterator   it;
+      typename std::map<TType,TScalar>::iterator   it;
       for(it = this->mComponents.begin(); it != this->mComponents.end(); it++)
       {
-         it->setZeros();
+         it->second.setZeros();
       }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
-   template <typename TScalar, int COMPONENTS, typename TType> MHDFloat VectorField<TScalar, COMPONENTS, TType>::requiredStorage() const
+   template <typename TScalar, typename TType> MHDFloat VectorField<TScalar,TType>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
-      typename std::vector<TScalar>::const_iterator   it;
+      typename std::map<TType,TScalar>::const_iterator   it;
       for(it = this->mComponents.begin(); it != this->mComponents.end(); it++)
       {
-         mem += it->requiredStorage();
+         mem += it->second.requiredStorage();
       }
 
       return mem;

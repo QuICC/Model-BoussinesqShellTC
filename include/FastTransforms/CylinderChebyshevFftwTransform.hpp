@@ -27,10 +27,13 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Exceptions/Exception.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/Arithmetics.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "FastTransforms/FftSetup.hpp"
+#include "TypeSelectors/SparseSolverSelector.hpp"
+#include "SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -46,8 +49,18 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** 
+          * Enum of projector IDs:
+          *    - PROJ: projection
+          *    - DIFF: D
+          *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
+          *    - DIVRDIFFR: 1/r D r
+          *    - DIFFDIVR: D 1/r
+          *
+          * All projectors assume "even" data, ie even "m" -> even "r", odd "m" -> odd "r"
+          */
+         enum Id {PROJ, DIFF, DIVR, DIVR2, DIVRDIFFR, DIFFDIVR};
       };
 
       /**
@@ -55,8 +68,12 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
-         enum Id {INTG};
+         /** 
+          * Enum of integrator IDs
+          *    - INTGE: even integration, even "m" -> even "r", etc
+          *    - INTGO: odd integration, even "m" -> odd "r", etc
+          */
+         enum Id {INTGE, INTGO};
       };
 
    };
@@ -126,10 +143,9 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator);
+         void integrate(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute forward FFT (C2C)
@@ -139,40 +155,57 @@ namespace Transform {
           * @param rChebVal   Output Chebyshev coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (R2R)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projectors should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector);
+         void project(Matrix& rPhysVal, const Matrix& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
          /**
           * @brief Compute backward FFT (C2C)
           *
           * Compute the FFT from Chebyshev spectral space to real physical space
           *
-          * \mhdTodo Projectors should be converted to Python
-          *
           * @param rPhysVal   Output physical values
           * @param chebVal    Input Chebyshev coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -190,34 +223,86 @@ namespace Transform {
          SharedFftSetup    mspSetup;
 
          /**
-          * @brief FFTW plan for the forward transform (real -> real)
+          * @brief FFTW plan for the even forward transform (real -> real)
           */
-         fftw_plan   mFPlan;
+         fftw_plan   mFEPlan;
 
          /**
-          * @brief FFTW plan for the backward transform (real -> real)
+          * @brief FFTW plan for the odd forward and backward transform (real -> real) 
+          *
+          * DCT IV is it's own inverse
           */
-         fftw_plan   mBPlan;
+         fftw_plan   mFBOPlan;
 
          /**
-          * @brief Storage for data input
+          * @brief FFTW plan for the even backward transform (real -> real)
           */
-         Matrix   mTmpIn;
+         fftw_plan   mBEPlan;
 
          /**
-          * @brief Storage for data output
+          * @brief FFTW plan for the odd forward transform with even size (real -> real)
           */
-         Matrix   mTmpOut;
+         fftw_plan   mFEOPlan;
 
          /**
-          * @brief Storage for the even Chebyshev differentiation matrix
+          * @brief FFTW plan for the even backward transform with odd size (real -> real)
           */
-         SparseMatrix   mDiffE;
+         fftw_plan   mBEOPlan;
 
          /**
-          * @brief Storage for the odd Chebyshev differentiation matrix
+          * @brief FFTW plan for the odd backward transform with even size (real -> real)
           */
-         SparseMatrix   mDiffO;
+         fftw_plan   mFBOEPlan;
+
+         /**
+          * @brief Storage for even data input
+          */
+         Matrix   mTmpEIn;
+
+         /**
+          * @brief Storage for odd data input
+          */
+         Matrix   mTmpOIn;
+
+         /**
+          * @brief Storage for even data output
+          */
+         Matrix   mTmpEOut;
+
+         /**
+          * @brief Storage for odd data output
+          */
+         Matrix   mTmpOOut;
+
+         /**
+          * @brief Storage for the projector operators
+          */
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
+
+         /**
+          * @brief Storage for the integrator operators
+          */
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices
+          */
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+
+         /**
+          * @brief Storage for the backward operators input data
+          */
+         Matrix mTmpInS;
+
+         /**
+          * @brief Storage for the backward operators output data
+          */
+         Matrix mTmpOutS;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)
@@ -233,158 +318,144 @@ namespace Transform {
           * @brief Cleanup memory used by FFTW on destruction
           */
          void cleanupFft();
+
+         /**
+          * @brief Extract the parity modes from the whole data
+          */
+         void extractParityModes(Matrix& rSelected, const Matrix& data, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Extract the parity modes from the whole data
+          */
+         void extractParityModes(Matrix& rSelected, const MatrixZ& data, const bool isReal, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Set the parity modes into the whole data
+          */
+         void setParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Set the parity modes into the whole data
+          */
+         void setParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Add the parity modes into the whole data
+          */
+         void addParityModes(Matrix& rData, const Matrix& selected, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Add the parity modes into the whole data
+          */
+         void addParityModes(MatrixZ& rData, const Matrix& selected, const bool isReal, const MatrixI& info, const int rows);
+
+         /**
+          * @brief Get input temporary data depending on parity
+          */
+         Matrix& rTmpIn(const int parity);
+
+         /**
+          * @brief Get output temporary data depending on parity
+          */
+         Matrix& rTmpOut(const int parity);
+
+         /**
+          * @brief Get the parity block description
+          */
+         const MatrixI& parityBlocks(const int parity) const;
+
+         /**
+          * @brief Get the FFTW plan depending on parity
+          */
+         fftw_plan fPlan(const int parity, const int sizeParity);
+
+         /**
+          * @brief Get the FFTW plan depending on parity
+          */
+         fftw_plan bPlan(const int parity, const int sizeParity);
+
+         /**
+          * @brief Get the differentiation matrix depending on parity
+          */
+         const SparseMatrix& diff(const int parity) const;
    };
 
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator)
+   inline Matrix& CylinderChebyshevFftwTransform::rTmpIn(const int parity)
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
-
-      // Do transform
-      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
-
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
-   }
-
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, CylinderChebyshevFftwTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was not setup
-      assert(this->mspSetup->type() == FftSetup::REAL);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative
-      if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
+      if(parity == 0)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize());
-
-      // Compute simple projection
+         return this->mTmpEIn;
       } else
       {
-         // Copy into other array
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         return this->mTmpOIn;
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
    }
 
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, CylinderChebyshevFftwTransform::IntegratorType::Id integrator)
+   inline Matrix& CylinderChebyshevFftwTransform::rTmpOut(const int parity)
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rChebVal.rows() == this->mspSetup->bwdSize());
-      assert(rChebVal.cols() == this->mspSetup->howmany());
-
-      // Do transform of real part
-      this->mTmpIn = physVal.real();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
-
-      // Do transform of imaginary part
-      this->mTmpIn = physVal.imag();
-      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
-
-      // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+      if(parity == 0)
+      {
+         return this->mTmpEOut;
+      } else
+      {
+         return this->mTmpOOut;
+      }
    }
 
-   template <Arithmetics::Id TOperation> void CylinderChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, CylinderChebyshevFftwTransform::ProjectorType::Id projector)
+   inline const MatrixI& CylinderChebyshevFftwTransform::parityBlocks(const int parity) const
    {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // Assert that a mixed transform was setup
-      assert(this->mspSetup->type() == FftSetup::COMPONENT);
-
-      // assert on the padding size
-      assert(this->mspSetup->padSize() >= 0);
-      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
-
-      // assert right sizes for input  matrix
-      assert(chebVal.rows() == this->mspSetup->bwdSize());
-      assert(chebVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative of real part
-      if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
+      if(parity == 0)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).real();
-
-      // Compute simple projection of real part
+         return this->mspSetup->evenBlocks();
       } else
       {
-         // Copy values into simple matrix
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         return this->mspSetup->oddBlocks();
       }
+   }
 
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
-
-      // Do transform of real part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.real() = this->mTmpOut;
-
-      // Compute first derivative of imaginary part
-      if(projector == CylinderChebyshevFftwTransform::ProjectorType::DIFF)
+   inline fftw_plan CylinderChebyshevFftwTransform::fPlan(const int parity, const int sizeParity)
+   {
+      if(parity == 0 && parity == sizeParity)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiffO*chebVal.topRows(this->mspSetup->specSize()).imag();
-
-      // Compute simple projection of imaginary part
+         return this->mFEPlan;
+      } else if(parity == 1 && parity == sizeParity)
+      {
+         return this->mFBOPlan;
+      } else if(parity == 0)
+      {
+         return this->mFEOPlan;
       } else
       {
-         // Rescale results
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         return this->mFBOEPlan;
       }
+   }
 
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+   inline fftw_plan CylinderChebyshevFftwTransform::bPlan(const int parity, const int sizeParity)
+   {
+      if(parity == 0 && parity == sizeParity)
+      {
+         return this->mBEPlan;
+      } else if(parity == 1 && parity == sizeParity)
+      {
+         return this->mFBOPlan;
+      } else if(parity == 0)
+      {
+         return this->mBEOPlan;
+      } else
+      {
+         return this->mFBOEPlan;
+      }
+   }
 
-      // Do transform of imaginary part
-      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
-      rPhysVal.imag() = this->mTmpOut;
+   inline const SparseMatrix& CylinderChebyshevFftwTransform::diff(const int parity) const
+   {
+      if(parity == 0)
+      {
+         return this->mDiffE;
+      } else
+      {
+         return this->mDiffO;
+      }
    }
 
 }

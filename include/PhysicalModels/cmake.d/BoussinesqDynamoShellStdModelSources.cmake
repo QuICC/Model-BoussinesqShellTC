@@ -1,0 +1,16 @@
+set(MHDModelSources
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellTransport.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellMomentum.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Shell/Boussinesq/BoussinesqDynamoShellInduction.cpp
+   ${GEOMHDISCC_SRC_DIR}/Equations/Tools/EquationEigenSHlTools.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/EnergyTags.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/SphericalScalarEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/IoVariable/SphericalTorPolEnergyWriter.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/RandomVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactStateIds.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactScalarState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/States/ShellExactVectorState.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/ScalarFieldVisualizer.cpp
+   ${GEOMHDISCC_SRC_DIR}/Generator/Visualizers/VectorFieldVisualizer.cpp
+)

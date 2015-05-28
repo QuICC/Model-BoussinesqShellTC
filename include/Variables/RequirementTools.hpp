@@ -21,6 +21,7 @@
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
+#include "TransformConfigurators/ProjectorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -33,25 +34,26 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise variables and variable requirements from equations
           *
-          * @param varInfo       Variable requirements
+          * @param projectorTree Transform tree for backward projection
           * @param rScalarVars   Scalar variables
           * @param rVectorVars   Vector variables
           * @param scalarEqs     Scalar equations
           * @param vectorEqs     Vector equations
           * @param spRes      Shared resolution
           */
-         static void initVariables(VariableRequirement& varInfo, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes);
+         static void initVariables(std::vector<Transform::ProjectorTree>& projectorTree, std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& rScalarVars, std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& rVectorVars, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs, SharedResolution spRes);
 
          /**
           * @brief Map variables to the corresponding equation 
           *
-          * @param nonInfo    Nonlinear computations requirements
-          * @param rScalarEqs Scalar equations
-          * @param rVectorEqs Vector equations
-          * @param scalarVars Scalar variables
-          * @param vectorVars Vector variables
+          * @param integratorTree Transform tree for forward integration
+          * @param rScalarEqs          Scalar equations
+          * @param rVectorEqs          Vector equations
+          * @param scalarVars          Scalar variables
+          * @param vectorVars          Vector variables
+          * @param forwardIsNonlinear  Forward transform works on nonlinear terms
           */
-         static void mapEquationVariables(std::set<PhysicalNames::Id>& nonInfo, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars);
+         static void mapEquationVariables(std::vector<Transform::IntegratorTree>& integratorTree, std::vector<Equations::SharedIScalarEquation>& rScalarEqs, std::vector<Equations::SharedIVectorEquation>& rVectorEqs, const std::map<PhysicalNames::Id, Datatypes::SharedScalarVariableType>& scalarVars, const std::map<PhysicalNames::Id, Datatypes::SharedVectorVariableType>& vectorVars, const bool forwardIsNonlinear);
          
       protected:
 

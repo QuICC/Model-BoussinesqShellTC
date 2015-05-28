@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import numpy as np
 import scipy.sparse as spsp
 
+import geomhdiscc.base.utils as utils
+
 
 def no_bc():
     """Get a no boundary condition flag"""
@@ -66,13 +68,19 @@ def constrain(mat, parity, bc, location = 't'):
 
 def apply_tau(mat, parity, bc, location = 't'):
     """Add Tau lines to the matrix"""
-
+    
+    # u = 0
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], parity, bc.get('c',None))
+    # D u = 0
     elif bc[0] == 11:
         cond = tau_diff(mat.shape[0], parity, bc.get('c',None))
+    # 1/r D u = 0
     elif bc[0] == 13:
         cond = tau_1rdr(mat.shape[0], parity, bc.get('c',None))
+    # Last mode is zero
+    elif bc[0] == 99:
+        cond = tau_last(mat.shape[0], parity)
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -95,7 +103,7 @@ def tau_value(nr, parity, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append([c*norm_c(i) for i in np.arange(parity, 2*nr, 2)])
+    cond.append([c*tau_c(i) for i in np.arange(parity, 2*nr, 2)])
 
     return np.array(cond)
 
@@ -121,7 +129,7 @@ def tau_diff2(nr, parity, coeffs = None):
         c = coeffs
 
     cond = []
-    cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(parity, 2*nr, 2)])
+    cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(parity, 2*nr, 2)])
 
     return np.array(cond)
 
@@ -132,9 +140,31 @@ def tau_1rdr(nr, parity, coeffs = None):
 
     return cond
 
+def tau_last(nr, parity):
+    """Create the zero last mode tau line(s)"""
+
+    cond = []
+    cond.append([0 for i in np.arange(parity, 2*(nr-1), 2)] + [tau_c(2*nr)])
+
+    return np.array(cond)
+
+def stencil(nr, parity, bc):
+    """Create a Galerkin stencil matrix"""
+
+    if bc[0] == -10:
+        mat = stencil_value(nr, parity)
+    elif bc[0] == -11:
+        mat = stencil_diff(nr, parity)
+    elif bc[0] == -13:
+        mat = stencil_1rdr(nr, parity)
+
+    return mat
+
 def apply_galerkin(mat, parity, bc):
     """Apply a Galerkin stencil on the matrix"""
 
+    nr = mat.shape[0]
+    mat = restrict_eye(nr, parity, 'rt', bc['r'])*mat*stencil(nr, parity, bc)
     return mat
 
 def restrict_eye(nr, parity, t, q):
@@ -163,10 +193,98 @@ def restrict_eye(nr, parity, t, q):
 
     return spsp.diags(diags, offsets, (nrows, ncols))
 
-def norm_c(n):
+def stencil_value(nr, parity):
+    """Create stencil matrix for a zero boundary value"""
+
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        return -galerkin_c(n+2*offsets[0])
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_diff(nr, parity):
+    """Create stencil matrix for a zero 1st derivative"""
+
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        return -(n+2.0*offsets[0])**2/n**2
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_diff2(nr, parity):
+    """Create stencil matrix for a zero 2nd derivative"""
+
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        return -(n - 3.0)*(n - 2.0)**2/(n**2*(n + 1.0))
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def stencil_1rdr(nr, parity):
+    """Create stencil matrix for a zero 2nd derivative"""
+
+    ns = np.arange(parity, 2*nr, 2)
+    offsets = [-1, 0]
+
+    # Generate subdiagonal
+    def d_1(n):
+        return -(n - 3.0)/(n + 1.0)
+
+    # Generate diagonal
+    def d0(n):
+        return 1.0
+
+    ds = [d_1, d0]
+    diags = utils.build_diagonals(ns, -1, ds, offsets, None, False)
+    diags[-1] = diags[-1][0:nr+offsets[0]]
+
+    return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+def tau_c(n):
     """Compute the chebyshev normalisation c factor"""
 
     if n > 0:
         return 2
     else:
         return 1
+
+def galerkin_c(n):
+    """Compute the chebyshev normalisation c factor for galerkin boundary"""
+
+    if n > 0:
+        return 1
+    else:
+        return 0.5

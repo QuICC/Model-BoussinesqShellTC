@@ -46,7 +46,7 @@ namespace Transform {
       struct Projectors
       {
          /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         enum Id {PROJ, PROJLL, DIFF, DIFFLL, DIVSIN, DIVSINLL, DIVSINDIFFSIN};
       };
 
       /**
@@ -55,7 +55,7 @@ namespace Transform {
       struct Integrators
       {
          /// Enum of integrator IDs
-         enum Id {INTG};
+         enum Id {INTG, INTGDIVLL, INTGLL, INTGLL2, INTGDIVSIN, INTGDIVLLDIVSIN, INTGLLDIVSIN, INTGDIFF, INTGDIVLLDIFF, INTGLLDIFF};
       };
 
    };
@@ -121,10 +121,9 @@ namespace Transform {
           * @param rSpecVal   Output spectral coefficients
           * @param physVal    Input physical values
           * @param integrator Integrator to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator);
+         void integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
 
          /**
           * @brief Compute polynomial projection
@@ -132,10 +131,9 @@ namespace Transform {
           * @param rPhysVal   Output physical values
           * @param specVal    Input spectral coefficients
           * @param projector  Projector to use
-          *
-          * @tparam TOperation   Arithmetic operation to perform
+          * @param arithId    Arithmetic operation to perform
           */
-         template <Arithmetics::Id TOperation> void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector);
+         void project(MatrixZ& rPhysVal, const MatrixZ& specVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
@@ -148,19 +146,29 @@ namespace Transform {
 
       private:
          /**
-          * @brief Initialise the quadrature points and weights
+          * @brief Initialise the operators
           */
-         void initQuadrature();
+         void initOperators();
 
          /**
-          * @brief Initialise the projector
+          * @brief Compute integration with vector of operators
           */
-         void initProjector();
+         void setIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops);
 
          /**
-          * @brief Initialise the derivative
+          * @brief f(l) Compute integration with vector of operators
           */
-         void initDerivative();
+         void setMultLIntegrator(MatrixZ& rSpecVal, const MatrixZ& physVal, const std::vector<Matrix>& ops, const Array& mult);
+
+         /**
+          * @brief Compute projection with vector of operators
+          */
+         void setProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops);
+
+         /**
+          * @brief Compute f(l) projection with vector of operators
+          */
+         void setMultLProjector(MatrixZ& rPhysVal, const MatrixZ& specVal, const std::vector<Matrix>& ops, const Array& mult);
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1]
@@ -178,88 +186,35 @@ namespace Transform {
          Array mWeights;
 
          /**
+          * @brief Storage for the l(l+1) factor
+          */
+         Array mLl;
+
+         /**
+          * @brief Storage for the (l(l+1))^2 factor
+          */
+         Array mLl2;
+
+         /**
+          * @brief Storage for the 1/l(l+1) factor
+          */
+         Array mDivLl;
+
+         /**
           * @brief Polynomial setup object providing the sizes
           */
          SharedPolySetup    mspSetup;
 
          /**
-          * @brief Projector matrix
+          * @brief Storage for the projector operators 
           */
-         std::vector<Matrix>  mProjector;
+         std::map<ProjectorType::Id,std::vector<Matrix> >  mProjOp;
 
          /**
-          * @brief Derivative matrix
+          * @brief Storage for the integrator operators 
           */
-         std::vector<Matrix>  mDerivative;
+         std::map<IntegratorType::Id,std::vector<Matrix> >  mIntgOp;
    };
-
-   template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::integrate(MatrixZ& rSpecVal, const MatrixZ& physVal, AssociatedLegendreTransform::IntegratorType::Id integrator)
-   {
-      //
-      /// \mhdBug Implementation should work but is probably slow!
-      //
-      
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // assert right sizes for input matrix
-      assert(physVal.rows() == this->mspSetup->fwdSize());
-      assert(physVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rSpecVal.cols() == this->mspSetup->howmany());
-
-      // Compute integration
-      int start = 0;
-      int physRows = this->mspSetup->fwdSize(); 
-      for(size_t i = 0; i < this->mProjector.size(); i++)
-      {
-         int cols = this->mspSetup->mult()(i);
-         int specRows = this->mProjector.at(i).cols();
-         rSpecVal.block(0, start, specRows, cols) = this->mProjector.at(i).transpose()*this->mWeights.asDiagonal()*physVal.block(0,start, physRows, cols);
-         start += cols;
-      }
-   }
-
-   template <Arithmetics::Id TOperation> void AssociatedLegendreTransform::project(MatrixZ& rPhysVal, const MatrixZ& specVal, AssociatedLegendreTransform::ProjectorType::Id projector)
-   {
-      // Add static assert to make sure only SET operation is used
-      Debug::StaticAssert< (TOperation == Arithmetics::SET) >();
-
-      // assert right sizes for input  matrix
-      assert(specVal.cols() == this->mspSetup->howmany());
-
-      // assert right sizes for output matrix
-      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
-      assert(rPhysVal.cols() == this->mspSetup->howmany());
-
-      // Compute first derivative
-      if(projector == AssociatedLegendreTransform::ProjectorType::DIFF)
-      {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mDerivative.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mDerivative.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mDerivative.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
-
-      // Compute simple projection
-      } else
-      {
-         int start = 0;
-         int physRows = this->mspSetup->fwdSize(); 
-         for(size_t i = 0; i < this->mProjector.size(); i++)
-         {
-            int cols = this->mspSetup->mult()(i);
-            int specRows = this->mProjector.at(i).cols();
-            rPhysVal.block(0, start, physRows, cols) = this->mProjector.at(i)*specVal.block(0,start, specRows, cols);
-            start += cols;
-         }
-      }
-   }
 
 }
 }

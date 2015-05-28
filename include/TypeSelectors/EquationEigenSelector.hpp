@@ -103,33 +103,61 @@
    }
 #endif //GEOMHDISCC_SPATIALSCHEME_AFT
 
-// Configure code to use BLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_BLF
+// Configure code to use BLFl scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLFL
 
-   #include "Equations/Tools/EquationEigenSHTools.hpp"
-
-   namespace GeoMHDiSCC {
-
-      namespace Equations {
-
-         namespace EigenSelector = EigenSH;
-      }
-   }
-#endif //GEOMHDISCC_SPATIALSCHEME_BLF
-
-// Configure code to use SLF scheme
-#ifdef GEOMHDISCC_SPATIALSCHEME_SLF
-
-   #include "Equations/Tools/EquationEigenSHTools.hpp"
+   #include "Equations/Tools/EquationEigenSHlTools.hpp"
 
    namespace GeoMHDiSCC {
 
       namespace Equations {
 
-         namespace EigenSelector = EigenSH;
+         namespace EigenSelector = EigenSHl;
       }
    }
-#endif //GEOMHDISCC_SPATIALSCHEME_SLF
+#endif //GEOMHDISCC_SPATIALSCHEME_BLFL
+
+// Configure code to use BLFm scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_BLFM
+
+   #include "Equations/Tools/EquationEigenSHmTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = EigenSHm;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_BLFM
+
+// Configure code to use SLFl scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_SLFL
+
+   #include "Equations/Tools/EquationEigenSHlTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = EigenSHl;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_SLFL
+
+// Configure code to use SLFm scheme
+#ifdef GEOMHDISCC_SPATIALSCHEME_SLFM
+
+   #include "Equations/Tools/EquationEigenSHmTools.hpp"
+
+   namespace GeoMHDiSCC {
+
+      namespace Equations {
+
+         namespace EigenSelector = EigenSHm;
+      }
+   }
+#endif //GEOMHDISCC_SPATIALSCHEME_SLFM
 
 // Configure code to use WFT scheme
 #ifdef GEOMHDISCC_SPATIALSCHEME_WFT

@@ -33,12 +33,8 @@ namespace Schemes {
       return "TTT";
    }
 
-   void TTTScheme::tuneResolution(SharedResolution spRes)
+   void TTTScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
-      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
       // Create single rank communicator
       #ifdef GEOMHDISCC_MPI
          std::vector<int>  ranks;

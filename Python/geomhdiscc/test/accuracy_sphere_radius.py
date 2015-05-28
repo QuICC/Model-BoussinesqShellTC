@@ -64,6 +64,7 @@ def d1(nr, rg):
         sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(l%2,2*nr,2)])
         ssol = sy.diff(sphys,x)
         test_forward(A, (l%2,(l+1)%2), sphys, ssol, rg, 1)
+
 def i2x1(nr, rg):
     """Accuracy test for i2x1 operator"""
 
@@ -222,14 +223,14 @@ if __name__ == "__main__":
 
     # run tests
     #zblk(nr, rg)
-    d1(nr, rg)
+#    d1(nr, rg)
     i2x1(nr, rg)
-    i2x2d1(nr, rg)
-    i2x2(nr, rg)
-    i2x2lapl(nr, rg)
-    i4x3(nr, rg)
-    i4x4d1(nr, rg)
-    i4x4(nr, rg)
-    i4x4lapl(nr, rg)
-    i4x4lapl2(nr, rg)
-    qid(nr, rg)
+#    i2x2d1(nr, rg)
+#    i2x2(nr, rg)
+#    i2x2lapl(nr, rg)
+#    i4x3(nr, rg)
+#    i4x4d1(nr, rg)
+#    i4x4(nr, rg)
+#    i4x4lapl(nr, rg)
+#    i4x4lapl2(nr, rg)
+#    qid(nr, rg)

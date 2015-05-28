@@ -39,7 +39,7 @@ namespace Equations {
 
    void BoussinesqFPlane3DQGVorticityZ::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 1, false, false);
    }
 
    void BoussinesqFPlane3DQGVorticityZ::setRequirements()
@@ -51,7 +51,7 @@ namespace Equations {
       this->setSolveTiming(SolveTiming::AFTER);
 
       // Set non orthogonal vertical vorticity requirements: is scalar?, need spectral?, need physical?, need diff?
-      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, true, true));
+      this->mRequirements.addField(PhysicalNames::VORTICITYZ, FieldRequirement(true, true, false, false));
    }
 
 }

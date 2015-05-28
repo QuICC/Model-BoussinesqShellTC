@@ -23,7 +23,8 @@
 #include "Equations/IVectorEquation.hpp"
 #include "TypeSelectors/TransformSelector.hpp"
 #include "TypeSelectors/VariableSelector.hpp"
-#include "TransformConfigurators/TransformSteps.hpp"
+#include "TransformConfigurators/TransformStepsMacro.h"
+#include "TransformConfigurators/IntegratorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -35,21 +36,6 @@ namespace Transform {
    class ForwardConfigurator
    {
       public:
-         /**
-          * @brief Update variable values from dealiased data
-          *
-          * @param spEquation Equation providing the variable
-          * @param coord      Transform coordinator
-          */
-         static void updateEquation(Equations::SharedIScalarEquation spEquation, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Prepare the timestep RHS for a vector
-          *
-          * @param spEquation Equation providing the variable
-          * @param coord      Transform coordinator
-          */
-         static void updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -57,41 +43,37 @@ namespace Transform {
           *
           * @param spEquation Equation providing the nonlinear computation
           * @param coord      Transform coordinator
-          *
-          * \tparam TComponent Physical vector field component
           */
-         template <FieldComponents::Physical::Id TComponent> static void nonlinearTerm(Equations::SharedIEquation spEquation, TransformCoordinatorType& coord);
+         static void nonlinearTerm(const IntegratorTree& tree, Equations::SharedIEquation spEquation, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the integration transform of the first dimension
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::ForwardBase::Step TStep> static void integrate1D(TransformCoordinatorType& coord);
+         static void integrate1D(const IntegratorTree::Integrator1DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Compute the integration transform of the second dimension
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::ForwardBase::Step TStep> static void integrate2D(TransformCoordinatorType& coord);
+         static void integrate2D(const IntegratorTree::Integrator2DEdge& edge, TransformCoordinatorType& coord, const bool recover, const bool hold);
 
          /**
           * @brief Compute the integration transform of the third dimension
           *
           * @param coord   Transform coordinator
           */
-         template <TransformSteps::ForwardBase::Step TStep> static void integrate3D(TransformCoordinatorType& coord);
+         static void integrate3D(const IntegratorTree::Integrator3DEdge& edge, TransformCoordinatorType& coord, const bool hold);
 
          /**
-          * @brief Update equation variable from dealiased data for a vector field
+          * @brief Update variable values from dealiased data
           *
           * @param spEquation Equation providing the variable
           * @param coord      Transform coordinator
-          *
-          * \tparam TComponent Spectral vector field component
           */
-         template <FieldComponents::Spectral::Id TComponent> static void updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
+         template <typename TSharedEquation> static void updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold);
 
          /**
           * @brief Empty constructor
@@ -106,72 +88,31 @@ namespace Transform {
       private: 
    };
 
-   template <FieldComponents::Physical::Id TComponent> void ForwardConfigurator::nonlinearTerm(Equations::SharedIEquation spEquation, TransformCoordinatorType& coord)
+   template <typename TSharedEquation> void ForwardConfigurator::updateEquation(const IntegratorTree::Integrator1DEdge& edge, TSharedEquation spEquation, TransformCoordinatorType& coord, const bool hold)
    {
       // Start profiler
-      ProfilerMacro_start(ProfilerMacro::NONLINEAR);
+      ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
 
-      // Get physical storage
-      TransformCoordinatorType::CommunicatorType::Fwd3DType &rNLComp = coord.communicator().providePhysical();
+      // Recover temporary storage
+      TransformCoordinatorType::CommunicatorType::Bwd1DType &rInVar = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
 
-      // Compute nonlinear term component
-      spEquation->computeNonlinear(rNLComp, TComponent);
+      // Compute linear term component
+      spEquation->updateDealiasedUnknown(rInVar, edge.specId(), edge.arithId());
 
-      // Compute nonlinear term component
-      spEquation->useNonlinear(rNLComp, TComponent);
+      // Hold temporary storage
+      if(hold)
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().holdFwd(rInVar);
 
-      // Transfer physical storage to next step
-      coord.communicator().holdPhysical(rNLComp);
+      // Free the temporary storage
+      } else
+      {
+         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rInVar);
+      }
 
       // Stop profiler
-      ProfilerMacro_stop(ProfilerMacro::NONLINEAR);
+      ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
    }
-
-   template <FieldComponents::Spectral::Id TComponent> void ForwardConfigurator::updateEquation(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord)
-   {
-      // Only compute for equations requiring nonlinear terms
-      if(spEquation->couplingInfo(FieldComponents::Spectral::SCALAR).hasNonlinear())
-      {
-         // Start profiler
-         ProfilerMacro_start(ProfilerMacro::DIAGNOSTICEQUATION);
-
-         // Recover temporary storage
-         TransformCoordinatorType::CommunicatorType::Bwd1DType &rComp = coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd();
-
-         // Compute linear term component
-         spEquation->updateDealiasedUnknown(rComp, TComponent);
-
-         // Free the temporary storage
-         coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(rComp);
-
-         // Stop profiler
-         ProfilerMacro_stop(ProfilerMacro::DIAGNOSTICEQUATION);
-      }
-   }
-
-   /// Specialised integration to do nothing
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
-
-   /// Specialised integration to compute scalar
-   template <> void ForwardConfigurator::integrate1D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
-
-
-   /// Specialised 2D integration to do nothing
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
-
-   /// Specialised 2D integration to compute scalar
-   template <> void ForwardConfigurator::integrate2D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
-
-
-   /// Specialised 3D integration to do nothing
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::NOTHING>(TransformCoordinatorType& coord);
-
-   /// Specialised 3D integration to compute scalar
-   template <> void ForwardConfigurator::integrate3D<TransformSteps::ForwardBase::DO_SCALAR>(TransformCoordinatorType& coord);
-
-
-   /// Specialised timestep preparation to do nothing
-   template <> void ForwardConfigurator::updateEquation<FieldComponents::Spectral::NOTUSED>(Equations::SharedIVectorEquation spEquation, TransformCoordinatorType& coord);
 
 }
 }

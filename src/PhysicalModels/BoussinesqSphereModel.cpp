@@ -25,7 +25,10 @@
 #include "IoVariable/VisualizationFileWriter.hpp"
 #include "IoTools/IdToHuman.hpp"
 #include "Equations/Sphere/Boussinesq/BoussinesqSphereTransport.hpp"
-#include "Equations/Sphere/Boussinesq/BoussinesqSphereVelocity.hpp"
+#include "Equations/Sphere/Boussinesq/BoussinesqSphereMomentum.hpp"
+#include "Generator/States/RandomScalarState.hpp"
+#include "Generator/States/RandomVectorState.hpp"
+#include "Generator/States/SphereExactStateIds.hpp"
 #include "Generator/States/SphereExactScalarState.hpp"
 #include "Generator/States/SphereExactVectorState.hpp"
 #include "Generator/Visualizers/ScalarFieldVisualizer.hpp"
@@ -44,24 +47,47 @@ namespace GeoMHDiSCC {
       spSim->addScalarEquation<Equations::BoussinesqSphereTransport>();
       
       // Add Navier-Stokes equation
-      spSim->addVectorEquation<Equations::BoussinesqSphereVelocity>();
+      spSim->addVectorEquation<Equations::BoussinesqSphereMomentum>();
    }
 
    void BoussinesqSphereModel::addStates(SharedStateGenerator spGen)
    {
-      // Shared pointer to equation
-      Equations::SharedSphereExactScalarState spSExact;
-      Equations::SharedSphereExactVectorState spVExact;
+      // Generate "exact" solutions (trigonometric or monomial)
+      if(true)
+      {
+         // Shared pointer to equation
+         Equations::SharedSphereExactScalarState spScalar;
+         Equations::SharedSphereExactVectorState spVector;
 
-      // Add temperature initial state generator
-      spSExact = spGen->addScalarEquation<Equations::SphereExactScalarState>();
-      spSExact->setIdentity(PhysicalNames::TEMPERATURE);
-      spSExact->setStateType(Equations::SphereExactScalarState::CONSTANT);
+         // Add temperature initial state generator
+         spScalar = spGen->addScalarEquation<Equations::SphereExactScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setStateType(Equations::SphereExactStateIds::CONSTANT);
 
-      // Add temperature initial state generator
-      spVExact = spGen->addVectorEquation<Equations::SphereExactVectorState>();
-      spVExact->setIdentity(PhysicalNames::VELOCITY);
-      spVExact->setStateType(Equations::SphereExactVectorState::CONSTANT);
+         // Add temperature initial state generator
+         spVector = spGen->addVectorEquation<Equations::SphereExactVectorState>();
+         spVector->setStateType(FieldComponents::Physical::R, Equations::SphereExactStateIds::CONSTANT);
+         spVector->setStateType(FieldComponents::Physical::THETA, Equations::SphereExactStateIds::CONSTANT);
+         spVector->setStateType(FieldComponents::Physical::PHI, Equations::SphereExactStateIds::CONSTANT);
+
+      // Generate random spectrum
+      } else
+      {
+         // Shared pointer to random initial state equation
+         Equations::SharedRandomScalarState spScalar;
+         Equations::SharedRandomVectorState spVector;
+
+         // Add scalar random initial state generator 
+         spVector = spGen->addVectorEquation<Equations::RandomVectorState>();
+         spVector->setIdentity(PhysicalNames::VELOCITY);
+         spVector->setSpectrum(FieldComponents::Spectral::TOR, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+         spVector->setSpectrum(FieldComponents::Spectral::POL, -1e-4, 1e-4, 1e4, 1e4, 1e4);
+
+         // Add scalar random initial state generator
+         spScalar = spGen->addScalarEquation<Equations::RandomScalarState>();
+         spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+         spScalar->setSpectrum(-1e-3, 1e-3, 1e4, 1e4, 1e4);
+      }
 
       // Add output file
       IoVariable::SharedStateFileWriter spOut(new IoVariable::StateFileWriter(SchemeType::type(), SchemeType::isRegular()));
@@ -73,16 +99,23 @@ namespace GeoMHDiSCC {
    void BoussinesqSphereModel::addVisualizers(SharedVisualizationGenerator spVis)
    {
       // Shared pointer to basic field visualizer
-      Equations::SharedScalarFieldVisualizer spField;
+      Equations::SharedScalarFieldVisualizer spScalar;
+      Equations::SharedVectorFieldVisualizer spVector;
 
-      // Add first field visualization
-      spField = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
-      spField->setFields(true, false);
-      spField->setIdentity(PhysicalNames::TEMPERATURE);
+      // Add temperature field visualization
+      spScalar = spVis->addScalarEquation<Equations::ScalarFieldVisualizer>();
+      spScalar->setFields(true, false);
+      spScalar->setIdentity(PhysicalNames::TEMPERATURE);
+
+      // Add velocity field visualization
+      spVector = spVis->addVectorEquation<Equations::VectorFieldVisualizer>();
+      spVector->setFields(true, false, false);
+      spVector->setIdentity(PhysicalNames::VELOCITY);
 
       // Add output file
       IoVariable::SharedVisualizationFileWriter spOut(new IoVariable::VisualizationFileWriter(SchemeType::type()));
       spOut->expect(PhysicalNames::TEMPERATURE);
+      spOut->expect(PhysicalNames::VELOCITY);
       spVis->addHdf5OutputFile(spOut);
    }
 
@@ -93,6 +126,7 @@ namespace GeoMHDiSCC {
 
       // Set expected fields
       spIn->expect(PhysicalNames::TEMPERATURE);
+      spIn->expect(PhysicalNames::VELOCITY);
 
       // Set simulation state
       spVis->setInitialState(spIn);

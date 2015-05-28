@@ -27,6 +27,7 @@
 #include "Base/Typedefs.hpp"
 #include "Enums/Dimensions.hpp"
 #include "Enums/DimensionTools.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 #include "Communicators/Converters/SerialConverterBase.hpp"
 
@@ -61,7 +62,7 @@ namespace Parallel {
          /**
           * @brief Setup the converter
           */
-         virtual void setup();
+         virtual void setup(const Dimensions::Transform::Id transId);
 
          /**
           * @brief Get the converted data from TBwdA to TFwdB conversion
@@ -78,12 +79,32 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs);
+         virtual void setupCommunication(const int packs, const TransformDirection::Id direction);
+
+         /**
+          * @brief Start persistent send for forward transform
+          */
+         virtual void initiateForwardSend();
+
+         /**
+          * @brief Post persistent receive for forward transform
+          */
+         virtual void prepareForwardReceive();
 
          /**
           * @brief Start communication for forward transform
           */
          virtual void initiateForwardCommunication();
+
+         /**
+          * @brief Start persistent send for backward transform
+          */
+         virtual void initiateBackwardSend();
+
+         /**
+          * @brief Post persistent receive for backward transform
+          */
+         virtual void prepareBackwardReceive();
 
          /**
           * @brief Start communication for backward transform
@@ -133,15 +154,31 @@ namespace Parallel {
       return rOut;
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setup(const Dimensions::Transform::Id transId)
    {
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs)
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupCommunication(const int packs, const TransformDirection::Id direction)
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardSend()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareForwardReceive()
    {
    }
 
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateForwardCommunication()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::initiateBackwardSend()
+   {
+   }
+
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void SerialConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::prepareBackwardReceive()
    {
    }
 

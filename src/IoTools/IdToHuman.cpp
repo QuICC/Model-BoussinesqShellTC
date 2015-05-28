@@ -241,12 +241,18 @@ namespace IoTools {
    {
       switch(id)
       {
-         case FieldComponents::Physical::ONE:
+         case FieldComponents::Physical::X:
             return "X";
-         case FieldComponents::Physical::TWO:
+         case FieldComponents::Physical::Y:
             return "Y";
-         case FieldComponents::Physical::THREE:
+         case FieldComponents::Physical::Z:
             return "Z";
+         case FieldComponents::Physical::R:
+            return "R";
+         case FieldComponents::Physical::THETA:
+            return "Theta";
+         case FieldComponents::Physical::PHI:
+            return "Phi";
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
@@ -258,12 +264,18 @@ namespace IoTools {
    {
       switch(id)
       {
-         case FieldComponents::Physical::ONE:
+         case FieldComponents::Physical::X:
             return "x";
-         case FieldComponents::Physical::TWO:
+         case FieldComponents::Physical::Y:
             return "y";
-         case FieldComponents::Physical::THREE:
+         case FieldComponents::Physical::Z:
             return "z";
+         case FieldComponents::Physical::R:
+            return "r";
+         case FieldComponents::Physical::THETA:
+            return "theta";
+         case FieldComponents::Physical::PHI:
+            return "phi";
          case FieldComponents::Physical::SCALAR:
             return "";
          default:
@@ -275,12 +287,28 @@ namespace IoTools {
    {
       switch(id)
       {
-         case FieldComponents::Spectral::ONE:
+         case FieldComponents::Spectral::X:
+            return "X";
+         case FieldComponents::Spectral::Y:
+            return "Y";
+         case FieldComponents::Spectral::Z:
+            return "Z";
+         case FieldComponents::Spectral::R:
+            return "R";
+         case FieldComponents::Spectral::THETA:
+            return "Theta";
+         case FieldComponents::Spectral::PHI:
+            return "Phi";
+         case FieldComponents::Spectral::TOR:
             return "Toroidal";
-         case FieldComponents::Spectral::TWO:
+         case FieldComponents::Spectral::POL:
             return "Poloidal";
-         case FieldComponents::Spectral::THREE:
-            return "NOTYET";
+         case FieldComponents::Spectral::Q:
+            return "Q";
+         case FieldComponents::Spectral::S:
+            return "S";
+         case FieldComponents::Spectral::T:
+            return "T";
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
@@ -292,12 +320,28 @@ namespace IoTools {
    {
       switch(id)
       {
-         case FieldComponents::Spectral::ONE:
+         case FieldComponents::Spectral::X:
+            return "x";
+         case FieldComponents::Spectral::Y:
+            return "y";
+         case FieldComponents::Spectral::Z:
+            return "z";
+         case FieldComponents::Spectral::R:
+            return "r";
+         case FieldComponents::Spectral::THETA:
+            return "theta";
+         case FieldComponents::Spectral::PHI:
+            return "phi";
+         case FieldComponents::Spectral::TOR:
             return "tor";
-         case FieldComponents::Spectral::TWO:
+         case FieldComponents::Spectral::POL:
             return "pol";
-         case FieldComponents::Spectral::THREE:
-            return "NOTYET";
+         case FieldComponents::Spectral::Q:
+            return "q";
+         case FieldComponents::Spectral::S:
+            return "s";
+         case FieldComponents::Spectral::T:
+            return "t";
          case FieldComponents::Spectral::SCALAR:
             return "";
          default:
@@ -309,14 +353,10 @@ namespace IoTools {
    {
       switch(id)
       {
-         case NonDimensional::CHI:
-            return "chi";
-
+         //
+         // Nondimensional numbers
          case NonDimensional::EKMAN:
             return "ekman";
-
-         case NonDimensional::GAMMA:
-            return "gamma";
 
          case NonDimensional::MAGEKMAN:
             return "magnetic_ekman";
@@ -336,12 +376,24 @@ namespace IoTools {
          case NonDimensional::ROSSBY:
             return "rossby";
 
+         case NonDimensional::TAYLOR:
+            return "taylor";
+        
+         //
+         // Geometrical numbers
          case NonDimensional::RO:
             return "ro";
 
          case NonDimensional::RRATIO:
             return "rratio";
 
+         //
+         // Flags
+         case NonDimensional::HEATING:
+            return "heating";
+
+         //
+         // Axis scalings
          case NonDimensional::SCALE1D:
             return "scale1d";
 
@@ -351,11 +403,79 @@ namespace IoTools {
          case NonDimensional::SCALE3D:
             return "scale3d";
 
-         case NonDimensional::TAYLOR:
-            return "taylor";
+         // 
+         // Greek alphabet
+         case NonDimensional::ALPHA:
+            return "alpha";
+
+         case NonDimensional::BETA:
+            return "beta";
+
+         case NonDimensional::GAMMA:
+            return "gamma";
+
+         case NonDimensional::DELTA:
+            return "delta";
+
+         case NonDimensional::EPSILON:
+            return "epsilon";
+
+         case NonDimensional::ZETA:
+            return "zeta";
+
+         case NonDimensional::ETA:
+            return "eta";
 
          case NonDimensional::THETA:
             return "theta";
+
+         case NonDimensional::IOTA:
+            return "iota";
+
+         case NonDimensional::KAPPA:
+            return "kappa";
+
+         case NonDimensional::LAMBDA:
+            return "lambda";
+
+         case NonDimensional::MU:
+            return "mu";
+
+         case NonDimensional::NU:
+            return "nu";
+
+         case NonDimensional::XI:
+            return "xi";
+
+         case NonDimensional::OMICRON:
+            return "omicron";
+
+         case NonDimensional::PI:
+            return "pi";
+
+         case NonDimensional::RHO:
+            return "rho";
+
+         case NonDimensional::SIGMA:
+            return "sigma";
+
+         case NonDimensional::TAU:
+            return "tau";
+
+         case NonDimensional::UPSILON:
+            return "upsilon";
+
+         case NonDimensional::PHI:
+            return "phi";
+
+         case NonDimensional::CHI:
+            return "chi";
+
+         case NonDimensional::PSI:
+            return "psi";
+
+         case NonDimensional::OMEGA:
+            return "omega";
 
          default:
             throw Exception("Unknown ID to tag conversion requested (NonDimensional)");
@@ -366,9 +486,6 @@ namespace IoTools {
    {
       switch(id)
       {
-         case ModelOperator::QI:
-            return "qi";
-
          case ModelOperator::TIME:
             return "time";
 
@@ -377,6 +494,12 @@ namespace IoTools {
 
          case ModelOperator::EXPLICIT_LINEAR:
             return "explicit_linear";
+
+         case ModelOperator::EXPLICIT_NONLINEAR:
+            return "explicit_nonlinear";
+
+         case ModelOperator::EXPLICIT_NEXTSTEP:
+            return "explicit_nextstep";
 
          case ModelOperator::STENCIL:
             return "stencil";

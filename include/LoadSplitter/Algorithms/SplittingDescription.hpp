@@ -20,6 +20,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/Splitting.hpp"
+#include "IoXml/VtpWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -40,7 +41,7 @@ namespace Parallel {
           * @param factors    CPU splitting factors
           * @param score      Score 
           */
-         SplittingDescription(const Splitting::Algorithms::Id algorithm, const Splitting::Groupers::Id grouper, const int dims, const ArrayI& factors, const MHDFloat score, const std::vector<std::multimap<int,int> >& structure);
+         SplittingDescription();
 
          /**
           * @brief Destructor
@@ -50,12 +51,12 @@ namespace Parallel {
          /**
           * @brief ID of the algorithm
           */
-         const Splitting::Algorithms::Id algorithm;
+         Splitting::Algorithms::Id algorithm;
 
          /**
           * @brief ID of the grouper
           */
-         const Splitting::Groupers::Id grouper;
+         Splitting::Groupers::Id grouper;
 
          /**
           * @brief Number of dimensions
@@ -70,12 +71,19 @@ namespace Parallel {
          /**
           * @brief Score of the splitting
           */
-         MHDFloat score;
+         Array score;
 
          /**
           * @brief Communication structure
           */
          std::vector<std::multimap<int,int> >   structure;
+
+         #ifdef GEOMHDISCC_DEBUG
+         /**
+          * @brief Storage for data distribution visualization files
+          */
+         std::vector<IoXml::SharedVtpWriter> vtpFiles;
+         #endif //GEOMHDISCC_DEBUG
          
       protected:
 

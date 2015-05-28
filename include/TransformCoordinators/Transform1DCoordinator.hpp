@@ -27,10 +27,19 @@
 #include "Enums/FieldIds.hpp"
 #include "Enums/NonDimensional.hpp"
 #include "Resolutions/Resolution.hpp"
-#include "Variables/VariableRequirement.hpp"
 
 
 namespace GeoMHDiSCC {
+
+   namespace Transform {
+
+      // Forward declaration for ProjectorTree
+      class ProjectorTree;
+
+      // Forward declaration for IntegratorTree
+      class IntegratorTree;
+
+   }
 
    /**
     * 
@@ -61,10 +70,11 @@ namespace GeoMHDiSCC {
          /**
           * @brief Initialise transform of the 1D coordinator
           *
-          * @param spRes   Resolution information object
-          * @param varInfo Variables information
+          * @param spRes            Resolution information object
+          * @param integratorTree   Transform integrator tree
+          * @param projectorTree    Transform projector tree
           */
-         void initTransforms(SharedResolution spRes, const VariableRequirement& varInfo);
+         void initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
 
          /**
           * @brief Initialise the data communicator
@@ -94,6 +104,16 @@ namespace GeoMHDiSCC {
          TCommunicator&  communicator();
 
          /**
+          * @brief Get the transform integrator tree
+          */
+         const std::vector<Transform::IntegratorTree>& integratorTree() const;
+
+         /**
+          * @brief Get the transform projector tree
+          */
+         const std::vector<Transform::ProjectorTree>& projectorTree() const;
+
+         /**
           * @brief Need to compute backward transform to physical values?
           *
           * @param name Name of the field
@@ -101,9 +121,14 @@ namespace GeoMHDiSCC {
          bool needPhysical(PhysicalNames::Id name);
 
          /**
-          * @brief Need to compute backward transform to physical differential values (gradient or curl)?
+          * @brief Need to compute backward transform to physical gradient values (scalar or vector)?
           */
-         bool needPhysicalDiff(PhysicalNames::Id name);
+         bool needPhysicalGradient(PhysicalNames::Id name);
+
+         /**
+          * @brief Need to compute backward transform to physical curl values?
+          */
+         bool needPhysicalCurl(PhysicalNames::Id name);
 
          /**
           * @brief Get grid array(s) of the mesh
@@ -124,9 +149,14 @@ namespace GeoMHDiSCC {
          T1D  mTransform1D;
 
          /**
-          * @brief Variable information
+          * @brief Transform integrator tree
           */
-         VariableRequirement  mVarInfo;
+         std::vector<Transform::IntegratorTree> mIntegratorTree;
+
+         /**
+          * @brief Transform projector tree
+          */
+         std::vector<Transform::ProjectorTree> mProjectorTree;
 
          /**
           * @brief Initialise the transforms
@@ -146,14 +176,14 @@ namespace GeoMHDiSCC {
       return this->mCommunicator;
    }
 
-   template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysical(PhysicalNames::Id name)
+   template <typename T1D, typename TCommunicator> inline const std::vector<Transform::IntegratorTree>& Transform1DCoordinator<T1D,TCommunicator>::integratorTree() const
    {
-      return this->mVarInfo.field(name).needPhysical();
+      return this->mIntegratorTree;
    }
 
-   template <typename T1D, typename TCommunicator> inline bool Transform1DCoordinator<T1D,TCommunicator>::needPhysicalDiff(PhysicalNames::Id name)
+   template <typename T1D, typename TCommunicator> inline const std::vector<Transform::ProjectorTree>& Transform1DCoordinator<T1D,TCommunicator>::projectorTree() const
    {
-      return this->mVarInfo.field(name).needPhysicalDiff();
+      return this->mProjectorTree;
    }
 
    template <typename T1D, typename TCommunicator> Transform1DCoordinator<T1D,TCommunicator>::Transform1DCoordinator()
@@ -164,13 +194,16 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
+   template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
    {
       // Initialise the transforms
       this->initTransform(std::tr1::static_pointer_cast<typename T1D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA1D)));
 
-      // Store information about variables
-      this->mVarInfo = varInfo;
+      // Store the projector tree
+      this->mIntegratorTree = integratorTree;
+
+      // Store the projector tree
+      this->mProjectorTree = projectorTree;
    }
 
    template <typename T1D, typename TCommunicator> void Transform1DCoordinator<T1D,TCommunicator>::initTransform(typename T1D::SharedSetupType spSetup1D)

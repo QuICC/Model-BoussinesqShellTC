@@ -3,6 +3,7 @@ set(MHDSources
    ITimer.cpp
    TimerTools.cpp
    ExecutionTimer.cpp
+   StageTimer.cpp
 )
 
 # Add in the parallel or serial timers depending on setup

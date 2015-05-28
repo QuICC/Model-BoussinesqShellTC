@@ -7,6 +7,10 @@ import numpy as np
 import scipy.sparse as spsp
 import itertools
 
+import geomhdiscc.base.utils as utils
+
+
+use_parity_bc = False
 
 def no_bc():
     """Get a no boundary condition flag"""
@@ -107,6 +111,9 @@ def apply_tau(mat, bc, location = 't'):
     # u = D^2u = 0
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
+    # Last mode is zero
+    elif bc[0] == 99:
+        cond = tau_last(mat.shape[0])
 
     if cond.dtype == 'complex_':
         bc_mat = mat.astype('complex_').tolil()
@@ -167,14 +174,14 @@ def tau_integral(nr, pos, coeffs = None):
     c = next(it)
     if pos >= 0:
         tmp = np.zeros((1,nr))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
         tmp[0,0] = tmp[0,0]/2
         cond.append(tmp[0,:])
         c = next(it)
 
     if pos <= 0:
         tmp = np.zeros((1,nr))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nr,2)]
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nr,2)]
         tmp[0,0] = tmp[0,0]/2
         cond.append(tmp[0,:])
 
@@ -226,7 +233,7 @@ def tau_diff2(nr, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nr)])
+        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nr)])
         c = next(it)
 
     if pos <= 0:
@@ -239,7 +246,7 @@ def tau_1rdr(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff(nr, pos, 1/a) + tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff(nr, pos, 1.0/a) + tau_value(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
@@ -248,7 +255,7 @@ def tau_1rd1r(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff(nr, pos, 1/a) - tau_value(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff(nr, pos, 1.0/a) - tau_value(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
@@ -257,7 +264,7 @@ def tau_d1rdr(nr, pos, coeffs = None):
 
     a = coeffs['a']
     b = coeffs['b']
-    cond = tau_diff2(nr, pos, 1/a) + tau_diff(nr, pos, [1/(a+b), 1/(a-b)])
+    cond = tau_diff2(nr, pos, 1.0/a) + tau_diff(nr, pos, [1.0/(a+b), 1.0/(a-b)])
 
     return cond
 
@@ -289,9 +296,19 @@ def tau_value_diff2(nr, pos, coeffs = None):
 
     return np.array(cond)
 
+def tau_last(nr):
+    """Create the boundary value tau line(s)"""
+
+    cond = []
+    cond.append([0 for i in np.arange(0,nr-1)] +  [tau_c(nr)])
+
+    return np.array(cond)
+
 def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
+    nr = mat.shape[0]
+    mat = mat*stencil(nr, parity, bc)
     return mat
 
 def restrict_eye(nr, t, q):

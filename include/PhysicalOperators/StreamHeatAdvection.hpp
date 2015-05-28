@@ -37,21 +37,21 @@ namespace Physical {
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         template <int COMPONENTS> static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Add streamfunction advection product to S
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         template <int COMPONENTS> static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
 
          /**
           * @brief Substract streamfunction advection product from S
           *
           *    \f$ \left(\nabla^{\perp}\psi\cdot\nabla_{\perp}\right)\overline{T} = -\partial_y\psi\partial_x \theta -\partial_y\psi\partial_x x + \partial_x\psi\partial_y \theta\f$
           */
-         template <int COMPONENTS> static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
+         static void sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c = 1.0);
          
       protected:
 
@@ -67,7 +67,7 @@ namespace Physical {
          ~StreamHeatAdvection();
    };
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::set(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -82,7 +82,7 @@ namespace Physical {
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::add(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {
@@ -97,7 +97,7 @@ namespace Physical {
       }
    }
 
-   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> template <int COMPONENTS> void StreamHeatAdvection<TXComp,TYComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, COMPONENTS, FieldComponents::Physical::Id> &w, const MHDFloat c)
+   template <FieldComponents::Physical::Id TXComp, FieldComponents::Physical::Id TYComp> void StreamHeatAdvection<TXComp,TYComp>::sub(Datatypes::PhysicalScalarType &rS, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &dPsi, const Datatypes::VectorField<Datatypes::PhysicalScalarType, FieldComponents::Physical::Id> &w, const MHDFloat c)
    {
       if(c != 1.0)
       {

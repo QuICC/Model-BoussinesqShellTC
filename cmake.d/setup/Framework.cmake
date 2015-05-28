@@ -38,7 +38,7 @@ endif(memoryTest)
 # Choose the type of MPI parallelisation or serial setup.
 # Possible options are: Serial, Auto, Single1D, Single2D, Tubular
 #
-set(GEOMHDISCC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular" "Fixed")
+set(GEOMHDISCC_MPIALGOS "Serial" "Auto" "Single1D" "Single2D" "Tubular" "Coupled2D")
 
 geomhdiscc_provide_choice(GEOMHDISCC_MPIALGOS "MPI algorithm" GEOMHDISCC_MPIALGO mpiTest)
 
@@ -51,7 +51,7 @@ if(mpiTest)
    if(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
       geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
    else(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
-      set(algos "Single1D" "Single2D" "Tubular" "Fixed")
+      set(algos "Single1D" "Single2D" "Tubular" "Coupled2D")
       foreach(GEOMHDISCC_MPIALGO ${algos})
          geomhdiscc_add_definition(GEOMHDISCC_MPIALGO)
       endforeach(GEOMHDISCC_MPIALGO ${algos})
@@ -72,7 +72,7 @@ if(mpiTest)
    set(GEOMHDISCC_GROUPERS_SINGLE1D "Equation" "Auto" "Single1D")
    set(GEOMHDISCC_GROUPERS_SINGLE2D "Equation" "Auto" "Single2D")
    set(GEOMHDISCC_GROUPERS_TUBULAR "Equation" "Auto" "Single1D" "Single2D" "Transform")
-   set(GEOMHDISCC_GROUPERS_FIXED "Equation" "Auto" "Single1D")
+   set(GEOMHDISCC_GROUPERS_COUPLED2D "Equation" "Auto" "Single1D")
    string(TOUPPER "GEOMHDISCC_GROUPERS_${GEOMHDISCC_MPIALGO}" upGrouper)
 
    geomhdiscc_provide_choice(${upGrouper} "Transform grouping" GEOMHDISCC_TRANSGROUPER groupTest)

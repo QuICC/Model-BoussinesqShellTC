@@ -65,19 +65,9 @@ namespace Diagnostics {
          void updateCfl();
 
          /**
-          * @brief Compute the current kinetic energy
-          */
-         void updateKineticEnergy();
-
-         /**
           * @brief Get CFL condition
           */
          MHDFloat cfl() const;
-
-         /**
-          * @brief Get kinetic energy condition
-          */
-         MHDFloat kineticEnergy() const;
 
          /**
           * @brief Get start time
@@ -116,11 +106,6 @@ namespace Diagnostics {
           * @brief Current CFL condition
           */
          MHDFloat mCfl;
-
-         /**
-          * @brief Current kinetic energy
-          */
-         MHDFloat mKinetic;
 
          /**
           * @brief Start simulation time

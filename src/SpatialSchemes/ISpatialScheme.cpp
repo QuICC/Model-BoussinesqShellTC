@@ -31,13 +31,9 @@ namespace Schemes {
    {
    }
 
-   void ISpatialScheme::tuneResolution(SharedResolution spRes)
+   void ISpatialScheme::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
-      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
-
-      spRes->setIndexCounter(spCounter);
-
-      ISpatialScheme::tuneMpiResolution();
+      ISpatialScheme::tuneMpiResolution(descr);
    }
 
    ISpatialScheme::ISpatialScheme(const int dims)
@@ -47,6 +43,14 @@ namespace Schemes {
 
    ISpatialScheme::~ISpatialScheme()
    {
+   }
+
+   void ISpatialScheme::addIndexCounter(SharedResolution spRes)
+   {
+      SharedRegularIndexCounter   spCounter(new RegularIndexCounter(spRes->sim(), spRes->cpu()));
+
+      spRes->setIndexCounter(spCounter);
+
    }
 
    void ISpatialScheme::init()
@@ -113,14 +117,32 @@ namespace Schemes {
       return this->mDims;
    }
 
-   void ISpatialScheme::tuneMpiResolution()
+   void ISpatialScheme::tuneMpiResolution(const Parallel::SplittingDescription& descr)
    {
-      // Create single rank communicator
-      #ifdef GEOMHDISCC_MPI
-         std::vector<int>  ranks;
-         ranks.push_back(FrameworkMacro::id());
-         FrameworkMacro::setSpectralComm(ranks);
-      #endif //GEOMHDISCC_MPI
+      #if defined GEOMHDISCC_MPI
+         for(std::vector<std::multimap<int,int> >::const_iterator vIt = descr.structure.begin(); vIt != descr.structure.end(); ++vIt)
+         {
+            // Extract the communication group from structure
+            std::multimap<int,int>::const_iterator it;
+            std::set<int> filter;
+            filter.insert(FrameworkMacro::id());
+            for(it = vIt->equal_range(FrameworkMacro::id()).first; it != vIt->equal_range(FrameworkMacro::id()).second; ++it)
+            {
+               filter.insert(it->second);
+            }
+
+            // Convert set to array of CPUs in group
+            ArrayI groupCpu(filter.size());
+            int i = 0;
+            for(std::set<int>::iterator it = filter.begin(); it != filter.end(); ++it)
+            {
+               groupCpu(i) = *it;
+               ++i;
+            }
+
+            FrameworkMacro::addTransformComm(groupCpu);
+         }
+      #endif //defined GEOMHDISCC_MPI
    }
 
 }

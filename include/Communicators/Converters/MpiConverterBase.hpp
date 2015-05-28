@@ -29,6 +29,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Base/MpiTypes.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "Resolutions/Resolution.hpp"
 #include "Communicators/Converters/IConverter.hpp"
 #include "Communicators/CommunicationBuffer.hpp"
@@ -136,7 +137,7 @@ namespace Parallel {
          /**
           * @brief Setup the MPI communication requests requests
           */
-         void setupRequests();
+         void setupRequests(const Dimensions::Transform::Id transId);
 
          /**
           * @brief Cleanup the MPI communication requests
@@ -197,14 +198,19 @@ namespace Parallel {
          int mPacks;
 
          /**
-          * @brief The number of packs in the "previous/active" forward send
+          * @brief Active operations are for forward direction
           */
-         int   mActiveFSendPacks;
+         TransformDirection::Id   mActiveDirection;
 
          /**
-          * @brief The number of packs in the "previous/active" backward send
+          * @brief The number of packs in the "previous/active" send operations
           */
-         int   mActiveBSendPacks;
+         int   mActiveSend;
+
+         /**
+          * @brief The number of packs in the "previous/active" receive operations
+          */
+         int   mActiveReceive;
 
          /**
           * @brief Storage for the receive position pointers
@@ -348,7 +354,7 @@ namespace Parallel {
    }
       
    template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::MpiConverterBase()
-      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveFSendPacks(0), mActiveBSendPacks(0)
+      : IConverter<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>(), mIsSending(false), mIsReceiving(false), mPacks(0), mActiveSend(0), mActiveReceive(0)
    {
    }
 
@@ -408,7 +414,7 @@ namespace Parallel {
       return ((size - 1 - id + ref) % size);
    }
 
-   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests()
+   template <typename TFwdA, typename TBwdA, typename TFwdB, typename TBwdB, typename TIdx> void MpiConverterBase<TFwdA, TBwdA, TFwdB, TBwdB, TIdx>::setupRequests(const Dimensions::Transform::Id transId)
    {
       // Storage for global location flags
       int dest;
@@ -418,6 +424,19 @@ namespace Parallel {
       int grpMe;
       int grpDest;
       int grpSrc;
+
+      // Shift tag to produce unique tag in 2D distribution
+      int tagShift = 0;
+      if(transId == Dimensions::Transform::TRA2D)
+      {
+         tagShift = 0;
+      } else if(transId == Dimensions::Transform::TRA3D)
+      {
+         tagShift = FrameworkMacro::nCpu();
+      } else
+      {
+         MPI_Abort(MPI_COMM_WORLD, 999);
+      }
 
       // Storage for the number of packs
       int packs;
@@ -454,8 +473,8 @@ namespace Parallel {
             // Get global MPI source rank
             src = this->fCpu(grpSrc);
 
-            // Set MPI tag
-            tag = src;
+            // Set shifted MPI tag to make it unique
+            tag = src + tagShift;
 
             //Safety asserts
             assert(static_cast<size_t>(grpSrc) < this->mFSizes.size());
@@ -468,12 +487,15 @@ namespace Parallel {
          // Create send backward requests
          for(int id = 0; id < this->nBCpu(); ++id)
          {
-            // Set MPI tag
-            tag = FrameworkMacro::id();
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), tag));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+
+            // Set shifted MPI tag to make it unique
+            tag = FrameworkMacro::id() + tagShift;
+
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nBCpu());
+
             // Get global MPI destination rank
             dest = this->bCpu(grpDest);
 
@@ -511,12 +533,16 @@ namespace Parallel {
          {
             // Get CPU group index of local node
             grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), FrameworkMacro::id()));
+
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nBCpu());
+
             // Get global MPI source rank
             src = this->bCpu(grpSrc);
-            // Set MPI tag
-            tag = src;
+
+            // Set shifted MPI tag to make it unique
+            tag = src + tagShift;
+
             // initialise the Recv request
             MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MPI_COMM_WORLD, &(this->mRecvBRequests.at(packs).at(grpSrc)));
          }
@@ -524,14 +550,18 @@ namespace Parallel {
          // Create send forward requests
          for(int id = 0; id < this->nFCpu(); ++id)
          {
-            // Set MPI tag
-            tag = FrameworkMacro::id();
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), tag));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), FrameworkMacro::id()));
+
+            // Set shifted MPI tag to make it unique
+            tag = FrameworkMacro::id() + tagShift;
+
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nFCpu());
+
             // Get global MPI destination rank
             dest = this->fCpu(grpDest);
+
             // initialise the Send request
             MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MPI_COMM_WORLD, &(this->mSendFRequests.at(packs).at(grpDest)));
          }

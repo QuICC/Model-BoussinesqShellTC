@@ -49,7 +49,7 @@ namespace Equations {
       SpectralComponent_iterator specIt;
       for(specIt = specRange.first; specIt != specRange.second; ++specIt)
       {
-         this->defineCoupling(*specIt, CouplingInformation::PROGNOSTIC, 1, false, false, false);
+         this->defineCoupling(*specIt, CouplingInformation::PROGNOSTIC, 1, false, false);
       }
    }
 

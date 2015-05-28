@@ -29,12 +29,10 @@ namespace GeoMHDiSCC {
           * @brief Enums of the different nondimensional factors
           */
          enum Id {
-            /// Chi
-            CHI = 0,
+            //
+            // Nondimensional numbers
             /// Ekman number
-            EKMAN,
-            /// Gamma
-            GAMMA,
+            EKMAN = 0,
             /// Magnetic Ekman number
             MAGEKMAN,
             /// Magnetic Prandtl number
@@ -47,20 +45,80 @@ namespace GeoMHDiSCC {
             ROBERTS,
             /// Rossby number
             ROSSBY,
+            /// Taylor number
+            TAYLOR,
+
+            // 
+            // Geometrical numbers
             /// Outer radius R_o
             RO,
             /// Radii ratio R_i/R_o
             RRATIO,
+
+            //
+            // Flags
+            /// Flag to switch between interal heating, differential heating, etc
+            HEATING,
+            
+            //
+            // Axis scaling factors
             /// 1D axis scale
             SCALE1D,
             /// 2D axis scale
             SCALE2D,
             /// 3D axis scale
             SCALE3D,
-            /// Taylor number
-            TAYLOR,
+
+            //
+            // Greek alphabet
+            /// Alpha
+            ALPHA,
+            /// Beta
+            BETA,
+            /// Gamma
+            GAMMA,
+            /// Delta
+            DELTA,
+            /// Epsilon
+            EPSILON,
+            /// Zeta
+            ZETA,
+            /// Eta
+            ETA,
             /// Theta
             THETA,
+            /// Iota
+            IOTA,
+            /// Kappa
+            KAPPA,
+            /// Lambda
+            LAMBDA,
+            /// Mu
+            MU,
+            /// Nu
+            NU,
+            /// Xi
+            XI,
+            /// Omicron
+            OMICRON,
+            /// Pi
+            PI,
+            /// Rho
+            RHO,
+            /// Sigma
+            SIGMA,
+            /// Tau
+            TAU,
+            /// Upsilon
+            UPSILON,
+            /// Phi
+            PHI,
+            /// Chi
+            CHI,
+            /// Psi
+            PSI,
+            /// Omega
+            OMEGA,
          };
       };
 }

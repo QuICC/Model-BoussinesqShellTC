@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingInformation::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -117,11 +117,6 @@ namespace Equations {
       return this->mFieldStart;
    }
 
-   int CouplingInformation::nExplicit() const
-   {
-      return this->mExplicitFields.size();
-   }
-
    int CouplingInformation::rhsCols(const int idx) const
    {
       return this->mRhsCols(idx);
@@ -134,6 +129,7 @@ namespace Equations {
 
       // Extract the position of the equation field
       FieldId_iterator pos = std::find(this->mImplicitFields.begin(), this->mImplicitFields.end(), std::make_pair(fieldId, compId));
+      assert((this->equationType() == TRIVIAL && pos == this->mImplicitFields.end()) || pos != this->mImplicitFields.end());
 
       // Set initial field index
       this->mFieldIndex = pos - this->mImplicitFields.begin();
@@ -147,9 +143,21 @@ namespace Equations {
       this->mImplicitFields.push_back(std::make_pair(fieldId,compId));
    }
 
-   void CouplingInformation::addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId)
+   void CouplingInformation::addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const ModelOperator::Id opId)
    {
-      this->mExplicitFields.push_back(std::make_pair(fieldId,compId));
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         this->mExplicitLFields.push_back(std::make_pair(fieldId,compId));
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         this->mExplicitNLFields.push_back(std::make_pair(fieldId,compId));
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         this->mExplicitNSFields.push_back(std::make_pair(fieldId,compId));
+      }
+
    }
 
    void CouplingInformation::setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart)
@@ -205,9 +213,23 @@ namespace Equations {
       return std::make_pair(this->mImplicitFields.begin(), this->mImplicitFields.end());
    }
 
-   CouplingInformation::FieldId_range CouplingInformation::explicitRange() const
+   CouplingInformation::FieldId_range CouplingInformation::explicitRange(const ModelOperator::Id opId) const
    {
-      return std::make_pair(this->mExplicitFields.begin(), this->mExplicitFields.end());
+      CouplingInformation::FieldId_range range;
+      if(opId == ModelOperator::EXPLICIT_LINEAR)
+      {
+         range = std::make_pair(this->mExplicitLFields.begin(), this->mExplicitLFields.end());
+
+      } else if(opId == ModelOperator::EXPLICIT_NONLINEAR)
+      {
+         range = std::make_pair(this->mExplicitNLFields.begin(), this->mExplicitNLFields.end());
+
+      } else if(opId == ModelOperator::EXPLICIT_NEXTSTEP)
+      {
+         range = std::make_pair(this->mExplicitNSFields.begin(), this->mExplicitNSFields.end());
+      }
+
+      return range;
    }
 }
 }

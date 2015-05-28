@@ -37,6 +37,7 @@ namespace Solver {
           *
           * @param start   Starting index (for example without m=0)
           * @param time    Solver timing with respect to timestepping
+          * @param expTime Explicit linear timing with respect to nonlinear calculation
           */
          SparseTrivialSolver(const int start, const SolveTiming::Id time);
 
@@ -57,6 +58,11 @@ namespace Solver {
           * @param cols Number of columns required
           */
          virtual void addStorage(const int rows, const int cols);
+
+         /**
+          * @brief Set solver RHS data to zero
+          */
+         void zeroSolver();
 
          /**
           * @brief Set RHS data
@@ -107,6 +113,15 @@ namespace Solver {
       // Add storage for solution
       this->mSolution.push_back(TData(rows,cols));
       this->mSolution.back().setZero();
+   }
+
+   template <typename TOperator,typename TData> void SparseTrivialSolver<TOperator,TData>::zeroSolver()
+   {
+      // Set solver RHS to zero
+      for(int i = 0; i < this->mSolution.size(); ++i)
+      {
+         this->mSolution.at(i).setZero();
+      }
    }
 
    template <typename TOperator,typename TData> int SparseTrivialSolver<TOperator,TData>::nSystem() const

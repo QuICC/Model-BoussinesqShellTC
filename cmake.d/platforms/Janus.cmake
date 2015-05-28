@@ -34,16 +34,16 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 #------- AVAILABLE LINEAR ALGEBRA LIBRARIES ------#
 ###################################################
 
-set(GEOMHDISCC_LINALGS "LAPACK" "Eigen" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
+set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
 ###################################################
 
-set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "SparseLU" "KentLU" "MKLPardiso" PARENT_SCOPE)
+set(GEOMHDISCC_SPLINALGS "SuperLU" "UmfPack" "MUMPS" "SparseLU" "KentLU" "MKLPardiso" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "dmumps" "zmumps" "mumps_common" "pord" "scalapack" "ptesmumps" "esmumps" "ptscotch" "scotch" "scotcherr" "scotcherrexit" "parmetis" "metis" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_KENTLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "klu" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_MKLPARDISO "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_GCC "/home/phma6156/share/gcc/include" PARENT_SCOPE)
@@ -54,6 +54,8 @@ set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "/home/phma6156/share/intel/include" PAREN
 set(GEOMHDISCC_LIBDIR_UMFPACK_INTEL "/home/phma6156/share/intel/lib" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/SRC" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib" PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS_INTEL "/home/phma6156/share/intel/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_MUMPS_INTEL "/home/phma6156/share/intel/lib" PARENT_SCOPE)
 
 ###################################################
 #----------- AVAILABLE LARGE IO FORMAT -----------#
@@ -61,6 +63,12 @@ set(GEOMHDISCC_LIBDIR_SUPERLU_INTEL "/home/phma6156/share/intel/SuperLU_4.3/lib"
 
 set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "z" "hdf5" PARENT_SCOPE)
+
+###################################################
+#-------------- MPI IMPLEMENTATION ---------------#
+###################################################
+
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#

@@ -22,6 +22,7 @@
 //
 #include "Base/Typedefs.hpp"
 #include "Enums/FieldIds.hpp"
+#include "Enums/ModelOperator.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -47,13 +48,13 @@ namespace Equations {
           */
          enum IndexType {
             /// Matrix index is slowest index of field
-            SLOWEST = 0,
+            SLOWEST_SINGLE_RHS = 0,
+            /// Matrix index is slowest index of field but has multiple RHS
+            SLOWEST_MULTI_RHS,
             /// Matrix index is a mode index
             MODE,
             /// Single matrix (ex. TTT scheme)
             SINGLE,
-            /// Matrix index is an index for geometrically coupled 1D and 3D
-            GEOMETRIC_1D_3D,
          };
 
          /**
@@ -176,11 +177,6 @@ namespace Equations {
          int rhsCols(const int idx) const;
 
          /**
-          * @brief Number of explicit linear fields
-          */
-         int nExplicit() const;
-
-         /**
           * @brief Add field to list of implicit timestep fields (coupled solve)
           *
           * @param fieldId Physical ID of the field
@@ -194,7 +190,7 @@ namespace Equations {
           * @param fieldId Physical ID of the field
           * @param compId  Physical ID of the component
           */
-         void addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId);
+         void addExplicitField(const PhysicalNames::Id fieldId, const FieldComponents::Spectral::Id compId, const ModelOperator::Id opId);
 
          /**
           * @brief Sort the list of implicit fields and set field index accordingly
@@ -260,7 +256,7 @@ namespace Equations {
          /**
           * @brief Get iterator to explicit fields
           */
-         FieldId_range explicitRange() const;
+         FieldId_range explicitRange(const ModelOperator::Id opId) const;
 
       protected:
 
@@ -271,14 +267,19 @@ namespace Equations {
          std::vector<SpectralFieldId>   mImplicitFields;
 
          /**
-          * @brief Storage for the implicit fields information
+          * @brief Storage for the explicit linear fields information
           */
-         std::multiset<SpectralFieldId>   mImplicitFieldsB;
+         std::vector<SpectralFieldId>   mExplicitLFields;
 
          /**
-          * @brief Storage for the explicit fields information
+          * @brief Storage for the explicit nonlinear fields information
           */
-         std::vector<SpectralFieldId>   mExplicitFields;
+         std::vector<SpectralFieldId>   mExplicitNLFields;
+
+         /**
+          * @brief Storage for the explicit nextstep fields information
+          */
+         std::vector<SpectralFieldId>   mExplicitNSFields;
 
          /**
           * @brief Storage for the equation type

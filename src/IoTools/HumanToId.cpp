@@ -30,17 +30,12 @@ namespace IoTools {
 
    NonDimensional::Id HumanToId::toNd(const std::string& id)
    {
-      if(id == IdToHuman::toTag(NonDimensional::CHI))
-      {
-         return NonDimensional::CHI;
-
-      } else if(id == IdToHuman::toTag(NonDimensional::EKMAN))
+      //
+      // Nondimensional numbers
+      // 
+      if(id == IdToHuman::toTag(NonDimensional::EKMAN))
       {
          return NonDimensional::EKMAN;
-
-      } else if(id == IdToHuman::toTag(NonDimensional::GAMMA))
-      {
-         return NonDimensional::GAMMA;
 
       } else if(id == IdToHuman::toTag(NonDimensional::MAGEKMAN))
       {
@@ -66,10 +61,27 @@ namespace IoTools {
       {
          return NonDimensional::ROSSBY;
 
+      } else if(id == IdToHuman::toTag(NonDimensional::TAYLOR))
+      {
+         return NonDimensional::TAYLOR;
+
+      // Geometrical numbers
+      //
+      } else if(id == IdToHuman::toTag(NonDimensional::RO))
+      {
+         return NonDimensional::RO;
+
       } else if(id == IdToHuman::toTag(NonDimensional::RRATIO))
       {
          return NonDimensional::RRATIO;
 
+      // Flags
+      //
+      } else if(id == IdToHuman::toTag(NonDimensional::HEATING))
+      {
+         return NonDimensional::HEATING;
+
+      // Axis scaling factors
       } else if(id == IdToHuman::toTag(NonDimensional::SCALE1D))
       {
          return NonDimensional::SCALE1D;
@@ -82,17 +94,103 @@ namespace IoTools {
       {
          return NonDimensional::SCALE3D;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::RO))
+      //
+      // Greek alphabet
+      } else if(id == IdToHuman::toTag(NonDimensional::ALPHA))
       {
-         return NonDimensional::RO;
+         return NonDimensional::ALPHA;
 
-      } else if(id == IdToHuman::toTag(NonDimensional::TAYLOR))
+      } else if(id == IdToHuman::toTag(NonDimensional::BETA))
       {
-         return NonDimensional::TAYLOR;
+         return NonDimensional::BETA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::GAMMA))
+      {
+         return NonDimensional::GAMMA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::DELTA))
+      {
+         return NonDimensional::DELTA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::EPSILON))
+      {
+         return NonDimensional::EPSILON;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::ZETA))
+      {
+         return NonDimensional::ZETA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::ETA))
+      {
+         return NonDimensional::ETA;
 
       } else if(id == IdToHuman::toTag(NonDimensional::THETA))
       {
          return NonDimensional::THETA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::IOTA))
+      {
+         return NonDimensional::IOTA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::KAPPA))
+      {
+         return NonDimensional::KAPPA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::LAMBDA))
+      {
+         return NonDimensional::LAMBDA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::MU))
+      {
+         return NonDimensional::MU;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::NU))
+      {
+         return NonDimensional::NU;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::XI))
+      {
+         return NonDimensional::XI;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::OMICRON))
+      {
+         return NonDimensional::OMICRON;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::PI))
+      {
+         return NonDimensional::PI;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::RHO))
+      {
+         return NonDimensional::RHO;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::SIGMA))
+      {
+         return NonDimensional::SIGMA;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::TAU))
+      {
+         return NonDimensional::TAU;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::UPSILON))
+      {
+         return NonDimensional::UPSILON;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::PHI))
+      {
+         return NonDimensional::PHI;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::CHI))
+      {
+         return NonDimensional::CHI;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::PSI))
+      {
+         return NonDimensional::PSI;
+
+      } else if(id == IdToHuman::toTag(NonDimensional::OMEGA))
+      {
+         return NonDimensional::OMEGA;
 
       } else
       {
@@ -102,11 +200,7 @@ namespace IoTools {
 
    ModelOperator::Id HumanToId::toModOp(const std::string& id)
    {
-      if(id == IdToHuman::toString(ModelOperator::QI))
-      {
-         return ModelOperator::QI;
-
-      } else if(id == IdToHuman::toString(ModelOperator::TIME))
+      if(id == IdToHuman::toString(ModelOperator::TIME))
       {
          return ModelOperator::TIME;
 
@@ -117,6 +211,14 @@ namespace IoTools {
       } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_LINEAR))
       {
          return ModelOperator::EXPLICIT_LINEAR;
+
+      } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_NONLINEAR))
+      {
+         return ModelOperator::EXPLICIT_NONLINEAR;
+
+      } else if(id == IdToHuman::toString(ModelOperator::EXPLICIT_NEXTSTEP))
+      {
+         return ModelOperator::EXPLICIT_NEXTSTEP;
 
       } else if(id == IdToHuman::toString(ModelOperator::STENCIL))
       {
@@ -265,7 +367,10 @@ namespace IoTools {
 
    FieldComponents::Spectral::Id HumanToId::toComp(const std::string& id)
    {
-      if(id == IdToHuman::toTag(FieldComponents::Spectral::ONE))
+      if(id == IdToHuman::toTag(FieldComponents::Spectral::SCALAR))
+      {
+         return FieldComponents::Spectral::SCALAR;
+      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::ONE))
       {
          return FieldComponents::Spectral::ONE;
       } else if(id == IdToHuman::toTag(FieldComponents::Spectral::TWO))
@@ -274,9 +379,6 @@ namespace IoTools {
       } else if(id == IdToHuman::toTag(FieldComponents::Spectral::THREE))
       {
          return FieldComponents::Spectral::THREE;
-      } else if(id == IdToHuman::toTag(FieldComponents::Spectral::SCALAR))
-      {
-         return FieldComponents::Spectral::SCALAR;
       } else
       {
          throw Exception("Unknown string to ID conversion requested (FieldComponents::Spectral)");

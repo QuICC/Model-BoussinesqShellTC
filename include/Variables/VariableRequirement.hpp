@@ -46,6 +46,11 @@ namespace GeoMHDiSCC {
          const FieldRequirement& field(const PhysicalNames::Id id) const;
 
          /**
+          * @brief Set field requirements
+          */
+         FieldRequirement& rField(const PhysicalNames::Id id);
+
+         /**
           * @brief Add field requirement
           */
          void addField(const PhysicalNames::Id id, const FieldRequirement& req);

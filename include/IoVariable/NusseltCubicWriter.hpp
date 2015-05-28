@@ -47,6 +47,11 @@ namespace IoVariable {
          virtual ~NusseltCubicWriter();
 
          /**
+          * @brief Initialise the operator and file
+          */
+         virtual void init();
+
+         /**
           * @brief Write State to file
           */
          virtual void write();
@@ -54,6 +59,10 @@ namespace IoVariable {
       protected:
 
       private:
+         /**
+          * @brief Nusselt calculation operator
+          */
+         SparseMatrix   mNusseltOp;
 
    };
 

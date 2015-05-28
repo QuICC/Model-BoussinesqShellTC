@@ -33,8 +33,9 @@
 #include "LoadSplitter/Algorithms/SerialSplitting.hpp"
 #include "LoadSplitter/Algorithms/SingleSplitting.hpp"
 #include "LoadSplitter/Algorithms/TubularSplitting.hpp"
-#include "LoadSplitter/Algorithms/FixedSplitting.hpp"
+#include "LoadSplitter/Algorithms/Coupled2DSplitting.hpp"
 #include "IoXml/GxlWriter.hpp"
+#include "IoXml/VtpWriter.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -73,10 +74,10 @@ namespace Parallel {
                   this->mAlgorithms.push_back(SharedSplittingAlgorithm(new SingleSplitting(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST)));
                #endif //GEOMHDISCC_MPIALGO_SINGLE1D
 
-               #ifdef GEOMHDISCC_MPIALGO_FIXED
+               #ifdef GEOMHDISCC_MPIALGO_COUPLED2D
                   // Add the single splitting algorithm for first data exchange
-                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new FixedSplitting(this->mId, this->mNCpu, dim)));
-               #endif //GEOMHDISCC_MPIALGO_FIXED
+                  this->mAlgorithms.push_back(SharedSplittingAlgorithm(new Coupled2DSplitting(this->mId, this->mNCpu, dim)));
+               #endif //GEOMHDISCC_MPIALGO_COUPLED2D
 
 
                // Check if problem is 3D
@@ -156,13 +157,24 @@ namespace Parallel {
       }
    }
 
-   std::pair<SharedResolution,SplittingDescription> LoadSplitter::bestSplitting() const
+   std::pair<SharedResolution,SplittingDescription> LoadSplitter::bestSplitting()
    {
       // Make sure there is at least one successful splitting (score > 0)
       if(this->mScores.size() > 0)
       {
+         // Build communication structure
+         SplittingAlgorithm::buildCommunicationStructure(this->mScores.rbegin()->second.first, this->mScores.rbegin()->second.second.structure);
+
          // Describe the splitting with the highest score
          this->describeSplitting(this->mScores.rbegin()->second.second);
+
+         #ifdef GEOMHDISCC_DEBUG
+            for(std::vector<IoXml::SharedVtpWriter>::const_iterator it = this->mScores.rbegin()->second.second.vtpFiles.begin(); it != this->mScores.rbegin()->second.second.vtpFiles.end(); ++it)
+            {
+               (*it)->write();
+               (*it)->finalize();
+            }
+         #endif //GEOMHDISCC_DEBUG
 
          // Return the splitting with the highest score
          return this->mScores.rbegin()->second;
@@ -226,8 +238,8 @@ namespace Parallel {
             case(Splitting::Algorithms::TUBULAR):
                tmpStr = "Tubular";
                break;
-            case(Splitting::Algorithms::FIXED):
-               tmpStr = "Fixed";
+            case(Splitting::Algorithms::COUPLED2D):
+               tmpStr = "Coupled 2D";
                break;
          }
          IoTools::Formatter::printCentered(std::cout, "Algorithm: " + tmpStr);
@@ -245,7 +257,7 @@ namespace Parallel {
                tmpStr += " x ";
             }
          }
-         if(descr.algorithm == Splitting::Algorithms::SINGLE1D || descr.algorithm == Splitting::Algorithms::FIXED)
+         if(descr.algorithm == Splitting::Algorithms::SINGLE1D || descr.algorithm == Splitting::Algorithms::COUPLED2D)
          {
             tmpStr += " x 1";
          } else if(descr.algorithm == Splitting::Algorithms::SINGLE2D)
@@ -263,8 +275,11 @@ namespace Parallel {
          gxl.finalize();
 
          oss.str("");
-         oss << descr.score;
+         oss << static_cast<int>(descr.score.prod());
          IoTools::Formatter::printCentered(std::cout, "Score: " + oss.str());
+         oss.str("");
+         oss << " (" << descr.score(0) << ", " << std::setprecision(2)<< descr.score(1) << ", " << descr.score(2) << ", " << descr.score(3) << ")";
+         IoTools::Formatter::printCentered(std::cout, oss.str());
 
          IoTools::Formatter::printNewline(std::cout);
       }

@@ -36,11 +36,6 @@ namespace Schemes {
    {
       public:
          /**
-          * @brief Tune the resolution
-          */
-         static void tuneResolution(SharedResolution spRes);
-
-         /**
           * @brief Interpret the configuration dimensions
           */
          static void interpretConfigDimensions(ArrayI& rDim);
@@ -71,6 +66,11 @@ namespace Schemes {
           * @brief Add the transform setups to resolution
           */
          virtual void addTransformSetups(SharedResolution spRes) const;
+
+         /**
+          * @brief Add index counter to shared resolution
+          */
+         virtual void addIndexCounter(SharedResolution spRes);
          
       protected:
          /**

@@ -24,7 +24,33 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    FftSetup::FftSetup(const int size, const int howmany, const int specSize, const FftSetup::Type type)
-      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1)
+      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1), mEvenBlocks(0,0), mOddBlocks(0,0)
+   {
+      // Set the backward size
+      if(this->mType == FftSetup::MIXED)
+      {
+         this->mBwdSize = this->mFwdSize/2 + 1;
+      } else if(this->mType == FftSetup::REAL)
+      {
+         this->mBwdSize = this->mFwdSize;
+      } else if(this->mType == FftSetup::COMPLEX)
+      {
+         this->mBwdSize = this->mFwdSize;
+      } else if(this->mType == FftSetup::COMPONENT)
+      {
+         this->mBwdSize = this->mFwdSize;
+      } else
+      {
+         throw Exception("Unknown FFT setup type requested");
+      }
+
+      // Safety assert
+      assert(this->mBwdSize > this->mSpecSize);
+      assert(this->mFwdSize >= this->mBwdSize);
+   }
+
+   FftSetup::FftSetup(const int size, const ArrayI& howmany, const MatrixI& evenBlocks, const MatrixI& oddBlocks, const int specSize, const FftSetup::Type type)
+      : TransformSetup(size, howmany, specSize), mBwdSize(0), mType(type), mScale(-1), mBoxScale(-1), mEvenBlocks(evenBlocks), mOddBlocks(oddBlocks)
    {
       // Set the backward size
       if(this->mType == FftSetup::MIXED)
@@ -71,6 +97,16 @@ namespace Transform {
    int FftSetup::bwdSize() const
    {
       return this->mBwdSize;
+   }
+
+   const MatrixI& FftSetup::evenBlocks() const
+   {
+      return this->mEvenBlocks;
+   }
+
+   const MatrixI& FftSetup::oddBlocks() const
+   {
+      return this->mOddBlocks;
    }
 
    int FftSetup::padSize() const

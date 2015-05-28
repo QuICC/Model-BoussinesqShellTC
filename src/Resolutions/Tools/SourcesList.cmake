@@ -3,5 +3,6 @@ set(MHDSources
    IndexCounter.cpp
    RegularIndexCounter.cpp
    DoublePeriodicIndexCounter.cpp
-   SphericalHarmonicIndexCounter.cpp
+   SHlIndexCounter.cpp
+   SHmIndexCounter.cpp
 )

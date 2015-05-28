@@ -92,25 +92,25 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSPOLY);
          spExact->setModeOptions(1e0, 0.0, 1e0, 1.0, -3e0, 0.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINPOLY);
          spExact->setModeOptions(1.5e1, 1.0, 2e2, 2.0, 2e0, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYSINPOLY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYSINPOLY);
          spExact->setModeOptions(-3e0, 2.0, 1e-1, 5.0, 1e0, 3.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::CartesianExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::CartesianExactScalarState::POLYCOSPOLY);
+         spExact->setStateType(Equations::CartesianExactStateIds::POLYCOSPOLY);
          spExact->setModeOptions(1e1, 1.0, 3e0, 10.0, -7e0, 1.0);
 
       // Generate random spectrum

@@ -64,7 +64,7 @@ namespace Equations {
 
    void RandomScalarState::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, false, true, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, false, true, false);
    }
 
    Datatypes::SpectralScalarType::PointType RandomScalarState::sourceTerm(FieldComponents::Spectral::Id compId, const int i1D, const int i3D, const int i2D) const
@@ -113,15 +113,30 @@ namespace Equations {
 
    void RandomScalarState::makeRandom(MHDComplex& val, const int i1D, const int i3D, const int i2D) const
    {
-      val.real() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
+      MHDFloat tmp;
+      this->makeRandom(tmp, i1D, i3D, i2D);
 
-      if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D) != 0)
-      {
-         val.imag() = ((this->mMin-this->mMax)*static_cast<MHDFloat>(rand())/RAND_MAX)+this->mMax;
-      } else
-      {
-         val.imag() = 0.0;
-      }
+      val.real() = tmp;
+
+      #if defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMDHDISCC_SPATIALSCHEME_TFF || defined GEOMDHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
+         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i2D) != 0)
+         {
+            this->makeRandom(tmp, i1D, i3D, i2D);
+            val.imag() = tmp;
+         } else
+         {
+            val.imag() = 0.0;
+         }
+      #elif defined GEOMHDISCC_SPATIALSCHEME_SLFL || defined GEOMHDISCC_SPATIALSCHEME_BLFL
+         if(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i3D, i2D) != 0)
+         {
+            this->makeRandom(tmp, i1D, i3D, i2D);
+            val.imag() = tmp;
+         } else
+         {
+            val.imag() = 0.0;
+         }
+      #endif //defined GEOMHDISCC_SPATIALSCHEME_TFT || defined GEOMDHDISCC_SPATIALSCHEME_TFF || defined GEOMDHDISCC_SPATIALSCHEME_FFF || defined GEOMHDISCC_SPATIALSCHEME_SLFM || defined GEOMHDISCC_SPATIALSCHEME_BLFM || defined GEOMHDISCC_SPATIALSCHEME_AFT || defined GEOMHDISCC_SPATIALSCHEME_CFT
    }
 
 }

@@ -29,14 +29,16 @@ namespace GeoMHDiSCC {
           * @brief Enums of the different model operators
           */
          enum Id {
-            /// Quasi inverse operator
-            QI = 0,
             /// Time operator (block diagonal)
-            TIME,
+            TIME = 0,
             /// Implicitly timestepped linear operator
             IMPLICIT_LINEAR,
             /// Explicitly timestepped linear operator
             EXPLICIT_LINEAR,
+            /// Explicitly timestepped linear operator
+            EXPLICIT_NONLINEAR,
+            /// Explicitly timestepped linear operator
+            EXPLICIT_NEXTSTEP,
             /// Galerkin stencil
             STENCIL,
          };

@@ -21,7 +21,7 @@
 //
 #include "Equations/IScalarEquation.hpp"
 #include "Equations/IVectorEquation.hpp"
-#include "Variables/VariableRequirement.hpp"
+#include "TransformConfigurators/IntegratorTree.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -33,6 +33,9 @@ namespace Transform {
    class IForwardGrouper
    {
       public:
+         /// Typedef for field and component ID
+         typedef std::pair<PhysicalNames::Id,FieldComponents::Physical::Id> FieldIdType;
+
          /**
           * @brief Setup the full forward transform structure for equations
           *
@@ -45,18 +48,16 @@ namespace Transform {
          /**
           * @brief Get the number of required buffer packs for the first exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         virtual ArrayI packs1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo) = 0;
+         virtual ArrayI packs1D(const std::vector<IntegratorTree>& integratorTree) = 0;
 
          /**
           * @brief Get the number of required buffer packs for the second exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         virtual ArrayI packs2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo) = 0;
+         virtual ArrayI packs2D(const std::vector<IntegratorTree>& integratorTree) = 0;
 
          /**
           * @brief Location of the split in the configurator
@@ -65,66 +66,47 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Constant number of first exchange packets required for a scalar
+          * @brief Find equation corresponding to name of scalar
           */
-         const int mcScalarPacks1D;
-
-         /**
-          * @brief Constant number of second exchange packets required for a scalar
-          */
-         const int mcScalarPacks2D;
-
-         /**
-          * @brief Constant number of first exchange packets required for a vector field
-          */
-         const int mcVectorPacks1D;
-
-         /**
-          * @brief Constant number of second exchange packets required for a vector field
-          */
-         const int mcVectorPacks2D;
+         template <typename TSharedEquation> typename std::vector<TSharedEquation>::iterator findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name);
 
          /**
           * @brief Storage for named packet sizes for the first exchange
           */
-         std::map<PhysicalNames::Id, int>  mNamedPacks1D;
+         std::map<FieldIdType, int>  mNamedPacks1D;
 
          /**
           * @brief Storage for named packet sizes for the second exchange
           */
-         std::map<PhysicalNames::Id, int>  mNamedPacks2D;
+         std::map<FieldIdType, int>  mNamedPacks2D;
 
          /**
           * @brief Get and set the name pack numbers for the first exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         ArrayI namePacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI namePacks1D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Get and set the named pack numbers for the second exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         ArrayI namePacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI namePacks2D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Get the grouped pack number for the first exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         ArrayI groupPacks1D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI groupPacks1D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Get the grouped pack number for the second exchange
           *
-          * @param varInfo Variable information
-          * @param nonInfo Nonlinear requirements
+          * @param integratorTree Transform integrator tree 
           */
-         ArrayI groupPacks2D(const VariableRequirement& varInfo, const std::set<PhysicalNames::Id>& nonInfo);
+         ArrayI groupPacks2D(const std::vector<IntegratorTree>& integratorTree);
 
          /**
           * @brief Empty constructor
@@ -138,6 +120,20 @@ namespace Transform {
 
       private: 
    };
+
+   template < typename TSharedEquation> typename std::vector<TSharedEquation>::iterator IForwardGrouper::findEquation(std::vector<TSharedEquation>& eqs, PhysicalNames::Id name)
+   {
+      typename std::vector<TSharedEquation>::iterator eqIt;
+      for(eqIt = eqs.begin(); eqIt != eqs.end(); ++eqIt)
+      {
+         if((*eqIt)->name() == name)
+         {
+            break;
+         }
+      }
+
+      return eqIt;
+   }
 
    /// Typdef for a smart reference counting pointer to a backward grouper base
    typedef SharedPtrMacro<IForwardGrouper>   SharedIForwardGrouper;

@@ -71,43 +71,52 @@ def constrain(mat, bc, location = 't'):
 
 def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
+    
+    nbc = bc[0]//10
 
     if bc[0] == 10:
-        cond = tau_value(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 11:
-        cond = tau_value(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_value(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 12:
-        cond = tau_diff(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 13:
-        cond = tau_diff(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 15:
-        cond = tau_diff2(mat.shape[0], -1, bc.get('c',None))
+        cond = tau_diff2(mat.shape[1], -1, bc.get('c',None))
     elif bc[0] == 16:
-        cond = tau_integral(mat.shape[0], 1, bc.get('c',None))
+        cond = tau_integral(mat.shape[1], 1, bc.get('c',None))
     elif bc[0] == 20:
-        cond = tau_value(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 21:
-        cond = tau_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 22:
-        cond = tau_diff2(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_valuediff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 40:
-        cond = tau_value_diff(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff(mat.shape[1], 0, bc.get('c',None))
     elif bc[0] == 41:
-        cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
+        cond = tau_value_diff2(mat.shape[1], 0, bc.get('c',None))
+    # Set last modes to zero
+    elif bc[0] > 990 and bc[0] < 1000:
+        cond = tau_last(mat.shape[1], bc[0]-990)
+        nbc = bc[0]-990
 
-    if cond.dtype == 'complex_':
-        bc_mat = mat.astype('complex_').tolil()
-    else:
-        bc_mat = mat.tolil()
-
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
     if location == 't':
-        bc_mat[0:cond.shape[0],:] = cond
+        s = 0
     elif location == 'b':
-        bc_mat[-cond.shape[0]:,:] = cond
+        s = mat.shape[0]-nbc
 
-    return bc_mat
+    conc = np.concatenate
+    for i,c in enumerate(cond):
+        mat.data = conc((mat.data, c))
+        mat.row = conc((mat.row, [s+i]*mat.shape[1]))
+        mat.col = conc((mat.col, np.arange(0,mat.shape[1])))
+
+    return mat
 
 def tau_value(nx, pos, coeffs = None):
     """Create the tau line(s) for a zero boundary value"""
@@ -128,11 +137,15 @@ def tau_value(nx, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*tau_c(i) for i in np.arange(0,nx)])
+        cnst = c*tau_c()
+        cond.append(cnst*np.ones(nx))
+        cond[-1][0] /= tau_c()
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*tau_c(i)*(-1.0)**i for i in np.arange(0,nx)])
+        cnst = c*tau_c()
+        cond.append(-cnst*np.cumprod(-np.ones(nx)))
+        cond[-1][0] /= tau_c()
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -192,11 +205,11 @@ def tau_diff2(nx, pos, coeffs = None):
     cond = []
     c = next(it)
     if pos >= 0:
-        cond.append([c*((1/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*((1.0/3.0)*(i**4 - i**2)) for i in np.arange(0,nx)])
         c = next(it)
 
     if pos <= 0:
-        cond.append([c*(((-1.0)**i/3)*(i**4 - i**2)) for i in np.arange(0,nx)])
+        cond.append([c*(((-1.0)**i/3.0)*(i**4 - i**2)) for i in np.arange(0,nx)])
 
     if use_parity_bc and pos == 0:
         t = cond[0]
@@ -225,16 +238,27 @@ def tau_integral(nx, pos, coeffs = None):
     c = next(it)
     if pos >= 0:
         tmp = np.zeros((1,nx))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
-        tmp[0,0] = tmp[0,0]/2
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2.0
         cond.append(tmp[0,:])
         c = next(it)
 
     if pos <= 0:
         tmp = np.zeros((1,nx))
-        tmp[0,::2] = [2*(n/(n**2-1) - 1/(n-1)) for n in np.arange(0,nx,2)]
-        tmp[0,0] = tmp[0,0]/2
+        tmp[0,::2] = [2.0*(n/(n**2 - 1.0) - 1.0/(n - 1.0)) for n in np.arange(0,nx,2)]
+        tmp[0,0] = tmp[0,0]/2.0
         cond.append(tmp[0,:])
+
+    return np.array(cond)
+
+def tau_valuediff(nx, pos, coeffs = None):
+    """Create the tau lines for a zero boundary value at top and a zero 1st derivative at bottom"""
+
+    assert(pos == 0)
+
+    cond = []
+    cond.append(list(tau_value(nx,1,coeffs)[0]))
+    cond.append(list(tau_diff(nx,-1,coeffs)[0]))
 
     return np.array(cond)
 
@@ -282,6 +306,15 @@ def tau_value_diff2(nx, pos, coeffs = None):
 
     return np.array(cond)
 
+def tau_last(nx, nrow):
+    """Create the last modes to zero value tau line(s)"""
+
+    cond = np.zeros((nrow, nx))
+    for j in range(0, nrow):
+        cond[j,nx-nrow+j] = tau_c()
+
+    return cond
+
 def stencil(nx, bc):
     """Create a Galerkin stencil matrix"""
 
@@ -308,7 +341,8 @@ def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""
 
     nx = mat.shape[0]
-    return mat*stencil(nx, bc)
+    mat = mat*stencil(nx, bc)
+    return mat
 
 def restrict_eye(nx, t, q):
     """Create the non-square identity to restrict matrix"""
@@ -486,13 +520,10 @@ def stencil_value_diff2(nx, pos):
 
     return spsp.diags(diags, offsets, (nx,nx+offsets[0]))
 
-def tau_c(n):
+def tau_c():
     """Compute the chebyshev normalisation c factor for tau boundary"""
 
-    if n > 0:
-        return 2
-    else:
-        return 1
+    return 2.0
 
 def galerkin_c(n):
     """Compute the chebyshev normalisation c factor for galerkin boundary"""

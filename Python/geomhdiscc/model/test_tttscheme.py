@@ -7,7 +7,7 @@ import numpy as np
 import scipy.sparse as spsp
 
 import geomhdiscc.base.utils as utils
-import geomhdiscc.geometry.cartesian.cartesian_3d as c3d
+import geomhdiscc.geometry.cartesian.cartesian_3d as geo
 import geomhdiscc.base.base_model as base_model
 from geomhdiscc.geometry.cartesian.cartesian_boundary_3d import no_bc
 
@@ -17,25 +17,25 @@ class TestTTTScheme(base_model.BaseModel):
 
     solve_coupled = True
 
-    def nondimensional_parameters(self):
-        """Get the list of nondimensional parameters"""
-
-        return ["prandtl", "rayleigh", "scale1d", "scale2d", "scale3d"]
-
     def periodicity(self):
         """Get the domain periodicity"""
 
         return [False, False, False]
 
-    def all_fields(self):
+    def nondimensional_parameters(self):
+        """Get the list of nondimensional parameters"""
+
+        return ["prandtl", "rayleigh", "scale1d", "scale2d", "scale3d"]
+
+    def config_fields(self):
         """Get the list of fields that need a configuration entry"""
 
-        return ["velocityx", "velocityy", "velocityz", "temperature"]
+        return ["velocity", "temperature"]
 
     def stability_fields(self):
         """Get the list of fields needed for linear stability calculations"""
 
-        fields = [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature","")]
+        fields = [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]
 
         return fields
 
@@ -44,7 +44,7 @@ class TestTTTScheme(base_model.BaseModel):
 
         # Solve as coupled equations
         if self.solve_coupled:
-            fields = [("velocityx",""), ("velocityy",""), ("velocityz",""), ("temperature","")]
+            fields = [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]
 
         # Solve as splitted equations
         else:
@@ -52,10 +52,25 @@ class TestTTTScheme(base_model.BaseModel):
 
         return fields
 
-    def explicit_fields(self, field_row):
-        """Get the list of fields with explicit linear dependence"""
+    def explicit_fields(self, timing, field_row):
+        """Get the list of fields with explicit dependence"""
 
-        return []
+        # Explicit linear terms
+        if timing == self.EXPLICIT_LINEAR:
+            fields = []
+
+        # Explicit nonlinear terms
+        elif timing == self.EXPLICIT_NONLINEAR:
+            if field_row in [("velocity","x"), ("velocity","y"), ("velocity","z"), ("temperature","")]:
+                fields = [field_row]
+            else:
+                fields = []
+
+        # Explicit update terms for next step
+        elif timing == self.EXPLICIT_NEXTSTEP:
+            fields = []
+
+        return fields
 
     def block_size(self, res, field_row):
         """Create block size information"""
@@ -88,27 +103,10 @@ class TestTTTScheme(base_model.BaseModel):
         # Matrix operator is real
         is_complex = False
 
-        # Implicit field coupling
-        im_fields = self.implicit_fields(field_row)
-        # Additional explicit linear fields
-        ex_fields = self.explicit_fields(field_row)
-
         # Index mode: 
         index_mode = self.SINGLE
 
-        # Compute block info
-        block_info = self.block_size(res, field_row)
-
-        # Compute system size
-        sys_n = 0
-        for f in im_fields:
-            sys_n += self.block_size(res, f)[1]
-        
-        if sys_n == 0:
-            sys_n = block_info[1]
-        block_info = block_info + (sys_n,)
-
-        return (is_complex, im_fields, ex_fields, index_mode, block_info)
+        return self.compile_equation_info(res, field_row, is_complex, index_mode)
 
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
@@ -125,13 +123,13 @@ class TestTTTScheme(base_model.BaseModel):
             if bcId == 0:
                 if self.use_galerkin:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
                 else:
                     if field_row == ("velocityx","") and field_col == ("velocityx",""):
@@ -146,21 +144,21 @@ class TestTTTScheme(base_model.BaseModel):
             # Set LHS galerkin restriction
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
 
         # Stencil:
         elif bcs["bcType"] == self.STENCIL:
@@ -168,134 +166,139 @@ class TestTTTScheme(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocityx",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityy",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("velocityz",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
                     elif field_col == ("temperature",""):
-                        bc = {'x':{0:-20, 'r':0}, 'y':{0:-20, 'r':0}, 'z':{0:-20, 'r':0}}
+                        bc = {'x':{0:-20, 'rt':0}, 'y':{0:-20, 'rt':0}, 'z':{0:-20, 'rt':0}}
 
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
             bc = no_bc()
             if self.use_galerkin:
                 if field_row == ("velocityx",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityy",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("velocityz",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
                 elif field_row == ("temperature",""):
-                    bc['x']['r'] = 2
-                    bc['y']['r'] = 2
-                    bc['z']['r'] = 2
+                    bc['x']['rt'] = 2
+                    bc['y']['rt'] = 2
+                    bc['z']['rt'] = 2
 
         return bc
 
-    def stencil(self, res, eq_params, eigs, bcs, field_row):
-        """Create the galerkin stencil"""
-        
-        # Get boundary condition
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        return c3d.stencil(res[0], res[2], bc)
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+        """Create the explicit nonlinear operator"""
 
-    def qi(self, res, eq_params, eigs, bcs, field_row):
-        """Create the quasi-inverse operator"""
+        mat = None 
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("velocity","x") and field_col == field_row:
+            mat = geo.i2j2k2(res[0],res[1],res[2], bc)
 
-        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
-        if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+        elif field_row == ("velocity","y") and field_col == field_row:
+            mat = geo.i2j2k2(res[0],res[1],res[2], bc)
 
-        elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+        elif field_row == ("velocity","z") and field_col == field_row:
+            mat = geo.i2j2k2(res[0],res[1],res[2], bc)
 
-        elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+        elif field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2j2k2(res[0],res[1],res[2], bc)
 
-        elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0],res[1],res[2], bc)
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
-    def linear_block(self, res, eq_params, eigs, bcs, field_row, field_col):
+    def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col):
         """Create matrix block of linear operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocityx",""):
             if field_col == ("velocityx",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
         elif field_row == ("velocityy",""):
             if field_col == ("velocityx",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
         elif field_row == ("velocityz",""):
             if field_col == ("velocityx",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
  
             elif field_col == ("velocityy",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocityx",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityy",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("velocityz",""):
-                mat = c3d.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
+                mat = geo.zblk(res[0], res[1], res[2], 2, 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = c3d.i2j2k2lapl(res[0], res[1], res[2], bc)
+                mat = geo.i2j2k2lapl(res[0], res[1], res[2], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
     def time_block(self, res, eq_params, eigs, bcs, field_row):
         """Create matrix block of time operator"""
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocityx",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
         elif field_row == ("velocityy",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
         elif field_row == ("velocityz",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
 
         elif field_row == ("temperature",""):
-            mat = c3d.i2j2k2(res[0], res[1], res[2], bc)
+            mat = geo.i2j2k2(res[0], res[1], res[2], bc)
+
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
         return mat

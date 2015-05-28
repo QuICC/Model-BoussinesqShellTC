@@ -31,8 +31,7 @@ set(GEOMHDISCC_FFTPLANS "Fast" "Medium" "Slow" PARENT_SCOPE)
 #------- AVAILABLE LINEAR ALGEBRA LIBRARIES ------#
 ###################################################
 
-set(GEOMHDISCC_LINALGS "LAPACK" "Eigen" PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_LAPACK "auto" PARENT_SCOPE)
+set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
 ###################################################
 #--- AVAILABLE SPARSE LINEAR ALGEBRA LIBRARIES ---#
@@ -50,6 +49,12 @@ set(GEOMHDISCC_LIBRARIES_SPQR "spqr" PARENT_SCOPE)
 
 set(GEOMHDISCC_LARGEIOS "HDF5" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_HDF5 "rt" "hdf5" PARENT_SCOPE)
+
+###################################################
+#-------------- MPI IMPLEMENTATION ---------------#
+###################################################
+
+set(GEOMHDISCC_MPIIMPLS "OpenMPI" PARENT_SCOPE)
 
 ###################################################
 #-------------- MULTIPLE PRECISION ---------------#

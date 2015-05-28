@@ -117,7 +117,9 @@ namespace Transform {
 
       // Initialise temporary storage
       this->mTmpRIn.setZero(bwdSize, howmany);
-      this->mTmpZIn.setZero(fwdSize, howmany);
+      this->mTmpROut.setZero(fwdSize, howmany);
+      this->mTmpZIn.setZero(bwdSize, howmany);
+      this->mTmpROut.setZero(fwdSize, howmany);
    }
 
    void FftwTransform::cleanupFft()
@@ -139,6 +141,199 @@ namespace Transform {
 
       // cleanup FFTW library
       FftwLibrary::cleanupFft();
+   }
+
+   void FftwTransform::integrate(MatrixZ& rFFTVal, const Matrix& physVal, FftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::MIXED);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rFFTVal.rows() == this->mspSetup->bwdSize());
+      assert(rFFTVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_dft_r2c(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), reinterpret_cast<fftw_complex* >(rFFTVal.data()));
+
+      // Compute first derivative integration
+      if(integrator == FftwTransform::IntegratorType::INTGDIFF)
+      {
+         // Get differentiation factors
+         ArrayZ factor = -this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+
+         // Rescale results
+         rFFTVal = factor.asDiagonal()*rFFTVal;
+
+      // Compute simple projection
+      } else
+      {
+         // Rescale output from FFT
+         rFFTVal *= this->mspSetup->scale();
+      }
+   }
+
+   void FftwTransform::project(Matrix& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::MIXED);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(fftVal.rows() == this->mspSetup->bwdSize());
+      assert(fftVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative
+      if(projector == FftwTransform::ProjectorType::DIFF)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->specSize(), 0, this->mspSetup->specSize()-1);
+
+         // Rescale results
+         this->mTmpRIn.topRows(this->mspSetup->specSize()) = factor.asDiagonal()*fftVal.topRows(this->mspSetup->specSize());
+
+      // Compute simple projection
+      } else
+      {
+         // Rescale results
+         this->mTmpRIn.topRows(this->mspSetup->specSize()) = fftVal.topRows(this->mspSetup->specSize());
+      }
+
+      // Set the m=0 values to zero
+      this->mTmpRIn.row(0).imag().setConstant(0);
+
+      // Set the padded values to zero
+      this->mTmpRIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Do transform with corresponding arithmetics
+      if(arithId == Arithmetics::SET)
+      {
+         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
+      } else if(arithId == Arithmetics::SETNEG)
+      {
+         this->mTmpRIn = -this->mTmpRIn;
+         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), rPhysVal.data());
+      } else if(arithId == Arithmetics::ADD)
+      {
+         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), this->mTmpROut.data());
+         rPhysVal += this->mTmpROut;
+      } else if(arithId == Arithmetics::SUB)
+      {
+         fftw_execute_dft_c2r(this->mBPlan, reinterpret_cast<fftw_complex* >(this->mTmpRIn.data()), this->mTmpROut.data());
+         rPhysVal -= this->mTmpROut;
+      }
+   }
+
+   void FftwTransform::integrate(MatrixZ& rFFTVal, const MatrixZ& physVal, FftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a non mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPLEX);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rFFTVal.rows() == this->mspSetup->bwdSize());
+      assert(rFFTVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_dft(this->mFPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(physVal.data())), reinterpret_cast<fftw_complex* >(rFFTVal.data()));
+
+      // Compute first derivative integration
+      if(integrator == FftwTransform::IntegratorType::INTGDIFF)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->scale()*this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(this->mspSetup->bwdSize(), 0, this->mspSetup->bwdSize()-1);
+
+         // Rescale results
+         rFFTVal = factor.asDiagonal()*rFFTVal;
+
+      // Compute simple projection
+      } else
+      {
+         // Rescale output from FFT
+         rFFTVal *= this->mspSetup->scale();
+      }
+   }
+
+   void FftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& fftVal, FftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      // Assert that a non mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPLEX);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(fftVal.rows() == this->mspSetup->bwdSize());
+      assert(fftVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Get size of positive and negative frequency parts
+      int negN = this->mspSetup->specSize()/2;
+      int posN = negN + (this->mspSetup->specSize()%2);
+
+      // Compute first derivative
+      if(projector == FftwTransform::ProjectorType::DIFF)
+      {
+         // Get differentiation factors
+         ArrayZ factor = this->mspSetup->boxScale()*Math::cI*Array::LinSpaced(posN, 0, posN-1);
+         ArrayZ rfactor = this->mspSetup->boxScale()*Math::cI*(Array::LinSpaced(negN, 0, negN-1).array() - static_cast<MHDFloat>(negN));
+
+         // Split positive and negative frequencies and compute derivative
+         this->mTmpZIn.topRows(posN) = factor.asDiagonal()*fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = rfactor.asDiagonal()*fftVal.bottomRows(negN);
+
+      // Compute simple projection
+      } else
+      {
+         // Split positive and negative frequencies
+         this->mTmpZIn.topRows(posN) = fftVal.topRows(posN);
+         this->mTmpZIn.bottomRows(negN) = fftVal.bottomRows(negN);
+      }
+
+      // Set the padded values to zero
+      this->mTmpZIn.block(posN, 0, this->mspSetup->padSize(), this->mTmpZIn.cols()).setZero();
+
+      // Do transform with corresponding arithmetics
+      if(arithId == Arithmetics::SET)
+      {
+         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
+
+      } else if(arithId == Arithmetics::SETNEG)
+      {
+         this->mTmpZIn = -this->mTmpZIn;
+         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(rPhysVal.data()));
+
+      } else if(arithId == Arithmetics::ADD)
+      {
+         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
+         rPhysVal += this->mTmpZOut;
+
+      } else if(arithId == Arithmetics::SUB)
+      {
+         fftw_execute_dft(this->mBPlan, reinterpret_cast<fftw_complex *>(this->mTmpZIn.data()), reinterpret_cast<fftw_complex *>(this->mTmpZOut.data()));
+         rPhysVal -= this->mTmpZOut;
+      }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

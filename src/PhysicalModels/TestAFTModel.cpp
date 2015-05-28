@@ -92,25 +92,25 @@ namespace GeoMHDiSCC {
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYX);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYCOSPOLY);
+         spExact->setStateType(Equations::AnnulusExactStateIds::POLYCOSPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYY);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
+         spExact->setStateType(Equations::AnnulusExactStateIds::POLYSINPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::VELOCITYZ);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
+         spExact->setStateType(Equations::AnnulusExactStateIds::POLYSINPOLY);
          spExact->setModeOptions(1e0, 2.0, 1e0, 7.0, 1e0, 2.0);
 
          // Add scalar exact initial state generator
          spExact = spGen->addScalarEquation<Equations::AnnulusExactScalarState>();
          spExact->setIdentity(PhysicalNames::TEMPERATURE);
-         spExact->setStateType(Equations::AnnulusExactScalarState::POLYSINPOLY);
+         spExact->setStateType(Equations::AnnulusExactStateIds::POLYSINPOLY);
          spExact->setModeOptions(1e0, 1.0, 1e0, 7.0, 1e0, 7.0);
 
       // Generate random spectrum

@@ -22,6 +22,12 @@ namespace GeoMHDiSCC {
 namespace Transform {
 
    TransformSetup::TransformSetup(const int size, const int howmany, const int specSize)
+      : mFwdSize(size), mHowmany(1), mSpecSize(specSize)
+   {
+      this->mHowmany(0) = howmany;
+   }
+
+   TransformSetup::TransformSetup(const int size, const ArrayI& howmany, const int specSize)
       : mFwdSize(size), mHowmany(howmany), mSpecSize(specSize)
    {
    }
@@ -37,7 +43,12 @@ namespace Transform {
 
    int TransformSetup::howmany() const
    {
-      return this->mHowmany;
+      return this->mHowmany.sum();
+   }
+
+   int TransformSetup::howmany(const int parity) const
+   {
+      return this->mHowmany(parity);
    }
 
    int TransformSetup::specSize() const

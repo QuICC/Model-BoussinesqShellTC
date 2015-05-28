@@ -69,11 +69,21 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << nusselt << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << nusselt << std::endl;
       }
 
       // Close file
       this->postWrite();
+
+      // Abort if Nusselt number is NaN
+      if(std::isnan(nusselt))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Nusselt number is NaN!");
+      }
    }
 
 }

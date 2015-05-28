@@ -27,8 +27,6 @@
 #include "IoVariable/ContinuityTags.hpp"
 #include "IoTools/IdToHuman.hpp"
 
-#include <iostream>
-
 namespace GeoMHDiSCC {
 
 namespace IoVariable {
@@ -47,42 +45,13 @@ namespace IoVariable {
       // Create file
       this->preWrite();
 
-      ContinuityWriter::scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 3);
-      std::vector<FieldComponents::Physical::Id>  comp;
-      std::vector<ContinuityWriter::scalar_iterator>  sIt;
-      for(ContinuityWriter::scalar_iterator it = sRange.first; it != sRange.second; ++it)
-      {
-         #ifdef GEOMHDISCC_SPATIALSCHEME_TFF
-            if(it->first == PhysicalNames::VELOCITYX)
-            {
-               comp.push_back(FieldComponents::Physical::TWO);
-            } else if(it->first == PhysicalNames::VELOCITYY)
-            {
-               comp.push_back(FieldComponents::Physical::THREE);
-            } else if(it->first == PhysicalNames::VELOCITYZ)
-            {
-               comp.push_back(FieldComponents::Physical::ONE);
-            }
-         #else
-            if(it->first == PhysicalNames::VELOCITYX)
-            {
-               comp.push_back(FieldComponents::Physical::ONE);
-            } else if(it->first == PhysicalNames::VELOCITYY)
-            {
-               comp.push_back(FieldComponents::Physical::TWO);
-            } else if(it->first == PhysicalNames::VELOCITYZ)
-            {
-               comp.push_back(FieldComponents::Physical::THREE);
-            }
-         #endif //GEOMHDISCC_SPATIALSCHEME_TFF
-
-         sIt.push_back(it);
-      }
+      ContinuityWriter::vector_iterator_range vRange = this->vectorRange();
+      assert(std::distance(vRange.first, vRange.second) == 1);
+      ContinuityWriter::vector_iterator  vIt = vRange.first;
    
-      MHDFloat continuity = (sIt.at(0)->second->dom(0).grad().comp(comp.at(0)).data() + sIt.at(1)->second->dom(0).grad().comp(comp.at(1)).data() + sIt.at(2)->second->dom(0).grad().comp(comp.at(2)).data()).array().abs().maxCoeff();
+      MHDFloat continuity = (vIt->second->dom(0).grad(FieldComponents::Spectral::X).comp(FieldComponents::Physical::X).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Y).comp(FieldComponents::Physical::Y).data() + vIt->second->dom(0).grad(FieldComponents::Spectral::Z).comp(FieldComponents::Physical::Z).data()).array().abs().maxCoeff();
 
-      // Get the "global" Continuity number from MPI code
+      // Get the "global" velocity divergence from MPI code
       #ifdef GEOMHDISCC_MPI
          MPI_Allreduce(MPI_IN_PLACE, &continuity, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
       #endif //GEOMHDISCC_MPI
@@ -90,11 +59,21 @@ namespace IoVariable {
       // Check if the workflow allows IO to be performed
       if(FrameworkMacro::allowsIO())
       {
-         this->mFile << std::setprecision(16) << this->mTime << "\t" << continuity << std::endl;
+         this->mFile << std::setprecision(14) << this->mTime << "\t" << continuity << std::endl;
       }
 
       // Close file
       this->postWrite();
+
+      // Abort if continuity is NaN
+      if(std::isnan(continuity))
+      {
+         #ifdef GEOMHDISCC_MPI
+            MPI_Abort(MPI_COMM_WORLD, 99);
+         #endif //GEOMHDISCC_MPI
+
+         throw Exception("Continuity is NaN!");
+      }
    }
 
 }

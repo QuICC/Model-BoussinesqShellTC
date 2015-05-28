@@ -30,7 +30,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    ShellExactVectorState::ShellExactVectorState(SharedEquationParameters spEqParams)
-      : IVectorEquation(spEqParams), mTypeId(CONSTANT)
+      : IVectorEquation(spEqParams)
    {
    }
 
@@ -43,88 +43,231 @@ namespace Equations {
       // Set the name
       this->setName(name);
 
-      // Set toroidal and poloidal components
-      this->mSpectralIds.push_back(FieldComponents::Spectral::ONE);
-      this->mSpectralIds.push_back(FieldComponents::Spectral::TWO);
-
       // Set the variable requirements
       this->setRequirements();
    }
 
-   void ShellExactVectorState::setStateType(const ShellExactVectorState::StateTypeId id)
+   void ShellExactVectorState::setStateType(const ShellExactStateIds::Id id)
    {
       this->mTypeId = id;
    }
 
-   void ShellExactVectorState::setHarmonicOptions(const std::vector<std::tr1::tuple<int,int,MHDComplex> >& rModes, const std::vector<std::tr1::tuple<int,int,MHDComplex> >& tModes, const std::vector<std::tr1::tuple<int,int,MHDComplex> >& pModes)
+   void ShellExactVectorState::setHarmonicOptions(const FieldComponents::Spectral::Id compId, const std::vector<ShellExactVectorState::HarmonicModeType>& modes)
    {
-      this->mRSHModes = rModes;
-      this->mTSHModes = tModes;
-      this->mPSHModes = pModes;
+      this->mSHModes.insert(std::make_pair(compId, modes));
    }
 
    void ShellExactVectorState::setCoupling()
    {
-      SpectralComponent_range specRange = this->spectralRange();
-      SpectralComponent_iterator specIt;
-      for(specIt = specRange.first; specIt != specRange.second; ++specIt)
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
       {
-         this->defineCoupling(*specIt, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+         this->defineCoupling(FieldComponents::Spectral::ONE, CouplingInformation::TRIVIAL, 0, true, false, false);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::TWO, CouplingInformation::TRIVIAL, 0, true, false, false);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->defineCoupling(FieldComponents::Spectral::THREE, CouplingInformation::TRIVIAL, 0, true, false, false);
       }
    }
 
    void ShellExactVectorState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
    {
-      if(this->mTypeId == CONSTANT)
+      ShellExactStateIds::Id typeId = this->mTypeId;
+
+      // Initialize to zero
+      rNLComp.rData().setConstant(0);
+
+      if(typeId == ShellExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(42);
-      } else if(this->mTypeId == HARMONIC)
+      } else if(typeId == ShellExactStateIds::HARMONIC)
+      {
+         throw Exception("HARMONIC state is not implemented for vector states");
+
+      } else if(typeId == ShellExactStateIds::TOROIDAL || typeId == ShellExactStateIds::POLOIDAL || typeId == ShellExactStateIds::TORPOL)
       {
          int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
          int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
          int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
 
-         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, 1, 0.35);
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
          Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
          Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
 
-         Array funcPh(nPh);
-         MHDFloat funcR(nR);
-         MHDFloat funcTh;
-         typedef std::vector<std::tr1::tuple<int,int,MHDComplex> >::const_iterator ModeIt;
+         typedef std::vector<HarmonicModeType>::const_iterator ModeIt;
          std::pair<ModeIt, ModeIt>  modeRange;
-         if(compId == FieldComponents::Physical::ONE)
+
+         if(typeId == ShellExactStateIds::TOROIDAL || typeId == ShellExactStateIds::TORPOL)
          {
-            modeRange.first = this->mRSHModes.begin();
-            modeRange.second = this->mRSHModes.end();
-         } else if(compId == FieldComponents::Physical::TWO)
-         {
-            modeRange.first = this->mTSHModes.begin();
-            modeRange.second = this->mTSHModes.end();
-         } else
-         {
-            modeRange.first = this->mPSHModes.begin();
-            modeRange.second = this->mPSHModes.end();
+            Array funcSH(nPh);
+            MHDFloat funcR = 1.0;
+
+            modeRange.first = this->mSHModes.find(FieldComponents::Spectral::TOR)->second.begin();
+            modeRange.second = this->mSHModes.find(FieldComponents::Spectral::TOR)->second.end();
+
+            MHDFloat r;
+            MHDFloat theta;
+            nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+            for(int iR = 0; iR < nR; ++iR)
+            {
+               r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+               nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+
+                  for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
+                  {
+                     int l = std::tr1::get<0>(*it);
+                     int m = std::tr1::get<1>(*it);
+                     MHDFloat amplitude = std::abs(std::tr1::get<2>(*it));
+
+                     if(l == 0 and m == 0)
+                     {
+                        this->computeTor00(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 1 and m == 0)
+                     {
+                        this->computeTor10(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 1 and m == 1)
+                     {
+                        this->computeTor11(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 0)
+                     {
+                        this->computeTor20(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 1)
+                     {
+                        this->computeTor21(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 2)
+                     {
+                        this->computeTor22(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 5 and m == 4)
+                     {
+                        this->computeTor54(funcSH, compId, r, theta, phGrid);
+                     } else
+                     {
+                        throw Exception("Requested unimplemented toroidal harmonic");
+                     }
+                     
+                     rNLComp.addProfile(amplitude*funcR*funcSH,iTh,iR);
+                  }
+               }
+            }
          }
-         rNLComp.rData().setConstant(0);
+
+         if(typeId == ShellExactStateIds::POLOIDAL || typeId == ShellExactStateIds::TORPOL)
+         {
+            Array funcSH(nPh);
+            MHDFloat funcR = 1.0;
+
+            modeRange.first = this->mSHModes.find(FieldComponents::Spectral::POL)->second.begin();
+            modeRange.second = this->mSHModes.find(FieldComponents::Spectral::POL)->second.end();
+
+            MHDFloat r;
+            MHDFloat theta;
+            nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+            for(int iR = 0; iR < nR; ++iR)
+            {
+               r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+               nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
+               for(int iTh = 0; iTh < nTh; ++iTh)
+               {
+                  theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
+                  for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
+                  {
+                     int l = std::tr1::get<0>(*it);
+                     int m = std::tr1::get<1>(*it);
+                     MHDFloat amplitude = std::abs(std::tr1::get<2>(*it));
+
+                     if(l == 0 and m == 0)
+                     {
+                        this->computePol00(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 1 and m == 0)
+                     {
+                        this->computePol10(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 1 and m == 1)
+                     {
+                        this->computePol11(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 0)
+                     {
+                        this->computePol20(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 1)
+                     {
+                        this->computePol21(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 2 and m == 2)
+                     {
+                        this->computePol22(funcSH, compId, r, theta, phGrid);
+                     } else if(l == 4 and m == 3)
+                     {
+                        this->computePol43(funcSH, compId, r, theta, phGrid);
+                     } else
+                     {
+                        throw Exception("Requested unimplemented toroidal harmonic");
+                     }
+
+                     rNLComp.addProfile(amplitude*funcR*funcSH,iTh,iR);
+                  }
+               }
+            }
+         }
+
+      } else if(typeId == ShellExactStateIds::BENCHVELC1)
+      {
+         rNLComp.rData().setConstant(1e-12);
+
+      } else if(typeId == ShellExactStateIds::BENCHMAGC1)
+      {
+         int nR = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+         int nTh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM2D,Dimensions::Space::PHYSICAL);
+         int nPh = this->unknown().dom(0).spRes()->sim()->dim(Dimensions::Simulation::SIM3D,Dimensions::Space::PHYSICAL);
+
+         MHDFloat ro = this->eqParams().nd(NonDimensional::RO);
+         MHDFloat rratio = this->eqParams().nd(NonDimensional::RRATIO);
+         Array rGrid = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nR, ro, rratio);
+         Array thGrid = Transform::TransformSelector<Dimensions::Transform::TRA2D>::Type::generateGrid(nTh);
+         Array phGrid = Transform::TransformSelector<Dimensions::Transform::TRA3D>::Type::generateGrid(nPh);
+
+         Array funcPh = Array::Ones(nPh);
+         MHDFloat funcR = 1.0;
+         MHDFloat funcTh = 1.0;
+         MHDFloat amplitude = 1.0;
+
+         MHDFloat r;
+         MHDFloat theta;
+         MHDFloat scale = 0.5;
+         nR = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
          for(int iR = 0; iR < nR; ++iR)
          {
+            r = rGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR));
+            nTh = this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR);
             for(int iTh = 0; iTh < nTh; ++iTh)
             {
-               funcR = 1.0;
+               theta = thGrid(this->unknown().dom(0).spRes()->cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR));
 
-               for(ModeIt it = modeRange.first; it != modeRange.second; ++it)
+               if(compId == FieldComponents::Physical::R)
                {
-                  int l = std::tr1::get<0>(*it);
-                  int m = std::tr1::get<1>(*it);
-                  MHDFloat re = std::tr1::get<2>(*it).real();
-                  MHDFloat im = std::tr1::get<2>(*it).imag();
-
-                  // Spherical harmonic Y_l^m
-                  funcPh = re*(static_cast<MHDFloat>(m)*phGrid).array().cos() + im*(static_cast<MHDFloat>(m)*phGrid).array().sin();
-                  funcTh = std::tr1::sph_legendre(l,m, thGrid(iTh));
-                  rNLComp.addProfile(funcPh*funcR*funcTh,iTh,iR);
+                  amplitude = scale*5.0/8.0;
+                  funcR = 8.0*ro - 6.0*r - 2.0*std::pow(ro*rratio,4)/std::pow(r,3);
+                  funcTh = std::cos(theta);
+               } else if(compId == FieldComponents::Physical::THETA)
+               {
+                  amplitude = -scale*5.0/8.0;
+                  funcR = 8.0*ro - 9.0*r + std::pow(ro*rratio,4)/std::pow(r,3);
+                  funcTh = std::sin(theta);
+               } else if(compId == FieldComponents::Physical::PHI)
+               {
+                  amplitude = scale*5.0;
+                  funcR = std::sin(Math::PI*(r - ro*rratio));
+                  funcTh = std::sin(2*theta);
                }
+
+               rNLComp.addProfile(amplitude*funcR*funcTh*funcPh,iTh,iR);
             }
          }
       } else
@@ -145,6 +288,358 @@ namespace Equations {
 
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(false, true, false, false));
+   }
+
+   void ShellExactVectorState::computeTor00(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor10(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= std::sqrt(3.0/Math::PI)*std::sin(theta);
+         rField = Array::Ones(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor11(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= std::sqrt(3.0/(2.0*Math::PI));
+         rField = phi.array().cos() + phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= std::sqrt(3.0/(2.0*Math::PI))*std::cos(theta);
+         rField = phi.array().cos() - phi.array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor20(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= 3.0*std::sqrt(5.0/Math::PI)*std::cos(theta)*std::sin(theta);
+         rField = Array::Ones(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor21(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta);
+         rField = phi.array().cos() + phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(2.0*theta);
+         rField = phi.array().cos() - phi.array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor22(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::sin(theta);
+         rField = (2.0*phi).array().cos() + (2.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta)*std::sin(theta);
+         rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computeTor54(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Toroidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= -(3.0/2.0)*std::sqrt(385.0/(2.0*Math::PI))*std::cos(theta)*std::pow(std::sin(theta),3);
+         rField = (4.0*phi).array().cos() + (4.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0;
+         factor *= -(3.0/16.0)*std::sqrt(385.0/(2.0*Math::PI))*(3.0 + 5.0*std::cos(2.0*theta))*std::pow(std::sin(theta),3);
+         rField = (4.0*phi).array().cos() - (4.0*phi).array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol00(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol10(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= 2.0*std::sqrt(3.0/Math::PI)*std::cos(theta);
+         rField = Array::Ones(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -std::sqrt(3.0/Math::PI)*std::sin(theta);
+         rField = Array::Ones(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol11(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= -std::sqrt(6.0/Math::PI)*std::sin(theta);
+         rField = phi.array().cos() - phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -std::sqrt(3.0/(2.0*Math::PI))*std::cos(theta);
+         rField = phi.array().cos() +-phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= std::sqrt(3.0/(2.0*Math::PI));
+         rField = phi.array().cos() + phi.array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol20(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= (3.0/2.0)*std::sqrt(5.0/Math::PI)*(1.0 + 3.0*std::cos(2.0*theta));
+         rField = Array::Ones(phi.size());
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -3.0*std::sqrt(5.0/Math::PI)*std::cos(theta)*std::sin(theta);
+         rField = Array::Ones(phi.size());
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = 0.0;
+         rField = Array::Zero(phi.size());
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol21(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= -3.0*std::sqrt(30.0/Math::PI)*std::cos(theta)*std::sin(theta);
+         rField = phi.array().cos() - phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::cos(2.0*theta);
+         rField = phi.array().cos() - phi.array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta);
+         rField = phi.array().cos() + phi.array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol22(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= 3.0*std::sqrt(15.0/(2.0*Math::PI))*std::pow(std::sin(theta),2);
+         rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= std::sqrt(15.0/(2.0*Math::PI))*std::cos(theta)*std::sin(theta);
+         rField = (2.0*phi).array().cos() - (2.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -std::sqrt(15.0/(2.0*Math::PI))*std::sin(theta);
+         rField = (2.0*phi).array().cos() + (2.0*phi).array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::computePol43(Array& rField, FieldComponents::Physical::Id compId, const MHDFloat r, const MHDFloat theta, const Array& phi) const
+   {
+      // Poloidal part
+      MHDFloat factor = 1.0;
+      if(compId == FieldComponents::Physical::R)
+      {
+         factor = (std::pow(r,4) + std::pow(r,3) + std::pow(r,2) + r + 1.0)/r;
+         factor *= -15.0*std::sqrt(35.0/Math::PI)*std::cos(theta)*std::pow(std::sin(theta),3);
+         rField = (3.0*phi).array().cos() - (3.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::THETA)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= -(3.0/4.0)*std::sqrt(35.0/Math::PI)*(1.0 + 2.0*std::cos(2.0*theta))*std::pow(std::sin(theta),2);
+         rField = (3.0*phi).array().cos() - (3.0*phi).array().sin();
+
+      } else if(compId == FieldComponents::Physical::PHI)
+      {
+         factor = (5.0*std::pow(r,4) + 4.0*std::pow(r,3) + 3.0*std::pow(r,2) + 2.0*r + 1.0)/r;
+         factor *= (9.0/4.0)*std::sqrt(35.0/Math::PI)*std::cos(theta)*std::pow(std::sin(theta),2);
+         rField = (3.0*phi).array().cos() + (3.0*phi).array().sin();
+      }
+      rField *= factor;
+   }
+
+   void ShellExactVectorState::setNLComponents()
+   {
+      if(FieldComponents::Spectral::ONE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::ONE, 0);
+      }
+
+      if(FieldComponents::Spectral::TWO != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::TWO, 0);
+      }
+
+      if(FieldComponents::Spectral::THREE != FieldComponents::Spectral::NOTUSED)
+      {
+         this->addNLComponent(FieldComponents::Spectral::THREE, 0);
+      }
    }
 
 }

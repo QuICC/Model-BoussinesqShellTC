@@ -43,7 +43,7 @@ namespace Schemes {
          /**
           * @brief Tune the shared resolution used by simulation
           */
-         static void tuneResolution(SharedResolution spRes);
+         static void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
 
          /**
           * @brief Constructor

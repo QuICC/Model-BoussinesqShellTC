@@ -42,6 +42,8 @@ namespace Transform {
    ChebyshevFftwTransform::ChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL), mCScale(0.0)
    {
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
    }
 
    ChebyshevFftwTransform::~ChebyshevFftwTransform()
@@ -137,33 +139,60 @@ namespace Transform {
 
    void ChebyshevFftwTransform::initOperators()
    {
-      this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
+      //
+      // Initialise projector operators
+      //
+
+      //
+      // Initialise integrator operators
+      //
+
+      //
+      // Initialise solver operators
+      //
+      // First derivative
+      this->mSolveOp.insert(std::make_pair(ProjectorType::DIFF, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       // Initialise python wrapper
-      PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.cartesian.cartesian_1d");
 
-      // Prepare arguments to d1(...) call
+      // Prepare arguments to Chebyshev matrices call
       PyObject *pArgs, *pValue;
       pArgs = PyTuple_New(3);
-      // ... get operator size
-      pValue = PyLong_FromLong(this->mspSetup->specSize());
-      PyTuple_SetItem(pArgs, 0, pValue);
-      // ... create boundray condition (none)
+      // ... create boundray condition (last mode is zero)
       pValue = PyDict_New();
-      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
+      PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(991));
       PyTuple_SetItem(pArgs, 1, pValue);
       // ... set coefficient to 1.0
-      pValue = PyFloat_FromDouble(this->mCScale);
+      pValue = PyFloat_FromDouble(1.0/this->mCScale);
       PyTuple_SetItem(pArgs, 2, pValue);
 
-      // Call d1
-      PythonWrapper::setFunction("d1");
-      pValue = PythonWrapper::callFunction(pArgs);
+      // ... set resoluton for solver matrices
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Fill matrix and clenup
-      PythonWrapper::fillMatrix(this->mDiff, pValue);
+      // Call i1 for solver
+      PythonWrapper::setFunction("i1");
+      pValue = PythonWrapper::callFunction(pArgs);
+      // Fill matrix
+      PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIFF)->second, pValue);
       Py_DECREF(pValue);
+
+      // Initialize solver storage
+      this->mTmpInS.setZero(this->mspSetup->fwdSize(), this->mspSetup->howmany());
+      this->mTmpOutS.setZero(this->mspSetup->bwdSize(), this->mspSetup->howmany());
+
+      // Initialize solver and factorize division by d1 operator
+      SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>  pSolver = SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type>(new Solver::SparseSelector<SparseMatrix>::Type());
+      this->mSolver.insert(std::make_pair(ProjectorType::DIFF, pSolver));
+      this->mSolver.find(ProjectorType::DIFF)->second->compute(this->mSolveOp.find(ProjectorType::DIFF)->second);
+      // Check for successful factorisation
+      if(this->mSolver.find(ProjectorType::DIFF)->second->info() != Eigen::Success)
+      {
+         throw Exception("Factorization of backward 1st derivative failed!");
+      }
+
+      // Cleanup
       PythonWrapper::finalize();
    }
 
@@ -186,6 +215,283 @@ namespace Transform {
 
       // cleanup fftw library
       FftwLibrary::cleanupFft();
+   }
+
+   void ChebyshevFftwTransform::integrate(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
+      }
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
+   }
+
+   void ChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(chebVal.rows() == this->mspSetup->bwdSize());
+      assert(chebVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative
+      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()));
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Compute simple projection
+      } else
+      {
+         // Copy into other array
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      }
+
+      // Do transform
+      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
+   }
+
+   void ChebyshevFftwTransform::integrate(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // 
+      // Transform real part
+      //
+      this->mTmpIn = physVal.real();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
+
+      // 
+      // Transform imaginary part
+      //
+      this->mTmpIn = physVal.imag();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
+   }
+
+   void ChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert on the padding size
+      assert(this->mspSetup->padSize() >= 0);
+      assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
+
+      // assert right sizes for input  matrix
+      assert(chebVal.rows() == this->mspSetup->bwdSize());
+      assert(chebVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rPhysVal.rows() == this->mspSetup->fwdSize());
+      assert(rPhysVal.cols() == this->mspSetup->howmany());
+
+      // Compute first derivative of real part
+      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).real());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Compute simple projection of real part
+      } else
+      {
+         // Copy values into simple matrix
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      }
+
+      // Do transform of real part
+      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      rPhysVal.real() = this->mTmpOut;
+
+      // Compute first derivative of imaginary part
+      if(projector == ChebyshevFftwTransform::ProjectorType::DIFF)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+//         // Recurrence relation
+//         this->recurrenceDiff(this->mTmpIn, chebVal.topRows(this->mspSetup->specSize()).imag());
+//         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+
+      // Compute simple projection of imaginary part
+      } else
+      {
+         // Rescale results
+         this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
+      }
+
+      // Do transform of imaginary part
+      fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
+      rPhysVal.imag() = this->mTmpOut;
+   }
+
+   void ChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*rChebVal;
+      }
+   }
+
+   void ChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, ChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      //
+      // Transform real part
+      //
+      this->mTmpIn = physVal.real();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+
+      } else
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
+
+      //
+      // Transform imaginary part
+      //
+      this->mTmpIn = physVal.imag();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == ChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+
+      } else
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
+
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE

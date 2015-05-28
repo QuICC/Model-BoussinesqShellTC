@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "Base/Typedefs.hpp"
+#include "Enums/TransformDirection.hpp"
 #include "StorageProviders/StoragePairProviderMacro.h"
 
 namespace GeoMHDiSCC {
@@ -45,7 +46,7 @@ namespace Parallel {
          /**
           * @brief Set up the converter
           */
-         virtual void setup() = 0;
+         virtual void setup(const Dimensions::Transform::Id transId) = 0;
 
          /**
           * @brief Convert data from TFwdA to TBwdB
@@ -72,15 +73,35 @@ namespace Parallel {
           *
           * @param packs Number of packets in communication packing
           */
-         virtual void setupCommunication(const int packs) = 0;
+         virtual void setupCommunication(const int packs, const TransformDirection::Id direction) = 0;
 
          /**
-          * @brief Initiate communication for forward transform
+          * @brief Start persistent send for forward transform
+          */
+         virtual void initiateForwardSend() = 0;
+
+         /**
+          * @brief Post persistent receive for forward transform
+          */
+         virtual void prepareForwardReceive() = 0;
+
+         /**
+          * @brief Start communication for forward transform
           */
          virtual void initiateForwardCommunication() = 0;
 
          /**
-          * @brief Initiate communication for backward transform
+          * @brief Start persistent send for backward transform
+          */
+         virtual void initiateBackwardSend() = 0;
+
+         /**
+          * @brief Post persistent receive for backward transform
+          */
+         virtual void prepareBackwardReceive() = 0;
+
+         /**
+          * @brief Start communication for backward transform
           */
          virtual void initiateBackwardCommunication() = 0;
 

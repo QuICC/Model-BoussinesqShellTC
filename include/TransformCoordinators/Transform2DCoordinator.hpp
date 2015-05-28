@@ -26,7 +26,6 @@
 //
 #include "Enums/NonDimensional.hpp"
 #include "TransformCoordinators/Transform1DCoordinator.hpp"
-#include "Variables/VariableRequirement.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -63,9 +62,9 @@ namespace GeoMHDiSCC {
           * @brief Initialise transforms of the 2D coordinator
           *
           * @param spRes   Resolution information object
-          * @param varInfo Variables information
+          * @param projectorTree Transform projector tree
           */
-         void initTransforms(SharedResolution spRes, const VariableRequirement& varInfo);
+         void initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree);
 
          /**
           * @brief Initialise the data communicator
@@ -124,10 +123,10 @@ namespace GeoMHDiSCC {
    {
    }
 
-   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransforms(SharedResolution spRes, const VariableRequirement& varInfo)
+   template <typename T1D, typename T2D, typename TCommunicator> void Transform2DCoordinator<T1D, T2D, TCommunicator>::initTransforms(SharedResolution spRes, const std::vector<Transform::IntegratorTree>& integratorTree, const std::vector<Transform::ProjectorTree>& projectorTree)
    {
       // initialise the other dimension
-      Transform1DCoordinator<T1D, TCommunicator>::initTransforms(spRes, varInfo);
+      Transform1DCoordinator<T1D, TCommunicator>::initTransforms(spRes, integratorTree, projectorTree);
 
       // Initialise the transforms
       this->initTransform(std::tr1::static_pointer_cast<typename T2D::SetupType>(spRes->spTransformSetup(Dimensions::Transform::TRA2D)));

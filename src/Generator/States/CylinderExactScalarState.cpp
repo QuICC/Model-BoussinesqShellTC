@@ -29,7 +29,7 @@ namespace GeoMHDiSCC {
 namespace Equations {
 
    CylinderExactScalarState::CylinderExactScalarState(SharedEquationParameters spEqParams)
-      : IScalarEquation(spEqParams), mTypeId(CONSTANT), mModeA(3), mModeK(3)
+      : IScalarEquation(spEqParams), mTypeId(CylinderExactStateIds::CONSTANT), mModeA(3), mModeK(3)
    {
    }
 
@@ -46,7 +46,7 @@ namespace Equations {
       this->setRequirements();
    }
 
-   void CylinderExactScalarState::setStateType(const CylinderExactScalarState::StateTypeId id)
+   void CylinderExactScalarState::setStateType(const CylinderExactStateIds::Id id)
    {
       this->mTypeId = id;
    }
@@ -64,7 +64,7 @@ namespace Equations {
 
    void CylinderExactScalarState::setCoupling()
    {
-      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false, false);
+      this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, true, false, false);
    }
 
    void CylinderExactScalarState::computeNonlinear(Datatypes::PhysicalScalarType& rNLComp, FieldComponents::Physical::Id compId) const
@@ -72,7 +72,7 @@ namespace Equations {
       // Assert on scalar component is used
       assert(compId == FieldComponents::Physical::SCALAR);
 
-      if(this->mTypeId == CONSTANT)
+      if(this->mTypeId == CylinderExactStateIds::CONSTANT)
       {
          rNLComp.rData().setConstant(this->mModeA(0)*this->mModeA(1)*this->mModeA(2));
       } else
@@ -105,17 +105,17 @@ namespace Equations {
                   MHDFloat valT = 0.0;
                   MHDFloat valR = 0.0;
 
-                  if(this->mTypeId == POLYCOSPOLY)
+                  if(this->mTypeId == CylinderExactStateIds::POLYCOSPOLY)
                   {
-                     valR = this->poly(0,r_);
-                     valT = this->cos(1,t_);
-                     valZ = this->poly(2,z_);
+                     valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
+                     valT = CylinderExactStateIds::cos(this->mModeA(1),this->mModeK(1),t_);
+                     valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
 
-                  } else if(this->mTypeId == POLYSINPOLY)
+                  } else if(this->mTypeId == CylinderExactStateIds::POLYSINPOLY)
                   {
-                     valR = this->poly(0,r_);
-                     valT = this->sin(1,t_);
-                     valZ = this->poly(2,z_);
+                     valR = CylinderExactStateIds::poly(this->mModeA(0),this->mModeK(0),r_);
+                     valT = CylinderExactStateIds::sin(this->mModeA(1),this->mModeK(1),t_);
+                     valZ = CylinderExactStateIds::poly(this->mModeA(2),this->mModeK(2),z_);
 
                   } else
                   {
@@ -144,34 +144,6 @@ namespace Equations {
 
       // Add unknown to requirements: is scalar?, need spectral?, need physical?, need diff?
       this->mRequirements.addField(this->name(), FieldRequirement(true, true, false, false));
-   }
-
-   MHDFloat CylinderExactScalarState::cos(const int idx, const MHDFloat theta) const
-   {
-      return this->mModeA(idx)*std::cos(this->mModeK(idx)*theta);
-   }
-
-   MHDFloat CylinderExactScalarState::sin(const int idx, const MHDFloat theta) const
-   {
-      return this->mModeA(idx)*std::sin(this->mModeK(idx)*theta);
-   }
-
-   MHDFloat CylinderExactScalarState::poly(const int idx, const MHDFloat x) const
-   {
-      MHDFloat val;
-
-      if(this->mModeK(idx) == CylinderExactScalarState::PCOS)
-      {
-         val = this->cos(idx,Math::PI*(x-1)/2.0);
-      } else if(this->mModeK(idx) == CylinderExactScalarState::PSIN)
-      {
-         val = this->sin(idx,Math::PI*(x-1)/2.0);
-      } else
-      {
-         val = this->mModeA(idx)*std::pow(x,this->mModeK(idx));
-      }
-
-      return val;
    }
 
 }

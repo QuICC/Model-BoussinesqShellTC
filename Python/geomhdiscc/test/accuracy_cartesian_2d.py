@@ -38,6 +38,23 @@ def xz_to_phys(expr, grid_x, grid_z):
     vx, vz = np.meshgrid(grid_x, grid_z, indexing = 'ij')
     return func(vx, vz)
 
+def test_value(op, res_expr, sol, grid_x, grid_z):
+    """Perform a forward operation test"""
+
+    print("\tForward test")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    nx = len(grid_x)
+    nz = len(grid_x)
+    mesh = xz_to_phys(res_expr, grid_x, grid_z)
+    lhs = transf.tocheb2d(mesh)
+    lhs = lhs.reshape(nx*nz, order = 'F')
+    rhs = op*lhs
+    print(rhs)
+    print(sol)
+    err = np.abs(rhs - sol)
+    print("\t\tValue error: " + str(err))
+
 def test_forward(op, res_expr, sol_expr, grid_x, grid_z, qx, qz):
     """Perform a forward operation test"""
 
@@ -721,6 +738,17 @@ def lapl2he1_e1laplh(nx,nz, xg, zg):
     pl.colorbar()
     pl.show()
 
+def surfaceAvg(nx, nz, xg, zg):
+    """Accuracy test for the surface average"""
+
+    print("surfaceAvg:")
+    x = sy.Symbol('x')
+    z = sy.Symbol('z')
+    A = c2d.surfaceAvg(nx, nz)
+    sphys = np.sum([np.random.ranf()*z**j*np.sum([np.random.ranf()*x**i for i in np.arange(0,nx,1)]) for j in np.arange(0,nz,1)])
+    ssol = sy.integrate(sy.expand(sphys/4),(x,-1,1),(z,-1,1))
+    test_value(A, sphys, ssol, xg, zg)
+
 
 if __name__ == "__main__":
     # Set test parameters
@@ -759,3 +787,6 @@ if __name__ == "__main__":
     i4j4lapl2(nx, nz, xg, zg)
 #    lapl2he1_e1laplh(nx, nz, xg, zg)
 #    i4j1_lapl2he1_e1laplh(nx, nz, xg, zg)
+
+    # Run average operator tests
+    surfaceAvg(nx, nz, xg, zg)

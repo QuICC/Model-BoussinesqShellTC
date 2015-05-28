@@ -15,16 +15,34 @@ def no_bc():
 
     return radbc.no_bc()
 
-def constrain(mat, nr, maxl, m, bc):
+def ldependent_bc(bc, l):
+    """Set harmonic degree l for boundary conditions"""
+
+    if bc.get('c', None) is not None:
+        if bc['c'].get('l', None) is not None:
+            bc['c']['l'] = l
+
+    return bc
+
+def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
     """Contrain the matrix with the tau boundary condition"""
 
     bc_mat = mat
     if bc[0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
-        bc_mat = radbc.constrain(bcMat, bc)
-        for l in range(m+1, maxl+1):
+        if m == 0 and zero_l_zero:
+            bc_mat = bcMat
+        else:
+            if restriction is None or m in restriction:
+                bc = ldependent_bc(bc, m)
+                bc_mat = radbc.constrain(bcMat, bc)
+            else:
+                bc_mat = bcMat
+        for l in range(m+1, maxnl):
             bcMat = spsp.lil_matrix((nr,nr))
-            bcMat = radbc.constrain(bcMat, bc)
+            if restriction is None or l in restriction:
+                bc = ldependent_bc(bc, l)
+                bcMat = radbc.constrain(bcMat, bc)
             bc_mat = spsp.block_diag((bc_mat,bcMat))
 
         bc_mat = mat + bc_mat

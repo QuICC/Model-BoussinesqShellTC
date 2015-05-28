@@ -126,8 +126,6 @@ namespace Schemes {
 
    void BLFScheme::setDimensions()
    {
-      /// \mhdBug Setup of resolution information doesn't seem right
-
       //
       // Set transform space sizes
       //

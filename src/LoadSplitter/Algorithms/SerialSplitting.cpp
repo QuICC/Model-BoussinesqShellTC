@@ -45,7 +45,7 @@ namespace Parallel {
       return status;
    }
 
-   SharedTransformResolution  SerialSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId)
+   SharedTransformResolution  SerialSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
@@ -57,15 +57,15 @@ namespace Parallel {
       ArrayI  idx3D;
 
       // Compute the indexes
-      this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D);
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D);
 
       // Create TransformResolution object
       return SharedTransformResolution(new TransformResolution(fwd1D, bwd1D, idx2D, idx3D));
    }
 
-   int SerialSplitting::computeScore(SharedResolution spResolution)
+   Array SerialSplitting::computeScore(SharedResolution spResolution)
    {
-      return 1;
+      return Array::Constant(4,1.0);
    }
 }
 }

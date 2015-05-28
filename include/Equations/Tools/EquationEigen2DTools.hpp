@@ -49,6 +49,26 @@ namespace Eigen2D {
     */
    int fieldCouplingNMat(const SharedResolution spRes);
 
+   /**
+    * @brief Interpret Tau resolution provided by python code
+    */
+   void interpretTauN(ArrayI& rTauNs, const int tauSize, const SharedResolution spRes);
+
+   /**
+    * @brief Interpret Galerkin resolution provided by python code
+    */
+   void interpretGalerkinN(ArrayI& rGalerkinNs, const int galerkinSize, const SharedResolution spRes);
+
+   /**
+    * @brief Interpret number of RHS provided by python code
+    */
+   void interpretRhsN(ArrayI& rRhsCols, const int rhsSize, const SharedResolution spRes);
+
+   /**
+    * @brief Interpret system size provided by python code
+    */
+   void interpretSystemN(ArrayI& rSystemNs, const int systemSize, const SharedResolution spRes);
+
 //
 // Implementation follows
 //
