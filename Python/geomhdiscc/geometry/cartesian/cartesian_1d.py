@@ -130,7 +130,7 @@ def i2x1(nx, bc, coeff = 1.0, cscale = 1.0):
     offsets = np.arange(-3,4,2)
     nzrow = 1
 
-    cnst = coeff*scale
+    cnst = coeff*cscale
 
     # Generate 3rd subdiagonal
     def d_3(n):
@@ -161,7 +161,7 @@ def i2d1(nx, bc, coeff = 1.0, cscale = 1.0):
     offsets = np.arange(-1,2,2)
     nzrow = 1
 
-    cnst = coeff*scale
+    cnst = coeff*cscale
 
     # Generate 1st subdiagonal
     def d_1(n):
@@ -267,7 +267,7 @@ def i4d1(nx, bc, coeff = 1.0, cscale = 1.0):
     offsets = np.arange(-3,4,2)
     nzrow = 3
 
-    cnst = coeff*scale
+    cnst = coeff*cscale
 
     # Generate 3rd subdiagonal
     def d_2(n):
