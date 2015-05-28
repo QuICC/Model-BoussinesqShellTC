@@ -303,3 +303,76 @@ def ortho_gs(v, mat):
     y = np.reshape(v/vnn, (-1,1))
 
     return (y, h)
+
+def slepc_gevp(A, B):
+    """Compute eigenvalues using SLEPc"""
+
+    import sys, slepc4py
+    slepc4py.init(sys.argv)
+
+    from petsc4py import PETSc
+    from slepc4py import SLEPc
+    tA = (A + 1e-32*spsp.eye(A.shape[0])).tocsr()
+    tB = (B + 1e-32*spsp.eye(B.shape[0])).tocsr()
+    petscA = PETSc.Mat().createAIJ(size=tA.shape, csr=(tA.indptr, tA.indices, tA.data))
+    petscB = PETSc.Mat().createAIJ(size=tB.shape, csr=(tB.indptr, tB.indices, tB.data))
+
+    E = SLEPc.EPS(); E.create()
+
+    E.setOperators(petscA,petscB)
+    E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
+    E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
+    E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
+    E.setDimensions(nev = 3, ncv = 20)
+    ST = E.getST()
+    ST.setType('sinvert')
+    ST.setShift(0.0)
+    KSP = ST.getKSP()
+    E.setTolerances(max_it=200)
+    PC = KSP.getPC()
+    PC.setType('lu')
+    PC.setFactorSolverPackage('mumps')
+    E.setFromOptions()
+
+    E.solve()
+
+    Print = PETSc.Sys.Print
+
+    Print()
+    Print("******************************")
+    Print("*** SLEPc Solution Results ***")
+    Print("******************************")
+    Print()
+
+    its = E.getIterationNumber()
+    Print( "Number of iterations of the method: %d" % its )
+
+    eps_type = E.getType()
+    Print( "Solution method: %s" % eps_type )
+
+    nev, ncv, mpd = E.getDimensions()
+    Print( "Number of requested eigenvalues: %d" % nev )
+
+    tol, maxit = E.getTolerances()
+    Print( "Stopping condition: tol=%.4g, maxit=%d" % (tol, maxit) )
+
+    nconv = E.getConverged()
+    Print( "Number of converged eigenpairs %d" % nconv )
+
+    if nconv > 0:
+      # Create the results vectors
+      vr, wr = petscA.getVecs()
+      vi, wi = petscA.getVecs()
+      #
+      Print()
+      Print("        k          ||Ax-kx||/||kx|| ")
+      Print("----------------- ------------------")
+      for i in range(nconv):
+        k = E.getEigenpair(i, vr, vi)
+        error = E.computeRelativeError(i)
+        if k.imag != 0.0:
+          Print( " %9f%+9f j %12g" % (k.real, k.imag, error) )
+        else:
+          Print( " %12f       %12g" % (k.real, error) )
+      Print()
+
