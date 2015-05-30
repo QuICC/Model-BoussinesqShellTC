@@ -9,15 +9,15 @@ import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 model = mod.BoussinesqFPlane3DQG()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [32, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
-res = [32, 0, 0]
+res = [64, 0, 0]
 eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
 
-# Set wave number
+# Wave number function from single "index" (k perpendicular)
 def wave(kp):
     phi = 0
     kx = kp*np.cos(phi*np.pi/180.0)
@@ -26,30 +26,42 @@ def wave(kp):
 
 eigs = [1, 0]
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-gevp = MarginalCurve.GEVP(model, res, eq_params, eigs, bcs, fields, wave = wave)
+# Create marginal curve object
+curve = MarginalCurve.MarginalCurve(gevp_opts)
 
-curve = MarginalCurve.MarginalCurve(gevp)
-ks = np.arange(1, 2, 0.05)
+# Compute marginal curve at a single point
+#kp = 1.3048
+#kp = 25.0
+#Rac, evp_freq = curve.point(kp)
+#print((kp, Rac, evp_freq))
+#
+## Trace marginal curve for a set of wave indexes
+#ks = np.arange(0.5, 100.5, 0.5)
+#(data_k, data_Ra, data_freq) = curve.trace(ks)
+#
+## Compute minimum of marginal curve
+#kc, Rac, fc = curve.minimum(data_k, data_Ra)
+#print((kc, Rac, fc))
+#
+# Plot marginal curve and minimum
+#import matplotlib.pylab as pl
+#pl.plot(data_k, data_Ra, 'b', data_k, data_freq, 'g', kc, Rac, 'r+', markersize=14)
+#pl.show()
 
-(data_k, data_Ra, data_freq) = curve(ks)
-kc, Rac, fc = curve.minimum(data_k, data_Ra)
-import matplotlib.pylab as pl
-pl.plot(data_k, data_Ra, 'b', data_k, data_freq, 'g', kc, Rac, 'r+', markersize=12)
-pl.show()
-
-curve.point.gevp.setEigs(kc)
-evp_vec = curve.point.eigenvector()
-evp_lmb = curve.point.eigenvalue()
-evp_lmb = curve.point.gevp.solve(2*Rac, 10)
-print(curve.point.gevp.evp_lmb)
+# Compute and visualize some mode
+kp = 7
+Ra = 2402
+gevp_opts['eigs'] = wave(kp)
+gevp = MarginalCurve.GEVP(**gevp_opts)
 
 # Setup visualization and IO
 show_spy = False
 write_mtx = False
-solve_evp = True
-show_solution = (True and solve_evp)
+solve_gevp = True
+show_solution = (True and solve_gevp)
 
 if show_spy or show_solution:
     import matplotlib.pylab as pl
@@ -57,9 +69,11 @@ if show_spy or show_solution:
 if show_solution:
     import geomhdiscc.transform.cartesian as transf
 
+if show_spy or write_mtx:
+    A, B = gevp.buildMatrices(Ra)
+
 # Show the "spy" of the two matrices
 if show_spy:
-    A, B = curve.gevp(1.0)
     pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
     pl.tick_params(axis='x', labelsize=30)
     pl.tick_params(axis='y', labelsize=30)
@@ -75,22 +89,19 @@ if write_mtx:
     io.mmwrite("matrix_A.mtx", A)
     io.mmwrite("matrix_B.mtx", B)
 
-# Solve EVP with sptarn
-#if solve_evp:
-#    import geomhdiscc.linear_stability.solver as solver
-#    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
-#    print(evp_lmb)
+# Solve GEVP
+if solve_gevp:
+    gevp.solve(Ra, 5, with_vectors = True)
+    evp_lmb = gevp.evp_lmb
+    evp_vec = gevp.evp_vec
+    print(evp_lmb)
 
 if show_solution:
-#    viz_mode = 0
-#    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-#    sol_s = evp_vec[0:res[0],viz_mode]
-#    sol_w = evp_vec[res[0]:2*res[0],viz_mode]
-#    sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
-    print("\nVisualizing mode: " + str(evp_lmb))
-    sol_s = evp_vec[0:res[0]]
-    sol_w = evp_vec[res[0]:2*res[0]]
-    sol_t = evp_vec[2*res[0]:3*res[0]]
+    viz_mode = 0
+    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
+    sol_s = evp_vec[0:res[0],viz_mode]
+    sol_w = evp_vec[res[0]:2*res[0],viz_mode]
+    sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
     # Create spectrum plots
     pl.subplot(1,3,1)
     pl.semilogy(abs(sol_s))

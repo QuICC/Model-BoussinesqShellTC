@@ -85,14 +85,18 @@ def petsc_operators(A, B):
 def slepc_eps(A, B, nev, sigma = 0.0):
     """Create SLEPc eigensolver"""
 
+    opts = PETSc.Options()
+    opts["mat_mumps_icntl_14"] = 80
+
     E = SLEPc.EPS()
     E.create()
 
     E.setOperators(A,B)
     E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
     E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
+    #E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
-    E.setDimensions(nev = nev, ncv = 20)
+    E.setDimensions(nev = nev, ncv = 50)
     ST = E.getST()
     ST.setType('sinvert')
     ST.setShift(sigma)
@@ -101,6 +105,7 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     PC = KSP.getPC()
     PC.setType('lu')
     PC.setFactorSolverPackage('mumps')
+
     E.setFromOptions()
 
     return E
@@ -110,7 +115,7 @@ def eigenvalues(A, B, nev):
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, -0.9)
+    E = slepc_eps(pA, pB, nev, 0.1)
 
     E.solve()
     nconv = E.getConverged()
@@ -129,7 +134,7 @@ def eigenpairs(A, B, nev):
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, -0.9)
+    E = slepc_eps(pA, pB, nev, 0.1)
 
     E.solve()
     nconv = E.getConverged()
