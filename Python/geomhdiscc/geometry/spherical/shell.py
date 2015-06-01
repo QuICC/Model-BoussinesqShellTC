@@ -66,9 +66,9 @@ def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = No
     for l in range(m+1, maxnl):
         if restriction is None or l in restriction:
             bcr = sphbc.ldependent_bc(bcr, l)
-            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)))
+            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)), format = 'coo')
         else:
-            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)))
+            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)), format = 'coo')
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
@@ -88,9 +88,9 @@ def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = N
     for l in range(m+1, maxnl):
         if restriction is None or l in restriction:
             bcr = sphbc.ldependent_bc(bcr, l)
-            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)))
+            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)), format = 'coo')
         else:
-            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)))
+            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)), format = 'coo')
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
@@ -121,10 +121,10 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coe
         rmat2 = opr(nr, a, b, bcr)
         rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
         rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
-        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1) + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2)
+        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1, format = 'coo') + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2, format = 'coo')
         for ir,l in enumerate(range(m+1, maxnl)):
             bcr = sphbc.ldependent_bc(bcr, l)
-            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],opl(nr, a, b, bcr)) + coeff*shc(l)*spsp.kron(cordr[ir+1,:],opr(nr, a, b, bcr))
+            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],opl(nr, a, b, bcr), format = 'coo') + coeff*shc(l)*spsp.kron(cordr[ir+1,:],opr(nr, a, b, bcr), format = 'coo')
             mat = spsp.vstack([mat,row])
     else:
         mat = rad.zblk(nr, bc)
@@ -137,7 +137,7 @@ def zblk(nr, maxnl, m, bc):
     bcr = convert_bc(bc)
 
     nl = maxnl - m
-    mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr))
+    mat = spsp.kron(rad.zblk(nl,rad.radbc.no_bc()),rad.zblk(nr,bcr), format = 'coo')
     return sphbc.constrain(mat, nr, maxnl, m, bc)
 
 def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
@@ -196,7 +196,7 @@ def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     bcr = convert_bc(bc)
 
     nl = maxnl - m
-    mat = coeff*spsp.kron(rad.qid(nl,0,rad.radbc.no_bc()), rad.qid(nr,qr,bcr))
+    mat = coeff*spsp.kron(rad.qid(nl,0,rad.radbc.no_bc()), rad.qid(nr,qr,bcr), format = 'coo')
     return sphbc.constrain(mat, nr, maxnl, m, bc)
 
 def stencil(nr, maxnl, m, bc, make_square):

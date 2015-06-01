@@ -13,7 +13,7 @@ import geomhdiscc.geometry.spherical.sphere_radius_boundary as radbc
 def zblk(nr, l, bc):
     """Create a block of zeros"""
 
-    mat = spsp.lil_matrix((nr,nr))
+    mat = spsp.coo_matrix((nr,nr))
     return radbc.constrain(mat,l,bc)
 
 def d1(nr, l, bc, coeff = 1.0):
@@ -24,7 +24,7 @@ def d1(nr, l, bc, coeff = 1.0):
     for i in range(0,nr-1):
         mat[i,i+(l+1)%2:] = row[i+(l+1)%2:]
 
-    mat = coeff*mat
+    mat = coeff*mat.tocoo()
     return radbc.constrain(mat, l, bc)
 
 def i2x2(nr, l, bc, coeff = 1.0):
@@ -58,7 +58,7 @@ def i2x2(nr, l, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i2x2lapl(nr, l, bc, coeff = 1.0):
@@ -84,7 +84,7 @@ def i2x2lapl(nr, l, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i4x4(nr, l, bc, coeff = 1.0):
@@ -134,7 +134,7 @@ def i4x4(nr, l, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i4x4lapl(nr, l, bc, coeff = 1.0):
@@ -176,7 +176,7 @@ def i4x4lapl(nr, l, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i4x4lapl2(nr, l, bc, coeff = 1.0):
@@ -210,7 +210,7 @@ def i4x4lapl2(nr, l, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i2x1(nr, l, bc, coeff = 1.0):
@@ -242,7 +242,7 @@ def i2x1(nr, l, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i2x2d1(nr, l, bc, coeff = 1.0):
@@ -274,7 +274,7 @@ def i2x2d1(nr, l, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i4x3(nr, l, bc, coeff = 1.0):
@@ -322,7 +322,7 @@ def i4x3(nr, l, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def i4x4d1(nr, l, bc, coeff = 1.0):
@@ -370,14 +370,17 @@ def i4x4d1(nr, l, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (l+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
 def qid(nr, l, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
-
-    offsets = [0]
-    diags = [[0]*q + [1]*(nr-q)]
-
-    mat = coeff*spsp.diags(diags, offsets)
+    
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-q))
+    else:
+        mat.data = np.ones((nr-q))
+    mat.row = np.arange(q,nr)
+    mat.col = mat.row
     return radbc.constrain(mat, l, bc)

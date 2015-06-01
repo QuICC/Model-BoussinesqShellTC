@@ -9,6 +9,9 @@ import scipy.linalg as splin
 import scipy.sparse as spsp
 import scipy.sparse.linalg as spsplin
 
+import sys, slepc4py
+slepc4py.init(sys.argv)
+
 from petsc4py import PETSc
 from slepc4py import SLEPc
 
@@ -72,21 +75,25 @@ def sort_no_inf(vec, lmb):
 def petsc_operators(A, B):
     """Convert SciPy operators to PETSc operators"""
 
+    print("convert matrices to CSR")
     A = A.tocsr()
     B = B.tocsr()
 
+    print("Build PETSc matrices")
     pA = PETSc.Mat().createAIJ(size=A.shape, csr=(A.indptr, A.indices, A.data))
     pA.assemble()
     pB = PETSc.Mat().createAIJ(size=B.shape, csr=(B.indptr, B.indices, B.data))
     pB.assemble()
+    print("Done")
 
     return (pA, pB)
 
 def slepc_eps(A, B, nev, sigma = 0.0):
     """Create SLEPc eigensolver"""
 
-    opts = PETSc.Options()
-    opts["mat_mumps_icntl_14"] = 80
+    print("Construct EPS solver")
+    #opts = PETSc.Options()
+    #opts["mat_mumps_icntl_14"] = 80
 
     E = SLEPc.EPS()
     E.create()
@@ -96,17 +103,22 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     E.setWhichEigenpairs(SLEPc.EPS.Which.LARGEST_REAL)
     #E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
-    E.setDimensions(nev = nev, ncv = 50)
+    E.setDimensions(nev = nev)
+    E.setTolerances(max_it=50)
     ST = E.getST()
     ST.setType('sinvert')
     ST.setShift(sigma)
     KSP = ST.getKSP()
-    E.setTolerances(max_it=200)
+    KSP.setType('preonly')
     PC = KSP.getPC()
     PC.setType('lu')
     PC.setFactorSolverPackage('mumps')
+    PC.setFromOptions()
+    KSP.setFromOptions()
+    ST.setFromOptions()
 
     E.setFromOptions()
+    print("Done")
 
     return E
 
@@ -115,8 +127,9 @@ def eigenvalues(A, B, nev):
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, 0.1)
+    E = slepc_eps(pA, pB, nev, 0.9)
 
+    print("solve")
     E.solve()
     nconv = E.getConverged()
 
@@ -128,14 +141,17 @@ def eigenvalues(A, B, nev):
             err[i] = E.computeRelativeError(i)
 
         return eigs
+    else:
+        return None
 
 def eigenpairs(A, B, nev):
     """Compute eigenpairs using SLEPc"""
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, 0.1)
+    E = slepc_eps(pA, pB, nev, 0.9)
 
+    print("solve")
     E.solve()
     nconv = E.getConverged()
 
@@ -152,3 +168,5 @@ def eigenpairs(A, B, nev):
             err[i] = E.computeRelativeError(i)
 
         return (eigs, vects)
+    else:
+        return (None, None)

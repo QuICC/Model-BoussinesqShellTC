@@ -24,7 +24,7 @@ def wave(kp):
     ky = (kp**2-kx**2)**0.5
     return [kx, ky]
 
-eigs = [1, 0]
+eigs = wave(1.0)
 
 # Collect GEVP setup parameters into single dictionary
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
@@ -34,14 +34,14 @@ curve = MarginalCurve.MarginalCurve(gevp_opts)
 
 # Compute marginal curve at a single point
 #kp = 1.3048
-#kp = 25.0
-#Rac, evp_freq = curve.point(kp)
+#kp = 8.5
+#Rac, evp_freq = curve.point(kp, guess = 5218.69901425)
 #print((kp, Rac, evp_freq))
 #
-## Trace marginal curve for a set of wave indexes
-#ks = np.arange(0.5, 100.5, 0.5)
-#(data_k, data_Ra, data_freq) = curve.trace(ks)
-#
+# Trace marginal curve for a set of wave indexes
+ks = np.arange(0.5, 10.5, 0.5)
+(data_k, data_Ra, data_freq) = curve.trace(ks)
+
 ## Compute minimum of marginal curve
 #kc, Rac, fc = curve.minimum(data_k, data_Ra)
 #print((kc, Rac, fc))
@@ -51,83 +51,34 @@ curve = MarginalCurve.MarginalCurve(gevp_opts)
 #pl.plot(data_k, data_Ra, 'b', data_k, data_freq, 'g', kc, Rac, 'r+', markersize=14)
 #pl.show()
 
-# Compute and visualize some mode
-kp = 7
-Ra = 2402
-gevp_opts['eigs'] = wave(kp)
-gevp = MarginalCurve.GEVP(**gevp_opts)
-
-# Setup visualization and IO
-show_spy = False
-write_mtx = False
+# Setup comutation, visualization and IO
 solve_gevp = True
-show_solution = (True and solve_gevp)
+show_spy = False
+show_spectra = (True and solve_gevp)
+show_physical = (True and solve_gevp)
+viz_mode = 0
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+if show_spy or solve_gevp:
+    #kp = 1.5
+    #Ra = 9.44899084506
+    #kp = 3.0
+    #Ra = 82.0966227126
+    kp = 5.5
+    Ra = 915.388767955
+    kp = 8.5
+    Ra = 5218.69901425
+    gevp_opts['eigs'] = wave(kp)
+    gevp = MarginalCurve.GEVP(**gevp_opts)
 
-if show_solution:
-    import geomhdiscc.transform.cartesian as transf
-
-if show_spy or write_mtx:
-    A, B = gevp.buildMatrices(Ra)
-
-# Show the "spy" of the two matrices
 if show_spy:
-    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+    gevp.viewOperators(Ra, spy = True, write_mtx = True)
 
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
-
-# Solve GEVP
 if solve_gevp:
     gevp.solve(Ra, 5, with_vectors = True)
-    evp_lmb = gevp.evp_lmb
-    evp_vec = gevp.evp_vec
-    print(evp_lmb)
+    print(gevp.evp_lmb)
 
-if show_solution:
-    viz_mode = 0
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    sol_s = evp_vec[0:res[0],viz_mode]
-    sol_w = evp_vec[res[0]:2*res[0],viz_mode]
-    sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
-    # Create spectrum plots
-    pl.subplot(1,3,1)
-    pl.semilogy(abs(sol_s))
-    pl.title('s')
-    pl.subplot(1,3,2)
-    pl.semilogy(abs(sol_w))
-    pl.title('w')
-    pl.subplot(1,3,3)
-    pl.semilogy(abs(sol_t))
-    pl.title('T')
-    pl.show()
+if show_spectra:
+    gevp.viewSpectra(viz_mode)
 
-    # Compute physical space values
-    grid_x = transf.grid(res[0])
-    phys_s = transf.tophys(sol_s.real)
-    phys_w = transf.tophys(sol_w.real)
-    phys_t = transf.tophys(sol_t.real)
-
-    # Show physical plot
-    pl.subplot(1,3,1)
-    pl.plot(grid_x, phys_s)
-    pl.title('s')
-    pl.subplot(1,3,2)
-    pl.plot(grid_x, phys_w)
-    pl.title('w')
-    pl.subplot(1,3,3)
-    pl.plot(grid_x, phys_t)
-    pl.title('T')
-    pl.show()
+if show_physical:
+    gevp.viewPhysical(viz_mode)

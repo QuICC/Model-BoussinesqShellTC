@@ -22,7 +22,7 @@ class MarginalCurve:
         
         self.point = MarginalPoint(gevp_opts, mode)
 
-    def trace(self, ks):
+    def trace(self, ks, rtol = 1e-5):
         """Trace the marginal curve"""
         
         data_k = np.zeros(len(ks))
@@ -32,7 +32,7 @@ class MarginalCurve:
         for i, k in enumerate(ks):
             if i > 3:
                 Rac = p(k)
-            Rac, freq = self.point(k, guess = Rac)
+            Rac, freq = self.point(k, guess = Rac, rtol = rtol)
             data_k[i] = k
             data_Ra[i] = Rac
             data_freq[i] = freq
@@ -74,7 +74,7 @@ class MarginalPoint:
         self.a = None
         self.b = None
 
-    def __call__(self, k, guess = None, rtol = 1e-7):
+    def __call__(self, k, guess = None, rtol = 1e-5):
         """Compute marginal point in given interval [a, b]"""
 
         if guess is None:
@@ -158,18 +158,18 @@ class MarginalPoint:
         """Track the growth rate to find critical value"""
 
         self._gevp.solve(Ra, self.mode+1)
+        print((Ra, self._gevp.evp_lmb))
 
         return self._gevp.evp_lmb[self.mode].real
 
     def _signTracker(self, Ra):
         """Track the growth rate to find critical value"""
 
-        print(Ra)
         # Get change in rayleigh number
         dRa = Ra - self._gevp.eq_params['rayleigh']
         # Solve
         self._gevp.solve(Ra, self.mode+1)
-        print(self._gevp.evp_lmb)
+        print((Ra, self._gevp.evp_lmb))
 
         if self._gevp.evp_lmb is None:
             raise NewtonNoneError
@@ -224,12 +224,101 @@ class GEVP:
         """Solve the GEVP and store eigenvalues"""
 
         if Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
+            print("CREATING MATRICES")
             A, B = self.buildMatrices(Ra)
+            print("SOVLING")
             if with_vectors:
                 self.evp_lmb, self.evp_vec = solver.eigenpairs(A, B, nev)
             else:
                 self.evp_lmb = solver.eigenvalues(A, B, nev)
                 self.evp_vec = None
+
+    def viewOperators(self, Ra, spy = True, write_mtx = True):
+        """Spy and/or write the operators to MatrixMarket file"""
+
+        # Create operators
+        if spy or write_mtx:
+            A, B = self.buildMatrices(Ra)
+
+        # Spy the two operators
+        if spy:
+            import matplotlib.pylab as pl
+            pl.subplot(1,2,1)
+            pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
+            pl.tick_params(axis='x', labelsize=30)
+            pl.tick_params(axis='y', labelsize=30)
+            pl.subplot(1,2,2)
+            pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
+            pl.tick_params(axis='x', labelsize=30)
+            pl.tick_params(axis='y', labelsize=30)
+            pl.show()
+
+        if write_mtx:
+            import scipy.io as io
+            io.mmwrite("matrix_A.mtx", A)
+            io.mmwrite("matrix_B.mtx", B)
+
+    def viewSpectra(self, viz_mode, plot = True):
+        """Plot the spectra of the eigenvectors"""
+
+        if self.evp_lmb is not None:
+            import matplotlib.pylab as pl
+
+            # Extra different fields
+            start = 0
+            stop = 0
+            sol_cheb = dict()
+            for f in self.fields:
+                stop = stop + self.model.block_size(self.res, f)[0]
+                sol_cheb[f] = self.evp_vec[start:stop, viz_mode]
+                start = stop
+            
+            if plot:
+                print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
+                # Plot spectra
+                rows = np.ceil(len(self.fields)/3)
+                cols = min(3, len(self.fields))
+                for i,f in enumerate(self.fields):
+                    pl.subplot(rows,cols,i%3+1)
+                    pl.semilogy(abs(sol_cheb[f]))
+                    pl.title(f[0])
+                pl.show()
+
+            return sol_cheb
+
+        else:
+            return None
+
+    def viewPhysical(self, viz_mode, plot = True):
+        """Plot the spectra of the eigenvectors"""
+
+        if self.evp_lmb is not None:
+            import matplotlib.pylab as pl
+            import geomhdiscc.transform.cartesian as transf
+
+            # Extra different fields
+            sol_cheb = self.viewSpectra(viz_mode, False)
+
+            # Compute physical space values
+            sol_phys = dict()
+            grid = transf.grid(self.res[0])
+            for f in self.fields:
+                sol_phys[f] = transf.tophys(sol_cheb[f].real)
+
+            if plot:
+                print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
+                # Plot physical field
+                rows = np.ceil(len(self.fields)/3)
+                cols = min(3, len(self.fields))
+                for i,f in enumerate(self.fields):
+                    pl.subplot(rows,cols,i%3+1)
+                    pl.plot(grid, sol_phys[f])
+                    pl.title(f[0])
+                pl.show()
+            
+            return (grid, sol_phys)
+        else:
+            return None
 
     def defaultWave(self, k):
         """Default conversion for wavenumber index"""
