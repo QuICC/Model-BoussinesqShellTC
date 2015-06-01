@@ -8,31 +8,29 @@ import numpy as np
 import geomhdiscc.linear_stability.solver_slepc as solver
 import scipy.optimize as optimize
 
-class NewtonNoneError(Exception):
-    pass
-
-class NewtonDoneError(Exception):
-    pass
-
 class MarginalCurve:
     """The marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0):
+    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7):
         """Initialize the marginal curve"""
         
-        self.point = MarginalPoint(gevp_opts, mode)
+        self.point = MarginalPoint(gevp_opts, mode, rtol = rtol)
+        self.rtol = rtol
+        self.guess = None
 
-    def trace(self, ks, rtol = 1e-5):
+    def trace(self, ks, guess = None, initial_guess = 1.0):
         """Trace the marginal curve"""
         
+        print("Tracing marginal curve")
+        print("----------------------")
         data_k = np.zeros(len(ks))
         data_Ra = np.zeros(len(ks))
         data_freq = np.zeros(len(ks))
-        Rac = None
+        Rac = guess
         for i, k in enumerate(ks):
             if i > 3:
                 Rac = p(k)
-            Rac, freq = self.point(k, guess = Rac, rtol = rtol)
+            Rac, freq = self.point(k, guess = Rac, initial_guess = initial_guess)
             data_k[i] = k
             data_Ra[i] = Rac
             data_freq[i] = freq
@@ -43,28 +41,55 @@ class MarginalCurve:
 
         return (data_k, data_Ra, data_freq)
 
-    def minimum(self, ks, Ras):
+    def minimum(self, ks, Ras, xtol = 1e-4):
         """Compute the critical value (minimum of curve)"""
         
+        print("Finding minimum")
+        print("---------------")
+
         # Get bounds for minimum
         imin = np.argmin(Ras)
         a = ks[imin-1]
         b = ks[imin]
         c = ks[imin+1]
+        self.guess = Ras[imin]
 
         # Find minimum
-        opt = optimize.minimize_scalar(self._tracker, [a, b, c])
+        opt = optimize.minimize_scalar(self._tracker, [a, b, c], options = {'xtol':xtol})
+
+        print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(opt.x, opt.fun, self.point.frequency()))
 
         return (opt.x, opt.fun, self.point.frequency())
 
+    def view(self, ks, Ras, fs, minimum = None, plot = True):
+        """Plot the marginal curve"""
+
+        if plot:
+            import matplotlib.pylab as pl
+
+            pl.subplot(1,2,1)
+            pl.plot(ks, Ras, 'b')
+            if minimum is not None:
+                pl.plot(minimum[0], minimum[1], 'r+', markersize=14)
+            pl.title('Critical Rayleigh number')
+            pl.xlabel('Wavenumber')
+            pl.ylabel('Ra')
+
+            pl.subplot(1,2,2)
+            pl.plot(ks, fs, 'g')
+            pl.title('Critical frequency')
+            pl.xlabel('Wavenumber')
+            pl.ylabel('frequency')
+            pl.show()
+
     def _tracker(self, k):
 
-        return self.point(k)[0]
+        return self.point(k, guess = self.guess)[0]
 
 class MarginalPoint:
     """A point on the marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0):
+    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7):
         """Initialize the marginal point"""
 
         self._gevp = GEVP(**gevp_opts)
@@ -73,19 +98,22 @@ class MarginalPoint:
         self.fc = None
         self.a = None
         self.b = None
+        self.rtol = rtol
+        self.nev = max(mode+1, 1)
+        self.best = None
 
-    def __call__(self, k, guess = None, rtol = 1e-5):
+    def __call__(self, k, guess = None, initial_guess = 1.0):
         """Compute marginal point in given interval [a, b]"""
 
         if guess is None:
-            Ra = 1
-            factor = 2
+            Ra = initial_guess
+            factor = 2.0
         else:
             Ra = guess
             factor = 1.1
 
-        print("Computing marginal curve for k = " + str(k))
-        print("\t- initial guess Ra = " + str(Ra))
+        print("Computing marginal curve at k = {:g}".format(k))
+        print("\t- initial guess Ra = {:g}".format(Ra))
 
         # Set wavenumter
         self._gevp.setEigs(k)
@@ -94,25 +122,34 @@ class MarginalPoint:
         print("\t- finding interval")
         for i in range(0,16):
             self.findInterval(Ra)
-            if self.a != None:
+            if self.a != None and self.b != None:
                 break
+            elif self.best is not None and self.best[2]:
+                Ra = self.best[1]
+                self.best = (self.best[0], self.best[1], False)
+            elif self.best is not None:
+                if self.best[0] > 0:
+                    Ra = self.best[1]/(1.1*factor)
+                else:
+                    Ra = self.best[1]*(1.1*factor)
+                self.best = None
             else:
                 Ra = factor*Ra
 
-        if self.a is None:
+        if self.a is None or self.b is None:
             self.Rac = float('NaN')
             self.rc = float('NaN')
             self.a = None
             self.b = None
         else:
             # Refine zero with Brent's method
-            print("\t- Brent's method: [" + str(self.a) + ', ' + str(self.b) + "]")
-            Rac = optimize.brentq(self._tracker, self.a, self.b, rtol = rtol)
+            print("\t- Brent's method: [{:g}, {:g}]".format(self.a,self.b))
+            Rac = optimize.brentq(self._tracker, self.a, self.b, rtol = self.rtol)
             self.a = None
             self.b = None
             self.Rac = Rac
             self.fc = self.frequency()
-        print("\t- Ra = " + str(self.Rac) + ", freq = " + str(self.fc))
+        print("\t- Ra = {:g}, freq = {:g}, conv = {:g}".format(self.Rac, self.fc, self.growthRate()))
 
         return (self.Rac, self.fc)
 
@@ -120,8 +157,9 @@ class MarginalPoint:
         """Find the sign changing interval"""
 
         try:
-            Rac = optimize.newton(self._signTracker, guess)
-        except (NewtonDoneError, NewtonNoneError):
+            #Rac = optimize.newton(self._signTracker, guess)
+            Rac = solver.newton(self._signTracker, guess, step = 1e-4)
+        except (solver.NewtonDoneError, solver.NewtonNoneError):
             pass
         except:
             raise
@@ -129,36 +167,35 @@ class MarginalPoint:
     def eigenvector(self):
         """Compute the eigenvectors"""
 
-        self._gevp.solve(self.Rac, self.mode+1, with_vectors = True)
+        self._gevp.solve(self.Rac, self.nev, with_vectors = True)
 
         return self._gevp.evp_vec[:,self.mode]
 
     def eigenvalue(self):
         """Compute the eigenvalues"""
 
-        self._gevp.solve(self.Rac, self.mode+1)
+        self._gevp.solve(self.Rac, self.nev)
 
         return self._gevp.evp_lmb[self.mode]
 
     def growthRate(self):
         """Get the growth rate"""
 
-        self._gevp.solve(self.Rac, self.mode+1)
+        self._gevp.solve(self.Rac, self.nev)
 
         return self._gevp.evp_lmb[self.mode].real
 
     def frequency(self):
         """Compute the growth rate"""
 
-        self._gevp.solve(self.Rac, self.mode+1)
+        self._gevp.solve(self.Rac, self.nev)
 
         return self._gevp.evp_lmb[self.mode].imag
 
     def _tracker(self, Ra):
         """Track the growth rate to find critical value"""
 
-        self._gevp.solve(Ra, self.mode+1)
-        print((Ra, self._gevp.evp_lmb))
+        self._gevp.solve(Ra, self.nev)
 
         return self._gevp.evp_lmb[self.mode].real
 
@@ -166,22 +203,38 @@ class MarginalPoint:
         """Track the growth rate to find critical value"""
 
         # Get change in rayleigh number
-        dRa = Ra - self._gevp.eq_params['rayleigh']
+        if self._gevp.eq_params['rayleigh'] is None:
+            dRa = Ra
+        else:
+            dRa = Ra - self._gevp.eq_params['rayleigh']
+
         # Solve
-        self._gevp.solve(Ra, self.mode+1)
-        print((Ra, self._gevp.evp_lmb))
+        self._gevp.solve(Ra, self.nev)
 
         if self._gevp.evp_lmb is None:
-            raise NewtonNoneError
+            raise solver.NewtonNoneError
 
         growth = self._gevp.evp_lmb[self.mode].real
+        if growth > 0 and growth < 100:
+            self.b = Ra
+        elif growth < 0 and growth > -100:
+            self.a = Ra
+
+        if self.a is not None and self.b is not None:
+            raise solver.NewtonDoneError
+
         # Check for change of sign (require small change in rayleigh and small growth rate)
-        if abs(dRa/Ra) < 0.1 and abs(self._gevp.evp_lmb[self.mode].real) < 1:
-            self._gevp.solve(Ra+dRa, self.mode+1)
-            if growth*self._gevp.evp_lmb[self.mode].real < 0:
+        if abs(dRa/Ra) < 0.01 and abs(self._gevp.evp_lmb[self.mode].real) < 1:
+            self._gevp.solve(Ra+dRa, self.nev)
+            if self._gevp.evp_lmb is not None and growth*self._gevp.evp_lmb[self.mode].real < 0:
                 self.a = min(Ra, Ra+dRa)
                 self.b = max(Ra, Ra+dRa)
-                raise NewtonDoneError
+                raise solver.NewtonDoneError
+
+        if self.best is None:
+            self.best = (abs(growth), Ra, False)
+        elif abs(growth) < self.best[0]:
+            self.best = (abs(growth), Ra, True)
 
         return growth
 
@@ -194,6 +247,7 @@ class GEVP:
         self.model = copy.copy(model)
         self.res = res
         self.eq_params = eq_params.copy()
+        self.eq_params['rayleigh'] = None
         self.eigs = eigs
         self.bcs = bcs.copy()
         self.no_bcs = bcs.copy()
@@ -201,6 +255,7 @@ class GEVP:
         self.fields = self.model.stability_fields()
         self.evp_lmb = None
         self.evp_vec = None
+        self.changed = True
         if wave is None:
             self.wave = self.defaultWave
         else:
@@ -219,19 +274,20 @@ class GEVP:
        """Set the wave number"""
 
        self.eigs = self.wave(k)
+       self.changed = True
 
     def solve(self, Ra, nev, with_vectors = False):
         """Solve the GEVP and store eigenvalues"""
 
-        if Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
-            print("CREATING MATRICES")
+        if self.changed or Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
+            self.changed = False
             A, B = self.buildMatrices(Ra)
-            print("SOVLING")
             if with_vectors:
                 self.evp_lmb, self.evp_vec = solver.eigenpairs(A, B, nev)
             else:
                 self.evp_lmb = solver.eigenvalues(A, B, nev)
                 self.evp_vec = None
+        print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
     def viewOperators(self, Ra, spy = True, write_mtx = True):
         """Spy and/or write the operators to MatrixMarket file"""
@@ -262,7 +318,6 @@ class GEVP:
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
-            import matplotlib.pylab as pl
 
             # Extra different fields
             start = 0
@@ -274,14 +329,18 @@ class GEVP:
                 start = stop
             
             if plot:
+                import matplotlib.pylab as pl
                 print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot spectra
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))
                 for i,f in enumerate(self.fields):
-                    pl.subplot(rows,cols,i%3+1)
+                    pl.subplot(rows,cols,i+1)
                     pl.semilogy(abs(sol_cheb[f]))
-                    pl.title(f[0])
+                    title = f[0]
+                    if f[1] != "":
+                        title = title + ', ' + f[1]
+                    pl.title(title)
                 pl.show()
 
             return sol_cheb
@@ -293,7 +352,6 @@ class GEVP:
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
-            import matplotlib.pylab as pl
             import geomhdiscc.transform.cartesian as transf
 
             # Extra different fields
@@ -306,14 +364,18 @@ class GEVP:
                 sol_phys[f] = transf.tophys(sol_cheb[f].real)
 
             if plot:
+                import matplotlib.pylab as pl
                 print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot physical field
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))
                 for i,f in enumerate(self.fields):
-                    pl.subplot(rows,cols,i%3+1)
+                    pl.subplot(rows,cols,i+1)
                     pl.plot(grid, sol_phys[f])
-                    pl.title(f[0])
+                    title = f[0]
+                    if f[1] != "":
+                        title = title + ', ' + f[1]
+                    pl.title(title)
                 pl.show()
             
             return (grid, sol_phys)

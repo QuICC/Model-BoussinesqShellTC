@@ -16,14 +16,16 @@ eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
 res = [64, 0, 0]
 eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+phi = 0
 
-# Wave number function from single "index" (k perpendicular)
-def wave(kp):
-    phi = 0
+# Generic Wave number function from single "index" (k perpendicular) and angle
+def generic_wave(kp, phi):
     kx = kp*np.cos(phi*np.pi/180.0)
     ky = (kp**2-kx**2)**0.5
     return [kx, ky]
 
+# Wave number function from single "index" (k perpendicular)
+wave = functools.partial(generic_wave, phi = phi)
 eigs = wave(1.0)
 
 # Collect GEVP setup parameters into single dictionary
@@ -33,25 +35,20 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 curve = MarginalCurve.MarginalCurve(gevp_opts)
 
 # Compute marginal curve at a single point
-#kp = 1.3048
-#kp = 8.5
-#Rac, evp_freq = curve.point(kp, guess = 5218.69901425)
-#print((kp, Rac, evp_freq))
-#
+kp = 1.3048
+Rac, evp_freq = curve.point(kp, guess = 5218.69901425)
+
 # Trace marginal curve for a set of wave indexes
 ks = np.arange(0.5, 10.5, 0.5)
-(data_k, data_Ra, data_freq) = curve.trace(ks)
+(data_k, data_Ra, data_freq) = curve.trace(ks, initial_guess = 1)
 
 ## Compute minimum of marginal curve
-#kc, Rac, fc = curve.minimum(data_k, data_Ra)
-#print((kc, Rac, fc))
-#
-# Plot marginal curve and minimum
-#import matplotlib.pylab as pl
-#pl.plot(data_k, data_Ra, 'b', data_k, data_freq, 'g', kc, Rac, 'r+', markersize=14)
-#pl.show()
+kc, Rac, fc = curve.minimum(data_k, data_Ra)
 
-# Setup comutation, visualization and IO
+# Plot marginal curve and minimum
+curve.view(data_k, data_Ra, data_freq, minimum = (kc, Rac), plot = True)
+
+# Setup computation, visualization and IO
 solve_gevp = True
 show_spy = False
 show_spectra = (True and solve_gevp)
@@ -67,6 +64,7 @@ if show_spy or solve_gevp:
     Ra = 915.388767955
     kp = 8.5
     Ra = 5218.69901425
+    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
     gevp_opts['eigs'] = wave(kp)
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
@@ -75,6 +73,7 @@ if show_spy:
 
 if solve_gevp:
     gevp.solve(Ra, 5, with_vectors = True)
+    print("Found eigenvalues:")
     print(gevp.evp_lmb)
 
 if show_spectra:

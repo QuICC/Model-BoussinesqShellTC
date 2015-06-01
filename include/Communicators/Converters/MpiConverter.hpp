@@ -311,7 +311,7 @@ namespace Parallel {
          MPI_Testall(this->nFCpu(), this->pRecvFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 99);
+            MPI_Abort(MPI_COMM_WORLD, 999);
          }
 
          // Prepost the receive calls
@@ -331,7 +331,7 @@ namespace Parallel {
          MPI_Testall(this->nBCpu(), this->pSendBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 99);
+            MPI_Abort(MPI_COMM_WORLD, 999);
          }
 
          // Post non blocking send calls 
@@ -360,7 +360,7 @@ namespace Parallel {
          MPI_Testall(this->nBCpu(), this->pRecvBRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 99);
+            MPI_Abort(MPI_COMM_WORLD, 999);
          }
 
          // Prepost the receive calls
@@ -380,7 +380,7 @@ namespace Parallel {
          MPI_Testall(this->nFCpu(), this->pSendFRequests(this->mPacks), &flag, MPI_STATUSES_IGNORE);
          if(!flag)
          {
-            MPI_Abort(MPI_COMM_WORLD, 99);
+            MPI_Abort(MPI_COMM_WORLD, 999);
          }
 
          // Post non blocking send calls 

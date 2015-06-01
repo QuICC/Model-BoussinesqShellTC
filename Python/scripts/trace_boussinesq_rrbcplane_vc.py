@@ -1,25 +1,26 @@
 """Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a plane layer (2 periodic directions) (Velocity-continuity formulation)"""
 
 import numpy as np
+import functools
 
 import geomhdiscc.model.boussinesq_rrbcplane_vc as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCPlaneVC()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-res = [128, 0, 0]
+res = [512, 0, 0]
 
 # FT
 bc_temp = 0
 
 # SF, FT,
 #bc_vel = 1
-kx = 0
-ky = 3.710
+phi = 90
+kp = 3.710
 eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1d':2.0}
 #ky = 129
 #eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
@@ -49,13 +50,13 @@ eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1
 bc_vel = 0
 #ky = 54
 #eq_params = {'prandtl':1, 'rayleigh':3.455838e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-ky = 55
+kp = 55
 eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-ky = 55.4
+kp = 55.4
 eq_params = {'prandtl':1, 'rayleigh':3.44979010e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-ky = 55.402
+kp = 55.402
 eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-ky = 55.4023
+kp = 55.4023
 eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 56
 #eq_params = {'prandtl':1, 'rayleigh':3.450893e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
@@ -65,152 +66,79 @@ eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, '
 #eq_params = {'prandtl':1, 'rayleigh':4.134931e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 100
 #eq_params = {'prandtl':1, 'rayleigh':1.094775e8, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 120
-#eq_params = {'prandtl':1, 'rayleigh':7.7971364e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 121
+kp = 120
+eq_params = {'prandtl':1, 'rayleigh':7.7971364e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#kp = 121
 #eq_params = {'prandtl':1, 'rayleigh':7.7892799e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 122
+#kp = 122
 #eq_params = {'prandtl':1, 'rayleigh':7.7846430e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 123
+#kp = 123
 #eq_params = {'prandtl':1, 'rayleigh':7.7832219e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 124
+#kp = 124
 #eq_params = {'prandtl':1, 'rayleigh':7.7850143e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 128
+#kp = 128
 #eq_params = {'prandtl':1, 'rayleigh':7.8420000e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 130
+#kp = 130
 #eq_params = {'prandtl':1, 'rayleigh':7.8632272e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 131
+#kp = 131
 #eq_params = {'prandtl':1, 'rayleigh':7.8875224e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-
-eigs = [kx, ky]
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Generic Wave number function from single "index" (k perpendicular) and angle
+def generic_wave(kp, phi):
+    kx = kp*np.cos(phi*np.pi/180.0)
+    ky = (kp**2-kx**2)**0.5
+    return [kx, ky]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+wave = functools.partial(generic_wave, phi = phi)
+eigs = wave(kp)
 
-# Setup visualization and IO
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
+
+# Create marginal curve object
+curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
+
+# Compute marginal curve at a single point
+kp = 80
+Rac, fc = curve.point(kp, initial_guess = 1e0)
+
+# Trace marginal curve for a set of wave indexes
+ks = np.arange(122, 124.0, 0.5)
+(data_k, data_Ra, data_freq) = curve.trace(ks, guess = 7.7971364e8)
+
+# Compute minimum of marginal curve
+kc, Rac, fc = curve.minimum(data_k, data_Ra)
+
+# Plot marginal curve and minimum
+curve.view(data_k, data_Ra, data_freq, minimum = (kc, Rac), plot = True)
+
+# Setup computation, visualization and IO
+solve_gevp = True
 show_spy = False
-write_mtx = False
-solve_evp = True
-show_solution = (True and solve_evp)
+show_spectra = (True and solve_gevp)
+show_physical = (True and solve_gevp)
+viz_mode = 0
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+if show_spy or solve_gevp:
+    Ra = 7.7971364e8
+    kp = 120
+    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
+    gevp_opts['eigs'] = wave(kp)
+    gevp = MarginalCurve.GEVP(**gevp_opts)
 
-if show_solution:
-    import geomhdiscc.transform.cartesian as transf
-
-# Show the "spy" of the two matrices
 if show_spy:
-    pl.spy(A, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=5, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+    gevp.viewOperators(Ra, spy = True, write_mtx = True)
 
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
+if solve_gevp:
+    gevp.solve(Ra, 5, with_vectors = True)
+    print("Found eigenvalues:")
+    print(gevp.evp_lmb)
 
-# Solve EVP with sptarn
-if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e3, np.inf)
-    print(evp_lmb)
+if show_spectra:
+    gevp.viewSpectra(viz_mode)
 
-if show_solution:
-    viz_mode = -1
-    zscale = eq_params['scale1d']
-
-    for mode in range(0,len(evp_lmb)):
-        # Get solution vectors
-        sol_u = evp_vec[0:res[0],mode]
-        sol_v = evp_vec[res[0]:2*res[0],mode]
-        sol_w = evp_vec[2*res[0]:3*res[0],mode]
-
-        # Extract continuity from velocity
-        sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
-        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))))
-
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    # Get solution vectors
-    sol_u = evp_vec[0:res[0],viz_mode]
-    sol_v = evp_vec[res[0]:2*res[0],viz_mode]
-    sol_w = evp_vec[2*res[0]:3*res[0],viz_mode]
-    sol_t = evp_vec[3*res[0]:4*res[0],viz_mode]
-    sol_p = evp_vec[4*res[0]:5*res[0],viz_mode]
-    # Extract continuity from velocity
-    sol_c = 1j*kx*sol_u + 1j*ky*sol_v + mod.c1d.d1(res[0], mod.no_bc(), zscale)*sol_w
-
-    # Create spectrum plots
-    pl.subplot(2,3,1)
-    pl.semilogy(abs(sol_u))
-    pl.title('u')
-    pl.subplot(2,3,2)
-    pl.semilogy(abs(sol_v))
-    pl.title('v')
-    pl.subplot(2,3,3)
-    pl.semilogy(abs(sol_w))
-    pl.title('w')
-    pl.subplot(2,3,4)
-    pl.semilogy(abs(sol_t))
-    pl.title('T')
-    pl.subplot(2,3,5)
-    pl.semilogy(abs(sol_p))
-    pl.title('p')
-    pl.subplot(2,3,6)
-    pl.semilogy(abs(sol_c))
-    pl.title('Continuity')
-    pl.show()
-
-    # Compute physical space values
-    grid_x = transf.grid(res[0])
-    phys_ur = transf.tophys(sol_u.real)
-    phys_ui = transf.tophys(sol_u.imag)
-    phys_vr = transf.tophys(sol_v.real)
-    phys_vi = transf.tophys(sol_v.imag)
-    phys_wr = transf.tophys(sol_w.real)
-    phys_wi = transf.tophys(sol_w.imag)
-    phys_tr = transf.tophys(sol_t.real)
-    phys_ti = transf.tophys(sol_t.imag)
-    phys_pr = transf.tophys(sol_p.real)
-    phys_pi = transf.tophys(sol_p.imag)
-    phys_cr = transf.tophys(sol_c.real)
-    phys_ci = transf.tophys(sol_c.imag)
-    
-    # Show physical plot
-    pl.subplot(2,3,1)
-    pl.plot(grid_x, phys_ur)
-    pl.plot(grid_x, phys_ui)
-    pl.title('u')
-    pl.subplot(2,3,2)
-    pl.plot(grid_x, phys_vr)
-    pl.plot(grid_x, phys_vi)
-    pl.title('v')
-    pl.subplot(2,3,3)
-    pl.plot(grid_x, phys_wr)
-    pl.plot(grid_x, phys_wi)
-    pl.title('w')
-    pl.subplot(2,3,4)
-    pl.plot(grid_x, phys_tr)
-    pl.plot(grid_x, phys_ti)
-    pl.title('T')
-    pl.subplot(2,3,5)
-    pl.plot(grid_x, phys_pr)
-    pl.plot(grid_x, phys_pi)
-    pl.title('Pressure (real)')
-    pl.subplot(2,3,6)
-    pl.plot(grid_x, phys_ci)
-    pl.plot(grid_x, phys_cr)
-    pl.title('Continuity (imag)')
-    pl.show()
+if show_physical:
+    gevp.viewPhysical(viz_mode)

@@ -3,6 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
+import random
 import numpy as np
 import numpy.linalg as nplin
 import scipy.linalg as splin
@@ -16,84 +17,30 @@ from petsc4py import PETSc
 from slepc4py import SLEPc
 
 
-def bound_gevp(A, B, mode, lb, ub):
-    """Compute eigenvalues and bounds"""
+class NewtonNoneError(Exception):
+    pass
 
-    # Compute eigenvalues
-    evp_vec, evp_lmb = solve_gevp(A, B, lb, ub)
-
-    # Found an upper bound for eigenvalue search
-    if sum(np.real(evp_lmb) > 0) >= mode:
-        bound = evp_lmb(mode-1)
-        lmb = evp_lmb(mode-1)
-    elif len(evp_lmb) >= mode:
-        bound = np.real(evp_lmb(min(5,len(evp_lmb))))
-        lmb = evp_lmb(mode)
-    else:
-        bound = -1e0
-        lmb = -np.inf
-
-    return (bound, lmb)
-
-
-def solve_gevp(A, B, lb, ub):
-    """Solve the generalized eigenvalue problem"""
-
-    # max multiplicity of eigenvalues
-    max_mult = 100
-    # restart whole calculation if it fails (random algorithm)
-    max_fail = 10
-
-    # basis size
-    nbasis = 200
-
-    # Loop with increasing multiplicity until all eigenvalue in interval have been found
-    iresult = -1
-    for mult in range(10, min(max_mult, A.shape[0]), 10):
-        for run in range(0, max_fail):
-            try:
-                evp_vec, evp_lmb, iresult = sptarn(A, B, lb, ub, 100*np.spacing(2), nbasis, mult)
-                break
-            except:
-                print("SPTARN crashed, restarting with different guess")
-
-        if iresult > -1:
-            break
-
-    # Sort the eigenvalues and remove infinities
-    evp_vec, evp_lmb = sort_no_inf(evp_vec, evp_lmb)
-
-    return (evp_vec, evp_lmb)
-
-def sort_no_inf(vec, lmb):
-    """Sort eigenvalues and eigenvectors and remove infinities"""
-
-    idx = np.argsort(np.real(lmb))[::-1]
-
-    return (vec[:,idx], lmb[idx])
+class NewtonDoneError(Exception):
+    pass
 
 def petsc_operators(A, B):
     """Convert SciPy operators to PETSc operators"""
 
-    print("convert matrices to CSR")
     A = A.tocsr()
     B = B.tocsr()
 
-    print("Build PETSc matrices")
     pA = PETSc.Mat().createAIJ(size=A.shape, csr=(A.indptr, A.indices, A.data))
     pA.assemble()
     pB = PETSc.Mat().createAIJ(size=B.shape, csr=(B.indptr, B.indices, B.data))
     pB.assemble()
-    print("Done")
 
     return (pA, pB)
 
 def slepc_eps(A, B, nev, sigma = 0.0):
     """Create SLEPc eigensolver"""
 
-    print("Construct EPS solver")
-    #opts = PETSc.Options()
-    #opts["mat_mumps_icntl_14"] = 80
+    opts = PETSc.Options()
+    opts["mat_mumps_icntl_14"] = 80
 
     E = SLEPc.EPS()
     E.create()
@@ -104,10 +51,14 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     #E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
     E.setDimensions(nev = nev)
-    E.setTolerances(max_it=50)
+    E.setTolerances(max_it= 100)
     ST = E.getST()
     ST.setType('sinvert')
-    ST.setShift(sigma)
+    if sigma is None:
+        s = random.uniform(0.1, 0.5)
+    else:
+        s = sigma
+    ST.setShift(s)
     KSP = ST.getKSP()
     KSP.setType('preonly')
     PC = KSP.getPC()
@@ -118,18 +69,16 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     ST.setFromOptions()
 
     E.setFromOptions()
-    print("Done")
 
     return E
 
-def eigenvalues(A, B, nev):
+def eigenvalues(A, B, nev, sigma = None):
     """Compute eigenvalues using SLEPc"""
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, 0.9)
+    E = slepc_eps(pA, pB, nev, sigma)
 
-    print("solve")
     E.solve()
     nconv = E.getConverged()
 
@@ -144,14 +93,13 @@ def eigenvalues(A, B, nev):
     else:
         return None
 
-def eigenpairs(A, B, nev):
+def eigenpairs(A, B, nev, sigma = None):
     """Compute eigenpairs using SLEPc"""
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, 0.9)
+    E = slepc_eps(pA, pB, nev, sigma)
 
-    print("solve")
     E.solve()
     nconv = E.getConverged()
 
@@ -170,3 +118,74 @@ def eigenpairs(A, B, nev):
         return (eigs, vects)
     else:
         return (None, None)
+
+def newton(func, x0, args=(), tol=1.48e-8, maxiter=50, step = 1e-4):
+    """
+    Find a zero using secant method.
+    Find a zero of the function `func` given a nearby starting point `x0`.
+    Parameters
+    ----------
+    func : function
+        The function whose zero is wanted. It must be a function of a
+        single variable of the form f(x,a,b,c...), where a,b,c... are extra
+        arguments that can be passed in the `args` parameter.
+    x0 : float
+        An initial estimate of the zero that should be somewhere near the
+        actual zero.
+    args : tuple, optional
+        Extra arguments to be used in the function call.
+    tol : float, optional
+        The allowable error of the zero value.
+    maxiter : int, optional
+        Maximum number of iterations.
+    Returns
+    -------
+    zero : float
+        Estimated location where function is zero.
+    """
+    if tol <= 0:
+        raise ValueError("tol too small (%g <= 0)" % tol)
+    # Secant method
+    p0 = x0
+    q0 = func(*((p0,) + args))
+    if q0 >= 0:
+        p1 = x0*(1.0 - step) + step
+    else:
+        p1 = x0*(1.0 + step) + step
+    q1 = func(*((p1,) + args))
+    for iter in range(maxiter):
+        if q1 == q0:
+            if p1 != p0:
+                msg = "Tolerance of %s reached" % (p1 - p0)
+                warnings.warn(msg, RuntimeWarning)
+            return (p1 + p0)/2.0
+        else:
+            p = p1 - q1*(p1 - p0)/(q1 - q0)
+            if p < 0:
+                factor = 15.0/10.0
+                if q1 < 0:
+                    p = p1*factor
+                else:
+                    p = p1/factor
+        if abs(p - p1) < tol:
+            return p
+        p0 = p1
+        q0 = q1
+        p1 = p
+
+        try:
+            q1 = func(*((p1,) + args))
+        except NewtonNoneError:
+            if abs(p1/p0) > 10:
+                p1 = 10*p0
+                q1 = func(*((p1,) + args))
+            elif abs(p1/p0) > 2:
+                p1 = (p0 + p1)/2.0
+                q1 = func(*((p1,) + args))
+            else:
+                raise
+        except:
+            raise
+            
+    msg = "Failed to converge after %d iterations, value is %s" % (maxiter, p)
+    raise RuntimeError(msg)
