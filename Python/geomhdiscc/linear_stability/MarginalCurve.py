@@ -23,6 +23,7 @@ class MarginalCurve:
         
         print("Tracing marginal curve")
         print("----------------------")
+
         data_k = np.zeros(len(ks))
         data_Ra = np.zeros(len(ks))
         data_freq = np.zeros(len(ks))
@@ -41,7 +42,7 @@ class MarginalCurve:
 
         return (data_k, data_Ra, data_freq)
 
-    def minimum(self, ks, Ras, xtol = 1e-4):
+    def minimum(self, ks, Ras, xtol = 1e-4, only_int = False):
         """Compute the critical value (minimum of curve)"""
         
         print("Finding minimum")
@@ -54,12 +55,19 @@ class MarginalCurve:
         c = ks[imin+1]
         self.guess = Ras[imin]
 
-        # Find minimum
-        opt = optimize.minimize_scalar(self._tracker, [a, b, c], options = {'xtol':xtol})
+        if only_int:
+            self.point(b, guess = Ras[imin])
+            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(b, Ras[imin], self.point.frequency()))
 
-        print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(opt.x, opt.fun, self.point.frequency()))
+            return (b, Ras[imin], self.point.frequency())
+        else:
+            # Find minimum
+            opt = optimize.minimize_scalar(self._tracker, [a, b, c], options = {'xtol':xtol})
 
-        return (opt.x, opt.fun, self.point.frequency())
+            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(opt.x, opt.fun, self.point.frequency()))
+
+            return (opt.x, opt.fun, self.point.frequency())
+
 
     def view(self, ks, Ras, fs, minimum = None, plot = True):
         """Plot the marginal curve"""
@@ -119,6 +127,7 @@ class MarginalPoint:
         self._gevp.setEigs(k)
 
         # Search interval (newton)
+        self._gevp.best = None
         print("\t- finding interval")
         for i in range(0,16):
             self.findInterval(Ra)
@@ -314,7 +323,7 @@ class GEVP:
             io.mmwrite("matrix_A.mtx", A)
             io.mmwrite("matrix_B.mtx", B)
 
-    def viewSpectra(self, viz_mode, plot = True):
+    def viewSpectra(self, viz_mode, plot = True, naive = False):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
@@ -324,7 +333,10 @@ class GEVP:
             stop = 0
             sol_cheb = dict()
             for f in self.fields:
-                stop = stop + self.model.block_size(self.res, f)[0]
+                if naive:
+                    stop = stop + self.evp_vec.shape[0]/3
+                else:
+                    stop = stop + self.model.block_size(self.res, f)[0]
                 sol_cheb[f] = self.evp_vec[start:stop, viz_mode]
                 start = stop
             

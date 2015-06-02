@@ -13,6 +13,8 @@ import scipy.sparse.linalg as spsplin
 import sys, slepc4py
 slepc4py.init(sys.argv)
 
+from mpi4py import MPI
+
 from petsc4py import PETSc
 from slepc4py import SLEPc
 
@@ -29,10 +31,19 @@ def petsc_operators(A, B):
     A = A.tocsr()
     B = B.tocsr()
 
-    pA = PETSc.Mat().createAIJ(size=A.shape, csr=(A.indptr, A.indices, A.data))
-    pA.assemble()
-    pB = PETSc.Mat().createAIJ(size=B.shape, csr=(B.indptr, B.indices, B.data))
-    pB.assemble()
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+
+    pA = PETSc.Mat()
+    pB = PETSc.Mat()
+    if rank == 0:
+        pA.createAIJ(size=A.shape, nnz = A.nnz, csr=(A.indptr, A.indices, A.data), comm = comm)
+        pB.createAIJ(size=B.shape, nnz = B.nnz, csr=(B.indptr, B.indices, B.data), comm = comm)
+    else:
+        pA.createAIJ(size=A.shape, nnz = A.nnz, comm = comm)
+        pB.createAIJ(size=B.shape, nnz = B.nnz, comm = comm)
+    pA.assemble(assembly = PETSc.Mat.FINAL_ASSEMBLY)
+    pB.assemble(assembly = PETSc.Mat.FINAL_ASSEMBLY)
 
     return (pA, pB)
 
@@ -43,7 +54,7 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     opts["mat_mumps_icntl_14"] = 80
 
     E = SLEPc.EPS()
-    E.create()
+    E.create(comm = MPI.COMM_WORLD)
 
     E.setOperators(A,B)
     E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
