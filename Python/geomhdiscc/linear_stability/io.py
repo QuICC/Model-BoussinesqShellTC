@@ -5,59 +5,71 @@ from __future__ import unicode_literals
 
 import numpy as np
 
-
-def write_header(f, pbm, res, params):
+def write_header(f, name, nRes, nEigs, eq_params):
     """Write marginal curve file header"""
 
     # First header
-    f.write('#Results for: ' + pbm + '\n')
+    f.write('#Results for: ' + name + '\n')
 
     header = []
 
     # Resolution
-    for i,r in enumerate(res):
+    for i in range(0, nRes):
         header.append('Res_' + str(i))
 
+    # Wavenumber
+    for i in range(0, nEigs):
+        header.append('k_' + str(i))
+
     # Parameters
-    for k,v in sorted(params.items()):
+    for k,v in sorted(eq_params.items()):
+        if k == 'rayleigh':
+            continue
         header.append(k)
 
-    # Wave number
-    header.append('k')
-
-    # Critical values
-    for i in range(1, params['mode']+1):
-        header.append('Rac_' + str(i))
+    # Critical Rayleigh number
+    header.append('Rac')
 
     # Critical frequencies
-    for i in range(1, params['mode']+1):
-        header.append('Omega_' + str(i))
+    header.append('freq')
+
+    # Mode index
+    header.append('mode')
+
+    # Convergence (growth rate)
+    header.append('convergence')
 
     f.write('#'+'\t'.join(header) + '\n')
 
-
-def write_results(f, res, kc, racs, omegas, params):
+def write_results(f, res, eigs, eq_params, Rac, freq, mode, conv):
     """Write marginal curve point to file"""
 
     result = []
 
     # Resolution
     for r in res:
-        result.append(str(r))
+        result.append("{:d}".format(r))
+
+    # Wavenumber
+    for k in eigs:
+        result.append("{:.14g}".format(k))
 
     # Parameters
-    for k,v in sorted(params.items()):
-        result.append(str(v))
+    for k,v in sorted(eq_params.items()):
+        if k == 'rayleigh':
+            continue
+        result.append("{:.14g}".format(v))
 
-    # Wave number
-    result.append(str(kc))
+    # Critical rayleigh number
+    result.append("{:.14g}".format(Rac))
 
-    # Critical values
-    for rac in racs:
-        result.append(str(rac))
+    # Critical frequency
+    result.append("{:.14g}".format(freq))
 
-    # Critical frequencies
-    for omega in omegas:
-        result.append(str(omega))
+    # Mode index 
+    result.append("{:d}".format(mode))
+
+    # Convergence (growth rate)
+    result.append("{:.2g}".format(conv))
 
     f.write('\t'.join(result) + '\n')

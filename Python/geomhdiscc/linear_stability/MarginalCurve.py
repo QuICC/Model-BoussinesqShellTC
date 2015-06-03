@@ -5,16 +5,22 @@ from __future__ import unicode_literals
 
 import copy
 import numpy as np
-import geomhdiscc.linear_stability.solver_slepc as solver
 import scipy.optimize as optimize
+
+import geomhdiscc.linear_stability.solver_slepc as solver
+import geomhdiscc.linear_stability.io as io
 
 class MarginalCurve:
     """The marginal curve"""
 
     def __init__(self, gevp_opts, mode = 0, rtol = 1e-7):
         """Initialize the marginal curve"""
-        
-        self.point = MarginalPoint(gevp_opts, mode, rtol = rtol)
+
+        # Open file for IO and write header
+        self.out = open('marginal_curve.dat', 'a', 0)
+        io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
+
+        self.point = MarginalPoint(gevp_opts, mode, rtol = rtol, out_file = self.out)
         self.rtol = rtol
         self.guess = None
 
@@ -44,6 +50,10 @@ class MarginalCurve:
 
     def minimum(self, ks, Ras, xtol = 1e-4, only_int = False):
         """Compute the critical value (minimum of curve)"""
+
+        # Open file for IO and write header
+        min_out = open('marginal_minimum.dat', 'a', 0)
+        io.write_header(min_out, self.point._gevp.model.__class__.__name__, len(self.point._gevp.res), len(self.point._gevp.eigs), self.point._gevp.eq_params)
         
         print("Finding minimum")
         print("---------------")
@@ -54,20 +64,26 @@ class MarginalCurve:
         b = ks[imin]
         c = ks[imin+1]
         self.guess = Ras[imin]
-
-        if only_int:
-            self.point(b, guess = Ras[imin])
-            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(b, Ras[imin], self.point.frequency()))
-
-            return (b, Ras[imin], self.point.frequency())
+        if imin == 0 or imin == len(Ras)-1:
+            print("Minimum is not in provided range")
+            return (None, None, None)
         else:
-            # Find minimum
-            opt = optimize.minimize_scalar(self._tracker, [a, b, c], options = {'xtol':xtol})
+            if only_int:
+                self.point(b, guess = Ras[imin])
+                min_kc = b
+                min_Rac = Ras[imin]
+                min_fc = self.point.frequency()
 
-            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(opt.x, opt.fun, self.point.frequency()))
+            else:
+                # Find minimum
+                opt = optimize.minimize_scalar(self._tracker, [a, b, c], options = {'xtol':xtol})
+                min_kc = opt.x
+                min_Rac = opt.fun
+                min_fc = self.point.frequency()
 
-            return (opt.x, opt.fun, self.point.frequency())
-
+            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(min_kc, min_Rac, min_fc))
+            io.write_results(min_out, self.point._gevp.res, self.point._gevp.wave(min_kc), self.point._gevp.eq_params, min_Rac, min_fc, self.point.mode, self.point.growthRate())
+            return (min_kc, min_Rac, min_fc)
 
     def view(self, ks, Ras, fs, minimum = None, plot = True):
         """Plot the marginal curve"""
@@ -97,9 +113,10 @@ class MarginalCurve:
 class MarginalPoint:
     """A point on the marginal curve"""
 
-    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7):
+    def __init__(self, gevp_opts, mode = 0, rtol = 1e-7, out_file = None):
         """Initialize the marginal point"""
 
+        self.out = out_file
         self._gevp = GEVP(**gevp_opts)
         self.mode = mode
         self.Rac = None
@@ -158,6 +175,9 @@ class MarginalPoint:
             self.b = None
             self.Rac = Rac
             self.fc = self.frequency()
+
+        # Write results to file and show on console output
+        io.write_results(self.out, self._gevp.res, self._gevp.eigs, self._gevp.eq_params, self.Rac, self.fc, self.mode, self.growthRate())
         print("\t- Ra = {:g}, freq = {:g}, conv = {:g}".format(self.Rac, self.fc, self.growthRate()))
 
         return (self.Rac, self.fc)
