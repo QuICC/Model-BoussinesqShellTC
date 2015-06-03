@@ -12,52 +12,32 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [256, 0, 0]
+res = [32, 0, 0]
 
 # FT
 bc_temp = 0
 
 # SF, FT,
-#bc_vel = 1
+bc_vel = 1
 phi = 90
 kp = 3.710
-eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'heating':0, 'scale1d':2.0}
-#ky = 129
+eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':0.0, 'heating':0, 'scale1d':2.0}
+#kp = 129
 #eq_params = {'prandtl':1, 'rayleigh':8.7050552e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 131
-#eq_params = {'prandtl':1, 'rayleigh':8.7012659e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 130
-#eq_params = {'prandtl':1, 'rayleigh':8.7011095e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 132
-#eq_params = {'prandtl':1, 'rayleigh':8.7054933e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
-#ky = 65
-#eq_params = {'prandtl':1, 'rayleigh':4.13360252e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 60
+#kp = 60
 #eq_params = {'prandtl':1, 'rayleigh':4.04824521e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 61
-#eq_params = {'prandtl':1, 'rayleigh':4.04803724e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 62
-#eq_params = {'prandtl':1, 'rayleigh':4.05657944e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 60.5
-#eq_params = {'prandtl':1, 'rayleigh':4.04703887e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 60.52
-#eq_params = {'prandtl':1, 'rayleigh':4.04703659e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 60.523
-#eq_params = {'prandtl':1, 'rayleigh':4.04703656e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-#ky = 60.5229
-#eq_params = {'prandtl':1, 'rayleigh':4.04703656e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 ## NS, FT,
-bc_vel = 0
+#bc_vel = 0
 #ky = 54
 #eq_params = {'prandtl':1, 'rayleigh':3.455838e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-kp = 55
-eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-kp = 55.4
-eq_params = {'prandtl':1, 'rayleigh':3.44979010e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-kp = 55.402
-eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-kp = 55.4023
-eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#kp = 55
+#eq_params = {'prandtl':1, 'rayleigh':3.450289e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#kp = 55.4
+#eq_params = {'prandtl':1, 'rayleigh':3.44979010e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#kp = 55.402
+#eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
+#kp = 55.4023
+#eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 56
 #eq_params = {'prandtl':1, 'rayleigh':3.450893e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 60
@@ -66,8 +46,8 @@ eq_params = {'prandtl':1, 'rayleigh':3.44979009e7, 'taylor':1e10, 'heating':0, '
 #eq_params = {'prandtl':1, 'rayleigh':4.134931e7, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
 #ky = 100
 #eq_params = {'prandtl':1, 'rayleigh':1.094775e8, 'taylor':1e10, 'heating':0, 'scale1d':2.0}
-kp = 120
-eq_params = {'prandtl':1, 'rayleigh':7.7971364e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
+#kp = 120
+#eq_params = {'prandtl':1, 'rayleigh':7.7971364e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 #kp = 121
 #eq_params = {'prandtl':1, 'rayleigh':7.7892799e8, 'taylor':1e12, 'heating':0, 'scale1d':2.0}
 #kp = 122
@@ -98,42 +78,55 @@ eigs = wave(kp)
 # Collect GEVP setup parameters into single dictionary
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Create marginal curve object
-curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
-
-# Compute marginal curve at a single point
-kp = 80
-Rac, fc = curve.point(kp, initial_guess = 1e0)
-
-# Trace marginal curve for a set of wave indexes
-ks = np.arange(122, 124.0, 0.5)
-(data_k, data_Ra, data_freq) = curve.trace(ks, guess = 7.7971364e8)
-
-# Compute minimum of marginal curve
-kc, Rac, fc = curve.minimum(data_k, data_Ra)
-
-# Plot marginal curve and minimum
-curve.view(data_k, data_Ra, data_freq, minimum = (kc, Rac), plot = True)
-
 # Setup computation, visualization and IO
+marginal_point = False
+marginal_curve = False
+marginal_minimum = (True and marginal_curve)
+marginal_show_curve = (True and marginal_minimum)
 solve_gevp = True
-show_spy = False
+show_spy = True
+write_mtx = False
 show_spectra = (True and solve_gevp)
 show_physical = (True and solve_gevp)
 viz_mode = 0
 
-if show_spy or solve_gevp:
-    Ra = 7.7971364e8
-    kp = 120
-    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
-    gevp_opts['eigs'] = wave(kp)
-    gevp = MarginalCurve.GEVP(**gevp_opts)
+if marginal_point or marginal_curve:
+    # Create marginal curve object
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
 
-if show_spy:
-    gevp.viewOperators(Ra, spy = True, write_mtx = True)
+if marginal_point:
+    # Compute marginal curve at a single point
+    Rac, fc = curve.point(kp, initial_guess = 1e8)
+
+if marginal_curve:
+    # Trace marginal curve for a set of wave indexes
+    ks = np.arange(121, 124, 1)
+    (data_k, data_Ra, data_freq) = curve.trace(ks, guess = 7.8e8)
+
+    if marginal_minimum:
+        # Compute minimum of marginal curve
+        kc, Rac, fc = curve.minimum(data_k, data_Ra)
+
+    if marginal_show_curve:
+        if marginal_minimum:
+            minimum = (kc, Rac)
+        else:
+            minimum = None
+        # Plot marginal curve and minimum (if available)
+        curve.view(data_k, data_Ra, data_freq, minimum = minimum, plot = True)
+
+if show_spy or solve_gevp:
+    Ra = 0
+    kp = 3.71
+    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
+    gevp = MarginalCurve.GEVP(**gevp_opts)
+    gevp.setEigs(kp)
+
+if show_spy or write_mtx:
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
 if solve_gevp:
-    gevp.solve(Ra, 5, with_vectors = True)
+    gevp.solve(Ra, 10, with_vectors = True)
     print("Found eigenvalues:")
     print(gevp.evp_lmb)
 

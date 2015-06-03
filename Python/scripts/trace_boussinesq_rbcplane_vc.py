@@ -12,11 +12,14 @@ model.linearize = True
 model.use_galerkin = False
 
 # Set resolution, parameters, boundary conditions
-res = [256, 0, 0]
+res = [16, 0, 0]
 
 # SF, FT,
-bc_vel = 1
+bc_vel = 0
 bc_temp = 0
+phi = 90
+kp = 3.710
+eq_params = {'prandtl':1, 'rayleigh':667.0098243, 'heating':0, 'scale1d':2.0}
 ## kx = 0, ky = 2
 #kx = 0
 #ky = 2
@@ -53,9 +56,9 @@ bc_temp = 0
 #ky = 1.52
 #eq_params = {'prandtl':1, 'rayleigh':833.12, 'scale1d':2.0}
 # Minimum n = 2: k_ = 4.442882938
-phi = 35
-kp = np.sqrt(2)*np.pi
-eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'heating':0, 'scale1d':2.0}
+#phi = 35
+#kp = np.sqrt(2)*np.pi
+#eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'heating':0, 'scale1d':2.0}
 
 #kp = 3
 #eq_params = {'prandtl':1, 'rayleigh':2.19e4, 'heating':1, 'scale1d':2.0}
@@ -71,8 +74,8 @@ eq_params = {'prandtl':1, 'rayleigh':108*np.pi**4, 'heating':0, 'scale1d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':1.91091e4, 'heating':1, 'scale1d':2.0}
 #kp = 4.12
 #eq_params = {'prandtl':1, 'rayleigh':1.91086e4, 'heating':1, 'scale1d':2.0}
-kp = 4.1296
-eq_params = {'prandtl':1, 'rayleigh':1.910844559e4, 'heating':1, 'scale1d':2.0}
+#kp = 4.1296
+#eq_params = {'prandtl':1, 'rayleigh':1.910844559e4, 'heating':1, 'scale1d':2.0}
 #kp = 4.13
 #eq_params = {'prandtl':1, 'rayleigh':1.910844591e4, 'heating':1, 'scale1d':2.0}
 #kp = 4.14
@@ -85,7 +88,7 @@ eq_params = {'prandtl':1, 'rayleigh':1.910844559e4, 'heating':1, 'scale1d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':1.932e4, 'heating':1, 'scale1d':2.0}
 #kp = 5
 #eq_params = {'prandtl':1, 'rayleigh':2.018e4, 'heating':1, 'scale1d':2.0}
-phi = 0
+#phi = 0
 
 #kp = 4.1296
 #phi = 0
@@ -95,8 +98,15 @@ bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def generic_wave(kp, phi):
-    kx = kp*np.cos(phi*np.pi/180.0)
-    ky = (kp**2-kx**2)**0.5
+    if phi == 90:
+        kx = 0
+        ky = kp
+    elif phi == 0:
+        kx = kp
+        ky = 0
+    else:
+        kx = kp*np.cos(phi*np.pi/180.0)
+        ky = (kp**2-kx**2)**0.5
     return [kx, ky]
 
 # Wave number function from single "index" (k perpendicular)
@@ -106,39 +116,51 @@ eigs = wave(kp)
 # Collect GEVP setup parameters into single dictionary
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-# Create marginal curve object
-curve = MarginalCurve.MarginalCurve(gevp_opts)
-
-# Compute marginal curve at a single point
-kp = 4.1296
-Rac, evp_freq = curve.point(kp, guess = 4e6)
-
-# Trace marginal curve for a set of wave indexes
-ks = np.arange(2, 6.5, 0.5)
-(data_k, data_Ra, data_freq) = curve.trace(ks, initial_guess = 1e6)
-
-# Compute minimum of marginal curve
-kc, Rac, fc = curve.minimum(data_k, data_Ra)
-
-# Plot marginal curve and minimum
-curve.view(data_k, data_Ra, data_freq, minimum = (kc, Rac), plot = True)
-
 # Setup computation, visualization and IO
+marginal_point = False
+marginal_curve = False
+marginal_minimum = (True and marginal_curve)
+marginal_show_curve = (True and marginal_minimum)
 solve_gevp = True
 show_spy = False
+write_mtx = True
 show_spectra = (True and solve_gevp)
 show_physical = (True and solve_gevp)
 viz_mode = 0
 
-if show_spy or solve_gevp:
-    Ra = 1
-    kp = 1
-    gevp_opts['eigs'] = wave(kp)
+if marginal_point or marginal_curve:
+    # Create marginal curve object
+    curve = MarginalCurve.MarginalCurve(gevp_opts)
+
+if marginal_point:
+    # Compute marginal curve at a single point
+    Rac, evp_freq = curve.point(kp, guess = 4e6)
+
+if marginal_curve:
+    # Trace marginal curve for a set of wave indexes
+    ks = np.arange(2, 6.5, 0.5)
+    (data_k, data_Ra, data_freq) = curve.trace(ks, initial_guess = 1e6)
+
+    if marginal_minimum:
+        # Compute minimum of marginal curve
+        kc, Rac, fc = curve.minimum(data_k, data_Ra)
+
+    if marginal_show_curve:
+        if marginal_minimum:
+            minimum = (kc, Rac)
+        else:
+            minimum = None
+        # Plot marginal curve and minimum
+        curve.view(data_k, data_Ra, data_freq, minimum = minimum, plot = True)
+
+if show_spy or write_mtx or solve_gevp:
+    Ra = 1600
     print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(kp))
     gevp = MarginalCurve.GEVP(**gevp_opts)
+    gevp.setEigs(kp)
 
-if show_spy:
-    gevp.viewOperators(Ra, spy = True, write_mtx = True)
+if show_spy or write_mtx:
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
 if solve_gevp:
     gevp.solve(Ra, 5, with_vectors = True)

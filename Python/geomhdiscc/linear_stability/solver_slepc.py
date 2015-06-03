@@ -31,30 +31,39 @@ def petsc_operators(A, B):
     A = A.tocsr()
     B = B.tocsr()
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
+#    pA = PETSc.Mat().createAIJ(size=A.shape, csr=(A.indptr, A.indices, A.data))
+#    pB = PETSc.Mat().createAIJ(size=B.shape, csr=(B.indptr, B.indices, B.data))
+#    pA.assemble()
+#    pB.assemble()
+    # Setup A matrix
+    pA = PETSc.Mat().create()
+    pA.setSizes(A.shape)
+    pA.setUp()
+    # Setup B matrix
+    pB = PETSc.Mat().create()
+    pB.setSizes(B.shape)
+    pB.setUp()
 
-    pA = PETSc.Mat()
-    pB = PETSc.Mat()
-    if rank == 0:
-        pA.createAIJ(size=A.shape, nnz = A.nnz, csr=(A.indptr, A.indices, A.data), comm = comm)
-        pB.createAIJ(size=B.shape, nnz = B.nnz, csr=(B.indptr, B.indices, B.data), comm = comm)
-    else:
-        pA.createAIJ(size=A.shape, nnz = A.nnz, comm = comm)
-        pB.createAIJ(size=B.shape, nnz = B.nnz, comm = comm)
-    pA.assemble(assembly = PETSc.Mat.FINAL_ASSEMBLY)
-    pB.assemble(assembly = PETSc.Mat.FINAL_ASSEMBLY)
+    # Fill A matrix
+    rstart, rend = pA.getOwnershipRange()
+    pA.createAIJ(size=A.shape, nnz=A.getnnz(1), csr=(A.indptr[rstart:rend+1] - A.indptr[rstart], A.indices[A.indptr[rstart]:A.indptr[rend]], A.data[A.indptr[rstart]:A.indptr[rend]]))
+    pA.assemble()
+
+    # Fill B matrix
+    rstart, rend = pB.getOwnershipRange()
+    pB.createAIJ(size=B.shape, nnz=B.getnnz(1), csr=(B.indptr[rstart:rend+1] - B.indptr[rstart], B.indices[B.indptr[rstart]:B.indptr[rend]], B.data[B.indptr[rstart]:B.indptr[rend]]))
+    pB.assemble()
 
     return (pA, pB)
 
-def slepc_eps(A, B, nev, sigma = 0.0):
+def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
     """Create SLEPc eigensolver"""
 
     opts = PETSc.Options()
     opts["mat_mumps_icntl_14"] = 80
 
     E = SLEPc.EPS()
-    E.create(comm = MPI.COMM_WORLD)
+    E.create()
 
     E.setOperators(A,B)
     E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
@@ -63,12 +72,16 @@ def slepc_eps(A, B, nev, sigma = 0.0):
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
     E.setDimensions(nev = nev)
     E.setTolerances(max_it= 100)
+    if initial_vector is not None:
+        v = PETSc.Vec().createWithArray(initial_vector)
+        E.setInitialSpace(v)
+
     ST = E.getST()
     ST.setType('sinvert')
-    if sigma is None:
+    if tracker is None or abs(tracker) > 0.5:
         s = random.uniform(0.1, 0.5)
     else:
-        s = sigma
+        s = 0.0
     ST.setShift(s)
     KSP = ST.getKSP()
     KSP.setType('preonly')
@@ -83,12 +96,12 @@ def slepc_eps(A, B, nev, sigma = 0.0):
 
     return E
 
-def eigenvalues(A, B, nev, sigma = None):
+def eigenvalues(A, B, nev, tracker = None, initial_vector = None):
     """Compute eigenvalues using SLEPc"""
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, sigma)
+    E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
 
     E.solve()
     nconv = E.getConverged()
@@ -104,12 +117,12 @@ def eigenvalues(A, B, nev, sigma = None):
     else:
         return None
 
-def eigenpairs(A, B, nev, sigma = None):
+def eigenpairs(A, B, nev, tracker = None, initial_vector = None):
     """Compute eigenpairs using SLEPc"""
 
     pA, pB = petsc_operators(A, B)
 
-    E = slepc_eps(pA, pB, nev, sigma)
+    E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
 
     E.solve()
     nconv = E.getConverged()

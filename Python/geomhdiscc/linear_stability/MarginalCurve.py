@@ -195,18 +195,27 @@ class MarginalPoint:
         return self._gevp.evp_lmb[self.mode].real
 
     def frequency(self):
-        """Compute the growth rate"""
+        """Compute the frequency rate"""
 
-        self._gevp.solve(self.Rac, self.nev)
+        self._gevp.solve(self.Rac, self.nev, use_vector = True)
 
         return self._gevp.evp_lmb[self.mode].imag
 
     def _tracker(self, Ra):
         """Track the growth rate to find critical value"""
 
-        self._gevp.solve(Ra, self.nev)
+        for i in range(0, 10):
+            self._gevp.solve(Ra, self.nev, with_vectors = True, use_vector = True)
+            if self._gevp.evp_lmb is not None:
+                break
 
-        return self._gevp.evp_lmb[self.mode].real
+        growth = self._gevp.evp_lmb[self.mode].real
+        if self.best is None:
+            self.best = (abs(growth), Ra, False)
+        elif abs(growth) < self.best[0]:
+            self.best = (abs(growth), Ra, True)
+
+        return growth
 
     def _signTracker(self, Ra):
         """Track the growth rate to find critical value"""
@@ -273,6 +282,20 @@ class GEVP:
     def buildMatrices(self, Ra):
         """Build A and B matrices for the given rayleigh number"""
 
+#        self.eq_params['rayleigh'] = Ra
+#        from mpi4py import MPI
+#        length = (self.res[1] - self.eigs[0])//MPI.COMM_WORLD.Get_size()
+#        rem = (self.res[1] - self.eigs[0])%MPI.COMM_WORLD.Get_size()
+#        start = self.eigs[0]
+#        end = start
+#        for cpu in range(1,MPI.COMM_WORLD.Get_rank()+1):
+#            start = start + length + (rem > 0)
+#            rem = max(0, rem - 1)
+#        end = start + length + (rem > 0)
+#        restrict = np.arange(start,end)
+#        A = self.model.implicit_linear(self.res, self.eq_params, self.eigs, self.bcs, self.fields, restriction = restrict)
+#        B = self.model.time(self.res, self.eq_params, self.eigs, self.no_bcs, self.fields, restriction = restrict)
+
         self.eq_params['rayleigh'] = Ra
         A = self.model.implicit_linear(self.res, self.eq_params, self.eigs, self.bcs, self.fields)
         B = self.model.time(self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
@@ -285,18 +308,24 @@ class GEVP:
        self.eigs = self.wave(k)
        self.changed = True
 
-    def solve(self, Ra, nev, with_vectors = False):
+    def solve(self, Ra, nev, with_vectors = False, tracker = None, use_vector = False):
         """Solve the GEVP and store eigenvalues"""
 
         if self.changed or Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
             self.changed = False
             A, B = self.buildMatrices(Ra)
-            if with_vectors:
-                self.evp_lmb, self.evp_vec = solver.eigenpairs(A, B, nev)
+
+            if use_vector and self.evp_vec is not None:
+                initial_vector = self.evp_vec
             else:
-                self.evp_lmb = solver.eigenvalues(A, B, nev)
+                initial_vector = None
+
+            if with_vectors:
+                self.evp_lmb, self.evp_vec = solver.eigenpairs(A, B, nev, tracker = tracker, initial_vector = initial_vector)
+            else:
+                self.evp_lmb = solver.eigenvalues(A, B, nev, tracker = tracker, initial_vector = initial_vector)
                 self.evp_vec = None
-        print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
+            print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
     def viewOperators(self, Ra, spy = True, write_mtx = True):
         """Spy and/or write the operators to MatrixMarket file"""
@@ -342,7 +371,7 @@ class GEVP:
             
             if plot:
                 import matplotlib.pylab as pl
-                print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
+                print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot spectra
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))
@@ -377,7 +406,7 @@ class GEVP:
 
             if plot:
                 import matplotlib.pylab as pl
-                print("\nVisualizing mode: " + str(self.evp_lmb[viz_mode]))
+                print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot physical field
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))

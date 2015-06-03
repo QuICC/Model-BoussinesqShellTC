@@ -416,10 +416,10 @@ class BoussinesqRBCPlaneVC(base_model.BaseModel):
     def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
 
-        # U: TN
+        # U: T_N
         idx_u = utils.qidx(res[0], res[0]-1)
 
-        # V: TN
+        # V: T_N
         idx_v = utils.qidx(res[0], res[0]-1)
 
         # W:
