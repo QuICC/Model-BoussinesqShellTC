@@ -18,6 +18,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 from slepc4py import SLEPc
 
+Print = PETSc.Sys.Print
 
 class NewtonNoneError(Exception):
     pass
@@ -79,7 +80,11 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
     ST = E.getST()
     ST.setType('sinvert')
     if tracker is None or abs(tracker) > 0.5:
-        s = random.uniform(0.1, 0.5)
+        rnd = PETSc.Random()
+        rnd.create(comm = MPI.COMM_SELF)
+        rnd.setType(PETSc.Random.Type.RAND)
+        rnd.setInterval((0.1, 0.5))
+        s = rnd.getValueReal()
     else:
         s = 0.0
     ST.setShift(s)
@@ -132,7 +137,7 @@ def eigenpairs(A, B, nev, tracker = None, initial_vector = None):
         vr, wr = pA.getVecs()
         vi, wi = pA.getVecs()
         eigs = np.array(np.zeros(nev), dtype=complex)
-        vects = np.array(np.zeros((A.shape[0],nev)), dtype=complex)
+        vects = np.array(np.zeros((vi.getLocalSize(),nev)), dtype=complex)
         err = np.array(np.zeros(nev), dtype=complex)
         for i in range(nev):
             eigs[i] = E.getEigenpair(i, vr, vi)

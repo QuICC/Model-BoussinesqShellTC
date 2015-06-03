@@ -36,22 +36,22 @@ rratio = 0.35
 #res = [48, 48, 0]
 #Ta = 1e10
 #res = [64, 64, 0]
-Ta = 1e11
-res = [64, 64, 0]
-#Ta = 1e12
+#Ta = 1e11
 #res = [64, 64, 0]
+Ta = 1e12
+res = [96, 96, 0]
 #Ta = 1e13
-#res = [64, 64, 0]
+#res = [96, 96, 0]
 #Ta = 1e14
-#res = [64, 64, 0]
+#res = [128, 128, 0]
 #Ta = 1e15
-#res = [64, 64, 0]
+#res = [128, 128, 0]
 #Ta = 1e16
-#res = [64, 64, 0]
+#res = [256, 256, 0]
 #Ta = 1e17
-#res = [64, 64, 0]
+#res = [256, 256, 0]
 #Ta = 1e18
-#res = [64, 64, 0]
+#res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
@@ -73,11 +73,11 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 marginal_point = False
 marginal_curve = True
 marginal_minimum = (True and marginal_curve)
-marginal_show_curve = (True and marginal_minimum)
-solve_gevp = False
+marginal_show_curve = (False and marginal_minimum)
+solve_gevp = True
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp)
+show_spectra = (False and solve_gevp)
 show_physical = (False and solve_gevp)
 viz_mode = 0
 
@@ -91,7 +91,7 @@ if marginal_point:
 
 if marginal_curve:
     # Trace marginal curve for a set of wave indexes
-    ms = np.arange(10, 31, 1)
+    ms = np.arange(25, 36, 1)
     (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
     if marginal_minimum:

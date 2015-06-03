@@ -9,6 +9,9 @@ import scipy.optimize as optimize
 
 import geomhdiscc.linear_stability.solver_slepc as solver
 import geomhdiscc.linear_stability.io as io
+from geomhdiscc.linear_stability.solver_slepc import Print
+from mpi4py import MPI
+
 
 class MarginalCurve:
     """The marginal curve"""
@@ -17,7 +20,10 @@ class MarginalCurve:
         """Initialize the marginal curve"""
 
         # Open file for IO and write header
-        self.out = open('marginal_curve.dat', 'a', 0)
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            self.out = open('marginal_curve.dat', 'a', 0)
+        else:
+            self.out = None
         io.write_header(self.out, gevp_opts['model'].__class__.__name__, len(gevp_opts['res']), len(gevp_opts['eigs']), gevp_opts['eq_params'])
 
         self.point = MarginalPoint(gevp_opts, mode, rtol = rtol, out_file = self.out)
@@ -27,8 +33,8 @@ class MarginalCurve:
     def trace(self, ks, guess = None, initial_guess = 1.0):
         """Trace the marginal curve"""
         
-        print("Tracing marginal curve")
-        print("----------------------")
+        Print("Tracing marginal curve")
+        Print("----------------------")
 
         data_k = np.zeros(len(ks))
         data_Ra = np.zeros(len(ks))
@@ -52,11 +58,14 @@ class MarginalCurve:
         """Compute the critical value (minimum of curve)"""
 
         # Open file for IO and write header
-        min_out = open('marginal_minimum.dat', 'a', 0)
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            min_out = open('marginal_minimum.dat', 'a', 0)
+        else:
+            min_out = None
         io.write_header(min_out, self.point._gevp.model.__class__.__name__, len(self.point._gevp.res), len(self.point._gevp.eigs), self.point._gevp.eq_params)
         
-        print("Finding minimum")
-        print("---------------")
+        Print("Finding minimum")
+        Print("---------------")
 
         # Get bounds for minimum
         imin = np.argmin(Ras)
@@ -65,7 +74,7 @@ class MarginalCurve:
         c = ks[imin+1]
         self.guess = Ras[imin]
         if imin == 0 or imin == len(Ras)-1:
-            print("Minimum is not in provided range")
+            Print("Minimum is not in provided range")
             return (None, None, None)
         else:
             if only_int:
@@ -81,7 +90,7 @@ class MarginalCurve:
                 min_Rac = opt.fun
                 min_fc = self.point.frequency()
 
-            print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(min_kc, min_Rac, min_fc))
+            Print("Minimumt at kc: {:g}, Rac: {:g}, fc: {:g}".format(min_kc, min_Rac, min_fc))
             io.write_results(min_out, self.point._gevp.res, self.point._gevp.wave(min_kc), self.point._gevp.eq_params, min_Rac, min_fc, self.point.mode, self.point.growthRate())
             return (min_kc, min_Rac, min_fc)
 
@@ -137,15 +146,15 @@ class MarginalPoint:
             Ra = guess
             factor = 1.1
 
-        print("Computing marginal curve at k = {:g}".format(k))
-        print("\t- initial guess Ra = {:g}".format(Ra))
+        Print("Computing marginal curve at k = {:g}".format(k))
+        Print("\t- initial guess Ra = {:g}".format(Ra))
 
         # Set wavenumter
         self._gevp.setEigs(k)
 
         # Search interval (newton)
         self._gevp.best = None
-        print("\t- finding interval")
+        Print("\t- finding interval")
         for i in range(0,16):
             self.findInterval(Ra)
             if self.a != None and self.b != None:
@@ -169,7 +178,7 @@ class MarginalPoint:
             self.b = None
         else:
             # Refine zero with Brent's method
-            print("\t- Brent's method: [{:g}, {:g}]".format(self.a,self.b))
+            Print("\t- Brent's method: [{:g}, {:g}]".format(self.a,self.b))
             Rac = optimize.brentq(self._tracker, self.a, self.b, rtol = self.rtol)
             self.a = None
             self.b = None
@@ -178,7 +187,7 @@ class MarginalPoint:
 
         # Write results to file and show on console output
         io.write_results(self.out, self._gevp.res, self._gevp.eigs, self._gevp.eq_params, self.Rac, self.fc, self.mode, self.growthRate())
-        print("\t- Ra = {:g}, freq = {:g}, conv = {:g}".format(self.Rac, self.fc, self.growthRate()))
+        Print("\t- Ra = {:g}, freq = {:g}, conv = {:g}".format(self.Rac, self.fc, self.growthRate()))
 
         return (self.Rac, self.fc)
 
@@ -345,7 +354,7 @@ class GEVP:
             else:
                 self.evp_lmb = solver.eigenvalues(A, B, nev, tracker = tracker, initial_vector = initial_vector)
                 self.evp_vec = None
-            print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
+            Print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
     def viewOperators(self, Ra, spy = True, write_mtx = True):
         """Spy and/or write the operators to MatrixMarket file"""
@@ -391,7 +400,7 @@ class GEVP:
             
             if plot:
                 import matplotlib.pylab as pl
-                print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
+                Print("\nVisualizing spectra of mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot spectra
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))
@@ -426,7 +435,7 @@ class GEVP:
 
             if plot:
                 import matplotlib.pylab as pl
-                print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                 # Plot physical field
                 rows = np.ceil(len(self.fields)/3)
                 cols = min(3, len(self.fields))
