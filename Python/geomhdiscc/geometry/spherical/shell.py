@@ -56,19 +56,23 @@ def make_sh_operator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = No
     bcr = convert_bc(bc)
     shc = sh_coeff(with_sh_coeff)
 
+    base_mat = op(nr, a, b, rad.radbc.no_bc())
     if restriction is None or m in restriction:
         bcr = sphbc.ldependent_bc(bcr, m)
-        mat = coeff*shc(m)*op(nr, a, b, bcr)
+        mat = coeff*shc(m)*rad.radbc.constrain(base_mat,bcr)
         mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     else:
         mat = rad.zblk(nr, bcr)
+    blocks = [mat]
 
     for l in range(m+1, maxnl):
         if restriction is None or l in restriction:
             bcr = sphbc.ldependent_bc(bcr, l)
-            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, a, b, bcr)), format = 'coo')
+            mat = coeff*shc(l)*rad.radbc.constrain(base_mat,bcr)
         else:
-            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)), format = 'coo')
+            mat = rad.zblk(nr, bcr)
+        blocks.append(mat)
+    mat = spsp.block_diag(blocks, format = 'coo')
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
@@ -84,13 +88,16 @@ def make_sh_loperator(op, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = N
         mat = fix_l_zero(nr, m, mat, bcr, l_zero_fix)
     else:
         mat = rad.zblk(nr, bcr)
+    blocks = [mat]
 
     for l in range(m+1, maxnl):
         if restriction is None or l in restriction:
             bcr = sphbc.ldependent_bc(bcr, l)
-            mat = spsp.block_diag((mat,coeff*shc(l)*op(nr, l, a, b, bcr)), format = 'coo')
+            mat = coeff*shc(l)*op(nr, l, a, b, bcr)
         else:
-            mat = spsp.block_diag((mat,rad.zblk(nr, bcr)), format = 'coo')
+            mat = rad.zblk(nr, bcr)
+        blocks.append(mat)
+    mat = spsp.block_diag(blocks, format = 'coo')
 
     return sphbc.constrain(mat, nr, maxnl, m, bc, l_zero_fix, restriction = restriction)
 
@@ -115,17 +122,24 @@ def make_sh_qoperator(opl, opr, nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coe
         bcr = convert_bc(bc)
         shc = sh_coeff(with_sh_coeff)
 
+        base_opl = opl(nr, a, b, rad.radbc.no_bc())
+        base_opr = opr(nr, a, b, rad.radbc.no_bc())
+
         assert(l_zero_fix == 'zero')
         bcr = sphbc.ldependent_bc(bcr, m)
-        rmat1 = opl(nr, a, b, bcr)
-        rmat2 = opr(nr, a, b, bcr)
-        rmat1 = fix_l_zero(nr, m, rmat1, bcr, l_zero_fix)
-        rmat2 = fix_l_zero(nr, m, rmat2, bcr, l_zero_fix)
-        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmat1, format = 'coo') + coeff*shc(m)*spsp.kron(cordr[0,:], rmat2, format = 'coo')
+        rmatl = rad.radbc.constrain(base_opl, bcr)
+        rmatr = rad.radbc.constrain(base_opr, bcr)
+        rmatl = fix_l_zero(nr, m, rmatl, bcr, l_zero_fix)
+        rmatr = fix_l_zero(nr, m, rmatr, bcr, l_zero_fix)
+        mat = coeff*shc(m)*spsp.kron(cor_r[0,:],rmatl, format = 'coo') + coeff*shc(m)*spsp.kron(cordr[0,:], rmatr, format = 'coo')
+        rows = [mat]
         for ir,l in enumerate(range(m+1, maxnl)):
             bcr = sphbc.ldependent_bc(bcr, l)
-            row = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],opl(nr, a, b, bcr), format = 'coo') + coeff*shc(l)*spsp.kron(cordr[ir+1,:],opr(nr, a, b, bcr), format = 'coo')
-            mat = spsp.vstack([mat,row])
+            rmatl = rad.radbc.constrain(base_opl, bcr)
+            rmatr = rad.radbc.constrain(base_opr, bcr)
+            mat = coeff*shc(l)*spsp.kron(cor_r[ir+1,:],rmatl, format = 'coo') + coeff*shc(l)*spsp.kron(cordr[ir+1,:],rmatr, format = 'coo')
+            rows.append(mat)
+        mat = spsp.vstack(rows)
     else:
         mat = rad.zblk(nr, bc)
 

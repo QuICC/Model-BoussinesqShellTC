@@ -38,11 +38,11 @@ def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     if zr > 0:
         mat = mat.tolil()
         mat[-zr:,:] = 0
-        mat = mat.tocsr()
+        mat = mat.tocoo()
     return radbc.constrain(mat, bc)
 
 def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
@@ -75,11 +75,11 @@ def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     if zr > 0:
         mat = mat.tolil()
         mat[-zr:,:] = 0
-        mat = mat.tocsr()
+        mat = mat.tocoo()
     return radbc.constrain(mat, bc)
 
 def x4(nr, a, b, bc, coeff = 1.0, zr = 0):
@@ -128,11 +128,11 @@ def x4(nr, a, b, bc, coeff = 1.0, zr = 0):
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     if zr > 0:
         mat = mat.tolil()
         mat[-zr:,:] = 0
-        mat = mat.tocsr()
+        mat = mat.tocoo()
     return radbc.constrain(mat, bc)
 
 def d1(nr, a, b, bc, coeff = 1.0, zr = 1):
@@ -176,7 +176,7 @@ def i1(nr, a, b, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i1x1(nr, a, b, bc, coeff = 1.0):
@@ -209,7 +209,7 @@ def i1x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2(nr, a, b, bc, coeff = 1.0):
@@ -234,7 +234,7 @@ def i2(nr, a, b, bc, coeff = 1.0):
     ds = [d_2, d0, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x2(nr, a, b, bc, coeff = 1.0):
@@ -283,7 +283,7 @@ def i2x2(nr, a, b, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x3(nr, a, b, bc, coeff = 1.0):
@@ -340,7 +340,7 @@ def i2x3(nr, a, b, bc, coeff = 1.0):
     ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
@@ -373,7 +373,7 @@ def i2x2lapl(nr, l, a, b, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x3lapl(nr, l, a, b, bc, coeff = 1.0):
@@ -414,7 +414,7 @@ def i2x3lapl(nr, l, a, b, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4(nr, a, b, bc, coeff = 1.0):
@@ -447,7 +447,7 @@ def i4(nr, a, b, bc, coeff = 1.0):
     ds = [d_4, d_2, d0, d2, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x1(nr, a, b, bc, coeff = 1.0):
@@ -504,7 +504,7 @@ def i4x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x1d1x1(nr, a, b, bc, coeff = 1.0):
@@ -561,7 +561,7 @@ def i4x1d1x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x3d2(nr, a, b, bc, coeff = 1.0):
@@ -618,7 +618,7 @@ def i4x3d2(nr, a, b, bc, coeff = 1.0):
     ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x4(nr, a, b, bc, coeff = 1.0):
@@ -756,7 +756,7 @@ def i4x4laplrd1x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
@@ -821,7 +821,7 @@ def i4x4lapl(nr, l, a, b, bc, coeff = 1.0):
     ds = [d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
@@ -870,7 +870,7 @@ def i4x4lapl2(nr, l, a, b, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x1(nr, a, b, bc, coeff = 1.0):
@@ -911,7 +911,7 @@ def i2x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x1d1x1(nr, a, b, bc, coeff = 1.0):
@@ -952,7 +952,7 @@ def i2x1d1x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i2x2d1(nr, a, b, bc, coeff = 1.0):
@@ -993,7 +993,7 @@ def i2x2d1(nr, a, b, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x3(nr, a, b, bc, coeff = 1.0):
@@ -1066,7 +1066,7 @@ def i4x3(nr, a, b, bc, coeff = 1.0):
     ds = [d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x3d1x1(nr, a, b, bc, coeff = 1.0):
@@ -1139,7 +1139,7 @@ def i4x3d1x1(nr, a, b, bc, coeff = 1.0):
     ds = [d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def i4x4d1(nr, a, b, bc, coeff = 1.0):
@@ -1212,16 +1212,20 @@ def i4x4d1(nr, a, b, bc, coeff = 1.0):
     ds = [d_7, d_6, d_5, d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4, d5, d6, d7]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, bc)
 
 def qid(nr, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 
-    offsets = [0]
-    diags = [[0]*q + [1]*(nr-q)]
-
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-q))
+    else:
+        mat.data = np.ones((nr-q))
+    mat.row = np.arange(q,nr)
+    mat.col = mat.row
     return radbc.constrain(mat, bc)
 
 def linear_r2x(ro, rratio):

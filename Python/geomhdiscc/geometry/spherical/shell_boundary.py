@@ -29,7 +29,7 @@ def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
 
     bc_mat = mat
     if bc[0] > 0:
-        bcMat = spsp.lil_matrix((nr,nr))
+        bcMat = spsp.coo_matrix((nr,nr))
         if m == 0 and zero_l_zero:
             bc_mat = bcMat
         else:

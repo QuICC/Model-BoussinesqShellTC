@@ -28,12 +28,23 @@ def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None, has_wrap = True
                     row = i - max(0, lbw - col)
                     wrap[col][row] = f(ns[i])
 
+    # Compute the end index of zero rows
+    izrow = 0
+    for i,n in enumerate(ns):
+        if n <= nzrow:
+            izrow = i+1
+        else:
+            break
+
     # Build diagonals
     diags = [0]*len(ds)
     for d,f in enumerate(ds):
         lb = max(0, -offsets[d])
         ub = min(len(ns),len(ns)-offsets[d])
-        diags[d] = [f(n) if n > nzrow else 0 for n in ns[lb:ub]]
+        if izrow > lb:
+            diags[d] = np.concatenate((np.zeros(izrow-lb), f(ns[izrow:ub])))
+        else:
+            diags[d] = f(ns[lb:ub])
         if has_wrap:
             if len(wrap[d]) > 0:
                 diags[d][0:len(wrap[d])] = [x + y for x, y in zip(diags[d][0:len(wrap[d])], wrap[d][:])]
