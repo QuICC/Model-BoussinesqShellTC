@@ -388,13 +388,13 @@ class GEVP:
             # Extra different fields
             start = 0
             stop = 0
-            sol_cheb = dict()
+            sol_spec = dict()
             for f in self.fields:
                 if naive:
                     stop = stop + self.evp_vec.shape[0]/3
                 else:
                     stop = stop + self.model.block_size(self.res, f)[0]
-                sol_cheb[f] = self.evp_vec[start:stop, viz_mode]
+                sol_spec[f] = self.evp_vec[start:stop, viz_mode]
                 start = stop
             
             if plot:
@@ -405,49 +405,126 @@ class GEVP:
                 cols = min(3, len(self.fields))
                 for i,f in enumerate(self.fields):
                     pl.subplot(rows,cols,i+1)
-                    pl.semilogy(abs(sol_cheb[f]))
+                    pl.semilogy(abs(sol_spec[f]))
                     title = f[0]
                     if f[1] != "":
                         title = title + ', ' + f[1]
                     pl.title(title)
                 pl.show()
 
-            return sol_cheb
+            return sol_spec
 
         else:
             return None
 
-    def viewPhysical(self, viz_mode, plot = True):
+    def viewPhysical(self, viz_mode, geometry, plot = True, naive = False):
         """Plot the spectra of the eigenvectors"""
 
         if self.evp_lmb is not None:
-            import geomhdiscc.transform.cartesian as transf
 
             # Extra different fields
-            sol_cheb = self.viewSpectra(viz_mode, False)
+            sol_spec = self.viewSpectra(viz_mode, plot = False, naive = naive)
+            if geometry == 'c1d':
+                import geomhdiscc.transform.cartesian as transf
+                nD = 1
+            elif geometry == 'shell':
+                import geomhdiscc.transform.shell as transf
+                nD = 2
 
-            # Compute physical space values
-            sol_phys = dict()
-            grid = transf.grid(self.res[0])
-            for f in self.fields:
-                sol_phys[f] = transf.tophys(sol_cheb[f].real)
+            # 1D data: plot physical profile
+            sol_rphys = dict()
+            sol_iphys = dict()
+            if nD == 1:
+                grid = transf.grid(self.res[0])
+                for f in self.fields:
+                    sol_rphys[f] = transf.tophys(sol_spec[f].real)
+                    sol_iphys[f] = transf.tophys(sol_spec[f].imag)
 
-            if plot:
-                import matplotlib.pylab as pl
-                Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
-                # Plot physical field
-                rows = np.ceil(len(self.fields)/3)
-                cols = min(3, len(self.fields))
-                for i,f in enumerate(self.fields):
-                    pl.subplot(rows,cols,i+1)
-                    pl.plot(grid, sol_phys[f])
-                    title = f[0]
-                    if f[1] != "":
-                        title = title + ', ' + f[1]
-                    pl.title(title)
-                pl.show()
+                if plot:
+                    import matplotlib.pylab as pl
+                    Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                    # Plot physical field
+                    rows = np.ceil(len(self.fields)/3)
+                    cols = min(3, len(self.fields))
+                    for i,f in enumerate(self.fields):
+                        pl.subplot(rows,cols,i+1)
+                        pl.plot(grid, sol_rphys[f])
+                        title = f[0]
+                        if f[1] != "":
+                            title = title + ', ' + f[1]
+                        pl.title(title)
+                    pl.show()
+
+            # 2D data: plot physical contours on slice
+            elif nD == 2:
+                if geometry == 'shell':
+                    import geomhdiscc.geometry.spherical.shell_radius as geo
+                    a, b = geo.linear_r2x(self.eq_params['ro'], self.eq_params['rratio'])
+                    for f in self.fields:
+                        if f[0] == "velocity":
+                            Print("Toroidal/Poloidal projection not done yet")
+                        else:
+                            sol_rphys[f] = transf.toslice(sol_spec[f].real, self.res[0], self.res[1]-1, int(self.eigs[0]))
+                            sol_iphys[f] = transf.toslice(sol_spec[f].imag, self.res[0], self.res[1]-1, int(self.eigs[0]))
+
+                    if plot:
+                        import matplotlib.pylab as pl
+                        import matplotlib.cm as cm
+                        Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
+                        # Plot physical field in meridional slice
+                        grid = transf.grid_2d(self.res[0], a, b, self.res[1]-1, int(self.eigs[0]))
+                        rows = np.ceil(len(self.fields)/3)
+                        cols = min(3, len(self.fields))
+                        for i,f in enumerate(self.fields):
+                            if f[0] == "velocity":
+                                Print("Toroidal/Poloidal projection not done yet")
+                            else:
+                                pl.subplot(rows,cols,i+1, aspect = 'equal')
+                                pl.contourf(grid[0], grid[1], sol_rphys[f], 100)
+                                title = f[0]
+                                if f[1] != "":
+                                    title = title + ', ' + f[1]
+                                pl.title(title)
+                        pl.show()
+                        # Plot physical field in equatorial radial profile
+                        grid_r = transf.rgrid(self.res[0], a, b)
+                        rows = np.ceil(len(self.fields)/3)
+                        cols = min(3, len(self.fields))
+                        sol_rrad = dict()
+                        sol_irad = dict()
+                        for i,f in enumerate(self.fields):
+                            if f[0] == "velocity":
+                                Print("Toroidal/Poloidal projection not done yet")
+                            else:
+                                sol_rrad[f] = sol_rphys[f][grid[0].shape[0]//2,:]
+                                sol_irad[f] = sol_iphys[f][grid[0].shape[0]//2,:]
+                                pl.subplot(rows,cols,i+1)
+                                pl.plot(grid_r, sol_rrad[f], 'b-')
+                                pl.plot(grid_r, sol_irad[f], 'r-')
+                                title = f[0]
+                                if f[1] != "":
+                                    title = title + ', ' + f[1]
+                                pl.title(title)
+                        pl.show()
+                        # Plot physical field in equatorial slice
+                        grid_eq = transf.grid_eq(self.res[0], a, b, int(self.eigs[0]))
+                        rows = np.ceil(len(self.fields)/3)
+                        cols = min(3, len(self.fields))
+                        for i,f in enumerate(self.fields):
+                            if f[0] == "velocity":
+                                Print("Toroidal/Poloidal projection not done yet")
+                            else:
+                                phi = self.eigs[0]*transf.phgrid(int(self.eigs[0]))
+                                sol_eq = np.outer(np.cos(phi),sol_rrad[f]) + np.outer(np.sin(phi),sol_irad[f])
+                                pl.subplot(rows,cols,i+1, aspect = 'equal')
+                                pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 100, cmap = cm.RdBu)
+                                title = f[0]
+                                if f[1] != "":
+                                    title = title + ', ' + f[1]
+                                pl.title(title)
+                        pl.show()
             
-            return (grid, sol_phys)
+            return (grid, sol_rphys, sol_iphys)
         else:
             return None
 

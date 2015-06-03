@@ -17,9 +17,37 @@ def tgrid(maxl, m):
     """Create the theta Gauss-Legendre grid"""
 
     nt = 3*(maxl - m + 1)//2
+    nt = nt + (nt+1)%2
     x, tmp = leg.leggauss(nt)
 
     return x
+
+def phgrid(m):
+    """Create a phi grid for given harmonic order"""
+
+    return np.linspace(0, 2*np.pi, max(200,3*m))
+
+def grid_2d(nr, a, b, maxl, m):
+    """Compute the 2D grid for the contours"""
+
+    r = rgrid(nr, a, b)
+    th = np.arccos(tgrid(maxl, m))
+    rmesh, thmesh = np.meshgrid(r, th)
+    X = rmesh * np.sin(thmesh)
+    Y = rmesh * np.cos(thmesh)
+
+    return (X, Y)
+
+def grid_eq(nr, a, b, m):
+    """Compute the 2D grid for the equatorial contours"""
+
+    r = rgrid(nr, a, b)
+    phi = phgrid(m)
+    rmesh, phimesh = np.meshgrid(r, phi)
+    X = rmesh * np.cos(phimesh)
+    Y = rmesh * np.sin(phimesh)
+
+    return (X, Y)
 
 def torphys(spec):
     """Transform radial spectral coefficients to physical values"""
@@ -37,8 +65,7 @@ def torcheb(phys):
 
 def totphys(spec, maxl, m):
     """Tranform theta spectral coefficients to physical values"""
-
-    x = tgrid(maxl, m)
+    
     mat = plm(maxl, m)
     phys = mat.dot(spec)
 
@@ -69,6 +96,17 @@ def torcheb2D(phys):
     for j in range(phys.shape[1]):
         phys[:,j] = torcheb(phys[:,j])
 
+    return phys
+
+def toslice(spec, nr, maxl, m):
+    """Transform to latitudinal slice"""
+
+    spec = np.reshape(spec, (nr, maxl-m+1), order = 'F')
+
+    rphys = torphys2D(spec)
+
+    rspec = np.transpose(rphys)
+    phys = totphys(rspec, maxl, m)
     return phys
 
 def plm(maxl, m):

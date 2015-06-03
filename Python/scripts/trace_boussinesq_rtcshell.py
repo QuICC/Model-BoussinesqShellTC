@@ -38,10 +38,10 @@ rratio = 0.35
 #res = [64, 64, 0]
 #Ta = 1e11
 #res = [64, 64, 0]
-#Ta = 1e12
-#res = [96, 96, 0]
-Ta = 1e13
-res = [128, 128, 0]
+Ta = 1e12
+res = [96, 96, 0]
+#Ta = 1e13
+#res = [128, 128, 0]
 #Ta = 1e14
 #res = [192, 192, 0]
 #Ta = 1e15
@@ -78,7 +78,7 @@ solve_gevp = True
 show_spy = False
 write_mtx = False
 show_spectra = (True and solve_gevp)
-show_physical = (False and solve_gevp)
+show_physical = (True and solve_gevp)
 viz_mode = 0
 
 if marginal_point or marginal_curve:
@@ -91,7 +91,7 @@ if marginal_point:
 
 if marginal_curve:
     # Trace marginal curve for a set of wave indexes
-    ms = np.arange(25, 36, 1)
+    ms = np.arange(max(0, m-5), m+6, 1)
     (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
     if marginal_minimum:
@@ -120,4 +120,4 @@ if show_spectra:
     gevp.viewSpectra(viz_mode, naive = True)
 
 if show_physical:
-    gevp.viewPhysical(viz_mode)
+    gevp.viewPhysical(viz_mode, 'shell', naive = True)
