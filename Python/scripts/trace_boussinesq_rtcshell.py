@@ -38,18 +38,18 @@ rratio = 0.35
 #res = [64, 64, 0]
 #Ta = 1e11
 #res = [64, 64, 0]
-Ta = 1e12
-res = [96, 96, 0]
-#Ta = 1e13
+#Ta = 1e12
 #res = [96, 96, 0]
+Ta = 1e13
+res = [128, 128, 0]
 #Ta = 1e14
-#res = [128, 128, 0]
+#res = [192, 192, 0]
 #Ta = 1e15
-#res = [128, 128, 0]
+#res = [256, 256, 0]
 #Ta = 1e16
-#res = [256, 256, 0]
+#res = [384, 384, 0]
 #Ta = 1e17
-#res = [256, 256, 0]
+#res = [384, 384, 0]
 #Ta = 1e18
 #res = [512, 512, 0]
 
@@ -71,13 +71,13 @@ gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs'
 
 # Setup computation, visualization and IO
 marginal_point = False
-marginal_curve = True
+marginal_curve = False
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
 solve_gevp = True
 show_spy = False
 write_mtx = False
-show_spectra = (False and solve_gevp)
+show_spectra = (True and solve_gevp)
 show_physical = (False and solve_gevp)
 viz_mode = 0
 
@@ -104,7 +104,7 @@ if marginal_curve:
 
 if show_spy or solve_gevp:
     Ra = eq_params['rayleigh']
-    print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
+    MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
     gevp = MarginalCurve.GEVP(**gevp_opts)
 
@@ -113,8 +113,8 @@ if show_spy or write_mtx:
 
 if solve_gevp:
     gevp.solve(Ra, 1, with_vectors = True)
-    print("Found eigenvalues:")
-    print(gevp.evp_lmb)
+    MarginalCurve.Print("Found eigenvalues:")
+    MarginalCurve.Print(gevp.evp_lmb)
 
 if show_spectra:
     gevp.viewSpectra(viz_mode, naive = True)

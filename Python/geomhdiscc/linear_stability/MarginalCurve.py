@@ -324,7 +324,6 @@ class GEVP:
 #        restrict = np.arange(start,end)
 #        A = self.model.implicit_linear(self.res, self.eq_params, self.eigs, self.bcs, self.fields, restriction = restrict)
 #        B = self.model.time(self.res, self.eq_params, self.eigs, self.no_bcs, self.fields, restriction = restrict)
-
         self.eq_params['rayleigh'] = Ra
         A = self.model.implicit_linear(self.res, self.eq_params, self.eigs, self.bcs, self.fields)
         B = self.model.time(self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
