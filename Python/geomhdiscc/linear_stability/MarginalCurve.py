@@ -468,6 +468,7 @@ class GEVP:
                             sol_iphys[f] = transf.toslice(sol_spec[f].imag, self.res[0], self.res[1]-1, int(self.eigs[0]))
 
                     if plot:
+                        import matplotlib as mpl
                         import matplotlib.pylab as pl
                         import matplotlib.cm as cm
                         Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
@@ -475,12 +476,15 @@ class GEVP:
                         grid = transf.grid_2d(self.res[0], a, b, self.res[1]-1, int(self.eigs[0]))
                         rows = np.ceil(len(self.fields)/3)
                         cols = min(3, len(self.fields))
+                        mycm = cm.bwr
                         for i,f in enumerate(self.fields):
                             if f[0] == "velocity":
                                 Print("Toroidal/Poloidal projection not done yet")
                             else:
-                                pl.subplot(rows,cols,i+1, aspect = 'equal')
-                                pl.contourf(grid[0], grid[1], sol_rphys[f], 100)
+                                vmax = np.max(np.abs(sol_rphys[f]))
+                                #pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+                                pl.subplot(1,1,1, aspect = 'equal', axisbg = 'black')
+                                pl.contourf(grid[0], grid[1], sol_rphys[f], 30, cmap = mycm, vmax = vmax, vmin = -vmax)
                                 title = f[0]
                                 if f[1] != "":
                                     title = title + ', ' + f[1]
@@ -516,8 +520,10 @@ class GEVP:
                             else:
                                 phi = self.eigs[0]*transf.phgrid(int(self.eigs[0]))
                                 sol_eq = np.outer(np.cos(phi),sol_rrad[f]) + np.outer(np.sin(phi),sol_irad[f])
-                                pl.subplot(rows,cols,i+1, aspect = 'equal')
-                                pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 100, cmap = cm.RdBu)
+                                #pl.subplot(rows,cols,i+1, aspect = 'equal', axisbg = 'black')
+                                pl.subplot(1,1,1, aspect = 'equal', axisbg = 'black')
+                                vmax = np.max(np.abs(sol_eq))
+                                pl.contourf(grid_eq[0], grid_eq[1], sol_eq, 50, cmap = mycm)
                                 title = f[0]
                                 if f[1] != "":
                                     title = title + ', ' + f[1]

@@ -8,15 +8,21 @@ import numpy as np
 import numpy.polynomial.legendre as leg
 import scipy.special as spe
 
+min_r_points = 1000
+min_th_points = 1000
+min_phi_points = 1000
+
 def rgrid(nr, a, b):
     """Create the radial Chebyshev grid"""
 
-    return a*np.cos(np.pi*(np.arange(0,nr)+0.5)/nr) + b
+    gN = max(min_r_points, nr)
+
+    return a*np.cos(np.pi*(np.arange(0,gN)+0.5)/gN) + b
 
 def tgrid(maxl, m):
     """Create the theta Gauss-Legendre grid"""
 
-    nt = 3*(maxl - m + 1)//2
+    nt = max(min_th_points,3*(maxl - m + 1)//2)
     nt = nt + (nt+1)%2
     x, tmp = leg.leggauss(nt)
 
@@ -25,7 +31,7 @@ def tgrid(maxl, m):
 def phgrid(m):
     """Create a phi grid for given harmonic order"""
 
-    return np.linspace(0, 2*np.pi, max(200,3*m))
+    return np.linspace(0, 2*np.pi, max(min_phi_points,3*m))
 
 def grid_2d(nr, a, b, maxl, m):
     """Compute the 2D grid for the contours"""
@@ -52,9 +58,12 @@ def grid_eq(nr, a, b, m):
 def torphys(spec):
     """Transform radial spectral coefficients to physical values"""
 
-    n = len(spec)
+    if len(spec) < min_r_points:
+        data = np.hstack((spec, np.zeros(min_r_points - len(spec))))
+    else:
+        data = spec
 
-    return fftpack.dct(spec,3)
+    return fftpack.dct(data,3)
 
 def torcheb(phys):
     """Transform radial physical values to spectral coefficients"""
@@ -84,7 +93,7 @@ def totleg(phys, maxl, m):
 def torphys2D(spec):
     """Transform 2D R spectral coefficients to 2D R physical values"""
 
-    phys = np.zeros(spec.shape)
+    phys = np.zeros((max(spec.shape[0],min_r_points), spec.shape[1]))
     for j in range(spec.shape[1]):
         phys[:,j] = torphys(spec[:,j])
     

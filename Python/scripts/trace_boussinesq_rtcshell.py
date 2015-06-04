@@ -38,8 +38,8 @@ rratio = 0.35
 #res = [64, 64, 0]
 #Ta = 1e11
 #res = [64, 64, 0]
-Ta = 1e12
-res = [96, 96, 0]
+#Ta = 1e12
+#res = [96, 96, 0]
 #Ta = 1e13
 #res = [128, 128, 0]
 #Ta = 1e14
@@ -50,8 +50,8 @@ res = [96, 96, 0]
 #res = [384, 384, 0]
 #Ta = 1e17
 #res = [384, 384, 0]
-#Ta = 1e18
-#res = [512, 512, 0]
+Ta = 1e18
+res = [512, 796, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
