@@ -32,10 +32,6 @@ def petsc_operators(A, B):
     A = A.tocsr()
     B = B.tocsr()
 
-#    pA = PETSc.Mat().createAIJ(size=A.shape, csr=(A.indptr, A.indices, A.data))
-#    pB = PETSc.Mat().createAIJ(size=B.shape, csr=(B.indptr, B.indices, B.data))
-#    pA.assemble()
-#    pB.assemble()
     # Setup A matrix
     pA = PETSc.Mat().create()
     pA.setSizes(A.shape)
@@ -72,7 +68,7 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
     #E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setBalance(SLEPc.EPS.Balance.TWOSIDE)
     E.setDimensions(nev = nev)
-    E.setTolerances(max_it= 100)
+    #E.setTolerances(max_it= 100)
     if initial_vector is not None:
         v = PETSc.Vec().createWithArray(initial_vector)
         E.setInitialSpace(v)
