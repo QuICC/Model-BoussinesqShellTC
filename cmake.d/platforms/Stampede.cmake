@@ -41,9 +41,11 @@ set(GEOMHDISCC_LINALGS "Eigen" PARENT_SCOPE)
 
 set(GEOMHDISCC_SPLINALGS "MUMPS" "SparseLU" "UmfPack" PARENT_SCOPE)
 #set(GEOMHDISCC_INCLUDES_MUMPS $ENV{TACC_MUMPS_INC} PARENT_SCOPE)
-set(GEOMHDISCC_INCLUDES_MUMPS $ENV{TACC_MUMPS_INC} PARENT_SCOPE)
-set(GEOMHDISCC_LIBDIR_MUMPS $ENV{TACC_MUMPS_LIB} $ENV{TACC_MKL_LIB} PARENT_SCOPE)
-set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "scalapack" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" PARENT_SCOPE)
+#set(GEOMHDISCC_INCLUDES_MUMPS $ENV{TACC_MUMPS_INC} PARENT_SCOPE)
+#set(GEOMHDISCC_LIBDIR_MUMPS $ENV{TACC_MUMPS_LIB} $ENV{TACC_MKL_LIB} PARENT_SCOPE)
+set(GEOMHDISCC_INCLUDES_MUMPS "/work/00434/eijkhout/petsc/petsc-3.5.4/sandybridge/include" PARENT_SCOPE)
+set(GEOMHDISCC_LIBDIR_MUMPS "/work/00434/eijkhout/petsc/petsc-3.5.4/sandybridge/lib" $ENV{TACC_MKL_LIB} PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_MUMPS "dmumps" "zmumps" "mumps_common" "pord" "parmetis" "scalapack" "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "mpifort" "ifcore" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_UMFPACK "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "umfpack" "amd" "cholmod" "ccolamd" "colamd" "camd" "metis" "suitesparseconfig" PARENT_SCOPE)
 #set(GEOMHDISCC_LIBRARIES_SUPERLU "mkl_intel_lp64" "mkl_sequential" "mkl_core" "pthread" "m" "superlu_4.3" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_UMFPACK_INTEL "$ENV{HOME}/local/include" PARENT_SCOPE)
@@ -97,7 +99,7 @@ set(GEOMHDISCC_CC_LIB_MPI_INTEL ${GEOMHDISCC_CC_LIB_INTEL} PARENT_SCOPE)
 
 # Find python headers and library
 set(PYTHON_LIBRARY "pthread" "dl" "util" "m" "$ENV{TACC_PYTHON_LIB}/libpython2.7.so")
-set(PYTHON_INCLUDE_DIR "$ENV{TACC_PYTHON_DIR}/include/python2.7")
+set(PYTHON_INCLUDE_DIR "$ENV{TACC_PYTHON_INC}/python2.7")
 
 set(GEOMHDISCC_LIBRARIES ${PYTHON_LIBRARY} PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES ${PYTHON_INCLUDE_DIR} PARENT_SCOPE)
