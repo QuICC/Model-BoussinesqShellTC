@@ -25,15 +25,15 @@ def x1(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return a/2.0
+        return numpy.full(n.shape, a/2.0)
 
     # Generate diagonal
     def d0(n):
-        return b
+        return numpy.full(n.shape, b)
 
     # Generate 1st superdiagonal
     def d1(n):
-        return a/2.0
+        return d_1(n)
 
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
@@ -54,15 +54,15 @@ def x2(nr, a, b, bc, coeff = 1.0, zr = 0):
 
     # Generate 2nd subdiagonal
     def d_2(n):
-        return a**2/4.0
+        return np.full(n.shape, a**2/4.0)
 
     # Generate 1st subdiagonal
     def d_1(n):
-        return a*b
+        return np.full(n.shape, a*b)
 
     # Generate diagonal
     def d0(n):
-        return (a**2 + 2.0*b**2)/2.0
+        return np.full(n.shape, (a**2 + 2.0*b**2)/2.0)
 
     # Generate 1st superdiagonal
     def d1(n):
