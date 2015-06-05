@@ -26,30 +26,66 @@ class NewtonNoneError(Exception):
 class NewtonDoneError(Exception):
     pass
 
-def petsc_operators(A, B):
+def petsc_operators(opA, opB):
     """Convert SciPy operators to PETSc operators"""
 
-    A = A.tocsr()
-    B = B.tocsr()
-
+    import timeit
+    start = timeit.default_timer()
+#    if MPI.COMM_WORLD.Get_size() > 1:
+#        # Make sure we have clean COO matrices
+#        A = opA().tocoo()
+#        A.sum_duplicates()
+#
+#        # Create PETSc A matrix
+#        pA = PETSc.Mat().create()
+#        pA.setSizes(A.shape)
+#        pA.setUp()
+#        # Fill A matrix
+#        for i,j,v in zip(A.row, A.col, A.data):
+#            pA.setValue(i,j,v)
+#        A = None
+#        pA.assemblyBegin()
+#
+#        B = opB().tocoo()
+#        B.sum_duplicates()
+#
+#        pA.assemblyEnd()
+#
+#        # Setup PETSc B matrix
+#        pB = PETSc.Mat().create()
+#        pB.setSizes(B.shape)
+#        pB.setUp()
+#        # Fill B matrix
+#        for i,j,v in zip(B.row, B.col, B.data):
+#            pB.setValue(i,j,v)
+#        pB.assemble()
+#        B = None
+#    else:
     # Setup A matrix
+    A = opA().tocsr()
     pA = PETSc.Mat().create()
     pA.setSizes(A.shape)
     pA.setUp()
-    # Setup B matrix
-    pB = PETSc.Mat().create()
-    pB.setSizes(B.shape)
-    pB.setUp()
 
     # Fill A matrix
     rstart, rend = pA.getOwnershipRange()
     pA.createAIJ(size=A.shape, nnz=A.getnnz(1), csr=(A.indptr[rstart:rend+1] - A.indptr[rstart], A.indices[A.indptr[rstart]:A.indptr[rend]], A.data[A.indptr[rstart]:A.indptr[rend]]))
+    A = None
     pA.assemble()
+
+    # Setup B matrix
+    B = opB().tocsr()
+    pB = PETSc.Mat().create()
+    pB.setSizes(B.shape)
+    pB.setUp()
 
     # Fill B matrix
     rstart, rend = pB.getOwnershipRange()
     pB.createAIJ(size=B.shape, nnz=B.getnnz(1), csr=(B.indptr[rstart:rend+1] - B.indptr[rstart], B.indices[B.indptr[rstart]:B.indptr[rend]], B.data[B.indptr[rstart]:B.indptr[rend]]))
     pB.assemble()
+    B = None
+
+    Print("Operator construction time: {:g}".format(timeit.default_timer() - start))
 
     return (pA, pB)
 

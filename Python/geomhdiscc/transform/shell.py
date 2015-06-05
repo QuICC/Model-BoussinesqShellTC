@@ -8,9 +8,9 @@ import numpy as np
 import numpy.polynomial.legendre as leg
 import scipy.special as spe
 
-min_r_points = 1000
-min_th_points = 1000
-min_phi_points = 1000
+min_r_points = 2000
+min_th_points = 2000
+min_phi_points = 2000
 
 def rgrid(nr, a, b):
     """Create the radial Chebyshev grid"""

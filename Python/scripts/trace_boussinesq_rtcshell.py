@@ -43,15 +43,15 @@ rratio = 0.35
 #Ta = 1e13
 #res = [128, 128, 0]
 #Ta = 1e14
-#res = [192, 192, 0]
-#Ta = 1e15
 #res = [256, 256, 0]
+Ta = 1e15
+res = [384, 384, 0]
 #Ta = 1e16
-#res = [384, 384, 0]
+#res = [512, 512, 0]
 #Ta = 1e17
-#res = [384, 384, 0]
-Ta = 1e18
-res = [512, 796, 0]
+#res = [768, 768, 0]
+#Ta = 1e18
+#res = [1024, 1024, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
@@ -104,6 +104,7 @@ if marginal_curve:
 
 if show_spy or solve_gevp:
     Ra = eq_params['rayleigh']
+    Ra = 375.86256422491
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
     gevp = MarginalCurve.GEVP(**gevp_opts)
