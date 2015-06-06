@@ -309,29 +309,16 @@ class GEVP:
         else:
             self.wave = wave
 
-    def buildOperators(self, Ra):
+    def setupProblem(self, Ra):
         """Build A and B matrices for the given rayleigh number"""
 
         self.eq_params['rayleigh'] = Ra
 
-#        if MPI.COMM_WORLD.Get_size() > 1:
-#            length = (self.res[1] - self.eigs[0])//MPI.COMM_WORLD.Get_size()
-#            rem = (self.res[1] - self.eigs[0])%MPI.COMM_WORLD.Get_size()
-#            start = self.eigs[0]
-#            end = start
-#            for cpu in range(1,MPI.COMM_WORLD.Get_rank()+1):
-#                start = start + length + (rem > 0)
-#                rem = max(0, rem - 1)
-#            end = start + length + (rem > 0)
-#            restrict = np.arange(start,end)
-#        else:
-#            restrict = None
-        restrict = None
+        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
+        opB = functools.partial(self.model.time, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
+        sizes = ((self.res[0]**2,)*3, (self.res[0],)*3, self.eigs[0])
 
-        opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.bcs, self.fields, restriction = restrict)
-        opB = functools.partial(self.model.time, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields, restriction = restrict)
-
-        return (opA,opB)
+        return (opA,opB, sizes)
    
     def setEigs(self, k):
        """Set the wave number"""
@@ -344,7 +331,7 @@ class GEVP:
 
         if self.changed or Ra != self.eq_params['rayleigh'] or (with_vectors and self.evp_vec is None):
             self.changed = False
-            A, B = self.buildOperators(Ra)
+            problem = self.setupProblem(Ra)
 
             if use_vector and self.evp_vec is not None:
                 initial_vector = self.evp_vec
@@ -352,9 +339,9 @@ class GEVP:
                 initial_vector = None
 
             if with_vectors:
-                self.evp_lmb, self.evp_vec = solver.eigenpairs(A, B, nev, tracker = tracker, initial_vector = initial_vector)
+                self.evp_lmb, self.evp_vec = solver.eigenpairs(problem, nev, tracker = tracker, initial_vector = initial_vector)
             else:
-                self.evp_lmb = solver.eigenvalues(A, B, nev, tracker = tracker, initial_vector = initial_vector)
+                self.evp_lmb = solver.eigenvalues(problem, nev, tracker = tracker, initial_vector = initial_vector)
                 self.evp_vec = None
             Print("\t\t (Ra = {:g}, ev = ".format(Ra) + str(self.evp_lmb) + ")")
 
@@ -363,9 +350,10 @@ class GEVP:
 
         # Create operators
         if spy or write_mtx:
-            opA, opB = self.buildOperators(Ra)
-            A = opA()
-            B = opB()
+            opA, opB, sizes = self.setupProblem(Ra)
+            restrict = solver.restrict_operators(sizes)
+            A = opA(restriction = restrict)
+            B = opB(restriction = restrict)
 
         if write_mtx:
             import scipy.io as io

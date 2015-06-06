@@ -26,66 +26,65 @@ class NewtonNoneError(Exception):
 class NewtonDoneError(Exception):
     pass
 
-def petsc_operators(opA, opB):
+def restrict_operators(sizes):
+    """Compute restriction for operators"""
+
+    if MPI.COMM_WORLD.Get_size() > 1:
+        pTmp = PETSc.Vec().create()
+        pTmp.setSizes(np.sum(sizes[0]))
+        pTmp.setUp()
+        rstart, rend = pTmp.getOwnershipRange()
+       
+        restrict = []
+        bstart = 0
+        tot = 0
+        for s, l in zip(sizes[0], sizes[1]):
+            if rstart < tot + s:
+                bstart = max(np.floor((rstart-tot)/l),0) + sizes[2]
+                bend = min(np.ceil((rend-tot)/l),np.ceil(s/l)) + sizes[2]
+                restrict.append(np.arange(bstart,bend))
+            else:
+                restrict.append(np.array([]))
+            tot = tot + s
+
+    else:
+        restrict = None
+
+    return restrict
+
+def petsc_operators(opA, opB, sizes):
     """Convert SciPy operators to PETSc operators"""
 
-    import timeit
-    start = timeit.default_timer()
-#    if MPI.COMM_WORLD.Get_size() > 1:
-#        # Make sure we have clean COO matrices
-#        A = opA().tocoo()
-#        A.sum_duplicates()
-#
-#        # Create PETSc A matrix
-#        pA = PETSc.Mat().create()
-#        pA.setSizes(A.shape)
-#        pA.setUp()
-#        # Fill A matrix
-#        for i,j,v in zip(A.row, A.col, A.data):
-#            pA.setValue(i,j,v)
-#        A = None
-#        pA.assemblyBegin()
-#
-#        B = opB().tocoo()
-#        B.sum_duplicates()
-#
-#        pA.assemblyEnd()
-#
-#        # Setup PETSc B matrix
-#        pB = PETSc.Mat().create()
-#        pB.setSizes(B.shape)
-#        pB.setUp()
-#        # Fill B matrix
-#        for i,j,v in zip(B.row, B.col, B.data):
-#            pB.setValue(i,j,v)
-#        pB.assemble()
-#        B = None
-#    else:
+    # Build operator restriction
+    restrict = restrict_operators(sizes)
+
     # Setup A matrix
-    A = opA().tocsr()
+    A = opA(restriction = restrict).transpose().tocsr()
     pA = PETSc.Mat().create()
     pA.setSizes(A.shape)
     pA.setUp()
 
     # Fill A matrix
     rstart, rend = pA.getOwnershipRange()
-    pA.createAIJ(size=A.shape, nnz=A.getnnz(1), csr=(A.indptr[rstart:rend+1] - A.indptr[rstart], A.indices[A.indptr[rstart]:A.indptr[rend]], A.data[A.indptr[rstart]:A.indptr[rend]]))
+    pA.createAIJ(size=A.shape, nnz=A.getnnz(1)[rstart:rend+1], csr=(A.indptr[rstart:rend+1] - A.indptr[rstart], A.indices[A.indptr[rstart]:A.indptr[rend]], A.data[A.indptr[rstart]:A.indptr[rend]]))
     A = None
-    pA.assemble()
+    pA.assemblyBegin()
 
     # Setup B matrix
-    B = opB().tocsr()
+    B = opB(restriction = restrict).transpose().tocsr()
+    pA.assemblyEnd()
+    pA.transpose()
+
     pB = PETSc.Mat().create()
     pB.setSizes(B.shape)
     pB.setUp()
 
     # Fill B matrix
     rstart, rend = pB.getOwnershipRange()
-    pB.createAIJ(size=B.shape, nnz=B.getnnz(1), csr=(B.indptr[rstart:rend+1] - B.indptr[rstart], B.indices[B.indptr[rstart]:B.indptr[rend]], B.data[B.indptr[rstart]:B.indptr[rend]]))
+    pB.createAIJ(size=B.shape, nnz=B.getnnz(1)[rstart:rend+1], csr=(B.indptr[rstart:rend+1] - B.indptr[rstart], B.indices[B.indptr[rstart]:B.indptr[rend]], B.data[B.indptr[rstart]:B.indptr[rend]]))
     pB.assemble()
     B = None
-
-    Print("Operator construction time: {:g}".format(timeit.default_timer() - start))
+    pB.transpose()
 
     return (pA, pB)
 
@@ -94,6 +93,7 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
 
     opts = PETSc.Options()
     opts["mat_mumps_icntl_14"] = 80
+    opts["mat_mumps_icntl_29"] = 2
 
     E = SLEPc.EPS()
     E.create()
@@ -133,10 +133,10 @@ def slepc_eps(A, B, nev, tracker = None, initial_vector = None):
 
     return E
 
-def eigenvalues(A, B, nev, tracker = None, initial_vector = None):
+def eigenvalues(system, nev, tracker = None, initial_vector = None):
     """Compute eigenvalues using SLEPc"""
 
-    pA, pB = petsc_operators(A, B)
+    pA, pB = petsc_operators(*system)
 
     E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
 
@@ -154,10 +154,10 @@ def eigenvalues(A, B, nev, tracker = None, initial_vector = None):
     else:
         return None
 
-def eigenpairs(A, B, nev, tracker = None, initial_vector = None):
+def eigenpairs(system, nev, tracker = None, initial_vector = None):
     """Compute eigenpairs using SLEPc"""
 
-    pA, pB = petsc_operators(A, B)
+    pA, pB = petsc_operators(*system)
 
     E = slepc_eps(pA, pB, nev, tracker, initial_vector = initial_vector)
 

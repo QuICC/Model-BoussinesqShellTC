@@ -77,8 +77,8 @@ marginal_show_curve = (False and marginal_minimum)
 solve_gevp = True
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp)
-show_physical = (True and solve_gevp)
+show_spectra = (False and solve_gevp)
+show_physical = (False and solve_gevp)
 viz_mode = 0
 
 if marginal_point or marginal_curve:

@@ -53,22 +53,46 @@ def build_diagonals(ns, nzrow, ds, offsets, cross_parity = None, has_wrap = True
 
 def build_block_matrix(fields, func, func_args, restriction = None):
 
+    if restriction is None:
+        restrict = [None]*len(fields)
+    else:
+        try:
+            n = len(restriction[0])
+            if len(restriction) == len(fields):
+                restrict = restriction
+            else:
+                raise RuntimeError('Restriction size does not match number of fields')
+        except TypeError:
+            restrict = [restriction]*len(fields)
+
     tmp = []
     for field_row in fields:
         row = []
-        for field_col in fields:
+        for j, field_col in enumerate(fields):
             args = func_args + (field_row,field_col)
-            row.append(func(*args, restriction = restriction))
+            row.append(func(*args, restriction = restrict[j]))
         tmp.append(row)
 
     return spsp.bmat(tmp, format='coo')
 
 def build_diag_matrix(fields, func, func_args, restriction = None):
 
+    if restriction is None:
+        restrict = [None]*len(fields)
+    else:
+        try:
+            n = len(restriction[0])
+            if len(restriction) == len(fields):
+                restrict = restriction
+            else:
+                raise RuntimeError('Restriction size does not match number of fields')
+        except TypeError:
+            restrict = [restriction]*len(fields)
+
     tmp = []
-    for field_row in fields:
+    for j, field_row in enumerate(fields):
         args = func_args + (field_row,)
-        tmp.append(func(*args, restriction = restriction))
+        tmp.append(func(*args, restriction = restrict[j]))
    
     return spsp.block_diag(tmp, format='coo')
 
