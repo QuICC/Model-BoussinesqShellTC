@@ -6,23 +6,58 @@ from __future__ import unicode_literals
 import scipy.fftpack as fftpack
 import numpy as np
 
+min_r_points = 2000
+min_th_points = 2000
+min_z_points = 2000
 
 def rgrid(nr, a, b):
     """Create the radial Chebyshev grid"""
 
-    return a*np.cos(np.pi*(np.arange(0,nr)+0.5)/nr) + b
+    gN = max(min_r_points, nr)
+
+    return a*np.cos(np.pi*(np.arange(0,gN)+0.5)/gN) + b
+
+def eqgrid(m):
+    """Create a equatorial (theta) grid for given order"""
+
+    return np.linspace(0, 2*np.pi, max(min_th_points,3*m))
 
 def zgrid(nz):
     """Create the z Chebyshev grid"""
 
-    return np.cos(np.pi*(np.arange(0,nz)+0.5)/nz)
+    gN = max(min_r_points, nz)
+
+    return np.cos(np.pi*(np.arange(0,gN)+0.5)/gN)
+
+def grid_2d(nr, a, b, nz):
+    """Compute the 2D grid for the contours"""
+
+    r = rgrid(nr, a, b)
+    z = zgrid(nz)
+    X, Y = np.meshgrid(r, z)
+
+    return (X, Y)
+
+def grid_eq(nr, a, b, m):
+    """Compute the 2D grid for the equatorial contours"""
+
+    r = rgrid(nr, a, b)
+    th = eqgrid(m)
+    rmesh, thmesh = np.meshgrid(r, th)
+    X = rmesh * np.cos(thmesh)
+    Y = rmesh * np.sin(thmesh)
+
+    return (X, Y)
 
 def torphys(spec):
     """Transform R spectral coefficients to physical values"""
 
-    n = len(spec)
+    if len(spec) < min_r_points:
+        data = np.hstack((spec, np.zeros(min_r_points - len(spec))))
+    else:
+        data = spec
 
-    return fftpack.dct(spec,3)
+    return fftpack.dct(data,3)
 
 def torcheb(phys):
     """Transform R physical values to spectral coefficients"""
@@ -34,9 +69,12 @@ def torcheb(phys):
 def tozphys(spec):
     """Transform Z spectral coefficients to physical values"""
 
-    n = len(spec)
+    if len(spec) < min_z_points:
+        data = np.hstack((spec, np.zeros(min_z_points - len(spec))))
+    else:
+        data = spec
 
-    return fftpack.dct(spec,3)
+    return fftpack.dct(data,3)
 
 def tozcheb(phys):
     """Transform Z physical values to spectral coefficients"""
@@ -44,6 +82,51 @@ def tozcheb(phys):
     n = len(phys)
 
     return fftpack.dct(phys,2)/(2*n)
+
+def torphys2D(spec):
+    """Transform 2D R spectral coefficients to 2D R physical values"""
+
+    phys = np.zeros((max(spec.shape[0],min_r_points), spec.shape[1]))
+    for j in range(spec.shape[1]):
+        phys[:,j] = torphys(spec[:,j])
+    
+    return phys
+
+def torcheb2D(phys):
+    """Transform 2D R physical values to 2D R spectral coefficients"""
+
+    for j in range(phys.shape[1]):
+        phys[:,j] = torcheb(phys[:,j])
+
+    return phys
+
+def tozphys2D(spec):
+    """Transform 2D Z spectral coefficients to 2D Z physical values"""
+
+    phys = np.zeros((max(spec.shape[0],min_z_points), spec.shape[1]))
+    for j in range(spec.shape[1]):
+        phys[:,j] = tozphys(spec[:,j])
+    
+    return phys
+
+def tozcheb2D(phys):
+    """Transform 2D Z physical values to 2D Z spectral coefficients"""
+
+    for j in range(phys.shape[1]):
+        phys[:,j] = tozcheb(phys[:,j])
+
+    return phys
+
+def toslice(spec, nr, nz):
+    """Transform to latitudinal slice"""
+
+    spec = np.reshape(spec, (nr, nz), order = 'F')
+
+    rphys = torphys2D(spec)
+
+    rspec = np.transpose(rphys)
+    phys = tozphys2D(rspec)
+    return phys
 
 def tophys2d(spec):
     """Transform 2D spectral coefficients to 2D physical values"""

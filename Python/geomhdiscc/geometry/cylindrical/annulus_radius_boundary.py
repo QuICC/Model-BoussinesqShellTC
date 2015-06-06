@@ -72,6 +72,8 @@ def constrain(mat, bc, location = 't'):
 def apply_tau(mat, bc, location = 't'):
     """Add Tau lines to the matrix"""
 
+    nbc = bc[0]//10
+
     # Outer u = 0
     if bc[0] == 10:
         cond = tau_value(mat.shape[0], 1, bc.get('c',None))
@@ -111,21 +113,25 @@ def apply_tau(mat, bc, location = 't'):
     # u = D^2u = 0
     elif bc[0] == 41:
         cond = tau_value_diff2(mat.shape[0], 0, bc.get('c',None))
-    # Last mode is zero
-    elif bc[0] == 99:
-        cond = tau_last(mat.shape[0])
+    # Set last modes to zero
+    elif bc[0] > 990 and bc[0] < 1000:
+        cond = tau_last(mat.shape[1], bc[0]-990)
+        nbc = bc[0]-990
 
-    if cond.dtype == 'complex_':
-        bc_mat = mat.astype('complex_').tolil()
-    else:
-        bc_mat = mat.tolil()
-
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
     if location == 't':
-        bc_mat[0:cond.shape[0],:] = cond
+        s = 0
     elif location == 'b':
-        bc_mat[-cond.shape[0]:,:] = cond
+        s = mat.shape[0]-nbc
 
-    return bc_mat
+    conc = np.concatenate
+    for i,c in enumerate(cond):
+        mat.data = conc((mat.data, c))
+        mat.row = conc((mat.row, [s+i]*mat.shape[1]))
+        mat.col = conc((mat.col, np.arange(0,mat.shape[1])))
+
+    return mat
 
 def tau_value(nr, pos, coeffs = None):
     """Create the boundary value tau line(s)"""
@@ -296,13 +302,14 @@ def tau_value_diff2(nr, pos, coeffs = None):
 
     return np.array(cond)
 
-def tau_last(nr):
+def tau_last(nr, nrow):
     """Create the boundary value tau line(s)"""
 
-    cond = []
-    cond.append([0 for i in np.arange(0,nr-1)] +  [tau_c(nr)])
+    cond = np.zeros((nrow, nr))
+    for j in range(0, nrow):
+        cond[j,nr-nrow+j] = tau_c(nr-nrow+j)
 
-    return np.array(cond)
+    return cond
 
 def apply_galerkin(mat, bc):
     """Apply a Galerkin stencil on the matrix"""

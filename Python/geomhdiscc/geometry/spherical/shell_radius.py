@@ -1218,7 +1218,6 @@ def i4x4d1(nr, a, b, bc, coeff = 1.0):
 def qid(nr, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 
-    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     mat = spsp.coo_matrix((nr,nr))
     if coeff != 1.0:
         mat.data = coeff*np.ones((nr-q))

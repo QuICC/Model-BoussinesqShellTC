@@ -28,8 +28,8 @@ def tgrid(maxl, m):
 
     return x
 
-def phgrid(m):
-    """Create a phi grid for given harmonic order"""
+def eqgrid(m):
+    """Create a equatorial (phi) grid for given harmonic order"""
 
     return np.linspace(0, 2*np.pi, max(min_phi_points,3*m))
 
@@ -48,7 +48,7 @@ def grid_eq(nr, a, b, m):
     """Compute the 2D grid for the equatorial contours"""
 
     r = rgrid(nr, a, b)
-    phi = phgrid(m)
+    phi = eqgrid(m)
     rmesh, phimesh = np.meshgrid(r, phi)
     X = rmesh * np.cos(phimesh)
     Y = rmesh * np.sin(phimesh)
