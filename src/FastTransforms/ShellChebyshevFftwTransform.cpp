@@ -394,7 +394,7 @@ namespace Transform {
       assert(this->mspSetup->padSize() >= 0);
       assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
 
-      // assert right sizes for input  matrix
+      // assert right sizes for input matrix
       assert(chebVal.rows() == this->mspSetup->bwdSize());
       assert(chebVal.cols() == this->mspSetup->howmany());
 

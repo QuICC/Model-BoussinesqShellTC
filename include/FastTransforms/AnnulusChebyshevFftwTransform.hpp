@@ -54,10 +54,10 @@ namespace Transform {
           *    - DIFF: D
           *    - DIVR: 1/r
           *    - DIVR2: 1/r^2
-          *    - DIVRDIFFR: 1/r D r
+          *    - DIVRDIFF: 1/r D
           *    - DIFFDIVR: D 1/r
           */
-         enum Id {PROJ, DIVR, DIVR2, DIFF, DIVRDIFFR, DIFFDIVR};
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIVRDIFF, DIFFDIVR};
       };
 
       /**

@@ -7,6 +7,7 @@
 // System includes
 //
 #include <cassert>
+#include <limits>
 
 // External includes
 //
@@ -23,6 +24,7 @@
 #include "FastTransforms/FftwLibrary.hpp"
 #include "Python/PythonWrapper.hpp"
 
+#include <iostream>
 namespace GeoMHDiSCC {
 
 namespace Transform {
@@ -144,8 +146,6 @@ namespace Transform {
       //
       // Initialise integrator operators
       //
-      // Multiplication by R
-      this->mIntgOp.insert(std::make_pair(IntegratorType::INTG, SparseMatrix(this->mspSetup->fwdSize(),this->mspSetup->fwdSize())));
 
       //
       // Initialise solver operators
@@ -176,15 +176,19 @@ namespace Transform {
       PyDict_SetItem(pValue, PyLong_FromLong(0), PyLong_FromLong(0));
       PyTuple_SetItem(pArgs, 3, pValue);
 
-      // Call x1 for solver
-      PythonWrapper::setFunction("x1");
+      // Set resoluton for solver matrices
+      pValue = PyLong_FromLong(this->mspSetup->fwdSize());
+      PyTuple_SetItem(pArgs, 0, pValue);
+
+      // Call r1 for solver
+      PythonWrapper::setFunction("r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR)->second, pValue);
       Py_DECREF(pValue);
 
-      // Call x1 for solver
-      PythonWrapper::setFunction("x2");
+      // Call r2 for solver
+      PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR2)->second, pValue);
@@ -303,7 +307,7 @@ namespace Transform {
       assert(this->mspSetup->padSize() >= 0);
       assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
 
-      // assert right sizes for input  matrix
+      // assert right sizes for input matrix
       assert(chebVal.rows() == this->mspSetup->bwdSize());
       assert(chebVal.cols() == this->mspSetup->howmany());
 
@@ -336,19 +340,31 @@ namespace Transform {
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
-      // Compute 1/r D r projection
-      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      // Compute 1/r D
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFF)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         // Compute 1st derivative
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
          this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpInS);
+
+         // Compute division by R
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(projector)->second, this->mTmpOutS);
          this->mTmpIn = this->mTmpInS;
 
       // Compute D 1/r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
       {
-         throw Exception("Backward DIFFDIVR operator is not yet implemented");
+         // Compute division by R
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIVR)->second, this->mTmpInS);
+
+         // Compute 1st derivative
+         this->mTmpOutS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection
       } else
@@ -458,19 +474,31 @@ namespace Transform {
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
-      // Compute 1/r D r
-      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      // Compute 1/r D
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFF)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         // Compute 1st derivative
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpInS);
+
+         // Compute division by R
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIVR)->second, this->mTmpOutS);
          this->mTmpIn = this->mTmpInS;
 
       // Compute D 1/r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
       {
-         throw Exception("Backward DIFFDIVR operator is not yet implemented");
+         // Compute division by R
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIVR)->second, this->mTmpInS);
+         
+         // Compute 1st derivative
+         this->mTmpOutS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of real part
       } else
@@ -509,19 +537,31 @@ namespace Transform {
          Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
          this->mTmpIn = this->mTmpOutS;
 
-      // Compute 1/r D r
-      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      // Compute 1/r D
+      } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIVRDIFF)
       {
-         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         // Compute 1st derivative
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
          this->mTmpInS.topRows(1).setZero();
-         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
-         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpInS);
+
+         // Compute division by R
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIVR)->second, this->mTmpOutS);
          this->mTmpIn = this->mTmpInS;
 
       // Compute D 1/r
       } else if(projector == AnnulusChebyshevFftwTransform::ProjectorType::DIFFDIVR)
       {
-         throw Exception("Backward DIFFDIVR operator is not yet implemented");
+         // Compute division by R
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIVR)->second, this->mTmpInS);
+         
+         // Compute 1st derivative
+         this->mTmpOutS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(AnnulusChebyshevFftwTransform::ProjectorType::DIFF)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of imaginary part
       } else
