@@ -18,6 +18,10 @@ else(GEOMHDISCC_MPI)
 endif(GEOMHDISCC_MPI)
 
 set(CMAKE_CXX_FLAGS "${GEOMHDISCC_CC_ARCH_${GEOMHDISCC_COMPILER}}" CACHE STRING "" FORCE)
+if(NOT GEOMHDISCC_THREADS STREQUAL "None")
+   string(TOUPPER "${GEOMHDISCC_THREADS}" model)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GEOMHDISCC_CC_${model}_${GEOMHDISCC_COMPILER}}" CACHE STRING "" FORCE)
+endif(NOT GEOMHDISCC_THREADS STREQUAL "None")
 
 if(GEOMHDISCC_MPI)
    foreach(inc ${GEOMHDISCC_CC_INC_MPI_${GEOMHDISCC_COMPILER}})
@@ -47,7 +51,7 @@ endforeach(inc)
 geomhdiscc_link_external(GEOMHDISCC_SMARTPTR)
 
 # FFT implementation libraries and includes
-geomhdiscc_link_external(GEOMHDISCC_FFT)
+geomhdiscc_link_external(GEOMHDISCC_FFT GEOMHDISCC_THREADS)
 
 # Linear algebra libraries and includes
 geomhdiscc_link_external(GEOMHDISCC_LINALG)

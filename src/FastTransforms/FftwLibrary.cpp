@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Exceptions/Exception.hpp"
 
 namespace GeoMHDiSCC {
 
@@ -58,12 +59,35 @@ namespace Transform {
       --FftwLibrary::sCounter;
    }
 
+   void FftwLibrary::initFft()
+   {
+      #ifdef GEOMHDISCC_THREADS_OPENMP
+      if(FftwLibrary::sCounter == 0)
+      {
+         // Initialize FFTW's threads
+         int error = fftw_init_threads();
+
+         if(error == 0)
+         {
+            throw Exception("FFTW's threads initialization failed!");
+         }
+      }
+
+      // Number of threads
+      fftw_plan_with_nthreads(2);
+      #endif //GEOMHDISCC_THREADS_OPENMP
+   }
+
    void FftwLibrary::cleanupFft()
    {
       // Check if all objects have been destroyed
       if(FftwLibrary::sCounter == 0)
       {
-         fftw_cleanup();
+         #ifdef GEOMHDISCC_THREADS_OPENMP
+            fftw_cleanup_threads();
+         #else
+            fftw_cleanup();
+         #endif //GEOMHDISCC_THREADS_OPENMP
       }
    }
 

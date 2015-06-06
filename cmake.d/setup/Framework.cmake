@@ -58,6 +58,7 @@ if(mpiTest)
    endif(NOT GEOMHDISCC_MPIALGO STREQUAL "Auto")
 endif(mpiTest)
 
+
 ###################################################
 #---------- MPI COMMUNICATION GROUPING -----------#
 ###################################################

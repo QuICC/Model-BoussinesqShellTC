@@ -43,6 +43,8 @@ namespace Transform {
    SphereChebyshevFftwTransform::SphereChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
+      // Initialize FFTW
+      FftwLibrary::initFft();
    }
 
    SphereChebyshevFftwTransform::~SphereChebyshevFftwTransform()

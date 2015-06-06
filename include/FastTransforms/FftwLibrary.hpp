@@ -35,6 +35,11 @@ namespace Transform {
          static unsigned int planFlag();
 
          /**
+          * @brief Initialize the FFTW library
+          */
+         static void initFft();
+
+         /**
           * @brief Register object using FFTW library
           */
          static void registerFft();

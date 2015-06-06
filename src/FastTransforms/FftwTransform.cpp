@@ -41,6 +41,8 @@ namespace Transform {
    FftwTransform::FftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
+      // Initialize FFTW
+      FftwLibrary::initFft();
    }
 
    FftwTransform::~FftwTransform()

@@ -42,9 +42,11 @@ namespace Transform {
 
    CylinderChebyshevFftwTransform::CylinderChebyshevFftwTransform()
       : mFEPlan(NULL), mFBOPlan(NULL), mBEPlan(NULL)
-
    {
       PythonWrapper::init();
+
+      // Initialize FFTW
+      FftwLibrary::initFft();
    }
 
    CylinderChebyshevFftwTransform::~CylinderChebyshevFftwTransform()

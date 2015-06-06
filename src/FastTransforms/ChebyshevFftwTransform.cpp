@@ -44,6 +44,9 @@ namespace Transform {
    {
       // Initialise the Python interpreter wrapper
       PythonWrapper::init();
+
+      // Initialize FFTW
+      FftwLibrary::initFft();
    }
 
    ChebyshevFftwTransform::~ChebyshevFftwTransform()

@@ -17,6 +17,17 @@ endif(sharedptrTest)
 
 
 ###################################################
+#------------ THREADS PARALLELISATION ------------#
+###################################################
+
+geomhdiscc_provide_choice(GEOMHDISCC_THREADSMODELS "Threads paralellization" GEOMHDISCC_THREADS threadsTest)
+
+if(threadsTest)
+   geomhdiscc_add_definition(GEOMHDISCC_THREADS)
+endif(threadsTest)
+
+
+###################################################
 #------------- FFT IMPLEMENTATION ----------------#
 ###################################################
 

@@ -15,6 +15,12 @@ set(GEOMHDISCC_COMPILERS "GCC" PARENT_SCOPE)
 set(GEOMHDISCC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 
 ###################################################
+#----------- AVAILABLE THREADS MODELS ------------#
+###################################################
+
+set(GEOMHDISCC_THREADSMODELS "None" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 

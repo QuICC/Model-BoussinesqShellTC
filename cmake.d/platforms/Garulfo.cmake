@@ -15,11 +15,18 @@ set(GEOMHDISCC_COMPILERS "GCC" PARENT_SCOPE)
 set(GEOMHDISCC_SMARTPTRS "Boost" "TR1" "cxx0x" PARENT_SCOPE)
 
 ###################################################
+#----------- AVAILABLE THREADS MODELS ------------#
+###################################################
+
+set(GEOMHDISCC_THREADSMODELS "None" "OpenMP" PARENT_SCOPE)
+
+###################################################
 #----------- AVAILABLE FFT VERSIONS --------------#
 ###################################################
 
 set(GEOMHDISCC_FFTS "FFTW" "cuFFT" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_FFTW "fftw3" PARENT_SCOPE)
+set(GEOMHDISCC_LIBRARIES_FFTW_OPENMP "fftw3_omp" "fftw3" PARENT_SCOPE)
 set(GEOMHDISCC_LIBRARIES_CUFFT "cudart" "cufft" "cufftw" PARENT_SCOPE)
 set(GEOMHDISCC_INCLUDES_CUFFT "/opt/cuda/include" "/opt/cuda/sdk/common/inc/" PARENT_SCOPE)
 set(GEOMHDISCC_LIBDIR_CUFFT "/opt/cuda/lib64" PARENT_SCOPE)
@@ -80,6 +87,8 @@ set(GEOMHDISCC_CC_SERIAL_GCC "g++" PARENT_SCOPE)
 set(GEOMHDISCC_CC_MPI_GCC "mpic++" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_ARCH_GCC "-march=native -O2" PARENT_SCOPE)
+
+set(GEOMHDISCC_CC_OPENMP_GCC "-fopenmp" PARENT_SCOPE)
 
 set(GEOMHDISCC_CC_INC_GCC "" PARENT_SCOPE)
 
