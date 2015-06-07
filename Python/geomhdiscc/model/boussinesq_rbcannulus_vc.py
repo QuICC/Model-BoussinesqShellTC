@@ -1,4 +1,4 @@
-"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+"""Module provides the functions to generate the Boussinesq Rayleigh-Benard convection in a cylindrical annulus modified for parity (velocity-continuity formulation)"""
 
 from __future__ import division
 from __future__ import unicode_literals
@@ -13,7 +13,7 @@ from geomhdiscc.geometry.cylindrical.annulus_boundary import no_bc
 
 
 class BoussinesqRBCAnnulusVC(base_model.BaseModel):
-    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylindrical annulus (velocity-continuity formulation)"""
+    """Class to setup the Boussinesq Rayleigh-Benard convection in a cylindrical annulus modified for parity (velocity-continuity formulation)"""
 
     def periodicity(self):
         """Get the domain periodicity"""
@@ -235,30 +235,31 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
 
         return bc
 
-    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_block, restriction = None):
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create the explicit nonlinear operator"""
 
         a, b = geo.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r") and field_col == field_row:
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+            mat = geo.i2j2r3(res[0], res[2], a, b, bc)
             mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat
 
         elif field_row == ("velocity","theta") and field_col == field_row:
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+            mat = geo.i2j2r3(res[0], res[2], a, b, bc)
             mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat
 
         elif field_row == ("velocity","z") and field_col == field_row:
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc)
             mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -276,10 +277,11 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","r"):
             if field_col == ("velocity","r"):
-                mat = geo.i2j2x2vlapl(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = geo.i2j2r3vlaplr_1(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_u, res[2], res[0])
@@ -295,7 +297,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2x2d1(res[0], res[2], a, b, bc, -1.0)
+                mat = geo.i2j2r3d1r_2(res[0], res[2], a, b, bc, -1.0)
                 mat = utils.qid_from_idx(idx_u, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","theta"):
@@ -304,7 +306,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
             elif field_col == ("velocity","theta"):
-                mat = geo.i2j2x2vlapl(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = geo.i2j2r3vlaplr_1(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_v, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_v, res[2], res[0])
@@ -316,7 +318,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2x1(res[0], res[2], a, b, bc, -1j*m)
+                mat = geo.i2j2(res[0], res[2], a, b, bc, -1j*m)
                 mat = utils.qid_from_idx(idx_v, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("velocity","z"):
@@ -327,17 +329,17 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("velocity","z"):
-                mat = geo.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = geo.i2j2r2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 if bcs["bcType"] == self.SOLVER_HAS_BC:
                     mat = mat + utils.id_from_idx_2d(idx_w, res[2], res[0])
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2x2(res[0], res[2], a, b, bc, Ra)
+                mat = geo.i2j2r2(res[0], res[2], a, b, bc, Ra)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat
 
             elif field_col == ("pressure",""):
-                mat = geo.i2j2x2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
+                mat = geo.i2j2e1(res[0], res[2], a, b, bc, -1.0, zscale = zscale)
                 mat = utils.qid_from_idx(idx_w, res[0]*res[2])*mat*utils.qid_from_idx(idx_p, res[0]*res[2])
 
         elif field_row == ("temperature",""):
@@ -349,13 +351,13 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
 
             elif field_col == ("velocity","z"):
                 if self.linearize:
-                    mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+                    mat = geo.i2j2r2(res[0], res[2], a, b, bc)
                     mat = mat*utils.qid_from_idx(idx_w, res[0]*res[2])
                 else:
                     mat = geo.zblk(res[0], res[2], 2, 2, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2j2x2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
+                mat = geo.i2j2r2lapl(res[0], res[2], m, a, b, bc, zscale = zscale)
 
             elif field_col == ("pressure",""):
                 mat = geo.zblk(res[0], res[2], 2, 2, bc)
@@ -369,7 +371,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = geo.i1j1x1div(res[0]+1, res[2]+1, a, b, bc)
+                    mat = geo.i1j1r1d1(res[0]+1, res[2]+1, a, b, bc)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_u, res[0]*res[2])
 
                 elif field_col == ("velocity","theta"):
@@ -389,7 +391,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
                     bc['z']['cr'] = 1
                     bc['z']['rt'] = 1
                     bc['z']['zb'] = 1
-                    mat = geo.i1j1x1e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
+                    mat = geo.i1j1r2e1(res[0]+1, res[2]+1, a, b, bc, zscale = zscale)
                     mat = utils.qid_from_idx(idx_p, res[0]*res[2])*mat*utils.qid_from_idx(idx_w, res[0]*res[2])
 
                 elif field_col == ("temperature",""):
@@ -401,7 +403,7 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
             else:
                 mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
@@ -418,35 +420,40 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
 
         idx_u, idx_v, idx_w, idx_p = self.zero_blocks(res, eigs)
 
+        mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","r"):
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_u, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","theta"):
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_v, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("velocity","z"):
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc, 1.0/Pr)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc, 1.0/Pr)
             S = utils.qid_from_idx(idx_w, res[0]*res[2])
             mat = S*mat*S
 
         elif field_row == ("temperature",""):
-            mat = geo.i2j2x2(res[0], res[2], a, b, bc)
+            mat = geo.i2j2r2(res[0], res[2], a, b, bc)
 
         elif field_row == ("pressure",""):
             mat = geo.zblk(res[0], res[2], 1, 1, bc)
 
-        else:
+        if mat is None:
             raise RuntimeError("Equations are not setup properly!")
 
         return mat
 
     def zero_blocks(self, res, eigs):
         """Build restriction matrices"""
+
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         # U: T_iN, T_Ni
         idx_u = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
@@ -457,14 +464,13 @@ class BoussinesqRBCAnnulusVC(base_model.BaseModel):
 #        idx_v = np.union1d(idx_v, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
 
         # W: T_Nk, T_N-1K
-#        idx_w = utils.qidx(res[2], res[2])
         idx_w = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-2))
 
         # Pressure: T_iN, T_Nk
         idx_p = utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-1), utils.qidx(res[0], 0))
         idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], res[2]-3), utils.qidx(res[0], res[0]-4)))
         # Pressure: T_00
-        if eigs[0] == 0:
+        if m == 0:
             idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.qidx(res[2], 0), utils.qidx(res[0], res[0]-1)))
             idx_p = np.union1d(idx_p, utils.idx_kron_2d(res[2], res[0], utils.sidx(res[2], res[2]-1), utils.sidx(res[0], res[0]-1)))
 

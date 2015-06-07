@@ -13,8 +13,8 @@ model.use_galerkin = False
 # Set resolution, parameters, boundary conditions
 bc_vel = 1 # 0: NS, 1: SF
 bc_temp = 0 # 0: FT 1: FF
-Ta = 1e14
-res = [192, 192, 0]
+Ta = 1e16
+res = [256, 256, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum

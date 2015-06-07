@@ -16,8 +16,8 @@ def zblk(nr, parity, bc):
     mat = spsp.lil_matrix((nr,nr))
     return radbc.constrain(mat,parity,bc)
 
-def x1(nr, parity, bc, coeff = 1.0, zr = 0):
-    """Create operator for x multiplication"""
+def r1(nr, parity, bc, coeff = 1.0, zr = 0):
+    """Create operator for r multiplication"""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -37,15 +37,15 @@ def x1(nr, parity, bc, coeff = 1.0, zr = 0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     if zr > 0:
         mat = mat.tolil()
         mat[-zr:,:] = 0
         mat = mat.tocsr()
     return radbc.constrain(mat, parity, bc)
 
-def x2(nr, parity, bc, coeff = 1.0, zr = 0):
-    """Create operator for x^2 multiplication"""
+def r2(nr, parity, bc, coeff = 1.0, zr = 0):
+    """Create operator for r^2 multiplication"""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -85,16 +85,16 @@ def d1(nr, parity, bc, coeff = 1.0, zr = None):
     mat = coeff*mat
     return radbc.constrain(mat, parity, bc)
 
-def x1d1(nr, parity, bc, coeff = 1.0, zr = 1):
-    """Create operator for x times derivative"""
+def r1d1(nr, parity, bc, coeff = 1.0, zr = 1):
+    """Create operator for r times derivative"""
 
-    mat = x1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = zr)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
+    mat = r1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = zr)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
     return radbc.constrain(mat, parity, bc)
 
-def x1div(nr, parity, bc, coeff = 1.0, zr = 1):
-    """Create operator for x times radial divergence"""
+def r1div(nr, parity, bc, coeff = 1.0, zr = 1):
+    """Create operator for r times radial divergence"""
 
-    mat = sid(nr, parity, zr, radbc.no_bc(), coeff) + x1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = zr)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
+    mat = sid(nr, parity, zr, radbc.no_bc(), coeff) + r1(nr, (parity+1)%2, radbc.no_bc(), coeff, zr = zr)*d1(nr, parity, radbc.no_bc(), coeff, zr = zr)
     return radbc.constrain(mat, parity, bc)
 
 def i1(nr, parity, bc, coeff = 1.0):
@@ -118,11 +118,11 @@ def i1(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i1x1d1(nr, parity, bc, coeff = 1.0):
-    """Create operator for 1st integral x 1st derivative T_n(x)."""
+def i1r1d1(nr, parity, bc, coeff = 1.0):
+    """Create operator for 1st integral r 1st derivative T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -142,11 +142,11 @@ def i1x1d1(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i1x1div(nr, parity, bc, coeff = 1.0):
-    """Create operator for 1st integral x radial divergence T_n(x)."""
+def i1r1div(nr, parity, bc, coeff = 1.0):
+    """Create operator for 1st integral r radial divergence T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -166,11 +166,11 @@ def i1x1div(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i1x1(nr, parity, bc, coeff = 1.0):
-    """Create operator for 1st integral of x T_n(x)."""
+def i1r1(nr, parity, bc, coeff = 1.0):
+    """Create operator for 1st integral of r T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2,2)
@@ -187,11 +187,11 @@ def i1x1(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i1x2(nr, parity, bc, coeff = 1.0):
-    """Create operator for 1st integral of x^2 T_n(x)."""
+def i1r2(nr, parity, bc, coeff = 1.0):
+    """Create operator for 1st integral of r^2 T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -219,7 +219,7 @@ def i1x2(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
 def i2(nr, parity, bc, coeff = 1.0):
@@ -244,11 +244,11 @@ def i2(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x1(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x T_n(x)."""
+def i2r1(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -276,11 +276,11 @@ def i2x1(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2d2(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 2nd derivative T_n(x)."""
+def i2r2d2(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 2nd derivative T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -301,11 +301,11 @@ def i2x2d2(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2d1(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 1st derivative T_n(x)."""
+def i2r2d1(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 1st derivative T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -333,11 +333,11 @@ def i2x2d1(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 T_n(x)."""
+def i2r2(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-2,3)
@@ -366,11 +366,11 @@ def i2x2(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x3(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^3 T_n(x)."""
+def i2r3(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^3 T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -406,11 +406,11 @@ def i2x3(nr, parity, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2div(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 radial divergence T_n(x)."""
+def i2r2div(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 radial divergence T_n(x)."""
 
     ns = np.arange((parity+1)%2, 2*nr, 2)
     if parity == 0:
@@ -438,11 +438,11 @@ def i2x2div(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets, (parity+1)%2)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2laplh(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
+def i2r2laplh(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 Laplacian T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -463,11 +463,11 @@ def i2x2laplh(nr, m, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x2vlaplh(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 vector Laplacian T_n(x)."""
+def i2r2vlaplh(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 vector Laplacian T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -488,11 +488,11 @@ def i2x2vlaplh(nr, m, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x3vlaplhx_1(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^3 vector Laplacian 1/x T_n(x)."""
+def i2r3vlaplhr_1(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^3 vector Laplacian 1/x T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -513,11 +513,11 @@ def i2x3vlaplhx_1(nr, m, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x3d1(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^3 first derivative T_n(x)."""
+def i2r3d1(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^3 first derivative T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-2,3)
@@ -546,11 +546,11 @@ def i2x3d1(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i2x3d1x_2(nr, parity, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^3 first derivative 1/x^2 T_n(x)."""
+def i2r3d1r_2(nr, parity, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^3 first derivative 1/r^2 T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-1,2)
@@ -571,7 +571,7 @@ def i2x3d1x_2(nr, parity, bc, coeff = 1.0):
     ds = [d_1, d0, d1]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
 def i4(nr, parity, bc, coeff = 1.0):
@@ -604,11 +604,11 @@ def i4(nr, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i4x4(nr, parity, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 T_n(x)."""
+def i4r4(nr, parity, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-4,5)
@@ -653,11 +653,11 @@ def i4x4(nr, parity, bc, coeff = 1.0):
     ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i4x4laplh(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
+def i4r4laplh(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 Laplacian T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-3,4)
@@ -694,11 +694,11 @@ def i4x4laplh(nr, m, parity, bc, coeff = 1.0):
     ds = [d_3, d_2, d_1, d0, d1, d2, d3]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
-def i4x4lapl2h(nr, m, parity, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
+def i4r4lapl2h(nr, m, parity, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 Laplacian^2 T_n(x)."""
 
     ns = np.arange(parity, 2*nr, 2)
     offsets = np.arange(-2,3)
@@ -727,23 +727,29 @@ def i4x4lapl2h(nr, m, parity, bc, coeff = 1.0):
     ds = [d_2, d_1, d0, d1, d2]
     diags = utils.build_diagonals(ns, nzrow, ds, offsets)
 
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, parity, bc)
 
 def qid(nr, parity, q, bc, coeff = 1.0):
     """Create a quasi identity block of order q"""
 
-    offsets = [0]
-    diags = [[0]*q + [1]*(nr-q)]
-
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-q))
+    else:
+        mat.data = np.ones((nr-q))
+    mat.row = np.arange(q,nr)
+    mat.col = mat.row
     return radbc.constrain(mat, parity, bc)
 
 def sid(nr, parity, s, bc, coeff = 1.0):
     """Create a identity block with last s rows zeroed"""
 
-    offsets = [0]
-    diags = [[1]*(nr-s) + [0]*s]
-
-    mat = coeff*spsp.diags(diags, offsets)
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-s))
+    else:
+        mat.data = np.ones((nr-s))
+    mat.row = np.arange(0,nr-s)
+    mat.col = mat.row
     return radbc.constrain(mat, parity, bc)

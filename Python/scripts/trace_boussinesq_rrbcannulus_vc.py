@@ -18,12 +18,12 @@ model.use_galerkin = False
 #eq_params = {'prandtl':1, 'rayleigh':3.5e6, 'taylor':1e10, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
 #eq_params = {'prandtl':1, 'rayleigh':5e4, 'taylor':1e6, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 1 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 7 
 res = [64, 0, 64]
-eq_params = {'taylor':1e8, 'prandtl':1, 'rayleigh':8e4, 'ro':1.0, 'rratio':0.35, 'heating':0, 'scale3d':2.0}
+eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':6e3, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)
@@ -36,15 +36,16 @@ eigs = wave(0)
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
 # Setup computation, visualization and IO
-marginal_point = False
+marginal_point = True
 marginal_curve = False
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
-solve_gevp = True
+marginal_show_point = (True and (marginal_point or marginal_minimum))
+solve_gevp = (True or marginal_show_point)
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp)
-show_physical = (True and solve_gevp)
+show_spectra = (True and solve_gevp) or marginal_show_point
+show_physical = (True and solve_gevp) or marginal_show_point
 viz_mode = 0
 
 if marginal_point or marginal_curve:
@@ -69,7 +70,11 @@ if marginal_curve:
         curve.view(data_m, data_Ra, data_freq, minimum = (mc, Rac), plot = True)
 
 if show_spy or solve_gevp:
-    Ra = eq_params['rayleigh']
+    if marginal_show_point:
+        Ra = Rac
+        m = mc
+    else:
+        Ra = eq_params['rayleigh']
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
     gevp = MarginalCurve.GEVP(**gevp_opts)

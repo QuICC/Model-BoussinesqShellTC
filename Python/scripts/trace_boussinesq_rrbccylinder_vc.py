@@ -1,218 +1,88 @@
 """Script to run a marginal curve trace for the Boussinesq rotating Rayleigh-Benard convection in a cylinder model (velocity-continuity formulation)"""
 
 import numpy as np
-import scipy.sparse as spsp
-import scipy.sparse.linalg as spsplin
 
 import geomhdiscc.model.boussinesq_rrbccylinder_vc as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRRBCCylinderVC()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
-# Set resolution, parameters, boundary conditions
-res = [32, 0, 32]
-res = [14, 0, 14]
-eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':5901.55, 'scale3d':2.0}
-#eq_params = {'prandtl':1, 'rayleigh':0.}
-eigs = [2]
+# Set boundary conditions
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+
+# Create parameters
+m = 7 
+res = [48, 0, 48]
+eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':5901.55, 'scale3d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+def wave(m):
+    return [float(m)]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+eigs = wave(0)
 
-# Setup visualization and IO
-show_spy = True
-write_mtx = True
-solve_evp = True
-show_solution = (True and solve_evp)
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+# Setup computation, visualization and IO
+marginal_point = True
+marginal_curve = False
+marginal_minimum = (True and marginal_curve)
+marginal_show_curve = (False and marginal_minimum)
+marginal_show_point = (True and (marginal_point or marginal_minimum))
+solve_gevp = (True or marginal_show_point)
+show_spy = False
+write_mtx = False
+show_spectra = (True and solve_gevp) or marginal_show_point
+show_physical = (True and solve_gevp) or marginal_show_point
+viz_mode = 0
 
-if show_solution:
-    import geomhdiscc.transform.cylinder as transf
+if marginal_point or marginal_curve:
+    # Create marginal curve object
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
 
-# Show the "spy" of the two matrices
-if show_spy:
-    pl.spy(A, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+if marginal_point:
+    # Compute marginal curve at a single point
+    Rac, evp_freq = curve.point(m, guess = eq_params['rayleigh'])
 
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
+if marginal_curve:
+    # Trace marginal curve for a set of wave indexes
+    ms = np.arange(max(0, m-5), m+6, 1)
+    (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
-# Solve EVP with sptarn
-if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1, np.inf)
-    print(evp_lmb)
+    if marginal_minimum:
+        # Compute minimum of marginal curve
+        mc, Rac, fc = curve.minimum(data_m, data_Ra, only_int = True)
 
-if show_solution:
-    viz_mode = 0
-    zscale = eq_params['scale3d']
+    if marginal_show_curve:
+        # Plot marginal curve and minimum
+        curve.view(data_m, data_Ra, data_freq, minimum = (mc, Rac), plot = True)
 
-    for mode in range(0,len(evp_lmb)):
-        # Get solution vectors
-        sol_ubar = evp_vec[0:res[0]*res[2],mode]
-        sol_vbar = evp_vec[res[0]*res[2]:2*res[0]*res[2],mode]
-        sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
-        # Extract continuity from velocity 
-        sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
-        intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
-        print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
+if show_spy or solve_gevp:
+    if marginal_show_point:
+        Ra = Rac
+        m = mc
+    else:
+        Ra = eq_params['rayleigh']
+    MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
+    gevp_opts['eigs'] = wave(m)
+    gevp = MarginalCurve.GEVP(**gevp_opts)
 
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    # Get solution vectors
-    sol_ubar = evp_vec[0:res[0]*res[2],viz_mode]
-    sol_vbar = evp_vec[res[0]*res[2]:2*res[0]*res[2],viz_mode]
-    sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],viz_mode]
-    sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],viz_mode]
-    sol_pbar = evp_vec[4*res[0]*res[2]:5*res[0]*res[2],viz_mode]
-    # Extract continuity from velocity 
-    sol_c = mod.cylinder.x1d1(res[0], res[2], eigs[0]%2, mod.no_bc(), sr = 0, sz = 0)*sol_ubar + 1j*eigs[0]*sol_vbar + mod.cylinder.x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale, sr = 0)*sol_w
-    intg_c = mod.cylinder.i1j1x1d1(res[0], res[2], eigs[0]%2, mod.no_bc())*sol_ubar + mod.cylinder.i1j1(res[0], res[2], eigs[0]%2, mod.no_bc(),1j*eigs[0])*sol_vbar + mod.cylinder.i1j1x2e1(res[0], res[2], eigs[0]%2, mod.no_bc(), zscale = zscale)*sol_w
-    
-    # Create spectrum plots
-    pl.subplot(2,3,1)
-    pl.semilogy(np.abs(sol_ubar))
-    pl.title("u")
-    pl.subplot(2,3,2)
-    pl.semilogy(np.abs(sol_vbar))
-    pl.title("v")
-    pl.subplot(2,3,3)
-    pl.semilogy(np.abs(sol_w))
-    pl.title("w")
-    pl.subplot(2,3,4)
-    pl.semilogy(np.abs(sol_t))
-    pl.title("T")
-    pl.subplot(2,3,5)
-    pl.semilogy(np.abs(sol_c))
-    pl.title("Continuity")
-    pl.subplot(2,3,6)
-    pl.semilogy(np.abs(sol_pbar))
-    pl.title("p")
-    pl.show()
-    pl.close("all")
-    
-    # Create solution matrices
-    mat_ubar = sol_ubar.reshape(res[0], res[2], order = 'F')
-    mat_u = spsplin.spsolve(mod.cylinder.rad.x1(res[0], (eigs[0]+1)%2, {0:0}, zr = 0).tocsr(), mat_ubar.real)
-    mat_vbar = sol_vbar.reshape(res[0], res[2], order = 'F')
-    mat_v = spsplin.spsolve(mod.cylinder.rad.x1(res[0], (eigs[0]+1)%2, {0:0}, zr = 0).tocsr(), mat_vbar.real)
-    mat_w = sol_w.reshape(res[0], res[2], order = 'F')
-    mat_t = sol_t.reshape(res[0], res[2], order = 'F')
-    mat_pbar = sol_pbar.reshape(res[0], res[2], order = 'F')
-    mat_p = spsplin.spsolve(mod.cylinder.rad.x2(res[0], eigs[0]%2, {0:0}, zr = 0).tocsr(), mat_pbar.real)
-    mat_c = sol_c.reshape(res[0], res[2], order = 'F')
+if show_spy or write_mtx:
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
 
-    # Visualize spectrum matrix
-    pl.subplot(2,5,1)
-    pl.imshow(np.log10(np.abs(mat_ubar)))
-    pl.colorbar()
-    pl.title("U bar")
-    pl.subplot(2,5,2)
-    pl.imshow(np.log10(np.abs(mat_vbar)))
-    pl.colorbar()
-    pl.title("V bar")
-    pl.subplot(2,5,4)
-    pl.imshow(np.log10(np.abs(mat_pbar)))
-    pl.colorbar()
-    pl.title("P bar")
-    pl.subplot(2,5,5)
-    pl.imshow(np.log10(np.abs(mat_c)))
-    pl.colorbar()
-    pl.title("Continuity")
+if solve_gevp:
+    gevp.solve(Ra, 1, with_vectors = True)
+    MarginalCurve.Print("Found eigenvalues:")
+    MarginalCurve.Print(gevp.evp_lmb)
 
-    pl.subplot(2,5,6)
-    pl.imshow(np.log10(np.abs(mat_u)))
-    pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,5,7)
-    pl.imshow(np.log10(np.abs(mat_v)))
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,5,8)
-    pl.imshow(np.log10(np.abs(mat_w)))
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,5,9)
-    pl.imshow(np.log10(np.abs(mat_p)))
-    pl.colorbar()
-    pl.title("p")
-    pl.subplot(2,5,10)
-    pl.imshow(np.log10(np.abs(mat_t)))
-    pl.colorbar()
-    pl.title("T")
-    pl.show()
-    pl.close("all")
+if show_spectra:
+    gevp.viewSpectra(viz_mode, naive = True)
 
-    # Compute physical space values
-    grid_r = transf.rgrid(res[0])
-    grid_z = transf.zgrid(res[2])
-    phys_ubar = transf.tophys2d(mat_ubar, eigs[0]%2)
-    phys_u = transf.tophys2d(mat_u, (eigs[0]+1)%2)
-    phys_vbar = transf.tophys2d(mat_vbar, eigs[0]%2)
-    phys_v = transf.tophys2d(mat_v, (eigs[0]+1)%2)
-    phys_w = transf.tophys2d(mat_w, eigs[0]%2)
-    phys_t = transf.tophys2d(mat_t, eigs[0]%2)
-    phys_pbar = transf.tophys2d(mat_pbar, eigs[0]%2)
-    phys_p = transf.tophys2d(mat_p, eigs[0]%2)
-    phys_c = transf.tophys2d(mat_c, eigs[0]%2)
-
-    # Show physical contour plot
-    pl.subplot(2,5,1)
-    pl.contourf(grid_z, grid_r, phys_ubar, 50)
-    pl.colorbar()
-    pl.title("U bar")
-    pl.subplot(2,5,2)
-    pl.contourf(grid_z, grid_r, phys_vbar, 50)
-    pl.colorbar()
-    pl.title("V bar")
-    pl.subplot(2,5,4)
-    pl.contourf(grid_z, grid_r, phys_pbar, 50)
-    pl.colorbar()
-    pl.title("P bar")
-    pl.subplot(2,5,5)
-    pl.contourf(grid_z, grid_r, np.log10(np.abs(phys_c)), 50)
-    pl.colorbar()
-    pl.title("Continuity")
-
-    pl.subplot(2,5,6)
-    pl.contourf(grid_z, grid_r, phys_u, 50)
-    pl.colorbar()
-    pl.title("u")
-    pl.subplot(2,5,7)
-    pl.contourf(grid_z, grid_r, phys_v, 50)
-    pl.colorbar()
-    pl.title("v")
-    pl.subplot(2,5,8)
-    pl.contourf(grid_z, grid_r, phys_w, 50)
-    pl.colorbar()
-    pl.title("w")
-    pl.subplot(2,5,9)
-    pl.contourf(grid_z, grid_r, phys_p, 50)
-    pl.colorbar()
-    pl.title("p")
-    pl.subplot(2,5,10)
-    pl.contourf(grid_z, grid_r, phys_t, 50)
-    pl.colorbar()
-    pl.title("T")
-    pl.show()
-    pl.close("all")
+if show_physical:
+    gevp.viewPhysical(viz_mode, 'annulus', naive = True)

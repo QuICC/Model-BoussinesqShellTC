@@ -406,7 +406,7 @@ class BoussinesqRRBCAnnulusVC(base_model.BaseModel):
 
                 elif field_col == ("pressure",""):
                     mat = geo.zblk(res[0], res[2], 1, 1, bc)
-                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[2])
+                    mat = mat + utils.id_from_idx_2d(idx_p, res[2], res[0])
             else:
                 mat = geo.zblk(res[0], res[2], 1, 1, no_bc())
 

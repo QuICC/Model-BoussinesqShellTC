@@ -87,11 +87,11 @@ def constrain(mat, nr, nz, qr, qz, bc, location = 't'):
     if bc['r'][0] > 0:
         bcMat = spsp.lil_matrix((nr,nr))
         bcMat = radbc.constrain(bcMat, bc['r'], location = location)
-        bc_mat = bc_mat + spsp.kron(bzid(nz, sz, 0, bc['z'], location = location), bcMat)
+        bc_mat = bc_mat + spsp.kron(bzid(nz, sz, 0, bc['z'], location = location), bcMat, format = 'coo')
 
     if bc['z'][0] > 0:
         bcMat = spsp.lil_matrix((nz,nz))
         bcMat = c1dbc.constrain(bcMat, bc['z'], location = location)
-        bc_mat = bc_mat + spsp.kron(bcMat, brid(nr, sr, 0, bc['r'], location = location))
+        bc_mat = bc_mat + spsp.kron(bcMat, brid(nr, sr, 0, bc['r'], location = location), format = 'coo')
 
     return bc_mat
