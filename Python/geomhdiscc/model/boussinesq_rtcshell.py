@@ -87,6 +87,22 @@ class BoussinesqRTCShell(base_model.BaseModel):
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
 
+    def stability_sizes(self, res, eigs):
+        """Get the block sizes in the stability calculation matrix"""
+
+        # Block sizes
+        blocks = []
+        for f in self.stability_fields():
+            blocks.append(self.block_size(res, f)[1]*(res[1]-eigs[0]))
+
+        # Invariant size (local dimension in spectral space, no restriction)
+        invariant = (res[0],)*len(self.stability_fields())
+
+        # Index shift
+        shift = int(eigs[0])
+
+        return (blocks, invariant, shift)
+
     def equation_info(self, res, field_row):
         """Provide description of the system of equation"""
 

@@ -14,7 +14,7 @@ model.use_galerkin = False
 bc_vel = 1 # 0: NS, 1: SF
 bc_temp = 0 # 0: FT 1: FF
 Ta = 1e16
-res = [256, 256, 0]
+res = [512, 512, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
 m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
@@ -33,8 +33,8 @@ eigs = wave(1)
 gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
 # Setup computation, visualization and IO
-marginal_point = True
-marginal_curve = False
+marginal_point = False
+marginal_curve = True
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
 marginal_show_point = (True and (marginal_point or marginal_minimum))

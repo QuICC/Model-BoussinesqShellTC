@@ -120,6 +120,22 @@ class BaseModel:
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         return geo.stencil(res[0], bc, make_square)
 
+    def stability_sizes(self, res, eigs):
+        """Get the block sizes in the stability calculation matrix"""
+
+        # Block sizes
+        blocks = []
+        for f in self.stability_fields():
+            blocks.append(self.block_size(res, f)[1])
+
+        # Invariant size (local dimension in spectral space, no restriction)
+        invariant = (res[0],)*len(self.stability_fields())
+
+        # Index shift
+        shift = 0
+
+        return (blocks, invariant, shift)
+
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 

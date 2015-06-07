@@ -316,9 +316,9 @@ class GEVP:
 
         opA = functools.partial(self.model.implicit_linear, self.res, self.eq_params, self.eigs, self.bcs, self.fields)
         opB = functools.partial(self.model.time, self.res, self.eq_params, self.eigs, self.no_bcs, self.fields)
-        sizes = ((self.res[0]**2,)*3, (self.res[0],)*3, self.eigs[0])
+        sizes = self.model.stability_sizes(self.res, self.eigs)
 
-        return (opA,opB, sizes)
+        return (opA, opB, sizes)
    
     def setEigs(self, k):
        """Set the wave number"""
