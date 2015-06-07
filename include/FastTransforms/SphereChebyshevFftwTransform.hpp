@@ -46,8 +46,17 @@ namespace Transform {
        */
       struct Projectors
       {
-         /// Enum of projector IDs
-         enum Id {PROJ,  DIFF};
+         /** Enum of projector IDs
+          *    - PROJ: projection
+          *    - DIFF: D
+          *    - DIFF2: D^2
+          *    - DIVR: 1/r
+          *    - DIVR2: 1/r^2
+          *    - DIFFR: D r
+          *    - DIVRDIFFR: 1/r D r
+          *    - RADLAPL: radial laplacian: D^2 + 2/r D
+          */
+         enum Id {PROJ, DIVR, DIVR2, DIFF, DIFF2, DIFFR, DIVRDIFFR, RADLAPL};
       };
 
       /**
@@ -55,8 +64,17 @@ namespace Transform {
        */
       struct Integrators
       {
-         /// Enum of integrator IDs
-         enum Id {INTG};
+         /** 
+          * Enum of integrator IDs:
+          *    - INTG: integration
+          *    - INTGR: integration of r
+          *    - INTGQ4: integration of QST Q component for Poloidal NL (4th order equation)
+          *    - INTGS4: integration of QST S component for Poloidal NL (4th order equation)
+          *    - INTGT: integration of QST T component for Toroidal NL (2nd order equation)
+          *    - INTGQ2: integration of QST Q component for Poloidal NL (2nd order equation)
+          *    - INTGS2: integration of QST S component for Poloidal NL (2nd order equation)
+          */
+         enum Id {INTG, INTGR, INTGQ4, INTGS4, INTGT, INTGQ2, INTGS2};
       };
 
    };
@@ -166,6 +184,30 @@ namespace Transform {
           */
          void project(MatrixZ& rPhysVal, const MatrixZ& chebVal, ProjectorType::Id projector, Arithmetics::Id arithId);
 
+         /**
+          * @brief Compute forward FFT (R2R) provide full output without spectral truncation
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(Matrix& rChebVal, const Matrix& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
+         /**
+          * @brief Compute forward FFT (C2C)
+          *
+          * Compute the FFT from real physical space to Chebyshev spectral space full output without spectral truncation
+          *
+          * @param rChebVal   Output Chebyshev coefficients
+          * @param physVal    Input physical values
+          * @param integrator Integrator to use
+          * @param arithId    Arithmetic operation to perform
+          */
+         void integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, IntegratorType::Id integrator, Arithmetics::Id arithId);
+
      #ifdef GEOMHDISCC_STORAGEPROFILE
          /**
           * @brief Get the memory requirements
@@ -202,9 +244,34 @@ namespace Transform {
          Matrix   mTmpOut;
 
          /**
-          * @brief Storage for the Chebyshev differentiation matrix
+          * @brief Storage for the projector operators
           */
-         SparseMatrix   mDiff;
+         std::map<ProjectorType::Id, SparseMatrix> mProjOp;
+
+         /**
+          * @brief Storage for the integrator operators
+          */
+         std::map<IntegratorType::Id, SparseMatrix> mIntgOp;
+
+         /**
+          * @brief Storage for the sparse solver matrices
+          */
+         std::map<ProjectorType::Id, SparseMatrix> mSolveOp;
+
+         /**
+          * @brief Storage for the sparse solvers
+          */
+         std::map<ProjectorType::Id, SharedPtrMacro<Solver::SparseSelector<SparseMatrix>::Type> > mSolver;
+
+         /**
+          * @brief Storage for the backward operators input data
+          */
+         Matrix mTmpInS;
+
+         /**
+          * @brief Storage for the backward operators output data
+          */
+         Matrix mTmpOutS;
 
          /**
           * @brief Initialise the FFTW transforms (i.e. create plans, etc)

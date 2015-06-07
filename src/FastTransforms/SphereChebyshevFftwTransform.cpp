@@ -7,6 +7,7 @@
 // System includes
 //
 #include <cassert>
+#include <limits>
 
 // External includes
 //
@@ -17,6 +18,7 @@
 
 // Project includes
 //
+#include "StaticAsserts/StaticAssert.hpp"
 #include "Exceptions/Exception.hpp"
 #include "Base/MathConstants.hpp"
 #include "FastTransforms/FftwLibrary.hpp"
@@ -43,6 +45,9 @@ namespace Transform {
    SphereChebyshevFftwTransform::SphereChebyshevFftwTransform()
       : mFPlan(NULL), mBPlan(NULL)
    {
+      // Initialise the Python interpreter wrapper
+      PythonWrapper::init();
+
       // Initialize FFTW
       FftwLibrary::initFft();
    }
@@ -122,8 +127,6 @@ namespace Transform {
 
    void SphereChebyshevFftwTransform::initOperators()
    {
-      this->mDiff.resize(this->mspSetup->specSize(),this->mspSetup->specSize());
-
       // Initialise python wrapper
       PythonWrapper::init();
       PythonWrapper::import("geomhdiscc.geometry.spherical.sphere_radius");
@@ -191,8 +194,19 @@ namespace Transform {
       // Do transform
       fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
 
-      // Rescale to remove FFT scaling
-      rChebVal *= this->mspSetup->scale();
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal.topRows(this->mspSetup->specSize()) *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()) = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*rChebVal;
+      }
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
    }
 
    void SphereChebyshevFftwTransform::project(Matrix& rPhysVal, const Matrix& chebVal, SphereChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
@@ -206,7 +220,7 @@ namespace Transform {
       assert(this->mspSetup->padSize() >= 0);
       assert(this->mspSetup->bwdSize() - this->mspSetup->padSize() >= 0);
 
-      // assert right sizes for input  matrix
+      // assert right sizes for input matrix
       assert(chebVal.rows() == this->mspSetup->bwdSize());
       assert(chebVal.cols() == this->mspSetup->howmany());
 
@@ -217,17 +231,74 @@ namespace Transform {
       // Compute first derivative
       if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(1).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute second derivative
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.topRows(2).setZero();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R^2
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute D r projection
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute 1/r D r projection
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
+
+      // Compute radial laplacian projection
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection
       } else
       {
          // Copy into other array
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize());
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), rPhysVal.data());
@@ -248,19 +319,41 @@ namespace Transform {
       assert(rChebVal.rows() == this->mspSetup->bwdSize());
       assert(rChebVal.cols() == this->mspSetup->howmany());
 
-      // Do transform of real part
+      // 
+      // Transform real part
+      //
       this->mTmpIn = physVal.real();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
 
-      // Do transform of imaginary part
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
+
+      // 
+      // Transform imaginary part
+      //
       this->mTmpIn = physVal.imag();
+
       fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
 
-      // Rescale FFT output
-      rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mTmpOut.topRows(this->mspSetup->specSize());
+
+      } else
+      {
+         rChebVal.topRows(this->mspSetup->specSize()).imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second.topRows(this->mspSetup->specSize())*this->mTmpOut;
+      }
+
+      #ifdef GEOMHDISCC_DEBUG
+         rChebVal.bottomRows(this->mspSetup->padSize()).setConstant(std::numeric_limits<MHDFloat>::quiet_NaN());
+      #endif //GEOMHDISCC_DEBUG
    }
 
    void SphereChebyshevFftwTransform::project(MatrixZ& rPhysVal, const MatrixZ& chebVal, SphereChebyshevFftwTransform::ProjectorType::Id projector, Arithmetics::Id arithId)
@@ -285,17 +378,73 @@ namespace Transform {
       // Compute first derivative of real part
       if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R of real part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R^2 of real part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute D r projection of real part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute 1/r D r projection of real part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
+
+      // Compute radial laplacian projection of real part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of real part
       } else
       {
          // Copy values into simple matrix
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).real();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of real part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
@@ -304,21 +453,155 @@ namespace Transform {
       // Compute first derivative of imaginary part
       if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF)
       {
-         this->mTmpIn.topRows(this->mspSetup->specSize()) = this->mDiff*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute second derivative by R of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFF2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(2).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute division by R^2 of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVR2)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag(); 
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(projector)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute D r projection of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpIn = this->mTmpOutS;
+
+      // Compute 1/r D r projection of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::DIVRDIFFR)
+      {
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR)->second.leftCols(this->mspSetup->specSize())*chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
+
+      // Compute radial laplacian projection of imaginary part
+      } else if(projector == SphereChebyshevFftwTransform::ProjectorType::RADLAPL)
+      {
+         this->mTmpInS.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpInS.bottomRows(this->mspSetup->padSize()).setZero();
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         this->mTmpInS = this->mSolveOp.find(ProjectorType::DIVR2)->second*this->mTmpOutS;
+         this->mTmpInS.topRows(1).setZero();
+         Solver::internal::solveWrapper(this->mTmpOutS, *this->mSolver.find(ProjectorType::DIFF)->second, this->mTmpInS);
+         Solver::internal::solveWrapper(this->mTmpInS, *this->mSolver.find(ProjectorType::DIVR2)->second, this->mTmpOutS);
+         this->mTmpIn = this->mTmpInS;
 
       // Compute simple projection of imaginary part
       } else
       {
          // Rescale results
          this->mTmpIn.topRows(this->mspSetup->specSize()) = chebVal.topRows(this->mspSetup->specSize()).imag();
+         this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
       }
-
-      // Set the padded values to zero
-      this->mTmpIn.bottomRows(this->mspSetup->padSize()).setZero();
 
       // Do transform of imaginary part
       fftw_execute_r2r(this->mBPlan, this->mTmpIn.data(), this->mTmpOut.data());
       rPhysVal.imag() = this->mTmpOut;
+   }
+
+   void SphereChebyshevFftwTransform::integrate_full(Matrix& rChebVal, const Matrix& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was not setup
+      assert(this->mspSetup->type() == FftSetup::REAL);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      // Do transform
+      fftw_execute_r2r(this->mFPlan, const_cast<MHDFloat *>(physVal.data()), rChebVal.data());
+
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         // Rescale to remove FFT scaling
+         rChebVal *= this->mspSetup->scale();
+
+      } else
+      {
+         rChebVal = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*rChebVal;
+      }
+   }
+
+   void SphereChebyshevFftwTransform::integrate_full(MatrixZ& rChebVal, const MatrixZ& physVal, SphereChebyshevFftwTransform::IntegratorType::Id integrator, Arithmetics::Id arithId)
+   {
+      assert(arithId == Arithmetics::SET);
+
+      // Assert that a mixed transform was setup
+      assert(this->mspSetup->type() == FftSetup::COMPONENT);
+
+      // assert right sizes for input matrix
+      assert(physVal.rows() == this->mspSetup->fwdSize());
+      assert(physVal.cols() == this->mspSetup->howmany());
+
+      // assert right sizes for output matrix
+      assert(rChebVal.rows() == this->mspSetup->bwdSize());
+      assert(rChebVal.cols() == this->mspSetup->howmany());
+
+      //
+      // Transform real part
+      //
+      this->mTmpIn = physVal.real();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mTmpOut;
+
+      } else
+      {
+         rChebVal.real() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
+
+      //
+      // Transform imaginary part
+      //
+      this->mTmpIn = physVal.imag();
+
+      fftw_execute_r2r(this->mFPlan, this->mTmpIn.data(), this->mTmpOut.data());
+
+      if(integrator == SphereChebyshevFftwTransform::IntegratorType::INTG)
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mTmpOut;
+
+      } else
+      {
+         rChebVal.imag() = this->mspSetup->scale()*this->mIntgOp.find(integrator)->second*this->mTmpOut;
+      }
    }
 
 #ifdef GEOMHDISCC_STORAGEPROFILE
