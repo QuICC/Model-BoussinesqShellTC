@@ -43,7 +43,7 @@ def constrain(mat, nr, maxnl, m, bc, zero_l_zero = False, restriction = None):
             if restriction is None or l in restriction:
                 bc = ldependent_bc(bc, l)
                 bcMat = radbc.constrain(bcMat, bc)
-            bc_mat = spsp.block_diag((bc_mat,bcMat))
+            bc_mat = spsp.block_diag((bc_mat,bcMat), format = 'coo')
 
         bc_mat = mat + bc_mat
 

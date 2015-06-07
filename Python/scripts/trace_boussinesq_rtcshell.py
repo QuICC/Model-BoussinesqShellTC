@@ -74,11 +74,12 @@ marginal_point = False
 marginal_curve = False
 marginal_minimum = (True and marginal_curve)
 marginal_show_curve = (False and marginal_minimum)
-solve_gevp = True
+marginal_show_point = (True and (marginal_point or marginal_minimum))
+solve_gevp = (True or marginal_show_point)
 show_spy = False
 write_mtx = False
-show_spectra = (True and solve_gevp)
-show_physical = (True and solve_gevp)
+show_spectra = (True and solve_gevp) or marginal_show_point
+show_physical = (True and solve_gevp) or marginal_show_point
 viz_mode = 0
 
 if marginal_point or marginal_curve:
@@ -88,6 +89,7 @@ if marginal_point or marginal_curve:
 if marginal_point:
     # Compute marginal curve at a single point
     Rac, evp_freq = curve.point(m, guess = eq_params['rayleigh'])
+    mc = m
 
 if marginal_curve:
     # Trace marginal curve for a set of wave indexes
@@ -103,8 +105,11 @@ if marginal_curve:
         curve.view(data_m, data_Ra, data_freq, minimum = (mc, Rac), plot = True)
 
 if show_spy or solve_gevp:
-    Ra = eq_params['rayleigh']
-    Ra = 375.86256422491
+    if marginal_show_point:
+        Ra = Rac
+        m = mc
+    else:
+        Ra = eq_params['rayleigh']
     MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
     gevp_opts['eigs'] = wave(m)
     gevp = MarginalCurve.GEVP(**gevp_opts)

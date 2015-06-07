@@ -8,9 +8,9 @@ import numpy as np
 import numpy.polynomial.legendre as leg
 import scipy.special as spe
 
+from geomhdiscc.transform.spherical import thgrid, totphys, totleg, eqgrid
+
 min_r_points = 2000
-min_th_points = 2000
-min_phi_points = 2000
 
 def rgrid(nr, a, b):
     """Create the radial Chebyshev grid"""
@@ -19,25 +19,13 @@ def rgrid(nr, a, b):
 
     return a*np.cos(np.pi*(np.arange(0,gN)+0.5)/gN) + b
 
-def tgrid(maxl, m):
-    """Create the theta Gauss-Legendre grid"""
-
-    nt = max(min_th_points,3*(maxl - m + 1)//2)
-    nt = nt + (nt+1)%2
-    x, tmp = leg.leggauss(nt)
-
-    return x
-
-def eqgrid(m):
-    """Create a equatorial (phi) grid for given harmonic order"""
-
-    return np.linspace(0, 2*np.pi, max(min_phi_points,3*m))
+grid_1d = rgrid
 
 def grid_2d(nr, a, b, maxl, m):
     """Compute the 2D grid for the contours"""
 
     r = rgrid(nr, a, b)
-    th = np.arccos(tgrid(maxl, m))
+    th = thgrid(maxl, m)
     rmesh, thmesh = np.meshgrid(r, th)
     X = rmesh * np.sin(thmesh)
     Y = rmesh * np.cos(thmesh)
@@ -65,30 +53,14 @@ def torphys(spec):
 
     return fftpack.dct(data,3)
 
+toprofile = torphys
+
 def torcheb(phys):
     """Transform radial physical values to spectral coefficients"""
 
     n = len(phys)
 
     return fftpack.dct(phys,2)/(2*n)
-
-def totphys(spec, maxl, m):
-    """Tranform theta spectral coefficients to physical values"""
-    
-    mat = plm(maxl, m)
-    phys = mat.dot(spec)
-
-    return phys
-
-def totleg(phys, maxl, m):
-    """Tranform theta physical values to spectral coefficients"""
-
-    nt = 3*(maxl - m + 1)//2
-    x, w = leg.leggauss(nt)
-    mat = plm(maxl, m).T
-    spec = mat.dot(np.diag(w).dot(phys))
-
-    return spec
 
 def torphys2D(spec):
     """Transform 2D R spectral coefficients to 2D R physical values"""
@@ -117,27 +89,3 @@ def toslice(spec, nr, maxl, m):
     rspec = np.transpose(rphys)
     phys = totphys(rspec, maxl, m)
     return phys
-
-def plm(maxl, m):
-    """Compute the normalized associated legendre polynomial projection matrix"""
-
-    x = tgrid(maxl, m)
-    mat = np.zeros((len(x), maxl - m + 1))
-    mat[:,0] = pmm(maxl, m)[:,0]
-    mat[:,1] = np.sqrt(2.0*m + 3.0)*x*mat[:,0]
-    for i, l in enumerate(range(m+2, maxl + 1)):
-        mat[:,i+2] = np.sqrt((2.0*l + 1)/(l - m))*np.sqrt((2.0*l - 1.0)/(l + m))*x*mat[:,i+1] - np.sqrt((2.0*l + 1)/(2.0*l - 3.0))*np.sqrt((l + m - 1.0)/(l + m))*np.sqrt((l - m - 1.0)/(l - m))*mat[:,i]
-
-    return mat
-
-def pmm(maxl, m):
-    """Compute the normalized associated legendre polynomial of order and degree m"""
-
-    x = tgrid(maxl, m)
-    mat = np.zeros((len(x), 1))
-    mat[:,0] = 1.0/np.sqrt(2.0)
-    sx = np.sqrt(1.0 - x**2)
-    for i in range(1, m+1):
-        mat[:,0] = -np.sqrt((2.0*i + 1.0)/(2.0*i))*sx*mat[:,0]
-
-    return mat

@@ -159,50 +159,50 @@ def i2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = F
 
     return make_sh_operator(rad.i2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i2x2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i2x2 radial operator kronecker with an identity"""
+def i2r2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i2r2 radial operator kronecker with an identity"""
 
-    return make_sh_operator(rad.i2x2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_operator(rad.i2r2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i2x3(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i2x3 radial operator kronecker with an identity"""
+def i2r3(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i2r3 radial operator kronecker with an identity"""
 
-    return make_sh_operator(rad.i2x3, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_operator(rad.i2r3, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i2x2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i2x2 radial operator kronecker with coriolis Q term"""
+def i2r2coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i2r2 radial operator kronecker with coriolis Q term"""
 
-    return make_sh_qoperator(rad.i2x1, rad.i2x2d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_qoperator(rad.i2r1, rad.i2r2d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i2x2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i2x2lapl radial operator kronecker with an identity"""
+def i2r2lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i2r2lapl radial operator kronecker with an identity"""
 
-    return make_sh_loperator(rad.i2x2lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_loperator(rad.i2r2lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i2x3lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i2x3lapl radial operator kronecker with an identity"""
+def i2r3lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i2r3lapl radial operator kronecker with an identity"""
 
-    return make_sh_loperator(rad.i2x3lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_loperator(rad.i2r3lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i4x4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i4x4 radial operator kronecker with an identity"""
+def i4r4(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i4r4 radial operator kronecker with an identity"""
 
-    return make_sh_operator(rad.i4x4, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_operator(rad.i4r4, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i4x4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i4x4 radial operator kronecker with coriolis Q term"""
+def i4r4coriolis(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i4r4 radial operator kronecker with coriolis Q term"""
 
-    return make_sh_qoperator(rad.i4x3, rad.i4x4d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_qoperator(rad.i4r3, rad.i4r4d1, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i4x4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i4x4lapl radial operator kronecker with an identity"""
+def i4r4lapl(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i4r4lapl radial operator kronecker with an identity"""
 
-    return make_sh_loperator(rad.i4x4lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_loperator(rad.i4r4lapl, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
-def i4x4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
-    """Create a i4x4lapl2 radial operator kronecker with an identity"""
+def i4r4lapl2(nr, maxnl, m, a, b, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i4r4lapl2 radial operator kronecker with an identity"""
 
-    return make_sh_loperator(rad.i4x4lapl2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    return make_sh_loperator(rad.i4r4lapl2, nr, maxnl, m, a, b, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
 def qid(nr, maxnl, m, qr, bc, coeff = 1.0):
     """Create a quasi identity block order qr in r"""

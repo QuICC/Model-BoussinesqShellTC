@@ -97,7 +97,6 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def convert_bc(self, eq_params, eigs, bcs, field_row, field_col):
         """Convert simulation input boundary conditions to ID"""
 
-        l = eigs[0]
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         # Solver: no tau boundary conditions
@@ -184,20 +183,22 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
     def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block for explicit linear term"""
 
-        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
+        assert(eigs[0].is_integer())
 
         l = eigs[0]
+
+        Ra_eff, bg_eff = self.nondimensional_factors(eq_params)
 
         a, b = geo.linear_r2x(eq_params['ro'], eq_params['rratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4x4(res[0], a, b, bc, Ra_eff*l*(l+1.0))
+            mat = geo.i4r4(res[0], a, b, bc, Ra_eff*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
+                mat = geo.i2r2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
             else:
                 mat = geo.i2(res[0], a, b, bc, -bg_eff*l*(l+1.0))
 
@@ -215,9 +216,9 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc)
+                mat = geo.i2r2(res[0], a, b, bc)
             else:
-                mat = geo.i2x3(res[0], a, b, bc)
+                mat = geo.i2r3(res[0], a, b, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -236,16 +237,16 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
-                mat = geo.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                mat = geo.i2r2lapl(res[0], l, a, b, bc, 1.0/Pr)
             else:
-                mat = geo.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
+                mat = geo.i2r3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -262,16 +263,16 @@ class BoussinesqRTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc)
+                mat = geo.i2r2(res[0], a, b, bc)
             else:
-                mat = geo.i2x3(res[0], a, b, bc)
+                mat = geo.i2r3(res[0], a, b, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

@@ -27,8 +27,8 @@ def d1(nr, l, bc, coeff = 1.0):
     mat = coeff*mat.tocoo()
     return radbc.constrain(mat, l, bc)
 
-def i2x2(nr, l, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 T_n(x)."""
+def i2r2(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 T_n(x)."""
 
     parity = l%2
     ns = np.arange(parity, 2*nr, 2)
@@ -61,8 +61,8 @@ def i2x2(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i2x2lapl(nr, l, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 Laplacian T_n(x)."""
+def i2r2lapl(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 Laplacian T_n(x)."""
 
     parity = l%2
     ns = np.arange(parity, 2*nr, 2)
@@ -87,8 +87,8 @@ def i2x2lapl(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i4x4(nr, l, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 T_n(x)."""
+def i4r4(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 T_n(x)."""
 
     parity = l%2
     ns = np.arange(parity, 2*nr, 2)
@@ -137,8 +137,8 @@ def i4x4(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i4x4lapl(nr, l, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 Laplacian T_n(x)."""
+def i4r4lapl(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 Laplacian T_n(x)."""
 
     parity = l%2
     ns = np.arange(parity, 2*nr, 2)
@@ -179,8 +179,8 @@ def i4x4lapl(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i4x4lapl2(nr, l, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 Laplacian^2 T_n(x)."""
+def i4r4lapl2(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 Laplacian^2 T_n(x)."""
 
     parity = l%2
     ns = np.arange(parity, 2*nr, 2)
@@ -213,7 +213,7 @@ def i4x4lapl2(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i2x1(nr, l, bc, coeff = 1.0):
+def i2r1(nr, l, bc, coeff = 1.0):
     """Create operator for 2nd integral of x T_n(x)."""
 
     ns = np.arange((l+1)%2, 2*nr, 2)
@@ -245,8 +245,8 @@ def i2x1(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i2x2d1(nr, l, bc, coeff = 1.0):
-    """Create operator for 2nd integral of x^2 D T_n(x)."""
+def i2r2d1(nr, l, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 D T_n(x)."""
 
     ns = np.arange((l+1)%2, 2*nr, 2)
     if l%2 == 0:
@@ -277,8 +277,8 @@ def i2x2d1(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i4x3(nr, l, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^3 T_n(x)."""
+def i4r3(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^3 T_n(x)."""
 
     ns = np.arange((l+1)%2, 2*nr, 2)
     if l%2 == 0:
@@ -325,8 +325,8 @@ def i4x3(nr, l, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, l, bc)
 
-def i4x4d1(nr, l, bc, coeff = 1.0):
-    """Create operator for 4th integral of x^4 D T_n(x)."""
+def i4r4d1(nr, l, bc, coeff = 1.0):
+    """Create operator for 4th integral of r^4 D T_n(x)."""
 
     ns = np.arange((l+1)%2, 2*nr, 2)
     if l%2 == 0:

@@ -40,10 +40,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("velocity","tor") or field_row == ("velocity","pol") or field_row == ("temperature",""):
-            fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-        else:
-            fields = []
+        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
         return fields
 
@@ -73,7 +70,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[1]
+        tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("velocity","tor") or field_row == ("temperature",""):
                 shift_r = 1
@@ -82,11 +79,11 @@ class BoussinesqRTCSphere(base_model.BaseModel):
             else:
                 shift_r = 0
 
-            gal_n = (res[0] - shift_x)*res[1]
+            gal_n = (res[0] - shift_r)
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
 
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
@@ -130,7 +127,7 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                     elif field_row == ("temperature","") and field_col == ("temperature",""):
                             bc = {0:10}
 
-            elif bcId == 0:
+            elif bcId == 1:
                 if self.use_galerkin:
                     if field_col == ("velocity","tor"):
                         bc = {0:-11, 'rt':0}
@@ -158,17 +155,17 @@ class BoussinesqRTCSphere(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("temperature",""):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-11, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-21, 'rt':0}
+                        bc = {0:-21, 'rt':2}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -186,21 +183,34 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
         return bc
 
-    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
-        """Create the explicit nonlinear operator"""
+    def explicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create matrix block for explicit linear term"""
 
-        m = eigs[1]
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
-        if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2x2(res[0], res[1], m, bc)
+        if field_row == ("temperature","") and field_col == ("velocity","pol"):
+            mat = geo.i2r2(res[0], res[1], m, bc, -1.0, with_sh_coeff = 'laplh', restriction = restriction)
 
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4x4(res[0], res[1], m, bc)
+        if mat is None:
+            raise RuntimeError("Equations are not setup properly!")
 
-        elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2x2(res[0], res[1], m, bc)
+        return mat
+
+    def nonlinear_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
+        """Create the explicit nonlinear operator"""
+
+        assert(eigs[0].is_integer())
+
+        m = eigs[0]
+
+        mat = None
+        bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
+        if field_row == ("temperature","") and field_col == field_row:
+            mat = geo.i2r2(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -209,39 +219,39 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
     def implicit_block(self, res, eq_params, eigs, bcs, field_row, field_col, restriction = None):
         """Create matrix block linear operator"""
+        assert(eigs[0].is_integer())
 
-        Ta = eq_params['taylor']
         Pr = eq_params['prandtl']
         Ra = eq_params['rayleigh']
-        T = Ta**0.5
-        
-        m = eigs[1]
+        T = eq_params['taylor']**0.5
+
+        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i2x2(res[0], res[1], m, bc, 1j*m*T)
+                mat = mat + geo.i2r2(res[0], res[1], m, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i2x2coriolis(res[0], res[1], m, bc, -T)
+                mat = geo.i2r2coriolis(res[0], res[1], m, bc, -T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol"):
             if field_col == ("velocity","tor"):
-                mat = geo.i4x4coriolis(res[0], res[1], m, bc, T)
+                mat = geo.i4r4coriolis(res[0], res[1], m, bc, T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i4r4lapl2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'set', restriction = restriction)
                 bc[0] = min(bc[0], 0)
-                mat = mat + geo.i4x4lapl(res[0], res[1], m, bc, 1j*m*T)
+                mat = mat + geo.i4r4lapl(res[0], res[1], m, bc, 1j*m*T, l_zero_fix = 'zero', restriction = restriction)
 
             elif field_col == ("temperature",""):
-                mat = geo.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
+                mat = geo.i4r4(res[0], res[1], m, bc, -Ra, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -249,13 +259,13 @@ class BoussinesqRTCSphere(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+                    mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', restriction = restriction)
 
                 else:
                     mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2x2lapl(res[0], res[1], m, bc)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, 1.0/Pr, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -265,19 +275,20 @@ class BoussinesqRTCSphere(base_model.BaseModel):
     def time_block(self, res, eq_params, eigs, bcs, field_row, restriction = None):
         """Create matrix block of time operator"""
 
-        Pr = eq_params['prandtl']
-        m = eigs[1]
+        assert(eigs[0].is_integer())
+
+        m = int(eigs[0])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i2r2(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4x4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i4r4lapl(res[0], res[1], m, bc, with_sh_coeff = 'laplh', l_zero_fix = 'zero', restriction = restriction)
 
         elif field_row == ("temperature",""):
-            mat = geo.i2x2(res[0], res[1], m, bc, Pr)
+            mat = geo.i2r2(res[0], res[1], m, bc, restriction = restriction)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

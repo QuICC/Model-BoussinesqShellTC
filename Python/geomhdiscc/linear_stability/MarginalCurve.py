@@ -420,8 +420,17 @@ class GEVP:
             if geometry == 'c1d':
                 import geomhdiscc.transform.cartesian as transf
                 nD = 1
+            elif geometry == 's1d':
+                import geomhdiscc.transform.shell as transf
+                nD = 1
+            elif geometry == 'b1d':
+                import geomhdiscc.transform.sphere as transf
+                nD = 1
             elif geometry == 'shell':
                 import geomhdiscc.transform.shell as transf
+                nD = 2
+            elif geometry == "sphere":
+                import geomhdiscc.transform.sphere as transf
                 nD = 2
             elif geometry == "annulus":
                 import geomhdiscc.transform.annulus as transf
@@ -431,15 +440,29 @@ class GEVP:
             sol_rphys = dict()
             sol_iphys = dict()
             if nD == 1:
-                grid = transf.grid(self.res[0])
+                if geometry == 'c1d':
+                    viz_res = (self.res[0], )
+                    prof_opt = ()
+
+                elif geometry == 's1d':
+                    import geomhdiscc.geometry.spherical.shell_radius as geo
+                    a, b = geo.linear_r2x(self.eq_params['ro'], self.eq_params['rratio'])
+                    viz_res = (self.res[0], a, b)
+                    prof_opt = ()
+
+                elif geometry == 'b1d':
+                    viz_res = (self.res[0],)
+                    prof_opt = (int(self.eigs[0])%2,)
+
                 for f in self.fields:
-                    sol_rphys[f] = transf.tophys(sol_spec[f].real)
-                    sol_iphys[f] = transf.tophys(sol_spec[f].imag)
+                    sol_rphys[f] = transf.toprofile(sol_spec[f].real, *prof_opt)
+                    sol_iphys[f] = transf.toprofile(sol_spec[f].imag, *prof_opt)
 
                 if plot:
                     import matplotlib.pylab as pl
                     Print("\nVisualizing physical data of mode: " + str(self.evp_lmb[viz_mode]))
                     # Plot physical field
+                    grid = transf.grid_1d(*viz_res)
                     rows = np.ceil(len(self.fields)/3)
                     cols = min(3, len(self.fields))
                     for i,f in enumerate(self.fields):
@@ -457,6 +480,10 @@ class GEVP:
                     import geomhdiscc.geometry.spherical.shell_radius as geo
                     a, b = geo.linear_r2x(self.eq_params['ro'], self.eq_params['rratio'])
                     res_1d = (self.res[0], a, b)
+                    res_2d = (self.res[1]-1, int(self.eigs[0]))
+
+                if geometry == 'sphere':
+                    res_1d = (self.res[0],)
                     res_2d = (self.res[1]-1, int(self.eigs[0]))
 
                 elif geometry == 'annulus':

@@ -201,43 +201,43 @@ namespace Transform {
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call x1
-      PythonWrapper::setFunction("x1");
+      // Call r1
+      PythonWrapper::setFunction("r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGR)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST Q component (4th order)
-      PythonWrapper::setFunction("i4x3");
+      PythonWrapper::setFunction("i4r3");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ4)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST S component (4th order)
-      PythonWrapper::setFunction("i4x3d1x1");
+      PythonWrapper::setFunction("i4r3d1r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS4)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST T component
-      PythonWrapper::setFunction("i2x2");
+      PythonWrapper::setFunction("i2r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGT)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST Q component (2nd order)
-      PythonWrapper::setFunction("i2x1");
+      PythonWrapper::setFunction("i2r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGQ2)->second, pValue);
       Py_DECREF(pValue);
 
       // Call QST S component (2nd order)
-      PythonWrapper::setFunction("i2x1d1x1");
+      PythonWrapper::setFunction("i2r1d1r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mIntgOp.find(IntegratorType::INTGS2)->second, pValue);
@@ -247,15 +247,15 @@ namespace Transform {
       pValue = PyLong_FromLong(this->mspSetup->fwdSize());
       PyTuple_SetItem(pArgs, 0, pValue);
 
-      // Call x1 for solver
-      PythonWrapper::setFunction("x1");
+      // Call r1 for solver
+      PythonWrapper::setFunction("r1");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR)->second, pValue);
       Py_DECREF(pValue);
 
-      // Call x1 for solver
-      PythonWrapper::setFunction("x2");
+      // Call r2 for solver
+      PythonWrapper::setFunction("r2");
       pValue = PythonWrapper::callFunction(pArgs);
       // Fill matrix
       PythonWrapper::fillMatrix(this->mSolveOp.find(ProjectorType::DIVR2)->second, pValue);

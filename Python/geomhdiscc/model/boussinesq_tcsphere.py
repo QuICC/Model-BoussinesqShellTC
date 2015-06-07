@@ -30,20 +30,10 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
         return ["velocity", "temperature"]
 
-    def stability_fields(self):
-        """Get the list of fields needed for linear stability calculations"""
-
-        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-
-        return fields
-
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
 
-        if field_row == ("velocity","tor") or field_row == ("velocity","pol") or field_row == ("temperature",""):
-            fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
-        else:
-            fields = []
+        fields =  [("velocity","tor"), ("velocity","pol"), ("temperature","")]
 
         return fields
 
@@ -71,7 +61,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
     def block_size(self, res, field_row):
         """Create block size information"""
 
-        tau_n = res[0]*res[1]
+        tau_n = res[0]
         if self.use_galerkin:
             if field_row == ("velocity","tor") or field_row == ("temperature",""):
                 shift_r = 1
@@ -80,11 +70,11 @@ class BoussinesqTCSphere(base_model.BaseModel):
             else:
                 shift_r = 0
 
-            gal_n = (res[0] - shift_x)*res[1]
+            gal_n = (res[0] - shift_r)
 
         else:
             gal_n = tau_n
-            shift_x = 0
+            shift_r = 0
 
         block_info = (tau_n, gal_n, (shift_r,0,0), 1)
         return block_info
@@ -156,17 +146,17 @@ class BoussinesqTCSphere(base_model.BaseModel):
                 bcId = bcs.get(field_col[0], -1)
                 if bcId == 0:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-20, 'rt':0}
+                        bc = {0:-20, 'rt':2}
                     elif field_col == ("temperature",""):
-                        bc = {0:-10, 'rt':0}
+                        bc = {0:-10, 'rt':1}
 
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
-                        bc = {0:-11, 'rt':0}
+                        bc = {0:-11, 'rt':1}
                     elif field_col == ("velocity","pol"):
-                        bc = {0:-21, 'rt':0}
+                        bc = {0:-21, 'rt':2}
         
         # Field values to RHS:
         elif bcs["bcType"] == self.FIELD_TO_RHS:
@@ -192,13 +182,13 @@ class BoussinesqTCSphere(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2x2(res[0], res[1], m, bc)
+            mat = geo.i2r2(res[0], res[1], m, bc)
 
         elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4x4(res[0], res[1], m, bc)
+            mat = geo.i4r4(res[0], res[1], m, bc)
 
         elif field_row == ("temperature","") and field_col == field_row:
-            mat = geo.i2x2(res[0], res[1], m, bc)
+            mat = geo.i2r2(res[0], res[1], m, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -217,7 +207,7 @@ class BoussinesqTCSphere(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor"):
             if field_col == ("velocity","tor"):
-                mat = geo.i2x2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i2r2lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("velocity","pol"):
                 mat = geo.zblk(res[0], res[1], m, bc)
@@ -230,10 +220,10 @@ class BoussinesqTCSphere(base_model.BaseModel):
                 mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("velocity","pol"):
-                mat = geo.i4x4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
+                mat = geo.i4r4lapl2(res[0], res[1], m, bc, 1.0, 'laplh')
 
             elif field_col == ("temperature",""):
-                mat = geo.i4x4(res[0], res[1], m, bc, -Ra, 'laplh')
+                mat = geo.i4r4(res[0], res[1], m, bc, -Ra, 'laplh')
 
         elif field_row == ("temperature",""):
             if field_col == ("velocity","tor"):
@@ -241,13 +231,13 @@ class BoussinesqTCSphere(base_model.BaseModel):
 
             elif field_col == ("velocity","pol"):
                 if self.linearize:
-                    mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+                    mat = geo.i2r2(res[0], res[1], m, bc, 1.0, 'laplh')
 
                 else:
                     mat = geo.zblk(res[0], res[1], m, bc)
 
             elif field_col == ("temperature",""):
-                mat = geo.i2x2lapl(res[0], res[1], m, bc)
+                mat = geo.i2r2lapl(res[0], res[1], m, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -263,13 +253,13 @@ class BoussinesqTCSphere(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2x2(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i2r2(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4x4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
+            mat = geo.i4r4lapl(res[0], res[1], m, bc, 1.0, 'laplh')
 
         elif field_row == ("temperature",""):
-            mat = geo.i2x2(res[0], res[1], m, bc, Pr)
+            mat = geo.i2r2(res[0], res[1], m, bc, Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

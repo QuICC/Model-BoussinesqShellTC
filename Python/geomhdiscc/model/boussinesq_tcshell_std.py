@@ -30,6 +30,13 @@ class BoussinesqTCShellStd(base_model.BaseModel):
 
         return ["velocity", "temperature"]
 
+    def stability_fields(self):
+        """Get the list of fields needed for linear stability calculations"""
+
+        fields =  [("velocity","pol"), ("temperature","")]
+
+        return fields
+
     def implicit_fields(self, field_row):
         """Get the list of coupled fields in solve"""
     
@@ -193,11 +200,11 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","pol") and field_col == ("temperature",""):
-            mat = geo.i4x4(res[0], a, b, bc, Ra*l*(l+1.0))
+            mat = geo.i4r4(res[0], a, b, bc, Ra*l*(l+1.0))
 
         elif field_row == ("temperature","") and field_col == ("velocity","pol"):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc, -l*(l+1.0))
+                mat = geo.i2r2(res[0], a, b, bc, -l*(l+1.0))
             else:
                 mat = geo.i2(res[0], a, b, bc, -l*(l+1.0))
 
@@ -215,9 +222,9 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("temperature","") and field_col == field_row:
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc)
+                mat = geo.i2r2(res[0], a, b, bc)
             else:
-                mat = geo.i2x3(res[0], a, b, bc)
+                mat = geo.i2r3(res[0], a, b, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -228,6 +235,7 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         """Create matrix block linear operator"""
 
         Pr = eq_params['prandtl']
+        Ra = eq_params['rayleigh']
 
         l = eigs[0]
 
@@ -236,16 +244,29 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
         if field_row == ("velocity","tor") and field_col == field_row:
-            mat = geo.i2x2lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i2r2lapl(res[0], l, a, b, bc, l*(l+1.0))
 
-        elif field_row == ("velocity","pol") and field_col == field_row:
-            mat = geo.i4x4lapl2(res[0], l, a, b, bc, l*(l+1.0))
+        elif field_row == ("velocity","pol"):
+            if field_col == ("velocity","pol"):
+                mat = geo.i4r4lapl2(res[0], l, a, b, bc, l*(l+1.0))
 
-        elif field_row == ("temperature","") and field_col == field_row:
-            if eq_params["heating"] == 0:
-                mat = geo.i2x2lapl(res[0], l, a, b, bc, 1.0/Pr)
-            else:
-                mat = geo.i2x3lapl(res[0], l, a, b, bc, 1.0/Pr)
+            elif field_col == ("temperature",""):
+                if self.linearize:
+                    mat = geo.i4r4(res[0], a, b, bc, -Ra*l*(l+1.0))
+
+        elif field_row == ("temperature",""):
+            if field_col == ("velocity","pol"):
+                if self.linearize:
+                    if eq_params["heating"] == 0:
+                        mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
+                    else:
+                        mat = geo.i2(res[0], a, b, bc, l*(l+1.0))
+
+            elif field_col == ("temperature",""):
+                if eq_params["heating"] == 0:
+                    mat = geo.i2r2lapl(res[0], l, a, b, bc, 1.0/Pr)
+                else:
+                    mat = geo.i2r3lapl(res[0], l, a, b, bc, 1.0/Pr)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")
@@ -262,16 +283,16 @@ class BoussinesqTCShellStd(base_model.BaseModel):
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)
         if field_row == ("velocity","tor"):
-            mat = geo.i2x2(res[0], a, b, bc, l*(l+1.0))
+            mat = geo.i2r2(res[0], a, b, bc, l*(l+1.0))
 
         elif field_row == ("velocity","pol"):
-            mat = geo.i4x4lapl(res[0], l, a, b, bc, l*(l+1.0))
+            mat = geo.i4r4lapl(res[0], l, a, b, bc, l*(l+1.0))
 
         elif field_row == ("temperature",""):
             if eq_params["heating"] == 0:
-                mat = geo.i2x2(res[0], a, b, bc)
+                mat = geo.i2r2(res[0], a, b, bc)
             else:
-                mat = geo.i2x3(res[0], a, b, bc)
+                mat = geo.i2r3(res[0], a, b, bc)
 
         if mat is None:
             raise RuntimeError("Equations are not setup properly!")

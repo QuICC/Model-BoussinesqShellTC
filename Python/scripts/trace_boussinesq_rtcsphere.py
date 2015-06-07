@@ -3,83 +3,90 @@
 import numpy as np
 
 import geomhdiscc.model.boussinesq_rtcsphere as mod
+import geomhdiscc.linear_stability.MarginalCurve as MarginalCurve
 
 # Create the model and activate linearization
 model = mod.BoussinesqRTCSphere()
 model.linearize = True
 model.use_galerkin = False
-fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
-l = 0
-m = 9
-res = [16, m+16, 0]
-eigs = [l, m]
-eq_params = {'taylor':1e2, 'prandtl':1, 'rayleigh':4.761e6}
-bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
-bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
+bc_vel = 1 # 0: NS, 1: SF
+bc_temp = 0 # 0: FT 1: FF
+Ta = 1e14
+res = [192, 192, 0]
+
+# Create parameters (rescaling to proper nondimensionalisation)
+m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
+res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
+Ra_th = 4.1173*Ta**(2./3.) + 17.7815*Ta**(0.5) # Asymptotic prediction for critical Rayleigh number
+eq_params = {'taylor':Ta, 'prandtl':1, 'rayleigh':Ra_th}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
-# Generate the operator A for the generalized EVP Ax = sigm B x
-A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
+# Wave number function from single "index" (k perpendicular)
+def wave(m):
+    return [float(m)]
 
-# Generate the operator B for the generalized EVP Ax = sigm B x
-bcs['bcType'] = model.SOLVER_NO_TAU
-B = model.time(res, eq_params, eigs, bcs, fields)
+eigs = wave(1)
 
-# Setup visualization and IO
-show_spy = True
-write_mtx = True
-solve_evp = True
-show_solution = (True and solve_evp)
+# Collect GEVP setup parameters into single dictionary
+gevp_opts = {'model':model, 'res':res, 'eq_params':eq_params, 'eigs':eigs, 'bcs':bcs, 'wave':wave}
 
-if show_spy or show_solution:
-    import matplotlib.pylab as pl
+# Setup computation, visualization and IO
+marginal_point = True
+marginal_curve = False
+marginal_minimum = (True and marginal_curve)
+marginal_show_curve = (False and marginal_minimum)
+marginal_show_point = (True and (marginal_point or marginal_minimum))
+solve_gevp = True or marginal_show_point
+show_spy = False
+write_mtx = False
+show_spectra = (True and solve_gevp) or marginal_show_point
+show_physical = (True and solve_gevp) or marginal_show_point
+viz_mode = 0
 
-if show_solution:
-    import geomhdiscc.transform.sphere as transf
+if marginal_point or marginal_curve:
+    # Create marginal curve object
+    curve = MarginalCurve.MarginalCurve(gevp_opts, rtol = 1e-8)
 
-# Show the "spy" of the two matrices
-if show_spy:
-    pl.spy(A, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
-    pl.spy(B, markersize=3, marker = '.', markeredgecolor = 'b')
-    pl.tick_params(axis='x', labelsize=30)
-    pl.tick_params(axis='y', labelsize=30)
-    pl.show()
+if marginal_point:
+    # Compute marginal curve at a single point
+    Rac, evp_freq = curve.point(m, guess = eq_params['rayleigh'])
+    mc = m
 
-# Export the two matrices to matrix market format
-if write_mtx:
-    import scipy.io as io
-    io.mmwrite("matrix_A.mtx", A)
-    io.mmwrite("matrix_B.mtx", B)
+if marginal_curve:
+    # Trace marginal curve for a set of wave indexes
+    ms = np.arange(max(0, m-5), m+6, 1)
+    (data_m, data_Ra, data_freq) = curve.trace(ms, initial_guess = eq_params['rayleigh'])
 
-# Solve EVP with sptarn
-if solve_evp:
-    import geomhdiscc.linear_stability.solver as solver
-    evp_vec, evp_lmb, iresult = solver.sptarn(A, B, -1e1, 1e2)
-    print(evp_lmb)
+    if marginal_minimum:
+        # Compute minimum of marginal curve
+        mc, Rac, fc = curve.minimum(data_m, data_Ra, only_int = True)
 
-if show_solution:
-    viz_mode = 0
-    print("\nVisualizing mode: " + str(evp_lmb[viz_mode]))
-    # Get solution vectors
-    nL = res[1]-m+1
-    sol_tor = evp_vec[0:res[0]*nL,viz_mode]
-    sol_pol = evp_vec[res[0]*nL:2*res[0]*nL,viz_mode]
-    sol_t = evp_vec[2*res[0]*nL:3*res[0]*nL,viz_mode]
-    
-    # Create spectrum plots
-    pl.subplot(1,3,1)
-    pl.semilogy(np.abs(sol_tor))
-    pl.title("Toroidal")
-    pl.subplot(1,3,2)
-    pl.semilogy(np.abs(sol_pol))
-    pl.title("Poloidal")
-    pl.subplot(1,3,3)
-    pl.semilogy(np.abs(sol_t))
-    pl.title("T")
-    pl.show()
-    pl.close("all")
+    if marginal_show_curve:
+        # Plot marginal curve and minimum
+        curve.view(data_m, data_Ra, data_freq, minimum = (mc, Rac), plot = True)
+
+if show_spy or solve_gevp:
+    if marginal_show_point:
+        Ra = Rac
+        m = mc
+    else:
+        Ra = eq_params['rayleigh']
+    MarginalCurve.Print("Computing eigenvalues for Ra = " + str(Ra) + ", k = " + str(m))
+    gevp_opts['eigs'] = wave(m)
+    gevp = MarginalCurve.GEVP(**gevp_opts)
+
+if show_spy or write_mtx:
+    gevp.viewOperators(Ra, spy = show_spy, write_mtx = write_mtx)
+
+if solve_gevp:
+    gevp.solve(Ra, 1, with_vectors = True)
+    MarginalCurve.Print("Found eigenvalues:")
+    MarginalCurve.Print(gevp.evp_lmb)
+
+if show_spectra:
+    gevp.viewSpectra(viz_mode, naive = True)
+
+if show_physical:
+    gevp.viewPhysical(viz_mode, 'sphere', naive = True)
